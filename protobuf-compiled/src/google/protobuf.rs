@@ -6,51 +6,49 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::DescriptorProtoSimple as DescriptorProto;
-pub use _puroro_impls::EnumDescriptorProtoSimple as EnumDescriptorProto;
-pub use _puroro_impls::EnumOptionsSimple as EnumOptions;
-pub use _puroro_impls::EnumValueDescriptorProtoSimple as EnumValueDescriptorProto;
-pub use _puroro_impls::EnumValueOptionsSimple as EnumValueOptions;
-pub use _puroro_impls::ExtensionRangeOptionsSimple as ExtensionRangeOptions;
-pub use _puroro_impls::FieldDescriptorProtoSimple as FieldDescriptorProto;
-pub use _puroro_impls::FieldOptionsSimple as FieldOptions;
-pub use _puroro_impls::FileDescriptorProtoSimple as FileDescriptorProto;
-pub use _puroro_impls::FileDescriptorSetSimple as FileDescriptorSet;
-pub use _puroro_impls::FileOptionsSimple as FileOptions;
-pub use _puroro_impls::GeneratedCodeInfoSimple as GeneratedCodeInfo;
-pub use _puroro_impls::MessageOptionsSimple as MessageOptions;
-pub use _puroro_impls::MethodDescriptorProtoSimple as MethodDescriptorProto;
-pub use _puroro_impls::MethodOptionsSimple as MethodOptions;
-pub use _puroro_impls::OneofDescriptorProtoSimple as OneofDescriptorProto;
-pub use _puroro_impls::OneofOptionsSimple as OneofOptions;
-pub use _puroro_impls::ServiceDescriptorProtoSimple as ServiceDescriptorProto;
-pub use _puroro_impls::ServiceOptionsSimple as ServiceOptions;
-pub use _puroro_impls::SourceCodeInfoSimple as SourceCodeInfo;
-pub use _puroro_impls::UninterpretedOptionSimple as UninterpretedOption;
-pub use _puroro_impls::*;
-pub mod _puroro_impls {
+pub use _puroro_simple_impl::DescriptorProto;
+pub use _puroro_simple_impl::EnumDescriptorProto;
+pub use _puroro_simple_impl::EnumOptions;
+pub use _puroro_simple_impl::EnumValueDescriptorProto;
+pub use _puroro_simple_impl::EnumValueOptions;
+pub use _puroro_simple_impl::ExtensionRangeOptions;
+pub use _puroro_simple_impl::FieldDescriptorProto;
+pub use _puroro_simple_impl::FieldOptions;
+pub use _puroro_simple_impl::FileDescriptorProto;
+pub use _puroro_simple_impl::FileDescriptorSet;
+pub use _puroro_simple_impl::FileOptions;
+pub use _puroro_simple_impl::GeneratedCodeInfo;
+pub use _puroro_simple_impl::MessageOptions;
+pub use _puroro_simple_impl::MethodDescriptorProto;
+pub use _puroro_simple_impl::MethodOptions;
+pub use _puroro_simple_impl::OneofDescriptorProto;
+pub use _puroro_simple_impl::OneofOptions;
+pub use _puroro_simple_impl::ServiceDescriptorProto;
+pub use _puroro_simple_impl::ServiceOptions;
+pub use _puroro_simple_impl::SourceCodeInfo;
+pub use _puroro_simple_impl::UninterpretedOption;
+pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
-    pub struct FileDescriptorSetSimple {
+    pub struct FileDescriptorSet {
         pub file: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
         >,
     }
-    impl ::puroro::Message<FileDescriptorSetSimple> for FileDescriptorSetSimple {}
+    impl ::puroro::Message<FileDescriptorSet> for FileDescriptorSet {}
 
-    impl FileDescriptorSetTrait for FileDescriptorSetSimple {
+    impl super::_puroro_traits::FileDescriptorSetTrait for FileDescriptorSet {
         type Field1MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
         type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         >;
 
@@ -59,7 +57,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for FileDescriptorSetSimple {
+    impl ::puroro::MessageRepresentativeImpl for FileDescriptorSet {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
             static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
@@ -69,7 +67,7 @@ pub mod _puroro_impls {
                             name: "file",
                             number: 1,
                             lazy_containing_type: Lazy::new(|| {
-                                <FileDescriptorSetSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                <FileDescriptorSet as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
                         };
                         ::puroro::internal::init_field_descriptor(init)
@@ -86,7 +84,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorSetSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorSet {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -95,7 +93,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FileDescriptorSetSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FileDescriptorSet {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -107,7 +105,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple>
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto>
             >::deser_field(&mut self.file, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -115,7 +113,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorSetSimple {
+    impl ::puroro::SerToIoWrite for FileDescriptorSet {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -124,13 +122,4038 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
                 >,
             >::ser_field(&self.file, 1, out)?;
 
             ::std::result::Result::Ok(())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct FileDescriptorProto {
+        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub dependency: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+        pub public_dependency: ::std::vec::Vec<i32>,
+        pub weak_dependency: ::std::vec::Vec<i32>,
+        pub message_type: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+        >,
+        pub enum_type: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+        >,
+        pub service: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
+        >,
+        pub extension: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+        >,
+        pub options: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
+            >,
+        >,
+        pub source_code_info: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
+            >,
+        >,
+        pub syntax: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    }
+    impl ::puroro::Message<FileDescriptorProto> for FileDescriptorProto {}
+
+    impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        type Field2StringType<'this> = &'this str;
+        fn package<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+            self.package.as_ref().map(|v| v.as_ref())
+        }
+        type Field3StringType<'this> = &'this str;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            str,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
+        >;
+
+        fn dependency<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.dependency.iter())
+        }
+        type Field10RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn public_dependency<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            self.public_dependency.iter().cloned()
+        }
+        type Field11RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn weak_dependency<'this>(&'this self) -> Self::Field11RepeatedType<'this> {
+            self.weak_dependency.iter().cloned()
+        }
+        type Field4MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto;
+        type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+            >,
+        >;
+
+        fn message_type<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.message_type.iter())
+        }
+        type Field5MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto;
+        type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+            >,
+        >;
+
+        fn enum_type<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.enum_type.iter())
+        }
+        type Field6MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto;
+        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
+            >,
+        >;
+
+        fn service<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.service.iter())
+        }
+        type Field7MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
+        type Field7RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+            >,
+        >;
+
+        fn extension<'this>(&'this self) -> Self::Field7RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.extension.iter())
+        }
+        type Field8MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+        type Field9MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo;
+        fn source_code_info<'this>(&'this self) -> Option<Self::Field9MessageType<'this>> {
+            self.source_code_info.as_ref().map(|v| v.as_ref())
+        }
+        type Field12StringType<'this> = &'this str;
+        fn syntax<'this>(&'this self) -> Option<Self::Field12StringType<'this>> {
+            self.syntax.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for FileDescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 12]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "package",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "dependency",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "public_dependency",
+                                number: 10,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "weak_dependency",
+                                number: 11,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "message_type",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "enum_type",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "service",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "extension",
+                                number: 7,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 8,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "source_code_info",
+                                number: 9,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "syntax",
+                                number: 12,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "FileDescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FileDescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.package, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.dependency, data),
+            10 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.public_dependency, data),
+            11 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.weak_dependency, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto>
+            >::deser_field(&mut self.message_type, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto>
+            >::deser_field(&mut self.enum_type, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto>
+            >::deser_field(&mut self.service, data),
+            7 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto>
+            >::deser_field(&mut self.extension, data),
+            8 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions>
+            >::deser_field(&mut self.options, data),
+            9 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo>
+            >::deser_field(&mut self.source_code_info, data),
+            12 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.syntax, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for FileDescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.package,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                &self.dependency,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.public_dependency,
+                10,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.weak_dependency,
+                11,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+                >,
+            >::ser_field(&self.message_type, 4, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+                >,
+            >::ser_field(&self.enum_type, 5, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto>
+        >::ser_field(&self.service, 6, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+                >,
+            >::ser_field(&self.extension, 7, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
+                >,
+            >::ser_field(&self.options, 8, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
+                >,
+            >::ser_field(&self.source_code_info, 9, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.syntax,
+                12,
+                out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct DescriptorProto {
+    pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub field: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto>,
+    pub extension: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto>,
+    pub nested_type: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto>,
+    pub enum_type: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto>,
+    pub extension_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>,
+    pub oneof_decl: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions>>,
+    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>,
+    pub reserved_name: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+}
+    impl ::puroro::Message<DescriptorProto> for DescriptorProto {}
+
+    impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        type Field2MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
+        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+            >,
+        >;
+
+        fn field<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.field.iter())
+        }
+        type Field6MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
+        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+            >,
+        >;
+
+        fn extension<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.extension.iter())
+        }
+        type Field3MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+            >,
+        >;
+
+        fn nested_type<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.nested_type.iter())
+        }
+        type Field4MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto;
+        type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+            >,
+        >;
+
+        fn enum_type<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.enum_type.iter())
+        }
+        type Field5MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange;
+        type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>>;
+
+        fn extension_range<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.extension_range.iter())
+        }
+        type Field8MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto;
+        type Field8RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
+            >,
+        >;
+
+        fn oneof_decl<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.oneof_decl.iter())
+        }
+        type Field7MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+        type Field9MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange;
+        type Field9RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>>;
+
+        fn reserved_range<'this>(&'this self) -> Self::Field9RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_range.iter())
+        }
+        type Field10StringType<'this> = &'this str;
+        type Field10RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            str,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
+        >;
+
+        fn reserved_name<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_name.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for DescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 10]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "field",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "extension",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "nested_type",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "enum_type",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "extension_range",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "oneof_decl",
+                                number: 8,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 7,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "reserved_range",
+                                number: 9,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "reserved_name",
+                                number: 10,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <DescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "DescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for DescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for DescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto>
+            >::deser_field(&mut self.field, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto>
+            >::deser_field(&mut self.extension, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto>
+            >::deser_field(&mut self.nested_type, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto>
+            >::deser_field(&mut self.enum_type, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>
+            >::deser_field(&mut self.extension_range, data),
+            8 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto>
+            >::deser_field(&mut self.oneof_decl, data),
+            7 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions>
+            >::deser_field(&mut self.options, data),
+            9 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>
+            >::deser_field(&mut self.reserved_range, data),
+            10 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.reserved_name, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for DescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+                >,
+            >::ser_field(&self.field, 2, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+                >,
+            >::ser_field(&self.extension, 6, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+                >,
+            >::ser_field(&self.nested_type, 3, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+                >,
+            >::ser_field(&self.enum_type, 4, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>
+        >::ser_field(&self.extension_range, 5, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
+                >,
+            >::ser_field(&self.oneof_decl, 8, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
+                >,
+            >::ser_field(&self.options, 7, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>
+        >::ser_field(&self.reserved_range, 9, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                &self.reserved_name,
+                10,
+                out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct ExtensionRangeOptions {
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<ExtensionRangeOptions> for ExtensionRangeOptions {}
+
+    impl super::_puroro_traits::ExtensionRangeOptionsTrait for ExtensionRangeOptions {
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for ExtensionRangeOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "uninterpreted_option",
+                            number: 999,
+                            lazy_containing_type: Lazy::new(|| {
+                                <ExtensionRangeOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "ExtensionRangeOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRangeOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for ExtensionRangeOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for ExtensionRangeOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct FieldDescriptorProto {
+        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub number: ::std::option::Option<i32>,
+        pub label: ::std::option::Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+        >,
+        pub type_: ::std::option::Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+        >,
+        pub type_name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub extendee: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub default_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub oneof_index: ::std::option::Option<i32>,
+        pub json_name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub options: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
+            >,
+        >,
+        pub proto3_optional: ::std::option::Option<bool>,
+    }
+    impl ::puroro::Message<FieldDescriptorProto> for FieldDescriptorProto {}
+
+    impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        fn number<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.number)
+        }
+        fn label<'this>(
+            &'this self,
+        ) -> Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+        > {
+            Clone::clone(&self.label)
+        }
+        fn type_<'this>(
+            &'this self,
+        ) -> Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+        > {
+            Clone::clone(&self.type_)
+        }
+        type Field6StringType<'this> = &'this str;
+        fn type_name<'this>(&'this self) -> Option<Self::Field6StringType<'this>> {
+            self.type_name.as_ref().map(|v| v.as_ref())
+        }
+        type Field2StringType<'this> = &'this str;
+        fn extendee<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+            self.extendee.as_ref().map(|v| v.as_ref())
+        }
+        type Field7StringType<'this> = &'this str;
+        fn default_value<'this>(&'this self) -> Option<Self::Field7StringType<'this>> {
+            self.default_value.as_ref().map(|v| v.as_ref())
+        }
+        fn oneof_index<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.oneof_index)
+        }
+        type Field10StringType<'this> = &'this str;
+        fn json_name<'this>(&'this self) -> Option<Self::Field10StringType<'this>> {
+            self.json_name.as_ref().map(|v| v.as_ref())
+        }
+        type Field8MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+        fn proto3_optional<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.proto3_optional)
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for FieldDescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 11]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "number",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "label",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "type",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "type_name",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "extendee",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "default_value",
+                                number: 7,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "oneof_index",
+                                number: 9,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "json_name",
+                                number: 10,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 8,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "proto3_optional",
+                                number: 17,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "FieldDescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for FieldDescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FieldDescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.number, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
+            >::deser_field(&mut self.label, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
+            >::deser_field(&mut self.type_, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.type_name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.extendee, data),
+            7 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.default_value, data),
+            9 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.oneof_index, data),
+            10 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.json_name, data),
+            8 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions>
+            >::deser_field(&mut self.options, data),
+            17 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.proto3_optional, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for FieldDescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.number,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
+        >::ser_field(&self.label, 4, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
+        >::ser_field(&self.type_, 5, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.type_name,
+                6,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.extendee,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.default_value,
+                7,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.oneof_index,
+                9,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.json_name,
+                10,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
+                >,
+            >::ser_field(&self.options, 8, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.proto3_optional,
+                17,
+                out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct OneofDescriptorProto {
+        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub options: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
+            >,
+        >,
+    }
+    impl ::puroro::Message<OneofDescriptorProto> for OneofDescriptorProto {}
+
+    impl super::_puroro_traits::OneofDescriptorProtoTrait for OneofDescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        type Field2MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field2MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for OneofDescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <OneofDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <OneofDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "OneofDescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for OneofDescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for OneofDescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions>
+            >::deser_field(&mut self.options, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for OneofDescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
+                >,
+            >::ser_field(&self.options, 2, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct EnumDescriptorProto {
+    pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions>>,
+    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>,
+    pub reserved_name: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+}
+    impl ::puroro::Message<EnumDescriptorProto> for EnumDescriptorProto {}
+
+    impl super::_puroro_traits::EnumDescriptorProtoTrait for EnumDescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto;
+        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
+            >,
+        >;
+
+        fn value<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.value.iter())
+        }
+        type Field3MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+        type Field4MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange;
+        type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+    self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>>;
+
+        fn reserved_range<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_range.iter())
+        }
+        type Field5StringType<'this> = &'this str;
+        type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            str,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
+        >;
+
+        fn reserved_name<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_name.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for EnumDescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 5]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "value",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "reserved_range",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "reserved_name",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "EnumDescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumDescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumDescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto>
+            >::deser_field(&mut self.value, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions>
+            >::deser_field(&mut self.options, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>
+            >::deser_field(&mut self.reserved_range, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.reserved_name, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for EnumDescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto>
+        >::ser_field(&self.value, 2, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
+                >,
+            >::ser_field(&self.options, 3, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>
+        >::ser_field(&self.reserved_range, 4, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                &self.reserved_name,
+                5,
+                out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct EnumValueDescriptorProto {
+        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub number: ::std::option::Option<i32>,
+        pub options: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
+            >,
+        >,
+    }
+    impl ::puroro::Message<EnumValueDescriptorProto> for EnumValueDescriptorProto {}
+
+    impl super::_puroro_traits::EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        fn number<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.number)
+        }
+        type Field3MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for EnumValueDescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumValueDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "number",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumValueDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumValueDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "EnumValueDescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueDescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumValueDescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.number, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions>
+            >::deser_field(&mut self.options, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for EnumValueDescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.number,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
+                >,
+            >::ser_field(&self.options, 3, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct ServiceDescriptorProto {
+        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub method: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
+        >,
+        pub options: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
+            >,
+        >,
+    }
+    impl ::puroro::Message<ServiceDescriptorProto> for ServiceDescriptorProto {}
+
+    impl super::_puroro_traits::ServiceDescriptorProtoTrait for ServiceDescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        type Field2MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto;
+        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
+            >,
+        >;
+
+        fn method<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.method.iter())
+        }
+        type Field3MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for ServiceDescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <ServiceDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "method",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <ServiceDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <ServiceDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "ServiceDescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceDescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for ServiceDescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto>
+            >::deser_field(&mut self.method, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions>
+            >::deser_field(&mut self.options, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for ServiceDescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto>
+        >::ser_field(&self.method, 2, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
+                >,
+            >::ser_field(&self.options, 3, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct MethodDescriptorProto {
+        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub input_type: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub output_type: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub options: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
+            >,
+        >,
+        pub client_streaming: ::std::option::Option<bool>,
+        pub server_streaming: ::std::option::Option<bool>,
+    }
+    impl ::puroro::Message<MethodDescriptorProto> for MethodDescriptorProto {}
+
+    impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProto {
+        type Field1StringType<'this> = &'this str;
+        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.name.as_ref().map(|v| v.as_ref())
+        }
+        type Field2StringType<'this> = &'this str;
+        fn input_type<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+            self.input_type.as_ref().map(|v| v.as_ref())
+        }
+        type Field3StringType<'this> = &'this str;
+        fn output_type<'this>(&'this self) -> Option<Self::Field3StringType<'this>> {
+            self.output_type.as_ref().map(|v| v.as_ref())
+        }
+        type Field4MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions;
+        fn options<'this>(&'this self) -> Option<Self::Field4MessageType<'this>> {
+            self.options.as_ref().map(|v| v.as_ref())
+        }
+        fn client_streaming<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.client_streaming)
+        }
+        fn server_streaming<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.server_streaming)
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for MethodDescriptorProto {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 6]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "input_type",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "output_type",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "options",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "client_streaming",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "server_streaming",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodDescriptorProto as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "MethodDescriptorProto",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for MethodDescriptorProto {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MethodDescriptorProto {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.name, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.input_type, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.output_type, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions>
+            >::deser_field(&mut self.options, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.client_streaming, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.server_streaming, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MethodDescriptorProto {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.name, 1, out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.input_type,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.output_type,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
+                >,
+            >::ser_field(&self.options, 4, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.client_streaming,
+                5,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.server_streaming,
+                6,
+                out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct FileOptions {
+        pub java_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub java_outer_classname: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub java_multiple_files: ::std::option::Option<bool>,
+        pub java_generate_equals_and_hash: ::std::option::Option<bool>,
+        pub java_string_check_utf8: ::std::option::Option<bool>,
+        pub optimize_for: ::std::option::Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
+        >,
+        pub go_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub cc_generic_services: ::std::option::Option<bool>,
+        pub java_generic_services: ::std::option::Option<bool>,
+        pub py_generic_services: ::std::option::Option<bool>,
+        pub php_generic_services: ::std::option::Option<bool>,
+        pub deprecated: ::std::option::Option<bool>,
+        pub cc_enable_arenas: ::std::option::Option<bool>,
+        pub objc_class_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub csharp_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub swift_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub php_class_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub php_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub php_metadata_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub ruby_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<FileOptions> for FileOptions {}
+
+    impl super::_puroro_traits::FileOptionsTrait for FileOptions {
+        type Field1StringType<'this> = &'this str;
+        fn java_package<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.java_package.as_ref().map(|v| v.as_ref())
+        }
+        type Field8StringType<'this> = &'this str;
+        fn java_outer_classname<'this>(&'this self) -> Option<Self::Field8StringType<'this>> {
+            self.java_outer_classname.as_ref().map(|v| v.as_ref())
+        }
+        fn java_multiple_files<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.java_multiple_files)
+        }
+        fn java_generate_equals_and_hash<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.java_generate_equals_and_hash)
+        }
+        fn java_string_check_utf8<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.java_string_check_utf8)
+        }
+        fn optimize_for<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
+        {
+            Clone::clone(&self.optimize_for)
+        }
+        type Field11StringType<'this> = &'this str;
+        fn go_package<'this>(&'this self) -> Option<Self::Field11StringType<'this>> {
+            self.go_package.as_ref().map(|v| v.as_ref())
+        }
+        fn cc_generic_services<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.cc_generic_services)
+        }
+        fn java_generic_services<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.java_generic_services)
+        }
+        fn py_generic_services<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.py_generic_services)
+        }
+        fn php_generic_services<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.php_generic_services)
+        }
+        fn deprecated<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.deprecated)
+        }
+        fn cc_enable_arenas<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.cc_enable_arenas)
+        }
+        type Field36StringType<'this> = &'this str;
+        fn objc_class_prefix<'this>(&'this self) -> Option<Self::Field36StringType<'this>> {
+            self.objc_class_prefix.as_ref().map(|v| v.as_ref())
+        }
+        type Field37StringType<'this> = &'this str;
+        fn csharp_namespace<'this>(&'this self) -> Option<Self::Field37StringType<'this>> {
+            self.csharp_namespace.as_ref().map(|v| v.as_ref())
+        }
+        type Field39StringType<'this> = &'this str;
+        fn swift_prefix<'this>(&'this self) -> Option<Self::Field39StringType<'this>> {
+            self.swift_prefix.as_ref().map(|v| v.as_ref())
+        }
+        type Field40StringType<'this> = &'this str;
+        fn php_class_prefix<'this>(&'this self) -> Option<Self::Field40StringType<'this>> {
+            self.php_class_prefix.as_ref().map(|v| v.as_ref())
+        }
+        type Field41StringType<'this> = &'this str;
+        fn php_namespace<'this>(&'this self) -> Option<Self::Field41StringType<'this>> {
+            self.php_namespace.as_ref().map(|v| v.as_ref())
+        }
+        type Field44StringType<'this> = &'this str;
+        fn php_metadata_namespace<'this>(&'this self) -> Option<Self::Field44StringType<'this>> {
+            self.php_metadata_namespace.as_ref().map(|v| v.as_ref())
+        }
+        type Field45StringType<'this> = &'this str;
+        fn ruby_package<'this>(&'this self) -> Option<Self::Field45StringType<'this>> {
+            self.ruby_package.as_ref().map(|v| v.as_ref())
+        }
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for FileOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 21]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "java_package",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "java_outer_classname",
+                                number: 8,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "java_multiple_files",
+                                number: 10,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "java_generate_equals_and_hash",
+                                number: 20,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "java_string_check_utf8",
+                                number: 27,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "optimize_for",
+                                number: 9,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "go_package",
+                                number: 11,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "cc_generic_services",
+                                number: 16,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "java_generic_services",
+                                number: 17,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "py_generic_services",
+                                number: 18,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "php_generic_services",
+                                number: 42,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "deprecated",
+                                number: 23,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "cc_enable_arenas",
+                                number: 31,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "objc_class_prefix",
+                                number: 36,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "csharp_namespace",
+                                number: 37,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "swift_prefix",
+                                number: 39,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "php_class_prefix",
+                                number: 40,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "php_namespace",
+                                number: 41,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "php_metadata_namespace",
+                                number: 44,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "ruby_package",
+                                number: 45,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "uninterpreted_option",
+                                number: 999,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FileOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "FileOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for FileOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FileOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.java_package, data),
+            8 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.java_outer_classname, data),
+            10 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.java_multiple_files, data),
+            20 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.java_generate_equals_and_hash, data),
+            27 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.java_string_check_utf8, data),
+            9 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
+            >::deser_field(&mut self.optimize_for, data),
+            11 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.go_package, data),
+            16 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.cc_generic_services, data),
+            17 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.java_generic_services, data),
+            18 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.py_generic_services, data),
+            42 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.php_generic_services, data),
+            23 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.deprecated, data),
+            31 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.cc_enable_arenas, data),
+            36 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.objc_class_prefix, data),
+            37 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.csharp_namespace, data),
+            39 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.swift_prefix, data),
+            40 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.php_class_prefix, data),
+            41 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.php_namespace, data),
+            44 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.php_metadata_namespace, data),
+            45 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.ruby_package, data),
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for FileOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.java_package,
+                1,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.java_outer_classname,
+                8,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.java_multiple_files,
+                10,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.java_generate_equals_and_hash,
+                20,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.java_string_check_utf8,
+                27,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
+        >::ser_field(&self.optimize_for, 9, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.go_package,
+                11,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.cc_generic_services,
+                16,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.java_generic_services,
+                17,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.py_generic_services,
+                18,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.php_generic_services,
+                42,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.deprecated,
+                23,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.cc_enable_arenas,
+                31,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.objc_class_prefix,
+                36,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.csharp_namespace,
+                37,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.swift_prefix,
+                39,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.php_class_prefix,
+                40,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.php_namespace,
+                41,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.php_metadata_namespace,
+                44,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.ruby_package,
+                45,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct MessageOptions {
+        pub message_set_wire_format: ::std::option::Option<bool>,
+        pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
+        pub deprecated: ::std::option::Option<bool>,
+        pub map_entry: ::std::option::Option<bool>,
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<MessageOptions> for MessageOptions {}
+
+    impl super::_puroro_traits::MessageOptionsTrait for MessageOptions {
+        fn message_set_wire_format<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.message_set_wire_format)
+        }
+        fn no_standard_descriptor_accessor<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.no_standard_descriptor_accessor)
+        }
+        fn deprecated<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.deprecated)
+        }
+        fn map_entry<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.map_entry)
+        }
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for MessageOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 5]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "message_set_wire_format",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MessageOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "no_standard_descriptor_accessor",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MessageOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "deprecated",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MessageOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "map_entry",
+                                number: 7,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MessageOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "uninterpreted_option",
+                                number: 999,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MessageOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "MessageOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for MessageOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MessageOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.message_set_wire_format, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.no_standard_descriptor_accessor, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.deprecated, data),
+            7 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.map_entry, data),
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MessageOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.message_set_wire_format,
+                1,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.no_standard_descriptor_accessor,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.deprecated,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.map_entry,
+                7,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct FieldOptions {
+        pub ctype: ::std::option::Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+        >,
+        pub packed: ::std::option::Option<bool>,
+        pub jstype: ::std::option::Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+        >,
+        pub lazy: ::std::option::Option<bool>,
+        pub deprecated: ::std::option::Option<bool>,
+        pub weak: ::std::option::Option<bool>,
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<FieldOptions> for FieldOptions {}
+
+    impl super::_puroro_traits::FieldOptionsTrait for FieldOptions {
+        fn ctype<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype>
+        {
+            Clone::clone(&self.ctype)
+        }
+        fn packed<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.packed)
+        }
+        fn jstype<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype>
+        {
+            Clone::clone(&self.jstype)
+        }
+        fn lazy<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.lazy)
+        }
+        fn deprecated<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.deprecated)
+        }
+        fn weak<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.weak)
+        }
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for FieldOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 7]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "ctype",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "packed",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "jstype",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "lazy",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "deprecated",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "weak",
+                                number: 10,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "uninterpreted_option",
+                                number: 999,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <FieldOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "FieldOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for FieldOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FieldOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype>
+            >::deser_field(&mut self.ctype, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.packed, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype>
+            >::deser_field(&mut self.jstype, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.lazy, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.deprecated, data),
+            10 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.weak, data),
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for FieldOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<
+                    self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+                >,
+            >::ser_field(&self.ctype, 1, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.packed,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<
+                    self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+                >,
+            >::ser_field(&self.jstype, 6, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.lazy, 5, out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.deprecated,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.weak, 10, out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct OneofOptions {
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<OneofOptions> for OneofOptions {}
+
+    impl super::_puroro_traits::OneofOptionsTrait for OneofOptions {
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for OneofOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "uninterpreted_option",
+                            number: 999,
+                            lazy_containing_type: Lazy::new(|| {
+                                <OneofOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "OneofOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for OneofOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for OneofOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for OneofOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct EnumOptions {
+        pub allow_alias: ::std::option::Option<bool>,
+        pub deprecated: ::std::option::Option<bool>,
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<EnumOptions> for EnumOptions {}
+
+    impl super::_puroro_traits::EnumOptionsTrait for EnumOptions {
+        fn allow_alias<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.allow_alias)
+        }
+        fn deprecated<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.deprecated)
+        }
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for EnumOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "allow_alias",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "deprecated",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "uninterpreted_option",
+                                number: 999,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumOptions as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "EnumOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.allow_alias, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.deprecated, data),
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for EnumOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.allow_alias,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.deprecated,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct EnumValueOptions {
+        pub deprecated: ::std::option::Option<bool>,
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<EnumValueOptions> for EnumValueOptions {}
+
+    impl super::_puroro_traits::EnumValueOptionsTrait for EnumValueOptions {
+        fn deprecated<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.deprecated)
+        }
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for EnumValueOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "deprecated",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumValueOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "uninterpreted_option",
+                                number: 999,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <EnumValueOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "EnumValueOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumValueOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.deprecated, data),
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for EnumValueOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.deprecated,
+                1,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct ServiceOptions {
+        pub deprecated: ::std::option::Option<bool>,
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<ServiceOptions> for ServiceOptions {}
+
+    impl super::_puroro_traits::ServiceOptionsTrait for ServiceOptions {
+        fn deprecated<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.deprecated)
+        }
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for ServiceOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "deprecated",
+                                number: 33,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <ServiceOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "uninterpreted_option",
+                                number: 999,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <ServiceOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "ServiceOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for ServiceOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            33 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.deprecated, data),
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for ServiceOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.deprecated,
+                33,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct MethodOptions {
+        pub deprecated: ::std::option::Option<bool>,
+        pub idempotency_level: ::std::option::Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
+        >,
+        pub uninterpreted_option: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+        >,
+    }
+    impl ::puroro::Message<MethodOptions> for MethodOptions {}
+
+    impl super::_puroro_traits::MethodOptionsTrait for MethodOptions {
+        fn deprecated<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.deprecated)
+        }
+        fn idempotency_level<'this>(
+            &'this self,
+        ) -> Option<
+            self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
+        > {
+            Clone::clone(&self.idempotency_level)
+        }
+        type Field999MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
+        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+            >,
+        >;
+
+        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for MethodOptions {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "deprecated",
+                                number: 33,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "idempotency_level",
+                                number: 34,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "uninterpreted_option",
+                                number: 999,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MethodOptions as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "MethodOptions",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for MethodOptions {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MethodOptions {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            33 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.deprecated, data),
+            34 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
+            >::deser_field(&mut self.idempotency_level, data),
+            999 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption>
+            >::deser_field(&mut self.uninterpreted_option, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MethodOptions {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.deprecated,
+                33,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
+        >::ser_field(&self.idempotency_level, 34, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                >,
+            >::ser_field(&self.uninterpreted_option, 999, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct UninterpretedOption {
+    pub name: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>,
+    pub identifier_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub positive_int_value: ::std::option::Option<u64>,
+    pub negative_int_value: ::std::option::Option<i64>,
+    pub double_value: ::std::option::Option<f64>,
+    pub string_value: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
+    pub aggregate_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+}
+    impl ::puroro::Message<UninterpretedOption> for UninterpretedOption {}
+
+    impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOption {
+        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart;
+        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+    self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>>;
+
+        fn name<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.name.iter())
+        }
+        type Field3StringType<'this> = &'this str;
+        fn identifier_value<'this>(&'this self) -> Option<Self::Field3StringType<'this>> {
+            self.identifier_value.as_ref().map(|v| v.as_ref())
+        }
+        fn positive_int_value<'this>(&'this self) -> Option<u64> {
+            Clone::clone(&self.positive_int_value)
+        }
+        fn negative_int_value<'this>(&'this self) -> Option<i64> {
+            Clone::clone(&self.negative_int_value)
+        }
+        fn double_value<'this>(&'this self) -> Option<f64> {
+            Clone::clone(&self.double_value)
+        }
+        type Field7BytesType<'this> = &'this [u8];
+        fn string_value<'this>(&'this self) -> Option<Self::Field7BytesType<'this>> {
+            self.string_value.as_ref().map(|v| v.as_ref())
+        }
+        type Field8StringType<'this> = &'this str;
+        fn aggregate_value<'this>(&'this self) -> Option<Self::Field8StringType<'this>> {
+            self.aggregate_value.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for UninterpretedOption {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 7]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "name",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <UninterpretedOption as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "identifier_value",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <UninterpretedOption as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "positive_int_value",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <UninterpretedOption as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "negative_int_value",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <UninterpretedOption as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "double_value",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <UninterpretedOption as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_value",
+                                number: 7,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <UninterpretedOption as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "aggregate_value",
+                                number: 8,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <UninterpretedOption as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "UninterpretedOption",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for UninterpretedOption {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for UninterpretedOption {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>
+            >::deser_field(&mut self.name, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.identifier_value, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::UInt64
+            >::deser_field(&mut self.positive_int_value, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int64
+            >::deser_field(&mut self.negative_int_value, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Double
+            >::deser_field(&mut self.double_value, data),
+            7 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.string_value, data),
+            8 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.aggregate_value, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for UninterpretedOption {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>
+        >::ser_field(&self.name, 2, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.identifier_value,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
+                &self.positive_int_value,
+                4,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
+                &self.negative_int_value,
+                5,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field(
+                &self.double_value,
+                6,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.string_value,
+                7,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.aggregate_value,
+                8,
+                out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct SourceCodeInfo {
+    pub location: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>,
+}
+    impl ::puroro::Message<SourceCodeInfo> for SourceCodeInfo {}
+
+    impl super::_puroro_traits::SourceCodeInfoTrait for SourceCodeInfo {
+        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location;
+        type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+    self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>>;
+
+        fn location<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.location.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for SourceCodeInfo {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "location",
+                            number: 1,
+                            lazy_containing_type: Lazy::new(|| {
+                                <SourceCodeInfo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                )
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "SourceCodeInfo",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for SourceCodeInfo {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for SourceCodeInfo {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>
+            >::deser_field(&mut self.location, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for SourceCodeInfo {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>
+        >::ser_field(&self.location, 1, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct GeneratedCodeInfo {
+    pub annotation: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>,
+}
+    impl ::puroro::Message<GeneratedCodeInfo> for GeneratedCodeInfo {}
+
+    impl super::_puroro_traits::GeneratedCodeInfoTrait for GeneratedCodeInfo {
+        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation;
+        type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+    self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>>;
+
+        fn annotation<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.annotation.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for GeneratedCodeInfo {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "annotation",
+                            number: 1,
+                            lazy_containing_type: Lazy::new(|| {
+                                <GeneratedCodeInfo as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "GeneratedCodeInfo",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for GeneratedCodeInfo {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for GeneratedCodeInfo {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>
+            >::deser_field(&mut self.annotation, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for GeneratedCodeInfo {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>
+        >::ser_field(&self.annotation, 1, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+}
+
+pub use _puroro_impls::*;
+pub mod _puroro_impls {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    use super::_puroro_traits::*;
     impl FileDescriptorSetTrait for () {
         type Field1MessageType<'this> = ();
         type Field1RepeatedType<'this> =
@@ -205,20 +4228,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileDescriptorSetSimpleField1 {
         pub file: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<FileDescriptorSetSimple> for FileDescriptorSetSimpleField1 {}
+    impl ::puroro::Message<super::FileDescriptorSet> for FileDescriptorSetSimpleField1 {}
 
     impl super::_puroro_traits::FileDescriptorSetTrait for FileDescriptorSetSimpleField1 {
         type Field1MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
         type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         >;
 
@@ -236,7 +4259,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
                 >,
             >::ser_field(&self.file, 1, out)?;
             ::std::result::Result::Ok(())
@@ -246,13 +4269,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         > for FileDescriptorSetSimpleField1
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         ) -> Self {
             Self { file: value }
@@ -262,11 +4285,11 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct FileDescriptorSetSimpleByValue {}
-    impl ::puroro::Message<FileDescriptorSetSimple> for FileDescriptorSetSimpleByValue {}
+    impl ::puroro::Message<super::FileDescriptorSet> for FileDescriptorSetSimpleByValue {}
 
     impl FileDescriptorSetTrait for FileDescriptorSetSimpleByValue {
         type Field1MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
         >;
         type Field1RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1MessageType<'this>>;
@@ -283,7 +4306,7 @@ pub mod _puroro_impls {
         pub fn append_file(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         ) -> FileDescriptorSetBuilder<(T, FileDescriptorSetSimpleField1)> {
             FileDescriptorSetBuilder((self.0, ::std::convert::From::from(value)))
@@ -297,408 +4320,6 @@ pub mod _puroro_impls {
     impl FileDescriptorSetBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct FileDescriptorProtoSimple {
-        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub dependency: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
-        pub public_dependency: ::std::vec::Vec<i32>,
-        pub weak_dependency: ::std::vec::Vec<i32>,
-        pub message_type: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
-        >,
-        pub enum_type: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
-        >,
-        pub service: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
-        >,
-        pub extension: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-        >,
-        pub options: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
-            >,
-        >,
-        pub source_code_info: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
-            >,
-        >,
-        pub syntax: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-    }
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimple {}
-
-    impl FileDescriptorProtoTrait for FileDescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        type Field2StringType<'this> = &'this str;
-        fn package<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.package.as_ref().map(|v| v.as_ref())
-        }
-        type Field3StringType<'this> = &'this str;
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            str,
-            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
-        >;
-
-        fn dependency<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.dependency.iter())
-        }
-        type Field10RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
-
-        fn public_dependency<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            self.public_dependency.iter().cloned()
-        }
-        type Field11RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
-
-        fn weak_dependency<'this>(&'this self) -> Self::Field11RepeatedType<'this> {
-            self.weak_dependency.iter().cloned()
-        }
-        type Field4MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple;
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
-            >,
-        >;
-
-        fn message_type<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.message_type.iter())
-        }
-        type Field5MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple;
-        type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
-            >,
-        >;
-
-        fn enum_type<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.enum_type.iter())
-        }
-        type Field6MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple;
-        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
-            >,
-        >;
-
-        fn service<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.service.iter())
-        }
-        type Field7MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple;
-        type Field7RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-            >,
-        >;
-
-        fn extension<'this>(&'this self) -> Self::Field7RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.extension.iter())
-        }
-        type Field8MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-        type Field9MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple;
-        fn source_code_info<'this>(&'this self) -> Option<Self::Field9MessageType<'this>> {
-            self.source_code_info.as_ref().map(|v| v.as_ref())
-        }
-        type Field12StringType<'this> = &'this str;
-        fn syntax<'this>(&'this self) -> Option<Self::Field12StringType<'this>> {
-            self.syntax.as_ref().map(|v| v.as_ref())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for FileDescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 12]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "package",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "dependency",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "public_dependency",
-                                number: 10,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "weak_dependency",
-                                number: 11,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "message_type",
-                                number: 4,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "enum_type",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "service",
-                                number: 6,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "extension",
-                                number: 7,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 8,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "source_code_info",
-                                number: 9,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "syntax",
-                                number: 12,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "FileDescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FileDescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.package, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::String
-            >::deser_field(&mut self.dependency, data),
-            10 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.public_dependency, data),
-            11 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.weak_dependency, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple>
-            >::deser_field(&mut self.message_type, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple>
-            >::deser_field(&mut self.enum_type, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple>
-            >::deser_field(&mut self.service, data),
-            7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple>
-            >::deser_field(&mut self.extension, data),
-            8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple>
-            >::deser_field(&mut self.options, data),
-            9 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple>
-            >::deser_field(&mut self.source_code_info, data),
-            12 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.syntax, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.package,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.dependency,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.public_dependency,
-                10,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.weak_dependency,
-                11,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
-                >,
-            >::ser_field(&self.message_type, 4, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
-                >,
-            >::ser_field(&self.enum_type, 5, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple>
-        >::ser_field(&self.service, 6, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-                >,
-            >::ser_field(&self.extension, 7, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
-                >,
-            >::ser_field(&self.options, 8, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
-                >,
-            >::ser_field(&self.source_code_info, 9, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.syntax,
-                12,
-                out,
-            )?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl FileDescriptorProtoTrait for () {
@@ -1207,7 +4828,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -1284,7 +4905,7 @@ pub mod _puroro_impls {
         pub package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
@@ -1363,7 +4984,7 @@ pub mod _puroro_impls {
         pub dependency: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField3 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField3 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField3 {
         type Field1StringType<'this> = &'static str;
@@ -1442,7 +5063,7 @@ pub mod _puroro_impls {
         pub public_dependency: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField10 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField10 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField10 {
         type Field1StringType<'this> = &'static str;
@@ -1519,7 +5140,7 @@ pub mod _puroro_impls {
         pub weak_dependency: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField11 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField11 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField11 {
         type Field1StringType<'this> = &'static str;
@@ -1594,11 +5215,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileDescriptorProtoSimpleField4 {
         pub message_type: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField4 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField4 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField4 {
         type Field1StringType<'this> = &'static str;
@@ -1618,12 +5239,12 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field4MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto;
         type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         >;
 
@@ -1662,7 +5283,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
                 >,
             >::ser_field(&self.message_type, 4, out)?;
             ::std::result::Result::Ok(())
@@ -1672,13 +5293,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         > for FileDescriptorProtoSimpleField4
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         ) -> Self {
             Self {
@@ -1690,11 +5311,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileDescriptorProtoSimpleField5 {
         pub enum_type: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField5 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField5 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField5 {
         type Field1StringType<'this> = &'static str;
@@ -1720,12 +5341,12 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field5MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto;
         type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         >;
 
@@ -1758,7 +5379,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
                 >,
             >::ser_field(&self.enum_type, 5, out)?;
             ::std::result::Result::Ok(())
@@ -1768,13 +5389,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         > for FileDescriptorProtoSimpleField5
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         ) -> Self {
             Self { enum_type: value }
@@ -1784,11 +5405,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileDescriptorProtoSimpleField6 {
         pub service: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField6 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField6 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField6 {
         type Field1StringType<'this> = &'static str;
@@ -1819,12 +5440,12 @@ pub mod _puroro_impls {
         fn enum_type<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple;
+        type Field6MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto;
         type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
             >,
         >;
 
@@ -1849,7 +5470,7 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto>
         >::ser_field(&self.service, 6, out)?;
             ::std::result::Result::Ok(())
         }
@@ -1858,13 +5479,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
             >,
         > for FileDescriptorProtoSimpleField6
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
             >,
         ) -> Self {
             Self { service: value }
@@ -1874,11 +5495,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileDescriptorProtoSimpleField7 {
         pub extension: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField7 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField7 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField7 {
         type Field1StringType<'this> = &'static str;
@@ -1916,12 +5537,12 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field7MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
         type Field7RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         >;
 
@@ -1942,7 +5563,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
                 >,
             >::ser_field(&self.extension, 7, out)?;
             ::std::result::Result::Ok(())
@@ -1952,13 +5573,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         > for FileDescriptorProtoSimpleField7
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         ) -> Self {
             Self { extension: value }
@@ -1969,12 +5590,12 @@ pub mod _puroro_impls {
     pub struct FileDescriptorProtoSimpleField8 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField8 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField8 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField8 {
         type Field1StringType<'this> = &'static str;
@@ -2018,7 +5639,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field8MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions;
         fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -2035,7 +5656,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
                 >,
             >::ser_field(&self.options, 8, out)?;
             ::std::result::Result::Ok(())
@@ -2046,7 +5667,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
                 >,
             >,
         > for FileDescriptorProtoSimpleField8
@@ -2054,7 +5675,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
                 >,
             >,
         ) -> Self {
@@ -2066,12 +5687,12 @@ pub mod _puroro_impls {
     pub struct FileDescriptorProtoSimpleField9 {
         pub source_code_info: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
             >,
         >,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField9 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField9 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField9 {
         type Field1StringType<'this> = &'static str;
@@ -2116,7 +5737,7 @@ pub mod _puroro_impls {
         }
         type Field8MessageType<'this> = ();
         type Field9MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo;
         fn source_code_info<'this>(&'this self) -> Option<Self::Field9MessageType<'this>> {
             self.source_code_info.as_ref().map(|v| v.as_ref())
         }
@@ -2132,7 +5753,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
                 >,
             >::ser_field(&self.source_code_info, 9, out)?;
             ::std::result::Result::Ok(())
@@ -2143,7 +5764,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
                 >,
             >,
         > for FileDescriptorProtoSimpleField9
@@ -2151,7 +5772,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
                 >,
             >,
         ) -> Self {
@@ -2166,7 +5787,7 @@ pub mod _puroro_impls {
         pub syntax: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleField12 {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleField12 {}
 
     impl super::_puroro_traits::FileDescriptorProtoTrait for FileDescriptorProtoSimpleField12 {
         type Field1StringType<'this> = &'static str;
@@ -2243,7 +5864,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct FileDescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<FileDescriptorProtoSimple> for FileDescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::FileDescriptorProto> for FileDescriptorProtoSimpleByValue {}
 
     impl FileDescriptorProtoTrait for FileDescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -2269,7 +5890,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field4MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
         >;
         type Field4RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field4MessageType<'this>>;
@@ -2277,7 +5898,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field5MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
         >;
         type Field5RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field5MessageType<'this>>;
@@ -2285,7 +5906,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field6MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
         >;
         type Field6RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field6MessageType<'this>>;
@@ -2293,7 +5914,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field7MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
         >;
         type Field7RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field7MessageType<'this>>;
@@ -2301,13 +5922,13 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field8MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field9MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
         >;
         fn source_code_info<'this>(&'this self) -> Option<Self::Field9MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
@@ -2356,7 +5977,7 @@ pub mod _puroro_impls {
         pub fn append_message_type(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSimpleField4)> {
             FileDescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -2364,7 +5985,7 @@ pub mod _puroro_impls {
         pub fn append_enum_type(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSimpleField5)> {
             FileDescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -2372,7 +5993,7 @@ pub mod _puroro_impls {
         pub fn append_service(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::ServiceDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto,
             >,
         ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSimpleField6)> {
             FileDescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -2380,7 +6001,7 @@ pub mod _puroro_impls {
         pub fn append_extension(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSimpleField7)> {
             FileDescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -2389,7 +6010,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
                 >,
             >,
         ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSimpleField8)> {
@@ -2399,7 +6020,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::SourceCodeInfoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
                 >,
             >,
         ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSimpleField9)> {
@@ -2420,360 +6041,6 @@ pub mod _puroro_impls {
     impl FileDescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct DescriptorProtoSimple {
-    pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-    pub field: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple>,
-    pub extension: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple>,
-    pub nested_type: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple>,
-    pub enum_type: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple>,
-    pub extension_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>,
-    pub oneof_decl: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple>,
-    pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple>>,
-    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>,
-    pub reserved_name: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
-}
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimple {}
-
-    impl DescriptorProtoTrait for DescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        type Field2MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple;
-        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-            >,
-        >;
-
-        fn field<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.field.iter())
-        }
-        type Field6MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple;
-        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-            >,
-        >;
-
-        fn extension<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.extension.iter())
-        }
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple;
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
-            >,
-        >;
-
-        fn nested_type<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.nested_type.iter())
-        }
-        type Field4MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple;
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
-            >,
-        >;
-
-        fn enum_type<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.enum_type.iter())
-        }
-        type Field5MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple;
-        type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>>;
-
-        fn extension_range<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.extension_range.iter())
-        }
-        type Field8MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple;
-        type Field8RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
-            >,
-        >;
-
-        fn oneof_decl<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.oneof_decl.iter())
-        }
-        type Field7MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-        type Field9MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple;
-        type Field9RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>>;
-
-        fn reserved_range<'this>(&'this self) -> Self::Field9RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_range.iter())
-        }
-        type Field10StringType<'this> = &'this str;
-        type Field10RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            str,
-            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
-        >;
-
-        fn reserved_name<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_name.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for DescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 10]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "field",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "extension",
-                                number: 6,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "nested_type",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "enum_type",
-                                number: 4,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "extension_range",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "oneof_decl",
-                                number: 8,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 7,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "reserved_range",
-                                number: 9,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "reserved_name",
-                                number: 10,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <DescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "DescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for DescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for DescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple>
-            >::deser_field(&mut self.field, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple>
-            >::deser_field(&mut self.extension, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple>
-            >::deser_field(&mut self.nested_type, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple>
-            >::deser_field(&mut self.enum_type, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>
-            >::deser_field(&mut self.extension_range, data),
-            8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple>
-            >::deser_field(&mut self.oneof_decl, data),
-            7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple>
-            >::deser_field(&mut self.options, data),
-            9 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>
-            >::deser_field(&mut self.reserved_range, data),
-            10 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::String
-            >::deser_field(&mut self.reserved_name, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-                >,
-            >::ser_field(&self.field, 2, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
-                >,
-            >::ser_field(&self.extension, 6, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
-                >,
-            >::ser_field(&self.nested_type, 3, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
-                >,
-            >::ser_field(&self.enum_type, 4, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>
-        >::ser_field(&self.extension_range, 5, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
-                >,
-            >::ser_field(&self.oneof_decl, 8, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple,
-                >,
-            >::ser_field(&self.options, 7, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>
-        >::ser_field(&self.reserved_range, 9, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.reserved_name,
-                10,
-                out,
-            )?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl DescriptorProtoTrait for () {
@@ -3265,7 +6532,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -3347,21 +6614,21 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProtoSimpleField2 {
         pub field: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
         type Field2MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
         type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         >;
 
@@ -3422,7 +6689,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
                 >,
             >::ser_field(&self.field, 2, out)?;
             ::std::result::Result::Ok(())
@@ -3432,13 +6699,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         > for DescriptorProtoSimpleField2
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         ) -> Self {
             Self { field: value }
@@ -3448,11 +6715,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProtoSimpleField6 {
         pub extension: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField6 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField6 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField6 {
         type Field1StringType<'this> = &'static str;
@@ -3463,12 +6730,12 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field6MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto;
         type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         >;
 
@@ -3523,7 +6790,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
                 >,
             >::ser_field(&self.extension, 6, out)?;
             ::std::result::Result::Ok(())
@@ -3533,13 +6800,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         > for DescriptorProtoSimpleField6
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         ) -> Self {
             Self { extension: value }
@@ -3549,11 +6816,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProtoSimpleField3 {
         pub nested_type: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField3 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField3 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField3 {
         type Field1StringType<'this> = &'static str;
@@ -3570,12 +6837,12 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto;
         type Field3RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         >;
 
@@ -3624,7 +6891,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
                 >,
             >::ser_field(&self.nested_type, 3, out)?;
             ::std::result::Result::Ok(())
@@ -3634,13 +6901,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         > for DescriptorProtoSimpleField3
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         ) -> Self {
             Self { nested_type: value }
@@ -3650,11 +6917,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProtoSimpleField4 {
         pub enum_type: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField4 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField4 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField4 {
         type Field1StringType<'this> = &'static str;
@@ -3677,12 +6944,12 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field4MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto;
         type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         >;
 
@@ -3725,7 +6992,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
                 >,
             >::ser_field(&self.enum_type, 4, out)?;
             ::std::result::Result::Ok(())
@@ -3735,13 +7002,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         > for DescriptorProtoSimpleField4
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         ) -> Self {
             Self { enum_type: value }
@@ -3750,10 +7017,10 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProtoSimpleField5 {
-    pub extension_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>,
+    pub extension_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>,
 }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField5 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField5 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField5 {
         type Field1StringType<'this> = &'static str;
@@ -3781,10 +7048,10 @@ pub mod _puroro_impls {
         fn enum_type<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field5MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple;
+        type Field5MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange;
         type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>>;
+    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>>;
 
         fn extension_range<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.extension_range.iter())
@@ -3817,14 +7084,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>
         >::ser_field(&self.extension_range, 5, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>> for DescriptorProtoSimpleField5 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>> for DescriptorProtoSimpleField5 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>) -> Self {
         Self {
             extension_range: value,
         }
@@ -3834,11 +7101,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProtoSimpleField8 {
         pub oneof_decl: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField8 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField8 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField8 {
         type Field1StringType<'this> = &'static str;
@@ -3873,12 +7140,12 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field8MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto;
         type Field8RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
             >,
         >;
 
@@ -3909,7 +7176,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
                 >,
             >::ser_field(&self.oneof_decl, 8, out)?;
             ::std::result::Result::Ok(())
@@ -3919,13 +7186,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
             >,
         > for DescriptorProtoSimpleField8
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
             >,
         ) -> Self {
             Self { oneof_decl: value }
@@ -3936,12 +7203,12 @@ pub mod _puroro_impls {
     pub struct DescriptorProtoSimpleField7 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField7 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField7 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField7 {
         type Field1StringType<'this> = &'static str;
@@ -3982,7 +7249,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field7MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions;
         fn options<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -4009,7 +7276,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
                 >,
             >::ser_field(&self.options, 7, out)?;
             ::std::result::Result::Ok(())
@@ -4020,7 +7287,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
                 >,
             >,
         > for DescriptorProtoSimpleField7
@@ -4028,7 +7295,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
                 >,
             >,
         ) -> Self {
@@ -4038,10 +7305,10 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProtoSimpleField9 {
-    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>,
+    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>,
 }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField9 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField9 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField9 {
         type Field1StringType<'this> = &'static str;
@@ -4082,10 +7349,10 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field7MessageType<'this> = ();
-        type Field9MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple;
+        type Field9MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange;
         type Field9RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>>;
+    self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>>;
 
         fn reserved_range<'this>(&'this self) -> Self::Field9RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_range.iter())
@@ -4105,14 +7372,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>
         >::ser_field(&self.reserved_range, 9, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>> for DescriptorProtoSimpleField9 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>> for DescriptorProtoSimpleField9 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>) -> Self {
         Self {
             reserved_range: value,
         }
@@ -4124,7 +7391,7 @@ pub mod _puroro_impls {
         pub reserved_name: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleField10 {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleField10 {}
 
     impl super::_puroro_traits::DescriptorProtoTrait for DescriptorProtoSimpleField10 {
         type Field1StringType<'this> = &'static str;
@@ -4210,7 +7477,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct DescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<DescriptorProtoSimple> for DescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::DescriptorProto> for DescriptorProtoSimpleByValue {}
 
     impl DescriptorProtoTrait for DescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -4218,7 +7485,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field2MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
         >;
         type Field2RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field2MessageType<'this>>;
@@ -4226,7 +7493,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field6MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
         >;
         type Field6RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field6MessageType<'this>>;
@@ -4234,7 +7501,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field3MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
         >;
         type Field3RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field3MessageType<'this>>;
@@ -4242,21 +7509,21 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field4MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
         >;
         type Field4RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field4MessageType<'this>>;
         fn enum_type<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field5MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>;
+        type Field5MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>;
         type Field5RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field5MessageType<'this>>;
         fn extension_range<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field8MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
         >;
         type Field8RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
@@ -4264,12 +7531,12 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field7MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field9MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>;
+        type Field9MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>;
         type Field9RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field9MessageType<'this>>;
         fn reserved_range<'this>(&'this self) -> Self::Field9RepeatedType<'this> {
@@ -4297,7 +7564,7 @@ pub mod _puroro_impls {
         pub fn append_field(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField2)> {
             DescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -4305,7 +7572,7 @@ pub mod _puroro_impls {
         pub fn append_extension(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
             >,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField6)> {
             DescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -4313,7 +7580,7 @@ pub mod _puroro_impls {
         pub fn append_nested_type(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::DescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
             >,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField3)> {
             DescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -4321,21 +7588,21 @@ pub mod _puroro_impls {
         pub fn append_enum_type(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
             >,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField4)> {
             DescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
         }
         pub fn append_extension_range(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ExtensionRangeSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField5)> {
             DescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
         }
         pub fn append_oneof_decl(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::OneofDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
             >,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField8)> {
             DescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -4344,7 +7611,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MessageOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
                 >,
             >,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField7)> {
@@ -4352,7 +7619,7 @@ pub mod _puroro_impls {
         }
         pub fn append_reserved_range(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_impls::ReservedRangeSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>,
         ) -> DescriptorProtoBuilder<(T, DescriptorProtoSimpleField9)> {
             DescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
         }
@@ -4371,104 +7638,6 @@ pub mod _puroro_impls {
     impl DescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct ExtensionRangeOptionsSimple {
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<ExtensionRangeOptionsSimple> for ExtensionRangeOptionsSimple {}
-
-    impl ExtensionRangeOptionsTrait for ExtensionRangeOptionsSimple {
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for ExtensionRangeOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "uninterpreted_option",
-                            number: 999,
-                            lazy_containing_type: Lazy::new(|| {
-                                <ExtensionRangeOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "ExtensionRangeOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRangeOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for ExtensionRangeOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for ExtensionRangeOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl ExtensionRangeOptionsTrait for () {
@@ -4545,20 +7714,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct ExtensionRangeOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<ExtensionRangeOptionsSimple> for ExtensionRangeOptionsSimpleField999 {}
+    impl ::puroro::Message<super::ExtensionRangeOptions> for ExtensionRangeOptionsSimpleField999 {}
 
     impl super::_puroro_traits::ExtensionRangeOptionsTrait for ExtensionRangeOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -4576,7 +7745,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -4586,13 +7755,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for ExtensionRangeOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -4604,11 +7773,11 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct ExtensionRangeOptionsSimpleByValue {}
-    impl ::puroro::Message<ExtensionRangeOptionsSimple> for ExtensionRangeOptionsSimpleByValue {}
+    impl ::puroro::Message<super::ExtensionRangeOptions> for ExtensionRangeOptionsSimpleByValue {}
 
     impl ExtensionRangeOptionsTrait for ExtensionRangeOptionsSimpleByValue {
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -4625,7 +7794,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> ExtensionRangeOptionsBuilder<(T, ExtensionRangeOptionsSimpleField999)> {
             ExtensionRangeOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -4639,331 +7808,6 @@ pub mod _puroro_impls {
     impl ExtensionRangeOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct FieldDescriptorProtoSimple {
-        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub number: ::std::option::Option<i32>,
-        pub label: ::std::option::Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
-        >,
-        pub type_: ::std::option::Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
-        >,
-        pub type_name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub extendee: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub default_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub oneof_index: ::std::option::Option<i32>,
-        pub json_name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub options: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
-            >,
-        >,
-        pub proto3_optional: ::std::option::Option<bool>,
-    }
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimple {}
-
-    impl FieldDescriptorProtoTrait for FieldDescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        fn number<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.number)
-        }
-        fn label<'this>(
-            &'this self,
-        ) -> Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
-        > {
-            Clone::clone(&self.label)
-        }
-        fn type_<'this>(
-            &'this self,
-        ) -> Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
-        > {
-            Clone::clone(&self.type_)
-        }
-        type Field6StringType<'this> = &'this str;
-        fn type_name<'this>(&'this self) -> Option<Self::Field6StringType<'this>> {
-            self.type_name.as_ref().map(|v| v.as_ref())
-        }
-        type Field2StringType<'this> = &'this str;
-        fn extendee<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.extendee.as_ref().map(|v| v.as_ref())
-        }
-        type Field7StringType<'this> = &'this str;
-        fn default_value<'this>(&'this self) -> Option<Self::Field7StringType<'this>> {
-            self.default_value.as_ref().map(|v| v.as_ref())
-        }
-        fn oneof_index<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.oneof_index)
-        }
-        type Field10StringType<'this> = &'this str;
-        fn json_name<'this>(&'this self) -> Option<Self::Field10StringType<'this>> {
-            self.json_name.as_ref().map(|v| v.as_ref())
-        }
-        type Field8MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-        fn proto3_optional<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.proto3_optional)
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for FieldDescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 11]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "number",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "label",
-                                number: 4,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "type",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "type_name",
-                                number: 6,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "extendee",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "default_value",
-                                number: 7,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "oneof_index",
-                                number: 9,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "json_name",
-                                number: 10,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 8,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "proto3_optional",
-                                number: 17,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "FieldDescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for FieldDescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FieldDescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.number, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
-            >::deser_field(&mut self.label, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
-            >::deser_field(&mut self.type_, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.type_name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.extendee, data),
-            7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.default_value, data),
-            9 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.oneof_index, data),
-            10 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.json_name, data),
-            8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple>
-            >::deser_field(&mut self.options, data),
-            17 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.proto3_optional, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.number,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
-        >::ser_field(&self.label, 4, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
-        >::ser_field(&self.type_, 5, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.type_name,
-                6,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.extendee,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.default_value,
-                7,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.oneof_index,
-                9,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.json_name,
-                10,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
-                >,
-            >::ser_field(&self.options, 8, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.proto3_optional,
-                17,
-                out,
-            )?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl FieldDescriptorProtoTrait for () {
@@ -5277,7 +8121,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -5317,7 +8161,7 @@ pub mod _puroro_impls {
         pub number: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField3 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField3 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField3 {
         type Field1StringType<'this> = &'static str;
@@ -5359,7 +8203,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField4 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField4 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField4 {
         type Field1StringType<'this> = &'static str;
@@ -5413,7 +8257,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField5 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField5 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField5 {
         type Field1StringType<'this> = &'static str;
@@ -5465,7 +8309,7 @@ pub mod _puroro_impls {
         pub type_name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField6 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField6 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField6 {
         type Field1StringType<'this> = &'static str;
@@ -5507,7 +8351,7 @@ pub mod _puroro_impls {
         pub extendee: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
@@ -5549,7 +8393,7 @@ pub mod _puroro_impls {
         pub default_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField7 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField7 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField7 {
         type Field1StringType<'this> = &'static str;
@@ -5593,7 +8437,7 @@ pub mod _puroro_impls {
         pub oneof_index: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField9 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField9 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField9 {
         type Field1StringType<'this> = &'static str;
@@ -5633,7 +8477,7 @@ pub mod _puroro_impls {
         pub json_name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField10 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField10 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField10 {
         type Field1StringType<'this> = &'static str;
@@ -5674,12 +8518,12 @@ pub mod _puroro_impls {
     pub struct FieldDescriptorProtoSimpleField8 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField8 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField8 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField8 {
         type Field1StringType<'this> = &'static str;
@@ -5688,7 +8532,7 @@ pub mod _puroro_impls {
         type Field7StringType<'this> = &'static str;
         type Field10StringType<'this> = &'static str;
         type Field8MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions;
         fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -5703,7 +8547,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
                 >,
             >::ser_field(&self.options, 8, out)?;
             ::std::result::Result::Ok(())
@@ -5714,7 +8558,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
                 >,
             >,
         > for FieldDescriptorProtoSimpleField8
@@ -5722,7 +8566,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
                 >,
             >,
         ) -> Self {
@@ -5735,7 +8579,7 @@ pub mod _puroro_impls {
         pub proto3_optional: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleField17 {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleField17 {}
 
     impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleField17 {
         type Field1StringType<'this> = &'static str;
@@ -5775,7 +8619,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct FieldDescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<FieldDescriptorProtoSimple> for FieldDescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSimpleByValue {}
 
     impl FieldDescriptorProtoTrait for FieldDescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -5819,7 +8663,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field8MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field8MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
@@ -5896,7 +8740,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FieldOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
                 >,
             >,
         ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSimpleField8)> {
@@ -5917,121 +8761,6 @@ pub mod _puroro_impls {
     impl FieldDescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct OneofDescriptorProtoSimple {
-        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub options: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
-            >,
-        >,
-    }
-    impl ::puroro::Message<OneofDescriptorProtoSimple> for OneofDescriptorProtoSimple {}
-
-    impl OneofDescriptorProtoTrait for OneofDescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        type Field2MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field2MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for OneofDescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <OneofDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <OneofDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "OneofDescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for OneofDescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for OneofDescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple>
-            >::deser_field(&mut self.options, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for OneofDescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
-                >,
-            >::ser_field(&self.options, 2, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl OneofDescriptorProtoTrait for () {
@@ -6119,7 +8848,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<OneofDescriptorProtoSimple> for OneofDescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::OneofDescriptorProto> for OneofDescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::OneofDescriptorProtoTrait for OneofDescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -6154,17 +8883,17 @@ pub mod _puroro_impls {
     pub struct OneofDescriptorProtoSimpleField2 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<OneofDescriptorProtoSimple> for OneofDescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::OneofDescriptorProto> for OneofDescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::OneofDescriptorProtoTrait for OneofDescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
         type Field2MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions;
         fn options<'this>(&'this self) -> Option<Self::Field2MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -6179,7 +8908,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
                 >,
             >::ser_field(&self.options, 2, out)?;
             ::std::result::Result::Ok(())
@@ -6190,7 +8919,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
                 >,
             >,
         > for OneofDescriptorProtoSimpleField2
@@ -6198,7 +8927,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
                 >,
             >,
         ) -> Self {
@@ -6209,7 +8938,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct OneofDescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<OneofDescriptorProtoSimple> for OneofDescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::OneofDescriptorProto> for OneofDescriptorProtoSimpleByValue {}
 
     impl OneofDescriptorProtoTrait for OneofDescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -6217,7 +8946,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field2MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field2MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
@@ -6239,7 +8968,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::OneofOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
                 >,
             >,
         ) -> OneofDescriptorProtoBuilder<(T, OneofDescriptorProtoSimpleField2)> {
@@ -6254,199 +8983,6 @@ pub mod _puroro_impls {
     impl OneofDescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct EnumDescriptorProtoSimple {
-    pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-    pub value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple>,
-    pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple>>,
-    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>,
-    pub reserved_name: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
-}
-    impl ::puroro::Message<EnumDescriptorProtoSimple> for EnumDescriptorProtoSimple {}
-
-    impl EnumDescriptorProtoTrait for EnumDescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple;
-        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
-            >,
-        >;
-
-        fn value<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.value.iter())
-        }
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-        type Field4MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple;
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>>;
-
-        fn reserved_range<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_range.iter())
-        }
-        type Field5StringType<'this> = &'this str;
-        type Field5RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            str,
-            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
-        >;
-
-        fn reserved_name<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_name.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for EnumDescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 5]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "value",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "reserved_range",
-                                number: 4,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "reserved_name",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "EnumDescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumDescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumDescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple>
-            >::deser_field(&mut self.value, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple>
-            >::deser_field(&mut self.options, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>
-            >::deser_field(&mut self.reserved_range, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::String
-            >::deser_field(&mut self.reserved_name, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for EnumDescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple>
-        >::ser_field(&self.value, 2, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple,
-                >,
-            >::ser_field(&self.options, 3, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>
-        >::ser_field(&self.reserved_range, 4, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.reserved_name,
-                5,
-                out,
-            )?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl EnumDescriptorProtoTrait for () {
@@ -6683,7 +9219,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<EnumDescriptorProtoSimple> for EnumDescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::EnumDescriptorProto> for EnumDescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::EnumDescriptorProtoTrait for EnumDescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -6735,20 +9271,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumDescriptorProtoSimpleField2 {
         pub value: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<EnumDescriptorProtoSimple> for EnumDescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::EnumDescriptorProto> for EnumDescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::EnumDescriptorProtoTrait for EnumDescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
-        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple;
+        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto;
         type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
             >,
         >;
 
@@ -6777,7 +9313,7 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto>
         >::ser_field(&self.value, 2, out)?;
             ::std::result::Result::Ok(())
         }
@@ -6786,13 +9322,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
             >,
         > for EnumDescriptorProtoSimpleField2
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
             >,
         ) -> Self {
             Self { value: value }
@@ -6803,12 +9339,12 @@ pub mod _puroro_impls {
     pub struct EnumDescriptorProtoSimpleField3 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<EnumDescriptorProtoSimple> for EnumDescriptorProtoSimpleField3 {}
+    impl ::puroro::Message<super::EnumDescriptorProto> for EnumDescriptorProtoSimpleField3 {}
 
     impl super::_puroro_traits::EnumDescriptorProtoTrait for EnumDescriptorProtoSimpleField3 {
         type Field1StringType<'this> = &'static str;
@@ -6819,7 +9355,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions;
         fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -6846,7 +9382,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
                 >,
             >::ser_field(&self.options, 3, out)?;
             ::std::result::Result::Ok(())
@@ -6857,7 +9393,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
                 >,
             >,
         > for EnumDescriptorProtoSimpleField3
@@ -6865,7 +9401,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
                 >,
             >,
         ) -> Self {
@@ -6875,10 +9411,10 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumDescriptorProtoSimpleField4 {
-    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>,
+    pub reserved_range: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>,
 }
 
-    impl ::puroro::Message<EnumDescriptorProtoSimple> for EnumDescriptorProtoSimpleField4 {}
+    impl ::puroro::Message<super::EnumDescriptorProto> for EnumDescriptorProtoSimpleField4 {}
 
     impl super::_puroro_traits::EnumDescriptorProtoTrait for EnumDescriptorProtoSimpleField4 {
         type Field1StringType<'this> = &'static str;
@@ -6889,10 +9425,10 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field3MessageType<'this> = ();
-        type Field4MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple;
+        type Field4MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange;
         type Field4RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>>;
+    self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>>;
 
         fn reserved_range<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.reserved_range.iter())
@@ -6912,14 +9448,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>
         >::ser_field(&self.reserved_range, 4, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>> for EnumDescriptorProtoSimpleField4 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>> for EnumDescriptorProtoSimpleField4 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>) -> Self {
         Self {
             reserved_range: value,
         }
@@ -6931,7 +9467,7 @@ pub mod _puroro_impls {
         pub reserved_name: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<EnumDescriptorProtoSimple> for EnumDescriptorProtoSimpleField5 {}
+    impl ::puroro::Message<super::EnumDescriptorProto> for EnumDescriptorProtoSimpleField5 {}
 
     impl super::_puroro_traits::EnumDescriptorProtoTrait for EnumDescriptorProtoSimpleField5 {
         type Field1StringType<'this> = &'static str;
@@ -6987,7 +9523,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct EnumDescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<EnumDescriptorProtoSimple> for EnumDescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::EnumDescriptorProto> for EnumDescriptorProtoSimpleByValue {}
 
     impl EnumDescriptorProtoTrait for EnumDescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -6995,7 +9531,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field2MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
         >;
         type Field2RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field2MessageType<'this>>;
@@ -7003,12 +9539,12 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field3MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field4MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>;
+        type Field4MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>;
         type Field4RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field4MessageType<'this>>;
         fn reserved_range<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
@@ -7036,7 +9572,7 @@ pub mod _puroro_impls {
         pub fn append_value(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumValueDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto,
             >,
         ) -> EnumDescriptorProtoBuilder<(T, EnumDescriptorProtoSimpleField2)> {
             EnumDescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -7045,7 +9581,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
                 >,
             >,
         ) -> EnumDescriptorProtoBuilder<(T, EnumDescriptorProtoSimpleField3)> {
@@ -7053,7 +9589,7 @@ pub mod _puroro_impls {
         }
         pub fn append_reserved_range(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_impls::EnumReservedRangeSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>,
         ) -> EnumDescriptorProtoBuilder<(T, EnumDescriptorProtoSimpleField4)> {
             EnumDescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
         }
@@ -7072,143 +9608,6 @@ pub mod _puroro_impls {
     impl EnumDescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct EnumValueDescriptorProtoSimple {
-        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub number: ::std::option::Option<i32>,
-        pub options: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
-            >,
-        >,
-    }
-    impl ::puroro::Message<EnumValueDescriptorProtoSimple> for EnumValueDescriptorProtoSimple {}
-
-    impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        fn number<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.number)
-        }
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for EnumValueDescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumValueDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "number",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumValueDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumValueDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "EnumValueDescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueDescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumValueDescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.number, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple>
-            >::deser_field(&mut self.options, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for EnumValueDescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.number,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
-                >,
-            >::ser_field(&self.options, 3, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl EnumValueDescriptorProtoTrait for () {
@@ -7318,7 +9717,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<EnumValueDescriptorProtoSimple> for EnumValueDescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::EnumValueDescriptorProto> for EnumValueDescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -7354,7 +9753,7 @@ pub mod _puroro_impls {
         pub number: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<EnumValueDescriptorProtoSimple> for EnumValueDescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::EnumValueDescriptorProto> for EnumValueDescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
@@ -7389,17 +9788,17 @@ pub mod _puroro_impls {
     pub struct EnumValueDescriptorProtoSimpleField3 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<EnumValueDescriptorProtoSimple> for EnumValueDescriptorProtoSimpleField3 {}
+    impl ::puroro::Message<super::EnumValueDescriptorProto> for EnumValueDescriptorProtoSimpleField3 {}
 
     impl super::_puroro_traits::EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoSimpleField3 {
         type Field1StringType<'this> = &'static str;
         type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions;
         fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -7414,7 +9813,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
                 >,
             >::ser_field(&self.options, 3, out)?;
             ::std::result::Result::Ok(())
@@ -7425,7 +9824,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
                 >,
             >,
         > for EnumValueDescriptorProtoSimpleField3
@@ -7433,7 +9832,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
                 >,
             >,
         ) -> Self {
@@ -7444,7 +9843,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct EnumValueDescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<EnumValueDescriptorProtoSimple> for EnumValueDescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::EnumValueDescriptorProto> for EnumValueDescriptorProtoSimpleByValue {}
 
     impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -7455,7 +9854,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field3MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
@@ -7483,7 +9882,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::EnumValueOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
                 >,
             >,
         ) -> EnumValueDescriptorProtoBuilder<(T, EnumValueDescriptorProtoSimpleField3)> {
@@ -7498,153 +9897,6 @@ pub mod _puroro_impls {
     impl EnumValueDescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct ServiceDescriptorProtoSimple {
-        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub method: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
-        >,
-        pub options: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
-            >,
-        >,
-    }
-    impl ::puroro::Message<ServiceDescriptorProtoSimple> for ServiceDescriptorProtoSimple {}
-
-    impl ServiceDescriptorProtoTrait for ServiceDescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        type Field2MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple;
-        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
-            >,
-        >;
-
-        fn method<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.method.iter())
-        }
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for ServiceDescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <ServiceDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "method",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <ServiceDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <ServiceDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "ServiceDescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceDescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for ServiceDescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple>
-            >::deser_field(&mut self.method, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple>
-            >::deser_field(&mut self.options, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for ServiceDescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple>
-        >::ser_field(&self.method, 2, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
-                >,
-            >::ser_field(&self.options, 3, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl ServiceDescriptorProtoTrait for () {
@@ -7787,7 +10039,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<ServiceDescriptorProtoSimple> for ServiceDescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::ServiceDescriptorProto> for ServiceDescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::ServiceDescriptorProtoTrait for ServiceDescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -7827,21 +10079,21 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct ServiceDescriptorProtoSimpleField2 {
         pub method: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<ServiceDescriptorProtoSimple> for ServiceDescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::ServiceDescriptorProto> for ServiceDescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::ServiceDescriptorProtoTrait for ServiceDescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
         type Field2MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto;
         type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
             >,
         >;
 
@@ -7858,7 +10110,7 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto>
         >::ser_field(&self.method, 2, out)?;
             ::std::result::Result::Ok(())
         }
@@ -7867,13 +10119,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
             >,
         > for ServiceDescriptorProtoSimpleField2
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
             >,
         ) -> Self {
             Self { method: value }
@@ -7884,12 +10136,12 @@ pub mod _puroro_impls {
     pub struct ServiceDescriptorProtoSimpleField3 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<ServiceDescriptorProtoSimple> for ServiceDescriptorProtoSimpleField3 {}
+    impl ::puroro::Message<super::ServiceDescriptorProto> for ServiceDescriptorProtoSimpleField3 {}
 
     impl super::_puroro_traits::ServiceDescriptorProtoTrait for ServiceDescriptorProtoSimpleField3 {
         type Field1StringType<'this> = &'static str;
@@ -7900,7 +10152,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions;
         fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -7915,7 +10167,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
                 >,
             >::ser_field(&self.options, 3, out)?;
             ::std::result::Result::Ok(())
@@ -7926,7 +10178,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
                 >,
             >,
         > for ServiceDescriptorProtoSimpleField3
@@ -7934,7 +10186,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
                 >,
             >,
         ) -> Self {
@@ -7945,7 +10197,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct ServiceDescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<ServiceDescriptorProtoSimple> for ServiceDescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::ServiceDescriptorProto> for ServiceDescriptorProtoSimpleByValue {}
 
     impl ServiceDescriptorProtoTrait for ServiceDescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -7953,7 +10205,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field2MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
         >;
         type Field2RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field2MessageType<'this>>;
@@ -7961,7 +10213,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field3MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
@@ -7982,7 +10234,7 @@ pub mod _puroro_impls {
         pub fn append_method(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::MethodDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto,
             >,
         ) -> ServiceDescriptorProtoBuilder<(T, ServiceDescriptorProtoSimpleField2)> {
             ServiceDescriptorProtoBuilder((self.0, ::std::convert::From::from(value)))
@@ -7991,7 +10243,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::ServiceOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
                 >,
             >,
         ) -> ServiceDescriptorProtoBuilder<(T, ServiceDescriptorProtoSimpleField3)> {
@@ -8006,211 +10258,6 @@ pub mod _puroro_impls {
     impl ServiceDescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MethodDescriptorProtoSimple {
-        pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub input_type: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub output_type: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub options: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
-            >,
-        >,
-        pub client_streaming: ::std::option::Option<bool>,
-        pub server_streaming: ::std::option::Option<bool>,
-    }
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimple {}
-
-    impl MethodDescriptorProtoTrait for MethodDescriptorProtoSimple {
-        type Field1StringType<'this> = &'this str;
-        fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.name.as_ref().map(|v| v.as_ref())
-        }
-        type Field2StringType<'this> = &'this str;
-        fn input_type<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.input_type.as_ref().map(|v| v.as_ref())
-        }
-        type Field3StringType<'this> = &'this str;
-        fn output_type<'this>(&'this self) -> Option<Self::Field3StringType<'this>> {
-            self.output_type.as_ref().map(|v| v.as_ref())
-        }
-        type Field4MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple;
-        fn options<'this>(&'this self) -> Option<Self::Field4MessageType<'this>> {
-            self.options.as_ref().map(|v| v.as_ref())
-        }
-        fn client_streaming<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.client_streaming)
-        }
-        fn server_streaming<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.server_streaming)
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for MethodDescriptorProtoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 6]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "input_type",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "output_type",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "options",
-                                number: 4,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "client_streaming",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "server_streaming",
-                                number: 6,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodDescriptorProtoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "MethodDescriptorProto",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for MethodDescriptorProtoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MethodDescriptorProtoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.name, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.input_type, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.output_type, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple>
-            >::deser_field(&mut self.options, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.client_streaming, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.server_streaming, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for MethodDescriptorProtoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.input_type,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.output_type,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
-                >,
-            >::ser_field(&self.options, 4, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.client_streaming,
-                5,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.server_streaming,
-                6,
-                out,
-            )?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl MethodDescriptorProtoTrait for () {
@@ -8395,7 +10442,7 @@ pub mod _puroro_impls {
         pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimpleField1 {}
+    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSimpleField1 {}
 
     impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -8433,7 +10480,7 @@ pub mod _puroro_impls {
         pub input_type: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimpleField2 {}
+    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSimpleField2 {}
 
     impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSimpleField2 {
         type Field1StringType<'this> = &'static str;
@@ -8473,7 +10520,7 @@ pub mod _puroro_impls {
         pub output_type: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimpleField3 {}
+    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSimpleField3 {}
 
     impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSimpleField3 {
         type Field1StringType<'this> = &'static str;
@@ -8512,19 +10559,19 @@ pub mod _puroro_impls {
     pub struct MethodDescriptorProtoSimpleField4 {
         pub options: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
             >,
         >,
     }
 
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimpleField4 {}
+    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSimpleField4 {}
 
     impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSimpleField4 {
         type Field1StringType<'this> = &'static str;
         type Field2StringType<'this> = &'static str;
         type Field3StringType<'this> = &'static str;
         type Field4MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions;
         fn options<'this>(&'this self) -> Option<Self::Field4MessageType<'this>> {
             self.options.as_ref().map(|v| v.as_ref())
         }
@@ -8539,7 +10586,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
                 >,
             >::ser_field(&self.options, 4, out)?;
             ::std::result::Result::Ok(())
@@ -8550,7 +10597,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
                 >,
             >,
         > for MethodDescriptorProtoSimpleField4
@@ -8558,7 +10605,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
                 >,
             >,
         ) -> Self {
@@ -8571,7 +10618,7 @@ pub mod _puroro_impls {
         pub client_streaming: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimpleField5 {}
+    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSimpleField5 {}
 
     impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSimpleField5 {
         type Field1StringType<'this> = &'static str;
@@ -8611,7 +10658,7 @@ pub mod _puroro_impls {
         pub server_streaming: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimpleField6 {}
+    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSimpleField6 {}
 
     impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSimpleField6 {
         type Field1StringType<'this> = &'static str;
@@ -8649,7 +10696,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MethodDescriptorProtoSimpleByValue {}
-    impl ::puroro::Message<MethodDescriptorProtoSimple> for MethodDescriptorProtoSimpleByValue {}
+    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSimpleByValue {}
 
     impl MethodDescriptorProtoTrait for MethodDescriptorProtoSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -8665,7 +10712,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field4MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
         >;
         fn options<'this>(&'this self) -> Option<Self::Field4MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
@@ -8705,7 +10752,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::MethodOptionsSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
                 >,
             >,
         ) -> MethodDescriptorProtoBuilder<(T, MethodDescriptorProtoSimpleField4)> {
@@ -8732,559 +10779,6 @@ pub mod _puroro_impls {
     impl MethodDescriptorProtoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct FileOptionsSimple {
-        pub java_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub java_outer_classname: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub java_multiple_files: ::std::option::Option<bool>,
-        pub java_generate_equals_and_hash: ::std::option::Option<bool>,
-        pub java_string_check_utf8: ::std::option::Option<bool>,
-        pub optimize_for: ::std::option::Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
-        >,
-        pub go_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub cc_generic_services: ::std::option::Option<bool>,
-        pub java_generic_services: ::std::option::Option<bool>,
-        pub py_generic_services: ::std::option::Option<bool>,
-        pub php_generic_services: ::std::option::Option<bool>,
-        pub deprecated: ::std::option::Option<bool>,
-        pub cc_enable_arenas: ::std::option::Option<bool>,
-        pub objc_class_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub csharp_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub swift_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub php_class_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub php_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub php_metadata_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub ruby_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimple {}
-
-    impl FileOptionsTrait for FileOptionsSimple {
-        type Field1StringType<'this> = &'this str;
-        fn java_package<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.java_package.as_ref().map(|v| v.as_ref())
-        }
-        type Field8StringType<'this> = &'this str;
-        fn java_outer_classname<'this>(&'this self) -> Option<Self::Field8StringType<'this>> {
-            self.java_outer_classname.as_ref().map(|v| v.as_ref())
-        }
-        fn java_multiple_files<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.java_multiple_files)
-        }
-        fn java_generate_equals_and_hash<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.java_generate_equals_and_hash)
-        }
-        fn java_string_check_utf8<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.java_string_check_utf8)
-        }
-        fn optimize_for<'this>(
-            &'this self,
-        ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
-        {
-            Clone::clone(&self.optimize_for)
-        }
-        type Field11StringType<'this> = &'this str;
-        fn go_package<'this>(&'this self) -> Option<Self::Field11StringType<'this>> {
-            self.go_package.as_ref().map(|v| v.as_ref())
-        }
-        fn cc_generic_services<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.cc_generic_services)
-        }
-        fn java_generic_services<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.java_generic_services)
-        }
-        fn py_generic_services<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.py_generic_services)
-        }
-        fn php_generic_services<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.php_generic_services)
-        }
-        fn deprecated<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.deprecated)
-        }
-        fn cc_enable_arenas<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.cc_enable_arenas)
-        }
-        type Field36StringType<'this> = &'this str;
-        fn objc_class_prefix<'this>(&'this self) -> Option<Self::Field36StringType<'this>> {
-            self.objc_class_prefix.as_ref().map(|v| v.as_ref())
-        }
-        type Field37StringType<'this> = &'this str;
-        fn csharp_namespace<'this>(&'this self) -> Option<Self::Field37StringType<'this>> {
-            self.csharp_namespace.as_ref().map(|v| v.as_ref())
-        }
-        type Field39StringType<'this> = &'this str;
-        fn swift_prefix<'this>(&'this self) -> Option<Self::Field39StringType<'this>> {
-            self.swift_prefix.as_ref().map(|v| v.as_ref())
-        }
-        type Field40StringType<'this> = &'this str;
-        fn php_class_prefix<'this>(&'this self) -> Option<Self::Field40StringType<'this>> {
-            self.php_class_prefix.as_ref().map(|v| v.as_ref())
-        }
-        type Field41StringType<'this> = &'this str;
-        fn php_namespace<'this>(&'this self) -> Option<Self::Field41StringType<'this>> {
-            self.php_namespace.as_ref().map(|v| v.as_ref())
-        }
-        type Field44StringType<'this> = &'this str;
-        fn php_metadata_namespace<'this>(&'this self) -> Option<Self::Field44StringType<'this>> {
-            self.php_metadata_namespace.as_ref().map(|v| v.as_ref())
-        }
-        type Field45StringType<'this> = &'this str;
-        fn ruby_package<'this>(&'this self) -> Option<Self::Field45StringType<'this>> {
-            self.ruby_package.as_ref().map(|v| v.as_ref())
-        }
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for FileOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 21]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "java_package",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "java_outer_classname",
-                                number: 8,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "java_multiple_files",
-                                number: 10,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "java_generate_equals_and_hash",
-                                number: 20,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "java_string_check_utf8",
-                                number: 27,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "optimize_for",
-                                number: 9,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "go_package",
-                                number: 11,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "cc_generic_services",
-                                number: 16,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "java_generic_services",
-                                number: 17,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "py_generic_services",
-                                number: 18,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "php_generic_services",
-                                number: 42,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "deprecated",
-                                number: 23,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "cc_enable_arenas",
-                                number: 31,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "objc_class_prefix",
-                                number: 36,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "csharp_namespace",
-                                number: 37,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "swift_prefix",
-                                number: 39,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "php_class_prefix",
-                                number: 40,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "php_namespace",
-                                number: 41,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "php_metadata_namespace",
-                                number: 44,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "ruby_package",
-                                number: 45,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "uninterpreted_option",
-                                number: 999,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FileOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "FileOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for FileOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FileOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.java_package, data),
-            8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.java_outer_classname, data),
-            10 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.java_multiple_files, data),
-            20 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.java_generate_equals_and_hash, data),
-            27 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.java_string_check_utf8, data),
-            9 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
-            >::deser_field(&mut self.optimize_for, data),
-            11 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.go_package, data),
-            16 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.cc_generic_services, data),
-            17 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.java_generic_services, data),
-            18 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.py_generic_services, data),
-            42 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.php_generic_services, data),
-            23 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.deprecated, data),
-            31 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.cc_enable_arenas, data),
-            36 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.objc_class_prefix, data),
-            37 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.csharp_namespace, data),
-            39 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.swift_prefix, data),
-            40 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.php_class_prefix, data),
-            41 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.php_namespace, data),
-            44 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.php_metadata_namespace, data),
-            45 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.ruby_package, data),
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for FileOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.java_package,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.java_outer_classname,
-                8,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_multiple_files,
-                10,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_generate_equals_and_hash,
-                20,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_string_check_utf8,
-                27,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
-        >::ser_field(&self.optimize_for, 9, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.go_package,
-                11,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.cc_generic_services,
-                16,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_generic_services,
-                17,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.py_generic_services,
-                18,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.php_generic_services,
-                42,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
-                23,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.cc_enable_arenas,
-                31,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.objc_class_prefix,
-                36,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.csharp_namespace,
-                37,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.swift_prefix,
-                39,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.php_class_prefix,
-                40,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.php_namespace,
-                41,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.php_metadata_namespace,
-                44,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.ruby_package,
-                45,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl FileOptionsTrait for () {
@@ -9823,7 +11317,7 @@ pub mod _puroro_impls {
         pub java_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField1 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField1 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -9877,7 +11371,7 @@ pub mod _puroro_impls {
         pub java_outer_classname: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField8 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField8 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField8 {
         type Field1StringType<'this> = &'static str;
@@ -9931,7 +11425,7 @@ pub mod _puroro_impls {
         pub java_multiple_files: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField10 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField10 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField10 {
         type Field1StringType<'this> = &'static str;
@@ -9983,7 +11477,7 @@ pub mod _puroro_impls {
         pub java_generate_equals_and_hash: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField20 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField20 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField20 {
         type Field1StringType<'this> = &'static str;
@@ -10035,7 +11529,7 @@ pub mod _puroro_impls {
         pub java_string_check_utf8: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField27 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField27 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField27 {
         type Field1StringType<'this> = &'static str;
@@ -10089,7 +11583,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField9 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField9 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField9 {
         type Field1StringType<'this> = &'static str;
@@ -10152,7 +11646,7 @@ pub mod _puroro_impls {
         pub go_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField11 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField11 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField11 {
         type Field1StringType<'this> = &'static str;
@@ -10204,7 +11698,7 @@ pub mod _puroro_impls {
         pub cc_generic_services: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField16 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField16 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField16 {
         type Field1StringType<'this> = &'static str;
@@ -10256,7 +11750,7 @@ pub mod _puroro_impls {
         pub java_generic_services: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField17 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField17 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField17 {
         type Field1StringType<'this> = &'static str;
@@ -10308,7 +11802,7 @@ pub mod _puroro_impls {
         pub py_generic_services: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField18 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField18 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField18 {
         type Field1StringType<'this> = &'static str;
@@ -10360,7 +11854,7 @@ pub mod _puroro_impls {
         pub php_generic_services: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField42 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField42 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField42 {
         type Field1StringType<'this> = &'static str;
@@ -10412,7 +11906,7 @@ pub mod _puroro_impls {
         pub deprecated: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField23 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField23 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField23 {
         type Field1StringType<'this> = &'static str;
@@ -10462,7 +11956,7 @@ pub mod _puroro_impls {
         pub cc_enable_arenas: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField31 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField31 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField31 {
         type Field1StringType<'this> = &'static str;
@@ -10514,7 +12008,7 @@ pub mod _puroro_impls {
         pub objc_class_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField36 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField36 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField36 {
         type Field1StringType<'this> = &'static str;
@@ -10568,7 +12062,7 @@ pub mod _puroro_impls {
         pub csharp_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField37 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField37 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField37 {
         type Field1StringType<'this> = &'static str;
@@ -10622,7 +12116,7 @@ pub mod _puroro_impls {
         pub swift_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField39 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField39 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField39 {
         type Field1StringType<'this> = &'static str;
@@ -10676,7 +12170,7 @@ pub mod _puroro_impls {
         pub php_class_prefix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField40 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField40 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField40 {
         type Field1StringType<'this> = &'static str;
@@ -10730,7 +12224,7 @@ pub mod _puroro_impls {
         pub php_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField41 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField41 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField41 {
         type Field1StringType<'this> = &'static str;
@@ -10784,7 +12278,7 @@ pub mod _puroro_impls {
         pub php_metadata_namespace: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField44 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField44 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField44 {
         type Field1StringType<'this> = &'static str;
@@ -10838,7 +12332,7 @@ pub mod _puroro_impls {
         pub ruby_package: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField45 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField45 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField45 {
         type Field1StringType<'this> = &'static str;
@@ -10890,11 +12384,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleField999 {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleField999 {}
 
     impl super::_puroro_traits::FileOptionsTrait for FileOptionsSimpleField999 {
         type Field1StringType<'this> = &'static str;
@@ -10908,12 +12402,12 @@ pub mod _puroro_impls {
         type Field44StringType<'this> = &'static str;
         type Field45StringType<'this> = &'static str;
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -10931,7 +12425,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -10941,13 +12435,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for FileOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -10959,7 +12453,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct FileOptionsSimpleByValue {}
-    impl ::puroro::Message<FileOptionsSimple> for FileOptionsSimpleByValue {}
+    impl ::puroro::Message<super::FileOptions> for FileOptionsSimpleByValue {}
 
     impl FileOptionsTrait for FileOptionsSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -11036,7 +12530,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -11175,7 +12669,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> FileOptionsBuilder<(T, FileOptionsSimpleField999)> {
             FileOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -11189,194 +12683,6 @@ pub mod _puroro_impls {
     impl FileOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MessageOptionsSimple {
-        pub message_set_wire_format: ::std::option::Option<bool>,
-        pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
-        pub deprecated: ::std::option::Option<bool>,
-        pub map_entry: ::std::option::Option<bool>,
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<MessageOptionsSimple> for MessageOptionsSimple {}
-
-    impl MessageOptionsTrait for MessageOptionsSimple {
-        fn message_set_wire_format<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.message_set_wire_format)
-        }
-        fn no_standard_descriptor_accessor<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.no_standard_descriptor_accessor)
-        }
-        fn deprecated<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.deprecated)
-        }
-        fn map_entry<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.map_entry)
-        }
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for MessageOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 5]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "message_set_wire_format",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MessageOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "no_standard_descriptor_accessor",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MessageOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "deprecated",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MessageOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "map_entry",
-                                number: 7,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MessageOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "uninterpreted_option",
-                                number: 999,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MessageOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "MessageOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for MessageOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MessageOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.message_set_wire_format, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.no_standard_descriptor_accessor, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.deprecated, data),
-            7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.map_entry, data),
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for MessageOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.message_set_wire_format,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.no_standard_descriptor_accessor,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.map_entry,
-                7,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl MessageOptionsTrait for () {
@@ -11508,7 +12814,7 @@ pub mod _puroro_impls {
         pub message_set_wire_format: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<MessageOptionsSimple> for MessageOptionsSimpleField1 {}
+    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSimpleField1 {}
 
     impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSimpleField1 {
         fn message_set_wire_format<'this>(&'this self) -> Option<bool> {
@@ -11550,7 +12856,7 @@ pub mod _puroro_impls {
         pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<MessageOptionsSimple> for MessageOptionsSimpleField2 {}
+    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSimpleField2 {}
 
     impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSimpleField2 {
         fn no_standard_descriptor_accessor<'this>(&'this self) -> Option<bool> {
@@ -11592,7 +12898,7 @@ pub mod _puroro_impls {
         pub deprecated: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<MessageOptionsSimple> for MessageOptionsSimpleField3 {}
+    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSimpleField3 {}
 
     impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSimpleField3 {
         fn deprecated<'this>(&'this self) -> Option<bool> {
@@ -11632,7 +12938,7 @@ pub mod _puroro_impls {
         pub map_entry: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<MessageOptionsSimple> for MessageOptionsSimpleField7 {}
+    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSimpleField7 {}
 
     impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSimpleField7 {
         fn map_entry<'this>(&'this self) -> Option<bool> {
@@ -11670,20 +12976,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MessageOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<MessageOptionsSimple> for MessageOptionsSimpleField999 {}
+    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSimpleField999 {}
 
     impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -11701,7 +13007,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -11711,13 +13017,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for MessageOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -11729,7 +13035,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MessageOptionsSimpleByValue {}
-    impl ::puroro::Message<MessageOptionsSimple> for MessageOptionsSimpleByValue {}
+    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSimpleByValue {}
 
     impl MessageOptionsTrait for MessageOptionsSimpleByValue {
         fn message_set_wire_format<'this>(&'this self) -> Option<bool> {
@@ -11745,7 +13051,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -11786,7 +13092,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> MessageOptionsBuilder<(T, MessageOptionsSimpleField999)> {
             MessageOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -11800,246 +13106,6 @@ pub mod _puroro_impls {
     impl MessageOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct FieldOptionsSimple {
-        pub ctype: ::std::option::Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
-        >,
-        pub packed: ::std::option::Option<bool>,
-        pub jstype: ::std::option::Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
-        >,
-        pub lazy: ::std::option::Option<bool>,
-        pub deprecated: ::std::option::Option<bool>,
-        pub weak: ::std::option::Option<bool>,
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimple {}
-
-    impl FieldOptionsTrait for FieldOptionsSimple {
-        fn ctype<'this>(
-            &'this self,
-        ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype>
-        {
-            Clone::clone(&self.ctype)
-        }
-        fn packed<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.packed)
-        }
-        fn jstype<'this>(
-            &'this self,
-        ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype>
-        {
-            Clone::clone(&self.jstype)
-        }
-        fn lazy<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.lazy)
-        }
-        fn deprecated<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.deprecated)
-        }
-        fn weak<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.weak)
-        }
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for FieldOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 7]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "ctype",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "packed",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "jstype",
-                                number: 6,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "lazy",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "deprecated",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "weak",
-                                number: 10,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "uninterpreted_option",
-                                number: 999,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <FieldOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "FieldOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for FieldOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for FieldOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype>
-            >::deser_field(&mut self.ctype, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.packed, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype>
-            >::deser_field(&mut self.jstype, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.lazy, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.deprecated, data),
-            10 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.weak, data),
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for FieldOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Enum2<
-                    self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
-                >,
-            >::ser_field(&self.ctype, 1, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.packed,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Enum2<
-                    self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
-                >,
-            >::ser_field(&self.jstype, 6, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.lazy, 5, out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.weak, 10, out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl FieldOptionsTrait for () {
@@ -12218,7 +13284,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleField1 {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleField1 {}
 
     impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSimpleField1 {
         fn ctype<'this>(
@@ -12272,7 +13338,7 @@ pub mod _puroro_impls {
         pub packed: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleField2 {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleField2 {}
 
     impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSimpleField2 {
         fn packed<'this>(&'this self) -> Option<bool> {
@@ -12314,7 +13380,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleField6 {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleField6 {}
 
     impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSimpleField6 {
         fn jstype<'this>(
@@ -12368,7 +13434,7 @@ pub mod _puroro_impls {
         pub lazy: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleField5 {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleField5 {}
 
     impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSimpleField5 {
         fn lazy<'this>(&'this self) -> Option<bool> {
@@ -12406,7 +13472,7 @@ pub mod _puroro_impls {
         pub deprecated: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleField3 {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleField3 {}
 
     impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSimpleField3 {
         fn deprecated<'this>(&'this self) -> Option<bool> {
@@ -12446,7 +13512,7 @@ pub mod _puroro_impls {
         pub weak: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleField10 {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleField10 {}
 
     impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSimpleField10 {
         fn weak<'this>(&'this self) -> Option<bool> {
@@ -12482,20 +13548,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FieldOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleField999 {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleField999 {}
 
     impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -12513,7 +13579,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -12523,13 +13589,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for FieldOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -12541,7 +13607,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct FieldOptionsSimpleByValue {}
-    impl ::puroro::Message<FieldOptionsSimple> for FieldOptionsSimpleByValue {}
+    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSimpleByValue {}
 
     impl FieldOptionsTrait for FieldOptionsSimpleByValue {
         fn ctype<'this>(
@@ -12569,7 +13635,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -12626,7 +13692,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> FieldOptionsBuilder<(T, FieldOptionsSimpleField999)> {
             FieldOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -12640,104 +13706,6 @@ pub mod _puroro_impls {
     impl FieldOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct OneofOptionsSimple {
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<OneofOptionsSimple> for OneofOptionsSimple {}
-
-    impl OneofOptionsTrait for OneofOptionsSimple {
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for OneofOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "uninterpreted_option",
-                            number: 999,
-                            lazy_containing_type: Lazy::new(|| {
-                                <OneofOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "OneofOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for OneofOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for OneofOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for OneofOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl OneofOptionsTrait for () {
@@ -12814,20 +13782,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct OneofOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<OneofOptionsSimple> for OneofOptionsSimpleField999 {}
+    impl ::puroro::Message<super::OneofOptions> for OneofOptionsSimpleField999 {}
 
     impl super::_puroro_traits::OneofOptionsTrait for OneofOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -12845,7 +13813,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -12855,13 +13823,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for OneofOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -12873,11 +13841,11 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct OneofOptionsSimpleByValue {}
-    impl ::puroro::Message<OneofOptionsSimple> for OneofOptionsSimpleByValue {}
+    impl ::puroro::Message<super::OneofOptions> for OneofOptionsSimpleByValue {}
 
     impl OneofOptionsTrait for OneofOptionsSimpleByValue {
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -12894,7 +13862,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> OneofOptionsBuilder<(T, OneofOptionsSimpleField999)> {
             OneofOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -12908,150 +13876,6 @@ pub mod _puroro_impls {
     impl OneofOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct EnumOptionsSimple {
-        pub allow_alias: ::std::option::Option<bool>,
-        pub deprecated: ::std::option::Option<bool>,
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<EnumOptionsSimple> for EnumOptionsSimple {}
-
-    impl EnumOptionsTrait for EnumOptionsSimple {
-        fn allow_alias<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.allow_alias)
-        }
-        fn deprecated<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.deprecated)
-        }
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for EnumOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "allow_alias",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "deprecated",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "uninterpreted_option",
-                                number: 999,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "EnumOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.allow_alias, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.deprecated, data),
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for EnumOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.allow_alias,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl EnumOptionsTrait for () {
@@ -13156,7 +13980,7 @@ pub mod _puroro_impls {
         pub allow_alias: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<EnumOptionsSimple> for EnumOptionsSimpleField2 {}
+    impl ::puroro::Message<super::EnumOptions> for EnumOptionsSimpleField2 {}
 
     impl super::_puroro_traits::EnumOptionsTrait for EnumOptionsSimpleField2 {
         fn allow_alias<'this>(&'this self) -> Option<bool> {
@@ -13196,7 +14020,7 @@ pub mod _puroro_impls {
         pub deprecated: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<EnumOptionsSimple> for EnumOptionsSimpleField3 {}
+    impl ::puroro::Message<super::EnumOptions> for EnumOptionsSimpleField3 {}
 
     impl super::_puroro_traits::EnumOptionsTrait for EnumOptionsSimpleField3 {
         fn deprecated<'this>(&'this self) -> Option<bool> {
@@ -13234,20 +14058,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<EnumOptionsSimple> for EnumOptionsSimpleField999 {}
+    impl ::puroro::Message<super::EnumOptions> for EnumOptionsSimpleField999 {}
 
     impl super::_puroro_traits::EnumOptionsTrait for EnumOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -13265,7 +14089,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -13275,13 +14099,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for EnumOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -13293,7 +14117,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct EnumOptionsSimpleByValue {}
-    impl ::puroro::Message<EnumOptionsSimple> for EnumOptionsSimpleByValue {}
+    impl ::puroro::Message<super::EnumOptions> for EnumOptionsSimpleByValue {}
 
     impl EnumOptionsTrait for EnumOptionsSimpleByValue {
         fn allow_alias<'this>(&'this self) -> Option<bool> {
@@ -13303,7 +14127,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -13332,7 +14156,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> EnumOptionsBuilder<(T, EnumOptionsSimpleField999)> {
             EnumOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -13346,128 +14170,6 @@ pub mod _puroro_impls {
     impl EnumOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct EnumValueOptionsSimple {
-        pub deprecated: ::std::option::Option<bool>,
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<EnumValueOptionsSimple> for EnumValueOptionsSimple {}
-
-    impl EnumValueOptionsTrait for EnumValueOptionsSimple {
-        fn deprecated<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.deprecated)
-        }
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for EnumValueOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "deprecated",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumValueOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "uninterpreted_option",
-                                number: 999,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <EnumValueOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "EnumValueOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumValueOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.deprecated, data),
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for EnumValueOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl EnumValueOptionsTrait for () {
@@ -13559,7 +14261,7 @@ pub mod _puroro_impls {
         pub deprecated: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<EnumValueOptionsSimple> for EnumValueOptionsSimpleField1 {}
+    impl ::puroro::Message<super::EnumValueOptions> for EnumValueOptionsSimpleField1 {}
 
     impl super::_puroro_traits::EnumValueOptionsTrait for EnumValueOptionsSimpleField1 {
         fn deprecated<'this>(&'this self) -> Option<bool> {
@@ -13597,20 +14299,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumValueOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<EnumValueOptionsSimple> for EnumValueOptionsSimpleField999 {}
+    impl ::puroro::Message<super::EnumValueOptions> for EnumValueOptionsSimpleField999 {}
 
     impl super::_puroro_traits::EnumValueOptionsTrait for EnumValueOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -13628,7 +14330,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -13638,13 +14340,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for EnumValueOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -13656,14 +14358,14 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct EnumValueOptionsSimpleByValue {}
-    impl ::puroro::Message<EnumValueOptionsSimple> for EnumValueOptionsSimpleByValue {}
+    impl ::puroro::Message<super::EnumValueOptions> for EnumValueOptionsSimpleByValue {}
 
     impl EnumValueOptionsTrait for EnumValueOptionsSimpleByValue {
         fn deprecated<'this>(&'this self) -> Option<bool> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -13686,7 +14388,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> EnumValueOptionsBuilder<(T, EnumValueOptionsSimpleField999)> {
             EnumValueOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -13700,128 +14402,6 @@ pub mod _puroro_impls {
     impl EnumValueOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct ServiceOptionsSimple {
-        pub deprecated: ::std::option::Option<bool>,
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<ServiceOptionsSimple> for ServiceOptionsSimple {}
-
-    impl ServiceOptionsTrait for ServiceOptionsSimple {
-        fn deprecated<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.deprecated)
-        }
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for ServiceOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "deprecated",
-                                number: 33,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <ServiceOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "uninterpreted_option",
-                                number: 999,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <ServiceOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "ServiceOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for ServiceOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            33 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.deprecated, data),
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for ServiceOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
-                33,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl ServiceOptionsTrait for () {
@@ -13913,7 +14493,7 @@ pub mod _puroro_impls {
         pub deprecated: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<ServiceOptionsSimple> for ServiceOptionsSimpleField33 {}
+    impl ::puroro::Message<super::ServiceOptions> for ServiceOptionsSimpleField33 {}
 
     impl super::_puroro_traits::ServiceOptionsTrait for ServiceOptionsSimpleField33 {
         fn deprecated<'this>(&'this self) -> Option<bool> {
@@ -13951,20 +14531,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct ServiceOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<ServiceOptionsSimple> for ServiceOptionsSimpleField999 {}
+    impl ::puroro::Message<super::ServiceOptions> for ServiceOptionsSimpleField999 {}
 
     impl super::_puroro_traits::ServiceOptionsTrait for ServiceOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -13982,7 +14562,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -13992,13 +14572,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for ServiceOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -14010,14 +14590,14 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct ServiceOptionsSimpleByValue {}
-    impl ::puroro::Message<ServiceOptionsSimple> for ServiceOptionsSimpleByValue {}
+    impl ::puroro::Message<super::ServiceOptions> for ServiceOptionsSimpleByValue {}
 
     impl ServiceOptionsTrait for ServiceOptionsSimpleByValue {
         fn deprecated<'this>(&'this self) -> Option<bool> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -14040,7 +14620,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> ServiceOptionsBuilder<(T, ServiceOptionsSimpleField999)> {
             ServiceOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -14054,154 +14634,6 @@ pub mod _puroro_impls {
     impl ServiceOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MethodOptionsSimple {
-        pub deprecated: ::std::option::Option<bool>,
-        pub idempotency_level: ::std::option::Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
-        >,
-        pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-        >,
-    }
-    impl ::puroro::Message<MethodOptionsSimple> for MethodOptionsSimple {}
-
-    impl MethodOptionsTrait for MethodOptionsSimple {
-        fn deprecated<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.deprecated)
-        }
-        fn idempotency_level<'this>(
-            &'this self,
-        ) -> Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
-        > {
-            Clone::clone(&self.idempotency_level)
-        }
-        type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
-        type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-            >,
-        >;
-
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.uninterpreted_option.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for MethodOptionsSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "deprecated",
-                                number: 33,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "idempotency_level",
-                                number: 34,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "uninterpreted_option",
-                                number: 999,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MethodOptionsSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "MethodOptions",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for MethodOptionsSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MethodOptionsSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            33 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.deprecated, data),
-            34 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
-            >::deser_field(&mut self.idempotency_level, data),
-            999 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple>
-            >::deser_field(&mut self.uninterpreted_option, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for MethodOptionsSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
-                33,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
-        >::ser_field(&self.idempotency_level, 34, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl MethodOptionsTrait for () {
@@ -14318,7 +14750,7 @@ pub mod _puroro_impls {
         pub deprecated: ::std::option::Option<bool>,
     }
 
-    impl ::puroro::Message<MethodOptionsSimple> for MethodOptionsSimpleField33 {}
+    impl ::puroro::Message<super::MethodOptions> for MethodOptionsSimpleField33 {}
 
     impl super::_puroro_traits::MethodOptionsTrait for MethodOptionsSimpleField33 {
         fn deprecated<'this>(&'this self) -> Option<bool> {
@@ -14360,7 +14792,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message<MethodOptionsSimple> for MethodOptionsSimpleField34 {}
+    impl ::puroro::Message<super::MethodOptions> for MethodOptionsSimpleField34 {}
 
     impl super::_puroro_traits::MethodOptionsTrait for MethodOptionsSimpleField34 {
         fn idempotency_level<'this>(
@@ -14402,20 +14834,20 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MethodOptionsSimpleField999 {
         pub uninterpreted_option: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >,
     }
 
-    impl ::puroro::Message<MethodOptionsSimple> for MethodOptionsSimpleField999 {}
+    impl ::puroro::Message<super::MethodOptions> for MethodOptionsSimpleField999 {}
 
     impl super::_puroro_traits::MethodOptionsTrait for MethodOptionsSimpleField999 {
         type Field999MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption;
         type Field999RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         >;
 
@@ -14433,7 +14865,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
                 >,
             >::ser_field(&self.uninterpreted_option, 999, out)?;
             ::std::result::Result::Ok(())
@@ -14443,13 +14875,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         > for MethodOptionsSimpleField999
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> Self {
             Self {
@@ -14461,7 +14893,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MethodOptionsSimpleByValue {}
-    impl ::puroro::Message<MethodOptionsSimple> for MethodOptionsSimpleByValue {}
+    impl ::puroro::Message<super::MethodOptions> for MethodOptionsSimpleByValue {}
 
     impl MethodOptionsTrait for MethodOptionsSimpleByValue {
         fn deprecated<'this>(&'this self) -> Option<bool> {
@@ -14475,7 +14907,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field999MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
         >;
         type Field999RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
@@ -14504,7 +14936,7 @@ pub mod _puroro_impls {
         pub fn append_uninterpreted_option(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::UninterpretedOptionSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
             >,
         ) -> MethodOptionsBuilder<(T, MethodOptionsSimpleField999)> {
             MethodOptionsBuilder((self.0, ::std::convert::From::from(value)))
@@ -14518,231 +14950,6 @@ pub mod _puroro_impls {
     impl MethodOptionsBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct UninterpretedOptionSimple {
-    pub name: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>,
-    pub identifier_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-    pub positive_int_value: ::std::option::Option<u64>,
-    pub negative_int_value: ::std::option::Option<i64>,
-    pub double_value: ::std::option::Option<f64>,
-    pub string_value: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
-    pub aggregate_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-}
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimple {}
-
-    impl UninterpretedOptionTrait for UninterpretedOptionSimple {
-        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple;
-        type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>>;
-
-        fn name<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.name.iter())
-        }
-        type Field3StringType<'this> = &'this str;
-        fn identifier_value<'this>(&'this self) -> Option<Self::Field3StringType<'this>> {
-            self.identifier_value.as_ref().map(|v| v.as_ref())
-        }
-        fn positive_int_value<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.positive_int_value)
-        }
-        fn negative_int_value<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.negative_int_value)
-        }
-        fn double_value<'this>(&'this self) -> Option<f64> {
-            Clone::clone(&self.double_value)
-        }
-        type Field7BytesType<'this> = &'this [u8];
-        fn string_value<'this>(&'this self) -> Option<Self::Field7BytesType<'this>> {
-            self.string_value.as_ref().map(|v| v.as_ref())
-        }
-        type Field8StringType<'this> = &'this str;
-        fn aggregate_value<'this>(&'this self) -> Option<Self::Field8StringType<'this>> {
-            self.aggregate_value.as_ref().map(|v| v.as_ref())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for UninterpretedOptionSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 7]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "name",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <UninterpretedOptionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "identifier_value",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <UninterpretedOptionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "positive_int_value",
-                                number: 4,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <UninterpretedOptionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "negative_int_value",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <UninterpretedOptionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "double_value",
-                                number: 6,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <UninterpretedOptionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "string_value",
-                                number: 7,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <UninterpretedOptionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "aggregate_value",
-                                number: 8,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <UninterpretedOptionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "UninterpretedOption",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for UninterpretedOptionSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for UninterpretedOptionSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>
-            >::deser_field(&mut self.name, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.identifier_value, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.positive_int_value, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.negative_int_value, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Double
-            >::deser_field(&mut self.double_value, data),
-            7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.string_value, data),
-            8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.aggregate_value, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>
-        >::ser_field(&self.name, 2, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.identifier_value,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
-                &self.positive_int_value,
-                4,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
-                &self.negative_int_value,
-                5,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field(
-                &self.double_value,
-                6,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
-                &self.string_value,
-                7,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.aggregate_value,
-                8,
-                out,
-            )?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl UninterpretedOptionTrait for () {
@@ -14963,16 +15170,16 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct UninterpretedOptionSimpleField2 {
-    pub name: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>,
+    pub name: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>,
 }
 
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleField2 {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleField2 {}
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSimpleField2 {
-        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple;
+        type Field2MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart;
         type Field2RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>>;
+    self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>>;
 
         fn name<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.name.iter())
@@ -14989,14 +15196,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>
         >::ser_field(&self.name, 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>> for UninterpretedOptionSimpleField2 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>> for UninterpretedOptionSimpleField2 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>) -> Self {
         Self {
             name: value,
         }
@@ -15008,7 +15215,7 @@ pub mod _puroro_impls {
         pub identifier_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleField3 {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleField3 {}
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSimpleField3 {
         type Field2MessageType<'this> = ();
@@ -15055,7 +15262,7 @@ pub mod _puroro_impls {
         pub positive_int_value: ::std::option::Option<u64>,
     }
 
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleField4 {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleField4 {}
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSimpleField4 {
         type Field2MessageType<'this> = ();
@@ -15100,7 +15307,7 @@ pub mod _puroro_impls {
         pub negative_int_value: ::std::option::Option<i64>,
     }
 
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleField5 {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleField5 {}
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSimpleField5 {
         type Field2MessageType<'this> = ();
@@ -15145,7 +15352,7 @@ pub mod _puroro_impls {
         pub double_value: ::std::option::Option<f64>,
     }
 
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleField6 {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleField6 {}
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSimpleField6 {
         type Field2MessageType<'this> = ();
@@ -15190,7 +15397,7 @@ pub mod _puroro_impls {
         pub string_value: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
     }
 
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleField7 {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleField7 {}
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSimpleField7 {
         type Field2MessageType<'this> = ();
@@ -15237,7 +15444,7 @@ pub mod _puroro_impls {
         pub aggregate_value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleField8 {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleField8 {}
 
     impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSimpleField8 {
         type Field2MessageType<'this> = ();
@@ -15282,10 +15489,10 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct UninterpretedOptionSimpleByValue {}
-    impl ::puroro::Message<UninterpretedOptionSimple> for UninterpretedOptionSimpleByValue {}
+    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSimpleByValue {}
 
     impl UninterpretedOptionTrait for UninterpretedOptionSimpleByValue {
-        type Field2MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>;
+        type Field2MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>;
         type Field2RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field2MessageType<'this>>;
         fn name<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
@@ -15321,7 +15528,7 @@ pub mod _puroro_impls {
     {
         pub fn append_name(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_impls::NamePartSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>,
         ) -> UninterpretedOptionBuilder<(T, UninterpretedOptionSimpleField2)> {
             UninterpretedOptionBuilder((self.0, ::std::convert::From::from(value)))
         }
@@ -15370,94 +15577,6 @@ pub mod _puroro_impls {
     impl UninterpretedOptionBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct SourceCodeInfoSimple {
-    pub location: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>,
-}
-    impl ::puroro::Message<SourceCodeInfoSimple> for SourceCodeInfoSimple {}
-
-    impl SourceCodeInfoTrait for SourceCodeInfoSimple {
-        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple;
-        type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>>;
-
-        fn location<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.location.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for SourceCodeInfoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "location",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <SourceCodeInfoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "SourceCodeInfo",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for SourceCodeInfoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for SourceCodeInfoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>
-            >::deser_field(&mut self.location, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for SourceCodeInfoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>
-        >::ser_field(&self.location, 1, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl SourceCodeInfoTrait for () {
@@ -15533,16 +15652,16 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct SourceCodeInfoSimpleField1 {
-    pub location: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>,
+    pub location: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>,
 }
 
-    impl ::puroro::Message<SourceCodeInfoSimple> for SourceCodeInfoSimpleField1 {}
+    impl ::puroro::Message<super::SourceCodeInfo> for SourceCodeInfoSimpleField1 {}
 
     impl super::_puroro_traits::SourceCodeInfoTrait for SourceCodeInfoSimpleField1 {
-        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple;
+        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location;
         type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>>;
+    self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>>;
 
         fn location<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.location.iter())
@@ -15556,14 +15675,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>
         >::ser_field(&self.location, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>> for SourceCodeInfoSimpleField1 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>> for SourceCodeInfoSimpleField1 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>) -> Self {
         Self {
             location: value,
         }
@@ -15573,10 +15692,10 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct SourceCodeInfoSimpleByValue {}
-    impl ::puroro::Message<SourceCodeInfoSimple> for SourceCodeInfoSimpleByValue {}
+    impl ::puroro::Message<super::SourceCodeInfo> for SourceCodeInfoSimpleByValue {}
 
     impl SourceCodeInfoTrait for SourceCodeInfoSimpleByValue {
-        type Field1MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>;
+        type Field1MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>;
         type Field1RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1MessageType<'this>>;
         fn location<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
@@ -15591,7 +15710,7 @@ pub mod _puroro_impls {
     {
         pub fn append_location(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_impls::LocationSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>,
         ) -> SourceCodeInfoBuilder<(T, SourceCodeInfoSimpleField1)> {
             SourceCodeInfoBuilder((self.0, ::std::convert::From::from(value)))
         }
@@ -15604,94 +15723,6 @@ pub mod _puroro_impls {
     impl SourceCodeInfoBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct GeneratedCodeInfoSimple {
-    pub annotation: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>,
-}
-    impl ::puroro::Message<GeneratedCodeInfoSimple> for GeneratedCodeInfoSimple {}
-
-    impl GeneratedCodeInfoTrait for GeneratedCodeInfoSimple {
-        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple;
-        type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>>;
-
-        fn annotation<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.annotation.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for GeneratedCodeInfoSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "annotation",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <GeneratedCodeInfoSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "GeneratedCodeInfo",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for GeneratedCodeInfoSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for GeneratedCodeInfoSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>
-            >::deser_field(&mut self.annotation, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for GeneratedCodeInfoSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>
-        >::ser_field(&self.annotation, 1, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl GeneratedCodeInfoTrait for () {
@@ -15767,16 +15798,16 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct GeneratedCodeInfoSimpleField1 {
-    pub annotation: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>,
+    pub annotation: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>,
 }
 
-    impl ::puroro::Message<GeneratedCodeInfoSimple> for GeneratedCodeInfoSimpleField1 {}
+    impl ::puroro::Message<super::GeneratedCodeInfo> for GeneratedCodeInfoSimpleField1 {}
 
     impl super::_puroro_traits::GeneratedCodeInfoTrait for GeneratedCodeInfoSimpleField1 {
-        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple;
+        type Field1MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation;
         type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>>;
+    self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>>;
 
         fn annotation<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.annotation.iter())
@@ -15790,14 +15821,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>
         >::ser_field(&self.annotation, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>> for GeneratedCodeInfoSimpleField1 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>> for GeneratedCodeInfoSimpleField1 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>) -> Self {
         Self {
             annotation: value,
         }
@@ -15807,10 +15838,10 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct GeneratedCodeInfoSimpleByValue {}
-    impl ::puroro::Message<GeneratedCodeInfoSimple> for GeneratedCodeInfoSimpleByValue {}
+    impl ::puroro::Message<super::GeneratedCodeInfo> for GeneratedCodeInfoSimpleByValue {}
 
     impl GeneratedCodeInfoTrait for GeneratedCodeInfoSimpleByValue {
-        type Field1MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>;
+        type Field1MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>;
         type Field1RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1MessageType<'this>>;
         fn annotation<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
@@ -15825,7 +15856,7 @@ pub mod _puroro_impls {
     {
         pub fn append_annotation(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_impls::AnnotationSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>,
         ) -> GeneratedCodeInfoBuilder<(T, GeneratedCodeInfoSimpleField1)> {
             GeneratedCodeInfoBuilder((self.0, ::std::convert::From::from(value)))
         }
@@ -17374,41 +17405,39 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_impls::ExtensionRangeSimple as ExtensionRange;
-        pub use _puroro_impls::ReservedRangeSimple as ReservedRange;
-        pub use _puroro_impls::*;
-        pub mod _puroro_impls {
+        pub use _puroro_simple_impl::ExtensionRange;
+        pub use _puroro_simple_impl::ReservedRange;
+        pub mod _puroro_simple_impl {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            use super::_puroro_traits::*;
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
                 ::std::cmp::PartialEq,
                 ::std::fmt::Debug,
             )]
-            pub struct ExtensionRangeSimple {
+            pub struct ExtensionRange {
             pub start: ::std::option::Option<i32>,
             pub end: ::std::option::Option<i32>,
-            pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>>,
+            pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>,
         }
-            impl ::puroro::Message<ExtensionRangeSimple> for ExtensionRangeSimple {}
+            impl ::puroro::Message<ExtensionRange> for ExtensionRange {}
 
-            impl ExtensionRangeTrait for ExtensionRangeSimple {
+            impl super::_puroro_traits::ExtensionRangeTrait for ExtensionRange {
                 fn start<'this>(&'this self) -> Option<i32> {
                     Clone::clone(&self.start)
                 }
                 fn end<'this>(&'this self) -> Option<i32> {
                     Clone::clone(&self.end)
                 }
-                type Field3MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple;
+                type Field3MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions;
                 fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
                     self.options.as_ref().map(|v| v.as_ref())
                 }
             }
 
-            impl ::puroro::MessageRepresentativeImpl for ExtensionRangeSimple {
+            impl ::puroro::MessageRepresentativeImpl for ExtensionRange {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
                     static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
@@ -17419,7 +17448,7 @@ pub mod _puroro_nested {
                                         name: "start",
                                         number: 1,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <ExtensionRangeSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <ExtensionRange as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -17429,7 +17458,7 @@ pub mod _puroro_nested {
                                         name: "end",
                                         number: 2,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <ExtensionRangeSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <ExtensionRange as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -17439,7 +17468,7 @@ pub mod _puroro_nested {
                                         name: "options",
                                         number: 3,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <ExtensionRangeSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <ExtensionRange as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -17460,7 +17489,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRangeSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRange {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -17469,7 +17498,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for ExtensionRangeSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for ExtensionRange {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -17489,7 +17518,7 @@ pub mod _puroro_nested {
                         ::puroro::tags::Optional, ::puroro::tags::Int32
                     >::deser_field(&mut self.end, data),
                     3 => DeserFieldFromBytesIter::<
-                        ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>
+                        ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>
                     >::deser_field(&mut self.options, data),
         
                     _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -17497,7 +17526,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for ExtensionRangeSimple {
+            impl ::puroro::SerToIoWrite for ExtensionRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -17510,12 +17539,135 @@ pub mod _puroro_nested {
                     ::puroro::tags::Optional, ::puroro::tags::Int32
                 >::ser_field(&self.end, 2, out)?;
                     SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>
+                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>
                 >::ser_field(&self.options, 3, out)?;
 
                     ::std::result::Result::Ok(())
                 }
             }
+            #[derive(
+                ::std::clone::Clone,
+                ::std::default::Default,
+                ::std::cmp::PartialEq,
+                ::std::fmt::Debug,
+            )]
+            pub struct ReservedRange {
+                pub start: ::std::option::Option<i32>,
+                pub end: ::std::option::Option<i32>,
+            }
+            impl ::puroro::Message<ReservedRange> for ReservedRange {}
+
+            impl super::_puroro_traits::ReservedRangeTrait for ReservedRange {
+                fn start<'this>(&'this self) -> Option<i32> {
+                    Clone::clone(&self.start)
+                }
+                fn end<'this>(&'this self) -> Option<i32> {
+                    Clone::clone(&self.end)
+                }
+            }
+
+            impl ::puroro::MessageRepresentativeImpl for ReservedRange {
+                fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+                    use ::puroro::once_cell::sync::Lazy;
+                    static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
+                        Lazy::new(|| {
+                            [
+                                {
+                                    let init = ::puroro::internal::FieldDescriptorInitializer {
+                                        name: "start",
+                                        number: 1,
+                                        lazy_containing_type: Lazy::new(|| {
+                                            <ReservedRange as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                        }),
+                                    };
+                                    ::puroro::internal::init_field_descriptor(init)
+                                },
+                                {
+                                    let init = ::puroro::internal::FieldDescriptorInitializer {
+                                        name: "end",
+                                        number: 2,
+                                        lazy_containing_type: Lazy::new(|| {
+                                            <ReservedRange as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                        }),
+                                    };
+                                    ::puroro::internal::init_field_descriptor(init)
+                                },
+                            ]
+                        });
+                    static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> =
+                        Lazy::new(|| {
+                            let init = ::puroro::internal::MessageDescriptorInitializer {
+                                name: "ReservedRange",
+                                lazy_fields: Lazy::new(|| {
+                                    Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()
+                                }),
+                            };
+                            ::puroro::internal::init_message_descriptor(init)
+                        });
+                    Lazy::force(&LAZY_DESCRIPTOR)
+                }
+            }
+
+            impl ::puroro::DeserializableMessageFromBytesIterator for ReservedRange {
+                fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+                where
+                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+                {
+                    ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+                }
+            }
+
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for ReservedRange {
+                fn deser_field<I>(
+                    &mut self,
+                    field_number: i32,
+                    data: ::puroro::types::FieldData<
+                        &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+                    >,
+                ) -> ::puroro::Result<()>
+                where
+                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+                {
+                    use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+                    match field_number {
+                        1 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Optional,
+                            ::puroro::tags::Int32,
+                        >::deser_field(&mut self.start, data),
+                        2 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Optional,
+                            ::puroro::tags::Int32,
+                        >::deser_field(&mut self.end, data),
+
+                        _ => unimplemented!("TODO: This case should be handled properly..."),
+                    }
+                }
+            }
+
+            impl ::puroro::SerToIoWrite for ReservedRange {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::ser_field(&self.start, 1, out)?;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::ser_field(&self.end, 2, out)?;
+
+                    ::std::result::Result::Ok(())
+                }
+            }
+        }
+
+        pub use _puroro_impls::*;
+        pub mod _puroro_impls {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            use super::_puroro_traits::*;
             impl ExtensionRangeTrait for () {
                 type Field3MessageType<'this> = ();
             }
@@ -17605,7 +17757,7 @@ pub mod _puroro_nested {
                 pub start: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<ExtensionRangeSimple> for ExtensionRangeSimpleField1 {}
+            impl ::puroro::Message<super::ExtensionRange> for ExtensionRangeSimpleField1 {}
 
             impl super::_puroro_traits::ExtensionRangeTrait for ExtensionRangeSimpleField1 {
                 fn start<'this>(&'this self) -> Option<i32> {
@@ -17638,7 +17790,7 @@ pub mod _puroro_nested {
                 pub end: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<ExtensionRangeSimple> for ExtensionRangeSimpleField2 {}
+            impl ::puroro::Message<super::ExtensionRange> for ExtensionRangeSimpleField2 {}
 
             impl super::_puroro_traits::ExtensionRangeTrait for ExtensionRangeSimpleField2 {
                 fn end<'this>(&'this self) -> Option<i32> {
@@ -17668,13 +17820,13 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct ExtensionRangeSimpleField3 {
-            pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>>,
+            pub options: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>,
         }
 
-            impl ::puroro::Message<ExtensionRangeSimple> for ExtensionRangeSimpleField3 {}
+            impl ::puroro::Message<super::ExtensionRange> for ExtensionRangeSimpleField3 {}
 
             impl super::_puroro_traits::ExtensionRangeTrait for ExtensionRangeSimpleField3 {
-                type Field3MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple;
+                type Field3MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions;
                 fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
                     self.options.as_ref().map(|v| v.as_ref())
                 }
@@ -17687,14 +17839,14 @@ pub mod _puroro_nested {
                 {
                     use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>
+                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>
                 >::ser_field(&self.options, 3, out)?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>>> for ExtensionRangeSimpleField3 {
-            fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>>) -> Self {
+            impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>> for ExtensionRangeSimpleField3 {
+            fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>) -> Self {
                 Self {
                     options: value,
                 }
@@ -17707,7 +17859,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct ExtensionRangeSimpleByValue {}
-            impl ::puroro::Message<ExtensionRangeSimple> for ExtensionRangeSimpleByValue {}
+            impl ::puroro::Message<super::ExtensionRange> for ExtensionRangeSimpleByValue {}
 
             impl ExtensionRangeTrait for ExtensionRangeSimpleByValue {
                 fn start<'this>(&'this self) -> Option<i32> {
@@ -17716,7 +17868,7 @@ pub mod _puroro_nested {
                 fn end<'this>(&'this self) -> Option<i32> {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
-                type Field3MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>;
+                type Field3MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>;
                 fn options<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
@@ -17741,7 +17893,7 @@ pub mod _puroro_nested {
                 }
                 pub fn append_options(
                     self,
-                    value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::ExtensionRangeOptionsSimple>>,
+                    value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>,
                 ) -> ExtensionRangeBuilder<(T, ExtensionRangeSimpleField3)> {
                     ExtensionRangeBuilder((self.0, ::std::convert::From::from(value)))
                 }
@@ -17754,121 +17906,6 @@ pub mod _puroro_nested {
             impl ExtensionRangeBuilder<()> {
                 pub fn new() -> Self {
                     Self(())
-                }
-            }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
-            pub struct ReservedRangeSimple {
-                pub start: ::std::option::Option<i32>,
-                pub end: ::std::option::Option<i32>,
-            }
-            impl ::puroro::Message<ReservedRangeSimple> for ReservedRangeSimple {}
-
-            impl ReservedRangeTrait for ReservedRangeSimple {
-                fn start<'this>(&'this self) -> Option<i32> {
-                    Clone::clone(&self.start)
-                }
-                fn end<'this>(&'this self) -> Option<i32> {
-                    Clone::clone(&self.end)
-                }
-            }
-
-            impl ::puroro::MessageRepresentativeImpl for ReservedRangeSimple {
-                fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-                    use ::puroro::once_cell::sync::Lazy;
-                    static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
-                        Lazy::new(|| {
-                            [
-                                {
-                                    let init = ::puroro::internal::FieldDescriptorInitializer {
-                                        name: "start",
-                                        number: 1,
-                                        lazy_containing_type: Lazy::new(|| {
-                                            <ReservedRangeSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                        }),
-                                    };
-                                    ::puroro::internal::init_field_descriptor(init)
-                                },
-                                {
-                                    let init = ::puroro::internal::FieldDescriptorInitializer {
-                                        name: "end",
-                                        number: 2,
-                                        lazy_containing_type: Lazy::new(|| {
-                                            <ReservedRangeSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                        }),
-                                    };
-                                    ::puroro::internal::init_field_descriptor(init)
-                                },
-                            ]
-                        });
-                    static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> =
-                        Lazy::new(|| {
-                            let init = ::puroro::internal::MessageDescriptorInitializer {
-                                name: "ReservedRange",
-                                lazy_fields: Lazy::new(|| {
-                                    Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()
-                                }),
-                            };
-                            ::puroro::internal::init_message_descriptor(init)
-                        });
-                    Lazy::force(&LAZY_DESCRIPTOR)
-                }
-            }
-
-            impl ::puroro::DeserializableMessageFromBytesIterator for ReservedRangeSimple {
-                fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-                where
-                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-                {
-                    ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-                }
-            }
-
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for ReservedRangeSimple {
-                fn deser_field<I>(
-                    &mut self,
-                    field_number: i32,
-                    data: ::puroro::types::FieldData<
-                        &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
-                    >,
-                ) -> ::puroro::Result<()>
-                where
-                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-                {
-                    use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-                    match field_number {
-                        1 => DeserFieldFromBytesIter::<
-                            ::puroro::tags::Optional,
-                            ::puroro::tags::Int32,
-                        >::deser_field(&mut self.start, data),
-                        2 => DeserFieldFromBytesIter::<
-                            ::puroro::tags::Optional,
-                            ::puroro::tags::Int32,
-                        >::deser_field(&mut self.end, data),
-
-                        _ => unimplemented!("TODO: This case should be handled properly..."),
-                    }
-                }
-            }
-
-            impl ::puroro::SerToIoWrite for ReservedRangeSimple {
-                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-                where
-                    W: ::std::io::Write,
-                {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.start, 1, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.end, 2, out)?;
-
-                    ::std::result::Result::Ok(())
                 }
             }
             impl ReservedRangeTrait for () {}
@@ -17921,7 +17958,7 @@ pub mod _puroro_nested {
                 pub start: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<ReservedRangeSimple> for ReservedRangeSimpleField1 {}
+            impl ::puroro::Message<super::ReservedRange> for ReservedRangeSimpleField1 {}
 
             impl super::_puroro_traits::ReservedRangeTrait for ReservedRangeSimpleField1 {
                 fn start<'this>(&'this self) -> Option<i32> {
@@ -17953,7 +17990,7 @@ pub mod _puroro_nested {
                 pub end: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<ReservedRangeSimple> for ReservedRangeSimpleField2 {}
+            impl ::puroro::Message<super::ReservedRange> for ReservedRangeSimpleField2 {}
 
             impl super::_puroro_traits::ReservedRangeTrait for ReservedRangeSimpleField2 {
                 fn end<'this>(&'this self) -> Option<i32> {
@@ -17986,7 +18023,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct ReservedRangeSimpleByValue {}
-            impl ::puroro::Message<ReservedRangeSimple> for ReservedRangeSimpleByValue {}
+            impl ::puroro::Message<super::ReservedRange> for ReservedRangeSimpleByValue {}
 
             impl ReservedRangeTrait for ReservedRangeSimpleByValue {
                 fn start<'this>(&'this self) -> Option<i32> {
@@ -18262,26 +18299,24 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_impls::EnumReservedRangeSimple as EnumReservedRange;
-        pub use _puroro_impls::*;
-        pub mod _puroro_impls {
+        pub use _puroro_simple_impl::EnumReservedRange;
+        pub mod _puroro_simple_impl {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            use super::_puroro_traits::*;
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
                 ::std::cmp::PartialEq,
                 ::std::fmt::Debug,
             )]
-            pub struct EnumReservedRangeSimple {
+            pub struct EnumReservedRange {
                 pub start: ::std::option::Option<i32>,
                 pub end: ::std::option::Option<i32>,
             }
-            impl ::puroro::Message<EnumReservedRangeSimple> for EnumReservedRangeSimple {}
+            impl ::puroro::Message<EnumReservedRange> for EnumReservedRange {}
 
-            impl EnumReservedRangeTrait for EnumReservedRangeSimple {
+            impl super::_puroro_traits::EnumReservedRangeTrait for EnumReservedRange {
                 fn start<'this>(&'this self) -> Option<i32> {
                     Clone::clone(&self.start)
                 }
@@ -18290,7 +18325,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::MessageRepresentativeImpl for EnumReservedRangeSimple {
+            impl ::puroro::MessageRepresentativeImpl for EnumReservedRange {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
                     static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
@@ -18301,7 +18336,7 @@ pub mod _puroro_nested {
                                         name: "start",
                                         number: 1,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <EnumReservedRangeSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <EnumReservedRange as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -18311,7 +18346,7 @@ pub mod _puroro_nested {
                                         name: "end",
                                         number: 2,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <EnumReservedRangeSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <EnumReservedRange as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -18332,7 +18367,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for EnumReservedRangeSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for EnumReservedRange {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -18341,7 +18376,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumReservedRangeSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for EnumReservedRange {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -18368,7 +18403,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for EnumReservedRangeSimple {
+            impl ::puroro::SerToIoWrite for EnumReservedRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -18384,6 +18419,14 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+        }
+
+        pub use _puroro_impls::*;
+        pub mod _puroro_impls {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            use super::_puroro_traits::*;
             impl EnumReservedRangeTrait for () {}
             impl<T, U> EnumReservedRangeTrait for (T, U)
             where
@@ -18434,7 +18477,7 @@ pub mod _puroro_nested {
                 pub start: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<EnumReservedRangeSimple> for EnumReservedRangeSimpleField1 {}
+            impl ::puroro::Message<super::EnumReservedRange> for EnumReservedRangeSimpleField1 {}
 
             impl super::_puroro_traits::EnumReservedRangeTrait for EnumReservedRangeSimpleField1 {
                 fn start<'this>(&'this self) -> Option<i32> {
@@ -18466,7 +18509,7 @@ pub mod _puroro_nested {
                 pub end: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<EnumReservedRangeSimple> for EnumReservedRangeSimpleField2 {}
+            impl ::puroro::Message<super::EnumReservedRange> for EnumReservedRangeSimpleField2 {}
 
             impl super::_puroro_traits::EnumReservedRangeTrait for EnumReservedRangeSimpleField2 {
                 fn end<'this>(&'this self) -> Option<i32> {
@@ -18499,7 +18542,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct EnumReservedRangeSimpleByValue {}
-            impl ::puroro::Message<EnumReservedRangeSimple> for EnumReservedRangeSimpleByValue {}
+            impl ::puroro::Message<super::EnumReservedRange> for EnumReservedRangeSimpleByValue {}
 
             impl EnumReservedRangeTrait for EnumReservedRangeSimpleByValue {
                 fn start<'this>(&'this self) -> Option<i32> {
@@ -18791,26 +18834,24 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_impls::NamePartSimple as NamePart;
-        pub use _puroro_impls::*;
-        pub mod _puroro_impls {
+        pub use _puroro_simple_impl::NamePart;
+        pub mod _puroro_simple_impl {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            use super::_puroro_traits::*;
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
                 ::std::cmp::PartialEq,
                 ::std::fmt::Debug,
             )]
-            pub struct NamePartSimple {
+            pub struct NamePart {
                 pub name_part: ::std::option::Option<::std::borrow::Cow<'static, str>>,
                 pub is_extension: ::std::option::Option<bool>,
             }
-            impl ::puroro::Message<NamePartSimple> for NamePartSimple {}
+            impl ::puroro::Message<NamePart> for NamePart {}
 
-            impl NamePartTrait for NamePartSimple {
+            impl super::_puroro_traits::NamePartTrait for NamePart {
                 type Field1StringType<'this> = &'this str;
                 fn name_part<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
                     self.name_part.as_ref().map(|v| v.as_ref())
@@ -18820,7 +18861,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::MessageRepresentativeImpl for NamePartSimple {
+            impl ::puroro::MessageRepresentativeImpl for NamePart {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
                     static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
@@ -18831,7 +18872,7 @@ pub mod _puroro_nested {
                                         name: "name_part",
                                         number: 1,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <NamePartSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <NamePart as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -18841,7 +18882,7 @@ pub mod _puroro_nested {
                                         name: "is_extension",
                                         number: 2,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <NamePartSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <NamePart as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -18862,7 +18903,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for NamePartSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for NamePart {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -18871,7 +18912,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for NamePartSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for NamePart {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -18898,7 +18939,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for NamePartSimple {
+            impl ::puroro::SerToIoWrite for NamePart {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -18916,6 +18957,14 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+        }
+
+        pub use _puroro_impls::*;
+        pub mod _puroro_impls {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            use super::_puroro_traits::*;
             impl NamePartTrait for () {
                 type Field1StringType<'this> = &'static str;
             }
@@ -18984,7 +19033,7 @@ pub mod _puroro_nested {
                 pub name_part: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<NamePartSimple> for NamePartSimpleField1 {}
+            impl ::puroro::Message<super::NamePart> for NamePartSimpleField1 {}
 
             impl super::_puroro_traits::NamePartTrait for NamePartSimpleField1 {
                 type Field1StringType<'this> = &'this str;
@@ -19019,7 +19068,7 @@ pub mod _puroro_nested {
                 pub is_extension: ::std::option::Option<bool>,
             }
 
-            impl ::puroro::Message<NamePartSimple> for NamePartSimpleField2 {}
+            impl ::puroro::Message<super::NamePart> for NamePartSimpleField2 {}
 
             impl super::_puroro_traits::NamePartTrait for NamePartSimpleField2 {
                 type Field1StringType<'this> = &'static str;
@@ -19057,7 +19106,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct NamePartSimpleByValue {}
-            impl ::puroro::Message<NamePartSimple> for NamePartSimpleByValue {}
+            impl ::puroro::Message<super::NamePart> for NamePartSimpleByValue {}
 
             impl NamePartTrait for NamePartSimpleByValue {
                 type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -19161,29 +19210,27 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_impls::LocationSimple as Location;
-        pub use _puroro_impls::*;
-        pub mod _puroro_impls {
+        pub use _puroro_simple_impl::Location;
+        pub mod _puroro_simple_impl {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            use super::_puroro_traits::*;
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
                 ::std::cmp::PartialEq,
                 ::std::fmt::Debug,
             )]
-            pub struct LocationSimple {
+            pub struct Location {
                 pub path: ::std::vec::Vec<i32>,
                 pub span: ::std::vec::Vec<i32>,
                 pub leading_comments: ::std::option::Option<::std::borrow::Cow<'static, str>>,
                 pub trailing_comments: ::std::option::Option<::std::borrow::Cow<'static, str>>,
                 pub leading_detached_comments: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
             }
-            impl ::puroro::Message<LocationSimple> for LocationSimple {}
+            impl ::puroro::Message<Location> for Location {}
 
-            impl LocationTrait for LocationSimple {
+            impl super::_puroro_traits::LocationTrait for Location {
                 type Field1RepeatedType<'this> =
                     ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
@@ -19219,7 +19266,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::MessageRepresentativeImpl for LocationSimple {
+            impl ::puroro::MessageRepresentativeImpl for Location {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
                     static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 5]> =
@@ -19230,7 +19277,7 @@ pub mod _puroro_nested {
                                         name: "path",
                                         number: 1,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <LocationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Location as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -19240,7 +19287,7 @@ pub mod _puroro_nested {
                                         name: "span",
                                         number: 2,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <LocationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Location as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -19250,7 +19297,7 @@ pub mod _puroro_nested {
                                         name: "leading_comments",
                                         number: 3,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <LocationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Location as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -19260,7 +19307,7 @@ pub mod _puroro_nested {
                                         name: "trailing_comments",
                                         number: 4,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <LocationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Location as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -19270,7 +19317,7 @@ pub mod _puroro_nested {
                                         name: "leading_detached_comments",
                                         number: 6,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <LocationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Location as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -19291,7 +19338,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for LocationSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for Location {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -19300,7 +19347,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for LocationSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for Location {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -19345,7 +19392,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for LocationSimple {
+            impl ::puroro::SerToIoWrite for Location {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19370,6 +19417,14 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+        }
+
+        pub use _puroro_impls::*;
+        pub mod _puroro_impls {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            use super::_puroro_traits::*;
             impl LocationTrait for () {
                 type Field1RepeatedType<'this> =
                     ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -19610,7 +19665,7 @@ pub mod _puroro_nested {
                 pub path: ::std::vec::Vec<i32>,
             }
 
-            impl ::puroro::Message<LocationSimple> for LocationSimpleField1 {}
+            impl ::puroro::Message<super::Location> for LocationSimpleField1 {}
 
             impl super::_puroro_traits::LocationTrait for LocationSimpleField1 {
                 type Field1RepeatedType<'this> =
@@ -19662,7 +19717,7 @@ pub mod _puroro_nested {
                 pub span: ::std::vec::Vec<i32>,
             }
 
-            impl ::puroro::Message<LocationSimple> for LocationSimpleField2 {}
+            impl ::puroro::Message<super::Location> for LocationSimpleField2 {}
 
             impl super::_puroro_traits::LocationTrait for LocationSimpleField2 {
                 type Field1RepeatedType<'this> =
@@ -19714,7 +19769,7 @@ pub mod _puroro_nested {
                 pub leading_comments: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<LocationSimple> for LocationSimpleField3 {}
+            impl ::puroro::Message<super::Location> for LocationSimpleField3 {}
 
             impl super::_puroro_traits::LocationTrait for LocationSimpleField3 {
                 type Field1RepeatedType<'this> =
@@ -19772,7 +19827,7 @@ pub mod _puroro_nested {
                 pub trailing_comments: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<LocationSimple> for LocationSimpleField4 {}
+            impl ::puroro::Message<super::Location> for LocationSimpleField4 {}
 
             impl super::_puroro_traits::LocationTrait for LocationSimpleField4 {
                 type Field1RepeatedType<'this> =
@@ -19830,7 +19885,7 @@ pub mod _puroro_nested {
                 pub leading_detached_comments: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<LocationSimple> for LocationSimpleField6 {}
+            impl ::puroro::Message<super::Location> for LocationSimpleField6 {}
 
             impl super::_puroro_traits::LocationTrait for LocationSimpleField6 {
                 type Field1RepeatedType<'this> =
@@ -19889,7 +19944,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct LocationSimpleByValue {}
-            impl ::puroro::Message<LocationSimple> for LocationSimpleByValue {}
+            impl ::puroro::Message<super::Location> for LocationSimpleByValue {}
 
             impl LocationTrait for LocationSimpleByValue {
                 type Field1RepeatedType<'this> =
@@ -20070,28 +20125,26 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_impls::AnnotationSimple as Annotation;
-        pub use _puroro_impls::*;
-        pub mod _puroro_impls {
+        pub use _puroro_simple_impl::Annotation;
+        pub mod _puroro_simple_impl {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            use super::_puroro_traits::*;
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
                 ::std::cmp::PartialEq,
                 ::std::fmt::Debug,
             )]
-            pub struct AnnotationSimple {
+            pub struct Annotation {
                 pub path: ::std::vec::Vec<i32>,
                 pub source_file: ::std::option::Option<::std::borrow::Cow<'static, str>>,
                 pub begin: ::std::option::Option<i32>,
                 pub end: ::std::option::Option<i32>,
             }
-            impl ::puroro::Message<AnnotationSimple> for AnnotationSimple {}
+            impl ::puroro::Message<Annotation> for Annotation {}
 
-            impl AnnotationTrait for AnnotationSimple {
+            impl super::_puroro_traits::AnnotationTrait for Annotation {
                 type Field1RepeatedType<'this> =
                     ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
@@ -20110,7 +20163,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::MessageRepresentativeImpl for AnnotationSimple {
+            impl ::puroro::MessageRepresentativeImpl for Annotation {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
                     static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 4]> =
@@ -20121,7 +20174,7 @@ pub mod _puroro_nested {
                                         name: "path",
                                         number: 1,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <AnnotationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Annotation as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -20131,7 +20184,7 @@ pub mod _puroro_nested {
                                         name: "source_file",
                                         number: 2,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <AnnotationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Annotation as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -20141,7 +20194,7 @@ pub mod _puroro_nested {
                                         name: "begin",
                                         number: 3,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <AnnotationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Annotation as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -20151,7 +20204,7 @@ pub mod _puroro_nested {
                                         name: "end",
                                         number: 4,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <AnnotationSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <Annotation as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -20172,7 +20225,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for AnnotationSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for Annotation {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -20181,7 +20234,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for AnnotationSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for Annotation {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -20216,7 +20269,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for AnnotationSimple {
+            impl ::puroro::SerToIoWrite for Annotation {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -20238,6 +20291,14 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+        }
+
+        pub use _puroro_impls::*;
+        pub mod _puroro_impls {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            use super::_puroro_traits::*;
             impl AnnotationTrait for () {
                 type Field1RepeatedType<'this> =
                     ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -20366,7 +20427,7 @@ pub mod _puroro_nested {
                 pub path: ::std::vec::Vec<i32>,
             }
 
-            impl ::puroro::Message<AnnotationSimple> for AnnotationSimpleField1 {}
+            impl ::puroro::Message<super::Annotation> for AnnotationSimpleField1 {}
 
             impl super::_puroro_traits::AnnotationTrait for AnnotationSimpleField1 {
                 type Field1RepeatedType<'this> =
@@ -20402,7 +20463,7 @@ pub mod _puroro_nested {
                 pub source_file: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<AnnotationSimple> for AnnotationSimpleField2 {}
+            impl ::puroro::Message<super::Annotation> for AnnotationSimpleField2 {}
 
             impl super::_puroro_traits::AnnotationTrait for AnnotationSimpleField2 {
                 type Field1RepeatedType<'this> =
@@ -20442,7 +20503,7 @@ pub mod _puroro_nested {
                 pub begin: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<AnnotationSimple> for AnnotationSimpleField3 {}
+            impl ::puroro::Message<super::Annotation> for AnnotationSimpleField3 {}
 
             impl super::_puroro_traits::AnnotationTrait for AnnotationSimpleField3 {
                 type Field1RepeatedType<'this> =
@@ -20480,7 +20541,7 @@ pub mod _puroro_nested {
                 pub end: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message<AnnotationSimple> for AnnotationSimpleField4 {}
+            impl ::puroro::Message<super::Annotation> for AnnotationSimpleField4 {}
 
             impl super::_puroro_traits::AnnotationTrait for AnnotationSimpleField4 {
                 type Field1RepeatedType<'this> =
@@ -20519,7 +20580,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct AnnotationSimpleByValue {}
-            impl ::puroro::Message<AnnotationSimple> for AnnotationSimpleByValue {}
+            impl ::puroro::Message<super::Annotation> for AnnotationSimpleByValue {}
 
             impl AnnotationTrait for AnnotationSimpleByValue {
                 type Field1RepeatedType<'this> =

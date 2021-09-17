@@ -5,27 +5,25 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::CodeGeneratorRequestSimple as CodeGeneratorRequest;
-pub use _puroro_impls::CodeGeneratorResponseSimple as CodeGeneratorResponse;
-pub use _puroro_impls::VersionSimple as Version;
-pub use _puroro_impls::*;
-pub mod _puroro_impls {
+pub use _puroro_simple_impl::CodeGeneratorRequest;
+pub use _puroro_simple_impl::CodeGeneratorResponse;
+pub use _puroro_simple_impl::Version;
+pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
-    pub struct VersionSimple {
+    pub struct Version {
         pub major: ::std::option::Option<i32>,
         pub minor: ::std::option::Option<i32>,
         pub patch: ::std::option::Option<i32>,
         pub suffix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
-    impl ::puroro::Message<VersionSimple> for VersionSimple {}
+    impl ::puroro::Message<Version> for Version {}
 
-    impl VersionTrait for VersionSimple {
+    impl super::_puroro_traits::VersionTrait for Version {
         fn major<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.major)
         }
@@ -41,7 +39,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for VersionSimple {
+    impl ::puroro::MessageRepresentativeImpl for Version {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
             static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 4]> =
@@ -52,7 +50,7 @@ pub mod _puroro_impls {
                                 name: "major",
                                 number: 1,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <VersionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Version as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -62,7 +60,7 @@ pub mod _puroro_impls {
                                 name: "minor",
                                 number: 2,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <VersionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Version as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -72,7 +70,7 @@ pub mod _puroro_impls {
                                 name: "patch",
                                 number: 3,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <VersionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Version as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -82,7 +80,7 @@ pub mod _puroro_impls {
                                 name: "suffix",
                                 number: 4,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <VersionSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Version as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -100,7 +98,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for VersionSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for Version {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -109,7 +107,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for VersionSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Version {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -138,7 +136,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for VersionSimple {
+    impl ::puroro::SerToIoWrite for Version {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -168,6 +166,329 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct CodeGeneratorRequest {
+        pub file_to_generate: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+        pub parameter: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub proto_file: ::std::vec::Vec<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
+        >,
+        pub compiler_version: ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
+            >,
+        >,
+    }
+    impl ::puroro::Message<CodeGeneratorRequest> for CodeGeneratorRequest {}
+
+    impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequest {
+        type Field1StringType<'this> = &'this str;
+        type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            str,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
+        >;
+
+        fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.file_to_generate.iter())
+        }
+        type Field2StringType<'this> = &'this str;
+        fn parameter<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+            self.parameter.as_ref().map(|v| v.as_ref())
+        }
+        type Field15MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
+        type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
+            >,
+        >;
+
+        fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.proto_file.iter())
+        }
+        type Field3MessageType<'this> =
+            &'this self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version;
+        fn compiler_version<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            self.compiler_version.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for CodeGeneratorRequest {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 4]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "file_to_generate",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <CodeGeneratorRequest as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "parameter",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <CodeGeneratorRequest as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "proto_file",
+                                number: 15,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <CodeGeneratorRequest as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "compiler_version",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <CodeGeneratorRequest as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "CodeGeneratorRequest",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorRequest {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for CodeGeneratorRequest {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.file_to_generate, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.parameter, data),
+            15 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto>
+            >::deser_field(&mut self.proto_file, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version>
+            >::deser_field(&mut self.compiler_version, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for CodeGeneratorRequest {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                &self.file_to_generate,
+                1,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.parameter,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
+                >,
+            >::ser_field(&self.proto_file, 15, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
+                >,
+            >::ser_field(&self.compiler_version, 3, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct CodeGeneratorResponse {
+    pub error: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub supported_features: ::std::option::Option<u64>,
+    pub file: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>,
+}
+    impl ::puroro::Message<CodeGeneratorResponse> for CodeGeneratorResponse {}
+
+    impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponse {
+        type Field1StringType<'this> = &'this str;
+        fn error<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
+            self.error.as_ref().map(|v| v.as_ref())
+        }
+        fn supported_features<'this>(&'this self) -> Option<u64> {
+            Clone::clone(&self.supported_features)
+        }
+        type Field15MessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File;
+        type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+    self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>>;
+
+        fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.file.iter())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for CodeGeneratorResponse {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "error",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <CodeGeneratorResponse as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "supported_features",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <CodeGeneratorResponse as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "file",
+                                number: 15,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <CodeGeneratorResponse as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "CodeGeneratorResponse",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorResponse {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for CodeGeneratorResponse {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.error, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::UInt64
+            >::deser_field(&mut self.supported_features, data),
+            15 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>
+            >::deser_field(&mut self.file, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for CodeGeneratorResponse {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.error,
+                1,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
+                &self.supported_features,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>
+        >::ser_field(&self.file, 15, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+}
+
+pub use _puroro_impls::*;
+pub mod _puroro_impls {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    use super::_puroro_traits::*;
     impl VersionTrait for () {
         type Field4StringType<'this> = &'static str;
     }
@@ -257,7 +578,7 @@ pub mod _puroro_impls {
         pub major: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<VersionSimple> for VersionSimpleField1 {}
+    impl ::puroro::Message<super::Version> for VersionSimpleField1 {}
 
     impl super::_puroro_traits::VersionTrait for VersionSimpleField1 {
         fn major<'this>(&'this self) -> Option<i32> {
@@ -292,7 +613,7 @@ pub mod _puroro_impls {
         pub minor: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<VersionSimple> for VersionSimpleField2 {}
+    impl ::puroro::Message<super::Version> for VersionSimpleField2 {}
 
     impl super::_puroro_traits::VersionTrait for VersionSimpleField2 {
         fn minor<'this>(&'this self) -> Option<i32> {
@@ -327,7 +648,7 @@ pub mod _puroro_impls {
         pub patch: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<VersionSimple> for VersionSimpleField3 {}
+    impl ::puroro::Message<super::Version> for VersionSimpleField3 {}
 
     impl super::_puroro_traits::VersionTrait for VersionSimpleField3 {
         fn patch<'this>(&'this self) -> Option<i32> {
@@ -362,7 +683,7 @@ pub mod _puroro_impls {
         pub suffix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<VersionSimple> for VersionSimpleField4 {}
+    impl ::puroro::Message<super::Version> for VersionSimpleField4 {}
 
     impl super::_puroro_traits::VersionTrait for VersionSimpleField4 {
         type Field4StringType<'this> = &'this str;
@@ -397,7 +718,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct VersionSimpleByValue {}
-    impl ::puroro::Message<VersionSimple> for VersionSimpleByValue {}
+    impl ::puroro::Message<super::Version> for VersionSimpleByValue {}
 
     impl VersionTrait for VersionSimpleByValue {
         fn major<'this>(&'this self) -> Option<i32> {
@@ -453,186 +774,6 @@ pub mod _puroro_impls {
     impl VersionBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct CodeGeneratorRequestSimple {
-        pub file_to_generate: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
-        pub parameter: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub proto_file: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
-        >,
-        pub compiler_version: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
-            >,
-        >,
-    }
-    impl ::puroro::Message<CodeGeneratorRequestSimple> for CodeGeneratorRequestSimple {}
-
-    impl CodeGeneratorRequestTrait for CodeGeneratorRequestSimple {
-        type Field1StringType<'this> = &'this str;
-        type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            str,
-            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
-        >;
-
-        fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.file_to_generate.iter())
-        }
-        type Field2StringType<'this> = &'this str;
-        fn parameter<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.parameter.as_ref().map(|v| v.as_ref())
-        }
-        type Field15MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple;
-        type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
-            >,
-        >;
-
-        fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.proto_file.iter())
-        }
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple;
-        fn compiler_version<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.compiler_version.as_ref().map(|v| v.as_ref())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for CodeGeneratorRequestSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 4]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "file_to_generate",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <CodeGeneratorRequestSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "parameter",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <CodeGeneratorRequestSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "proto_file",
-                                number: 15,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <CodeGeneratorRequestSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "compiler_version",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <CodeGeneratorRequestSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "CodeGeneratorRequest",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorRequestSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for CodeGeneratorRequestSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::String
-            >::deser_field(&mut self.file_to_generate, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.parameter, data),
-            15 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple>
-            >::deser_field(&mut self.proto_file, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple>
-            >::deser_field(&mut self.compiler_version, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for CodeGeneratorRequestSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.file_to_generate,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.parameter,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
-                >,
-            >::ser_field(&self.proto_file, 15, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
-                >,
-            >::ser_field(&self.compiler_version, 3, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl CodeGeneratorRequestTrait for () {
@@ -832,7 +973,7 @@ pub mod _puroro_impls {
         pub file_to_generate: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<CodeGeneratorRequestSimple> for CodeGeneratorRequestSimpleField1 {}
+    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField1 {}
 
     impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -884,7 +1025,7 @@ pub mod _puroro_impls {
         pub parameter: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<CodeGeneratorRequestSimple> for CodeGeneratorRequestSimpleField2 {}
+    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField2 {}
 
     impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField2 {
         type Field1StringType<'this> = &'static str;
@@ -932,11 +1073,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct CodeGeneratorRequestSimpleField15 {
         pub proto_file: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
         >,
     }
 
-    impl ::puroro::Message<CodeGeneratorRequestSimple> for CodeGeneratorRequestSimpleField15 {}
+    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField15 {}
 
     impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField15 {
         type Field1StringType<'this> = &'static str;
@@ -947,12 +1088,12 @@ pub mod _puroro_impls {
         }
         type Field2StringType<'this> = &'static str;
         type Field15MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple;
+            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
         type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             ::std::slice::Iter<
                 'this,
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         >;
 
@@ -971,7 +1112,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
                 >,
             >::ser_field(&self.proto_file, 15, out)?;
             ::std::result::Result::Ok(())
@@ -981,13 +1122,13 @@ pub mod _puroro_impls {
     impl
         ::std::convert::From<
             ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         > for CodeGeneratorRequestSimpleField15
     {
         fn from(
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         ) -> Self {
             Self { proto_file: value }
@@ -998,12 +1139,12 @@ pub mod _puroro_impls {
     pub struct CodeGeneratorRequestSimpleField3 {
         pub compiler_version: ::std::option::Option<
             ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
+                self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
             >,
         >,
     }
 
-    impl ::puroro::Message<CodeGeneratorRequestSimple> for CodeGeneratorRequestSimpleField3 {}
+    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField3 {}
 
     impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField3 {
         type Field1StringType<'this> = &'static str;
@@ -1020,7 +1161,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple;
+            &'this self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version;
         fn compiler_version<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.compiler_version.as_ref().map(|v| v.as_ref())
         }
@@ -1035,7 +1176,7 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
+                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
                 >,
             >::ser_field(&self.compiler_version, 3, out)?;
             ::std::result::Result::Ok(())
@@ -1046,7 +1187,7 @@ pub mod _puroro_impls {
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
+                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
                 >,
             >,
         > for CodeGeneratorRequestSimpleField3
@@ -1054,7 +1195,7 @@ pub mod _puroro_impls {
         fn from(
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
+                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
                 >,
             >,
         ) -> Self {
@@ -1067,7 +1208,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct CodeGeneratorRequestSimpleByValue {}
-    impl ::puroro::Message<CodeGeneratorRequestSimple> for CodeGeneratorRequestSimpleByValue {}
+    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleByValue {}
 
     impl CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -1081,7 +1222,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field15MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
         >;
         type Field15RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
@@ -1089,7 +1230,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field3MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
+            self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
         >;
         fn compiler_version<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
@@ -1116,7 +1257,7 @@ pub mod _puroro_impls {
         pub fn append_proto_file(
             self,
             value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_impls::FileDescriptorProtoSimple,
+                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             >,
         ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSimpleField15)> {
             CodeGeneratorRequestBuilder((self.0, ::std::convert::From::from(value)))
@@ -1125,7 +1266,7 @@ pub mod _puroro_impls {
             self,
             value: ::std::option::Option<
                 ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_impls::VersionSimple,
+                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
                 >,
             >,
         ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSimpleField3)> {
@@ -1140,141 +1281,6 @@ pub mod _puroro_impls {
     impl CodeGeneratorRequestBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct CodeGeneratorResponseSimple {
-    pub error: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-    pub supported_features: ::std::option::Option<u64>,
-    pub file: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>,
-}
-    impl ::puroro::Message<CodeGeneratorResponseSimple> for CodeGeneratorResponseSimple {}
-
-    impl CodeGeneratorResponseTrait for CodeGeneratorResponseSimple {
-        type Field1StringType<'this> = &'this str;
-        fn error<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.error.as_ref().map(|v| v.as_ref())
-        }
-        fn supported_features<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.supported_features)
-        }
-        type Field15MessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple;
-        type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>>;
-
-        fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.file.iter())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for CodeGeneratorResponseSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 3]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "error",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <CodeGeneratorResponseSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "supported_features",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <CodeGeneratorResponseSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "file",
-                                number: 15,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <CodeGeneratorResponseSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "CodeGeneratorResponse",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorResponseSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for CodeGeneratorResponseSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.error, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.supported_features, data),
-            15 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>
-            >::deser_field(&mut self.file, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for CodeGeneratorResponseSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.error,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
-                &self.supported_features,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>
-        >::ser_field(&self.file, 15, out)?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl CodeGeneratorResponseTrait for () {
@@ -1394,7 +1400,7 @@ pub mod _puroro_impls {
         pub error: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<CodeGeneratorResponseSimple> for CodeGeneratorResponseSimpleField1 {}
+    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleField1 {}
 
     impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleField1 {
         type Field1StringType<'this> = &'this str;
@@ -1437,7 +1443,7 @@ pub mod _puroro_impls {
         pub supported_features: ::std::option::Option<u64>,
     }
 
-    impl ::puroro::Message<CodeGeneratorResponseSimple> for CodeGeneratorResponseSimpleField2 {}
+    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleField2 {}
 
     impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleField2 {
         type Field1StringType<'this> = &'static str;
@@ -1477,17 +1483,17 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct CodeGeneratorResponseSimpleField15 {
-    pub file: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>,
+    pub file: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>,
 }
 
-    impl ::puroro::Message<CodeGeneratorResponseSimple> for CodeGeneratorResponseSimpleField15 {}
+    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleField15 {}
 
     impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleField15 {
         type Field1StringType<'this> = &'static str;
-        type Field15MessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple;
+        type Field15MessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File;
         type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>>;
+    self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File,
+    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>>;
 
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.file.iter())
@@ -1501,14 +1507,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>
         >::ser_field(&self.file, 15, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>> for CodeGeneratorResponseSimpleField15 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>> for CodeGeneratorResponseSimpleField15 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>) -> Self {
         Self {
             file: value,
         }
@@ -1518,7 +1524,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct CodeGeneratorResponseSimpleByValue {}
-    impl ::puroro::Message<CodeGeneratorResponseSimple> for CodeGeneratorResponseSimpleByValue {}
+    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleByValue {}
 
     impl CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleByValue {
         type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -1528,7 +1534,7 @@ pub mod _puroro_impls {
         fn supported_features<'this>(&'this self) -> Option<u64> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field15MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>;
+        type Field15MessageType<'this> = ::std::boxed::Box<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>;
         type Field15RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
@@ -1555,7 +1561,7 @@ pub mod _puroro_impls {
         }
         pub fn append_file(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_impls::FileSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>,
         ) -> CodeGeneratorResponseBuilder<(T, CodeGeneratorResponseSimpleField15)> {
             CodeGeneratorResponseBuilder((self.0, ::std::convert::From::from(value)))
         }
@@ -1762,28 +1768,26 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_impls::FileSimple as File;
-        pub use _puroro_impls::*;
-        pub mod _puroro_impls {
+        pub use _puroro_simple_impl::File;
+        pub mod _puroro_simple_impl {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            use super::_puroro_traits::*;
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
                 ::std::cmp::PartialEq,
                 ::std::fmt::Debug,
             )]
-            pub struct FileSimple {
+            pub struct File {
             pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             pub insertion_point: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             pub content: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-            pub generated_code_info: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>>,
+            pub generated_code_info: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>,
         }
-            impl ::puroro::Message<FileSimple> for FileSimple {}
+            impl ::puroro::Message<File> for File {}
 
-            impl FileTrait for FileSimple {
+            impl super::_puroro_traits::FileTrait for File {
                 type Field1StringType<'this> = &'this str;
                 fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
                     self.name.as_ref().map(|v| v.as_ref())
@@ -1796,7 +1800,7 @@ pub mod _puroro_nested {
                 fn content<'this>(&'this self) -> Option<Self::Field15StringType<'this>> {
                     self.content.as_ref().map(|v| v.as_ref())
                 }
-                type Field16MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple;
+                type Field16MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo;
                 fn generated_code_info<'this>(
                     &'this self,
                 ) -> Option<Self::Field16MessageType<'this>> {
@@ -1804,7 +1808,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::MessageRepresentativeImpl for FileSimple {
+            impl ::puroro::MessageRepresentativeImpl for File {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
                     static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 4]> =
@@ -1815,7 +1819,7 @@ pub mod _puroro_nested {
                                         name: "name",
                                         number: 1,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <FileSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <File as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -1825,7 +1829,7 @@ pub mod _puroro_nested {
                                         name: "insertion_point",
                                         number: 2,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <FileSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <File as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -1835,7 +1839,7 @@ pub mod _puroro_nested {
                                         name: "content",
                                         number: 15,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <FileSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <File as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -1845,7 +1849,7 @@ pub mod _puroro_nested {
                                         name: "generated_code_info",
                                         number: 16,
                                         lazy_containing_type: Lazy::new(|| {
-                                            <FileSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                            <File as ::puroro::MessageRepresentativeImpl>::descriptor()
                                         }),
                                     };
                                     ::puroro::internal::init_field_descriptor(init)
@@ -1866,7 +1870,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for FileSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for File {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1875,7 +1879,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for FileSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for File {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -1898,7 +1902,7 @@ pub mod _puroro_nested {
                         ::puroro::tags::Optional, ::puroro::tags::String
                     >::deser_field(&mut self.content, data),
                     16 => DeserFieldFromBytesIter::<
-                        ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>
+                        ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>
                     >::deser_field(&mut self.generated_code_info, data),
         
                     _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1906,7 +1910,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for FileSimple {
+            impl ::puroro::SerToIoWrite for File {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -1922,12 +1926,20 @@ pub mod _puroro_nested {
                     ::puroro::tags::Optional, ::puroro::tags::String
                 >::ser_field(&self.content, 15, out)?;
                     SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>
+                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>
                 >::ser_field(&self.generated_code_info, 16, out)?;
 
                     ::std::result::Result::Ok(())
                 }
             }
+        }
+
+        pub use _puroro_impls::*;
+        pub mod _puroro_impls {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            use super::_puroro_traits::*;
             impl FileTrait for () {
                 type Field1StringType<'this> = &'static str;
                 type Field2StringType<'this> = &'static str;
@@ -2087,7 +2099,7 @@ pub mod _puroro_nested {
                 pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<FileSimple> for FileSimpleField1 {}
+            impl ::puroro::Message<super::File> for FileSimpleField1 {}
 
             impl super::_puroro_traits::FileTrait for FileSimpleField1 {
                 type Field1StringType<'this> = &'this str;
@@ -2125,7 +2137,7 @@ pub mod _puroro_nested {
                 pub insertion_point: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<FileSimple> for FileSimpleField2 {}
+            impl ::puroro::Message<super::File> for FileSimpleField2 {}
 
             impl super::_puroro_traits::FileTrait for FileSimpleField2 {
                 type Field1StringType<'this> = &'static str;
@@ -2165,7 +2177,7 @@ pub mod _puroro_nested {
                 pub content: ::std::option::Option<::std::borrow::Cow<'static, str>>,
             }
 
-            impl ::puroro::Message<FileSimple> for FileSimpleField15 {}
+            impl ::puroro::Message<super::File> for FileSimpleField15 {}
 
             impl super::_puroro_traits::FileTrait for FileSimpleField15 {
                 type Field1StringType<'this> = &'static str;
@@ -2200,16 +2212,16 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct FileSimpleField16 {
-            pub generated_code_info: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>>,
+            pub generated_code_info: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>,
         }
 
-            impl ::puroro::Message<FileSimple> for FileSimpleField16 {}
+            impl ::puroro::Message<super::File> for FileSimpleField16 {}
 
             impl super::_puroro_traits::FileTrait for FileSimpleField16 {
                 type Field1StringType<'this> = &'static str;
                 type Field2StringType<'this> = &'static str;
                 type Field15StringType<'this> = &'static str;
-                type Field16MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple;
+                type Field16MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo;
                 fn generated_code_info<'this>(
                     &'this self,
                 ) -> Option<Self::Field16MessageType<'this>> {
@@ -2224,14 +2236,14 @@ pub mod _puroro_nested {
                 {
                     use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>
+                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>
                 >::ser_field(&self.generated_code_info, 16, out)?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>>> for FileSimpleField16 {
-            fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>>) -> Self {
+            impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>> for FileSimpleField16 {
+            fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>) -> Self {
                 Self {
                     generated_code_info: value,
                 }
@@ -2244,7 +2256,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct FileSimpleByValue {}
-            impl ::puroro::Message<FileSimple> for FileSimpleByValue {}
+            impl ::puroro::Message<super::File> for FileSimpleByValue {}
 
             impl FileTrait for FileSimpleByValue {
                 type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -2260,7 +2272,7 @@ pub mod _puroro_nested {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
                 type Field16MessageType<'this> = ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple,
+                    self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo,
                 >;
                 fn generated_code_info<'this>(
                     &'this self,
@@ -2294,7 +2306,7 @@ pub mod _puroro_nested {
                 }
                 pub fn append_generated_code_info(
                     self,
-                    value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_impls::GeneratedCodeInfoSimple>>,
+                    value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>,
                 ) -> FileBuilder<(T, FileSimpleField16)> {
                     FileBuilder((self.0, ::std::convert::From::from(value)))
                 }
