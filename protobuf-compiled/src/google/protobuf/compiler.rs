@@ -100,7 +100,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for VersionSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for VersionSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -565,7 +565,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for CodeGeneratorRequestSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorRequestSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1219,7 +1219,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for CodeGeneratorResponseSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorResponseSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1866,7 +1866,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for FileSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for FileSimple {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,

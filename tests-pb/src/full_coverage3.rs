@@ -762,7 +762,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Msg {
+    impl ::puroro::DeserializableMessageFromBytesIterator for Msg {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -11453,7 +11453,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for Submsg {
+            impl ::puroro::DeserializableMessageFromBytesIterator for Submsg {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,

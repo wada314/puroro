@@ -9,6 +9,24 @@ where
     fn descriptor() -> &'static MessageDescriptor {
         M::descriptor()
     }
+
+    fn merge_from_bytes<I>(&mut self, iter: I) -> Result<()>
+    where
+        Self: DeserializableMessageFromBytesIterator,
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        <Self as DeserializableMessageFromBytesIterator>::deser(self, iter)
+    }
+
+    fn from_bytes<I>(iter: I) -> Result<Self>
+    where
+        Self: DeserializableMessageFromBytesIterator + Default,
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        let mut msg = <Self as Default>::default();
+        msg.merge_from_bytes(iter)?;
+        Ok(msg)
+    }
 }
 impl<M, T, U> Message<M> for crate::Either<T, U>
 where
@@ -45,7 +63,7 @@ pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {
 pub trait RepeatedField<'msg>: IntoIterator {}
 impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
 
-pub trait DeserFromBytesIter {
+pub trait DeserializableMessageFromBytesIterator {
     fn deser<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;

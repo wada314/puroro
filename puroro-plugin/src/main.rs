@@ -15,7 +15,7 @@ use ::protobuf_compiled::google::protobuf::compiler::code_generator_response::{F
 use ::protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
-use ::puroro::{DeserFromBytesIter, SerToIoWrite};
+use ::puroro::{DeserializableMessageFromBytesIterator, SerToIoWrite};
 use ::std::collections::{HashMap, HashSet};
 use ::std::env;
 use ::std::io::{stdin, stdout, Read};

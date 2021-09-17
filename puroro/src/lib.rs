@@ -24,7 +24,7 @@
 //!
 //! You can serialize a struct:
 //! ```rust
-//!
+//! use ::puroro::
 //! ```
 //!
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]

@@ -73,7 +73,7 @@ impl ::puroro::MessageRepresentativeImpl for {{ m.simple_ident }} {
     }
 }
 
-impl ::puroro::DeserFromBytesIter for {{ m.simple_ident }} {
+impl ::puroro::DeserializableMessageFromBytesIterator for {{ m.simple_ident }} {
     fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>

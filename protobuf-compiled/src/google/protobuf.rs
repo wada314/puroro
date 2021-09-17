@@ -86,7 +86,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for FileDescriptorSetSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorSetSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -568,7 +568,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for FileDescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2660,7 +2660,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for DescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for DescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4426,7 +4426,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for ExtensionRangeOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRangeOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4847,7 +4847,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for FieldDescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for FieldDescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -5983,7 +5983,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for OneofDescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for OneofDescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -6378,7 +6378,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for EnumDescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumDescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -7152,7 +7152,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for EnumValueDescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueDescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -7590,7 +7590,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for ServiceDescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceDescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -8130,7 +8130,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for MethodDescriptorProtoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for MethodDescriptorProtoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -9084,7 +9084,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for FileOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for FileOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -11302,7 +11302,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for MessageOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for MessageOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -11951,7 +11951,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for FieldOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for FieldOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -12695,7 +12695,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for OneofOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for OneofOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -12993,7 +12993,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for EnumOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -13417,7 +13417,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for EnumValueOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -13771,7 +13771,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for ServiceOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -14145,7 +14145,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for MethodOptionsSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for MethodOptionsSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -14655,7 +14655,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for UninterpretedOptionSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for UninterpretedOptionSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -15418,7 +15418,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for SourceCodeInfoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for SourceCodeInfoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -15652,7 +15652,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for GeneratedCodeInfoSimple {
+    impl ::puroro::DeserializableMessageFromBytesIterator for GeneratedCodeInfoSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -17460,7 +17460,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for ExtensionRangeSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRangeSimple {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -17819,7 +17819,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for ReservedRangeSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for ReservedRangeSimple {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -18332,7 +18332,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for EnumReservedRangeSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for EnumReservedRangeSimple {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -18862,7 +18862,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for NamePartSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for NamePartSimple {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -19291,7 +19291,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for LocationSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for LocationSimple {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -20172,7 +20172,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for AnnotationSimple {
+            impl ::puroro::DeserializableMessageFromBytesIterator for AnnotationSimple {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
