@@ -15,7 +15,7 @@ use ::protobuf_compiled::google::protobuf::compiler::code_generator_response::{F
 use ::protobuf_compiled::google::protobuf::compiler::{
     CodeGeneratorRequest, CodeGeneratorResponse,
 };
-use ::puroro::{DeserializableMessageFromBytesIterator, SerToIoWrite};
+use ::puroro::{Message, SerToIoWrite};
 use ::std::collections::{HashMap, HashSet};
 use ::std::env;
 use ::std::io::{stdin, stdout, Read};
@@ -95,8 +95,7 @@ fn format_rust_file(input: &str) -> Option<String> {
 }
 
 fn main() -> Result<()> {
-    let mut cgreq: CodeGeneratorRequest = Default::default();
-    cgreq.deser(&mut stdin().bytes()).unwrap();
+    let mut cgreq = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
 
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
