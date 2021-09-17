@@ -26,15 +26,19 @@
 //! ```no_run
 //! use ::puroro::Message; // For from_bytes() method
 //! use ::std::io::Read; // For bytes() method
-//! # use ::std::borrow::Cow;
-//! # pub struct MyMessage {
-//! #     pub my_number: i32,
-//! #     pub my_name: Vec<Cow<'static, str>>,
-//! #     pub my_child: Option<Box<MyMessage>>,
-//! # }
-//! let input = vec![0x08, 0x0A];
+//! let input = vec![0x08, 0x0a];
 //! let msg = MyMessage::from_bytes(input.bytes());
 //! assert_eq!(10, msg.my_number);
+//! ```
+//!
+//! And serialize it to `std::io::Write`:
+//! ```no_run
+//! use ::puroro::Message; // For ser() method
+//! let mut output = vec![];
+//! let msg = MyMessage::default();
+//! msg.my_number = 10;
+//! msg.ser(&mut output).unwrap();
+//! assert_eq!([0x08, 0x0a], output);
 //! ```
 //!
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
