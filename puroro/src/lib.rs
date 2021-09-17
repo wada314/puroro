@@ -22,9 +22,19 @@
 //! }
 //! ```
 //!
-//! You can serialize a struct:
-//! ```rust
-//! use ::puroro::
+//! You can deserialize a struct from `Iterator<std::io::Result<u8>>`:
+//! ```no_run
+//! use ::puroro::Message; // For from_bytes() method
+//! use ::std::io::Read; // For bytes() method
+//! # use ::std::borrow::Cow;
+//! # pub struct MyMessage {
+//! #     pub my_number: i32,
+//! #     pub my_name: Vec<Cow<'static, str>>,
+//! #     pub my_child: Option<Box<MyMessage>>,
+//! # }
+//! let input = vec![0x08, 0x0A];
+//! let msg = MyMessage::from_bytes(input.bytes());
+//! assert_eq!(10, msg.my_number);
 //! ```
 //!
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
