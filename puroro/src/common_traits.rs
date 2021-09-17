@@ -3,11 +3,11 @@ use crate::{Either, Result};
 use ::std::convert::TryFrom;
 use ::std::io::Write;
 
-pub trait Message<M>
-where
-    M: MessageRepresentativeImpl,
-{
-    fn descriptor() -> &'static MessageDescriptor {
+pub trait Message<M> {
+    fn descriptor() -> &'static MessageDescriptor
+    where
+        M: MessageRepresentativeImpl,
+    {
         M::descriptor()
     }
 

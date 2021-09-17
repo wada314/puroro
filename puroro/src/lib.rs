@@ -24,6 +24,9 @@
 //!
 //! You can deserialize a struct from `Iterator<std::io::Result<u8>>`:
 //! ```no_run
+//! # pub struct MyMessage {
+//! #     pub my_number: i32,
+//! # }
 //! use ::puroro::Message; // For from_bytes() method
 //! use ::std::io::Read; // For bytes() method
 //! let input = vec![0x08, 0x0a];
@@ -33,6 +36,18 @@
 //!
 //! And serialize it to `std::io::Write`:
 //! ```no_run
+//! # #![derive(Default)]
+//! # pub struct MyMessage {
+//! #     pub my_number: i32,
+//! # }
+//! # impl ::puroro::Message<MyMessage> for MyMessage {}
+//! impl ::puroro::SerializableMessageToIoWrite for MyMessage {
+//!     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()> where W: std::io::Write {
+//!         ::puroro::internal::impls::simple::se::SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+//!             &self.my_number, 1, out
+//!         )?;
+//!     }
+//! }
 //! use ::puroro::Message; // For ser() method
 //! let mut output = vec![];
 //! let msg = MyMessage::default();
