@@ -24,6 +24,12 @@ where
     M: MessageRepresentativeImpl,
 {
 }
+impl<M, T> Message<M> for Option<T>
+where
+    T: Message<M>,
+    M: MessageRepresentativeImpl,
+{
+}
 impl<M> Message<M> for () where M: MessageRepresentativeImpl {}
 
 pub trait MessageRepresentativeImpl {
