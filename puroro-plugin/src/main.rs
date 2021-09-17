@@ -95,7 +95,7 @@ fn format_rust_file(input: &str) -> Option<String> {
 }
 
 fn main() -> Result<()> {
-    let mut cgreq = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
+    let cgreq = CodeGeneratorRequest::from_bytes(&mut stdin().bytes()).unwrap();
 
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
