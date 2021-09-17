@@ -1064,7 +1064,7 @@ fn test_make_module_path() {
         make_module_path(package.clone(), empty.clone())
     );
     assert_eq!(
-        "self::_puroro_root::puroro_nested::code_generator_response",
+        "self::_puroro_root::_puroro_nested::code_generator_response",
         make_module_path(empty.clone(), outer_messages.clone())
     );
     assert_eq!(
