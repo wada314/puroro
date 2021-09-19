@@ -43,12 +43,12 @@ pub mod _puroro_simple_impl {
         }
         type Field5StringType<'this> = &'this str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            &self.string_unlabeled
+            self.string_unlabeled.deref()
         }
         type Field6MessageType<'this> =
             &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+            self.submsg_unlabeled.as_deref()
         }
     }
 
@@ -487,13 +487,14 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField1 {
+
+    pub struct MsgSingleField1 {
         pub i32_unlabeled: i32,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSimpleField1 {}
+    impl ::puroro::Message<super::Msg> for MsgSingleField1 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
         }
@@ -511,7 +512,7 @@ pub mod _puroro_impls {
         type Field6MessageType<'this> = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -526,7 +527,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<i32> for MsgSimpleField1 {
+    impl ::std::convert::From<i32> for MsgSingleField1 {
         fn from(value: i32) -> Self {
             Self {
                 i32_unlabeled: value,
@@ -535,13 +536,14 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField2 {
+
+    pub struct MsgSingleField2 {
         pub i32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSimpleField2 {}
+    impl ::puroro::Message<super::Msg> for MsgSingleField2 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField2 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
@@ -562,7 +564,7 @@ pub mod _puroro_impls {
         type Field6MessageType<'this> = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -577,7 +579,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for MsgSimpleField2 {
+    impl ::std::convert::From<::std::option::Option<i32>> for MsgSingleField2 {
         fn from(value: ::std::option::Option<i32>) -> Self {
             Self {
                 i32_optional: value,
@@ -586,13 +588,14 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField3 {
+
+    pub struct MsgSingleField3 {
         pub i32_repeated: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSimpleField3 {}
+    impl ::puroro::Message<super::Msg> for MsgSingleField3 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField3 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
@@ -611,7 +614,7 @@ pub mod _puroro_impls {
         type Field6MessageType<'this> = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -626,7 +629,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<i32>> for MsgSimpleField3 {
+    impl ::std::convert::From<::std::vec::Vec<i32>> for MsgSingleField3 {
         fn from(value: ::std::vec::Vec<i32>) -> Self {
             Self {
                 i32_repeated: value,
@@ -635,13 +638,14 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField4 {
+
+    pub struct MsgSingleField4 {
         pub f32_unlabeled: f32,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSimpleField4 {}
+    impl ::puroro::Message<super::Msg> for MsgSingleField4 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField4 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
@@ -659,7 +663,7 @@ pub mod _puroro_impls {
         type Field6MessageType<'this> = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -674,7 +678,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<f32> for MsgSimpleField4 {
+    impl ::std::convert::From<f32> for MsgSingleField4 {
         fn from(value: f32) -> Self {
             Self {
                 f32_unlabeled: value,
@@ -683,13 +687,32 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField5 {
-        pub string_unlabeled: ::std::borrow::Cow<'static, str>,
+
+    pub struct MsgSingleField5<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_unlabeled: T,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSimpleField5 {}
+    impl<T> ::puroro::Message<super::Msg> for MsgSingleField5<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField5 {
+    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField5<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
@@ -702,19 +725,25 @@ pub mod _puroro_impls {
         }
         type Field5StringType<'this> = &'this str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            &self.string_unlabeled
+            self.string_unlabeled.deref()
         }
         type Field6MessageType<'this> = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSimpleField5 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField5<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
-                &self.string_unlabeled,
+                self.string_unlabeled.deref(),
                 5,
                 out,
             )?;
@@ -722,7 +751,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::borrow::Cow<'static, str>> for MsgSimpleField5 {
+    impl<T> ::std::convert::From<::std::borrow::Cow<'static, str>> for MsgSingleField5<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn from(value: ::std::borrow::Cow<'static, str>) -> Self {
             Self {
                 string_unlabeled: value,
@@ -731,15 +766,32 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField6 {
-        pub submsg_unlabeled: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
-        >,
+
+    pub struct MsgSingleField6<T>
+    where
+        T: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub submsg_unlabeled: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSimpleField6 {}
+    impl<T> ::puroro::Message<super::Msg> for MsgSingleField6<T> where
+        T: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
+    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField6<T>
+    where
+        T: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
@@ -757,11 +809,17 @@ pub mod _puroro_impls {
         type Field6MessageType<'this> =
             &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+            self.submsg_unlabeled.as_deref()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSimpleField6 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField6<T>
+    where
+        T: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -772,17 +830,22 @@ pub mod _puroro_impls {
                 ::puroro::tags::Message<
                     self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
                 >,
-            >::ser_field(&self.submsg_unlabeled, 6, out)?;
+            >::ser_field(self.submsg_unlabeled.deref(), 6, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
+    impl<T>
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
             >,
-        > for MsgSimpleField6
+        > for MsgSingleField6<T>
+    where
+        T: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
         fn from(
             value: ::std::option::Option<
@@ -830,37 +893,74 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        pub fn append_i32_unlabeled(self, value: i32) -> MsgBuilder<(T, MsgSimpleField1)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        pub fn append_i32_unlabeled(self, value: i32) -> MsgBuilder<(T, MsgSingleField1)> {
+            MsgBuilder((
+                self.0,
+                MsgSingleField1 {
+                    i32_unlabeled: value,
+                },
+            ))
         }
         pub fn append_i32_optional(
             self,
             value: ::std::option::Option<i32>,
-        ) -> MsgBuilder<(T, MsgSimpleField2)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        ) -> MsgBuilder<(T, MsgSingleField2)> {
+            MsgBuilder((
+                self.0,
+                MsgSingleField2 {
+                    i32_optional: value,
+                },
+            ))
         }
         pub fn append_i32_repeated(
             self,
             value: ::std::vec::Vec<i32>,
-        ) -> MsgBuilder<(T, MsgSimpleField3)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        ) -> MsgBuilder<(T, MsgSingleField3)> {
+            MsgBuilder((
+                self.0,
+                MsgSingleField3 {
+                    i32_repeated: value,
+                },
+            ))
         }
-        pub fn append_f32_unlabeled(self, value: f32) -> MsgBuilder<(T, MsgSimpleField4)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        pub fn append_f32_unlabeled(self, value: f32) -> MsgBuilder<(T, MsgSingleField4)> {
+            MsgBuilder((
+                self.0,
+                MsgSingleField4 {
+                    f32_unlabeled: value,
+                },
+            ))
         }
-        pub fn append_string_unlabeled(
+        pub fn append_string_unlabeled<U>(self, value: U) -> MsgBuilder<(T, MsgSingleField5<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField5 {
+                    string_unlabeled: value,
+                },
+            ))
+        }
+        pub fn append_submsg_unlabeled<U>(
             self,
-            value: ::std::borrow::Cow<'static, str>,
-        ) -> MsgBuilder<(T, MsgSimpleField5)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
-        }
-        pub fn append_submsg_unlabeled(
-            self,
-            value: ::std::option::Option<
-                ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
-            >,
-        ) -> MsgBuilder<(T, MsgSimpleField6)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> MsgBuilder<(T, MsgSingleField6<U>)>
+        where
+            U: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField6 {
+                    submsg_unlabeled: value,
+                },
+            ))
         }
 
         pub fn build(self) -> T {
@@ -915,19 +1015,20 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct SubmsgSimpleField1 {
+
+    pub struct SubmsgSingleField1 {
         pub i32_unlabeled: i32,
     }
 
-    impl ::puroro::Message<super::Submsg> for SubmsgSimpleField1 {}
+    impl ::puroro::Message<super::Submsg> for SubmsgSingleField1 {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
+    impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for SubmsgSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for SubmsgSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -942,7 +1043,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<i32> for SubmsgSimpleField1 {
+    impl ::std::convert::From<i32> for SubmsgSingleField1 {
         fn from(value: i32) -> Self {
             Self {
                 i32_unlabeled: value,
@@ -966,8 +1067,13 @@ pub mod _puroro_impls {
     where
         T: SubmsgTrait,
     {
-        pub fn append_i32_unlabeled(self, value: i32) -> SubmsgBuilder<(T, SubmsgSimpleField1)> {
-            SubmsgBuilder((self.0, ::std::convert::From::from(value)))
+        pub fn append_i32_unlabeled(self, value: i32) -> SubmsgBuilder<(T, SubmsgSingleField1)> {
+            SubmsgBuilder((
+                self.0,
+                SubmsgSingleField1 {
+                    i32_unlabeled: value,
+                },
+            ))
         }
 
         pub fn build(self) -> T {

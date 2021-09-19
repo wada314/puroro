@@ -107,7 +107,7 @@ pub mod _puroro_simple_impl {
     impl super::_puroro_traits::Test2Trait for Test2 {
         type Field2StringType<'this> = &'this str;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.b.as_ref().map(|v| v.as_ref())
+            self.b.as_deref()
         }
     }
 
@@ -194,7 +194,7 @@ pub mod _puroro_simple_impl {
         type Field3MessageType<'this> =
             &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            self.c.as_deref()
         }
     }
 
@@ -396,19 +396,20 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test1SimpleField1 {
+
+    pub struct Test1SingleField1 {
         pub a: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<super::Test1> for Test1SimpleField1 {}
+    impl ::puroro::Message<super::Test1> for Test1SingleField1 {}
 
-    impl super::_puroro_traits::Test1Trait for Test1SimpleField1 {
+    impl super::_puroro_traits::Test1Trait for Test1SingleField1 {
         fn a<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.a)
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for Test1SimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for Test1SingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -421,7 +422,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for Test1SimpleField1 {
+    impl ::std::convert::From<::std::option::Option<i32>> for Test1SingleField1 {
         fn from(value: ::std::option::Option<i32>) -> Self {
             Self { a: value }
         }
@@ -446,8 +447,8 @@ pub mod _puroro_impls {
         pub fn append_a(
             self,
             value: ::std::option::Option<i32>,
-        ) -> Test1Builder<(T, Test1SimpleField1)> {
-            Test1Builder((self.0, ::std::convert::From::from(value)))
+        ) -> Test1Builder<(T, Test1SingleField1)> {
+            Test1Builder((self.0, Test1SingleField1 { a: value }))
         }
 
         pub fn build(self) -> T {
@@ -509,34 +510,66 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test2SimpleField2 {
-        pub b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+
+    pub struct Test2SingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub b: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::Test2> for Test2SimpleField2 {}
+    impl<T> ::puroro::Message<super::Test2> for Test2SingleField2<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::Test2Trait for Test2SimpleField2 {
+    impl<T> super::_puroro_traits::Test2Trait for Test2SingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field2StringType<'this> = &'this str;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.b.as_ref().map(|v| v.as_ref())
+            self.b.as_deref()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for Test2SimpleField2 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for Test2SingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.b, 2, out,
+                self.b.deref(),
+                2,
+                out,
             )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
-        for Test2SimpleField2
+    impl<T> ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
+        for Test2SingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
         fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
             Self { b: value }
@@ -560,11 +593,17 @@ pub mod _puroro_impls {
     where
         T: Test2Trait,
     {
-        pub fn append_b(
+        pub fn append_b<U>(
             self,
-            value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        ) -> Test2Builder<(T, Test2SimpleField2)> {
-            Test2Builder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> Test2Builder<(T, Test2SingleField2<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            Test2Builder((self.0, Test2SingleField2 { b: value }))
         }
 
         pub fn build(self) -> T {
@@ -625,23 +664,46 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test3SimpleField3 {
-        pub c: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>,
-        >,
+
+    pub struct Test3SingleField3<T>
+    where
+        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub c: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::Test3> for Test3SimpleField3 {}
+    impl<T> ::puroro::Message<super::Test3> for Test3SingleField3<T> where
+        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::Test3Trait for Test3SimpleField3 {
+    impl<T> super::_puroro_traits::Test3Trait for Test3SingleField3<T>
+    where
+        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field3MessageType<'this> =
             &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            self.c.as_deref()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for Test3SimpleField3 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for Test3SingleField3<T>
+    where
+        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -652,19 +714,24 @@ pub mod _puroro_impls {
                 ::puroro::tags::Message<
                     self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
                 >,
-            >::ser_field(&self.c, 3, out)?;
+            >::ser_field(self.c.deref(), 3, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
+    impl<T>
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<
                     self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
                 >,
             >,
-        > for Test3SimpleField3
+        > for Test3SingleField3<T>
+    where
+        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
         fn from(
             value: ::std::option::Option<
@@ -695,15 +762,17 @@ pub mod _puroro_impls {
     where
         T: Test3Trait,
     {
-        pub fn append_c(
+        pub fn append_c<U>(
             self,
-            value: ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
-                >,
-            >,
-        ) -> Test3Builder<(T, Test3SimpleField3)> {
-            Test3Builder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> Test3Builder<(T, Test3SingleField3<U>)>
+        where
+            U: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            Test3Builder((self.0, Test3SingleField3 { c: value }))
         }
 
         pub fn build(self) -> T {
@@ -775,13 +844,14 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test4SimpleField4 {
+
+    pub struct Test4SingleField4 {
         pub d: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message<super::Test4> for Test4SimpleField4 {}
+    impl ::puroro::Message<super::Test4> for Test4SingleField4 {}
 
-    impl super::_puroro_traits::Test4Trait for Test4SimpleField4 {
+    impl super::_puroro_traits::Test4Trait for Test4SingleField4 {
         type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
@@ -789,7 +859,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for Test4SimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for Test4SingleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -802,7 +872,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<i32>> for Test4SimpleField4 {
+    impl ::std::convert::From<::std::vec::Vec<i32>> for Test4SingleField4 {
         fn from(value: ::std::vec::Vec<i32>) -> Self {
             Self { d: value }
         }
@@ -825,8 +895,8 @@ pub mod _puroro_impls {
     where
         T: Test4Trait,
     {
-        pub fn append_d(self, value: ::std::vec::Vec<i32>) -> Test4Builder<(T, Test4SimpleField4)> {
-            Test4Builder((self.0, ::std::convert::From::from(value)))
+        pub fn append_d(self, value: ::std::vec::Vec<i32>) -> Test4Builder<(T, Test4SingleField4)> {
+            Test4Builder((self.0, Test4SingleField4 { d: value }))
         }
 
         pub fn build(self) -> T {

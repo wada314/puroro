@@ -173,6 +173,8 @@ struct Field {
     simple_maybe_field_message_path: Option<String>,
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
+    single_field_type_t: String,
+    single_field_type_u: String,
 }
 
 impl Field {
@@ -215,6 +217,8 @@ impl Field {
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple")?,
             simple_label_and_type_tags: f.rust_label_and_type_tags("Simple")?,
+            single_field_type_t: f.single_field_type("T")?,
+            single_field_type_u: f.single_field_type("U")?,
         })
     }
 }

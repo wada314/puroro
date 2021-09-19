@@ -24,7 +24,7 @@ pub mod _puroro_simple_impl {
         type Field1MessageType<'this> =
             &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
         fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+            self.recursive_unlabeled.as_deref()
         }
     }
 
@@ -164,23 +164,46 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField1 {
-        pub recursive_unlabeled: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
-        >,
+
+    pub struct MsgSingleField1<T>
+    where
+        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub recursive_unlabeled: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSimpleField1 {}
+    impl<T> ::puroro::Message<super::Msg> for MsgSingleField1<T> where
+        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
+    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField1<T>
+    where
+        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field1MessageType<'this> =
             &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
         fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+            self.recursive_unlabeled.as_deref()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSimpleField1 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField1<T>
+    where
+        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -191,17 +214,22 @@ pub mod _puroro_impls {
                 ::puroro::tags::Message<
                     self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
                 >,
-            >::ser_field(&self.recursive_unlabeled, 1, out)?;
+            >::ser_field(self.recursive_unlabeled.deref(), 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
+    impl<T>
         ::std::convert::From<
             ::std::option::Option<
                 ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
             >,
-        > for MsgSimpleField1
+        > for MsgSingleField1<T>
+    where
+        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
         fn from(
             value: ::std::option::Option<
@@ -232,13 +260,22 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        pub fn append_recursive_unlabeled(
+        pub fn append_recursive_unlabeled<U>(
             self,
-            value: ::std::option::Option<
-                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
-            >,
-        ) -> MsgBuilder<(T, MsgSimpleField1)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> MsgBuilder<(T, MsgSingleField1<U>)>
+        where
+            U: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField1 {
+                    recursive_unlabeled: value,
+                },
+            ))
         }
 
         pub fn build(self) -> T {

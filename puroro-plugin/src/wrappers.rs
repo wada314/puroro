@@ -790,6 +790,32 @@ impl Field {
             t => t.numerical_rust_type()?.to_string(),
         })
     }
+
+    pub fn single_field_type(&self, t: &str) -> Result<String> {
+        let scalar_type = self.single_scalar_field_type(t)?;
+        Ok(match self.field_label()? {
+            FieldLabel::Required | FieldLabel::Optional => {
+                format!("::std::option::Option<{}>", scalar_type)
+            }
+            FieldLabel::Unlabeled => {
+                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{}>", scalar_type)
+                } else {
+                    scalar_type
+                }
+            }
+            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type),
+        })
+    }
+
+    pub fn single_scalar_field_type(&self, t: &str) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String | FieldType::Bytes | FieldType::Message(_) => t.to_string(),
+            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
 }
 
 impl Oneof {

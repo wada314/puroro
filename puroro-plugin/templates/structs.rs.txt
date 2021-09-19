@@ -30,7 +30,7 @@ pub mod _puroro_impls {
     {%- include "merged/body.rs.txt" %}
     {%- include "either/body.rs.txt" %}
     {%- include "option/body.rs.txt" %}
-    {%- include "single_field.rs.txt" %}
+    {%- include "single_field/body.rs.txt" %}
     {%- include "simple/by_value.rs.txt" %}
     {%- include "builder.rs.txt" %}
     {%- endfor %}
@@ -57,3 +57,8 @@ pub mod _puroro_impls {
 {%- macro option_trait_impl_field(f) -%}
 {%- include "option/trait_impl_field.rs.txt" %}
 {%- endmacro -%}
+
+{%- macro single_field_bound(f, t) -%}
+{%- include "single_field/bound.rs.txt" %}
+{%- endmacro -%}
+

@@ -2,13 +2,28 @@
 {%- if !sfield.is_explicit_oneof_field %}
 
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub struct {{ m.single_field_ident }}{{ sfield.number }} {
-    pub {{ sfield.ident }}: {{ sfield.simple_field_type }},
+
+{%- let maybe_gp %}
+{%- if sfield.is_length_delimited %}
+{%- let maybe_gp = "<T>" %}
+{%- else %}
+{%- let maybe_gp = "" %}
+{%- endif %}
+
+pub struct {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield, "T") %}
+{
+    pub {{ sfield.ident }}: {{ sfield.single_field_type_t }},
 }
 
-impl ::puroro::Message<super::{{ m.simple_ident }}> for {{ m.single_field_ident }}{{ sfield.number }} {}
+impl{{ maybe_gp }} ::puroro::Message<super::{{ m.simple_ident }}>
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield, "T") %}
+{}
 
-impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.single_field_ident }}{{ sfield.number }}
+impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait 
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield, "T") %}
 {
     {%- for field in m.fields %}
     {%- if field.number == sfield.number %}
@@ -27,12 +42,15 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.single_field_ident }}{{ 
             {%- endif %}
         >
     {
-        todo!()
+        None
     }
     {%- endfor %}
 }
 
-impl ::puroro::SerializableMessageToIoWrite for {{ m.single_field_ident }}{{ sfield.number }} {
+impl{{ maybe_gp }} ::puroro::SerializableMessageToIoWrite 
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield, "T") %}
+{
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
         W: ::std::io::Write
@@ -40,12 +58,19 @@ impl ::puroro::SerializableMessageToIoWrite for {{ m.single_field_ident }}{{ sfi
         use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<
             {{ sfield.simple_label_and_type_tags }}
-        >::ser_field(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+        >::ser_field(
+            &self.{{ sfield.ident }}, 
+            {{ sfield.number }}, 
+            out
+        )?;
         ::std::result::Result::Ok(())
     }
 }
 
-impl ::std::convert::From<{{ sfield.simple_field_type }}> for {{ m.single_field_ident }}{{ sfield.number }} {
+impl{{ maybe_gp }} ::std::convert::From<{{ sfield.simple_field_type }}> 
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield, "T") %}
+{
     fn from(value: {{ sfield.simple_field_type }}) -> Self {
         Self {
             {{ sfield.ident }}: value,

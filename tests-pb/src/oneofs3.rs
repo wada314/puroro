@@ -710,19 +710,20 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct SubmsgSimpleField1 {
+
+    pub struct SubmsgSingleField1 {
         pub i32_unlabeled: i32,
     }
 
-    impl ::puroro::Message<super::Submsg> for SubmsgSimpleField1 {}
+    impl ::puroro::Message<super::Submsg> for SubmsgSingleField1 {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
+    impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for SubmsgSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for SubmsgSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -737,7 +738,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<i32> for SubmsgSimpleField1 {
+    impl ::std::convert::From<i32> for SubmsgSingleField1 {
         fn from(value: i32) -> Self {
             Self {
                 i32_unlabeled: value,
@@ -761,8 +762,13 @@ pub mod _puroro_impls {
     where
         T: SubmsgTrait,
     {
-        pub fn append_i32_unlabeled(self, value: i32) -> SubmsgBuilder<(T, SubmsgSimpleField1)> {
-            SubmsgBuilder((self.0, ::std::convert::From::from(value)))
+        pub fn append_i32_unlabeled(self, value: i32) -> SubmsgBuilder<(T, SubmsgSingleField1)> {
+            SubmsgBuilder((
+                self.0,
+                SubmsgSingleField1 {
+                    i32_unlabeled: value,
+                },
+            ))
         }
 
         pub fn build(self) -> T {

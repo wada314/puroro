@@ -701,19 +701,20 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct SubmsgSimpleField1 {
+
+    pub struct SubmsgSingleField1 {
         pub i32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<super::Submsg> for SubmsgSimpleField1 {}
+    impl ::puroro::Message<super::Submsg> for SubmsgSingleField1 {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
+    impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for SubmsgSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for SubmsgSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -728,7 +729,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for SubmsgSimpleField1 {
+    impl ::std::convert::From<::std::option::Option<i32>> for SubmsgSingleField1 {
         fn from(value: ::std::option::Option<i32>) -> Self {
             Self {
                 i32_optional: value,
@@ -755,8 +756,13 @@ pub mod _puroro_impls {
         pub fn append_i32_optional(
             self,
             value: ::std::option::Option<i32>,
-        ) -> SubmsgBuilder<(T, SubmsgSimpleField1)> {
-            SubmsgBuilder((self.0, ::std::convert::From::from(value)))
+        ) -> SubmsgBuilder<(T, SubmsgSingleField1)> {
+            SubmsgBuilder((
+                self.0,
+                SubmsgSingleField1 {
+                    i32_optional: value,
+                },
+            ))
         }
 
         pub fn build(self) -> T {

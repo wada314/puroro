@@ -15,7 +15,7 @@ type Field{{ f.number }}MessageType<'this> = &'this {{ struct_path }};
 {%- if f.trait_has_scalar_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
     {%- if f.is_length_delimited %}
-    &self.{{ f.ident }}
+    self.{{ f.ident }}.deref()
     {%- else %}
     Clone::clone(&self.{{ f.ident }})
     {%- endif %}
@@ -26,7 +26,7 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
 fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     {%- if !f.is_explicit_oneof_field %}
     {%- if f.is_length_delimited %}
-    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
+    self.{{ f.ident }}.as_deref()
     {%- else %}
     Clone::clone(&self.{{ f.ident }})
     {%- endif %}
