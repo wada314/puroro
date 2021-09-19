@@ -28,7 +28,8 @@ pub trait {{ m.trait_ident }} {
     {%- if field.trait_has_repeated_getter %}
     type Field{{ field.number }}RepeatedType<'this>: 
         ::puroro::RepeatedField<'this> 
-        + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>;
+        + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>
+    where Self: 'this;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
     {%- endif %}
     {%- endfor %}

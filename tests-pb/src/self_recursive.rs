@@ -208,34 +208,25 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
                     self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
                 >,
-            >::ser_field(self.recursive_unlabeled.deref(), 1, out)?;
+            >::ser_field::<T, _, _>(&self.recursive_unlabeled, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<T>
-        ::std::convert::From<
-            ::std::option::Option<
-                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
-            >,
-        > for MsgSingleField1<T>
+    impl<T> ::std::convert::From<::std::option::Option<T>> for MsgSingleField1<T>
     where
         T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(
-            value: ::std::option::Option<
-                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
-            >,
-        ) -> Self {
+        fn from(value: ::std::option::Option<T>) -> Self {
             Self {
                 recursive_unlabeled: value,
             }

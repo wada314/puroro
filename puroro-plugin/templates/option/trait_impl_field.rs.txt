@@ -37,7 +37,7 @@ fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait
 {%- endif %}
 
 {%- if field.trait_has_repeated_getter %}
-type Field{{ field.number }}RepeatedType<'this> = 
+type Field{{ field.number }}RepeatedType<'this> where Self: 'this = 
     ::std::iter::Flatten<
         ::std::option::IntoIter<
             <T::Field{{ field.number }}RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter

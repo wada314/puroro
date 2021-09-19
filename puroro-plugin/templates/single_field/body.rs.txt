@@ -27,7 +27,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {
     {%- for field in m.fields %}
     {%- if field.number == sfield.number %}
-    {%- call simple_trait_impl_field(field) %}
+    {%- call single_field_trait_impl_field(field) %}
     {%- else %}
     {%- call empty_trait_impl_field(field) %}
     {%- endif %}
@@ -55,23 +55,26 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     where
         W: ::std::io::Write
     {
+        {%- if sfield.is_length_delimited %}
+        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+        SerFieldToIoWrite::<
+            {{ sfield.simple_label_and_type_tags }}
+        >::ser_field::<T, _, _>(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+        {%- else %}
         use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<
             {{ sfield.simple_label_and_type_tags }}
-        >::ser_field(
-            &self.{{ sfield.ident }}, 
-            {{ sfield.number }}, 
-            out
-        )?;
+        >::ser_field(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+        {%- endif %}
         ::std::result::Result::Ok(())
     }
 }
 
-impl{{ maybe_gp }} ::std::convert::From<{{ sfield.simple_field_type }}> 
+impl{{ maybe_gp }} ::std::convert::From<{{ sfield.single_field_type_t }}> 
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield, "T") %}
 {
-    fn from(value: {{ sfield.simple_field_type }}) -> Self {
+    fn from(value: {{ sfield.single_field_type_t }}) -> Self {
         Self {
             {{ sfield.ident }}: value,
         }

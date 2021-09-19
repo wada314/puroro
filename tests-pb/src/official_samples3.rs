@@ -564,24 +564,24 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
-                self.b.deref(),
-                2,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.b, 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<T> ::std::convert::From<::std::borrow::Cow<'static, str>> for Test2SingleField2<T>
+    impl<T> ::std::convert::From<T> for Test2SingleField2<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::borrow::Cow<'static, str>) -> Self {
+        fn from(value: T) -> Self {
             Self { b: value }
         }
     }
@@ -715,38 +715,25 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
                     self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
                 >,
-            >::ser_field(self.c.deref(), 3, out)?;
+            >::ser_field::<T, _, _>(&self.c, 3, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<T>
-        ::std::convert::From<
-            ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
-                >,
-            >,
-        > for Test3SingleField3<T>
+    impl<T> ::std::convert::From<::std::option::Option<T>> for Test3SingleField3<T>
     where
         T: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(
-            value: ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
-                >,
-            >,
-        ) -> Self {
+        fn from(value: ::std::option::Option<T>) -> Self {
             Self { c: value }
         }
     }
@@ -803,7 +790,10 @@ pub mod _puroro_impls {
         T: Test4Trait,
         U: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as Test4Trait>::Field4RepeatedType<'this>,
             <U as Test4Trait>::Field4RepeatedType<'this>,
         >;
@@ -820,7 +810,10 @@ pub mod _puroro_impls {
         T: Test4Trait,
         U: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as Test4Trait>::Field4RepeatedType<'this>,
             <U as Test4Trait>::Field4RepeatedType<'this>,
         >;
@@ -837,7 +830,10 @@ pub mod _puroro_impls {
     where
         T: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::std::iter::Flatten<
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Flatten<
             ::std::option::IntoIter<
                 <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
             >,
@@ -859,7 +855,10 @@ pub mod _puroro_impls {
     impl ::puroro::Message<super::Test4> for Test4SingleField4 {}
 
     impl super::_puroro_traits::Test4Trait for Test4SingleField4 {
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             self.d.iter().cloned()
@@ -1010,7 +1009,9 @@ pub mod _puroro_traits {
     }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = i32>;
+            + ::std::iter::IntoIterator<Item = i32>
+        where
+            Self: 'this;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
     }
 
