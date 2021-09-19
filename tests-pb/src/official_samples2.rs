@@ -110,7 +110,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this str;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.b.as_deref()
+            self.b.as_ref()
         }
     }
 
@@ -199,7 +199,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_deref()
+            self.c.as_ref()
         }
     }
 

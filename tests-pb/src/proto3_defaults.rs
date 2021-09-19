@@ -46,14 +46,14 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            self.string_unlabeled.deref()
+            self.string_unlabeled.as_ref()
         }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_deref()
+            self.submsg_unlabeled.as_ref()
         }
     }
 

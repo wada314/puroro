@@ -93,14 +93,14 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this [u8];
         fn bytes_required<'this>(&'this self) -> Option<Self::Field21BytesType<'this>> {
-            self.bytes_required.as_deref()
+            self.bytes_required.as_ref()
         }
         type Field22BytesType<'this>
         where
             Self: 'this,
         = &'this [u8];
         fn bytes_optional<'this>(&'this self) -> Option<Self::Field22BytesType<'this>> {
-            self.bytes_optional.as_deref()
+            self.bytes_optional.as_ref()
         }
         type Field23BytesType<'this>
         where
@@ -119,14 +119,14 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this str;
         fn string_required<'this>(&'this self) -> Option<Self::Field31StringType<'this>> {
-            self.string_required.as_deref()
+            self.string_required.as_ref()
         }
         type Field32StringType<'this>
         where
             Self: 'this,
         = &'this str;
         fn string_optional<'this>(&'this self) -> Option<Self::Field32StringType<'this>> {
-            self.string_optional.as_deref()
+            self.string_optional.as_ref()
         }
         type Field33StringType<'this>
         where
@@ -155,11 +155,11 @@ pub mod _puroro_simple_impl {
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_required<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
-            self.submsg_required.as_deref()
+            self.submsg_required.as_ref()
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
-            self.submsg_optional.as_deref()
+            self.submsg_optional.as_ref()
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         type Field53RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
