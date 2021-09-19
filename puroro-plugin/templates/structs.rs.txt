@@ -30,7 +30,7 @@ pub mod _puroro_impls {
     {%- include "merged/body.rs.txt" %}
     {%- include "either/body.rs.txt" %}
     {%- include "option/body.rs.txt" %}
-    {%- include "simple/single_field.rs.txt" %}
+    {%- include "single_field.rs.txt" %}
     {%- include "simple/by_value.rs.txt" %}
     {%- include "builder.rs.txt" %}
     {%- endfor %}

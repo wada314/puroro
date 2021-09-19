@@ -2,13 +2,13 @@
 {%- if !sfield.is_explicit_oneof_field %}
 
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub struct {{ m.simple_single_field_ident }}{{ sfield.number }} {
+pub struct {{ m.single_field_ident }}{{ sfield.number }} {
     pub {{ sfield.ident }}: {{ sfield.simple_field_type }},
 }
 
-impl ::puroro::Message<super::{{ m.simple_ident }}> for {{ m.simple_single_field_ident }}{{ sfield.number }} {}
+impl ::puroro::Message<super::{{ m.simple_ident }}> for {{ m.single_field_ident }}{{ sfield.number }} {}
 
-impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_single_field_ident }}{{ sfield.number }}
+impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.single_field_ident }}{{ sfield.number }}
 {
     {%- for field in m.fields %}
     {%- if field.number == sfield.number %}
@@ -32,7 +32,7 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_single_field_iden
     {%- endfor %}
 }
 
-impl ::puroro::SerializableMessageToIoWrite for {{ m.simple_single_field_ident }}{{ sfield.number }} {
+impl ::puroro::SerializableMessageToIoWrite for {{ m.single_field_ident }}{{ sfield.number }} {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
         W: ::std::io::Write
@@ -45,7 +45,7 @@ impl ::puroro::SerializableMessageToIoWrite for {{ m.simple_single_field_ident }
     }
 }
 
-impl ::std::convert::From<{{ sfield.simple_field_type }}> for {{ m.simple_single_field_ident }}{{ sfield.number }} {
+impl ::std::convert::From<{{ sfield.simple_field_type }}> for {{ m.single_field_ident }}{{ sfield.number }} {
     fn from(value: {{ sfield.simple_field_type }}) -> Self {
         Self {
             {{ sfield.ident }}: value,

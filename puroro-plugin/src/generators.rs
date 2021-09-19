@@ -56,7 +56,7 @@ struct Message {
     fields_len: usize,
     oneofs: Vec<Oneof>,
     simple_ident: String,
-    simple_single_field_ident: String,
+    single_field_ident: String,
     simple_by_value_ident: String,
     builder_ident: String,
 }
@@ -99,7 +99,7 @@ impl Message {
             fields_len,
             oneofs,
             simple_ident: m.rust_impl_ident(""),
-            simple_single_field_ident: m.rust_impl_ident("SimpleField"),
+            single_field_ident: m.rust_impl_ident("SingleField"),
             simple_by_value_ident: m.rust_impl_ident("SimpleByValue"),
             builder_ident: m.rust_impl_ident("Builder"),
         })
