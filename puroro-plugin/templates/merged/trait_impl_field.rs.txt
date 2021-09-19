@@ -2,14 +2,14 @@
 {%- when Some with (field_msg_path) %}
 {%- if f.is_repeated %}
 {#- For repeated message field, each message has either `T` or `U` type, never be merged. -#}
-type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
+type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
     <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
 >;
 {%- else %}
 {#- For non-repeated message field, the message is `T` and `U` merged type. -#}
 {#- There are 3+1 cases: `T` and `U` both exist, only `T`, only `U`, (and none of them). -#}
-type Field{{ f.number }}MessageType<'this> = (
+type Field{{ f.number }}MessageType<'this> where Self: 'this = (
     ::std::option::Option<<T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>>,
     ::std::option::Option<<U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>>,
 );
@@ -18,13 +18,13 @@ type Field{{ f.number }}MessageType<'this> = (
 {%- endmatch %}
 
 {%- if f.is_bytes %}
-type Field{{ f.number }}BytesType<'this> = ::puroro::Either<
+type Field{{ f.number }}BytesType<'this> where Self: 'this = ::puroro::Either<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
     <U as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
 >;
 {%- endif %}
 {%- if f.is_string %}
-type Field{{ f.number }}StringType<'this> = ::puroro::Either<
+type Field{{ f.number }}StringType<'this> where Self: 'this = ::puroro::Either<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
     <U as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
 >;

@@ -50,6 +50,9 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 impl{{ maybe_gp }} ::puroro::SerializableMessageToIoWrite 
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield, "T") %}
+{%- if sfield.is_message %}
+    T: ::puroro::SerializableMessageToIoWrite,
+{%- endif %}
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -58,12 +61,12 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         {%- if sfield.is_length_delimited %}
         use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<
-            {{ sfield.simple_label_and_type_tags }}
-        >::ser_field::<T, _, _>(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+            {{ sfield.single_field_label_and_type_tags }}
+        >::ser_field(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
         {%- else %}
         use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<
-            {{ sfield.simple_label_and_type_tags }}
+            {{ sfield.single_field_label_and_type_tags }}
         >::ser_field(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
         {%- endif %}
         ::std::result::Result::Ok(())

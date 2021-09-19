@@ -105,7 +105,10 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Test2> for Test2 {}
 
     impl super::_puroro_traits::Test2Trait for Test2 {
-        type Field2StringType<'this> = &'this str;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             self.b.as_deref()
         }
@@ -191,8 +194,10 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Test3> for Test3 {}
 
     impl super::_puroro_traits::Test3Trait for Test3 {
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_deref()
         }
@@ -462,14 +467,20 @@ pub mod _puroro_impls {
         }
     }
     impl Test2Trait for () {
-        type Field2StringType<'this> = &'static str;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
     }
     impl<T, U> Test2Trait for (T, U)
     where
         T: Test2Trait,
         U: Test2Trait,
     {
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as Test2Trait>::Field2StringType<'this>,
             <U as Test2Trait>::Field2StringType<'this>,
         >;
@@ -488,7 +499,10 @@ pub mod _puroro_impls {
         T: Test2Trait,
         U: Test2Trait,
     {
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as Test2Trait>::Field2StringType<'this>,
             <U as Test2Trait>::Field2StringType<'this>,
         >;
@@ -503,7 +517,10 @@ pub mod _puroro_impls {
     where
         T: Test2Trait,
     {
-        type Field2StringType<'this> = T::Field2StringType<'this>;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = T::Field2StringType<'this>;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             self.as_ref().and_then(|msg| msg.b())
         }
@@ -536,7 +553,10 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field2StringType<'this> = &'this str;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             self.b.as_deref()
         }
@@ -554,11 +574,9 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                T,
-                _,
-                _,
-            >(&self.b, 2, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.b, 2, out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -616,14 +634,20 @@ pub mod _puroro_impls {
         }
     }
     impl Test3Trait for () {
-        type Field3MessageType<'this> = ();
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
     impl<T, U> Test3Trait for (T, U)
     where
         T: Test3Trait,
         U: Test3Trait,
     {
-        type Field3MessageType<'this> = (
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = (
             ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
         );
@@ -641,7 +665,10 @@ pub mod _puroro_impls {
         T: Test3Trait,
         U: Test3Trait,
     {
-        type Field3MessageType<'this> = ::puroro::Either<
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as Test3Trait>::Field3MessageType<'this>,
             <U as Test3Trait>::Field3MessageType<'this>,
         >;
@@ -656,7 +683,10 @@ pub mod _puroro_impls {
     where
         T: Test3Trait,
     {
-        type Field3MessageType<'this> = T::Field3MessageType<'this>;
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field3MessageType<'this>;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.as_ref().and_then(|msg| msg.c())
         }
@@ -689,10 +719,12 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = &'this T;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_deref()
+            self.c.as_ref()
         }
     }
 
@@ -702,18 +734,16 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        T: ::puroro::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
-                >,
-            >::ser_field::<T, _, _>(&self.c, 3, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Message<T>>::ser_field(
+                &self.c, 3, out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -772,7 +802,10 @@ pub mod _puroro_impls {
         }
     }
     impl Test4Trait for () {
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -945,7 +978,9 @@ pub mod _puroro_traits {
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             ::std::default::Default::default()
         }
@@ -953,7 +988,10 @@ pub mod _puroro_traits {
 
     macro_rules! test2_delegate {
         ($ty:ty) => {
-            type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+            type Field2StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field2StringType<'this>;
             fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
                 (**self).b()
             }
@@ -975,7 +1013,8 @@ pub mod _puroro_traits {
     }
     pub trait Test3Trait {
         type Field3MessageType<'this>:
-            self::_puroro_root::official_samples2::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+            self::_puroro_root::official_samples2::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+            where Self: 'this;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             ::std::default::Default::default()
         }
@@ -983,7 +1022,10 @@ pub mod _puroro_traits {
 
     macro_rules! test3_delegate {
         ($ty:ty) => {
-            type Field3MessageType<'this> = <$ty>::Field3MessageType<'this>;
+            type Field3MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field3MessageType<'this>;
             fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
                 (**self).c()
             }
@@ -1013,7 +1055,10 @@ pub mod _puroro_traits {
 
     macro_rules! test4_delegate {
         ($ty:ty) => {
-            type Field4RepeatedType<'this> = <$ty>::Field4RepeatedType<'this>;
+            type Field4RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field4RepeatedType<'this>;
             fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
                 (**self).d()
             }

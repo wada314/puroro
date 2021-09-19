@@ -102,20 +102,15 @@ impl<M, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::
 where
     M: SerializableMessageToIoWrite,
 {
-    pub fn ser_field<MessageType, FieldType, W>(
-        field: &FieldType,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()>
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<MessageType>,
-        MessageType: Deref<Target = M>,
+        FieldType: VecOrOptionOrBare<M>,
         W: Write,
     {
         for item in field.iter() {
             let len = {
                 let mut null_out = NullWrite::new();
-                <M as SerializableMessageToIoWrite>::ser(item.deref(), &mut null_out)?;
+                <M as SerializableMessageToIoWrite>::ser(item, &mut null_out)?;
                 null_out.len()
             };
             let len_i32: i32 = len
@@ -123,7 +118,7 @@ where
                 .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            <M as SerializableMessageToIoWrite>::ser(item.deref(), out)?;
+            <M as SerializableMessageToIoWrite>::ser(item, out)?;
         }
         Ok(())
     }
@@ -133,19 +128,14 @@ impl<M> SerFieldToIoWrite<tags::Repeated, tags::Message<M>>
 where
     M: SerializableMessageToIoWrite,
 {
-    pub fn ser_field<MessageType, W>(
-        field: &Vec<MessageType>,
-        number: i32,
-        out: &mut W,
-    ) -> Result<()>
+    pub fn ser_field<W>(field: &Vec<M>, number: i32, out: &mut W) -> Result<()>
     where
-        MessageType: Deref<Target = M>,
         W: Write,
     {
         for item in field {
             let len = {
                 let mut null_out = NullWrite::new();
-                <M as SerializableMessageToIoWrite>::ser(item.deref(), &mut null_out)?;
+                <M as SerializableMessageToIoWrite>::ser(item, &mut null_out)?;
                 null_out.len()
             };
             let len_i32: i32 = len
@@ -153,7 +143,7 @@ where
                 .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            <M as SerializableMessageToIoWrite>::ser(item.deref(), out)?;
+            <M as SerializableMessageToIoWrite>::ser(item, out)?;
         }
         Ok(())
     }

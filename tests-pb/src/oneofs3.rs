@@ -33,10 +33,18 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Msg> for Msg {}
 
     impl super::_puroro_traits::MsgTrait for Msg {
-        type Field2StringType<'this> = &'this str;
-        type Field4StringType<'this> = &'this str;
-        type Field5MessageType<'this> =
-            &'this self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg;
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -400,9 +408,18 @@ pub mod _puroro_impls {
     }
     use super::_puroro_traits::*;
     impl MsgTrait for () {
-        type Field2StringType<'this> = &'static str;
-        type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = ();
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ();
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -424,15 +441,24 @@ pub mod _puroro_impls {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field2StringType<'this>,
             <U as MsgTrait>::Field2StringType<'this>,
         >;
-        type Field4StringType<'this> = ::puroro::Either<
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field4StringType<'this>,
             <U as MsgTrait>::Field4StringType<'this>,
         >;
-        type Field5MessageType<'this> = (
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = (
             ::std::option::Option<<T as MsgTrait>::Field5MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field5MessageType<'this>>,
         );
@@ -496,15 +522,24 @@ pub mod _puroro_impls {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field2StringType<'this>,
             <U as MsgTrait>::Field2StringType<'this>,
         >;
-        type Field4StringType<'this> = ::puroro::Either<
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field4StringType<'this>,
             <U as MsgTrait>::Field4StringType<'this>,
         >;
-        type Field5MessageType<'this> = ::puroro::Either<
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field5MessageType<'this>,
             <U as MsgTrait>::Field5MessageType<'this>,
         >;
@@ -570,9 +605,18 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        type Field2StringType<'this> = T::Field2StringType<'this>;
-        type Field4StringType<'this> = T::Field4StringType<'this>;
-        type Field5MessageType<'this> = T::Field5MessageType<'this>;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = T::Field2StringType<'this>;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = T::Field4StringType<'this>;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -792,15 +836,21 @@ pub mod _puroro_traits {
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         type Field4StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         type Field5MessageType<'this>: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -909,7 +959,10 @@ pub mod _puroro_traits {
             fn g1_int32<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).g1_int32()
             }
-            type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+            type Field2StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field2StringType<'this>;
             fn g1_string<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field2StringType<'this>> {
@@ -918,13 +971,19 @@ pub mod _puroro_traits {
             fn g2_f32<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).g2_f32()
             }
-            type Field4StringType<'this> = <$ty>::Field4StringType<'this>;
+            type Field4StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field4StringType<'this>;
             fn g2_string<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field4StringType<'this>> {
                 (**self).g2_string()
             }
-            type Field5MessageType<'this> = <$ty>::Field5MessageType<'this>;
+            type Field5MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field5MessageType<'this>;
             fn g2_submsg<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field5MessageType<'this>> {
@@ -1009,7 +1068,7 @@ pub mod _puroro_nested {
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupOne<
                 'msg,
-                T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             > {
                 G1Int32(i32),
                 G1String(
@@ -1018,7 +1077,9 @@ pub mod _puroro_nested {
                     >,
                 ),
             }
-            impl<'msg, T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait> GroupOne<'msg, T> {
+            impl<'msg, T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>
+                GroupOne<'msg, T>
+            {
                 pub fn g1_int32(self) -> ::std::option::Option<i32> {
                     match self {
                         Self::G1Int32(v) => ::std::option::Option::Some(v),
@@ -1042,7 +1103,7 @@ pub mod _puroro_nested {
             }
             impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, &'_ T>
             where
-                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+                T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             {
                 fn from(value: GroupOne<'msg, T>) -> Self {
                     match value {
@@ -1053,7 +1114,7 @@ pub mod _puroro_nested {
             }
             impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, ::std::boxed::Box<T>>
             where
-                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+                T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             {
                 fn from(value: GroupOne<'msg, T>) -> Self {
                     match value {
@@ -1065,13 +1126,15 @@ pub mod _puroro_nested {
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupTwo<
                 'msg,
-                T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             > {
                 G2F32(f32),
                 G2String(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field4StringType<'msg>),
                 G2Submsg(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<'msg>),
             }
-            impl<'msg, T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait> GroupTwo<'msg, T> {
+            impl<'msg, T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>
+                GroupTwo<'msg, T>
+            {
                 pub fn g2_f32(self) -> ::std::option::Option<f32> {
                     match self {
                         Self::G2F32(v) => ::std::option::Option::Some(v),
@@ -1108,7 +1171,7 @@ pub mod _puroro_nested {
             }
             impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ T>
             where
-                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+                T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             {
                 fn from(value: GroupTwo<'msg, T>) -> Self {
                     match value {
@@ -1120,7 +1183,7 @@ pub mod _puroro_nested {
             }
             impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, ::std::boxed::Box<T>>
             where
-                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+                T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             {
                 fn from(value: GroupTwo<'msg, T>) -> Self {
                     match value {

@@ -613,17 +613,23 @@ impl Field {
         self.proto_oneof_index.clone()
     }
 
-    pub fn rust_type_tag(&self, impl_name: &str) -> Result<String> {
+    pub fn rust_type_tag<F: Fn(&Message) -> Result<String>>(
+        &self,
+        gen_msg_path: F,
+    ) -> Result<String> {
         Ok(format!(
             "::puroro::tags::{type_tag}",
-            type_tag = self.field_type()?.tag_ident_and_gp(&impl_name)?,
+            type_tag = self.field_type()?.tag_ident_and_gp(gen_msg_path)?,
         ))
     }
-    pub fn rust_label_and_type_tags(&self, impl_name: &str) -> Result<String> {
+    pub fn rust_label_and_type_tags<F: Fn(&Message) -> Result<String>>(
+        &self,
+        gen_msg_path: F,
+    ) -> Result<String> {
         Ok(format!(
             "::puroro::tags::{label_tag}, {type_tag}",
             label_tag = self.field_label()?.tag_ident(),
-            type_tag = self.rust_type_tag(impl_name)?,
+            type_tag = self.rust_type_tag(gen_msg_path)?,
         ))
     }
 
@@ -989,7 +995,10 @@ impl FieldType {
         matches!(self, FieldType::Message(_))
     }
 
-    pub fn tag_ident_and_gp(&self, impl_name: &str) -> Result<String> {
+    pub fn tag_ident_and_gp<F: Fn(&Message) -> Result<String>>(
+        &self,
+        gen_msg_path: F,
+    ) -> Result<String> {
         Ok(match self {
             FieldType::Double => "Double".to_string(),
             FieldType::Float => "Float".to_string(),
@@ -1006,13 +1015,15 @@ impl FieldType {
             FieldType::Bool => "Bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "String".to_string(),
-            FieldType::Bytes => "Bytes".to_string().to_string(),
+            FieldType::Bytes => "Bytes".to_string(),
             FieldType::Enum2(e) => format!("Enum2<{}>", upgrade(e)?.rust_path()),
             FieldType::Enum3(e) => format!("Enum3<{}>", upgrade(e)?.rust_path()),
-            FieldType::Message(m) => format!(
-                "Message<{path}>",
-                path = upgrade(m)?.rust_impl_path(impl_name),
-            ),
+            FieldType::Message(m) => {
+                format!(
+                    "Message<{path}>",
+                    path = (gen_msg_path)(upgrade(m)?.deref())?,
+                )
+            }
         })
     }
 
@@ -1090,6 +1101,12 @@ impl MessageOrEnum {
                 .join("."),
         }
     }
+}
+
+pub fn gen_msg_type_from_impl_name(
+    impl_name: &'static str,
+) -> Box<dyn Fn(&Message) -> Result<String>> {
+    Box::new(move |msg| Ok(msg.rust_impl_path(impl_name)))
 }
 
 #[test]

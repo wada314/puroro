@@ -41,12 +41,17 @@ pub mod _puroro_simple_impl {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Clone::clone(&self.f32_unlabeled)
         }
-        type Field5StringType<'this> = &'this str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             self.string_unlabeled.deref()
         }
-        type Field6MessageType<'this> =
-            &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
             self.submsg_unlabeled.as_deref()
         }
@@ -313,18 +318,27 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this> = &'static str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> = ();
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
     impl<T, U> MsgTrait for (T, U)
     where
@@ -365,7 +379,10 @@ pub mod _puroro_impls {
                 <T as MsgTrait>::f32_unlabeled(&self.0)
             }
         }
-        type Field5StringType<'this> = ::puroro::Either<
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field5StringType<'this>,
             <U as MsgTrait>::Field5StringType<'this>,
         >;
@@ -377,7 +394,10 @@ pub mod _puroro_impls {
                 ::puroro::Either::Left(<T as MsgTrait>::string_unlabeled(&self.0))
             }
         }
-        type Field6MessageType<'this> = (
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = (
             ::std::option::Option<<T as MsgTrait>::Field6MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field6MessageType<'this>>,
         );
@@ -431,7 +451,10 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::f32_unlabeled(u),
             )
         }
-        type Field5StringType<'this> = ::puroro::Either<
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field5StringType<'this>,
             <U as MsgTrait>::Field5StringType<'this>,
         >;
@@ -441,7 +464,10 @@ pub mod _puroro_impls {
                 |u| ::puroro::Either::Right(<U as MsgTrait>::string_unlabeled(u)),
             )
         }
-        type Field6MessageType<'this> = ::puroro::Either<
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field6MessageType<'this>,
             <U as MsgTrait>::Field6MessageType<'this>,
         >;
@@ -481,13 +507,19 @@ pub mod _puroro_impls {
             self.as_ref()
                 .map_or_else(::std::default::Default::default, |msg| msg.f32_unlabeled())
         }
-        type Field5StringType<'this> = ::puroro::Either<T::Field5StringType<'this>, &'static str>;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<T::Field5StringType<'this>, &'static str>;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             self.as_ref().map_or(::puroro::Either::Right(""), |msg| {
                 ::puroro::Either::Left(msg.string_unlabeled())
             })
         }
-        type Field6MessageType<'this> = T::Field6MessageType<'this>;
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field6MessageType<'this>;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
@@ -507,18 +539,27 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
         }
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this> = &'static str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> = ();
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
     impl ::puroro::SerializableMessageToIoWrite for MsgSingleField1 {
@@ -559,18 +600,27 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this> = &'static str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> = ();
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
     impl ::puroro::SerializableMessageToIoWrite for MsgSingleField2 {
@@ -619,11 +669,17 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this> = &'static str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> = ();
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
     impl ::puroro::SerializableMessageToIoWrite for MsgSingleField3 {
@@ -661,18 +717,27 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Clone::clone(&self.f32_unlabeled)
         }
-        type Field5StringType<'this> = &'static str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> = ();
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
     impl ::puroro::SerializableMessageToIoWrite for MsgSingleField4 {
@@ -728,18 +793,27 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this> = &'this str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             self.string_unlabeled.deref()
         }
-        type Field6MessageType<'this> = ();
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
     impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField5<T>
@@ -754,11 +828,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field::<
-                T,
-                _,
-                _,
-            >(&self.string_unlabeled, 5, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                &self.string_unlabeled,
+                5,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -807,21 +881,29 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this> = &'static str;
+        type Field5StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> =
-            &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = &'this T;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_deref()
+            self.submsg_unlabeled.as_ref()
         }
     }
 
@@ -831,18 +913,18 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        T: ::puroro::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
-                >,
-            >::ser_field::<T, _, _>(&self.submsg_unlabeled, 6, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Message<T>>::ser_field(
+                &self.submsg_unlabeled,
+                6,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1110,10 +1192,13 @@ pub mod _puroro_traits {
         type Field5StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this>;
         type Field6MessageType<'this>:
-            self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+            self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+            where Self: 'this;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
@@ -1129,18 +1214,27 @@ pub mod _puroro_traits {
             fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_optional()
             }
-            type Field3RepeatedType<'this> = <$ty>::Field3RepeatedType<'this>;
+            type Field3RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field3RepeatedType<'this>;
             fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
                 (**self).i32_repeated()
             }
             fn f32_unlabeled<'this>(&'this self) -> f32 {
                 (**self).f32_unlabeled()
             }
-            type Field5StringType<'this> = <$ty>::Field5StringType<'this>;
+            type Field5StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field5StringType<'this>;
             fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
                 (**self).string_unlabeled()
             }
-            type Field6MessageType<'this> = <$ty>::Field6MessageType<'this>;
+            type Field6MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field6MessageType<'this>;
             fn submsg_unlabeled<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
