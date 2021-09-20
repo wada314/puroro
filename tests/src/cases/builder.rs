@@ -5,7 +5,7 @@ fn test_builder() {
     let builder = MsgBuilder::new();
     let msg = builder
         .append_i32_unlabeled(10)
-        .append_string_optional(Some("Test".into()))
+        .append_string_optional(Some("Test"))
         .build();
     assert_eq!(10, msg.i32_unlabeled());
     assert_eq!(Some("Test"), msg.string_optional().as_deref());
