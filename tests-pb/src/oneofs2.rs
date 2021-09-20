@@ -240,7 +240,9 @@ pub mod _puroro_simple_impl {
                     DeserFieldFromBytesIter::<
                         ::puroro::tags::OneofItem,
                         ::puroro::tags::Message<
-                            self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
+                            ::std::boxed::Box<
+                                self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
+                            >,
                         >,
                     >::deser_field(field_value_mut_ref, data)
                 }
@@ -296,7 +298,9 @@ pub mod _puroro_simple_impl {
                     E::G2Submsg(v) => SerFieldToIoWrite::<
                         ::puroro::tags::OneofItem,
                         ::puroro::tags::Message<
-                            self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
+                            ::std::boxed::Box<
+                                self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
+                            >,
                         >,
                     >::ser_field(v, 5, out)?,
                 }

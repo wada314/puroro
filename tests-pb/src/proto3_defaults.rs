@@ -172,7 +172,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Unlabeled, ::puroro::tags::String
             >::deser_field(&mut self.string_unlabeled, data),
             6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>
+                ::puroro::tags::Unlabeled, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>>
             >::deser_field(&mut self.submsg_unlabeled, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -214,7 +214,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+                    ::std::boxed::Box<
+                        self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+                    >,
                 >,
             >::ser_field(&self.submsg_unlabeled, 6, out)?;
 

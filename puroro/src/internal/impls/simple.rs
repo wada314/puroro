@@ -24,6 +24,9 @@ where
 
 pub trait VecOrOptionOrBare<T> {
     fn push(&mut self, val: T);
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T;
     type Iter<'a>: Iterator<Item = &'a T>
     where
         T: 'a;
@@ -32,6 +35,12 @@ pub trait VecOrOptionOrBare<T> {
 impl<T> VecOrOptionOrBare<T> for Option<T> {
     fn push(&mut self, val: T) {
         *self = Some(val);
+    }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        <Option<T>>::get_or_insert_with(self, f)
     }
     type Iter<'a>
     where
@@ -45,6 +54,13 @@ impl<T> VecOrOptionOrBare<T> for Vec<T> {
     fn push(&mut self, val: T) {
         self.push(val);
     }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        <Vec<T>>::push(self, (f)());
+        self.last_mut().unwrap()
+    }
     type Iter<'a>
     where
         T: 'a,
@@ -56,6 +72,12 @@ impl<T> VecOrOptionOrBare<T> for Vec<T> {
 impl<T> VecOrOptionOrBare<T> for T {
     fn push(&mut self, val: T) {
         *self = val;
+    }
+    fn get_or_insert_with<F>(&mut self, _: F) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        self
     }
     type Iter<'a>
     where

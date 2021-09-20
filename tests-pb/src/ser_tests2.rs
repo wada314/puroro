@@ -274,7 +274,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Repeated, ::puroro::tags::String
             >::deser_field(&mut self.string_repeated, data),
             7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
             >::deser_field(&mut self.submsg_optional, data),
             8 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
@@ -331,7 +331,7 @@ pub mod _puroro_simple_impl {
                 out,
             )?;
             SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+            ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
         >::ser_field(&self.submsg_optional, 7, out)?;
             SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>

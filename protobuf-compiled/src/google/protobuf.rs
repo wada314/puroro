@@ -473,10 +473,10 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto>
             >::deser_field(&mut self.extension, data),
             8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions>>
             >::deser_field(&mut self.options, data),
             9 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo>>
             >::deser_field(&mut self.source_code_info, data),
             12 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
@@ -540,13 +540,17 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 8, out)?;
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
+                    >,
                 >,
             >::ser_field(&self.source_code_info, 9, out)?;
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
@@ -856,7 +860,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto>
             >::deser_field(&mut self.oneof_decl, data),
             7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions>>
             >::deser_field(&mut self.options, data),
             9 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>
@@ -915,7 +919,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 7, out)?;
             SerFieldToIoWrite::<
@@ -1301,7 +1307,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Optional, ::puroro::tags::String
             >::deser_field(&mut self.json_name, data),
             8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions>>
             >::deser_field(&mut self.options, data),
             17 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bool
@@ -1360,7 +1366,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 8, out)?;
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
@@ -1465,7 +1473,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Optional, ::puroro::tags::String
             >::deser_field(&mut self.name, data),
             2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions>>
             >::deser_field(&mut self.options, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1485,7 +1493,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 2, out)?;
 
@@ -1649,7 +1659,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto>
             >::deser_field(&mut self.value, data),
             3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions>>
             >::deser_field(&mut self.options, data),
             4 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>
@@ -1678,7 +1688,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 3, out)?;
             SerFieldToIoWrite::<
@@ -1803,7 +1815,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Optional, ::puroro::tags::Int32
             >::deser_field(&mut self.number, data),
             3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions>>
             >::deser_field(&mut self.options, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1828,7 +1840,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 3, out)?;
 
@@ -1959,7 +1973,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto>
             >::deser_field(&mut self.method, data),
             3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions>>
             >::deser_field(&mut self.options, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1982,7 +1996,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 3, out)?;
 
@@ -2152,7 +2168,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Optional, ::puroro::tags::String
             >::deser_field(&mut self.output_type, data),
             4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions>>
             >::deser_field(&mut self.options, data),
             5 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bool
@@ -2188,7 +2204,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
+                    ::std::boxed::Box<
+                        self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
+                    >,
                 >,
             >::ser_field(&self.options, 4, out)?;
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
@@ -23578,7 +23596,7 @@ pub mod _puroro_nested {
                         ::puroro::tags::Optional, ::puroro::tags::Int32
                     >::deser_field(&mut self.end, data),
                     3 => DeserFieldFromBytesIter::<
-                        ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>
+                        ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>
                     >::deser_field(&mut self.options, data),
         
                     _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -23599,7 +23617,7 @@ pub mod _puroro_nested {
                     ::puroro::tags::Optional, ::puroro::tags::Int32
                 >::ser_field(&self.end, 2, out)?;
                     SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>
                 >::ser_field(&self.options, 3, out)?;
 
                     ::std::result::Result::Ok(())

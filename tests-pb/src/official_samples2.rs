@@ -253,7 +253,9 @@ pub mod _puroro_simple_impl {
                 3 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional,
                     ::puroro::tags::Message<
-                        self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
+                        ::std::boxed::Box<
+                            self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
+                        >,
                     >,
                 >::deser_field(&mut self.c, data),
 
@@ -271,7 +273,9 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
+                    ::std::boxed::Box<
+                        self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
+                    >,
                 >,
             >::ser_field(&self.c, 3, out)?;
 

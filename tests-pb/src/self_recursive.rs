@@ -80,7 +80,9 @@ pub mod _puroro_simple_impl {
                 1 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+                        ::std::boxed::Box<
+                            self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+                        >,
                     >,
                 >::deser_field(&mut self.recursive_unlabeled, data),
 
@@ -98,7 +100,7 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+                    ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
                 >,
             >::ser_field(&self.recursive_unlabeled, 1, out)?;
 

@@ -319,7 +319,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto>
             >::deser_field(&mut self.proto_file, data),
             3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version>
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version>>
             >::deser_field(&mut self.compiler_version, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -350,11 +350,8 @@ pub mod _puroro_simple_impl {
                 >,
             >::ser_field(&self.proto_file, 15, out)?;
             SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
-                >,
-            >::ser_field(&self.compiler_version, 3, out)?;
+            ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version>>
+        >::ser_field(&self.compiler_version, 3, out)?;
 
             ::std::result::Result::Ok(())
         }
@@ -2394,7 +2391,7 @@ pub mod _puroro_nested {
                         ::puroro::tags::Optional, ::puroro::tags::String
                     >::deser_field(&mut self.content, data),
                     16 => DeserFieldFromBytesIter::<
-                        ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>
+                        ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>
                     >::deser_field(&mut self.generated_code_info, data),
         
                     _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -2418,7 +2415,7 @@ pub mod _puroro_nested {
                     ::puroro::tags::Optional, ::puroro::tags::String
                 >::ser_field(&self.content, 15, out)?;
                     SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>
                 >::ser_field(&self.generated_code_info, 16, out)?;
 
                     ::std::result::Result::Ok(())
