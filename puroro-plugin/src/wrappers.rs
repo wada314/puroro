@@ -1103,12 +1103,6 @@ impl MessageOrEnum {
     }
 }
 
-pub fn gen_msg_type_from_impl_name(
-    impl_name: &'static str,
-) -> Box<dyn Fn(&Message) -> Result<String>> {
-    Box::new(move |msg| Ok(msg.rust_impl_path(impl_name)))
-}
-
 #[test]
 fn test_make_module_path() {
     let package = "google.protobuf.compiler".split('.');
