@@ -14,10 +14,9 @@
 //!
 //! A struct like this is output:
 //! ```rust
-//! # use ::std::borrow::Cow;
 //! pub struct MyMessage {
 //!     pub my_number: i32,
-//!     pub my_name: Vec<Cow<'static, str>>,
+//!     pub my_name: Vec<String>,
 //!     pub my_child: Option<Box<MyMessage>>,
 //! }
 //! ```

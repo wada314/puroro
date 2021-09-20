@@ -19,7 +19,7 @@ pub mod _puroro_simple_impl {
         pub major: ::std::option::Option<i32>,
         pub minor: ::std::option::Option<i32>,
         pub patch: ::std::option::Option<i32>,
-        pub suffix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub suffix: ::std::option::Option<::std::string::String>,
     }
     impl ::puroro::Message<Version> for Version {}
 
@@ -33,7 +33,10 @@ pub mod _puroro_simple_impl {
         fn patch<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.patch)
         }
-        type Field4StringType<'this> = &'this str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn suffix<'this>(&'this self) -> Option<Self::Field4StringType<'this>> {
             self.suffix.as_ref().map(|v| v.as_ref())
         }
@@ -170,8 +173,8 @@ pub mod _puroro_simple_impl {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct CodeGeneratorRequest {
-        pub file_to_generate: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
-        pub parameter: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub file_to_generate: ::std::vec::Vec<::std::string::String>,
+        pub parameter: ::std::option::Option<::std::string::String>,
         pub proto_file: ::std::vec::Vec<
             self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
         >,
@@ -184,21 +187,29 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<CodeGeneratorRequest> for CodeGeneratorRequest {}
 
     impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequest {
-        type Field1StringType<'this> = &'this str;
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
+            ::std::slice::Iter<'this, ::std::string::String>,
         >;
 
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.file_to_generate.iter())
         }
-        type Field2StringType<'this> = &'this str;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn parameter<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             self.parameter.as_ref().map(|v| v.as_ref())
         }
-        type Field15MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
         type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
             self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
             ::std::slice::Iter<
@@ -210,8 +221,10 @@ pub mod _puroro_simple_impl {
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.proto_file.iter())
         }
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version;
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version;
         fn compiler_version<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.compiler_version.as_ref().map(|v| v.as_ref())
         }
@@ -350,21 +363,24 @@ pub mod _puroro_simple_impl {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct CodeGeneratorResponse {
-    pub error: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub error: ::std::option::Option<::std::string::String>,
     pub supported_features: ::std::option::Option<u64>,
     pub file: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>,
 }
     impl ::puroro::Message<CodeGeneratorResponse> for CodeGeneratorResponse {}
 
     impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponse {
-        type Field1StringType<'this> = &'this str;
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn error<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
             self.error.as_ref().map(|v| v.as_ref())
         }
         fn supported_features<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.supported_features)
         }
-        type Field15MessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File;
+        type Field15MessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File;
         type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
     self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File,
     ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>>;
@@ -490,7 +506,10 @@ pub mod _puroro_impls {
     }
     use super::_puroro_traits::*;
     impl VersionTrait for () {
-        type Field4StringType<'this> = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
     }
     impl<T, U> VersionTrait for (T, U)
     where
@@ -506,7 +525,10 @@ pub mod _puroro_impls {
         fn patch<'this>(&'this self) -> Option<i32> {
             <U as VersionTrait>::patch(&self.1).or_else(|| <T as VersionTrait>::patch(&self.0))
         }
-        type Field4StringType<'this> = ::puroro::Either<
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as VersionTrait>::Field4StringType<'this>,
             <U as VersionTrait>::Field4StringType<'this>,
         >;
@@ -543,7 +565,10 @@ pub mod _puroro_impls {
                 |u| <U as VersionTrait>::patch(u),
             )
         }
-        type Field4StringType<'this> = ::puroro::Either<
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as VersionTrait>::Field4StringType<'this>,
             <U as VersionTrait>::Field4StringType<'this>,
         >;
@@ -567,27 +592,34 @@ pub mod _puroro_impls {
         fn patch<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.patch())
         }
-        type Field4StringType<'this> = T::Field4StringType<'this>;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = T::Field4StringType<'this>;
         fn suffix<'this>(&'this self) -> ::std::option::Option<Self::Field4StringType<'this>> {
             self.as_ref().and_then(|msg| msg.suffix())
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct VersionSimpleField1 {
+
+    pub struct VersionSingleField1 {
         pub major: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<super::Version> for VersionSimpleField1 {}
+    impl ::puroro::Message<super::Version> for VersionSingleField1 {}
 
-    impl super::_puroro_traits::VersionTrait for VersionSimpleField1 {
+    impl super::_puroro_traits::VersionTrait for VersionSingleField1 {
         fn major<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.major)
         }
-        type Field4StringType<'this> = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for VersionSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for VersionSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -602,27 +634,31 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for VersionSimpleField1 {
+    impl ::std::convert::From<::std::option::Option<i32>> for VersionSingleField1 {
         fn from(value: ::std::option::Option<i32>) -> Self {
             Self { major: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct VersionSimpleField2 {
+
+    pub struct VersionSingleField2 {
         pub minor: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<super::Version> for VersionSimpleField2 {}
+    impl ::puroro::Message<super::Version> for VersionSingleField2 {}
 
-    impl super::_puroro_traits::VersionTrait for VersionSimpleField2 {
+    impl super::_puroro_traits::VersionTrait for VersionSingleField2 {
         fn minor<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.minor)
         }
-        type Field4StringType<'this> = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for VersionSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for VersionSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -637,27 +673,31 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for VersionSimpleField2 {
+    impl ::std::convert::From<::std::option::Option<i32>> for VersionSingleField2 {
         fn from(value: ::std::option::Option<i32>) -> Self {
             Self { minor: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct VersionSimpleField3 {
+
+    pub struct VersionSingleField3 {
         pub patch: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<super::Version> for VersionSimpleField3 {}
+    impl ::puroro::Message<super::Version> for VersionSingleField3 {}
 
-    impl super::_puroro_traits::VersionTrait for VersionSimpleField3 {
+    impl super::_puroro_traits::VersionTrait for VersionSingleField3 {
         fn patch<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.patch)
         }
-        type Field4StringType<'this> = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for VersionSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for VersionSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -672,45 +712,77 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for VersionSimpleField3 {
+    impl ::std::convert::From<::std::option::Option<i32>> for VersionSingleField3 {
         fn from(value: ::std::option::Option<i32>) -> Self {
             Self { patch: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct VersionSimpleField4 {
-        pub suffix: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+
+    pub struct VersionSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub suffix: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::Version> for VersionSimpleField4 {}
+    impl<T> ::puroro::Message<super::Version> for VersionSingleField4<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::VersionTrait for VersionSimpleField4 {
-        type Field4StringType<'this> = &'this str;
+    impl<T> super::_puroro_traits::VersionTrait for VersionSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn suffix<'this>(&'this self) -> Option<Self::Field4StringType<'this>> {
-            self.suffix.as_ref().map(|v| v.as_ref())
+            self.suffix.as_deref()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for VersionSimpleField4 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for VersionSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.suffix,
-                4,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.suffix, 4, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
-        for VersionSimpleField4
+    impl<T> ::std::convert::From<::std::option::Option<T>> for VersionSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+        fn from(value: ::std::option::Option<T>) -> Self {
             Self { suffix: value }
         }
     }
@@ -730,7 +802,7 @@ pub mod _puroro_impls {
         fn patch<'this>(&'this self) -> Option<i32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field4StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field4StringType<'this> = ::std::string::String;
         fn suffix<'this>(&'this self) -> Option<Self::Field4StringType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -744,26 +816,32 @@ pub mod _puroro_impls {
         pub fn append_major(
             self,
             value: ::std::option::Option<i32>,
-        ) -> VersionBuilder<(T, VersionSimpleField1)> {
-            VersionBuilder((self.0, ::std::convert::From::from(value)))
+        ) -> VersionBuilder<(T, VersionSingleField1)> {
+            VersionBuilder((self.0, VersionSingleField1 { major: value }))
         }
         pub fn append_minor(
             self,
             value: ::std::option::Option<i32>,
-        ) -> VersionBuilder<(T, VersionSimpleField2)> {
-            VersionBuilder((self.0, ::std::convert::From::from(value)))
+        ) -> VersionBuilder<(T, VersionSingleField2)> {
+            VersionBuilder((self.0, VersionSingleField2 { minor: value }))
         }
         pub fn append_patch(
             self,
             value: ::std::option::Option<i32>,
-        ) -> VersionBuilder<(T, VersionSimpleField3)> {
-            VersionBuilder((self.0, ::std::convert::From::from(value)))
+        ) -> VersionBuilder<(T, VersionSingleField3)> {
+            VersionBuilder((self.0, VersionSingleField3 { patch: value }))
         }
-        pub fn append_suffix(
+        pub fn append_suffix<U>(
             self,
-            value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        ) -> VersionBuilder<(T, VersionSimpleField4)> {
-            VersionBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> VersionBuilder<(T, VersionSingleField4<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            VersionBuilder((self.0, VersionSingleField4 { suffix: value }))
         }
 
         pub fn build(self) -> T {
@@ -777,31 +855,53 @@ pub mod _puroro_impls {
         }
     }
     impl CodeGeneratorRequestTrait for () {
-        type Field1StringType<'this> = &'static str;
-        type Field1RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field2StringType<'this> = &'static str;
-        type Field15MessageType<'this> = ();
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field3MessageType<'this> = ();
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
     impl<T, U> CodeGeneratorRequestTrait for (T, U)
     where
         T: CodeGeneratorRequestTrait,
         U: CodeGeneratorRequestTrait,
     {
-        type Field1StringType<'this> = ::puroro::Either<
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::Field1StringType<'this>,
             <U as CodeGeneratorRequestTrait>::Field1StringType<'this>,
         >;
-        type Field1RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedLDField<
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedLDField<
             <T as CodeGeneratorRequestTrait>::Field1RepeatedType<'this>,
             <U as CodeGeneratorRequestTrait>::Field1RepeatedType<'this>,
         >;
@@ -812,7 +912,10 @@ pub mod _puroro_impls {
                 <U as CodeGeneratorRequestTrait>::file_to_generate(&self.1),
             )
         }
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::Field2StringType<'this>,
             <U as CodeGeneratorRequestTrait>::Field2StringType<'this>,
         >;
@@ -825,15 +928,20 @@ pub mod _puroro_impls {
                 None
             }
         }
-        type Field15MessageType<'this> = ::puroro::Either<
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::Field15MessageType<'this>,
             <U as CodeGeneratorRequestTrait>::Field15MessageType<'this>,
         >;
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-                <T as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
-                <U as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
-            >;
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+            <T as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
+            <U as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
+        >;
 
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -841,7 +949,10 @@ pub mod _puroro_impls {
                 <U as CodeGeneratorRequestTrait>::proto_file(&self.1),
             )
         }
-        type Field3MessageType<'this> = (
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = (
             ::std::option::Option<<T as CodeGeneratorRequestTrait>::Field3MessageType<'this>>,
             ::std::option::Option<<U as CodeGeneratorRequestTrait>::Field3MessageType<'this>>,
         );
@@ -862,11 +973,17 @@ pub mod _puroro_impls {
         T: CodeGeneratorRequestTrait,
         U: CodeGeneratorRequestTrait,
     {
-        type Field1StringType<'this> = ::puroro::Either<
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::Field1StringType<'this>,
             <U as CodeGeneratorRequestTrait>::Field1StringType<'this>,
         >;
-        type Field1RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedLDField<
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedLDField<
             <T as CodeGeneratorRequestTrait>::Field1RepeatedType<'this>,
             <U as CodeGeneratorRequestTrait>::Field1RepeatedType<'this>,
         >;
@@ -878,7 +995,10 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as CodeGeneratorRequestTrait>::file_to_generate(u)),
             )
         }
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::Field2StringType<'this>,
             <U as CodeGeneratorRequestTrait>::Field2StringType<'this>,
         >;
@@ -894,15 +1014,20 @@ pub mod _puroro_impls {
                 },
             )
         }
-        type Field15MessageType<'this> = ::puroro::Either<
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::Field15MessageType<'this>,
             <U as CodeGeneratorRequestTrait>::Field15MessageType<'this>,
         >;
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::either::EitherRepeatedMessageField<
-                <T as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
-                <U as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
-            >;
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+            <T as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
+            <U as CodeGeneratorRequestTrait>::Field15RepeatedType<'this>,
+        >;
 
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -911,7 +1036,10 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as CodeGeneratorRequestTrait>::proto_file(u)),
             )
         }
-        type Field3MessageType<'this> = ::puroro::Either<
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorRequestTrait>::Field3MessageType<'this>,
             <U as CodeGeneratorRequestTrait>::Field3MessageType<'this>,
         >;
@@ -932,8 +1060,14 @@ pub mod _puroro_impls {
     where
         T: CodeGeneratorRequestTrait,
     {
-        type Field1StringType<'this> = T::Field1StringType<'this>;
-        type Field1RepeatedType<'this> = ::std::iter::Flatten<
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = T::Field1StringType<'this>;
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Flatten<
             ::std::option::IntoIter<
                 <T::Field1RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
             >,
@@ -944,12 +1078,21 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        type Field2StringType<'this> = T::Field2StringType<'this>;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = T::Field2StringType<'this>;
         fn parameter<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             self.as_ref().and_then(|msg| msg.parameter())
         }
-        type Field15MessageType<'this> = T::Field15MessageType<'this>;
-        type Field15RepeatedType<'this> = ::std::iter::Flatten<
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field15MessageType<'this>;
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Flatten<
             ::std::option::IntoIter<
                 <T::Field15RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
             >,
@@ -960,7 +1103,10 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        type Field3MessageType<'this> = T::Field3MessageType<'this>;
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field3MessageType<'this>;
         fn compiler_version<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field3MessageType<'this>> {
@@ -969,51 +1115,94 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct CodeGeneratorRequestSimpleField1 {
-        pub file_to_generate: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+
+    pub struct CodeGeneratorRequestSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub file_to_generate: ::std::vec::Vec<T>,
     }
 
-    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField1 {}
+    impl<T> ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSingleField1<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField1 {
-        type Field1StringType<'this> = &'this str;
-        type Field1RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            str,
-            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
-        >;
+    impl<T> super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::single_field::DerefIter<::std::slice::Iter<'this, T>>;
 
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.file_to_generate.iter())
+            ::puroro::internal::impls::single_field::DerefIter::new(self.file_to_generate.iter())
         }
-        type Field2StringType<'this> = &'static str;
-        type Field15MessageType<'this> = ();
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field3MessageType<'this> = ();
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSimpleField1 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.file_to_generate,
-                1,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.file_to_generate, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<::std::borrow::Cow<'static, str>>>
-        for CodeGeneratorRequestSimpleField1
+    impl<T> ::std::convert::From<::std::vec::Vec<T>> for CodeGeneratorRequestSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>) -> Self {
+        fn from(value: ::std::vec::Vec<T>) -> Self {
             Self {
                 file_to_generate: value,
             }
@@ -1021,184 +1210,286 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct CodeGeneratorRequestSimpleField2 {
-        pub parameter: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+
+    pub struct CodeGeneratorRequestSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub parameter: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField2 {}
+    impl<T> ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSingleField2<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField2 {
-        type Field1StringType<'this> = &'static str;
-        type Field1RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
+    impl<T> super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field2StringType<'this> = &'this str;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn parameter<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.parameter.as_ref().map(|v| v.as_ref())
+            self.parameter.as_deref()
         }
-        type Field15MessageType<'this> = ();
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field3MessageType<'this> = ();
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSimpleField2 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.parameter,
-                2,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.parameter, 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
-        for CodeGeneratorRequestSimpleField2
+    impl<T> ::std::convert::From<::std::option::Option<T>> for CodeGeneratorRequestSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+        fn from(value: ::std::option::Option<T>) -> Self {
             Self { parameter: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct CodeGeneratorRequestSimpleField15 {
-        pub proto_file: ::std::vec::Vec<
-            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
-        >,
+
+    pub struct CodeGeneratorRequestSingleField15<T>
+    where
+        T: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub proto_file: ::std::vec::Vec<T>,
     }
 
-    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField15 {}
+    impl<T> ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSingleField15<T> where
+        T: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField15 {
-        type Field1StringType<'this> = &'static str;
-        type Field1RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
+    impl<T> super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSingleField15<T>
+    where
+        T: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field2StringType<'this> = &'static str;
-        type Field15MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto;
-        type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
-            >,
-        >;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = &'this T;
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::slice::Iter<'this, T>;
 
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.proto_file.iter())
+            self.proto_file.iter()
         }
-        type Field3MessageType<'this> = ();
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSimpleField15 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField15<T>
+    where
+        T: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        T: ::puroro::SerializableMessageToIoWrite,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
-                >,
-            >::ser_field(&self.proto_file, 15, out)?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.proto_file, 15, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
-        ::std::convert::From<
-            ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
-            >,
-        > for CodeGeneratorRequestSimpleField15
+    impl<T> ::std::convert::From<::std::vec::Vec<T>> for CodeGeneratorRequestSingleField15<T>
+    where
+        T: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
-            >,
-        ) -> Self {
+        fn from(value: ::std::vec::Vec<T>) -> Self {
             Self { proto_file: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct CodeGeneratorRequestSimpleField3 {
-        pub compiler_version: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
-            >,
-        >,
+
+    pub struct CodeGeneratorRequestSingleField3<T>
+    where
+        T: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub compiler_version: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleField3 {}
+    impl<T> ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSingleField3<T> where
+        T: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleField3 {
-        type Field1StringType<'this> = &'static str;
-        type Field1RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
+    impl<T> super::_puroro_traits::CodeGeneratorRequestTrait for CodeGeneratorRequestSingleField3<T>
+    where
+        T: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field1RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field2StringType<'this> = &'static str;
-        type Field15MessageType<'this> = ();
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version;
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = &'this T;
         fn compiler_version<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.compiler_version.as_ref().map(|v| v.as_ref())
+            self.compiler_version.as_ref()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSimpleField3 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField3<T>
+    where
+        T: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        T: ::puroro::SerializableMessageToIoWrite,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
-                >,
-            >::ser_field(&self.compiler_version, 3, out)?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.compiler_version, 3, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
-        ::std::convert::From<
-            ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
-                >,
-            >,
-        > for CodeGeneratorRequestSimpleField3
+    impl<T> ::std::convert::From<::std::option::Option<T>> for CodeGeneratorRequestSingleField3<T>
+    where
+        T: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
-                >,
-            >,
-        ) -> Self {
+        fn from(value: ::std::option::Option<T>) -> Self {
             Self {
                 compiler_version: value,
             }
@@ -1211,13 +1502,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message<super::CodeGeneratorRequest> for CodeGeneratorRequestSimpleByValue {}
 
     impl CodeGeneratorRequestTrait for CodeGeneratorRequestSimpleByValue {
-        type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field1StringType<'this> = ::std::string::String;
         type Field1RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field1StringType<'this>>;
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field2StringType<'this> = ::std::string::String;
         fn parameter<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -1242,35 +1533,69 @@ pub mod _puroro_impls {
     where
         T: CodeGeneratorRequestTrait,
     {
-        pub fn append_file_to_generate(
+        pub fn append_file_to_generate<U>(
             self,
-            value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
-        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSimpleField1)> {
-            CodeGeneratorRequestBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::vec::Vec<U>,
+        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSingleField1<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            CodeGeneratorRequestBuilder((
+                self.0,
+                CodeGeneratorRequestSingleField1 {
+                    file_to_generate: value,
+                },
+            ))
         }
-        pub fn append_parameter(
+        pub fn append_parameter<U>(
             self,
-            value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSimpleField2)> {
-            CodeGeneratorRequestBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSingleField2<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            CodeGeneratorRequestBuilder((
+                self.0,
+                CodeGeneratorRequestSingleField2 { parameter: value },
+            ))
         }
-        pub fn append_proto_file(
+        pub fn append_proto_file<U>(
             self,
-            value: ::std::vec::Vec<
-                self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
-            >,
-        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSimpleField15)> {
-            CodeGeneratorRequestBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::vec::Vec<U>,
+        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSingleField15<U>)>
+        where
+            U: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            CodeGeneratorRequestBuilder((
+                self.0,
+                CodeGeneratorRequestSingleField15 { proto_file: value },
+            ))
         }
-        pub fn append_compiler_version(
+        pub fn append_compiler_version<U>(
             self,
-            value: ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::google::protobuf::compiler::_puroro_simple_impl::Version,
-                >,
-            >,
-        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSimpleField3)> {
-            CodeGeneratorRequestBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> CodeGeneratorRequestBuilder<(T, CodeGeneratorRequestSingleField3<U>)>
+        where
+            U: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            CodeGeneratorRequestBuilder((
+                self.0,
+                CodeGeneratorRequestSingleField3 {
+                    compiler_version: value,
+                },
+            ))
         }
 
         pub fn build(self) -> T {
@@ -1284,10 +1609,18 @@ pub mod _puroro_impls {
         }
     }
     impl CodeGeneratorResponseTrait for () {
-        type Field1StringType<'this> = &'static str;
-        type Field15MessageType<'this> = ();
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1297,7 +1630,10 @@ pub mod _puroro_impls {
         T: CodeGeneratorResponseTrait,
         U: CodeGeneratorResponseTrait,
     {
-        type Field1StringType<'this> = ::puroro::Either<
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorResponseTrait>::Field1StringType<'this>,
             <U as CodeGeneratorResponseTrait>::Field1StringType<'this>,
         >;
@@ -1314,15 +1650,20 @@ pub mod _puroro_impls {
             <U as CodeGeneratorResponseTrait>::supported_features(&self.1)
                 .or_else(|| <T as CodeGeneratorResponseTrait>::supported_features(&self.0))
         }
-        type Field15MessageType<'this> = ::puroro::Either<
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorResponseTrait>::Field15MessageType<'this>,
             <U as CodeGeneratorResponseTrait>::Field15MessageType<'this>,
         >;
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-                <T as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
-                <U as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
-            >;
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
+            <T as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
+            <U as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
+        >;
 
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
@@ -1336,7 +1677,10 @@ pub mod _puroro_impls {
         T: CodeGeneratorResponseTrait,
         U: CodeGeneratorResponseTrait,
     {
-        type Field1StringType<'this> = ::puroro::Either<
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorResponseTrait>::Field1StringType<'this>,
             <U as CodeGeneratorResponseTrait>::Field1StringType<'this>,
         >;
@@ -1352,15 +1696,20 @@ pub mod _puroro_impls {
                 |u| <U as CodeGeneratorResponseTrait>::supported_features(u),
             )
         }
-        type Field15MessageType<'this> = ::puroro::Either<
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as CodeGeneratorResponseTrait>::Field15MessageType<'this>,
             <U as CodeGeneratorResponseTrait>::Field15MessageType<'this>,
         >;
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::either::EitherRepeatedMessageField<
-                <T as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
-                <U as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
-            >;
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+            <T as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
+            <U as CodeGeneratorResponseTrait>::Field15RepeatedType<'this>,
+        >;
 
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
@@ -1374,15 +1723,24 @@ pub mod _puroro_impls {
     where
         T: CodeGeneratorResponseTrait,
     {
-        type Field1StringType<'this> = T::Field1StringType<'this>;
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = T::Field1StringType<'this>;
         fn error<'this>(&'this self) -> ::std::option::Option<Self::Field1StringType<'this>> {
             self.as_ref().and_then(|msg| msg.error())
         }
         fn supported_features<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().and_then(|msg| msg.supported_features())
         }
-        type Field15MessageType<'this> = T::Field15MessageType<'this>;
-        type Field15RepeatedType<'this> = ::std::iter::Flatten<
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field15MessageType<'this>;
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Flatten<
             ::std::option::IntoIter<
                 <T::Field15RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
             >,
@@ -1396,69 +1754,115 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct CodeGeneratorResponseSimpleField1 {
-        pub error: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+
+    pub struct CodeGeneratorResponseSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub error: ::std::option::Option<T>,
     }
 
-    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleField1 {}
+    impl<T> ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSingleField1<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleField1 {
-        type Field1StringType<'this> = &'this str;
+    impl<T> super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn error<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-            self.error.as_ref().map(|v| v.as_ref())
+            self.error.as_deref()
         }
-        type Field15MessageType<'this> = ();
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponseSimpleField1 {
+    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponseSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.error,
-                1,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.error, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
-        for CodeGeneratorResponseSimpleField1
+    impl<T> ::std::convert::From<::std::option::Option<T>> for CodeGeneratorResponseSingleField1<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+        fn from(value: ::std::option::Option<T>) -> Self {
             Self { error: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct CodeGeneratorResponseSimpleField2 {
+
+    pub struct CodeGeneratorResponseSingleField2 {
         pub supported_features: ::std::option::Option<u64>,
     }
 
-    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleField2 {}
+    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSingleField2 {}
 
-    impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleField2 {
-        type Field1StringType<'this> = &'static str;
+    impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSingleField2 {
+        type Field1StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn supported_features<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.supported_features)
         }
-        type Field15MessageType<'this> = ();
-        type Field15RepeatedType<'this> =
-            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
+        type Field15MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field15RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field15MessageType<'this>>;
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponseSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponseSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1473,7 +1877,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<u64>> for CodeGeneratorResponseSimpleField2 {
+    impl ::std::convert::From<::std::option::Option<u64>> for CodeGeneratorResponseSingleField2 {
         fn from(value: ::std::option::Option<u64>) -> Self {
             Self {
                 supported_features: value,
@@ -1482,39 +1886,54 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct CodeGeneratorResponseSimpleField15 {
-    pub file: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>,
+
+    pub struct CodeGeneratorResponseSingleField15<T>
+where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    pub file: ::std::vec::Vec<T>,
 }
 
-    impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleField15 {}
+    impl<T> ::puroro::Message<super::CodeGeneratorResponse>
+for CodeGeneratorResponseSingleField15<T>
+where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{}
 
-    impl super::_puroro_traits::CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleField15 {
-        type Field1StringType<'this> = &'static str;
-        type Field15MessageType<'this> = &'this self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File;
-        type Field15RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File,
-    ::std::slice::Iter<'this, self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>>;
+    impl<T> super::_puroro_traits::CodeGeneratorResponseTrait 
+for CodeGeneratorResponseSingleField15<T>
+where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+type Field1StringType<'this> where Self: 'this = &'static str;
+type Field15MessageType<'this> where Self: 'this = &'this T;
+type Field15RepeatedType<'this> where Self: 'this 
+    = ::std::slice::Iter<'this, T>;
 
-        fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.file.iter())
-        }
+fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
+    self.file.iter()
+}
+}
+
+    impl<T> ::puroro::SerializableMessageToIoWrite 
+for CodeGeneratorResponseSingleField15<T>
+where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    T: ::puroro::SerializableMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write
+    {
+        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+        SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<T>
+        >::ser_field::<T, _, _>(&self.file, 15, out)?;
+        ::std::result::Result::Ok(())
     }
+}
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponseSimpleField15 {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>
-        >::ser_field(&self.file, 15, out)?;
-            ::std::result::Result::Ok(())
-        }
-    }
-
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>> for CodeGeneratorResponseSimpleField15 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>) -> Self {
+    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+for CodeGeneratorResponseSingleField15<T>
+where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn from(value: ::std::vec::Vec<T>) -> Self {
         Self {
             file: value,
         }
@@ -1527,7 +1946,7 @@ pub mod _puroro_impls {
     impl ::puroro::Message<super::CodeGeneratorResponse> for CodeGeneratorResponseSimpleByValue {}
 
     impl CodeGeneratorResponseTrait for CodeGeneratorResponseSimpleByValue {
-        type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field1StringType<'this> = ::std::string::String;
         fn error<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -1547,23 +1966,40 @@ pub mod _puroro_impls {
     where
         T: CodeGeneratorResponseTrait,
     {
-        pub fn append_error(
+        pub fn append_error<U>(
             self,
-            value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        ) -> CodeGeneratorResponseBuilder<(T, CodeGeneratorResponseSimpleField1)> {
-            CodeGeneratorResponseBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<U>,
+        ) -> CodeGeneratorResponseBuilder<(T, CodeGeneratorResponseSingleField1<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            CodeGeneratorResponseBuilder((
+                self.0,
+                CodeGeneratorResponseSingleField1 { error: value },
+            ))
         }
         pub fn append_supported_features(
             self,
             value: ::std::option::Option<u64>,
-        ) -> CodeGeneratorResponseBuilder<(T, CodeGeneratorResponseSimpleField2)> {
-            CodeGeneratorResponseBuilder((self.0, ::std::convert::From::from(value)))
+        ) -> CodeGeneratorResponseBuilder<(T, CodeGeneratorResponseSingleField2)> {
+            CodeGeneratorResponseBuilder((
+                self.0,
+                CodeGeneratorResponseSingleField2 {
+                    supported_features: value,
+                },
+            ))
         }
-        pub fn append_file(
-            self,
-            value: ::std::vec::Vec<self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_simple_impl::File>,
-        ) -> CodeGeneratorResponseBuilder<(T, CodeGeneratorResponseSimpleField15)> {
-            CodeGeneratorResponseBuilder((self.0, ::std::convert::From::from(value)))
+    pub fn append_file<U>(self, value: ::std::vec::Vec<U>)
+        -> CodeGeneratorResponseBuilder<(T, CodeGeneratorResponseSingleField15<U>)>
+where U: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    {
+            CodeGeneratorResponseBuilder((
+                self.0,
+                CodeGeneratorResponseSingleField15 { file: value },
+            ))
         }
 
         pub fn build(self) -> T {
@@ -1596,7 +2032,9 @@ pub mod _puroro_traits {
         type Field4StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn suffix<'this>(&'this self) -> ::std::option::Option<Self::Field4StringType<'this>> {
             ::std::default::Default::default()
         }
@@ -1613,7 +2051,10 @@ pub mod _puroro_traits {
             fn patch<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).patch()
             }
-            type Field4StringType<'this> = <$ty>::Field4StringType<'this>;
+            type Field4StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field4StringType<'this>;
             fn suffix<'this>(&'this self) -> ::std::option::Option<Self::Field4StringType<'this>> {
                 (**self).suffix()
             }
@@ -1637,24 +2078,34 @@ pub mod _puroro_traits {
         type Field1StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         type Field1RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field1StringType<'this>>;
+            + ::std::iter::IntoIterator<Item = Self::Field1StringType<'this>>
+        where
+            Self: 'this;
         fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this>;
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn parameter<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             ::std::default::Default::default()
         }
         type Field15MessageType<'this>:
-            self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+            self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+            where Self: 'this;
         type Field15RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field15MessageType<'this>>;
+            + ::std::iter::IntoIterator<Item = Self::Field15MessageType<'this>>
+        where
+            Self: 'this;
         fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this>;
         type Field3MessageType<'this>:
-            self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+            self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+            where Self: 'this;
         fn compiler_version<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field3MessageType<'this>> {
@@ -1664,23 +2115,41 @@ pub mod _puroro_traits {
 
     macro_rules! code_generator_request_delegate {
         ($ty:ty) => {
-            type Field1StringType<'this> = <$ty>::Field1StringType<'this>;
-            type Field1RepeatedType<'this> = <$ty>::Field1RepeatedType<'this>;
+            type Field1StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field1StringType<'this>;
+            type Field1RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field1RepeatedType<'this>;
             fn file_to_generate<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
                 (**self).file_to_generate()
             }
-            type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+            type Field2StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field2StringType<'this>;
             fn parameter<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field2StringType<'this>> {
                 (**self).parameter()
             }
-            type Field15MessageType<'this> = <$ty>::Field15MessageType<'this>;
-            type Field15RepeatedType<'this> = <$ty>::Field15RepeatedType<'this>;
+            type Field15MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field15MessageType<'this>;
+            type Field15RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field15RepeatedType<'this>;
             fn proto_file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
                 (**self).proto_file()
             }
-            type Field3MessageType<'this> = <$ty>::Field3MessageType<'this>;
+            type Field3MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field3MessageType<'this>;
             fn compiler_version<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field3MessageType<'this>> {
@@ -1706,7 +2175,9 @@ pub mod _puroro_traits {
         type Field1StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn error<'this>(&'this self) -> ::std::option::Option<Self::Field1StringType<'this>> {
             ::std::default::Default::default()
         }
@@ -1714,23 +2185,35 @@ pub mod _puroro_traits {
             ::std::default::Default::default()
         }
         type Field15MessageType<'this>:
-            self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+            self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+            where Self: 'this;
         type Field15RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field15MessageType<'this>>;
+            + ::std::iter::IntoIterator<Item = Self::Field15MessageType<'this>>
+        where
+            Self: 'this;
         fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this>;
     }
 
     macro_rules! code_generator_response_delegate {
         ($ty:ty) => {
-            type Field1StringType<'this> = <$ty>::Field1StringType<'this>;
+            type Field1StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field1StringType<'this>;
             fn error<'this>(&'this self) -> ::std::option::Option<Self::Field1StringType<'this>> {
                 (**self).error()
             }
             fn supported_features<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).supported_features()
             }
-            type Field15MessageType<'this> = <$ty>::Field15MessageType<'this>;
-            type Field15RepeatedType<'this> = <$ty>::Field15RepeatedType<'this>;
+            type Field15MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field15MessageType<'this>;
+            type Field15RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field15RepeatedType<'this>;
             fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
                 (**self).file()
             }
@@ -1780,27 +2263,36 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct File {
-            pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-            pub insertion_point: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-            pub content: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+            pub name: ::std::option::Option<::std::string::String>,
+            pub insertion_point: ::std::option::Option<::std::string::String>,
+            pub content: ::std::option::Option<::std::string::String>,
             pub generated_code_info: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>,
         }
             impl ::puroro::Message<File> for File {}
 
             impl super::_puroro_traits::FileTrait for File {
-                type Field1StringType<'this> = &'this str;
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = &'this str;
                 fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
                     self.name.as_ref().map(|v| v.as_ref())
                 }
-                type Field2StringType<'this> = &'this str;
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = &'this str;
                 fn insertion_point<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
                     self.insertion_point.as_ref().map(|v| v.as_ref())
                 }
-                type Field15StringType<'this> = &'this str;
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = &'this str;
                 fn content<'this>(&'this self) -> Option<Self::Field15StringType<'this>> {
                     self.content.as_ref().map(|v| v.as_ref())
                 }
-                type Field16MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo;
+                type Field16MessageType<'this> where Self: 'this = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo;
                 fn generated_code_info<'this>(
                     &'this self,
                 ) -> Option<Self::Field16MessageType<'this>> {
@@ -1941,17 +2433,32 @@ pub mod _puroro_nested {
             }
             use super::_puroro_traits::*;
             impl FileTrait for () {
-                type Field1StringType<'this> = &'static str;
-                type Field2StringType<'this> = &'static str;
-                type Field15StringType<'this> = &'static str;
-                type Field16MessageType<'this> = ();
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = ();
             }
             impl<T, U> FileTrait for (T, U)
             where
                 T: FileTrait,
                 U: FileTrait,
             {
-                type Field1StringType<'this> = ::puroro::Either<
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = ::puroro::Either<
                     <T as FileTrait>::Field1StringType<'this>,
                     <U as FileTrait>::Field1StringType<'this>,
                 >;
@@ -1964,7 +2471,10 @@ pub mod _puroro_nested {
                         None
                     }
                 }
-                type Field2StringType<'this> = ::puroro::Either<
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = ::puroro::Either<
                     <T as FileTrait>::Field2StringType<'this>,
                     <U as FileTrait>::Field2StringType<'this>,
                 >;
@@ -1977,7 +2487,10 @@ pub mod _puroro_nested {
                         None
                     }
                 }
-                type Field15StringType<'this> = ::puroro::Either<
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = ::puroro::Either<
                     <T as FileTrait>::Field15StringType<'this>,
                     <U as FileTrait>::Field15StringType<'this>,
                 >;
@@ -1990,7 +2503,10 @@ pub mod _puroro_nested {
                         None
                     }
                 }
-                type Field16MessageType<'this> = (
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = (
                     ::std::option::Option<<T as FileTrait>::Field16MessageType<'this>>,
                     ::std::option::Option<<U as FileTrait>::Field16MessageType<'this>>,
                 );
@@ -2013,7 +2529,10 @@ pub mod _puroro_nested {
                 T: FileTrait,
                 U: FileTrait,
             {
-                type Field1StringType<'this> = ::puroro::Either<
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = ::puroro::Either<
                     <T as FileTrait>::Field1StringType<'this>,
                     <U as FileTrait>::Field1StringType<'this>,
                 >;
@@ -2023,7 +2542,10 @@ pub mod _puroro_nested {
                         |u| <U as FileTrait>::name(u).map(|u| ::puroro::Either::Right(u)),
                     )
                 }
-                type Field2StringType<'this> = ::puroro::Either<
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = ::puroro::Either<
                     <T as FileTrait>::Field2StringType<'this>,
                     <U as FileTrait>::Field2StringType<'this>,
                 >;
@@ -2035,7 +2557,10 @@ pub mod _puroro_nested {
                         },
                     )
                 }
-                type Field15StringType<'this> = ::puroro::Either<
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = ::puroro::Either<
                     <T as FileTrait>::Field15StringType<'this>,
                     <U as FileTrait>::Field15StringType<'this>,
                 >;
@@ -2045,7 +2570,10 @@ pub mod _puroro_nested {
                         |u| <U as FileTrait>::content(u).map(|u| ::puroro::Either::Right(u)),
                     )
                 }
-                type Field16MessageType<'this> = ::puroro::Either<
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = ::puroro::Either<
                     <T as FileTrait>::Field16MessageType<'this>,
                     <U as FileTrait>::Field16MessageType<'this>,
                 >;
@@ -2068,25 +2596,37 @@ pub mod _puroro_nested {
             where
                 T: FileTrait,
             {
-                type Field1StringType<'this> = T::Field1StringType<'this>;
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = T::Field1StringType<'this>;
                 fn name<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field1StringType<'this>> {
                     self.as_ref().and_then(|msg| msg.name())
                 }
-                type Field2StringType<'this> = T::Field2StringType<'this>;
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = T::Field2StringType<'this>;
                 fn insertion_point<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field2StringType<'this>> {
                     self.as_ref().and_then(|msg| msg.insertion_point())
                 }
-                type Field15StringType<'this> = T::Field15StringType<'this>;
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = T::Field15StringType<'this>;
                 fn content<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field15StringType<'this>> {
                     self.as_ref().and_then(|msg| msg.content())
                 }
-                type Field16MessageType<'this> = T::Field16MessageType<'this>;
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = T::Field16MessageType<'this>;
                 fn generated_code_info<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field16MessageType<'this>> {
@@ -2095,77 +2635,159 @@ pub mod _puroro_nested {
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub struct FileSimpleField1 {
-                pub name: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+
+            pub struct FileSingleField1<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub name: ::std::option::Option<T>,
             }
 
-            impl ::puroro::Message<super::File> for FileSimpleField1 {}
+            impl<T> ::puroro::Message<super::File> for FileSingleField1<T> where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::FileTrait for FileSimpleField1 {
-                type Field1StringType<'this> = &'this str;
+            impl<T> super::_puroro_traits::FileTrait for FileSingleField1<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = &'this str;
                 fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
-                    self.name.as_ref().map(|v| v.as_ref())
+                    self.name.as_deref()
                 }
-                type Field2StringType<'this> = &'static str;
-                type Field15StringType<'this> = &'static str;
-                type Field16MessageType<'this> = ();
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = ();
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for FileSimpleField1 {
+            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField1<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field(&self.name, 1, out)?;
+                >::ser_field::<T, _, _>(&self.name, 1, out)?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
-                for FileSimpleField1
+            impl<T> ::std::convert::From<::std::option::Option<T>> for FileSingleField1<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
             {
-                fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+                fn from(value: ::std::option::Option<T>) -> Self {
                     Self { name: value }
                 }
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub struct FileSimpleField2 {
-                pub insertion_point: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+
+            pub struct FileSingleField2<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub insertion_point: ::std::option::Option<T>,
             }
 
-            impl ::puroro::Message<super::File> for FileSimpleField2 {}
+            impl<T> ::puroro::Message<super::File> for FileSingleField2<T> where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::FileTrait for FileSimpleField2 {
-                type Field1StringType<'this> = &'static str;
-                type Field2StringType<'this> = &'this str;
+            impl<T> super::_puroro_traits::FileTrait for FileSingleField2<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = &'this str;
                 fn insertion_point<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-                    self.insertion_point.as_ref().map(|v| v.as_ref())
+                    self.insertion_point.as_deref()
                 }
-                type Field15StringType<'this> = &'static str;
-                type Field16MessageType<'this> = ();
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = ();
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for FileSimpleField2 {
+            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField2<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field(&self.insertion_point, 2, out)?;
+                >::ser_field::<T, _, _>(&self.insertion_point, 2, out)?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
-                for FileSimpleField2
+            impl<T> ::std::convert::From<::std::option::Option<T>> for FileSingleField2<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
             {
-                fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+                fn from(value: ::std::option::Option<T>) -> Self {
                     Self {
                         insertion_point: value,
                     }
@@ -2173,82 +2795,167 @@ pub mod _puroro_nested {
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub struct FileSimpleField15 {
-                pub content: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+
+            pub struct FileSingleField15<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub content: ::std::option::Option<T>,
             }
 
-            impl ::puroro::Message<super::File> for FileSimpleField15 {}
+            impl<T> ::puroro::Message<super::File> for FileSingleField15<T> where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::FileTrait for FileSimpleField15 {
-                type Field1StringType<'this> = &'static str;
-                type Field2StringType<'this> = &'static str;
-                type Field15StringType<'this> = &'this str;
+            impl<T> super::_puroro_traits::FileTrait for FileSingleField15<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = &'this str;
                 fn content<'this>(&'this self) -> Option<Self::Field15StringType<'this>> {
-                    self.content.as_ref().map(|v| v.as_ref())
+                    self.content.as_deref()
                 }
-                type Field16MessageType<'this> = ();
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = ();
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for FileSimpleField15 {
+            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField15<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field(&self.content, 15, out)?;
+                >::ser_field::<T, _, _>(&self.content, 15, out)?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
-                for FileSimpleField15
+            impl<T> ::std::convert::From<::std::option::Option<T>> for FileSingleField15<T>
+            where
+                T: ::std::ops::Deref<Target = str>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
             {
-                fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+                fn from(value: ::std::option::Option<T>) -> Self {
                     Self { content: value }
                 }
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub struct FileSimpleField16 {
-            pub generated_code_info: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>,
-        }
 
-            impl ::puroro::Message<super::File> for FileSimpleField16 {}
+            pub struct FileSingleField16<T>
+            where
+                T: self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub generated_code_info: ::std::option::Option<T>,
+            }
 
-            impl super::_puroro_traits::FileTrait for FileSimpleField16 {
-                type Field1StringType<'this> = &'static str;
-                type Field2StringType<'this> = &'static str;
-                type Field15StringType<'this> = &'static str;
-                type Field16MessageType<'this> = &'this self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo;
+            impl<T> ::puroro::Message<super::File> for FileSingleField16<T> where
+                T: self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
+
+            impl<T> super::_puroro_traits::FileTrait for FileSingleField16<T>
+            where
+                T: self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                type Field1StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field2StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field15StringType<'this>
+                where
+                    Self: 'this,
+                = &'static str;
+                type Field16MessageType<'this>
+                where
+                    Self: 'this,
+                = &'this T;
                 fn generated_code_info<'this>(
                     &'this self,
                 ) -> Option<Self::Field16MessageType<'this>> {
-                    self.generated_code_info.as_ref().map(|v| v.as_ref())
+                    self.generated_code_info.as_ref()
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for FileSimpleField16 {
+            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField16<T>
+            where
+                T: self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                T: ::puroro::SerializableMessageToIoWrite,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>
-                >::ser_field(&self.generated_code_info, 16, out)?;
+                    ::puroro::tags::Optional, ::puroro::tags::Message<T>
+                >::ser_field::<T, _, _>(&self.generated_code_info, 16, out)?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>> for FileSimpleField16 {
-            fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>) -> Self {
-                Self {
-                    generated_code_info: value,
+            impl<T> ::std::convert::From<::std::option::Option<T>> for FileSingleField16<T>
+            where
+                T: self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ::std::option::Option<T>) -> Self {
+                    Self {
+                        generated_code_info: value,
+                    }
                 }
             }
-        }
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
@@ -2259,15 +2966,15 @@ pub mod _puroro_nested {
             impl ::puroro::Message<super::File> for FileSimpleByValue {}
 
             impl FileTrait for FileSimpleByValue {
-                type Field1StringType<'this> = ::std::borrow::Cow<'this, str>;
+                type Field1StringType<'this> = ::std::string::String;
                 fn name<'this>(&'this self) -> Option<Self::Field1StringType<'this>> {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
-                type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
+                type Field2StringType<'this> = ::std::string::String;
                 fn insertion_point<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
-                type Field15StringType<'this> = ::std::borrow::Cow<'this, str>;
+                type Field15StringType<'this> = ::std::string::String;
                 fn content<'this>(&'this self) -> Option<Self::Field15StringType<'this>> {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
@@ -2286,29 +2993,63 @@ pub mod _puroro_nested {
             where
                 T: FileTrait,
             {
-                pub fn append_name(
+                pub fn append_name<U>(
                     self,
-                    value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-                ) -> FileBuilder<(T, FileSimpleField1)> {
-                    FileBuilder((self.0, ::std::convert::From::from(value)))
+                    value: ::std::option::Option<U>,
+                ) -> FileBuilder<(T, FileSingleField1<U>)>
+                where
+                    U: ::std::ops::Deref<Target = str>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
+                    FileBuilder((self.0, FileSingleField1 { name: value }))
                 }
-                pub fn append_insertion_point(
+                pub fn append_insertion_point<U>(
                     self,
-                    value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-                ) -> FileBuilder<(T, FileSimpleField2)> {
-                    FileBuilder((self.0, ::std::convert::From::from(value)))
+                    value: ::std::option::Option<U>,
+                ) -> FileBuilder<(T, FileSingleField2<U>)>
+                where
+                    U: ::std::ops::Deref<Target = str>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
+                    FileBuilder((
+                        self.0,
+                        FileSingleField2 {
+                            insertion_point: value,
+                        },
+                    ))
                 }
-                pub fn append_content(
+                pub fn append_content<U>(
                     self,
-                    value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-                ) -> FileBuilder<(T, FileSimpleField15)> {
-                    FileBuilder((self.0, ::std::convert::From::from(value)))
+                    value: ::std::option::Option<U>,
+                ) -> FileBuilder<(T, FileSingleField15<U>)>
+                where
+                    U: ::std::ops::Deref<Target = str>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
+                    FileBuilder((self.0, FileSingleField15 { content: value }))
                 }
-                pub fn append_generated_code_info(
+                pub fn append_generated_code_info<U>(
                     self,
-                    value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::GeneratedCodeInfo>>,
-                ) -> FileBuilder<(T, FileSimpleField16)> {
-                    FileBuilder((self.0, ::std::convert::From::from(value)))
+                    value: ::std::option::Option<U>,
+                ) -> FileBuilder<(T, FileSingleField16<U>)>
+                where
+                    U: self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
+                    FileBuilder((
+                        self.0,
+                        FileSingleField16 {
+                            generated_code_info: value,
+                        },
+                    ))
                 }
 
                 pub fn build(self) -> T {
@@ -2332,7 +3073,9 @@ pub mod _puroro_nested {
                 type Field1StringType<'this>: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug;
+                    + ::std::fmt::Debug
+                where
+                    Self: 'this;
                 fn name<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field1StringType<'this>> {
@@ -2341,7 +3084,9 @@ pub mod _puroro_nested {
                 type Field2StringType<'this>: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug;
+                    + ::std::fmt::Debug
+                where
+                    Self: 'this;
                 fn insertion_point<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field2StringType<'this>> {
@@ -2350,14 +3095,17 @@ pub mod _puroro_nested {
                 type Field15StringType<'this>: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug;
+                    + ::std::fmt::Debug
+                where
+                    Self: 'this;
                 fn content<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field15StringType<'this>> {
                     ::std::default::Default::default()
                 }
                 type Field16MessageType<'this>:
-                    self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+                    self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+                    where Self: 'this;
                 fn generated_code_info<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::Field16MessageType<'this>> {
@@ -2367,25 +3115,37 @@ pub mod _puroro_nested {
 
             macro_rules! file_delegate {
                 ($ty:ty) => {
-                    type Field1StringType<'this> = <$ty>::Field1StringType<'this>;
+                    type Field1StringType<'this>
+                    where
+                        Self: 'this,
+                    = <$ty>::Field1StringType<'this>;
                     fn name<'this>(
                         &'this self,
                     ) -> ::std::option::Option<Self::Field1StringType<'this>> {
                         (**self).name()
                     }
-                    type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+                    type Field2StringType<'this>
+                    where
+                        Self: 'this,
+                    = <$ty>::Field2StringType<'this>;
                     fn insertion_point<'this>(
                         &'this self,
                     ) -> ::std::option::Option<Self::Field2StringType<'this>> {
                         (**self).insertion_point()
                     }
-                    type Field15StringType<'this> = <$ty>::Field15StringType<'this>;
+                    type Field15StringType<'this>
+                    where
+                        Self: 'this,
+                    = <$ty>::Field15StringType<'this>;
                     fn content<'this>(
                         &'this self,
                     ) -> ::std::option::Option<Self::Field15StringType<'this>> {
                         (**self).content()
                     }
-                    type Field16MessageType<'this> = <$ty>::Field16MessageType<'this>;
+                    type Field16MessageType<'this>
+                    where
+                        Self: 'this,
+                    = <$ty>::Field16MessageType<'this>;
                     fn generated_code_info<'this>(
                         &'this self,
                     ) -> ::std::option::Option<Self::Field16MessageType<'this>> {

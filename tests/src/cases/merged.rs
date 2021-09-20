@@ -159,11 +159,11 @@ fn test_get_oneof_field() {
         ..Default::default()
     };
     let msg_test = Msg {
-        group_two: Some(GroupTwo::G2String(Cow::Borrowed("Test"))),
+        group_two: Some(GroupTwo::G2String("Test".to_string())),
         ..Default::default()
     };
     let msg_test2 = Msg {
-        group_two: Some(GroupTwo::G2String(Cow::Borrowed("Test2"))),
+        group_two: Some(GroupTwo::G2String("Test2".to_string())),
         ..Default::default()
     };
     let msg_submsg_0 = Msg {

@@ -661,14 +661,14 @@ pub mod _puroro_impls {
         fn g1_int32<'this>(&'this self) -> Option<i32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field2StringType<'this> = ::std::string::String;
         fn g1_string<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         fn g2_f32<'this>(&'this self) -> Option<f32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field4StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field4StringType<'this> = ::std::string::String;
         fn g2_string<'this>(&'this self) -> Option<Self::Field4StringType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }

@@ -100,7 +100,7 @@ pub mod _puroro_simple_impl {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test2 {
-        pub b: ::std::borrow::Cow<'static, str>,
+        pub b: ::std::string::String,
     }
     impl ::puroro::Message<Test2> for Test2 {}
 
@@ -612,7 +612,7 @@ pub mod _puroro_impls {
     impl ::puroro::Message<super::Test2> for Test2SimpleByValue {}
 
     impl Test2Trait for Test2SimpleByValue {
-        type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field2StringType<'this> = ::std::string::String;
         fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }

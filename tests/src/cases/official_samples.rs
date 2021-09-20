@@ -37,7 +37,7 @@ fn proto2_test2_simple() {
     use std::io::Read as _;
     let mut t2 = s2::Test2::default();
     t2.deser(TEST2_INPUT.bytes()).unwrap();
-    assert_eq!(Some(Cow::Borrowed(TEST2_EXPECTED)), t2.b);
+    assert_eq!(Some(TEST2_EXPECTED.to_string()), t2.b);
 }
 
 #[test]

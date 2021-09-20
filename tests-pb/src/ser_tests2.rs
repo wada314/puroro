@@ -18,8 +18,8 @@ pub mod _puroro_simple_impl {
         pub i32_repeated: ::std::vec::Vec<i32>,
         pub float_optional: ::std::option::Option<f32>,
         pub float_repeated: ::std::vec::Vec<f32>,
-        pub string_optional: ::std::option::Option<::std::borrow::Cow<'static, str>>,
-        pub string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+        pub string_optional: ::std::option::Option<::std::string::String>,
+        pub string_repeated: ::std::vec::Vec<::std::string::String>,
         pub submsg_optional: ::std::option::Option<
             ::std::boxed::Box<
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
@@ -64,7 +64,7 @@ pub mod _puroro_simple_impl {
         = &'this str;
         type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
+            ::std::slice::Iter<'this, ::std::string::String>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
@@ -1939,11 +1939,11 @@ pub mod _puroro_impls {
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field5StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field5StringType<'this> = ::std::string::String;
         fn string_optional<'this>(&'this self) -> Option<Self::Field5StringType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field6StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field6StringType<'this> = ::std::string::String;
         type Field6RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field6StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
