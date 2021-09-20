@@ -8765,7 +8765,7 @@ for DescriptorProtoSingleField5<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ExtensionRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {}
 
-    impl<T> super::_puroro_traits::DescriptorProtoTrait 
+    impl<T> super::_puroro_traits::DescriptorProtoTrait
 for DescriptorProtoSingleField5<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ExtensionRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -8791,7 +8791,7 @@ fn enum_type<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
 }
 type Field5MessageType<'this> where Self: 'this = &'this T;
-type Field5RepeatedType<'this> where Self: 'this 
+type Field5RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 
 fn extension_range<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
@@ -8815,7 +8815,7 @@ fn reserved_name<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite 
+    impl<T> ::puroro::SerializableMessageToIoWrite
 for DescriptorProtoSingleField5<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ExtensionRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     T: ::puroro::SerializableMessageToIoWrite,
@@ -8832,7 +8832,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
     }
 }
 
-    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+    impl<T> ::std::convert::From<::std::vec::Vec<T>>
 for DescriptorProtoSingleField5<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ExtensionRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -9178,7 +9178,7 @@ for DescriptorProtoSingleField9<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {}
 
-    impl<T> super::_puroro_traits::DescriptorProtoTrait 
+    impl<T> super::_puroro_traits::DescriptorProtoTrait
 for DescriptorProtoSingleField9<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -9215,7 +9215,7 @@ fn oneof_decl<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
 }
 type Field7MessageType<'this> where Self: 'this = ();
 type Field9MessageType<'this> where Self: 'this = &'this T;
-type Field9RepeatedType<'this> where Self: 'this 
+type Field9RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 
 fn reserved_range<'this>(&'this self) -> Self::Field9RepeatedType<'this> {
@@ -9228,7 +9228,7 @@ fn reserved_name<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite 
+    impl<T> ::puroro::SerializableMessageToIoWrite
 for DescriptorProtoSingleField9<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     T: ::puroro::SerializableMessageToIoWrite,
@@ -9245,7 +9245,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
     }
 }
 
-    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+    impl<T> ::std::convert::From<::std::vec::Vec<T>>
 for DescriptorProtoSingleField9<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -12258,7 +12258,7 @@ for EnumDescriptorProtoSingleField4<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_traits::EnumReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {}
 
-    impl<T> super::_puroro_traits::EnumDescriptorProtoTrait 
+    impl<T> super::_puroro_traits::EnumDescriptorProtoTrait
 for EnumDescriptorProtoSingleField4<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_traits::EnumReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -12270,7 +12270,7 @@ fn value<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
 }
 type Field3MessageType<'this> where Self: 'this = ();
 type Field4MessageType<'this> where Self: 'this = &'this T;
-type Field4RepeatedType<'this> where Self: 'this 
+type Field4RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 
 fn reserved_range<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
@@ -12283,7 +12283,7 @@ fn reserved_name<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite 
+    impl<T> ::puroro::SerializableMessageToIoWrite
 for EnumDescriptorProtoSingleField4<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_traits::EnumReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     T: ::puroro::SerializableMessageToIoWrite,
@@ -12300,7 +12300,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
     }
 }
 
-    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+    impl<T> ::std::convert::From<::std::vec::Vec<T>>
 for EnumDescriptorProtoSingleField4<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_traits::EnumReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -20043,7 +20043,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>> 
+    impl ::std::convert::From<::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>>
 for MethodOptionsSingleField34
 {
     fn from(value: ::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>) -> Self {
@@ -20492,12 +20492,12 @@ for UninterpretedOptionSingleField2<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_traits::NamePartTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {}
 
-    impl<T> super::_puroro_traits::UninterpretedOptionTrait 
+    impl<T> super::_puroro_traits::UninterpretedOptionTrait
 for UninterpretedOptionSingleField2<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_traits::NamePartTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
 type Field2MessageType<'this> where Self: 'this = &'this T;
-type Field2RepeatedType<'this> where Self: 'this 
+type Field2RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 
 fn name<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
@@ -20508,7 +20508,7 @@ type Field7BytesType<'this> where Self: 'this = &'static [u8];
 type Field8StringType<'this> where Self: 'this = &'static str;
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite 
+    impl<T> ::puroro::SerializableMessageToIoWrite
 for UninterpretedOptionSingleField2<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_traits::NamePartTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     T: ::puroro::SerializableMessageToIoWrite,
@@ -20525,7 +20525,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_opt
     }
 }
 
-    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+    impl<T> ::std::convert::From<::std::vec::Vec<T>>
 for UninterpretedOptionSingleField2<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_traits::NamePartTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -21232,12 +21232,12 @@ for SourceCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_traits::LocationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {}
 
-    impl<T> super::_puroro_traits::SourceCodeInfoTrait 
+    impl<T> super::_puroro_traits::SourceCodeInfoTrait
 for SourceCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_traits::LocationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
 type Field1MessageType<'this> where Self: 'this = &'this T;
-type Field1RepeatedType<'this> where Self: 'this 
+type Field1RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 
 fn location<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
@@ -21245,7 +21245,7 @@ fn location<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite 
+    impl<T> ::puroro::SerializableMessageToIoWrite
 for SourceCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_traits::LocationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     T: ::puroro::SerializableMessageToIoWrite,
@@ -21262,7 +21262,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::source_code_info:
     }
 }
 
-    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+    impl<T> ::std::convert::From<::std::vec::Vec<T>>
 for SourceCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_traits::LocationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
@@ -21414,12 +21414,12 @@ for GeneratedCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_traits::AnnotationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {}
 
-    impl<T> super::_puroro_traits::GeneratedCodeInfoTrait 
+    impl<T> super::_puroro_traits::GeneratedCodeInfoTrait
 for GeneratedCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_traits::AnnotationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
 type Field1MessageType<'this> where Self: 'this = &'this T;
-type Field1RepeatedType<'this> where Self: 'this 
+type Field1RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 
 fn annotation<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
@@ -21427,7 +21427,7 @@ fn annotation<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite 
+    impl<T> ::puroro::SerializableMessageToIoWrite
 for GeneratedCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_traits::AnnotationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     T: ::puroro::SerializableMessageToIoWrite,
@@ -21444,7 +21444,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::generated_code_in
     }
 }
 
-    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+    impl<T> ::std::convert::From<::std::vec::Vec<T>>
 for GeneratedCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_traits::AnnotationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {

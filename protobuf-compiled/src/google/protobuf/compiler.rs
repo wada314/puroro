@@ -1895,13 +1895,13 @@ for CodeGeneratorResponseSingleField15<T>
 where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {}
 
-    impl<T> super::_puroro_traits::CodeGeneratorResponseTrait 
+    impl<T> super::_puroro_traits::CodeGeneratorResponseTrait
 for CodeGeneratorResponseSingleField15<T>
 where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {
 type Field1StringType<'this> where Self: 'this = &'static str;
 type Field15MessageType<'this> where Self: 'this = &'this T;
-type Field15RepeatedType<'this> where Self: 'this 
+type Field15RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 
 fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
@@ -1909,7 +1909,7 @@ fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite 
+    impl<T> ::puroro::SerializableMessageToIoWrite
 for CodeGeneratorResponseSingleField15<T>
 where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     T: ::puroro::SerializableMessageToIoWrite,
@@ -1926,7 +1926,7 @@ where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_ge
     }
 }
 
-    impl<T> ::std::convert::From<::std::vec::Vec<T>> 
+    impl<T> ::std::convert::From<::std::vec::Vec<T>>
 for CodeGeneratorResponseSingleField15<T>
 where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {

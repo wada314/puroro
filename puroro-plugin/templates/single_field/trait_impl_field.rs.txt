@@ -39,10 +39,10 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {%- if f.trait_has_repeated_getter %}
 {%- if f.is_length_delimited %}
 {%- if f.is_message %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this 
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this
     = ::std::slice::Iter<'this, T>;
 {%- else %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this 
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this
     = ::puroro::internal::impls::single_field::DerefIter<::std::slice::Iter<'this, T>>;
 {%- endif %}
 {%- else %}

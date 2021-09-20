@@ -29,8 +29,8 @@ pub trait {{ m.trait_ident }} {
     }
     {%- endif %}
     {%- if field.trait_has_repeated_getter %}
-    type Field{{ field.number }}RepeatedType<'this>: 
-        ::puroro::RepeatedField<'this> 
+    type Field{{ field.number }}RepeatedType<'this>:
+        ::puroro::RepeatedField<'this>
         + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>
     where Self: 'this;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
@@ -48,7 +48,7 @@ pub trait {{ m.trait_ident }} {
     {
         ::std::option::Option::None
     }
-        
+
     {%- for field in oneof.fields %}
     pub fn {{ field.getter_ident }}<'this>(&'this self) -> Option<{{ field.trait_getter_type }}> {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;

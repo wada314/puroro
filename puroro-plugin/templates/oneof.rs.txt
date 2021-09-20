@@ -12,7 +12,7 @@ pub enum {{ enum_ident }}
 
 
 {%- if has_reference_field %}
-impl <'msg, T: 'msg + ?Sized + {{ owner_message_trait_path }}> {{ enum_ident }}<'msg, T> 
+impl <'msg, T: 'msg + ?Sized + {{ owner_message_trait_path }}> {{ enum_ident }}<'msg, T>
 {%- else %}
 impl {{ enum_ident }}
 {%- endif %}
@@ -29,7 +29,7 @@ impl {{ enum_ident }}
 }
 
 {%- if has_reference_field %}
-impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>> 
+impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>>
 for {{ enum_ident }}<'msg, &'_ T>
 where
     T: 'msg + {{ owner_message_trait_path }},
@@ -45,7 +45,7 @@ where
 {%- endif %}
 
 {%- if has_reference_field %}
-impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>> 
+impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>>
 for {{ enum_ident }}<'msg, ::std::boxed::Box<T>>
 where
     T: 'msg + {{ owner_message_trait_path }},
