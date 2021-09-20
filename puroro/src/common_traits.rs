@@ -37,6 +37,7 @@ pub trait Message<M> {
         <Self as SerializableMessageToIoWrite>::ser(&self, out)
     }
 }
+impl<M> Message<M> for () where M: MessageRepresentativeImpl {}
 impl<M, T, U> Message<M> for crate::Either<T, U>
 where
     T: Message<M>,
@@ -57,7 +58,18 @@ where
     M: MessageRepresentativeImpl,
 {
 }
-impl<M> Message<M> for () where M: MessageRepresentativeImpl {}
+impl<M, T> Message<M> for Box<T>
+where
+    T: Message<M>,
+    M: MessageRepresentativeImpl,
+{
+}
+impl<'a, M, T> Message<M> for &'a T
+where
+    T: Message<M>,
+    M: MessageRepresentativeImpl,
+{
+}
 
 pub trait MessageRepresentativeImpl {
     fn descriptor() -> &'static MessageDescriptor;
@@ -132,6 +144,32 @@ where
         if let Some(ref msg) = self {
             msg.ser(out)?;
         }
+        Ok(())
+    }
+}
+impl<T> SerializableMessageToIoWrite for Box<T>
+where
+    T: SerializableMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        use ::std::ops::Deref;
+        <T as SerializableMessageToIoWrite>::ser(self.deref(), out)?;
+        Ok(())
+    }
+}
+impl<'a, T> SerializableMessageToIoWrite for &'a T
+where
+    T: SerializableMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        use ::std::ops::Deref;
+        <T as SerializableMessageToIoWrite>::ser(self.deref(), out)?;
         Ok(())
     }
 }
