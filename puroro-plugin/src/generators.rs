@@ -218,8 +218,15 @@ impl Field {
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple")?,
-            simple_label_and_type_tags: f
-                .rust_label_and_type_tags(wrappers::gen_msg_type_from_impl_name("Simple"))?,
+            simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
+                Ok(
+                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
+                        msg.rust_impl_path("Simple")
+                    } else {
+                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple"))
+                    },
+                )
+            })?,
             single_field_type_t: f.single_field_type("T")?,
             single_field_type_u: f.single_field_type("U")?,
             single_field_label_and_type_tags: f

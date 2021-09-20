@@ -187,13 +187,14 @@ where
     }
 }
 
-impl<M, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::Message<M>>
+impl<L, M> SerFieldToIoWrite<L, tags::Message<M>>
 where
+    L: tags::FieldLabelTag,
     M: SerializableMessageToIoWrite,
 {
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<Box<M>>,
+        FieldType: VecOrOptionOrBare<M>,
         W: Write,
     {
         for boxed in field.iter() {
@@ -208,31 +209,6 @@ where
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
             <M as SerializableMessageToIoWrite>::ser(boxed.deref(), out)?;
-        }
-        Ok(())
-    }
-}
-
-impl<M> SerFieldToIoWrite<tags::Repeated, tags::Message<M>>
-where
-    M: SerializableMessageToIoWrite,
-{
-    pub fn ser_field<W>(field: &Vec<M>, number: i32, out: &mut W) -> Result<()>
-    where
-        W: Write,
-    {
-        for item in field {
-            let len = {
-                let mut null_out = NullWrite::new();
-                <M as SerializableMessageToIoWrite>::ser(item, &mut null_out)?;
-                null_out.len()
-            };
-            let len_i32: i32 = len
-                .try_into()
-                .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
-            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
-            Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            <M as SerializableMessageToIoWrite>::ser(item, out)?;
         }
         Ok(())
     }
