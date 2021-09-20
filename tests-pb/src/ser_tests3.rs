@@ -75,7 +75,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            self.submsg_unlabeled.as_ref()
+            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
         type Field8MessageType<'this>
         where

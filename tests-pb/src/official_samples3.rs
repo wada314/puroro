@@ -199,7 +199,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_simple_impl::Test1;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref()
+            self.c.as_ref().map(|v| v.as_ref())
         }
     }
 
