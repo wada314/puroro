@@ -62,7 +62,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<
             {{ sfield.single_field_label_and_type_tags }}
-        >::ser_field(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+        >::ser_field::<T, _, _>(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
         {%- else %}
         use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<

@@ -3997,11 +3997,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Bytes>::ser_field(
-                &self.bytes_required,
-                21,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Bytes>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.bytes_required, 21, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -4214,11 +4214,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
-                &self.bytes_optional,
-                22,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.bytes_optional, 22, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -4429,11 +4429,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Bytes>::ser_field(
-                &self.bytes_repeated,
-                23,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Bytes>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.bytes_repeated, 23, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -4646,11 +4646,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::String>::ser_field(
-                &self.string_required,
-                31,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.string_required, 31, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -4863,11 +4863,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.string_optional,
-                32,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.string_optional, 32, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -5078,11 +5078,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.string_repeated,
-                33,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.string_repeated, 33, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -5856,11 +5856,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Message<T>>::ser_field(
-                &self.submsg_required,
-                51,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.submsg_required, 51, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6074,11 +6074,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Message<T>>::ser_field(
-                &self.submsg_optional,
-                52,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.submsg_optional, 52, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6200,10 +6200,10 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::DerefIter<::std::slice::Iter<'this, T>>;
+        = ::std::slice::Iter<'this, T>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::DerefIter::new(self.submsg_repeated.iter())
+            self.submsg_repeated.iter()
         }
         type Field103RepeatedType<'this>
         where
@@ -6290,11 +6290,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Message<T>>::ser_field(
-                &self.submsg_repeated,
-                53,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.submsg_repeated, 53, out)?;
             ::std::result::Result::Ok(())
         }
     }

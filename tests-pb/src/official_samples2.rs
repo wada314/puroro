@@ -574,9 +574,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.b, 2, out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.b, 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -741,9 +743,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Message<T>>::ser_field(
-                &self.c, 3, out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.c, 3, out)?;
             ::std::result::Result::Ok(())
         }
     }

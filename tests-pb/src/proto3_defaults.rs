@@ -828,11 +828,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
-                &self.string_unlabeled,
-                5,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.string_unlabeled, 5, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -920,11 +920,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Message<T>>::ser_field(
-                &self.submsg_unlabeled,
-                6,
-                out,
-            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.submsg_unlabeled, 6, out)?;
             ::std::result::Result::Ok(())
         }
     }
