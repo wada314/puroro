@@ -1,6 +1,6 @@
 //! Yet another Rust implementation of [Google Protocol Buffer](https://developers.google.com/protocol-buffers).
 //!
-//! # Quick sample
+//! # Generated structs
 //!
 //! For an input .proto file like this:
 //! ```protobuf
@@ -69,9 +69,9 @@
 //! # pub struct MyMessage {
 //! #     pub my_number: i32,
 //! # }
-//! # use ::puroro::*;
+//! # use ::puroro::{internal, Result, tags};
 //! # impl Message<MyMessage> for MyMessage {}
-//! # impl SerializableMessageToIoWrite for MyMessage {
+//! # impl ::puroro::SerializableMessageToIoWrite for MyMessage {
 //! #     fn ser<W>(&self, out: &mut W) -> Result<()> where W: std::io::Write {
 //! #         internal::impls::simple::se::SerFieldToIoWrite::<tags::Unlabeled, tags::Int32>::ser_field(
 //! #             &self.my_number, 1, out
@@ -103,7 +103,7 @@
 //! Trait like this is generated
 //! (Omitting some bounds for explanation. Please check the TBD page for detail):
 //!
-//! ```rust
+//! ```ignore
 //! // A readonly trait for message `MyMessage`
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
@@ -123,7 +123,7 @@
 //! This itself is not very interesting, it's just a limited interface of the `struct MyMessage`.
 //! But it's not only `struct MyMessage` which is implementing this trait:
 //!
-//! ```rust
+//! ```ignore
 //! impl MyMessageTrait for () { /* ... */ }
 //! impl<'a, T: MyMessageTrait> MyMessageTrait for &'a T { /* ... */ }
 //! impl<T: MyMessageTrait> MyMessageTrait for Box<T> { /* ... */ }
@@ -132,13 +132,13 @@
 //! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for puroro::Either<T, U> { /* ... */ }
 //! ```
 //!
-//! Because protocol buffer well defines the default behavior, we can even implement
-//! `MyMessageTrait` for `()` (it returns default values for the fields getter methods).
+//! Because protocol buffer well defines the default behavior, we can implement
+//! `MyMessageTrait` even for `()` (it returns default values for the fields getter methods).
 //! And for `(T, U)`, it behaves like a merged message of `T` and `U`!
 //!
 //! # Builder and SingleField structs
 //!
-//! ```rust
+//! ```ignore
 //! pub struct MyMessageBuilder<T>(T);
 //! impl MyMessageBuilder<()> {
 //!     pub fn new() -> Self { ... }
