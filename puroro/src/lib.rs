@@ -132,12 +132,18 @@
 //! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for puroro::Either<T, U> { /* ... */ }
 //! ```
 //!
+//! Because protocol buffer well defines the default behavior, we can even implement
+//! `MyMessageTrait` for `()` (it returns default values for the fields getter methods).
+//! And for `(T, U)`, it behaves like a merged message of `T` and `U`!
+//!
+//! # Builder and SingleField structs
+//!
 //! ```rust
 //! pub struct MyMessageBuilder<T>(T);
 //! impl MyMessageBuilder<()> {
 //!     pub fn new() -> Self { ... }
 //! }
-//! impl<T: MyMessageTrait> MyMessageBuilder {
+//! impl<T: MyMessageTrait> MyMessageBuilder<T> {
 //!     pub fn append_my_number(self, value: i32) -> MyMessageBuilder</**/>;
 //!     pub fn append_my_name<U: Deref<Target=str>>(self, value: Vec<U>) -> MyMessageBuilder</**/>;
 //!     pub fn append_my_child<U: MyMessageTrait>(self, value: U) -> MyMessageBuilder</**/>;
