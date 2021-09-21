@@ -21,34 +21,36 @@
 //! }
 //! ```
 //!
-//! You can deserialize a struct from `Iterator<std::io::Result<u8>>`:
+//! You can deserialize a struct from `Iterator<std::io::Result<u8>>`
+//! (which is a return type of `std::io::Read::bytes()` method):
 //! ```rust
 //! # #[derive(Default)]
 //! # pub struct MyMessage {
 //! #     pub my_number: i32,
 //! # }
-//! # impl ::puroro::Message<MyMessage> for MyMessage {}
-//! # impl ::puroro::DeserializableMessageFromBytesIterator for MyMessage {
-//! #     fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+//! # use ::puroro::*;
+//! # impl Message<MyMessage> for MyMessage {}
+//! # impl DeserializableMessageFromBytesIterator for MyMessage {
+//! #     fn deser<I>(&mut self, iter: I) -> Result<()>
 //! #     where
 //! #         I: Iterator<Item = ::std::io::Result<u8>>
 //! #     {
-//! #         ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+//! #         internal::de::from_iter::deser_from_iter(self, iter)
 //! #     }
 //! # }
-//! # impl ::puroro::internal::de::DeserFieldsFromBytesIter for MyMessage {
+//! # impl internal::de::DeserFieldsFromBytesIter for MyMessage {
 //! #     fn deser_field<I>(
 //! #         &mut self,
 //! #         field_number: i32,
-//! #         data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-//! #     ) -> ::puroro::Result<()>
+//! #         data: types::FieldData<&mut internal::de::from_iter::ScopedIter<I>>,
+//! #     ) -> Result<()>
 //! #     where
-//! #         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+//! #         I: Iterator<Item = ::std::io::Result<u8>>,
 //! #     {
-//! #         use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+//! #         use internal::impls::simple::de::DeserFieldFromBytesIter;
 //! #         match field_number {
 //! #             1 => DeserFieldFromBytesIter::<
-//! #                 ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+//! #                 tags::Unlabeled, tags::Int32
 //! #             >::deser_field(&mut self.my_number, data),
 //! #             _ => panic!(),
 //! #         }
@@ -67,10 +69,11 @@
 //! # pub struct MyMessage {
 //! #     pub my_number: i32,
 //! # }
-//! # impl ::puroro::Message<MyMessage> for MyMessage {}
-//! # impl ::puroro::SerializableMessageToIoWrite for MyMessage {
-//! #     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()> where W: std::io::Write {
-//! #         ::puroro::internal::impls::simple::se::SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+//! # use ::puroro::*;
+//! # impl Message<MyMessage> for MyMessage {}
+//! # impl SerializableMessageToIoWrite for MyMessage {
+//! #     fn ser<W>(&self, out: &mut W) -> Result<()> where W: std::io::Write {
+//! #         internal::impls::simple::se::SerFieldToIoWrite::<tags::Unlabeled, tags::Int32>::ser_field(
 //! #             &self.my_number, 1, out
 //! #         )
 //! #     }
@@ -81,6 +84,64 @@
 //! msg.my_number = 10;
 //! msg.ser(&mut output).unwrap();
 //! assert_eq!(vec![0x08, 0x0a], output);
+//! ```
+//!
+//! # Generated traits
+//!
+//! puroro generates not only the `struct MyMessage { ... }` but few other structs and traits.
+//! The most important one is `trait MyMessageTrait`.
+//! For the same input as above:
+//! ```protobuf
+//! syntax = "proto3";
+//! message MyMessage {
+//!     int32 my_number = 1;
+//!     repeated string my_name = 2;
+//!     MyMessage my_child = 3;
+//! }
+//! ```
+//!
+//! Trait like this is generated
+//! (Omitting some bounds for explanation. Please check the TBD page for detail):
+//!
+//! ```rust
+//! // A readonly trait for message `MyMessage`
+//! pub trait MyMessageTrait {
+//!     fn my_number(&self) -> i32;
+//!     type Field2StringType<'this>: Deref<Target=str>;
+//!     type Field2RepeatedType<'this>: IntoIterator<Item=Self::Field2StringType<'this>>;
+//!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
+//!     type Field3MessageType<'this>: MyMessageTrait;
+//!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
+//! }
+//! ```
+//!
+//! This may look like little complicated but actually it's not so much.
+//! Just remember that there are the methods which have same name with the
+//! `struct MyMessage`'s fields, and those returns a readonly value
+//! (sorry, mutable trait interface is still TBD!).
+//!
+//! This itself is not very interesting, it's just a limited interface of the `struct MyMessage`.
+//! But it's not only `struct MyMessage` which is implementing this trait:
+//!
+//! ```rust
+//! impl MyMessageTrait for () { /* ... */ }
+//! impl<'a, T: MyMessageTrait> MyMessageTrait for &'a T { /* ... */ }
+//! impl<T: MyMessageTrait> MyMessageTrait for Box<T> { /* ... */ }
+//! impl<T: MyMessageTrait> MyMessageTrait for Option<T> { /* ... */ }
+//! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for (T, U) { /* ... */ }
+//! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for puroro::Either<T, U> { /* ... */ }
+//! ```
+//!
+//! ```rust
+//! pub struct MyMessageBuilder<T>(T);
+//! impl MyMessageBuilder<()> {
+//!     pub fn new() -> Self { ... }
+//! }
+//! impl<T: MyMessageTrait> MyMessageBuilder {
+//!     pub fn append_my_number(self, value: i32) -> MyMessageBuilder</**/>;
+//!     pub fn append_my_name<U: Deref<Target=str>>(self, value: Vec<U>) -> MyMessageBuilder</**/>;
+//!     pub fn append_my_child<U: MyMessageTrait>(self, value: U) -> MyMessageBuilder</**/>;
+//! }
 //! ```
 //!
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
