@@ -148,6 +148,13 @@
 //!     pub fn append_my_name<U: Deref<Target=str>>(self, value: Vec<U>) -> MyMessageBuilder</**/>;
 //!     pub fn append_my_child<U: MyMessageTrait>(self, value: U) -> MyMessageBuilder</**/>;
 //! }
+//!
+//! pub struct MyMessageSingleField1 {
+//!     pub my_number: i32,
+//! }
+//! pub struct MyMessageSingleField2<T: Deref<Target=str>> {
+//!     pub my_name: T,
+//! }
 //! ```
 //!
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
