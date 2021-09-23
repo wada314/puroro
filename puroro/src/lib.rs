@@ -144,16 +144,19 @@
 //!     pub fn new() -> Self { ... }
 //! }
 //! impl<T: MyMessageTrait> MyMessageBuilder<T> {
-//!     pub fn append_my_number(self, value: i32) -> MyMessageBuilder</**/>;
-//!     pub fn append_my_name<U: Deref<Target=str>>(self, value: Vec<U>) -> MyMessageBuilder</**/>;
-//!     pub fn append_my_child<U: MyMessageTrait>(self, value: U) -> MyMessageBuilder</**/>;
+//!     pub fn append_my_number(self, value: i32) -> MyMessageBuilder<(T, MyMessageSingleField1)>;
+//!     pub fn append_my_name<U: Deref<Target=str>>(self, value: Vec<U>) -> MyMessageBuilder<(T, MyMessageSingleField2<U>)>;
+//!     pub fn append_my_child<U: MyMessageTrait>(self, value: U) -> MyMessageBuilder<(T, MyMessageSingleField3<U>)>;
 //! }
 //!
 //! pub struct MyMessageSingleField1 {
 //!     pub my_number: i32,
 //! }
 //! pub struct MyMessageSingleField2<T: Deref<Target=str>> {
-//!     pub my_name: T,
+//!     pub my_name: Vec<T>,
+//! }
+//! pub struct MyMessageSingleField3<T: MyMessageTrait> {
+//!     pub my_child: T,
 //! }
 //! ```
 //!
