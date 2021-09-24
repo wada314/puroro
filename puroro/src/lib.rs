@@ -139,6 +139,7 @@
 //! Because protocol buffer well defines the default behavior, we can implement
 //! `MyMessageTrait` even for `()` (it returns default values for the fields getter methods).
 //! And for `(T, U)`, it behaves like a merged message of `T` and `U`!
+//! The advanced usage of this trait composition is explained in the following section:
 //!
 //! # Builder and SingleField structs
 //!
@@ -184,9 +185,9 @@
 //! pub struct MyMessageSingleField3<T: MyMessageTrait> {
 //!     pub my_child: T,
 //! }
-//! impl MyMessageTrait for MyMessageSingleField1 { /* ... */}
-//! impl<T: Deref<Target=str>> MyMessageTrait for MyMessageSingleField2<T> { /* ... */}
-//! impl<T: MyMessageTrait> MyMessageTrait for MyMessageSingleField3<T> { /* ... */}
+//! impl MyMessageTrait for MyMessageSingleField1 { /* ... */ }
+//! impl<T: Deref<Target=str>> MyMessageTrait for MyMessageSingleField2<T> { /* ... */ }
+//! impl<T: MyMessageTrait> MyMessageTrait for MyMessageSingleField3<T> { /* ... */ }
 //! ```
 //!
 //! Usage:
