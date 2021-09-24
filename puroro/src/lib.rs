@@ -12,7 +12,7 @@
 //! }
 //! ```
 //!
-//! A struct like this is output:
+//! A struct like this is output ([detailed doc](internal::impls::simple)):
 //! ```rust
 //! pub struct MyMessage {
 //!     pub my_number: i32,

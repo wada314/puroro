@@ -1,3 +1,33 @@
+//! A very basic implementation of protobuf message in generated Rust code.
+//!
+//! puroro generates a plain struct which has public fields.
+//! For an input .proto file like this:
+//! ```protobuf
+//! syntax = "proto3";
+//! message MyMessage {
+//!     int32 my_number = 1;
+//!     repeated string my_name = 2;
+//!     MyMessage my_child = 3;
+//! }
+//! ```
+//!
+//! A struct like this is output:
+//! ```rust
+//! pub struct MyMessage {
+//!     pub my_number: i32,
+//!     pub my_name: Vec<String>,
+//!     pub my_child: Option<Box<MyMessage>>,
+//! }
+//! ```
+//!
+//! Here's the list of the field types correspondence between protobuf and Rust code:
+//!
+//! | base protobuf type | `required` | `optional` | (unlabeled) | `repeated` |
+//! |--------------------|------------|------------|-------------|------------|
+//! | `int32`            | `Option<i32>`|`Option<i32>`|`i32`     | `Vec<i32>` |
+//! | (Any numeric types)| `Option<T>`| `Option<T>`| `T`         | `Vec<T>`   |
+//!
+
 pub mod de;
 pub mod se;
 
