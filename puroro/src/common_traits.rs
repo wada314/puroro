@@ -70,6 +70,12 @@ where
     M: MessageRepresentativeImpl,
 {
 }
+impl<'a, M, T> Message<M> for &'a mut T
+where
+    T: Message<M>,
+    M: MessageRepresentativeImpl,
+{
+}
 
 pub trait MessageRepresentativeImpl {
     fn descriptor() -> &'static MessageDescriptor;
@@ -88,6 +94,42 @@ pub trait DeserializableMessageFromBytesIterator {
     fn deser<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
+}
+impl<'a, T> DeserializableMessageFromBytesIterator for &'a mut T
+where
+    T: DeserializableMessageFromBytesIterator,
+{
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        <T as DeserializableMessageFromBytesIterator>::deser(*self, iter)
+    }
+}
+impl<T> DeserializableMessageFromBytesIterator for Box<T>
+where
+    T: DeserializableMessageFromBytesIterator,
+{
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        <T as DeserializableMessageFromBytesIterator>::deser(self.as_mut(), iter)
+    }
+}
+impl<T> DeserializableMessageFromBytesIterator for Option<T>
+where
+    T: DeserializableMessageFromBytesIterator + Default,
+{
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        <T as DeserializableMessageFromBytesIterator>::deser(
+            self.get_or_insert_with(Default::default),
+            iter,
+        )
+    }
 }
 
 pub trait SerializableMessageToIoWrite {
@@ -161,6 +203,19 @@ where
     }
 }
 impl<'a, T> SerializableMessageToIoWrite for &'a T
+where
+    T: SerializableMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        use ::std::ops::Deref;
+        <T as SerializableMessageToIoWrite>::ser(self.deref(), out)?;
+        Ok(())
+    }
+}
+impl<'a, T> SerializableMessageToIoWrite for &'a mut T
 where
     T: SerializableMessageToIoWrite,
 {

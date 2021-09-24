@@ -46,6 +46,22 @@ where
 
 {%- if has_reference_field %}
 impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>>
+for {{ enum_ident }}<'msg, &'_ mut T>
+where
+    T: 'msg + {{ owner_message_trait_path }},
+{
+    fn from(value: {{ enum_ident }}<'msg, T>) -> Self {
+        match value {
+            {%- for field in fields %}
+            {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
+            {%- endfor %}
+        }
+    }
+}
+{%- endif %}
+
+{%- if has_reference_field %}
+impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>>
 for {{ enum_ident }}<'msg, ::std::boxed::Box<T>>
 where
     T: 'msg + {{ owner_message_trait_path }},

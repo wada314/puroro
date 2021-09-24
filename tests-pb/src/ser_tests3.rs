@@ -2459,6 +2459,13 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
 
+    impl<T> MsgTrait for &'_ mut T
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
     impl<T> MsgTrait for ::std::boxed::Box<T>
     where
         T: MsgTrait,
@@ -2752,6 +2759,13 @@ pub mod _puroro_nested {
             }
 
             impl<T> SubmsgTrait for &'_ T
+            where
+                T: SubmsgTrait,
+            {
+                submsg_delegate!(T);
+            }
+
+            impl<T> SubmsgTrait for &'_ mut T
             where
                 T: SubmsgTrait,
             {

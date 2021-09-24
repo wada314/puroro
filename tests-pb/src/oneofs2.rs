@@ -1019,6 +1019,13 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
 
+    impl<T> MsgTrait for &'_ mut T
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
     impl<T> MsgTrait for ::std::boxed::Box<T>
     where
         T: MsgTrait,
@@ -1040,6 +1047,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> SubmsgTrait for &'_ T
+    where
+        T: SubmsgTrait,
+    {
+        submsg_delegate!(T);
+    }
+
+    impl<T> SubmsgTrait for &'_ mut T
     where
         T: SubmsgTrait,
     {
@@ -1112,6 +1126,17 @@ pub mod _puroro_nested {
                     }
                 }
             }
+            impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, &'_ mut T>
+            where
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupOne<'msg, T>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
             impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, ::std::boxed::Box<T>>
             where
                 T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
@@ -1170,6 +1195,18 @@ pub mod _puroro_nested {
                 }
             }
             impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ T>
+            where
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupTwo<'msg, T>) -> Self {
+                    match value {
+                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
+                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
+                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
+                    }
+                }
+            }
+            impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ mut T>
             where
                 T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {

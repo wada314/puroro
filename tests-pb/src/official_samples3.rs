@@ -982,6 +982,13 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
 
+    impl<T> Test1Trait for &'_ mut T
+    where
+        T: Test1Trait,
+    {
+        test1_delegate!(T);
+    }
+
     impl<T> Test1Trait for ::std::boxed::Box<T>
     where
         T: Test1Trait,
@@ -1011,6 +1018,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test2Trait for &'_ T
+    where
+        T: Test2Trait,
+    {
+        test2_delegate!(T);
+    }
+
+    impl<T> Test2Trait for &'_ mut T
     where
         T: Test2Trait,
     {
@@ -1051,6 +1065,13 @@ pub mod _puroro_traits {
         test3_delegate!(T);
     }
 
+    impl<T> Test3Trait for &'_ mut T
+    where
+        T: Test3Trait,
+    {
+        test3_delegate!(T);
+    }
+
     impl<T> Test3Trait for ::std::boxed::Box<T>
     where
         T: Test3Trait,
@@ -1078,6 +1099,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test4Trait for &'_ T
+    where
+        T: Test4Trait,
+    {
+        test4_delegate!(T);
+    }
+
+    impl<T> Test4Trait for &'_ mut T
     where
         T: Test4Trait,
     {

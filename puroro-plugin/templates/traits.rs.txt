@@ -118,6 +118,13 @@ where
     {{ m.trait_delegate_macro_ident }}!(T);
 }
 
+impl<T> {{ m.trait_ident }} for &'_ mut T
+where
+    T: {{ m.trait_ident }}
+{
+    {{ m.trait_delegate_macro_ident }}!(T);
+}
+
 impl<T> {{ m.trait_ident }} for ::std::boxed::Box<T>
 where
     T: {{ m.trait_ident }}

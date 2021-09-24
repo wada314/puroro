@@ -126,6 +126,7 @@
 //! ```ignore
 //! impl MyMessageTrait for () { /* ... */ }
 //! impl<'a, T: MyMessageTrait> MyMessageTrait for &'a T { /* ... */ }
+//! impl<'a, T: MyMessageTrait> MyMessageTrait for &'a mut T { /* ... */ }
 //! impl<T: MyMessageTrait> MyMessageTrait for Box<T> { /* ... */ }
 //! impl<T: MyMessageTrait> MyMessageTrait for Option<T> { /* ... */ }
 //! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for (T, U) { /* ... */ }
