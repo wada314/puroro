@@ -30,7 +30,7 @@
 //! # }
 //! # use ::puroro::*;
 //! # impl Message<MyMessage> for MyMessage {}
-//! # impl DeserializableMessageFromBytesIterator for MyMessage {
+//! # impl internal::DeserializableMessageFromBytesIterator for MyMessage {
 //! #     fn deser<I>(&mut self, iter: I) -> Result<()>
 //! #     where
 //! #         I: Iterator<Item = ::std::io::Result<u8>>
@@ -71,7 +71,7 @@
 //! # }
 //! # use ::puroro::{internal, Result, tags};
 //! # impl Message<MyMessage> for MyMessage {}
-//! # impl ::puroro::SerializableMessageToIoWrite for MyMessage {
+//! # impl ::puroro::internal::SerializableMessageToIoWrite for MyMessage {
 //! #     fn ser<W>(&self, out: &mut W) -> Result<()> where W: std::io::Write {
 //! #         internal::impls::simple::se::SerFieldToIoWrite::<tags::Unlabeled, tags::Int32>::ser_field(
 //! #             &self.my_number, 1, out

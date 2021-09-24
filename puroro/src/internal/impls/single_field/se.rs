@@ -1,7 +1,7 @@
 use crate::internal::se::to_io_write::write_field_number_and_wire_type;
+use crate::internal::SerializableMessageToIoWrite;
 use crate::types::WireType;
 use crate::variant::Variant;
-use crate::SerializableMessageToIoWrite;
 use crate::{tags, Result};
 use ::std::convert::TryInto;
 use ::std::io::Write;

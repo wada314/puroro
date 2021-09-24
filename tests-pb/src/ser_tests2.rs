@@ -235,7 +235,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for Msg {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Msg {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -294,7 +294,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for Msg {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Msg {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -884,7 +884,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField1 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -972,7 +972,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1062,7 +1062,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField3 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1150,7 +1150,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField4 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1258,7 +1258,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField5<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField5<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -1376,7 +1376,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField6<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField6<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -1496,13 +1496,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField7<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField7<T>
     where
         T: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1615,13 +1615,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MsgSingleField8<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField8<T>
     where
         T: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1718,7 +1718,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField9 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField9 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1805,7 +1805,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField10 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1896,7 +1896,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MsgSingleField536870911 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField536870911 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2411,7 +2411,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for Submsg {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for Submsg {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2443,7 +2443,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for Submsg {
+            impl ::puroro::internal::SerializableMessageToIoWrite for Submsg {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -2510,7 +2510,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for SubmsgSingleField1 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for SubmsgSingleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,

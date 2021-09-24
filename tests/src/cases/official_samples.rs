@@ -1,6 +1,6 @@
 /// The sample cases documented in the Protobuf official encoding document:
 /// https://developers.google.com/protocol-buffers/docs/encoding
-use ::puroro::DeserializableMessageFromBytesIterator;
+use ::puroro::internal::DeserializableMessageFromBytesIterator;
 use ::std::borrow::Cow;
 use ::std::default::Default;
 use ::tests_pb::official_samples2 as s2;

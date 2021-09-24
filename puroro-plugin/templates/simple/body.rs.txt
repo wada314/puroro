@@ -73,7 +73,7 @@ impl ::puroro::MessageRepresentativeImpl for {{ m.simple_ident }} {
     }
 }
 
-impl ::puroro::DeserializableMessageFromBytesIterator for {{ m.simple_ident }} {
+impl ::puroro::internal::DeserializableMessageFromBytesIterator for {{ m.simple_ident }} {
     fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
@@ -131,7 +131,7 @@ impl ::puroro::internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
     }
 }
 
-impl ::puroro::SerializableMessageToIoWrite for {{ m.simple_ident }} {
+impl ::puroro::internal::SerializableMessageToIoWrite for {{ m.simple_ident }} {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
         W: ::std::io::Write

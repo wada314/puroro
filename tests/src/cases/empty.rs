@@ -1,4 +1,4 @@
-use ::puroro::SerializableMessageToIoWrite;
+use ::puroro::internal::SerializableMessageToIoWrite;
 use ::tests_pb::full_coverage2::MsgTrait as MsgTrait2;
 use ::tests_pb::full_coverage3::Enum as Enum3;
 use ::tests_pb::full_coverage3::MsgTrait as MsgTrait3;

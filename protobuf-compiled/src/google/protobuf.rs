@@ -86,7 +86,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorSet {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for FileDescriptorSet {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -115,7 +115,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorSet {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorSet {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -425,7 +425,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for FileDescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for FileDescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -487,7 +487,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -818,7 +818,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for DescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for DescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -874,7 +874,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for DescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for DescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -991,7 +991,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRangeOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for ExtensionRangeOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1020,7 +1020,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1259,7 +1259,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for FieldDescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for FieldDescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1318,7 +1318,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1449,7 +1449,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for OneofDescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for OneofDescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1481,7 +1481,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for OneofDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for OneofDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1632,7 +1632,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumDescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for EnumDescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1673,7 +1673,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1788,7 +1788,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueDescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for EnumValueDescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1823,7 +1823,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1946,7 +1946,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceDescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for ServiceDescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1981,7 +1981,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2138,7 +2138,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for MethodDescriptorProto {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for MethodDescriptorProto {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2182,7 +2182,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2626,7 +2626,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for FileOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for FileOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2715,7 +2715,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2942,7 +2942,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for MessageOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for MessageOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2983,7 +2983,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MessageOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3170,7 +3170,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for FieldOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for FieldOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3217,7 +3217,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3316,7 +3316,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for OneofOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for OneofOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3345,7 +3345,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for OneofOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for OneofOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3449,7 +3449,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for EnumOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3484,7 +3484,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3581,7 +3581,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for EnumValueOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for EnumValueOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3613,7 +3613,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumValueOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3705,7 +3705,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for ServiceOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for ServiceOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3737,7 +3737,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for ServiceOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3849,7 +3849,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for MethodOptions {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for MethodOptions {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3884,7 +3884,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MethodOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4052,7 +4052,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for UninterpretedOption {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for UninterpretedOption {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4099,7 +4099,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOption {
+    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOption {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4189,7 +4189,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for SourceCodeInfo {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for SourceCodeInfo {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4218,7 +4218,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for SourceCodeInfo {
+    impl ::puroro::internal::SerializableMessageToIoWrite for SourceCodeInfo {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4277,7 +4277,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for GeneratedCodeInfo {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for GeneratedCodeInfo {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4306,7 +4306,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for GeneratedCodeInfo {
+    impl ::puroro::internal::SerializableMessageToIoWrite for GeneratedCodeInfo {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4460,13 +4460,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorSetSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorSetSingleField1<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -5351,7 +5351,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -5505,7 +5505,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField2<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -5657,7 +5657,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField3<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -5791,7 +5791,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField10 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5915,7 +5915,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField11 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField11 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -6057,13 +6057,13 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField4<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField4<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::DescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6212,13 +6212,13 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField5<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField5<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::EnumDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6365,13 +6365,13 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField6<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField6<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::ServiceDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6518,13 +6518,13 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField7<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField7<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::FieldDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6673,13 +6673,13 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField8<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField8<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::FileOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6828,13 +6828,13 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField9<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField9<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::SourceCodeInfoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6985,7 +6985,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSingleField12<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProtoSingleField12<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -8079,7 +8079,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -8238,13 +8238,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField2<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::FieldDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -8398,13 +8398,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField6<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField6<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::FieldDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -8558,13 +8558,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField3<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::DescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -8718,13 +8718,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField4<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField4<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::EnumDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -8815,10 +8815,10 @@ fn reserved_name<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite
 for DescriptorProtoSingleField5<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ExtensionRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    T: ::puroro::SerializableMessageToIoWrite,
+    T: ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -8969,13 +8969,13 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField8<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField8<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::OneofDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -9131,13 +9131,13 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField7<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField7<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::MessageOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -9228,10 +9228,10 @@ fn reserved_name<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite
 for DescriptorProtoSingleField9<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_traits::ReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    T: ::puroro::SerializableMessageToIoWrite,
+    T: ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -9382,7 +9382,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for DescriptorProtoSingleField10<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for DescriptorProtoSingleField10<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -9765,13 +9765,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for ExtensionRangeOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -10284,7 +10284,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -10355,7 +10355,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField3 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10420,7 +10420,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField4 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10493,7 +10493,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField5 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10578,7 +10578,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField6<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField6<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -10667,7 +10667,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField2<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -10756,7 +10756,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField7<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField7<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -10829,7 +10829,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField9 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField9 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10906,7 +10906,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField10<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField10<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -10995,13 +10995,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField8<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField8<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::FieldOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -11067,7 +11067,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField17 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField17 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11441,7 +11441,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for OneofDescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for OneofDescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -11514,13 +11514,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for OneofDescriptorProtoSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for OneofDescriptorProtoSingleField2<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::OneofOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -12000,7 +12000,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -12104,13 +12104,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField2<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::EnumValueDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -12211,13 +12211,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto:
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField3<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::EnumOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -12283,10 +12283,10 @@ fn reserved_name<'this>(&'this self) -> Self::Field5RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite
 for EnumDescriptorProtoSingleField4<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_traits::EnumReservedRangeTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    T: ::puroro::SerializableMessageToIoWrite,
+    T: ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -12382,7 +12382,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField5<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumDescriptorProtoSingleField5<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -12704,7 +12704,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumValueDescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -12759,7 +12759,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         = ();
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProtoSingleField2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueDescriptorProtoSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12823,13 +12823,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProtoSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumValueDescriptorProtoSingleField3<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::EnumValueOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -13164,7 +13164,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for ServiceDescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -13246,13 +13246,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProtoSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for ServiceDescriptorProtoSingleField2<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::MethodDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -13331,13 +13331,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProtoSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for ServiceDescriptorProtoSingleField3<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::ServiceOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -13725,7 +13725,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -13806,7 +13806,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField2<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -13887,7 +13887,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField3<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -13968,13 +13968,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField4<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField4<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::MethodOptionsTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -14032,7 +14032,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField5 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14085,7 +14085,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField6 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14993,7 +14993,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -15111,7 +15111,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField8<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField8<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -15211,7 +15211,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField10 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15299,7 +15299,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField20 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField20 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15387,7 +15387,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField27 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField27 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15480,7 +15480,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField9 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField9 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15594,7 +15594,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField11<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField11<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -15692,7 +15692,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField16 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField16 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15780,7 +15780,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField17 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField17 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15868,7 +15868,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField18 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField18 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15956,7 +15956,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField42 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField42 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -16044,7 +16044,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField23 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField23 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -16130,7 +16130,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField31 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField31 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -16236,7 +16236,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField36<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField36<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -16354,7 +16354,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField37<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField37<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -16472,7 +16472,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField39<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField39<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -16590,7 +16590,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField40<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField40<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -16708,7 +16708,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField41<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField41<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -16826,7 +16826,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField44<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField44<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -16944,7 +16944,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField45<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField45<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -17060,13 +17060,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FileOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -17660,7 +17660,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSingleField1 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -17708,7 +17708,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSingleField2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -17756,7 +17756,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSingleField3 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -17802,7 +17802,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSingleField7 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField7 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -17864,13 +17864,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MessageOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -18215,7 +18215,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSingleField1 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -18272,7 +18272,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSingleField2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -18323,7 +18323,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSingleField6 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -18380,7 +18380,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSingleField5 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -18424,7 +18424,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSingleField3 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -18470,7 +18470,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSingleField10 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -18530,13 +18530,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for FieldOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -18812,13 +18812,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for OneofOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for OneofOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -19040,7 +19040,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumOptionsSingleField2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumOptionsSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -19086,7 +19086,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumOptionsSingleField3 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumOptionsSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -19148,13 +19148,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -19381,7 +19381,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for EnumValueOptionsSingleField1 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueOptionsSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -19443,13 +19443,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for EnumValueOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for EnumValueOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -19667,7 +19667,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for ServiceOptionsSingleField33 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceOptionsSingleField33 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -19729,13 +19729,13 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for ServiceOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for ServiceOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -19978,7 +19978,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MethodOptionsSingleField33 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodOptionsSingleField33 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -20030,7 +20030,7 @@ where U: self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_p
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for MethodOptionsSingleField34 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodOptionsSingleField34 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -20094,13 +20094,13 @@ for MethodOptionsSingleField34
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for MethodOptionsSingleField999<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MethodOptionsSingleField999<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::UninterpretedOptionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -20508,10 +20508,10 @@ type Field7BytesType<'this> where Self: 'this = &'static [u8];
 type Field8StringType<'this> where Self: 'this = &'static str;
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite
 for UninterpretedOptionSingleField2<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_traits::NamePartTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    T: ::puroro::SerializableMessageToIoWrite,
+    T: ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -20591,7 +20591,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_opt
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField3<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -20663,7 +20663,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_opt
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSingleField4 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -20723,7 +20723,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_opt
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSingleField5 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -20783,7 +20783,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_opt
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSingleField6 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -20861,7 +20861,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_opt
         = &'static str;
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSingleField7<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField7<T>
     where
         T: ::std::ops::Deref<Target = [u8]>
             + ::std::clone::Clone
@@ -20951,7 +20951,7 @@ where T: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_opt
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSingleField8<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField8<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -21245,10 +21245,10 @@ fn location<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite
 for SourceCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_traits::LocationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    T: ::puroro::SerializableMessageToIoWrite,
+    T: ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -21427,10 +21427,10 @@ fn annotation<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite
 for GeneratedCodeInfoSingleField1<T>
 where T: self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_traits::AnnotationTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    T: ::puroro::SerializableMessageToIoWrite,
+    T: ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -23567,7 +23567,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for ExtensionRange {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for ExtensionRange {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -23604,7 +23604,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for ExtensionRange {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -23686,7 +23686,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for ReservedRange {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for ReservedRange {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -23722,7 +23722,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for ReservedRange {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ReservedRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -23860,7 +23860,7 @@ pub mod _puroro_nested {
                 = ();
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeSingleField1 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeSingleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -23897,7 +23897,7 @@ pub mod _puroro_nested {
                 = ();
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeSingleField2 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeSingleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -23952,13 +23952,13 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for ExtensionRangeSingleField3<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeSingleField3<T>
             where
                 T: self::_puroro_root::google::protobuf::_puroro_traits::ExtensionRangeOptionsTrait
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
-                T: ::puroro::SerializableMessageToIoWrite,
+                T: ::puroro::internal::SerializableMessageToIoWrite,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
@@ -24098,7 +24098,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for ReservedRangeSingleField1 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ReservedRangeSingleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -24131,7 +24131,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for ReservedRangeSingleField2 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ReservedRangeSingleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -24504,7 +24504,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for EnumReservedRange {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for EnumReservedRange {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -24540,7 +24540,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for EnumReservedRange {
+            impl ::puroro::internal::SerializableMessageToIoWrite for EnumReservedRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -24623,7 +24623,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for EnumReservedRangeSingleField1 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for EnumReservedRangeSingleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -24656,7 +24656,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for EnumReservedRangeSingleField2 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for EnumReservedRangeSingleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -25048,7 +25048,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for NamePart {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for NamePart {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -25084,7 +25084,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for NamePart {
+            impl ::puroro::internal::SerializableMessageToIoWrite for NamePart {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -25221,7 +25221,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for NamePartSingleField1<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for NamePartSingleField1<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -25270,7 +25270,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for NamePartSingleField2 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for NamePartSingleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -25556,7 +25556,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for Location {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for Location {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -25610,7 +25610,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for Location {
+            impl ::puroro::internal::SerializableMessageToIoWrite for Location {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -25990,7 +25990,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for LocationSingleField1 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for LocationSingleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -26058,7 +26058,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for LocationSingleField2 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for LocationSingleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -26146,7 +26146,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for LocationSingleField3<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for LocationSingleField3<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -26248,7 +26248,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for LocationSingleField4<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for LocationSingleField4<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -26348,7 +26348,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for LocationSingleField6<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for LocationSingleField6<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -26734,7 +26734,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for Annotation {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for Annotation {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -26778,7 +26778,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for Annotation {
+            impl ::puroro::internal::SerializableMessageToIoWrite for Annotation {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -26975,7 +26975,7 @@ pub mod _puroro_nested {
                 = &'static str;
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for AnnotationSingleField1 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for AnnotationSingleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -27037,7 +27037,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for AnnotationSingleField2<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for AnnotationSingleField2<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -27093,7 +27093,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for AnnotationSingleField3 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for AnnotationSingleField3 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -27137,7 +27137,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for AnnotationSingleField4 {
+            impl ::puroro::internal::SerializableMessageToIoWrite for AnnotationSingleField4 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,

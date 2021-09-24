@@ -101,7 +101,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for Version {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Version {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -139,7 +139,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for Version {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Version {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -289,7 +289,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorRequest {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for CodeGeneratorRequest {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -327,7 +327,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequest {
+    impl ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorRequest {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -436,7 +436,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::DeserializableMessageFromBytesIterator for CodeGeneratorResponse {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for CodeGeneratorResponse {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -471,7 +471,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponse {
+    impl ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorResponse {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -616,7 +616,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for VersionSingleField1 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for VersionSingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -655,7 +655,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for VersionSingleField2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for VersionSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -694,7 +694,7 @@ pub mod _puroro_impls {
         = &'static str;
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for VersionSingleField3 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for VersionSingleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -751,7 +751,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for VersionSingleField4<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for VersionSingleField4<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -1171,7 +1171,7 @@ pub mod _puroro_impls {
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -1268,7 +1268,7 @@ pub mod _puroro_impls {
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField2<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField2<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -1361,13 +1361,13 @@ pub mod _puroro_impls {
         = ();
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField15<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField15<T>
     where
         T: self::_puroro_root::google::protobuf::_puroro_traits::FileDescriptorProtoTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1457,13 +1457,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField3<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorRequestSingleField3<T>
     where
         T: self::_puroro_root::google::protobuf::compiler::_puroro_traits::VersionTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::SerializableMessageToIoWrite,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1797,7 +1797,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponseSingleField1<T>
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorResponseSingleField1<T>
     where
         T: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
@@ -1859,7 +1859,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerializableMessageToIoWrite for CodeGeneratorResponseSingleField2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for CodeGeneratorResponseSingleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1909,10 +1909,10 @@ fn file<'this>(&'this self) -> Self::Field15RepeatedType<'this> {
 }
 }
 
-    impl<T> ::puroro::SerializableMessageToIoWrite
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite
 for CodeGeneratorResponseSingleField15<T>
 where T: self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response::_puroro_traits::FileTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    T: ::puroro::SerializableMessageToIoWrite,
+    T: ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -2359,7 +2359,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserializableMessageFromBytesIterator for File {
+            impl ::puroro::internal::DeserializableMessageFromBytesIterator for File {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2399,7 +2399,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerializableMessageToIoWrite for File {
+            impl ::puroro::internal::SerializableMessageToIoWrite for File {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -2679,7 +2679,7 @@ pub mod _puroro_nested {
                 = ();
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField1<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileSingleField1<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -2758,7 +2758,7 @@ pub mod _puroro_nested {
                 = ();
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField2<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileSingleField2<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -2839,7 +2839,7 @@ pub mod _puroro_nested {
                 = ();
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField15<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileSingleField15<T>
             where
                 T: ::std::ops::Deref<Target = str>
                     + ::std::clone::Clone
@@ -2920,13 +2920,13 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<T> ::puroro::SerializableMessageToIoWrite for FileSingleField16<T>
+            impl<T> ::puroro::internal::SerializableMessageToIoWrite for FileSingleField16<T>
             where
                 T: self::_puroro_root::google::protobuf::_puroro_traits::GeneratedCodeInfoTrait
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
-                T: ::puroro::SerializableMessageToIoWrite,
+                T: ::puroro::internal::SerializableMessageToIoWrite,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
