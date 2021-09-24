@@ -5,6 +5,9 @@ use ::std::convert::TryFrom;
 use ::std::io::Write;
 
 pub trait Message<M> {
+    /// Returns a descriptor of message.
+    /// Though currently the descriptor has almost no items.
+    /// More details may come in future versions.
     fn descriptor() -> &'static MessageDescriptor
     where
         M: MessageRepresentativeImpl,
@@ -12,6 +15,9 @@ pub trait Message<M> {
         M::descriptor()
     }
 
+    /// Deserialize the message from input bytes.
+    /// Please note that not all the message implementing this `Message` trait can be
+    /// deserialized from the input bytes (e.g. Either<T, U> cannot be deserialized).
     fn merge_from_bytes<I>(&mut self, iter: I) -> Result<()>
     where
         Self: DeserializableMessageFromBytesIterator,
@@ -20,6 +26,7 @@ pub trait Message<M> {
         <Self as DeserializableMessageFromBytesIterator>::deser(self, iter)
     }
 
+    /// A shorthand method that allocates and deserializes the message.
     fn from_bytes<I>(iter: I) -> Result<Self>
     where
         Self: DeserializableMessageFromBytesIterator + Default,
@@ -30,6 +37,7 @@ pub trait Message<M> {
         Ok(msg)
     }
 
+    /// Serializes the message into [`std::io::Write`].
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where
         Self: SerializableMessageToIoWrite,
