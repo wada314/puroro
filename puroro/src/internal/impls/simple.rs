@@ -22,10 +22,14 @@
 //!
 //! Here's the list of the field types correspondence between protobuf and Rust code:
 //!
-//! | base protobuf type | `required` | `optional` | (unlabeled) | `repeated` |
-//! |--------------------|------------|------------|-------------|------------|
-//! | `int32`            | `Option<i32>`|`Option<i32>`|`i32`     | `Vec<i32>` |
-//! | (Any numeric types)| `Option<T>`| `Option<T>`| `T`         | `Vec<T>`   |
+//! | base protobuf type | `required` / `optional` | (unlabeled) | `repeated` |
+//! |--------------------|-------------------------|-------------|------------|
+//! | `int32`            | `Option<i32>`           | `i32`       | `Vec<i32>` |
+//! | (Any numeric types)| `Option<T>`             | `T`         | `Vec<T>`   |
+//! | `bytes`            | `Option<Vec<u8>>`       | `Vec<u8>`   | `Vec<Vec<u8>>`|
+//! | `string`           | `Option<String>`        | `String`    | `Vec<String>`|
+//! | `SomeMessage`      | `Option<Box<SomeMessage>>`|`Option<Box<SomeMessage>>`|`Vec<SomeMessage>`|
+//!
 //!
 
 pub mod de;
