@@ -24,4 +24,11 @@ fn test_oneof_field_builder() {
     let msg2 = MsgBuilder::new().append_g1_string("test").build();
     assert_eq!(None, msg2.g1_int32());
     assert_eq!(Some("test"), msg2.g1_string().as_ref().map(|v| v.deref()));
+
+    let msg3 = MsgBuilder::new()
+        .append_g1_string("test")
+        .append_g1_int32(10)
+        .build();
+    assert_eq!(Some(10), msg3.g1_int32());
+    assert_eq!(None, msg3.g1_string());
 }
