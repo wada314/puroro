@@ -1169,6 +1169,43 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
+        pub fn append_g1_int32(self, value: i32) -> MsgBuilder<(T, MsgSingleField1)> {
+            MsgBuilder((self.0, MsgSingleField1 { g1_int32: value }))
+        }
+        pub fn append_g1_string<U>(self, value: U) -> MsgBuilder<(T, MsgSingleField2<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField2 { g1_string: value }))
+        }
+        pub fn append_g2_f32(self, value: f32) -> MsgBuilder<(T, MsgSingleField3)> {
+            MsgBuilder((self.0, MsgSingleField3 { g2_f32: value }))
+        }
+        pub fn append_g2_string<U>(self, value: U) -> MsgBuilder<(T, MsgSingleField4<U>)>
+        where
+            U: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField4 { g2_string: value }))
+        }
+        pub fn append_g2_submsg<U>(self, value: U) -> MsgBuilder<(T, MsgSingleField5<U>)>
+        where
+            U: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField5 { g2_submsg: value }))
+        }
+        pub fn append_g3_int32(self, value: i32) -> MsgBuilder<(T, MsgSingleField6)> {
+            MsgBuilder((self.0, MsgSingleField6 { g3_int32: value }))
+        }
+
         pub fn build(self) -> T {
             self.0
         }
