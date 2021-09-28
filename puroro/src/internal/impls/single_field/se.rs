@@ -49,8 +49,8 @@ where
         out: &mut W,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<BytesType>,
         BytesType: Deref<Target = [u8]>,
+        FieldType: VecOrOptionOrBare<BytesType>,
         W: Write,
     {
         for item in field.iter() {
@@ -78,8 +78,8 @@ where
         out: &mut W,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<StringType>,
         StringType: Deref<Target = str>,
+        FieldType: VecOrOptionOrBare<StringType>,
         W: Write,
     {
         for item in field.iter() {
