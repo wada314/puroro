@@ -1,3 +1,5 @@
+use ::itertools::Itertools;
+
 #[test]
 fn test_builder() {
     use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait};
@@ -11,6 +13,20 @@ fn test_builder() {
     assert!(::std::mem::size_of_val(&msg) < ::std::mem::size_of::<Msg>());
     dbg!(::std::mem::size_of_val(&msg));
     dbg!(::std::mem::size_of::<Msg>());
+}
+
+#[test]
+fn test_builder_append_repeated() {
+    use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait};
+    let msg = MsgBuilder::new()
+        .append_i32_repeated(vec![1, 1])
+        .append_i32_repeated(vec![])
+        .append_i32_repeated(vec![2, 3, 5])
+        .build();
+    assert_eq!(
+        vec![1, 1, 2, 3, 5],
+        msg.i32_repeated().into_iter().collect_vec()
+    );
 }
 
 #[test]
