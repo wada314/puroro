@@ -4,7 +4,7 @@ This library is under development and it is very possible to make breaking chang
 
 ## TODOs
 - proto2
-    - [ ] Groups, at least correctly ignore it (where's document!?)
+    - [ ] Groups, at least correctly ignore it
     - [x] Enums (In proto2 we need to refuse the unknown value)
     - [ ] default value (something like `optional int32 foo = 1; [default=10]`)
     - [ ] extensions
@@ -51,13 +51,16 @@ This library is under development and it is very possible to make breaking chang
 - tests -- Test cases
 - tests-pb -- Compiling .pb files used by tests crate
 - protobuf -- A git submodule of Google's official protobuf repository
-- protobuf-compiled -- Compiling .pb files in protobuf crate so that puroro-plugin crate can use it
+- protobuf-compiled -- Compiled .rs files in protobuf crate so that puroro-plugin crate can use it
+    - update-plugin-protos.bat -- A batch file to generate the compiled .rs files
 
-## Sample command
-Keep in mind that protoc command not work properly with Windows path separator "\\". Use "/" instead.
+## Sample command to compile
+Check `tests-pb/build.rs` for a sample build script.
+puroro generates root `lib.rs` and submodule files and directories, so you will
+want to make a separated crate containing only generated .rs code (and build.rs and the source .pb files).
 
 ```
 $ protoc <protofile-path> --plugin=protoc-gen-rust=./target/debug/puroro-plugin.exe --rust_out=<output-dir> --proto_path=<protofile-dir>
 ```
 
-Check `protobuf-pb/build.rs` for a sample build script.
+Keep in mind that protoc command not work properly with Windows path separator "\\". Use "/" instead.
