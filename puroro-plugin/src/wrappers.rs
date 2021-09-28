@@ -26,115 +26,6 @@ pub struct Context {
     lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
 }
 
-#[derive(Debug)]
-pub struct InputFile {
-    context: Weak<Context>,
-    package: Rc<Vec<String>>,
-    messages: Vec<Rc<Message>>,
-    enums: Vec<Rc<Enum>>,
-    syntax: ProtoSyntax,
-}
-
-#[derive(Debug)]
-pub struct Message {
-    input_file: Weak<InputFile>,
-    rust_ident: String,
-    rust_nested_module_ident: String,
-    proto_name: String,
-    package: Rc<Vec<String>>,
-    outer_messages: Rc<Vec<String>>,
-    fields: Vec<Rc<Field>>,
-    nested_messages: Vec<Rc<Message>>,
-    nested_enums: Vec<Rc<Enum>>,
-    oneofs: Vec<Rc<Oneof>>,
-}
-
-#[derive(Debug)]
-pub struct Enum {
-    input_file: Weak<InputFile>,
-    rust_ident: String,
-    proto_name: String,
-    package: Rc<Vec<String>>,
-    outer_messages: Rc<Vec<String>>,
-    values: Vec<EnumValue>,
-}
-
-#[derive(Debug)]
-pub struct Field {
-    message: Weak<Message>,
-    rust_ident: String,
-    rust_oneof_ident: String,
-    lazy_proto_type: OnceCell<FieldType>,
-    proto_name: String,
-    proto_type_name: String,
-    proto_type_enum: FieldTypeProto,
-    proto_label: FieldLabelProto,
-    proto_is_optional3: bool,
-    lazy_label: OnceCell<FieldLabel>,
-    number: i32,
-    proto_oneof_index: Option<i32>,
-}
-
-#[derive(Debug)]
-pub struct Oneof {
-    message: Weak<Message>,
-    index: i32,
-    rust_enum_ident: String,
-    rust_getter_ident: String,
-    lazy_fields: OnceCell<Vec<Rc<Field>>>,
-    lazy_is_synthetic: OnceCell<bool>,
-}
-
-#[derive(Debug)]
-pub struct EnumValue {
-    rust_ident: String,
-    number: i32,
-}
-
-#[derive(Debug, Clone)]
-pub enum ProtoSyntax {
-    Proto2,
-    Proto3,
-}
-
-#[derive(Debug, Clone)]
-pub enum FieldType {
-    Double,
-    Float,
-    Int32,
-    Int64,
-    UInt32,
-    UInt64,
-    SInt32,
-    SInt64,
-    Fixed32,
-    Fixed64,
-    SFixed32,
-    SFixed64,
-    Bool,
-    Group,
-    String,
-    Bytes,
-    Enum2(Weak<Enum>),
-    Enum3(Weak<Enum>),
-    Message(Weak<Message>),
-}
-
-#[derive(Debug, Clone)]
-pub enum FieldLabel {
-    Required,
-    Optional,
-    Unlabeled,
-    Repeated,
-    OneofField,
-}
-
-#[derive(Debug)]
-pub enum MessageOrEnum {
-    Message(Rc<Message>),
-    Enum(Rc<Enum>),
-}
-
 impl Context {
     pub fn try_from_proto(proto: CodeGeneratorRequest) -> Result<Rc<Context>> {
         let context = Rc::new_cyclic(|weak_context| Context {
@@ -215,6 +106,15 @@ impl Context {
     }
 }
 
+#[derive(Debug)]
+pub struct InputFile {
+    context: Weak<Context>,
+    package: Rc<Vec<String>>,
+    messages: Vec<Rc<Message>>,
+    enums: Vec<Rc<Enum>>,
+    syntax: ProtoSyntax,
+}
+
 impl InputFile {
     pub fn try_from_proto(context: Weak<Context>, proto: FileDescriptorProto) -> Result<Rc<Self>> {
         let package = Rc::new(
@@ -293,6 +193,20 @@ impl InputFile {
     pub fn rust_path_to_root_module(&self) -> String {
         iter::repeat("super").take(self.package().len()).join("::")
     }
+}
+
+#[derive(Debug)]
+pub struct Message {
+    input_file: Weak<InputFile>,
+    rust_ident: String,
+    rust_nested_module_ident: String,
+    proto_name: String,
+    package: Rc<Vec<String>>,
+    outer_messages: Rc<Vec<String>>,
+    fields: Vec<Rc<Field>>,
+    nested_messages: Vec<Rc<Message>>,
+    nested_enums: Vec<Rc<Enum>>,
+    oneofs: Vec<Rc<Oneof>>,
 }
 
 impl Message {
@@ -456,6 +370,16 @@ impl Hash for Message {
     }
 }
 
+#[derive(Debug)]
+pub struct Enum {
+    input_file: Weak<InputFile>,
+    rust_ident: String,
+    proto_name: String,
+    package: Rc<Vec<String>>,
+    outer_messages: Rc<Vec<String>>,
+    values: Vec<EnumValue>,
+}
+
 impl Enum {
     pub fn try_from_proto(
         input_file: Weak<InputFile>,
@@ -524,6 +448,22 @@ impl Enum {
             name: self.proto_name.clone(),
         })?)
     }
+}
+
+#[derive(Debug)]
+pub struct Field {
+    message: Weak<Message>,
+    rust_ident: String,
+    rust_oneof_ident: String,
+    lazy_proto_type: OnceCell<FieldType>,
+    proto_name: String,
+    proto_type_name: String,
+    proto_type_enum: FieldTypeProto,
+    proto_label: FieldLabelProto,
+    proto_is_optional3: bool,
+    lazy_label: OnceCell<FieldLabel>,
+    number: i32,
+    proto_oneof_index: Option<i32>,
 }
 
 impl Field {
@@ -829,6 +769,16 @@ impl Field {
     }
 }
 
+#[derive(Debug)]
+pub struct Oneof {
+    message: Weak<Message>,
+    index: i32,
+    rust_enum_ident: String,
+    rust_getter_ident: String,
+    lazy_fields: OnceCell<Vec<Rc<Field>>>,
+    lazy_is_synthetic: OnceCell<bool>,
+}
+
 impl Oneof {
     pub fn try_from_proto(
         message: Weak<Message>,
@@ -931,6 +881,12 @@ impl Oneof {
     }
 }
 
+#[derive(Debug)]
+pub struct EnumValue {
+    rust_ident: String,
+    number: i32,
+}
+
 impl EnumValue {
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
@@ -940,6 +896,12 @@ impl EnumValue {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum ProtoSyntax {
+    Proto2,
+    Proto3,
+}
+
 impl ProtoSyntax {
     pub fn tag_ident(&self) -> &str {
         match *self {
@@ -947,6 +909,29 @@ impl ProtoSyntax {
             ProtoSyntax::Proto3 => "Proto3",
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum FieldType {
+    Double,
+    Float,
+    Int32,
+    Int64,
+    UInt32,
+    UInt64,
+    SInt32,
+    SInt64,
+    Fixed32,
+    Fixed64,
+    SFixed32,
+    SFixed64,
+    Bool,
+    Group,
+    String,
+    Bytes,
+    Enum2(Weak<Enum>),
+    Enum3(Weak<Enum>),
+    Message(Weak<Message>),
 }
 
 impl FieldType {
@@ -1081,6 +1066,15 @@ impl FieldType {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum FieldLabel {
+    Required,
+    Optional,
+    Unlabeled,
+    Repeated,
+    OneofField,
+}
+
 impl FieldLabel {
     pub fn tag_ident(&self) -> &str {
         match *self {
@@ -1091,6 +1085,12 @@ impl FieldLabel {
             FieldLabel::OneofField => "OneofField",
         }
     }
+}
+
+#[derive(Debug)]
+pub enum MessageOrEnum {
+    Message(Rc<Message>),
+    Enum(Rc<Enum>),
 }
 
 impl MessageOrEnum {
