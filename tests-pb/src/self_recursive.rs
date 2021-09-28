@@ -209,7 +209,7 @@ pub mod _puroro_impls {
         type Field1MessageType<'this>
         where
             Self: 'this,
-        = &'this T;
+        = &'this ScalarType;
         fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref()
         }
@@ -221,7 +221,7 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::internal::SerializableMessageToIoWrite,
+        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -230,7 +230,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Unlabeled, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<T, _, _>(&self.recursive_unlabeled, 1, out)?;
+        >::ser_field::<ScalarType, _, _>(&self.recursive_unlabeled, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }

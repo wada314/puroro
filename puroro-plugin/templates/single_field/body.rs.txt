@@ -75,7 +75,7 @@ impl{{ maybe_gp }} ::puroro::internal::SerializableMessageToIoWrite
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield) %}
 {%- if sfield.is_message %}
-    T: ::puroro::internal::SerializableMessageToIoWrite,
+    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
 {%- endif %}
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -86,7 +86,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<
             {{ sfield.single_field_label_and_type_tags }}
-        >::ser_field::<T, _, _>(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+        >::ser_field::<ScalarType, _, _>(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
         {%- else %}
         use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<

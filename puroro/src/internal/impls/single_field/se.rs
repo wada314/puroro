@@ -1,3 +1,4 @@
+use super::VecOrOptionOrBare;
 use crate::internal::se::to_io_write::write_field_number_and_wire_type;
 use crate::internal::SerializableMessageToIoWrite;
 use crate::types::WireType;
@@ -7,8 +8,6 @@ use ::std::convert::TryInto;
 use ::std::io::Write;
 use ::std::marker::PhantomData;
 use ::std::ops::Deref;
-
-use super::super::simple::VecOrOptionOrBare;
 
 struct NullWrite(usize);
 impl Write for NullWrite {

@@ -672,10 +672,10 @@ pub mod _puroro_impls {
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.i32_repeated))
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -847,7 +847,7 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field::<
-                T,
+                ScalarType,
                 _,
                 _,
             >(&self.string_unlabeled, 5, out)?;
@@ -919,7 +919,7 @@ pub mod _puroro_impls {
         type Field6MessageType<'this>
         where
             Self: 'this,
-        = &'this T;
+        = &'this ScalarType;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
             self.submsg_unlabeled.as_ref()
         }
@@ -931,7 +931,7 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        T: ::puroro::internal::SerializableMessageToIoWrite,
+        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -940,7 +940,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Unlabeled, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<T, _, _>(&self.submsg_unlabeled, 6, out)?;
+        >::ser_field::<ScalarType, _, _>(&self.submsg_unlabeled, 6, out)?;
             ::std::result::Result::Ok(())
         }
     }

@@ -6,7 +6,7 @@ type Field{{ f.number }}StringType<'this> where Self: 'this = &'this str;
 {%- endif %}
 {%- match f.simple_maybe_field_message_path %}
 {%- when Some with (struct_path) %}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this T;
+type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this ScalarType;
 {%- else %}
 {%- endmatch %}
 
@@ -38,25 +38,29 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {%- if f.is_length_delimited %}
 {%- if f.is_message %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = ::std::slice::Iter<'this, T>;
+    = <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = ::puroro::internal::impls::single_field::DerefIter<::std::slice::Iter<'this, T>>;
+    = ::puroro::internal::impls::single_field::DerefIter<
+        <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter
+    >;
 {%- endif %}
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = ::std::iter::Cloned<::std::slice::Iter<'this, {{ f.trait_scalar_getter_type }}>>;
+    = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
 {%- endif %}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
-    self.{{ f.ident }}.iter()
+    ::std::iter::IntoIterator::into_iter(&self.{{ f.ident }})
     {%- else %}
-    ::puroro::internal::impls::single_field::DerefIter::new(self.{{ f.ident }}.iter())
+    ::puroro::internal::impls::single_field::DerefIter::new(
+        ::std::iter::IntoIterator::into_iter(&self.{{ f.ident }})
+    )
     {%- endif %}
     {%- else %}
-    self.{{ f.ident }}.iter().cloned()
+    ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.{{ f.ident }}))
     {%- endif %}
 }
 {%- endif %}

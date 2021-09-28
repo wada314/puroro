@@ -928,10 +928,10 @@ pub mod _puroro_impls {
         type Field2RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.i32_repeated))
         }
         type Field4RepeatedType<'this>
         where
@@ -1129,10 +1129,12 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.float_repeated.iter().cloned()
+            ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(
+                &self.float_repeated,
+            ))
         }
         type Field5StringType<'this>
         where
@@ -1303,7 +1305,7 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                T,
+                ScalarType,
                 _,
                 _,
             >(&self.string_optional, 5, out)?;
@@ -1384,10 +1386,14 @@ pub mod _puroro_impls {
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::DerefIter<::std::slice::Iter<'this, T>>;
+        = ::puroro::internal::impls::single_field::DerefIter<
+            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+        >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::DerefIter::new(self.string_repeated.iter())
+            ::puroro::internal::impls::single_field::DerefIter::new(
+                ::std::iter::IntoIterator::into_iter(&self.string_repeated),
+            )
         }
         type Field7MessageType<'this>
         where
@@ -1430,7 +1436,7 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field::<
-                T,
+                ScalarType,
                 _,
                 _,
             >(&self.string_repeated, 6, out)?;
@@ -1516,7 +1522,7 @@ pub mod _puroro_impls {
         type Field7MessageType<'this>
         where
             Self: 'this,
-        = &'this T;
+        = &'this ScalarType;
         fn submsg_optional<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             self.submsg_optional.as_ref()
         }
@@ -1549,7 +1555,7 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-        T: ::puroro::internal::SerializableMessageToIoWrite,
+        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1558,7 +1564,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<T, _, _>(&self.submsg_optional, 7, out)?;
+        >::ser_field::<ScalarType, _, _>(&self.submsg_optional, 7, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1651,14 +1657,14 @@ pub mod _puroro_impls {
         type Field8MessageType<'this>
         where
             Self: 'this,
-        = &'this T;
+        = &'this ScalarType;
         type Field8RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::slice::Iter<'this, T>;
+        = <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            self.submsg_repeated.iter()
+            ::std::iter::IntoIterator::into_iter(&self.submsg_repeated)
         }
         type Field10RepeatedType<'this>
         where
@@ -1680,7 +1686,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        T: ::puroro::internal::SerializableMessageToIoWrite,
+        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1689,7 +1695,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<T, _, _>(&self.submsg_repeated, 8, out)?;
+        >::ser_field::<ScalarType, _, _>(&self.submsg_repeated, 8, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1870,10 +1876,10 @@ pub mod _puroro_impls {
         type Field10RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests2::Enum>>;
+        = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            self.enum_repeated.iter().cloned()
+            ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.enum_repeated))
         }
     }
 
