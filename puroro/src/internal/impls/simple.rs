@@ -89,6 +89,10 @@
 //! assert_eq!(21, MyEnum::TwentyOne.into());
 //! ```
 //!
+//! [`Enum2`](crate::Enum2) also has supertrait [`Default`], where
+//! the default value is the first value in the enum definition
+//! ([official document](https://developers.google.com/protocol-buffers/docs/proto#optional)).
+//!
 //! ### proto3
 //!
 //! ```protobuf
@@ -99,16 +103,67 @@
 //! }
 //! ```
 //!
+//! Generates an enum like this:
+//!
+//! ```ignore
+//! enum MyEnum {
+//!     Zero,
+//!     TwentyOne,
+//!     _Unknown(i32),
+//! }
+//! impl puroro::Enum3 for MyEnum { /* ... */ }
+//! ```
+//!
+//! Unlike proto2 enum, proto3 enum contains `_Unknown(i32)` field so it
+//! implements [`From<i32>`] instead of proto2's [`TryFrom<i32>`](std::convert::TryFrom).
+//! [proto3 spec](https://developers.google.com/protocol-buffers/docs/proto3#enum)
+//! forces the first value in the definition is 0, so [`Default`] implementation
+//! always returns that value corresponding to 0.
+//!
 //! # Nested message / enum
 //!
 //! ```protobuf
 //! syntax = "proto3";
+//! package my_package;
 //! message MyMessage {
 //!     message MySubMessage {
-//!         int32 my_number = 1;
 //!     }
-//!     MySubMessage my_sub_message = 1;
+//!     MySubMessage my_child = 1;
 //! }
+//! ```
+//!
+//! If a message or an enum is nested into Message, then that message / enum
+//! are nested into a submodule.
+//! The outer message name is converted into ***lower_snake_case*** and be used
+//! as the submodule name.
+//!
+//! ```rust
+//! pub mod my_package {
+//!     pub struct MyMessage {
+//!         my_child: Option<Box<my_message::MySubMessage>>,
+//!     }
+//!     pub mod my_message {
+//!         pub struct MySubMessage {}
+//!     }
+//! }
+//! ```
+//!
+//! If you have a same name proto subpackage with the outer message,
+//! then the module generated from subpackage shadowes the module
+//! generated from the outer message. If you want to access the
+//! nested items' module, then please add `_puroro_nested` into the
+//! path like this:
+//!
+//! ```rust
+//! # pub mod my_package {
+//! #     pub mod _puroro_nested {
+//! #         pub mod my_message {
+//! #             #[derive(Default)]
+//! #             pub struct MySubMessage {}
+//! #         }
+//! #     }
+//! # }
+//! let nested_child = my_package::_puroro_nested::my_message::MySubMessage::default();
 //! ```
 //!
 
