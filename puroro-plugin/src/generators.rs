@@ -175,8 +175,8 @@ struct Field {
     simple_maybe_field_message_path: Option<String>,
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
-    single_field_type_t: String,
-    single_field_type_u: String,
+    single_field_type: String,
+    single_scalar_field_type: String,
     single_field_label_and_type_tags: String,
 }
 
@@ -231,10 +231,10 @@ impl Field {
                     },
                 )
             })?,
-            single_field_type_t: f.single_field_type("T")?,
-            single_field_type_u: f.single_field_type("U")?,
+            single_field_type: f.single_field_type()?,
+            single_scalar_field_type: f.single_scalar_field_type()?,
             single_field_label_and_type_tags: f
-                .rust_label_and_type_tags(|_| Ok("T".to_string()))?,
+                .rust_label_and_type_tags(|_| Ok("ScalarType".to_string()))?,
         })
     }
 }

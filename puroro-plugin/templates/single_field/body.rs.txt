@@ -4,25 +4,33 @@
 
 {%- let maybe_gp %}
 {%- if sfield.is_length_delimited %}
-{%- let maybe_gp = "<T>" %}
+    {%- if sfield.is_repeated %}
+        {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
+    {%- else %}
+        {%- let maybe_gp = "<ScalarType>" %}
+    {%- endif %}
 {%- else %}
-{%- let maybe_gp = "" %}
+    {%- if sfield.is_repeated %}
+        {%- let maybe_gp = "<RepeatedType>" %}
+    {%- else %}
+        {%- let maybe_gp = "" %}
+    {%- endif %}
 {%- endif %}
 
 pub struct {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield, "T") %}
+{%- call single_field_bound(sfield) %}
 {
-    pub {{ sfield.ident }}: {{ sfield.single_field_type_t }},
+    pub {{ sfield.ident }}: {{ sfield.single_field_type }},
 }
 
 impl{{ maybe_gp }} ::puroro::Message<super::{{ m.simple_ident }}>
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield, "T") %}
+{%- call single_field_bound(sfield) %}
 {}
 
 impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield, "T") %}
+{%- call single_field_bound(sfield) %}
 {
     {%- for field in m.fields %}
     {%- if field.number == sfield.number %}
@@ -65,7 +73,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 
 impl{{ maybe_gp }} ::puroro::internal::SerializableMessageToIoWrite
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield, "T") %}
+{%- call single_field_bound(sfield) %}
 {%- if sfield.is_message %}
     T: ::puroro::internal::SerializableMessageToIoWrite,
 {%- endif %}
@@ -89,11 +97,11 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     }
 }
 
-impl{{ maybe_gp }} ::std::convert::From<{{ sfield.single_field_type_t }}>
+impl{{ maybe_gp }} ::std::convert::From<{{ sfield.single_field_type }}>
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield, "T") %}
+{%- call single_field_bound(sfield) %}
 {
-    fn from(value: {{ sfield.single_field_type_t }}) -> Self {
+    fn from(value: {{ sfield.single_field_type }}) -> Self {
         Self {
             {{ sfield.ident }}: value,
         }

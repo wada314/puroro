@@ -532,27 +532,27 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct Test2SingleField2<T>
+    pub struct Test2SingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub b: ::std::option::Option<T>,
+        pub b: ::std::option::Option<ScalarType>,
     }
 
-    impl<T> ::puroro::Message<super::Test2> for Test2SingleField2<T> where
-        T: ::std::ops::Deref<Target = str>
+    impl<ScalarType> ::puroro::Message<super::Test2> for Test2SingleField2<ScalarType> where
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
     {
     }
 
-    impl<T> super::_puroro_traits::Test2Trait for Test2SingleField2<T>
+    impl<ScalarType> super::_puroro_traits::Test2Trait for Test2SingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -566,9 +566,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::internal::SerializableMessageToIoWrite for Test2SingleField2<T>
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test2SingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -587,14 +587,15 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::std::convert::From<::std::option::Option<T>> for Test2SingleField2<T>
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for Test2SingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<T>) -> Self {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
             Self { b: value }
         }
     }
@@ -616,12 +617,12 @@ pub mod _puroro_impls {
     where
         T: Test2Trait,
     {
-        pub fn append_b<U>(
+        pub fn append_b<ScalarType>(
             self,
-            value: ::std::option::Option<U>,
-        ) -> Test2Builder<(T, Test2SingleField2<U>)>
+            value: ::std::option::Option<ScalarType>,
+        ) -> Test2Builder<(T, Test2SingleField2<ScalarType>)>
         where
-            U: ::std::ops::Deref<Target = str>
+            ScalarType: ::std::ops::Deref<Target = str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
@@ -700,27 +701,27 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct Test3SingleField3<T>
+    pub struct Test3SingleField3<ScalarType>
     where
-        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+        ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub c: ::std::option::Option<T>,
+        pub c: ::std::option::Option<ScalarType>,
     }
 
-    impl<T> ::puroro::Message<super::Test3> for Test3SingleField3<T> where
-        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+    impl<ScalarType> ::puroro::Message<super::Test3> for Test3SingleField3<ScalarType> where
+        ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
     {
     }
 
-    impl<T> super::_puroro_traits::Test3Trait for Test3SingleField3<T>
+    impl<ScalarType> super::_puroro_traits::Test3Trait for Test3SingleField3<ScalarType>
     where
-        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+        ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -734,9 +735,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::internal::SerializableMessageToIoWrite for Test3SingleField3<T>
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test3SingleField3<ScalarType>
     where
-        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+        ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -747,23 +748,22 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Message<T>>::ser_field::<
-                T,
-                _,
-                _,
-            >(&self.c, 3, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
+        >::ser_field::<T, _, _>(&self.c, 3, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<T> ::std::convert::From<::std::option::Option<T>> for Test3SingleField3<T>
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for Test3SingleField3<ScalarType>
     where
-        T: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+        ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<T>) -> Self {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
             Self { c: value }
         }
     }
@@ -786,12 +786,12 @@ pub mod _puroro_impls {
     where
         T: Test3Trait,
     {
-        pub fn append_c<U>(
+        pub fn append_c<ScalarType>(
             self,
-            value: ::std::option::Option<U>,
-        ) -> Test3Builder<(T, Test3SingleField3<U>)>
+            value: ::std::option::Option<ScalarType>,
+        ) -> Test3Builder<(T, Test3SingleField3<ScalarType>)>
         where
-            U: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
+            ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
@@ -881,13 +881,22 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct Test4SingleField4 {
-        pub d: ::std::vec::Vec<i32>,
+    pub struct Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
+        pub d: RepeatedType,
     }
 
-    impl ::puroro::Message<super::Test4> for Test4SingleField4 {}
+    impl<RepeatedType> ::puroro::Message<super::Test4> for Test4SingleField4<RepeatedType> where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>
+    {
+    }
 
-    impl super::_puroro_traits::Test4Trait for Test4SingleField4 {
+    impl<RepeatedType> super::_puroro_traits::Test4Trait for Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -898,7 +907,11 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test4SingleField4 {
+    impl<RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+        for Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -911,8 +924,11 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<i32>> for Test4SingleField4 {
-        fn from(value: ::std::vec::Vec<i32>) -> Self {
+    impl<RepeatedType> ::std::convert::From<RepeatedType> for Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
+        fn from(value: RepeatedType) -> Self {
             Self { d: value }
         }
     }
@@ -934,7 +950,13 @@ pub mod _puroro_impls {
     where
         T: Test4Trait,
     {
-        pub fn append_d(self, value: ::std::vec::Vec<i32>) -> Test4Builder<(T, Test4SingleField4)> {
+        pub fn append_d<RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> Test4Builder<(T, Test4SingleField4<RepeatedType>)>
+        where
+            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        {
             Test4Builder((self.0, Test4SingleField4 { d: value }))
         }
 

@@ -181,27 +181,27 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MsgSingleField1<T>
+    pub struct MsgSingleField1<ScalarType>
     where
-        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub recursive_unlabeled: ::std::option::Option<T>,
+        pub recursive_unlabeled: ::std::option::Option<ScalarType>,
     }
 
-    impl<T> ::puroro::Message<super::Msg> for MsgSingleField1<T> where
-        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
     {
     }
 
-    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField1<T>
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
     where
-        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -215,9 +215,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1<T>
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1<ScalarType>
     where
-        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -228,23 +228,22 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Message<T>>::ser_field::<
-                T,
-                _,
-                _,
-            >(&self.recursive_unlabeled, 1, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<ScalarType>
+        >::ser_field::<T, _, _>(&self.recursive_unlabeled, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<T> ::std::convert::From<::std::option::Option<T>> for MsgSingleField1<T>
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField1<ScalarType>
     where
-        T: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<T>) -> Self {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
             Self {
                 recursive_unlabeled: value,
             }
@@ -269,12 +268,12 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        pub fn append_recursive_unlabeled<U>(
+        pub fn append_recursive_unlabeled<ScalarType>(
             self,
-            value: ::std::option::Option<U>,
-        ) -> MsgBuilder<(T, MsgSingleField1<U>)>
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
         where
-            U: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,

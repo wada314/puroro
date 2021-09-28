@@ -6,14 +6,24 @@ where
 {
     {%- for field in m.fields %}
 
+    {%- let maybe_gp %}
     {%- if field.is_length_delimited %}
-    pub fn append_{{ field.ident }}<U>(self, value: {{ field.single_field_type_u }})
-        -> {{ m.builder_ident }}<(T, {{ m.single_field_ident }}{{ field.number }}<U>)>
-    {%- call single_field_bound(field, "U") %}
+        {%- if field.is_repeated %}
+            {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
+        {%- else %}
+            {%- let maybe_gp = "<ScalarType>" %}
+        {%- endif %}
     {%- else %}
-    pub fn append_{{ field.ident }}(self, value: {{ field.single_field_type_u }})
-        -> {{ m.builder_ident }}<(T, {{ m.single_field_ident }}{{ field.number }})>
+        {%- if field.is_repeated %}
+            {%- let maybe_gp = "<RepeatedType>" %}
+        {%- else %}
+            {%- let maybe_gp = "" %}
+        {%- endif %}
     {%- endif %}
+
+    pub fn append_{{ field.ident }}{{ maybe_gp }}(self, value: {{ field.single_field_type }})
+        -> {{ m.builder_ident }}<(T, {{ m.single_field_ident }}{{ field.number }}{{ maybe_gp }})>
+    {%- call single_field_bound(field) %}
     {
         {{ m.builder_ident }}((self.0, {{ m.single_field_ident }}{{ field.number }} { {{ field.ident }}: value}))
     }

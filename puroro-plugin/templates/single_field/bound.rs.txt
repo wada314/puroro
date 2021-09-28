@@ -1,18 +1,28 @@
 
+{%- if f.is_length_delimited || f.is_repeated %}
+where
+{%- endif %}
+
 {%- if f.is_length_delimited %}
 
 {%- if f.is_bytes %}
-where {{ t }}: ::std::ops::Deref<Target=[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: ::std::ops::Deref<Target=[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {%- endif %}
 
 {%- if f.is_string %}
-where {{ t }}: ::std::ops::Deref<Target=str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: ::std::ops::Deref<Target=str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {%- endif %}
 
 {%- match f.trait_maybe_field_message_trait_path %}
 {%- when Some with (field_msg_path) %}
-where {{ t }}: {{ field_msg_path }} + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: {{ field_msg_path }} + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {%- else %}
 {%- endmatch %}
 
+{%- endif %}
+
+{%- if f.is_repeated %}
+for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
+    Item = &'a {{ f.single_scalar_field_type }}
+>,
 {%- endif %}

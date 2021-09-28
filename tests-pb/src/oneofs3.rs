@@ -720,27 +720,27 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MsgSingleField2<T>
+    pub struct MsgSingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub g1_string: T,
+        pub g1_string: ScalarType,
     }
 
-    impl<T> ::puroro::Message<super::Msg> for MsgSingleField2<T> where
-        T: ::std::ops::Deref<Target = str>
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField2<ScalarType> where
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
     {
     }
 
-    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField2<T>
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -777,9 +777,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField2<T>
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -798,14 +798,14 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::std::convert::From<T> for MsgSingleField2<T>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField2<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: T) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { g1_string: value }
         }
     }
@@ -874,27 +874,27 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MsgSingleField4<T>
+    pub struct MsgSingleField4<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub g2_string: T,
+        pub g2_string: ScalarType,
     }
 
-    impl<T> ::puroro::Message<super::Msg> for MsgSingleField4<T> where
-        T: ::std::ops::Deref<Target = str>
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField4<ScalarType> where
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
     {
     }
 
-    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField4<T>
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField4<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -931,9 +931,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField4<T>
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField4<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -952,41 +952,41 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::std::convert::From<T> for MsgSingleField4<T>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField4<ScalarType>
     where
-        T: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: T) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { g2_string: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MsgSingleField5<T>
+    pub struct MsgSingleField5<ScalarType>
     where
-        T: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+        ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub g2_submsg: T,
+        pub g2_submsg: ScalarType,
     }
 
-    impl<T> ::puroro::Message<super::Msg> for MsgSingleField5<T> where
-        T: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField5<ScalarType> where
+        ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
     {
     }
 
-    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField5<T>
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField5<ScalarType>
     where
-        T: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+        ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -1023,9 +1023,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField5<T>
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField5<ScalarType>
     where
-        T: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+        ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -1036,23 +1036,21 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::OneofField, ::puroro::tags::Message<T>>::ser_field::<
-                T,
-                _,
-                _,
-            >(&self.g2_submsg, 5, out)?;
+            SerFieldToIoWrite::<
+            ::puroro::tags::OneofField, ::puroro::tags::Message<ScalarType>
+        >::ser_field::<T, _, _>(&self.g2_submsg, 5, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<T> ::std::convert::From<T> for MsgSingleField5<T>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField5<ScalarType>
     where
-        T: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+        ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: T) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { g2_submsg: value }
         }
     }
@@ -1172,36 +1170,50 @@ pub mod _puroro_impls {
         pub fn append_g1_int32(self, value: i32) -> MsgBuilder<(T, MsgSingleField1)> {
             MsgBuilder((self.0, MsgSingleField1 { g1_int32: value }))
         }
-        pub fn append_g1_string<U>(self, value: U) -> MsgBuilder<(T, MsgSingleField2<U>)>
+
+        pub fn append_g1_string<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField2<ScalarType>)>
         where
-            U: ::std::ops::Deref<Target = str>
+            ScalarType: ::std::ops::Deref<Target = str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
             MsgBuilder((self.0, MsgSingleField2 { g1_string: value }))
         }
+
         pub fn append_g2_f32(self, value: f32) -> MsgBuilder<(T, MsgSingleField3)> {
             MsgBuilder((self.0, MsgSingleField3 { g2_f32: value }))
         }
-        pub fn append_g2_string<U>(self, value: U) -> MsgBuilder<(T, MsgSingleField4<U>)>
+
+        pub fn append_g2_string<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField4<ScalarType>)>
         where
-            U: ::std::ops::Deref<Target = str>
+            ScalarType: ::std::ops::Deref<Target = str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
             MsgBuilder((self.0, MsgSingleField4 { g2_string: value }))
         }
-        pub fn append_g2_submsg<U>(self, value: U) -> MsgBuilder<(T, MsgSingleField5<U>)>
+
+        pub fn append_g2_submsg<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
         where
-            U: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+            ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
             MsgBuilder((self.0, MsgSingleField5 { g2_submsg: value }))
         }
+
         pub fn append_g3_int32(self, value: i32) -> MsgBuilder<(T, MsgSingleField6)> {
             MsgBuilder((self.0, MsgSingleField6 { g3_int32: value }))
         }

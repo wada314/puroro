@@ -58,7 +58,7 @@ pub mod _puroro_impls {
 {%- include "option/trait_impl_field.rs.txt" %}
 {%- endmacro -%}
 
-{%- macro single_field_bound(f, t) -%}
+{%- macro single_field_bound(f) -%}
 {%- include "single_field/bound.rs.txt" %}
 {%- endmacro -%}
 
