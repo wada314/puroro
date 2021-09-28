@@ -186,7 +186,7 @@ pub mod _puroro_simple_impl {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofItem, ::puroro::tags::Int32
+                    ::puroro::tags::OneofField, ::puroro::tags::Int32
                 >::deser_field(field_value_mut_ref, data)
                 }
                 2 => {
@@ -199,7 +199,7 @@ pub mod _puroro_simple_impl {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofItem, ::puroro::tags::String
+                    ::puroro::tags::OneofField, ::puroro::tags::String
                 >::deser_field(field_value_mut_ref, data)
                 }
                 3 => {
@@ -212,7 +212,7 @@ pub mod _puroro_simple_impl {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofItem, ::puroro::tags::Float
+                    ::puroro::tags::OneofField, ::puroro::tags::Float
                 >::deser_field(field_value_mut_ref, data)
                 }
                 4 => {
@@ -225,7 +225,7 @@ pub mod _puroro_simple_impl {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofItem, ::puroro::tags::String
+                    ::puroro::tags::OneofField, ::puroro::tags::String
                 >::deser_field(field_value_mut_ref, data)
                 }
                 5 => {
@@ -238,7 +238,7 @@ pub mod _puroro_simple_impl {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::OneofField,
                         ::puroro::tags::Message<
                             ::std::boxed::Box<
                                 self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
@@ -256,7 +256,7 @@ pub mod _puroro_simple_impl {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofItem, ::puroro::tags::Int32
+                    ::puroro::tags::OneofField, ::puroro::tags::Int32
                 >::deser_field(field_value_mut_ref, data)
                 }
 
@@ -275,11 +275,11 @@ pub mod _puroro_simple_impl {
                 use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
                 match oneof {
                     E::G1Int32(v) => SerFieldToIoWrite::<
-                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::OneofField,
                         ::puroro::tags::Int32,
                     >::ser_field(v, 1, out)?,
                     E::G1String(v) => SerFieldToIoWrite::<
-                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::OneofField,
                         ::puroro::tags::String,
                     >::ser_field(v, 2, out)?,
                 }
@@ -288,15 +288,15 @@ pub mod _puroro_simple_impl {
                 use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
                 match oneof {
                     E::G2F32(v) => SerFieldToIoWrite::<
-                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::OneofField,
                         ::puroro::tags::Float,
                     >::ser_field(v, 3, out)?,
                     E::G2String(v) => SerFieldToIoWrite::<
-                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::OneofField,
                         ::puroro::tags::String,
                     >::ser_field(v, 4, out)?,
                     E::G2Submsg(v) => SerFieldToIoWrite::<
-                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::OneofField,
                         ::puroro::tags::Message<
                             ::std::boxed::Box<
                                 self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
@@ -309,7 +309,7 @@ pub mod _puroro_simple_impl {
                 use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
                 match oneof {
                     E::G3Int32(v) => SerFieldToIoWrite::<
-                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::OneofField,
                         ::puroro::tags::Int32,
                     >::ser_field(v, 6, out)?,
                 }
@@ -653,6 +653,469 @@ pub mod _puroro_impls {
                     E::G3Int32(v) => E::G3Int32(v),
                 })
             })
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField1 {
+        pub g1_int32: i32,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField1 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            ::std::option::Option::Some(E::G1Int32(self.g1_int32))
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            ::std::option::Option::None
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::OneofField, ::puroro::tags::Int32>::ser_field(
+                &self.g1_int32,
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<i32> for MsgSingleField1 {
+        fn from(value: i32) -> Self {
+            Self { g1_int32: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub g1_string: T,
+    }
+
+    impl<T> ::puroro::Message<super::Msg> for MsgSingleField2<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            ::std::option::Option::Some(E::G1String(::std::ops::Deref::deref(&self.g1_string)))
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            ::std::option::Option::None
+        }
+    }
+
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::OneofField, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.g1_string, 2, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<T> ::std::convert::From<T> for MsgSingleField2<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: T) -> Self {
+            Self { g1_string: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField3 {
+        pub g2_f32: f32,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField3 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField3 {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            ::std::option::Option::Some(E::G2F32(self.g2_f32))
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            ::std::option::Option::None
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField3 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::OneofField, ::puroro::tags::Float>::ser_field(
+                &self.g2_f32,
+                3,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<f32> for MsgSingleField3 {
+        fn from(value: f32) -> Self {
+            Self { g2_f32: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub g2_string: T,
+    }
+
+    impl<T> ::puroro::Message<super::Msg> for MsgSingleField4<T> where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            ::std::option::Option::Some(E::G2String(::std::ops::Deref::deref(&self.g2_string)))
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            ::std::option::Option::None
+        }
+    }
+
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::OneofField, ::puroro::tags::String>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.g2_string, 4, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<T> ::std::convert::From<T> for MsgSingleField4<T>
+    where
+        T: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: T) -> Self {
+            Self { g2_string: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField5<T>
+    where
+        T: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub g2_submsg: T,
+    }
+
+    impl<T> ::puroro::Message<super::Msg> for MsgSingleField5<T> where
+        T: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<T> super::_puroro_traits::MsgTrait for MsgSingleField5<T>
+    where
+        T: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = &'this T;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            ::std::option::Option::Some(E::G2Submsg(&self.g2_submsg))
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            ::std::option::Option::None
+        }
+    }
+
+    impl<T> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField5<T>
+    where
+        T: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        T: ::puroro::internal::SerializableMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::OneofField, ::puroro::tags::Message<T>>::ser_field::<
+                T,
+                _,
+                _,
+            >(&self.g2_submsg, 5, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<T> ::std::convert::From<T> for MsgSingleField5<T>
+    where
+        T: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: T) -> Self {
+            Self { g2_submsg: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField6 {
+        pub g3_int32: i32,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField6 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField6 {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field4StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            ::std::option::Option::Some(E::G3Int32(self.g3_int32))
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField6 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::OneofField, ::puroro::tags::Int32>::ser_field(
+                &self.g3_int32,
+                6,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<i32> for MsgSingleField6 {
+        fn from(value: i32) -> Self {
+            Self { g3_int32: value }
         }
     }
     #[derive(

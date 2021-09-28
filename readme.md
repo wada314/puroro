@@ -67,7 +67,7 @@ Keep in mind that protoc command not work properly with Windows path separator "
         - [x] Either -- `::itertools::Either<T, U>`
         - [x] Option -- `Some<T>`
         - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
-            - [ ] oneof field support
+            - [x] oneof field support
             - [x] Builder
     - [ ] Support the `allocator_api`. Waiting for the `String` support
     - [ ] RPCs / services

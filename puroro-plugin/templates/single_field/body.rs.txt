@@ -1,5 +1,4 @@
 {%- for sfield in m.fields %}
-{%- if !sfield.is_explicit_oneof_field %}
 
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -42,7 +41,24 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
             {%- endif %}
         >
     {
-        None
+        {%- if sfield.oneof_index == oneof.index %}
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        ::std::option::Option::Some(
+            E::{{ sfield.oneof_enum_value_ident }}(
+                {%- if sfield.is_length_delimited %}
+                {%- if sfield.is_message %}
+                &self.{{ sfield.ident }}
+                {%- else %}
+                ::std::ops::Deref::deref(&self.{{ sfield.ident }})
+                {%- endif %}
+                {%- else %}
+                self.{{ sfield.ident }}
+                {%- endif %}
+            )
+        )
+        {%- else %}
+        ::std::option::Option::None
+        {%- endif %}
     }
     {%- endfor %}
 }
@@ -84,5 +100,4 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     }
 }
 
-{%- endif %}
 {%- endfor %}

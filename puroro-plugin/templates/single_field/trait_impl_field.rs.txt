@@ -22,7 +22,6 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
 
 {%- if f.trait_has_optional_getter && !f.is_explicit_oneof_field %}
 fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
-    {%- if !f.is_explicit_oneof_field %}
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     self.{{ f.ident }}.as_ref()
@@ -31,7 +30,6 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
     {%- endif %}
     {%- else %}
     Clone::clone(&self.{{ f.ident }})
-    {%- endif %}
     {%- endif %}
 }
 {%- endif %}

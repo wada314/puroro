@@ -157,6 +157,7 @@ struct Field {
     ident: String,
     proto_name: String,
     number: i32,
+    oneof_index: i32,
     is_message: bool,
     is_string: bool,
     is_bytes: bool,
@@ -168,6 +169,7 @@ struct Field {
     trait_has_repeated_getter: bool,
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
+    oneof_enum_value_ident: String,
     simple_field_type: String,
     simple_scalar_field_type: String,
     simple_maybe_field_message_path: Option<String>,
@@ -197,6 +199,7 @@ impl Field {
             ident: f.rust_ident().to_string(),
             proto_name: f.proto_name().to_string(),
             number: f.number(),
+            oneof_index: f.oneof_index().unwrap_or(-1),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             is_string: matches!(f.field_type()?, wrappers::FieldType::String),
             is_bytes: matches!(f.field_type()?, wrappers::FieldType::Bytes),
@@ -213,6 +216,7 @@ impl Field {
             trait_has_repeated_getter: f.has_repeated_getter()?,
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
+            oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
             simple_field_type: f.simple_field_type()?,
             simple_scalar_field_type: f.simple_scalar_field_type()?,
             simple_maybe_field_message_path,
@@ -238,6 +242,7 @@ impl Field {
 #[derive(Template)]
 #[template(path = "oneof.rs.txt")]
 struct Oneof {
+    index: i32,
     enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
@@ -248,6 +253,7 @@ struct Oneof {
 impl Oneof {
     fn try_new(o: &wrappers::Oneof) -> Result<Self> {
         Ok(Oneof {
+            index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o

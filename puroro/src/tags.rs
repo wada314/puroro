@@ -90,7 +90,7 @@ pub type Optional = (False, (True, False), False, False, False);
 pub type Required = (False, (False, True), False, False, False);
 /// Proto3 unlabeled field.
 pub type Unlabeled = (False, False, True, False, False);
-pub type OneofItem = (False, False, False, True, False);
+pub type OneofField = (False, False, False, True, False);
 pub type MapEntry = (False, False, False, False, True);
 
 pub type LabelOptReqUnl<_1, _2> = (False, _1, _2, False, False);
@@ -179,7 +179,7 @@ impl FieldLabelTag for Unlabeled {
 impl FieldLabelTag for Required {
     const DO_DEFAULT_CHECK: bool = false;
 }
-impl FieldLabelTag for OneofItem {
+impl FieldLabelTag for OneofField {
     const DO_DEFAULT_CHECK: bool = false;
 }
 

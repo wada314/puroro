@@ -126,6 +126,7 @@ pub enum FieldLabel {
     Optional,
     Unlabeled,
     Repeated,
+    OneofField,
 }
 
 #[derive(Debug)]
@@ -588,6 +589,8 @@ impl Field {
             .get_or_try_init(|| {
                 Ok(if self.proto_is_optional3 {
                     FieldLabel::Optional
+                } else if self.is_non_synthetic_oneof_item()? {
+                    FieldLabel::OneofField
                 } else {
                     match self.proto_label {
                         FieldLabelProto::LabelOptional => {
@@ -637,7 +640,7 @@ impl Field {
         Ok(format!(
             "{label_then_space}{field_type} {name} = {number};",
             label_then_space = match self.field_label()? {
-                FieldLabel::Unlabeled => "",
+                FieldLabel::Unlabeled | FieldLabel::OneofField => "",
                 FieldLabel::Required => "required ",
                 FieldLabel::Optional => "optional ",
                 FieldLabel::Repeated => "repeated ",
@@ -759,6 +762,7 @@ impl Field {
     pub fn simple_field_type(&self) -> Result<String> {
         let scalar_type = self.simple_scalar_field_type()?;
         Ok(match self.field_label()? {
+            FieldLabel::OneofField => scalar_type,
             FieldLabel::Required | FieldLabel::Optional => {
                 format!("::std::option::Option<{}>", scalar_type)
             }
@@ -800,6 +804,7 @@ impl Field {
     pub fn single_field_type(&self, t: &str) -> Result<String> {
         let scalar_type = self.single_scalar_field_type(t)?;
         Ok(match self.field_label()? {
+            FieldLabel::OneofField => scalar_type,
             FieldLabel::Required | FieldLabel::Optional => {
                 format!("::std::option::Option<{}>", scalar_type)
             }
@@ -853,6 +858,9 @@ impl Oneof {
     }
     pub fn message(&self) -> Result<Rc<Message>> {
         upgrade(&self.message)
+    }
+    pub fn index(&self) -> i32 {
+        self.index
     }
     pub fn is_synthetic(&self) -> Result<bool> {
         self.lazy_is_synthetic
@@ -1080,6 +1088,7 @@ impl FieldLabel {
             FieldLabel::Optional => "Optional",
             FieldLabel::Unlabeled => "Unlabeled",
             FieldLabel::Repeated => "Repeated",
+            FieldLabel::OneofField => "OneofField",
         }
     }
 }
