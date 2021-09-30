@@ -68,11 +68,11 @@ want to make a separated crate containing only generated .rs code (and build.rs 
     - [ ] Required field checker
     - [ ] Other implementations
         - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
-        - [ ] SliceView -- A viewer over a `&[u8]` slice
+        - [ ] SliceView -- A viewer over a `&[u8]` slice, without allocating any extra memories
         - [x] Empty(Unit) -- `()`, which only returns default values
         - [x] Merged -- `(T, U)`
         - [x] Either -- `::itertools::Either<T, U>`
-        - [x] Option -- `Some<T>`
+        - [x] Option -- `Option<T>`
         - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
             - [x] oneof field support
             - [x] Builder
