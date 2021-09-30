@@ -11,8 +11,6 @@ fn test_builder() {
     assert_eq!(Some("Test"), msg.string_optional().as_deref());
     assert_eq!(0, msg.i64_unlabeled());
     assert!(::std::mem::size_of_val(&msg) < ::std::mem::size_of::<Msg>());
-    dbg!(::std::mem::size_of_val(&msg));
-    dbg!(::std::mem::size_of::<Msg>());
 }
 
 #[test]
