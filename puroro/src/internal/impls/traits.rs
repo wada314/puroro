@@ -54,7 +54,34 @@
 //! | `string`           | `Option<impl Deref<Target=str>>`|`impl Deref<Target=str>`|`impl IntoIterator<Item=impl Deref<Target=str>>`|
 //! | `SomeMessage`      | `Option<impl SomeMessage>`|`Option<impl SomeMessage>`|`impl IntoIterator<Item=impl SomeMessage>`|
 //!
-//! # trait blanket impls
+//! ## oneofs
+//!
+//! From a proto like this:
+//! ```protobuf
+//! syntax = "proto3";
+//! message MyMessage {
+//!     oneof my_oneofs {
+//!         int32 item1 = 1;
+//!         float item2 = 2;
+//!     }
+//! }
+//! ```
+//!
+//! This trait and enum are generated:
+//!
+//! ```rust
+//! pub trait MyMessageTrait {
+//!     fn my_oneofs(&self) -> Option<my_message::MyOneofs>;
+//! }
+//! pub mod my_message {
+//!     pub enum MyOneofs {
+//!         Item1(i32),
+//!         Item2(f32),
+//!     }
+//! }
+//! ```
+//!
+//! # trait impls
 //!
 //! The generated trait is implemented for the generated message structs and
 //! the following types:
@@ -79,4 +106,13 @@
 //! ### `Option<T>`
 //! If the value is `Some`, then behaves as same as `T`.
 //! If the value is `None`, then behaves as same as `()`.
+//!
+//! ### `puroro::Either<T, U>`
+//! Behaves as either `T` or `U`.
+//!
+//! ### `(T, U)`
+//! Behaves as a merged message of `T` and `U`.
+//! - Non-repeated, non-message field: Prioritize `U`'s value.
+//! - Non-repeated, message field: Merges `T`'s and `U`'s values.
+//! - Repeated field: Concatenates `T` and `U`'s repaeted values.
 //!

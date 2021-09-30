@@ -166,6 +166,32 @@
 //! let nested_child = my_package::_puroro_nested::my_message::MySubMessage::default();
 //! ```
 //!
+//! ## oneofs
+//!
+//! From a proto like this:
+//! ```protobuf
+//! syntax = "proto3";
+//! message MyMessage {
+//!     oneof my_oneofs {
+//!         int32 item1 = 1;
+//!         float item2 = 2;
+//!     }
+//! }
+//! ```
+//!
+//! This struct and enum are generated:
+//!
+//! ```rust
+//! pub struct MyMessage {
+//!     pub my_oneofs: Option<my_message::MyOneofs>,
+//! }
+//! pub mod my_message {
+//!     pub enum MyOneofs {
+//!         Item1(i32),
+//!         Item2(f32),
+//!     }
+//! }
+//! ```
 
 pub mod de;
 pub mod se;
