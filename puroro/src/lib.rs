@@ -208,7 +208,6 @@
 mod common_traits;
 pub mod desc;
 mod error;
-pub mod fixed_bits;
 pub mod internal;
 pub mod tags;
 pub mod types;

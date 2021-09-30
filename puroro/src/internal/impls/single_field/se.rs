@@ -1,4 +1,4 @@
-use crate::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
+use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::se::to_io_write::write_field_number_and_wire_type;
 use crate::internal::SerializableMessageToIoWrite;
 use crate::types::WireType;

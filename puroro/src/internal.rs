@@ -1,5 +1,6 @@
 pub mod bool;
 pub mod de;
+pub mod fixed_bits;
 pub mod impls;
 pub mod se;
 

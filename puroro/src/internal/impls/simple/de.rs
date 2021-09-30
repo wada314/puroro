@@ -1,7 +1,7 @@
 use super::VecOrOptionOrBare;
-use crate::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
 use crate::internal::de::DeserFieldsFromBytesIter;
+use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::types::FieldData;
 use crate::variant::VariantTypeTag;
 use crate::ErrorKind;
