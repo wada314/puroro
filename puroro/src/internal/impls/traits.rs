@@ -18,6 +18,7 @@
 //! ```rust
 //! // A readonly trait for message `MyMessage`
 //! # #![feature(generic_associated_types)]
+//! # use ::std::fmt::Debug;
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
