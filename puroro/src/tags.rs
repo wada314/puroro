@@ -1,5 +1,4 @@
 use crate::bool::{False, True};
-use ::std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
@@ -21,14 +20,6 @@ pub trait NumericalTypeTag {
 pub trait FieldLabelTag {
     const DO_DEFAULT_CHECK: bool;
 }
-
-/// A tuple of (`ProtoSyntaxTag`, `FieldLabelTag`, `FieldTypeTag`).
-/// TODO: Maybe map type should have its own tag type.
-pub trait FieldLabelAndTypeTag {}
-
-/// A tag trait for implementations of the proto message.
-/// e.g. Simple, Bumpalo, SliceView
-pub trait ImplTypeTag {}
 
 pub mod value {
     use ::std::marker::PhantomData;
@@ -182,8 +173,3 @@ impl FieldLabelTag for Required {
 impl FieldLabelTag for OneofField {
     const DO_DEFAULT_CHECK: bool = false;
 }
-
-pub struct Map<X, K, V>(PhantomData<(X, K, V)>);
-
-pub struct SimpleImpl;
-impl ImplTypeTag for SimpleImpl {}
