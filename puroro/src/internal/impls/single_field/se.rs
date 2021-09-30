@@ -39,10 +39,10 @@ impl NullWrite {
 
 pub struct SerFieldToIoWrite<L, V>(PhantomData<(L, V)>);
 
-impl<V, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::wire::Variant<V>>
+impl<V, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::Variant<V>>
 where
     tags::LabelNonRepeated<_1, _2, _3>: tags::FieldLabelTag,
-    tags::wire::Variant<V>: VariantTypeTag,
+    tags::Variant<V>: VariantTypeTag,
 {
     pub fn ser_field<'a, Unused, FieldType, W>(
         field: FieldType,
@@ -51,7 +51,7 @@ where
     ) -> Result<()>
     where
         FieldType:
-            IntoIterator<Item = &'a <tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType>,
+            IntoIterator<Item = &'a <tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
     {
         if let Some(item) = field.into_iter().next() {
@@ -59,7 +59,7 @@ where
                 || item.clone() != Default::default()
             {
                 write_field_number_and_wire_type(out, number, WireType::Variant)?;
-                let variant = Variant::from_native::<tags::wire::Variant<V>>(item.clone())?;
+                let variant = Variant::from_native::<tags::Variant<V>>(item.clone())?;
                 variant.encode_bytes(out)?;
             }
         }
@@ -67,9 +67,9 @@ where
     }
 }
 
-impl<V> SerFieldToIoWrite<tags::Repeated, tags::wire::Variant<V>>
+impl<V> SerFieldToIoWrite<tags::Repeated, tags::Variant<V>>
 where
-    tags::wire::Variant<V>: VariantTypeTag,
+    tags::Variant<V>: VariantTypeTag,
 {
     pub fn ser_field<'a, Unused, FieldType, W>(
         field: FieldType,
@@ -77,14 +77,14 @@ where
         out: &mut W,
     ) -> Result<()>
     where
-        FieldType: IntoIterator<Item = &'a <tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType>
+        FieldType: IntoIterator<Item = &'a <tags::Variant<V> as tags::NumericalTypeTag>::NativeType>
             + Clone,
         W: Write,
     {
         let len = {
             let mut null_out = NullWrite::new();
             for item in field.clone().into_iter() {
-                Variant::from_native::<tags::wire::Variant<V>>(item.clone())?
+                Variant::from_native::<tags::Variant<V>>(item.clone())?
                     .encode_bytes(&mut null_out)?;
             }
             null_out.len()
@@ -98,16 +98,16 @@ where
         write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
         Variant::from_i32(len_i32)?.encode_bytes(out)?;
         for item in field.clone().into_iter() {
-            Variant::from_native::<tags::wire::Variant<V>>(item.clone())?.encode_bytes(out)?;
+            Variant::from_native::<tags::Variant<V>>(item.clone())?.encode_bytes(out)?;
         }
         Ok(())
     }
 }
 
-impl<L, V> SerFieldToIoWrite<L, tags::wire::Bits32<V>>
+impl<L, V> SerFieldToIoWrite<L, tags::Bits32<V>>
 where
     L: tags::FieldLabelTag,
-    tags::wire::Bits32<V>: Bits32TypeTag,
+    tags::Bits32<V>: Bits32TypeTag,
 {
     pub fn ser_field<'a, Unused, FieldType, W>(
         field: FieldType,
@@ -115,14 +115,13 @@ where
         out: &mut W,
     ) -> Result<()>
     where
-        FieldType:
-            IntoIterator<Item = &'a <tags::wire::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: IntoIterator<Item = &'a <tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
     {
         for item in field.into_iter() {
             if !L::DO_DEFAULT_CHECK || item.clone() != Default::default() {
                 write_field_number_and_wire_type(out, number, WireType::Bits32)?;
-                let bytes = <tags::wire::Bits32<V> as Bits32TypeTag>::into_array(item.clone());
+                let bytes = <tags::Bits32<V> as Bits32TypeTag>::into_array(item.clone());
                 out.write(&bytes)?;
             }
         }
@@ -130,10 +129,10 @@ where
     }
 }
 
-impl<L, V> SerFieldToIoWrite<L, tags::wire::Bits64<V>>
+impl<L, V> SerFieldToIoWrite<L, tags::Bits64<V>>
 where
     L: tags::FieldLabelTag,
-    tags::wire::Bits64<V>: Bits64TypeTag,
+    tags::Bits64<V>: Bits64TypeTag,
 {
     pub fn ser_field<'a, Unused, FieldType, W>(
         field: FieldType,
@@ -141,14 +140,13 @@ where
         out: &mut W,
     ) -> Result<()>
     where
-        FieldType:
-            IntoIterator<Item = &'a <tags::wire::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: IntoIterator<Item = &'a <tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
     {
         for item in field.into_iter() {
             if !L::DO_DEFAULT_CHECK || item.clone() != Default::default() {
                 write_field_number_and_wire_type(out, number, WireType::Bits64)?;
-                let bytes = <tags::wire::Bits64<V> as Bits64TypeTag>::into_array(item.clone());
+                let bytes = <tags::Bits64<V> as Bits64TypeTag>::into_array(item.clone());
                 out.write(&bytes)?;
             }
         }
