@@ -234,8 +234,9 @@ impl Message {
         let proto_oneofs = proto.oneof_decl.clone();
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
-            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
-            rust_nested_module_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
+            rust_nested_module_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name))
+                .to_string(),
             proto_name,
             package: package.clone(),
             outer_messages: outer_messages.clone(),
@@ -397,7 +398,7 @@ impl Enum {
         let proto_value = proto.value.clone();
         Ok(Rc::new(Self {
             input_file: input_file,
-            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
             proto_name,
             package: package,
             outer_messages: outer_messages,
@@ -406,7 +407,8 @@ impl Enum {
                 .map(|v| EnumValue {
                     rust_ident: get_keyword_safe_ident(&to_camel_case(
                         &v.name.clone().unwrap_or_default(),
-                    )),
+                    ))
+                    .to_string(),
                     number: v.number.unwrap_or_default(),
                 })
                 .collect_vec(),
@@ -487,8 +489,8 @@ impl Field {
         let proto_oneof_index = proto.oneof_index;
         Ok(Self {
             message: Clone::clone(&message),
-            rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
-            rust_oneof_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)).to_string(),
+            rust_oneof_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
             proto_name,
             proto_type_name,
             proto_type_enum,
@@ -791,8 +793,8 @@ impl Oneof {
             Ok(Rc::new(Self {
                 message,
                 index: index,
-                rust_enum_ident: get_keyword_safe_ident(&to_camel_case(name)),
-                rust_getter_ident: get_keyword_safe_ident(&to_lower_snake_case(name)),
+                rust_enum_ident: get_keyword_safe_ident(&to_camel_case(name)).to_string(),
+                rust_getter_ident: get_keyword_safe_ident(&to_lower_snake_case(name)).to_string(),
                 lazy_fields: OnceCell::new(),
                 lazy_is_synthetic: OnceCell::new(),
             }))
