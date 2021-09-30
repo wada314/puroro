@@ -3,6 +3,8 @@
 A yet another protocol buffer compiler implementation for Rust language.
 This project is licensed under Apache 2.0 license.
 
+This is not an officially supported Google product.
+
 See puroro/src/lib.rs for more documents (TODO: Add link here).
 
 ## important notes
