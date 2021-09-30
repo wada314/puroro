@@ -4,6 +4,7 @@ use crate::Result;
 use ::std::convert::TryFrom;
 use ::std::io::Write;
 
+/// A common trait for protobuf message implementation in Rust.
 pub trait Message<M> {
     /// Returns a descriptor of message.
     /// Though currently the descriptor has almost no items.
@@ -16,8 +17,19 @@ pub trait Message<M> {
     }
 
     /// Deserialize the message from input bytes.
-    /// Please note that not all the message implementing this `Message` trait can be
-    /// deserialized from the input bytes (e.g. Either<T, U> cannot be deserialized).
+    /// This method does not clear the `&mut self` before deserializing.
+    /// i.e. This method "merges" the input into `&mut self`.
+    ///
+    /// Please note that this method is not implemented for some types
+    /// (e.g. Either<T, U> cannot be deserialized).
+    ///
+    /// ```ignore
+    /// use puroro::Message;
+    /// use std::io::Read;
+    /// let mut my_message = MyMessage::default();
+    /// let input = vec![0x80, 0x0a];
+    /// my_message.merge_from_bytes(input.bytes()).unwrap();
+    /// ```
     fn merge_from_bytes<I>(&mut self, iter: I) -> Result<()>
     where
         Self: DeserializableMessageFromBytesIterator,
@@ -96,5 +108,8 @@ pub trait Enum2:
 }
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
+/// A trait for repaeted field value returned from message traits getter methods.
+///
+/// Currently this trait is just an analogous of [`std::iter::IntoIterator`].
 pub trait RepeatedField<'msg>: IntoIterator {}
 impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
