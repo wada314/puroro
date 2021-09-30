@@ -1,5 +1,5 @@
+use crate::internal::variant::Variant;
 use crate::types::WireType;
-use crate::variant::Variant;
 use crate::ErrorKind;
 use crate::Result;
 use ::std::convert::TryInto;

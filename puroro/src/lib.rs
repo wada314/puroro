@@ -211,7 +211,6 @@ mod error;
 pub mod internal;
 pub mod tags;
 pub mod types;
-pub mod variant;
 
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};
