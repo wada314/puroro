@@ -87,6 +87,7 @@
 //! ```
 //!
 //! # Generated traits
+//! ([Detailed reference](internal::impls::traits))
 //!
 //! puroro generates not only the `struct MyMessage { ... }` but few other structs and traits.
 //! The most important one is `trait MyMessageTrait`.
@@ -101,7 +102,7 @@
 //! ```
 //!
 //! Trait like this is generated
-//! (Omitting some bounds for explanation. Please check the TBD page for detail):
+//! (Omitting some bounds for explanation. Please check the [traits](internal::impls::traits) page for detail):
 //!
 //! ```rust
 //! // A readonly trait for message `MyMessage`
@@ -142,6 +143,7 @@
 //! The advanced usage of this trait composition is explained in the following section:
 //!
 //! # Builder and SingleField structs
+//! ([Detailed reference](internal::impls::builder))
 //!
 //! puroro also generates a set of structs which is postfixed by "SingleField***N***"
 //! (***N*** is the number of the field), which stores only a certain field.
