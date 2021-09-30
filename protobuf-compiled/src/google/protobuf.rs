@@ -99,7 +99,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -438,7 +438,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -831,7 +831,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1004,7 +1004,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1272,7 +1272,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1462,7 +1462,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1645,7 +1645,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1801,7 +1801,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -1959,7 +1959,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2151,7 +2151,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2639,7 +2639,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -2955,7 +2955,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3183,7 +3183,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3329,7 +3329,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3462,7 +3462,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3594,7 +3594,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3718,7 +3718,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -3862,7 +3862,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4065,7 +4065,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4202,7 +4202,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -4290,7 +4290,7 @@ pub mod _puroro_simple_impl {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -23580,7 +23580,7 @@ pub mod _puroro_nested {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
-                    data: ::puroro::types::FieldData<
+                    data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
                     >,
                 ) -> ::puroro::Result<()>
@@ -23699,7 +23699,7 @@ pub mod _puroro_nested {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
-                    data: ::puroro::types::FieldData<
+                    data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
                     >,
                 ) -> ::puroro::Result<()>
@@ -24517,7 +24517,7 @@ pub mod _puroro_nested {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
-                    data: ::puroro::types::FieldData<
+                    data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
                     >,
                 ) -> ::puroro::Result<()>
@@ -25061,7 +25061,7 @@ pub mod _puroro_nested {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
-                    data: ::puroro::types::FieldData<
+                    data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
                     >,
                 ) -> ::puroro::Result<()>
@@ -25569,7 +25569,7 @@ pub mod _puroro_nested {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
-                    data: ::puroro::types::FieldData<
+                    data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
                     >,
                 ) -> ::puroro::Result<()>
@@ -26747,7 +26747,7 @@ pub mod _puroro_nested {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
-                    data: ::puroro::types::FieldData<
+                    data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
                     >,
                 ) -> ::puroro::Result<()>

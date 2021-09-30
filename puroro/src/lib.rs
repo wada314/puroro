@@ -42,7 +42,7 @@
 //! #     fn deser_field<I>(
 //! #         &mut self,
 //! #         field_number: i32,
-//! #         data: types::FieldData<&mut internal::de::from_iter::ScopedIter<I>>,
+//! #         data: internal::types::FieldData<&mut internal::de::from_iter::ScopedIter<I>>,
 //! #     ) -> Result<()>
 //! #     where
 //! #         I: Iterator<Item = ::std::io::Result<u8>>,
@@ -210,7 +210,6 @@ pub mod desc;
 mod error;
 pub mod internal;
 pub mod tags;
-pub mod types;
 
 pub use self::common_traits::*;
 pub use self::error::{ErrorKind, PuroroError};

@@ -3,6 +3,7 @@ pub mod de;
 pub mod fixed_bits;
 pub mod impls;
 pub mod se;
+pub mod types;
 pub mod variant;
 
 use crate::desc::{FieldDescriptor, MessageDescriptor};

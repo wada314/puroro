@@ -1,4 +1,4 @@
-use crate::types::FieldData;
+use crate::internal::types::FieldData;
 use crate::Result;
 use from_iter::ScopedIter;
 

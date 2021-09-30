@@ -1,6 +1,6 @@
 use super::DeserFieldsFromBytesIter;
+use crate::internal::types::{FieldData, WireType};
 use crate::internal::variant::Variant;
-use crate::types::{FieldData, WireType};
 use crate::{ErrorKind, Result};
 use ::std::convert::TryFrom;
 use ::std::io::Result as IoResult;
