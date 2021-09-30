@@ -15806,6 +15806,7 @@ pub mod _puroro_nested {
             )]
             pub struct Submsg {
                 pub i32_unlabeled: i32,
+                pub i64_unlabeled: i64,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
@@ -15813,24 +15814,38 @@ pub mod _puroro_nested {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     Clone::clone(&self.i32_unlabeled)
                 }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    Clone::clone(&self.i64_unlabeled)
+                }
             }
 
             impl ::puroro::MessageRepresentativeImpl for Submsg {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
-                    static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                    static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
                         Lazy::new(|| {
-                            [{
-                                let init = ::puroro::internal::FieldDescriptorInitializer {
-                                    name: "i32_unlabeled",
-                                    number: 1,
-                                    lazy_containing_type: Lazy::new(|| {
-                                        <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                        )
-                                    }),
-                                };
-                                ::puroro::internal::init_field_descriptor(init)
-                            }]
+                            [
+                                {
+                                    let init = ::puroro::internal::FieldDescriptorInitializer {
+                                        name: "i32_unlabeled",
+                                        number: 1,
+                                        lazy_containing_type: Lazy::new(|| {
+                                            <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                        }),
+                                    };
+                                    ::puroro::internal::init_field_descriptor(init)
+                                },
+                                {
+                                    let init = ::puroro::internal::FieldDescriptorInitializer {
+                                        name: "i64_unlabeled",
+                                        number: 101,
+                                        lazy_containing_type: Lazy::new(|| {
+                                            <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                        }),
+                                    };
+                                    ::puroro::internal::init_field_descriptor(init)
+                                },
+                            ]
                         });
                     static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> =
                         Lazy::new(|| {
@@ -15872,6 +15887,10 @@ pub mod _puroro_nested {
                             ::puroro::tags::Unlabeled,
                             ::puroro::tags::Int32,
                         >::deser_field(&mut self.i32_unlabeled, data),
+                        101 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Unlabeled,
+                            ::puroro::tags::Int64,
+                        >::deser_field(&mut self.i64_unlabeled, data),
 
                         _ => unimplemented!("TODO: This case should be handled properly..."),
                     }
@@ -15887,6 +15906,9 @@ pub mod _puroro_nested {
                     SerFieldToIoWrite::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
                 >::ser_field(&self.i32_unlabeled, 1, out)?;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int64
+                >::ser_field(&self.i64_unlabeled, 101, out)?;
 
                     ::std::result::Result::Ok(())
                 }
@@ -15903,6 +15925,9 @@ pub mod _puroro_nested {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     Default::default()
                 }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    Default::default()
+                }
             }
             impl<T, U> SubmsgTrait for (T, U)
             where
@@ -15917,6 +15942,14 @@ pub mod _puroro_nested {
                         <T as SubmsgTrait>::i32_unlabeled(&self.0)
                     }
                 }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    let right = <U as SubmsgTrait>::i64_unlabeled(&self.1);
+                    if right != ::std::default::Default::default() {
+                        right
+                    } else {
+                        <T as SubmsgTrait>::i64_unlabeled(&self.0)
+                    }
+                }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
             where
@@ -15929,6 +15962,12 @@ pub mod _puroro_nested {
                         |u| <U as SubmsgTrait>::i32_unlabeled(u),
                     )
                 }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    self.as_ref().either(
+                        |t| <T as SubmsgTrait>::i64_unlabeled(t),
+                        |u| <U as SubmsgTrait>::i64_unlabeled(u),
+                    )
+                }
             }
             impl<T> SubmsgTrait for ::std::option::Option<T>
             where
@@ -15937,6 +15976,10 @@ pub mod _puroro_nested {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     self.as_ref()
                         .map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+                }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    self.as_ref()
+                        .map_or_else(::std::default::Default::default, |msg| msg.i64_unlabeled())
                 }
             }
 
@@ -15951,6 +15994,9 @@ pub mod _puroro_nested {
             impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     Clone::clone(&self.i32_unlabeled)
+                }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    Default::default()
                 }
             }
 
@@ -15980,6 +16026,50 @@ pub mod _puroro_nested {
                     }
                 }
             }
+
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+            pub struct SubmsgSingleField101 {
+                pub i64_unlabeled: i64,
+            }
+
+            impl ::puroro::Message<super::Submsg> for SubmsgSingleField101 {}
+
+            impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField101 {
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    Default::default()
+                }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    Clone::clone(&self.i64_unlabeled)
+                }
+            }
+
+            impl ::puroro::internal::SerializableMessageToIoWrite for SubmsgSingleField101 {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int64
+                >::ser_field::
+                <(), _, _>
+                (
+                    ::std::iter::once(&self.i64_unlabeled),
+                    101,
+                    out
+                )?;
+                    ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::convert::From<i64> for SubmsgSingleField101 {
+                fn from(value: i64) -> Self {
+                    Self {
+                        i64_unlabeled: value,
+                    }
+                }
+            }
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
@@ -15991,6 +16081,9 @@ pub mod _puroro_nested {
 
             impl SubmsgTrait for SubmsgSimpleByValue {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    unimplemented!("Please don't use / instantiate this struct!!")
+                }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
             }
@@ -16008,6 +16101,18 @@ pub mod _puroro_nested {
                         self.0,
                         SubmsgSingleField1 {
                             i32_unlabeled: value,
+                        },
+                    ))
+                }
+
+                pub fn append_i64_unlabeled(
+                    self,
+                    value: i64,
+                ) -> SubmsgBuilder<(T, SubmsgSingleField101)> {
+                    SubmsgBuilder((
+                        self.0,
+                        SubmsgSingleField101 {
+                            i64_unlabeled: value,
                         },
                     ))
                 }
@@ -16031,12 +16136,16 @@ pub mod _puroro_nested {
 
             pub trait SubmsgTrait {
                 fn i32_unlabeled<'this>(&'this self) -> i32;
+                fn i64_unlabeled<'this>(&'this self) -> i64;
             }
 
             macro_rules! submsg_delegate {
                 ($ty:ty) => {
                     fn i32_unlabeled<'this>(&'this self) -> i32 {
                         (**self).i32_unlabeled()
+                    }
+                    fn i64_unlabeled<'this>(&'this self) -> i64 {
+                        (**self).i64_unlabeled()
                     }
                 };
             }

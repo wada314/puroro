@@ -13656,6 +13656,7 @@ pub mod _puroro_nested {
             )]
             pub struct Submsg {
                 pub i32_required: ::std::option::Option<i32>,
+                pub i64_required: ::std::option::Option<i64>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
@@ -13663,24 +13664,38 @@ pub mod _puroro_nested {
                 fn i32_required<'this>(&'this self) -> Option<i32> {
                     Clone::clone(&self.i32_required)
                 }
+                fn i64_required<'this>(&'this self) -> Option<i64> {
+                    Clone::clone(&self.i64_required)
+                }
             }
 
             impl ::puroro::MessageRepresentativeImpl for Submsg {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
-                    static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                    static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 2]> =
                         Lazy::new(|| {
-                            [{
-                                let init = ::puroro::internal::FieldDescriptorInitializer {
-                                    name: "i32_required",
-                                    number: 1,
-                                    lazy_containing_type: Lazy::new(|| {
-                                        <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                        )
-                                    }),
-                                };
-                                ::puroro::internal::init_field_descriptor(init)
-                            }]
+                            [
+                                {
+                                    let init = ::puroro::internal::FieldDescriptorInitializer {
+                                        name: "i32_required",
+                                        number: 1,
+                                        lazy_containing_type: Lazy::new(|| {
+                                            <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                        }),
+                                    };
+                                    ::puroro::internal::init_field_descriptor(init)
+                                },
+                                {
+                                    let init = ::puroro::internal::FieldDescriptorInitializer {
+                                        name: "i64_required",
+                                        number: 101,
+                                        lazy_containing_type: Lazy::new(|| {
+                                            <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                        }),
+                                    };
+                                    ::puroro::internal::init_field_descriptor(init)
+                                },
+                            ]
                         });
                     static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> =
                         Lazy::new(|| {
@@ -13722,6 +13737,10 @@ pub mod _puroro_nested {
                             ::puroro::tags::Required,
                             ::puroro::tags::Int32,
                         >::deser_field(&mut self.i32_required, data),
+                        101 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Required,
+                            ::puroro::tags::Int64,
+                        >::deser_field(&mut self.i64_required, data),
 
                         _ => unimplemented!("TODO: This case should be handled properly..."),
                     }
@@ -13737,6 +13756,9 @@ pub mod _puroro_nested {
                     SerFieldToIoWrite::<
                     ::puroro::tags::Required, ::puroro::tags::Int32
                 >::ser_field(&self.i32_required, 1, out)?;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Required, ::puroro::tags::Int64
+                >::ser_field(&self.i64_required, 101, out)?;
 
                     ::std::result::Result::Ok(())
                 }
@@ -13759,6 +13781,10 @@ pub mod _puroro_nested {
                     <U as SubmsgTrait>::i32_required(&self.1)
                         .or_else(|| <T as SubmsgTrait>::i32_required(&self.0))
                 }
+                fn i64_required<'this>(&'this self) -> Option<i64> {
+                    <U as SubmsgTrait>::i64_required(&self.1)
+                        .or_else(|| <T as SubmsgTrait>::i64_required(&self.0))
+                }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
             where
@@ -13771,6 +13797,12 @@ pub mod _puroro_nested {
                         |u| <U as SubmsgTrait>::i32_required(u),
                     )
                 }
+                fn i64_required<'this>(&'this self) -> Option<i64> {
+                    self.as_ref().either(
+                        |t| <T as SubmsgTrait>::i64_required(t),
+                        |u| <U as SubmsgTrait>::i64_required(u),
+                    )
+                }
             }
             impl<T> SubmsgTrait for ::std::option::Option<T>
             where
@@ -13778,6 +13810,9 @@ pub mod _puroro_nested {
             {
                 fn i32_required<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().and_then(|msg| msg.i32_required())
+                }
+                fn i64_required<'this>(&'this self) -> ::std::option::Option<i64> {
+                    self.as_ref().and_then(|msg| msg.i64_required())
                 }
             }
 
@@ -13821,6 +13856,47 @@ pub mod _puroro_nested {
                     }
                 }
             }
+
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+            pub struct SubmsgSingleField101 {
+                pub i64_required: ::std::option::Option<i64>,
+            }
+
+            impl ::puroro::Message<super::Submsg> for SubmsgSingleField101 {}
+
+            impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField101 {
+                fn i64_required<'this>(&'this self) -> Option<i64> {
+                    Clone::clone(&self.i64_required)
+                }
+            }
+
+            impl ::puroro::internal::SerializableMessageToIoWrite for SubmsgSingleField101 {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Required, ::puroro::tags::Int64
+                >::ser_field::
+                <(), _, _>
+                (
+                    &self.i64_required,
+                    101,
+                    out
+                )?;
+                    ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::convert::From<::std::option::Option<i64>> for SubmsgSingleField101 {
+                fn from(value: ::std::option::Option<i64>) -> Self {
+                    Self {
+                        i64_required: value,
+                    }
+                }
+            }
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
@@ -13832,6 +13908,9 @@ pub mod _puroro_nested {
 
             impl SubmsgTrait for SubmsgSimpleByValue {
                 fn i32_required<'this>(&'this self) -> Option<i32> {
+                    unimplemented!("Please don't use / instantiate this struct!!")
+                }
+                fn i64_required<'this>(&'this self) -> Option<i64> {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
             }
@@ -13849,6 +13928,18 @@ pub mod _puroro_nested {
                         self.0,
                         SubmsgSingleField1 {
                             i32_required: value,
+                        },
+                    ))
+                }
+
+                pub fn append_i64_required(
+                    self,
+                    value: ::std::option::Option<i64>,
+                ) -> SubmsgBuilder<(T, SubmsgSingleField101)> {
+                    SubmsgBuilder((
+                        self.0,
+                        SubmsgSingleField101 {
+                            i64_required: value,
                         },
                     ))
                 }
@@ -13874,12 +13965,18 @@ pub mod _puroro_nested {
                 fn i32_required<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::default::Default::default()
                 }
+                fn i64_required<'this>(&'this self) -> ::std::option::Option<i64> {
+                    ::std::default::Default::default()
+                }
             }
 
             macro_rules! submsg_delegate {
                 ($ty:ty) => {
                     fn i32_required<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).i32_required()
+                    }
+                    fn i64_required<'this>(&'this self) -> ::std::option::Option<i64> {
+                        (**self).i64_required()
                     }
                 };
             }
