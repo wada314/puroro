@@ -433,10 +433,12 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
-                &self.a, 1, out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field::<
+                (),
+                _,
+                _,
+            >(::std::iter::once(&self.a), 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -593,7 +595,7 @@ pub mod _puroro_impls {
                 ScalarType,
                 _,
                 _,
-            >(&self.b, 2, out)?;
+            >(::std::iter::once(&self.b), 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -760,7 +762,13 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Unlabeled, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<ScalarType, _, _>(&self.c, 3, out)?;
+        >::ser_field::
+        <ScalarType, _, _>
+        (
+            &self.c,
+            3,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -926,10 +934,12 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.d, 4, out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.d, 4, out)?;
             ::std::result::Result::Ok(())
         }
     }

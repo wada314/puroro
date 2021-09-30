@@ -82,17 +82,24 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     where
         W: ::std::io::Write
     {
-        {%- if sfield.is_length_delimited %}
         use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
         SerFieldToIoWrite::<
             {{ sfield.single_field_label_and_type_tags }}
-        >::ser_field::<ScalarType, _, _>(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+        >::ser_field::
+        {%- if sfield.is_length_delimited %}
+        <ScalarType, _, _>
         {%- else %}
-        use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-        SerFieldToIoWrite::<
-            {{ sfield.single_field_label_and_type_tags }}
-        >::ser_field(&self.{{ sfield.ident }}, {{ sfield.number }}, out)?;
+        <(), _, _>
         {%- endif %}
+        (
+            {%- if sfield.single_field_type == sfield.single_scalar_field_type %}
+            ::std::iter::once(&self.{{ sfield.ident }}),
+            {%- else %}
+            &self.{{ sfield.ident }},
+            {%- endif %}
+            {{ sfield.number }},
+            out
+        )?;
         ::std::result::Result::Ok(())
     }
 }

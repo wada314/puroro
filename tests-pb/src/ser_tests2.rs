@@ -889,12 +889,12 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_optional,
-                1,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.i32_optional, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -990,12 +990,12 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.i32_repeated,
-                2,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.i32_repeated, 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1083,12 +1083,12 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
-                &self.float_optional,
-                3,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.float_optional, 3, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1186,12 +1186,12 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
-                &self.float_repeated,
-                4,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.float_repeated, 4, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1564,7 +1564,13 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<ScalarType, _, _>(&self.submsg_optional, 7, out)?;
+        >::ser_field::
+        <ScalarType, _, _>
+        (
+            &self.submsg_optional,
+            7,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1695,7 +1701,13 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<ScalarType, _, _>(&self.submsg_repeated, 8, out)?;
+        >::ser_field::
+        <ScalarType, _, _>
+        (
+            &self.submsg_repeated,
+            8,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1789,11 +1801,11 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(&self.enum_optional, 9, out)?;
+            >::ser_field::<(), _, _>(&self.enum_optional, 9, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1893,11 +1905,11 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(&self.enum_repeated, 10, out)?;
+            >::ser_field::<(), _, _>(&self.enum_repeated, 10, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1986,12 +1998,12 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.very_large_field_number,
-                536870911,
-                out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.very_large_field_number, 536870911, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -2624,10 +2636,16 @@ pub mod _puroro_nested {
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.i32_optional, 1, out)?;
+                >::ser_field::
+                <(), _, _>
+                (
+                    &self.i32_optional,
+                    1,
+                    out
+                )?;
                     ::std::result::Result::Ok(())
                 }
             }
