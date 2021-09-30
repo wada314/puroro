@@ -1,4 +1,4 @@
-use crate::bool::{False, True};
+use crate::internal::bool::{False, True};
 use ::std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
