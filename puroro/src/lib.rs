@@ -183,8 +183,8 @@
 //! assert_eq!(10, my_message.my_number());
 //! ```
 //!
-#![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
 #![allow(incomplete_features)]
+#![feature(backtrace)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
 

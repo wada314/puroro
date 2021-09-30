@@ -12,7 +12,4 @@ puroro = { path = "../puroro" }
 puroro-plugin = { path = "../puroro-plugin" }
 
 [features]
-puroro-nightly = []
-default = [
-    "puroro-nightly", 
-]
+default = []

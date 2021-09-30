@@ -12,7 +12,4 @@ tests-pb = { path = "../tests-pb" }
 itertools = "0.10.1"
 
 [features]
-puroro-nightly = []
-default = [
-    "puroro-nightly", 
-]
+default = []

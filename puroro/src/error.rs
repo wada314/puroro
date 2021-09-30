@@ -3,7 +3,6 @@
 pub struct PuroroError {
     #[from]
     pub kind: ErrorKind,
-    #[cfg(feature = "puroro-nightly")]
     pub backtrace: std::backtrace::Backtrace,
 }
 

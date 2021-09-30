@@ -16,5 +16,4 @@ thiserror = "1.0.25"
 once_cell = "1.8.0"
 
 [features]
-puroro-nightly = []
-default = ["puroro-nightly"]
+default = []
