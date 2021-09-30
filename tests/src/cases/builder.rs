@@ -48,3 +48,24 @@ fn test_oneof_field_builder() {
     assert_eq!(Some(10), msg3.g1_int32());
     assert_eq!(None, msg3.g1_string());
 }
+
+#[test]
+fn test_ld_field_builder() {
+    use ::std::ops::Deref;
+    use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait};
+    let msg1 = MsgBuilder::new()
+        .append_string_unlabeled("str")
+        .append_string_optional(Some("String".to_string()))
+        .build();
+    assert_eq!("str", msg1.string_unlabeled().deref());
+    assert!(msg1.string_optional().is_some());
+    assert_eq!("String", msg1.string_optional().unwrap().deref());
+
+    let msg2 = MsgBuilder::new()
+        .append_bytes_unlabeled(b"slice" as &[u8])
+        .append_bytes_optional(Some(Vec::from(b"Vec" as &[u8])))
+        .build();
+    assert_eq!(b"slice", msg2.bytes_unlabeled().deref());
+    assert!(msg2.bytes_optional().is_some());
+    assert_eq!(b"Vec", msg2.bytes_optional().unwrap().deref());
+}
