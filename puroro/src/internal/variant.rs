@@ -4,6 +4,7 @@ use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;
 
+/// A representative type of variant-encoded types.
 #[derive(Debug, Default, Clone)]
 pub struct Variant([u8; 8]);
 

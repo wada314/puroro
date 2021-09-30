@@ -1,4 +1,4 @@
-use crate::variant::Variant;
+use crate::internal::variant::Variant;
 use crate::{ErrorKind, PuroroError};
 use ::std::convert::TryFrom;
 

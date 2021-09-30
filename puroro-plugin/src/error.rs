@@ -3,7 +3,6 @@
 pub struct GeneratorError {
     #[from]
     kind: ErrorKind,
-    #[cfg(feature = "puroro-nightly")]
     backtrace: std::backtrace::Backtrace,
 }
 
@@ -32,7 +31,6 @@ impl From<std::fmt::Error> for GeneratorError {
     fn from(e: std::fmt::Error) -> Self {
         Self {
             kind: ErrorKind::WriteError { source: e },
-            #[cfg(feature = "puroro-nightly")]
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }
@@ -41,7 +39,6 @@ impl From<::puroro::PuroroError> for GeneratorError {
     fn from(e: ::puroro::PuroroError) -> Self {
         Self {
             kind: ErrorKind::PuroroError { source: e },
-            #[cfg(feature = "puroro-nightly")]
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }

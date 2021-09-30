@@ -78,8 +78,14 @@ fn test_get_i32_repeated_field() {
 
 #[test]
 fn test_get_msg_optional_field() {
-    let submsg_3 = Submsg { i32_unlabeled: 3 };
-    let submsg_7 = Submsg { i32_unlabeled: 7 };
+    let submsg_3 = Submsg {
+        i32_unlabeled: 3,
+        ..Default::default()
+    };
+    let submsg_7 = Submsg {
+        i32_unlabeled: 7,
+        ..Default::default()
+    };
     let none = Msg {
         submsg_optional: None,
         ..Default::default()
@@ -101,8 +107,14 @@ fn test_get_msg_optional_field() {
 
 #[test]
 fn test_get_msg_repeated_field() {
-    let submsg_3 = Submsg { i32_unlabeled: 3 };
-    let submsg_7 = Submsg { i32_unlabeled: 7 };
+    let submsg_3 = Submsg {
+        i32_unlabeled: 3,
+        ..Default::default()
+    };
+    let submsg_7 = Submsg {
+        i32_unlabeled: 7,
+        ..Default::default()
+    };
     let empty = Msg {
         submsg_repeated: vec![],
         ..Default::default()
@@ -159,11 +171,11 @@ fn test_get_oneof_field() {
         ..Default::default()
     };
     let msg_test = Msg {
-        group_two: Some(GroupTwo::G2String(Cow::Borrowed("Test"))),
+        group_two: Some(GroupTwo::G2String("Test".to_string())),
         ..Default::default()
     };
     let msg_test2 = Msg {
-        group_two: Some(GroupTwo::G2String(Cow::Borrowed("Test2"))),
+        group_two: Some(GroupTwo::G2String("Test2".to_string())),
         ..Default::default()
     };
     let msg_submsg_0 = Msg {

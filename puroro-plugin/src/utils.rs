@@ -4,6 +4,7 @@ use ::lazy_static::lazy_static;
 use ::std::collections::HashSet;
 use ::std::iter;
 use ::std::rc::{Rc, Weak};
+use std::borrow::Cow;
 
 enum WordCase {
     CamelCase,
@@ -59,12 +60,12 @@ lazy_static! {
     .collect::<HashSet<&'static str>>();
 }
 
-pub fn get_keyword_safe_ident(input: &str) -> String {
-    let mut s = input.to_string();
-    while KEYWORDS.contains(s.as_str()) {
-        s.push('_');
+pub fn get_keyword_safe_ident(input: &str) -> Cow<'_, str> {
+    if KEYWORDS.contains(input) {
+        Cow::Owned(format!("r#{}", input))
+    } else {
+        Cow::Borrowed(input)
     }
-    s
 }
 
 pub fn make_module_path<'a, I, J>(package: I, outer_messages: J) -> String
@@ -75,13 +76,13 @@ where
     let package = package.map(|s| get_keyword_safe_ident(s));
 
     let outer_messages = outer_messages.map(|s| {
-        format!(
+        Cow::Owned(format!(
             "_puroro_nested::{}",
             get_keyword_safe_ident(&to_lower_snake_case(s))
-        )
+        ))
     });
-    let mut modules_iter = iter::once("self".to_string())
-        .chain(iter::once("_puroro_root".to_string()))
+    let mut modules_iter = iter::once("self".into())
+        .chain(iter::once("_puroro_root".into()))
         .chain(package)
         .chain(outer_messages);
     modules_iter.join("::")

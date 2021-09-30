@@ -1,0 +1,118 @@
+{%- for sfield in m.fields %}
+
+#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+{%- let maybe_gp %}
+{%- if sfield.is_length_delimited %}
+    {%- if sfield.is_repeated %}
+        {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
+    {%- else %}
+        {%- let maybe_gp = "<ScalarType>" %}
+    {%- endif %}
+{%- else %}
+    {%- if sfield.is_repeated %}
+        {%- let maybe_gp = "<RepeatedType>" %}
+    {%- else %}
+        {%- let maybe_gp = "" %}
+    {%- endif %}
+{%- endif %}
+
+pub struct {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield) %}
+{
+    pub {{ sfield.ident }}: {{ sfield.single_field_type }},
+}
+
+impl{{ maybe_gp }} ::puroro::Message<super::{{ m.simple_ident }}>
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield) %}
+{}
+
+impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield) %}
+{
+    {%- for field in m.fields %}
+    {%- if field.number == sfield.number %}
+    {%- call single_field_trait_impl_field(field) %}
+    {%- else %}
+    {%- call empty_trait_impl_field(field) %}
+    {%- endif %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        ::std::option::Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_reference_field %}
+            <'this, Self>
+            {%- endif %}
+        >
+    {
+        {%- if sfield.oneof_index == oneof.index %}
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        ::std::option::Option::Some(
+            E::{{ sfield.oneof_enum_value_ident }}(
+                {%- if sfield.is_length_delimited %}
+                {%- if sfield.is_message %}
+                &self.{{ sfield.ident }}
+                {%- else %}
+                ::std::ops::Deref::deref(&self.{{ sfield.ident }})
+                {%- endif %}
+                {%- else %}
+                self.{{ sfield.ident }}
+                {%- endif %}
+            )
+        )
+        {%- else %}
+        ::std::option::Option::None
+        {%- endif %}
+    }
+    {%- endfor %}
+}
+
+impl{{ maybe_gp }} ::puroro::internal::SerializableMessageToIoWrite
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield) %}
+{%- if sfield.is_message %}
+    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+{%- endif %}
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write
+    {
+        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+        SerFieldToIoWrite::<
+            {{ sfield.single_field_label_and_type_tags }}
+        >::ser_field::
+        {%- if sfield.is_length_delimited %}
+        <ScalarType, _, _>
+        {%- else %}
+        <(), _, _>
+        {%- endif %}
+        (
+            {%- if sfield.single_field_type == sfield.single_scalar_field_type %}
+            ::std::iter::once(&self.{{ sfield.ident }}),
+            {%- else %}
+            &self.{{ sfield.ident }},
+            {%- endif %}
+            {{ sfield.number }},
+            out
+        )?;
+        ::std::result::Result::Ok(())
+    }
+}
+
+impl{{ maybe_gp }} ::std::convert::From<{{ sfield.single_field_type }}>
+for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
+{%- call single_field_bound(sfield) %}
+{
+    fn from(value: {{ sfield.single_field_type }}) -> Self {
+        Self {
+            {{ sfield.ident }}: value,
+        }
+    }
+}
+
+{%- endfor %}

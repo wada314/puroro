@@ -20,6 +20,7 @@ message Msg {
 
     message Submsg {
         required int32 i32_required = 1;
+        required int64 i64_required = 101;
     }
     required Submsg submsg_required = 51;
     optional Submsg submsg_optional = 52;

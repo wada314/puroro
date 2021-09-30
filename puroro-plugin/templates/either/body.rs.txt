@@ -1,4 +1,4 @@
-impl<T, U> {{ m.trait_ident }} for ::puroro::Either<T, U> 
+impl<T, U> {{ m.trait_ident }} for ::puroro::Either<T, U>
 where
     T: {{ m.trait_ident }},
     U: {{ m.trait_ident }},
@@ -18,7 +18,7 @@ where
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
         match self.as_ref().either(
-            |t| t.{{ oneof.field_ident }}().map(|t| ::puroro::Either::Left(t)), 
+            |t| t.{{ oneof.field_ident }}().map(|t| ::puroro::Either::Left(t)),
             |u| u.{{ oneof.field_ident }}().map(|u| ::puroro::Either::Right(u)),
         ) {
             {%- for field in oneof.fields %}

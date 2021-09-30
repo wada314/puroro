@@ -6,7 +6,7 @@ where
     {%- for field in m.fields %}
     {%- call merged_trait_impl_field(field) %}
     {%- endfor %}
-    
+
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         Option<

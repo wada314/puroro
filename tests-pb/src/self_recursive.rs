@@ -5,32 +5,32 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::MsgSimple as Msg;
-pub use _puroro_impls::*;
-pub mod _puroro_impls {
+pub use _puroro_simple_impl::Msg;
+pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
-    pub struct MsgSimple {
+    pub struct Msg {
         pub recursive_unlabeled: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
+            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
         >,
     }
-    impl ::puroro::Message<MsgSimple> for MsgSimple {}
+    impl ::puroro::Message<Msg> for Msg {}
 
-    impl MsgTrait for MsgSimple {
-        type Field1MessageType<'this> =
-            &'this self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
+    impl super::_puroro_traits::MsgTrait for Msg {
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
         fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for MsgSimple {
+    impl ::puroro::MessageRepresentativeImpl for Msg {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
             static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
@@ -40,7 +40,7 @@ pub mod _puroro_impls {
                             name: "recursive_unlabeled",
                             number: 1,
                             lazy_containing_type: Lazy::new(|| {
-                                <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
                         };
                         ::puroro::internal::init_field_descriptor(init)
@@ -57,7 +57,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for MsgSimple {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Msg {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -66,11 +66,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Msg {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -80,7 +82,9 @@ pub mod _puroro_impls {
                 1 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        self::_puroro_root::self_recursive::_puroro_impls::MsgSimple,
+                        ::std::boxed::Box<
+                            self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+                        >,
                     >,
                 >::deser_field(&mut self.recursive_unlabeled, data),
 
@@ -89,7 +93,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MsgSimple {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Msg {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -98,22 +102,36 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    self::_puroro_root::self_recursive::_puroro_impls::MsgSimple,
+                    ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
                 >,
             >::ser_field(&self.recursive_unlabeled, 1, out)?;
 
             ::std::result::Result::Ok(())
         }
     }
+}
+
+pub use _puroro_impls::*;
+pub mod _puroro_impls {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    use super::_puroro_traits::*;
     impl MsgTrait for () {
-        type Field1MessageType<'this> = ();
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
     impl<T, U> MsgTrait for (T, U)
     where
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field1MessageType<'this> = (
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = (
             ::std::option::Option<<T as MsgTrait>::Field1MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field1MessageType<'this>>,
         );
@@ -134,7 +152,10 @@ pub mod _puroro_impls {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field1MessageType<'this> = ::puroro::Either<
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::Field1MessageType<'this>,
             <U as MsgTrait>::Field1MessageType<'this>,
         >;
@@ -149,7 +170,10 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        type Field1MessageType<'this> = T::Field1MessageType<'this>;
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field1MessageType<'this>;
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
@@ -158,50 +182,76 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgSimpleField1 {
-        pub recursive_unlabeled: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
-        >,
+
+    pub struct MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub recursive_unlabeled: ::std::option::Option<ScalarType>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
-        type Field1MessageType<'this> =
-            &'this self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+            self.recursive_unlabeled.as_ref()
         }
     }
 
-    impl ::puroro::SerToIoWrite for MsgSimpleField1 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    self::_puroro_root::self_recursive::_puroro_impls::MsgSimple,
-                >,
-            >::ser_field(&self.recursive_unlabeled, 1, out)?;
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<ScalarType>
+        >::ser_field::
+        <ScalarType, _, _>
+        (
+            &self.recursive_unlabeled,
+            1,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
-        ::std::convert::From<
-            ::std::option::Option<
-                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
-            >,
-        > for MsgSimpleField1
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: ::std::option::Option<
-                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
-            >,
-        ) -> Self {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
             Self {
                 recursive_unlabeled: value,
             }
@@ -211,11 +261,11 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MsgSimpleByValue {}
-    impl ::puroro::Message<MsgSimple> for MsgSimpleByValue {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleByValue {}
 
     impl MsgTrait for MsgSimpleByValue {
         type Field1MessageType<'this> =
-            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>;
+            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>;
         fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -226,13 +276,22 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        pub fn append_recursive_unlabeled(
+        pub fn append_recursive_unlabeled<ScalarType>(
             self,
-            value: ::std::option::Option<
-                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
-            >,
-        ) -> MsgBuilder<(T, MsgSimpleField1)> {
-            MsgBuilder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        where
+            ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField1 {
+                    recursive_unlabeled: value,
+                },
+            ))
         }
 
         pub fn build(self) -> T {
@@ -256,7 +315,9 @@ pub mod _puroro_traits {
         type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
@@ -266,7 +327,10 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type Field1MessageType<'this> = <$ty>::Field1MessageType<'this>;
+            type Field1MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field1MessageType<'this>;
             fn recursive_unlabeled<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
@@ -276,6 +340,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> MsgTrait for &'_ T
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
+    impl<T> MsgTrait for &'_ mut T
     where
         T: MsgTrait,
     {

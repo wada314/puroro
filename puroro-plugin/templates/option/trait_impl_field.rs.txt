@@ -1,19 +1,19 @@
 {%- if field.is_bytes %}
 {%- if field.trait_has_scalar_getter %}
-type Field{{ field.number }}BytesType<'this> = ::puroro::Either<T::Field{{ field.number }}BytesType<'this>, &'static [u8]>;
+type Field{{ field.number }}BytesType<'this> where Self: 'this = ::puroro::Either<T::Field{{ field.number }}BytesType<'this>, &'static [u8]>;
 {%- else %}
-type Field{{ field.number }}BytesType<'this> = T::Field{{ field.number }}BytesType<'this>;
+type Field{{ field.number }}BytesType<'this> where Self: 'this = T::Field{{ field.number }}BytesType<'this>;
 {%- endif %}
 {%- endif %}
 {%- if field.is_string %}
 {%- if field.trait_has_scalar_getter %}
-type Field{{ field.number }}StringType<'this> = ::puroro::Either<T::Field{{ field.number }}StringType<'this>, &'static str>;
+type Field{{ field.number }}StringType<'this> where Self: 'this = ::puroro::Either<T::Field{{ field.number }}StringType<'this>, &'static str>;
 {%- else %}
-type Field{{ field.number }}StringType<'this> = T::Field{{ field.number }}StringType<'this>;
+type Field{{ field.number }}StringType<'this> where Self: 'this = T::Field{{ field.number }}StringType<'this>;
 {%- endif %}
 {%- endif %}
 {%- if field.is_message %}
-type Field{{ field.number }}MessageType<'this> = T::Field{{ field.number }}MessageType<'this>;
+type Field{{ field.number }}MessageType<'this> where Self: 'this = T::Field{{ field.number }}MessageType<'this>;
 {%- endif %}
 
 {%- if field.trait_has_scalar_getter %}
@@ -37,7 +37,7 @@ fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait
 {%- endif %}
 
 {%- if field.trait_has_repeated_getter %}
-type Field{{ field.number }}RepeatedType<'this> = 
+type Field{{ field.number }}RepeatedType<'this> where Self: 'this =
     ::std::iter::Flatten<
         ::std::option::IntoIter<
             <T::Field{{ field.number }}RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter

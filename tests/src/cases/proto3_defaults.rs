@@ -1,7 +1,7 @@
 /// About the proto3's default values, check the following official document:
 /// https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md
 use crate::tests_pb::proto3_defaults::{Msg, Submsg};
-use ::puroro::DeserFromBytesIter;
+use ::puroro::internal::DeserializableMessageFromBytesIterator;
 
 const INPUT_FIELD1_I32_ZERO: &[u8] = &[(1 << 3) | 0, 0x00];
 const INPUT_FIELD1_I32_ONE: &[u8] = &[(1 << 3) | 0, 0x01];

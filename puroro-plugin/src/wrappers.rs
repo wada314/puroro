@@ -26,114 +26,6 @@ pub struct Context {
     lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
 }
 
-#[derive(Debug)]
-pub struct InputFile {
-    context: Weak<Context>,
-    package: Rc<Vec<String>>,
-    messages: Vec<Rc<Message>>,
-    enums: Vec<Rc<Enum>>,
-    syntax: ProtoSyntax,
-}
-
-#[derive(Debug)]
-pub struct Message {
-    input_file: Weak<InputFile>,
-    rust_ident: String,
-    rust_nested_module_ident: String,
-    proto_name: String,
-    package: Rc<Vec<String>>,
-    outer_messages: Rc<Vec<String>>,
-    fields: Vec<Rc<Field>>,
-    nested_messages: Vec<Rc<Message>>,
-    nested_enums: Vec<Rc<Enum>>,
-    oneofs: Vec<Rc<Oneof>>,
-}
-
-#[derive(Debug)]
-pub struct Enum {
-    input_file: Weak<InputFile>,
-    rust_ident: String,
-    proto_name: String,
-    package: Rc<Vec<String>>,
-    outer_messages: Rc<Vec<String>>,
-    values: Vec<EnumValue>,
-}
-
-#[derive(Debug)]
-pub struct Field {
-    message: Weak<Message>,
-    rust_ident: String,
-    rust_oneof_ident: String,
-    lazy_proto_type: OnceCell<FieldType>,
-    proto_name: String,
-    proto_type_name: String,
-    proto_type_enum: FieldTypeProto,
-    proto_label: FieldLabelProto,
-    proto_is_optional3: bool,
-    lazy_label: OnceCell<FieldLabel>,
-    number: i32,
-    proto_oneof_index: Option<i32>,
-}
-
-#[derive(Debug)]
-pub struct Oneof {
-    message: Weak<Message>,
-    index: i32,
-    rust_enum_ident: String,
-    rust_getter_ident: String,
-    lazy_fields: OnceCell<Vec<Rc<Field>>>,
-    lazy_is_synthetic: OnceCell<bool>,
-}
-
-#[derive(Debug)]
-pub struct EnumValue {
-    rust_ident: String,
-    number: i32,
-}
-
-#[derive(Debug, Clone)]
-pub enum ProtoSyntax {
-    Proto2,
-    Proto3,
-}
-
-#[derive(Debug, Clone)]
-pub enum FieldType {
-    Double,
-    Float,
-    Int32,
-    Int64,
-    UInt32,
-    UInt64,
-    SInt32,
-    SInt64,
-    Fixed32,
-    Fixed64,
-    SFixed32,
-    SFixed64,
-    Bool,
-    Group,
-    String,
-    Bytes,
-    Enum2(Weak<Enum>),
-    Enum3(Weak<Enum>),
-    Message(Weak<Message>),
-}
-
-#[derive(Debug, Clone)]
-pub enum FieldLabel {
-    Required,
-    Optional,
-    Unlabeled,
-    Repeated,
-}
-
-#[derive(Debug)]
-pub enum MessageOrEnum {
-    Message(Rc<Message>),
-    Enum(Rc<Enum>),
-}
-
 impl Context {
     pub fn try_from_proto(proto: CodeGeneratorRequest) -> Result<Rc<Context>> {
         let context = Rc::new_cyclic(|weak_context| Context {
@@ -212,6 +104,15 @@ impl Context {
 
         Ok(())
     }
+}
+
+#[derive(Debug)]
+pub struct InputFile {
+    context: Weak<Context>,
+    package: Rc<Vec<String>>,
+    messages: Vec<Rc<Message>>,
+    enums: Vec<Rc<Enum>>,
+    syntax: ProtoSyntax,
 }
 
 impl InputFile {
@@ -294,6 +195,20 @@ impl InputFile {
     }
 }
 
+#[derive(Debug)]
+pub struct Message {
+    input_file: Weak<InputFile>,
+    rust_ident: String,
+    rust_nested_module_ident: String,
+    proto_name: String,
+    package: Rc<Vec<String>>,
+    outer_messages: Rc<Vec<String>>,
+    fields: Vec<Rc<Field>>,
+    nested_messages: Vec<Rc<Message>>,
+    nested_enums: Vec<Rc<Enum>>,
+    oneofs: Vec<Rc<Oneof>>,
+}
+
 impl Message {
     pub fn try_from_proto(
         input_file: Weak<InputFile>,
@@ -319,8 +234,9 @@ impl Message {
         let proto_oneofs = proto.oneof_decl.clone();
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
-            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
-            rust_nested_module_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
+            rust_nested_module_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name))
+                .to_string(),
             proto_name,
             package: package.clone(),
             outer_messages: outer_messages.clone(),
@@ -387,9 +303,16 @@ impl Message {
         )
     }
     pub fn rust_impl_path(&self, impl_name: &str) -> String {
+        // "Simple" impls are separeted out to a special namespace.
+        let module = if impl_name == "Simple" {
+            "_puroro_simple_impl"
+        } else {
+            "_puroro_impls"
+        };
         format!(
-            "{path}::_puroro_impls::{ident}",
+            "{path}::{module}::{ident}",
             path = self.rust_module_path(),
+            module = module,
             ident = self.rust_impl_ident(impl_name),
         )
     }
@@ -404,7 +327,12 @@ impl Message {
         format!("{}Trait", &self.rust_ident)
     }
     pub fn rust_impl_ident(&self, impl_name: &str) -> String {
-        format!("{}{}", &self.rust_ident, impl_name)
+        // Simple impl uses raw name without suffix.
+        if impl_name == "Simple" {
+            self.rust_ident.clone()
+        } else {
+            format!("{}{}", &self.rust_ident, impl_name)
+        }
     }
     pub fn rust_nested_module_ident(&self) -> &str {
         &self.rust_nested_module_ident
@@ -443,6 +371,16 @@ impl Hash for Message {
     }
 }
 
+#[derive(Debug)]
+pub struct Enum {
+    input_file: Weak<InputFile>,
+    rust_ident: String,
+    proto_name: String,
+    package: Rc<Vec<String>>,
+    outer_messages: Rc<Vec<String>>,
+    values: Vec<EnumValue>,
+}
+
 impl Enum {
     pub fn try_from_proto(
         input_file: Weak<InputFile>,
@@ -460,7 +398,7 @@ impl Enum {
         let proto_value = proto.value.clone();
         Ok(Rc::new(Self {
             input_file: input_file,
-            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
             proto_name,
             package: package,
             outer_messages: outer_messages,
@@ -469,7 +407,8 @@ impl Enum {
                 .map(|v| EnumValue {
                     rust_ident: get_keyword_safe_ident(&to_camel_case(
                         &v.name.clone().unwrap_or_default(),
-                    )),
+                    ))
+                    .to_string(),
                     number: v.number.unwrap_or_default(),
                 })
                 .collect_vec(),
@@ -513,6 +452,22 @@ impl Enum {
     }
 }
 
+#[derive(Debug)]
+pub struct Field {
+    message: Weak<Message>,
+    rust_ident: String,
+    rust_oneof_ident: String,
+    lazy_proto_type: OnceCell<FieldType>,
+    proto_name: String,
+    proto_type_name: String,
+    proto_type_enum: FieldTypeProto,
+    proto_label: FieldLabelProto,
+    proto_is_optional3: bool,
+    lazy_label: OnceCell<FieldLabel>,
+    number: i32,
+    proto_oneof_index: Option<i32>,
+}
+
 impl Field {
     pub fn try_from_proto(message: Weak<Message>, proto: FieldDescriptorProto) -> Result<Self> {
         let proto_name = proto
@@ -534,8 +489,8 @@ impl Field {
         let proto_oneof_index = proto.oneof_index;
         Ok(Self {
             message: Clone::clone(&message),
-            rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
-            rust_oneof_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)).to_string(),
+            rust_oneof_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
             proto_name,
             proto_type_name,
             proto_type_enum,
@@ -576,6 +531,8 @@ impl Field {
             .get_or_try_init(|| {
                 Ok(if self.proto_is_optional3 {
                     FieldLabel::Optional
+                } else if self.is_non_synthetic_oneof_item()? {
+                    FieldLabel::OneofField
                 } else {
                     match self.proto_label {
                         FieldLabelProto::LabelOptional => {
@@ -601,17 +558,23 @@ impl Field {
         self.proto_oneof_index.clone()
     }
 
-    pub fn rust_type_tag(&self, impl_name: &str) -> Result<String> {
+    pub fn rust_type_tag<F: Fn(&Message) -> Result<String>>(
+        &self,
+        gen_msg_path: F,
+    ) -> Result<String> {
         Ok(format!(
             "::puroro::tags::{type_tag}",
-            type_tag = self.field_type()?.tag_ident_and_gp(&impl_name)?,
+            type_tag = self.field_type()?.tag_ident_and_gp(gen_msg_path)?,
         ))
     }
-    pub fn rust_label_and_type_tags(&self, impl_name: &str) -> Result<String> {
+    pub fn rust_label_and_type_tags<F: Fn(&Message) -> Result<String>>(
+        &self,
+        gen_msg_path: F,
+    ) -> Result<String> {
         Ok(format!(
             "::puroro::tags::{label_tag}, {type_tag}",
             label_tag = self.field_label()?.tag_ident(),
-            type_tag = self.rust_type_tag(impl_name)?,
+            type_tag = self.rust_type_tag(gen_msg_path)?,
         ))
     }
 
@@ -619,7 +582,7 @@ impl Field {
         Ok(format!(
             "{label_then_space}{field_type} {name} = {number};",
             label_then_space = match self.field_label()? {
-                FieldLabel::Unlabeled => "",
+                FieldLabel::Unlabeled | FieldLabel::OneofField => "",
                 FieldLabel::Required => "required ",
                 FieldLabel::Optional => "optional ",
                 FieldLabel::Repeated => "repeated ",
@@ -741,6 +704,7 @@ impl Field {
     pub fn simple_field_type(&self) -> Result<String> {
         let scalar_type = self.simple_scalar_field_type()?;
         Ok(match self.field_label()? {
+            FieldLabel::OneofField => scalar_type,
             FieldLabel::Required | FieldLabel::Optional => {
                 format!("::std::option::Option<{}>", scalar_type)
             }
@@ -763,8 +727,8 @@ impl Field {
     pub fn simple_scalar_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "::std::borrow::Cow<'static, str>".to_string(),
-            FieldType::Bytes => "::std::borrow::Cow<'static, [u8]>".to_string(),
+            FieldType::String => "::std::string::String".to_string(),
+            FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {
@@ -778,6 +742,45 @@ impl Field {
             t => t.numerical_rust_type()?.to_string(),
         })
     }
+
+    pub fn single_field_type(&self) -> Result<String> {
+        let scalar_type = self.single_scalar_field_type()?;
+        Ok(match self.field_label()? {
+            FieldLabel::OneofField => scalar_type,
+            FieldLabel::Required | FieldLabel::Optional => {
+                format!("::std::option::Option<{}>", scalar_type)
+            }
+            FieldLabel::Unlabeled => {
+                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{}>", scalar_type)
+                } else {
+                    scalar_type
+                }
+            }
+            FieldLabel::Repeated => "RepeatedType".to_string(),
+        })
+    }
+
+    pub fn single_scalar_field_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String | FieldType::Bytes | FieldType::Message(_) => {
+                "ScalarType".to_string()
+            }
+            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct Oneof {
+    message: Weak<Message>,
+    index: i32,
+    rust_enum_ident: String,
+    rust_getter_ident: String,
+    lazy_fields: OnceCell<Vec<Rc<Field>>>,
+    lazy_is_synthetic: OnceCell<bool>,
 }
 
 impl Oneof {
@@ -790,8 +793,8 @@ impl Oneof {
             Ok(Rc::new(Self {
                 message,
                 index: index,
-                rust_enum_ident: get_keyword_safe_ident(&to_camel_case(name)),
-                rust_getter_ident: get_keyword_safe_ident(&to_lower_snake_case(name)),
+                rust_enum_ident: get_keyword_safe_ident(&to_camel_case(name)).to_string(),
+                rust_getter_ident: get_keyword_safe_ident(&to_lower_snake_case(name)).to_string(),
                 lazy_fields: OnceCell::new(),
                 lazy_is_synthetic: OnceCell::new(),
             }))
@@ -809,6 +812,9 @@ impl Oneof {
     }
     pub fn message(&self) -> Result<Rc<Message>> {
         upgrade(&self.message)
+    }
+    pub fn index(&self) -> i32 {
+        self.index
     }
     pub fn is_synthetic(&self) -> Result<bool> {
         self.lazy_is_synthetic
@@ -879,6 +885,12 @@ impl Oneof {
     }
 }
 
+#[derive(Debug)]
+pub struct EnumValue {
+    rust_ident: String,
+    number: i32,
+}
+
 impl EnumValue {
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
@@ -888,6 +900,12 @@ impl EnumValue {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum ProtoSyntax {
+    Proto2,
+    Proto3,
+}
+
 impl ProtoSyntax {
     pub fn tag_ident(&self) -> &str {
         match *self {
@@ -895,6 +913,29 @@ impl ProtoSyntax {
             ProtoSyntax::Proto3 => "Proto3",
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum FieldType {
+    Double,
+    Float,
+    Int32,
+    Int64,
+    UInt32,
+    UInt64,
+    SInt32,
+    SInt64,
+    Fixed32,
+    Fixed64,
+    SFixed32,
+    SFixed64,
+    Bool,
+    Group,
+    String,
+    Bytes,
+    Enum2(Weak<Enum>),
+    Enum3(Weak<Enum>),
+    Message(Weak<Message>),
 }
 
 impl FieldType {
@@ -951,7 +992,10 @@ impl FieldType {
         matches!(self, FieldType::Message(_))
     }
 
-    pub fn tag_ident_and_gp(&self, impl_name: &str) -> Result<String> {
+    pub fn tag_ident_and_gp<F: Fn(&Message) -> Result<String>>(
+        &self,
+        gen_msg_path: F,
+    ) -> Result<String> {
         Ok(match self {
             FieldType::Double => "Double".to_string(),
             FieldType::Float => "Float".to_string(),
@@ -968,13 +1012,15 @@ impl FieldType {
             FieldType::Bool => "Bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "String".to_string(),
-            FieldType::Bytes => "Bytes".to_string().to_string(),
+            FieldType::Bytes => "Bytes".to_string(),
             FieldType::Enum2(e) => format!("Enum2<{}>", upgrade(e)?.rust_path()),
             FieldType::Enum3(e) => format!("Enum3<{}>", upgrade(e)?.rust_path()),
-            FieldType::Message(m) => format!(
-                "Message<{path}>",
-                path = upgrade(m)?.rust_impl_path(impl_name),
-            ),
+            FieldType::Message(m) => {
+                format!(
+                    "Message<{path}>",
+                    path = (gen_msg_path)(upgrade(m)?.deref())?,
+                )
+            }
         })
     }
 
@@ -1024,6 +1070,15 @@ impl FieldType {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum FieldLabel {
+    Required,
+    Optional,
+    Unlabeled,
+    Repeated,
+    OneofField,
+}
+
 impl FieldLabel {
     pub fn tag_ident(&self) -> &str {
         match *self {
@@ -1031,8 +1086,15 @@ impl FieldLabel {
             FieldLabel::Optional => "Optional",
             FieldLabel::Unlabeled => "Unlabeled",
             FieldLabel::Repeated => "Repeated",
+            FieldLabel::OneofField => "OneofField",
         }
     }
+}
+
+#[derive(Debug)]
+pub enum MessageOrEnum {
+    Message(Rc<Message>),
+    Enum(Rc<Enum>),
 }
 
 impl MessageOrEnum {
@@ -1064,11 +1126,11 @@ fn test_make_module_path() {
         make_module_path(package.clone(), empty.clone())
     );
     assert_eq!(
-        "self::_puroro_root::puroro_nested::code_generator_response",
+        "self::_puroro_root::_puroro_nested::code_generator_response",
         make_module_path(empty.clone(), outer_messages.clone())
     );
     assert_eq!(
-        "self::_puroro_root::google::protobuf::compiler::puroro_nested::code_generator_response",
+        "self::_puroro_root::google::protobuf::compiler::_puroro_nested::code_generator_response",
         make_module_path(package.clone(), outer_messages.clone())
     );
 }

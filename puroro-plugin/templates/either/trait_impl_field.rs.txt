@@ -1,18 +1,18 @@
 
 {%- if f.is_bytes %}
-type Field{{ f.number }}BytesType<'this> = ::puroro::Either<
+type Field{{ f.number }}BytesType<'this> where Self: 'this = ::puroro::Either<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
     <U as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
 >;
 {%- endif %}
 {%- if f.is_string %}
-type Field{{ f.number }}StringType<'this> = ::puroro::Either<
+type Field{{ f.number }}StringType<'this> where Self: 'this = ::puroro::Either<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
     <U as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
 >;
 {%- endif %}
 {%- if f.is_message %}
-type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
+type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
     <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
 >;
@@ -74,10 +74,11 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {%- else %}
 {%- let either_repeated_field_type = "EitherRepeatedField" %}
 {%- endif %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro::internal::impls::either::{{ either_repeated_field_type }}<
-    <T as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
-    <U as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
->;
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this
+    = ::puroro::internal::impls::either::{{ either_repeated_field_type }}<
+        <T as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+        <U as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    >;
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
 {

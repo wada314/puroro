@@ -20,6 +20,7 @@ message Msg {
 
     message Submsg {
         int32 i32_unlabeled = 1;
+        int64 i64_unlabeled = 101;
     }
     Submsg submsg_unlabeled = 51;
     optional Submsg submsg_optional = 52;

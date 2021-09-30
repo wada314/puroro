@@ -28,7 +28,7 @@ fn test_oneof_simple2() {
     assert!(matches!(msg.group_one(), Some(GroupOne2::G1Int32(100))));
     assert!(matches!(msg.g1_int32(), Some(100)));
     assert!(msg.g1_string().is_none());
-    msg.group_one = Some(GroupOne2::G1String(Cow::Borrowed("Test")));
+    msg.group_one = Some(GroupOne2::G1String("Test".to_string()));
     assert!(matches!(msg.group_one(), Some(GroupOne2::G1String("Test"))));
     assert!(matches!(msg.g1_string(), Some("Test")));
     assert!(msg.g1_int32().is_none());
@@ -42,7 +42,7 @@ fn test_oneof_simple2() {
     assert_eq!(msg.g2_f32(), Some(100.0));
     assert!(msg.g2_string().is_none());
     assert!(msg.g2_submsg().is_none());
-    msg.group_two = Some(GroupTwo2::G2String(Cow::Borrowed("Test")));
+    msg.group_two = Some(GroupTwo2::G2String("Test".to_string()));
     assert_eq!(msg.group_two(), Some(GroupTwo2::G2String("Test")));
     assert_eq!(msg.g2_string(), Some("Test"));
     assert!(msg.g2_f32().is_none());
@@ -91,7 +91,7 @@ fn test_oneof_simple3() {
     assert!(matches!(msg.group_one(), Some(GroupOne3::G1Int32(100))));
     assert!(matches!(msg.g1_int32(), Some(100)));
     assert!(msg.g1_string().is_none());
-    msg.group_one = Some(GroupOne3::G1String(Cow::Borrowed("Test")));
+    msg.group_one = Some(GroupOne3::G1String("Test".to_string()));
     assert!(matches!(msg.group_one(), Some(GroupOne3::G1String("Test"))));
     assert!(matches!(msg.g1_string(), Some("Test")));
     assert!(msg.g1_int32().is_none());
@@ -105,7 +105,7 @@ fn test_oneof_simple3() {
     assert_eq!(msg.g2_f32(), Some(100.0));
     assert!(msg.g2_string().is_none());
     assert!(msg.g2_submsg().is_none());
-    msg.group_two = Some(GroupTwo3::G2String(Cow::Borrowed("Test")));
+    msg.group_two = Some(GroupTwo3::G2String("Test".to_string()));
     assert_eq!(msg.group_two(), Some(GroupTwo3::G2String("Test")));
     assert_eq!(msg.g2_string(), Some("Test"));
     assert!(msg.g2_f32().is_none());

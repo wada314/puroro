@@ -1,23 +1,23 @@
 #[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.simple_by_value_ident }} {
 }
-impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_by_value_ident }} {}
+impl ::puroro::Message<super::{{ m.simple_ident }}> for {{ m.simple_by_value_ident }} {}
 
 impl {{ m.trait_ident }} for {{ m.simple_by_value_ident }} {
     {%- for field in m.fields %}
 
-    {#- 
+    {#-
      # The core part of this struct: BytesType, StringType, and MessageType are
-     # defined as an owned type instead of the normal `MyMessageSimple` struct's
-     # ref types. 
-     # For `MyMessageSimple` type's owned `oneof` `enum` types, they refer
+     # defined as an owned type instead of the normal `struct MyMessage`'s
+     # ref types.
+     # For `struct MyMessage` type's owned `oneof` `enum` types, they use
      # these owned types for the corresponding `oneof` fields.
-     #}    
+     #}
     {%- if field.is_bytes %}
-    type Field{{ field.number }}BytesType<'this> = ::std::borrow::Cow<'this, [u8]>;
+    type Field{{ field.number }}BytesType<'this> = ::std::vec::Vec<u8>;
     {%- endif %}
     {%- if field.is_string %}
-    type Field{{ field.number }}StringType<'this> = ::std::borrow::Cow<'this, str>;
+    type Field{{ field.number }}StringType<'this> = ::std::string::String;
     {%- endif %}
     {%- match field.simple_maybe_field_message_path %}
     {%- when Some with (struct_path) %}
@@ -44,7 +44,7 @@ impl {{ m.trait_ident }} for {{ m.simple_by_value_ident }} {
     }
     {%- endif %}
     {%- endfor %}
-    
+
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         Option<

@@ -46,7 +46,7 @@ impl ::std::convert::From<{{ ident }}> for i32 {
             {%- for value in values %}
             {{ ident }}::{{ value.ident }} => {{ value.number }},
             {%- endfor %}
-            
+
             {%- if is_proto3 %}
             {{ ident }}::_Unknown(ivalue) => ivalue,
             {%- endif %}

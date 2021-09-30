@@ -1,15 +1,11 @@
-use crate::bool::{False, True};
+use crate::internal::bool::{False, True};
 use ::std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
 /// This type actually consist of two tags for generics specialization:
-/// `wire::wire_tag<value::value_tag>`.
+/// `wire_tag<value::value_tag>`.
 pub trait FieldTypeTag {}
-
-/// A tag trait for types corresponding to the proto syntax.
-/// Proto2 or Proto3.
-pub trait ProtoSyntaxTag {}
 
 /// A `FieldTypeTag` which has wire type one of Variant (except enum), Bits32 or Bits64.
 pub trait NumericalTypeTag {
@@ -22,15 +18,7 @@ pub trait FieldLabelTag {
     const DO_DEFAULT_CHECK: bool;
 }
 
-/// A tuple of (`ProtoSyntaxTag`, `FieldLabelTag`, `FieldTypeTag`).
-/// TODO: Maybe map type should have its own tag type.
-pub trait FieldLabelAndTypeTag {}
-
-/// A tag trait for implementations of the proto message.
-/// e.g. Simple, Bumpalo, SliceView
-pub trait ImplTypeTag {}
-
-pub mod value {
+mod value {
     use ::std::marker::PhantomData;
     pub struct Int32;
     pub struct UInt32;
@@ -52,35 +40,31 @@ pub mod value {
     pub struct Fixed64;
 }
 
-pub mod wire {
-    use crate::bool::{False, True};
-    use ::std::marker::PhantomData;
-    pub type Variant<V> = (PhantomData<V>, (True, False), (False, False));
-    pub type LengthDelimited<V> = (PhantomData<V>, (False, True), (False, False));
-    pub type Bits32<V> = (PhantomData<V>, (False, False), (True, False));
-    pub type Bits64<V> = (PhantomData<V>, (False, False), (False, True));
+pub type Variant<V> = (PhantomData<V>, (True, False), (False, False));
+pub type LengthDelimited<V> = (PhantomData<V>, (False, True), (False, False));
+pub type Bits32<V> = (PhantomData<V>, (False, False), (True, False));
+pub type Bits64<V> = (PhantomData<V>, (False, False), (False, True));
 
-    pub type NonLD<V, _1, _2> = (PhantomData<V>, (_1, False), _2);
-}
+pub type NonLD<V, _1, _2> = (PhantomData<V>, (_1, False), _2);
 
-pub type Int32 = wire::Variant<value::Int32>;
-pub type SInt32 = wire::Variant<value::SInt32>;
-pub type UInt32 = wire::Variant<value::UInt32>;
-pub type Int64 = wire::Variant<value::Int64>;
-pub type SInt64 = wire::Variant<value::SInt64>;
-pub type UInt64 = wire::Variant<value::UInt64>;
-pub type Bool = wire::Variant<value::Bool>;
-pub type String = wire::LengthDelimited<value::String>;
-pub type Bytes = wire::LengthDelimited<value::Bytes>;
-pub type Float = wire::Bits32<value::Float>;
-pub type Fixed32 = wire::Bits32<value::Fixed32>;
-pub type SFixed32 = wire::Bits32<value::SFixed32>;
-pub type Double = wire::Bits64<value::Double>;
-pub type Fixed64 = wire::Bits64<value::Fixed64>;
-pub type SFixed64 = wire::Bits64<value::SFixed64>;
-pub type Enum2<E> = wire::Variant<value::Enum2<E>>;
-pub type Enum3<E> = wire::Variant<value::Enum3<E>>;
-pub type Message<M> = wire::LengthDelimited<value::Message<M>>;
+pub type Int32 = Variant<value::Int32>;
+pub type SInt32 = Variant<value::SInt32>;
+pub type UInt32 = Variant<value::UInt32>;
+pub type Int64 = Variant<value::Int64>;
+pub type SInt64 = Variant<value::SInt64>;
+pub type UInt64 = Variant<value::UInt64>;
+pub type Bool = Variant<value::Bool>;
+pub type String = LengthDelimited<value::String>;
+pub type Bytes = LengthDelimited<value::Bytes>;
+pub type Float = Bits32<value::Float>;
+pub type Fixed32 = Bits32<value::Fixed32>;
+pub type SFixed32 = Bits32<value::SFixed32>;
+pub type Double = Bits64<value::Double>;
+pub type Fixed64 = Bits64<value::Fixed64>;
+pub type SFixed64 = Bits64<value::SFixed64>;
+pub type Enum2<E> = Variant<value::Enum2<E>>;
+pub type Enum3<E> = Variant<value::Enum3<E>>;
+pub type Message<M> = LengthDelimited<value::Message<M>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
 pub type Repeated = (True, False, False, False, False);
@@ -90,14 +74,13 @@ pub type Optional = (False, (True, False), False, False, False);
 pub type Required = (False, (False, True), False, False, False);
 /// Proto3 unlabeled field.
 pub type Unlabeled = (False, False, True, False, False);
-pub type OneofItem = (False, False, False, True, False);
+/// An item of oneof.
+pub type OneofField = (False, False, False, True, False);
+/// Reserved for future use...
 pub type MapEntry = (False, False, False, False, True);
 
 pub type LabelOptReqUnl<_1, _2> = (False, _1, _2, False, False);
 pub type LabelNonRepeated<_1, _2, _3> = (False, _1, _2, _3, False);
-
-pub struct Proto2;
-pub struct Proto3;
 
 impl FieldTypeTag for Int32 {}
 impl FieldTypeTag for Int64 {}
@@ -117,9 +100,6 @@ impl FieldTypeTag for Fixed32 {}
 impl FieldTypeTag for Fixed64 {}
 impl FieldTypeTag for SFixed32 {}
 impl FieldTypeTag for SFixed64 {}
-
-impl ProtoSyntaxTag for Proto2 {}
-impl ProtoSyntaxTag for Proto3 {}
 
 impl NumericalTypeTag for Int32 {
     type NativeType = i32;
@@ -179,11 +159,6 @@ impl FieldLabelTag for Unlabeled {
 impl FieldLabelTag for Required {
     const DO_DEFAULT_CHECK: bool = false;
 }
-impl FieldLabelTag for OneofItem {
+impl FieldLabelTag for OneofField {
     const DO_DEFAULT_CHECK: bool = false;
 }
-
-pub struct Map<X, K, V>(PhantomData<(X, K, V)>);
-
-pub struct SimpleImpl;
-impl ImplTypeTag for SimpleImpl {}

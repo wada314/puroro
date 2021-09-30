@@ -1,6 +1,6 @@
 /// The sample cases documented in the Protobuf official encoding document:
 /// https://developers.google.com/protocol-buffers/docs/encoding
-use ::puroro::DeserFromBytesIter;
+use ::puroro::internal::DeserializableMessageFromBytesIterator;
 use ::std::borrow::Cow;
 use ::std::default::Default;
 use ::tests_pb::official_samples2 as s2;
@@ -37,7 +37,7 @@ fn proto2_test2_simple() {
     use std::io::Read as _;
     let mut t2 = s2::Test2::default();
     t2.deser(TEST2_INPUT.bytes()).unwrap();
-    assert_eq!(Some(Cow::Borrowed(TEST2_EXPECTED)), t2.b);
+    assert_eq!(Some(TEST2_EXPECTED.to_string()), t2.b);
 }
 
 #[test]

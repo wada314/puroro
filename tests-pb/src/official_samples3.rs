@@ -5,31 +5,29 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::Test1Simple as Test1;
-pub use _puroro_impls::Test2Simple as Test2;
-pub use _puroro_impls::Test3Simple as Test3;
-pub use _puroro_impls::Test4Simple as Test4;
-pub use _puroro_impls::*;
-pub mod _puroro_impls {
+pub use _puroro_simple_impl::Test1;
+pub use _puroro_simple_impl::Test2;
+pub use _puroro_simple_impl::Test3;
+pub use _puroro_simple_impl::Test4;
+pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
-    pub struct Test1Simple {
+    pub struct Test1 {
         pub a: i32,
     }
-    impl ::puroro::Message<Test1Simple> for Test1Simple {}
+    impl ::puroro::Message<Test1> for Test1 {}
 
-    impl Test1Trait for Test1Simple {
+    impl super::_puroro_traits::Test1Trait for Test1 {
         fn a<'this>(&'this self) -> i32 {
             Clone::clone(&self.a)
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test1Simple {
+    impl ::puroro::MessageRepresentativeImpl for Test1 {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
             static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
@@ -39,7 +37,7 @@ pub mod _puroro_impls {
                             name: "a",
                             number: 1,
                             lazy_containing_type: Lazy::new(|| {
-                                <Test1Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                <Test1 as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
                         };
                         ::puroro::internal::init_field_descriptor(init)
@@ -56,7 +54,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Test1Simple {
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test1 {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -65,11 +63,13 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test1Simple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test1 {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -85,7 +85,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test1Simple {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -98,6 +98,291 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct Test2 {
+        pub b: ::std::string::String,
+    }
+    impl ::puroro::Message<Test2> for Test2 {}
+
+    impl super::_puroro_traits::Test2Trait for Test2 {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
+            self.b.as_ref()
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for Test2 {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "b",
+                            number: 2,
+                            lazy_containing_type: Lazy::new(|| {
+                                <Test2 as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Test2",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test2 {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test2 {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::String
+            >::deser_field(&mut self.b, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test2 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                &self.b, 2, out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct Test3 {
+        pub c: ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>,
+        >,
+    }
+    impl ::puroro::Message<Test3> for Test3 {}
+
+    impl super::_puroro_traits::Test3Trait for Test3 {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::official_samples3::_puroro_simple_impl::Test1;
+        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            self.c.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for Test3 {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "c",
+                            number: 3,
+                            lazy_containing_type: Lazy::new(|| {
+                                <Test3 as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Test3",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test3 {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test3 {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+                3 => DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled,
+                    ::puroro::tags::Message<
+                        ::std::boxed::Box<
+                            self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
+                        >,
+                    >,
+                >::deser_field(&mut self.c, data),
+
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test3 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    ::std::boxed::Box<
+                        self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
+                    >,
+                >,
+            >::ser_field(&self.c, 3, out)?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct Test4 {
+        pub d: ::std::vec::Vec<i32>,
+    }
+    impl ::puroro::Message<Test4> for Test4 {}
+
+    impl super::_puroro_traits::Test4Trait for Test4 {
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.d.iter().cloned()
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for Test4 {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "d",
+                            number: 4,
+                            lazy_containing_type: Lazy::new(|| {
+                                <Test4 as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Test4",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test4 {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test4 {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.d, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test4 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.d, 4, out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+}
+
+pub use _puroro_impls::*;
+pub mod _puroro_impls {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    use super::_puroro_traits::*;
     impl Test1Trait for () {
         fn a<'this>(&'this self) -> i32 {
             Default::default()
@@ -138,32 +423,35 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test1SimpleField1 {
+
+    pub struct Test1SingleField1 {
         pub a: i32,
     }
 
-    impl ::puroro::Message<Test1Simple> for Test1SimpleField1 {}
+    impl ::puroro::Message<super::Test1> for Test1SingleField1 {}
 
-    impl super::_puroro_traits::Test1Trait for Test1SimpleField1 {
+    impl super::_puroro_traits::Test1Trait for Test1SingleField1 {
         fn a<'this>(&'this self) -> i32 {
             Clone::clone(&self.a)
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test1SimpleField1 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test1SingleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
-                &self.a, 1, out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field::<
+                (),
+                _,
+                _,
+            >(::std::iter::once(&self.a), 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<i32> for Test1SimpleField1 {
+    impl ::std::convert::From<i32> for Test1SingleField1 {
         fn from(value: i32) -> Self {
             Self { a: value }
         }
@@ -172,7 +460,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test1SimpleByValue {}
-    impl ::puroro::Message<Test1Simple> for Test1SimpleByValue {}
+    impl ::puroro::Message<super::Test1> for Test1SimpleByValue {}
 
     impl Test1Trait for Test1SimpleByValue {
         fn a<'this>(&'this self) -> i32 {
@@ -185,8 +473,8 @@ pub mod _puroro_impls {
     where
         T: Test1Trait,
     {
-        pub fn append_a(self, value: i32) -> Test1Builder<(T, Test1SimpleField1)> {
-            Test1Builder((self.0, ::std::convert::From::from(value)))
+        pub fn append_a(self, value: i32) -> Test1Builder<(T, Test1SingleField1)> {
+            Test1Builder((self.0, Test1SingleField1 { a: value }))
         }
 
         pub fn build(self) -> T {
@@ -199,92 +487,11 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test2Simple {
-        pub b: ::std::borrow::Cow<'static, str>,
-    }
-    impl ::puroro::Message<Test2Simple> for Test2Simple {}
-
-    impl Test2Trait for Test2Simple {
-        type Field2StringType<'this> = &'this str;
-        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
-            &self.b
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for Test2Simple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "b",
-                            number: 2,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test2Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test2",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserFromBytesIter for Test2Simple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test2Simple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::String
-            >::deser_field(&mut self.b, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for Test2Simple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
-                &self.b, 2, out,
-            )?;
-
-            ::std::result::Result::Ok(())
-        }
-    }
     impl Test2Trait for () {
-        type Field2StringType<'this> = &'static str;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'static str;
         fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
             ""
         }
@@ -294,7 +501,10 @@ pub mod _puroro_impls {
         T: Test2Trait,
         U: Test2Trait,
     {
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as Test2Trait>::Field2StringType<'this>,
             <U as Test2Trait>::Field2StringType<'this>,
         >;
@@ -312,7 +522,10 @@ pub mod _puroro_impls {
         T: Test2Trait,
         U: Test2Trait,
     {
-        type Field2StringType<'this> = ::puroro::Either<
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as Test2Trait>::Field2StringType<'this>,
             <U as Test2Trait>::Field2StringType<'this>,
         >;
@@ -327,7 +540,10 @@ pub mod _puroro_impls {
     where
         T: Test2Trait,
     {
-        type Field2StringType<'this> = ::puroro::Either<T::Field2StringType<'this>, &'static str>;
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<T::Field2StringType<'this>, &'static str>;
         fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
             self.as_ref().map_or(::puroro::Either::Right(""), |msg| {
                 ::puroro::Either::Left(msg.b())
@@ -336,34 +552,70 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test2SimpleField2 {
-        pub b: ::std::borrow::Cow<'static, str>,
+
+    pub struct Test2SingleField2<ScalarType>
+    where
+        ScalarType: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub b: ScalarType,
     }
 
-    impl ::puroro::Message<Test2Simple> for Test2SimpleField2 {}
+    impl<ScalarType> ::puroro::Message<super::Test2> for Test2SingleField2<ScalarType> where
+        ScalarType: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::Test2Trait for Test2SimpleField2 {
-        type Field2StringType<'this> = &'this str;
+    impl<ScalarType> super::_puroro_traits::Test2Trait for Test2SingleField2<ScalarType>
+    where
+        ScalarType: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field2StringType<'this>
+        where
+            Self: 'this,
+        = &'this str;
         fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
-            &self.b
+            self.b.deref()
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test2SimpleField2 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test2SingleField2<ScalarType>
+    where
+        ScalarType: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
-                &self.b, 2, out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(::std::iter::once(&self.b), 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::borrow::Cow<'static, str>> for Test2SimpleField2 {
-        fn from(value: ::std::borrow::Cow<'static, str>) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for Test2SingleField2<ScalarType>
+    where
+        ScalarType: ::std::ops::Deref<Target = str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { b: value }
         }
     }
@@ -371,10 +623,10 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test2SimpleByValue {}
-    impl ::puroro::Message<Test2Simple> for Test2SimpleByValue {}
+    impl ::puroro::Message<super::Test2> for Test2SimpleByValue {}
 
     impl Test2Trait for Test2SimpleByValue {
-        type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field2StringType<'this> = ::std::string::String;
         fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -385,11 +637,17 @@ pub mod _puroro_impls {
     where
         T: Test2Trait,
     {
-        pub fn append_b(
+        pub fn append_b<ScalarType>(
             self,
-            value: ::std::borrow::Cow<'static, str>,
-        ) -> Test2Builder<(T, Test2SimpleField2)> {
-            Test2Builder((self.0, ::std::convert::From::from(value)))
+            value: ScalarType,
+        ) -> Test2Builder<(T, Test2SingleField2<ScalarType>)>
+        where
+            ScalarType: ::std::ops::Deref<Target = str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            Test2Builder((self.0, Test2SingleField2 { b: value }))
         }
 
         pub fn build(self) -> T {
@@ -402,108 +660,21 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test3Simple {
-        pub c: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_impls::Test1Simple>,
-        >,
-    }
-    impl ::puroro::Message<Test3Simple> for Test3Simple {}
-
-    impl Test3Trait for Test3Simple {
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Simple;
-        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for Test3Simple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "c",
-                            number: 3,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test3Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test3",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserFromBytesIter for Test3Simple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test3Simple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-                3 => DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Message<
-                        self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
-                    >,
-                >::deser_field(&mut self.c, data),
-
-                _ => unimplemented!("TODO: This case should be handled properly..."),
-            }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for Test3Simple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
-                >,
-            >::ser_field(&self.c, 3, out)?;
-
-            ::std::result::Result::Ok(())
-        }
-    }
     impl Test3Trait for () {
-        type Field3MessageType<'this> = ();
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
     impl<T, U> Test3Trait for (T, U)
     where
         T: Test3Trait,
         U: Test3Trait,
     {
-        type Field3MessageType<'this> = (
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = (
             ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
         );
@@ -521,7 +692,10 @@ pub mod _puroro_impls {
         T: Test3Trait,
         U: Test3Trait,
     {
-        type Field3MessageType<'this> = ::puroro::Either<
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as Test3Trait>::Field3MessageType<'this>,
             <U as Test3Trait>::Field3MessageType<'this>,
         >;
@@ -536,61 +710,86 @@ pub mod _puroro_impls {
     where
         T: Test3Trait,
     {
-        type Field3MessageType<'this> = T::Field3MessageType<'this>;
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field3MessageType<'this>;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.as_ref().and_then(|msg| msg.c())
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test3SimpleField3 {
-        pub c: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_impls::Test1Simple>,
-        >,
+
+    pub struct Test3SingleField3<ScalarType>
+    where
+        ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub c: ::std::option::Option<ScalarType>,
     }
 
-    impl ::puroro::Message<Test3Simple> for Test3SimpleField3 {}
+    impl<ScalarType> ::puroro::Message<super::Test3> for Test3SingleField3<ScalarType> where
+        ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::Test3Trait for Test3SimpleField3 {
-        type Field3MessageType<'this> =
-            &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Simple;
+    impl<ScalarType> super::_puroro_traits::Test3Trait for Test3SingleField3<ScalarType>
+    where
+        ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            self.c.as_ref()
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test3SimpleField3 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test3SingleField3<ScalarType>
+    where
+        ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
-                >,
-            >::ser_field(&self.c, 3, out)?;
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<ScalarType>
+        >::ser_field::
+        <ScalarType, _, _>
+        (
+            &self.c,
+            3,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
-        ::std::convert::From<
-            ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
-                >,
-            >,
-        > for Test3SimpleField3
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for Test3SingleField3<ScalarType>
+    where
+        ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
-                >,
-            >,
-        ) -> Self {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
             Self { c: value }
         }
     }
@@ -598,11 +797,11 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test3SimpleByValue {}
-    impl ::puroro::Message<Test3Simple> for Test3SimpleByValue {}
+    impl ::puroro::Message<super::Test3> for Test3SimpleByValue {}
 
     impl Test3Trait for Test3SimpleByValue {
         type Field3MessageType<'this> =
-            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_impls::Test1Simple>;
+            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -613,15 +812,17 @@ pub mod _puroro_impls {
     where
         T: Test3Trait,
     {
-        pub fn append_c(
+        pub fn append_c<ScalarType>(
             self,
-            value: ::std::option::Option<
-                ::std::boxed::Box<
-                    self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
-                >,
-            >,
-        ) -> Test3Builder<(T, Test3SimpleField3)> {
-            Test3Builder((self.0, ::std::convert::From::from(value)))
+            value: ::std::option::Option<ScalarType>,
+        ) -> Test3Builder<(T, Test3SingleField3<ScalarType>)>
+        where
+            ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            Test3Builder((self.0, Test3SingleField3 { c: value }))
         }
 
         pub fn build(self) -> T {
@@ -634,93 +835,11 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test4Simple {
-        pub d: ::std::vec::Vec<i32>,
-    }
-    impl ::puroro::Message<Test4Simple> for Test4Simple {}
-
-    impl Test4Trait for Test4Simple {
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
-
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.d.iter().cloned()
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for Test4Simple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "d",
-                            number: 4,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test4Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test4",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserFromBytesIter for Test4Simple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test4Simple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.d, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for Test4Simple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.d, 4, out,
-            )?;
-
-            ::std::result::Result::Ok(())
-        }
-    }
     impl Test4Trait for () {
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -730,7 +849,10 @@ pub mod _puroro_impls {
         T: Test4Trait,
         U: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as Test4Trait>::Field4RepeatedType<'this>,
             <U as Test4Trait>::Field4RepeatedType<'this>,
         >;
@@ -747,7 +869,10 @@ pub mod _puroro_impls {
         T: Test4Trait,
         U: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as Test4Trait>::Field4RepeatedType<'this>,
             <U as Test4Trait>::Field4RepeatedType<'this>,
         >;
@@ -764,7 +889,10 @@ pub mod _puroro_impls {
     where
         T: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::std::iter::Flatten<
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Flatten<
             ::std::option::IntoIter<
                 <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
             >,
@@ -778,35 +906,57 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test4SimpleField4 {
-        pub d: ::std::vec::Vec<i32>,
+
+    pub struct Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
+        pub d: RepeatedType,
     }
 
-    impl ::puroro::Message<Test4Simple> for Test4SimpleField4 {}
+    impl<RepeatedType> ::puroro::Message<super::Test4> for Test4SingleField4<RepeatedType> where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>
+    {
+    }
 
-    impl super::_puroro_traits::Test4Trait for Test4SimpleField4 {
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+    impl<RepeatedType> super::_puroro_traits::Test4Trait for Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.d.iter().cloned()
+            ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.d))
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test4SimpleField4 {
+    impl<RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+        for Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.d, 4, out,
-            )?;
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.d, 4, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<i32>> for Test4SimpleField4 {
-        fn from(value: ::std::vec::Vec<i32>) -> Self {
+    impl<RepeatedType> ::std::convert::From<RepeatedType> for Test4SingleField4<RepeatedType>
+    where
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+    {
+        fn from(value: RepeatedType) -> Self {
             Self { d: value }
         }
     }
@@ -814,7 +964,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test4SimpleByValue {}
-    impl ::puroro::Message<Test4Simple> for Test4SimpleByValue {}
+    impl ::puroro::Message<super::Test4> for Test4SimpleByValue {}
 
     impl Test4Trait for Test4SimpleByValue {
         type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -828,8 +978,14 @@ pub mod _puroro_impls {
     where
         T: Test4Trait,
     {
-        pub fn append_d(self, value: ::std::vec::Vec<i32>) -> Test4Builder<(T, Test4SimpleField4)> {
-            Test4Builder((self.0, ::std::convert::From::from(value)))
+        pub fn append_d<RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> Test4Builder<(T, Test4SingleField4<RepeatedType>)>
+        where
+            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        {
+            Test4Builder((self.0, Test4SingleField4 { d: value }))
         }
 
         pub fn build(self) -> T {
@@ -868,6 +1024,13 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
 
+    impl<T> Test1Trait for &'_ mut T
+    where
+        T: Test1Trait,
+    {
+        test1_delegate!(T);
+    }
+
     impl<T> Test1Trait for ::std::boxed::Box<T>
     where
         T: Test1Trait,
@@ -878,13 +1041,18 @@ pub mod _puroro_traits {
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::fmt::Debug;
+            + ::std::fmt::Debug
+        where
+            Self: 'this;
         fn b<'this>(&'this self) -> Self::Field2StringType<'this>;
     }
 
     macro_rules! test2_delegate {
         ($ty:ty) => {
-            type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+            type Field2StringType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field2StringType<'this>;
             fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
                 (**self).b()
             }
@@ -892,6 +1060,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test2Trait for &'_ T
+    where
+        T: Test2Trait,
+    {
+        test2_delegate!(T);
+    }
+
+    impl<T> Test2Trait for &'_ mut T
     where
         T: Test2Trait,
     {
@@ -906,7 +1081,8 @@ pub mod _puroro_traits {
     }
     pub trait Test3Trait {
         type Field3MessageType<'this>:
-            self::_puroro_root::official_samples3::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+            self::_puroro_root::official_samples3::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+            where Self: 'this;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             ::std::default::Default::default()
         }
@@ -914,7 +1090,10 @@ pub mod _puroro_traits {
 
     macro_rules! test3_delegate {
         ($ty:ty) => {
-            type Field3MessageType<'this> = <$ty>::Field3MessageType<'this>;
+            type Field3MessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field3MessageType<'this>;
             fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
                 (**self).c()
             }
@@ -922,6 +1101,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test3Trait for &'_ T
+    where
+        T: Test3Trait,
+    {
+        test3_delegate!(T);
+    }
+
+    impl<T> Test3Trait for &'_ mut T
     where
         T: Test3Trait,
     {
@@ -936,13 +1122,18 @@ pub mod _puroro_traits {
     }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = i32>;
+            + ::std::iter::IntoIterator<Item = i32>
+        where
+            Self: 'this;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
     }
 
     macro_rules! test4_delegate {
         ($ty:ty) => {
-            type Field4RepeatedType<'this> = <$ty>::Field4RepeatedType<'this>;
+            type Field4RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field4RepeatedType<'this>;
             fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
                 (**self).d()
             }
@@ -950,6 +1141,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test4Trait for &'_ T
+    where
+        T: Test4Trait,
+    {
+        test4_delegate!(T);
+    }
+
+    impl<T> Test4Trait for &'_ mut T
     where
         T: Test4Trait,
     {

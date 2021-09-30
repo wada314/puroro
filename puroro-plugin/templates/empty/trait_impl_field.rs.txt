@@ -1,11 +1,11 @@
 {%- if f.is_bytes %}
-type Field{{ f.number }}BytesType<'this> = &'static [u8];
+type Field{{ f.number }}BytesType<'this> where Self: 'this = &'static [u8];
 {%- endif %}
 {%- if f.is_string %}
-type Field{{ f.number }}StringType<'this> = &'static str;
+type Field{{ f.number }}StringType<'this> where Self: 'this = &'static str;
 {%- endif %}
 {%- if f.is_message %}
-type Field{{ f.number }}MessageType<'this> = ();
+type Field{{ f.number }}MessageType<'this> where Self: 'this = ();
 {%- endif %}
 
 {%- if f.trait_has_scalar_getter %}
@@ -24,7 +24,7 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
 {%- endif %}
 
 {%- if f.trait_has_repeated_getter %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
     ::puroro::internal::impls::empty::EmptyRepeatedField::new()
 }
