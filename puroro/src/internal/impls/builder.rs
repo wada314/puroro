@@ -57,6 +57,51 @@
 //! assert_eq!(10, my_message.my_number());
 //! ```
 //!
+//! The biggest benefit of this builder is that the generated message only
+//! consumes the memory for existing fields.
+//! Even if you have a message which have 100 `int32` fields, if you use
+//! this builder and set only 1 field, then the generated
+//! struct only consumes as same memory size as an 1 field struct.
+//!
+//! # Field types
+//!
 //! For every fields (including the fields of nested oneof fields),
 //! a method `append_<fieldname>` is generated for the builder struct.
+//! The parameter types that these `append_*` methods can take are:
+//!
+//! | base protobuf type | `required` / `optional | (unlabeled) / `oneof` field | `repeated` |
+//! |--------------------|----------------------- |-----------------------------|------------|
+//! | `int32` | `Option<i32>` | `i32` | (see below) |
+//! | (any numeric types) | `Option<T>` | `T` | (see below) |
+//! | `bytes` | `Option<impl Deref<Target=[u8]>>` | impl Deref<Target=[u8]> | (see below) |
+//! | `string` | `Option<impl Deref<Target=str>>` | impl Deref<Target=str> | (see below) |
+//! | `SomeMessage` | `Option<impl SomeMessageTrait>` | Option<impl SomeMessageTrait> | (see below) |
+//!
+//! For repeated fields, a type `<RepeatedType>` where:
+//!
+//! `for <'a> &'a RepeatedType: IntoIterator<Item=&'a ScalarType>`
+//!
+//! can be passed. For example, `Vec<T>` or `&[T]` can be passed.
+//!
+//! # Limitations
+//! You may feel strange that the methods are named as `append_something`, not `set_something`.
+//! This is because that our builder methods have some limitations:
+//!
+//! - For non-message optional / required fields, you cannot "clear" the field
+//! once you have set some value.
+//! - Same for message non-repeated fields, you cannot "clear" the existing field
+//! but you can only merge into the existing field.
+//! - For non-message proto3 unlabeled fields, you cannot set the field value to
+//! a default value (e.g. `0` for int32, `""` for string) once you have set a value.
+//! - For repeated fields, you can only append the items. You cannot remove any
+//! items from the existing field.
+//!
+//! These limitations come from the protobuf language spec and our implementation
+//! of builder structs. Our builder's append methods are literally appending the
+//! field into the existing message. When the generated message is serialized,
+//! the fields are serialized in the same order with the append methods' call order.
+//! In the protocol buffer's specification, it is legal that the same field appears
+//! several times in the serialized bytes array and the behavior for that is well
+//! defined (as the above limitations).
+//!
 //!
