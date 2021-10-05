@@ -5,7 +5,7 @@ This project is licensed under Apache 2.0 license.
 
 This is not an officially supported Google product.
 
-See puroro/src/lib.rs for more documents (TODO: Add link here).
+See [puroro/src/lib.rs](https://docs.rs/puroro/0.1.0/puroro/) for more documents.
 
 ## important notes
 
