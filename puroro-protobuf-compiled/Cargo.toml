@@ -2,6 +2,8 @@
 name = "puroro-protobuf-compiled"
 version = "0.1.0"
 edition = "2018"
+license = "Apache-2.0"
+description = "A compiled Google Protocol Buffer's interface proto. Normal user don't need to use this crate directly."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
