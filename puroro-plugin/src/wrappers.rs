@@ -5,7 +5,7 @@ use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::once_cell::unsync::{Lazy, OnceCell};
-use ::protobuf_compiled::google::protobuf;
+use ::puroro_protobuf_compiled::google::protobuf;
 use ::std::borrow::Borrow;
 use ::std::collections::{HashMap, VecDeque};
 use ::std::convert::TryInto;
