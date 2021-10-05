@@ -10,7 +10,7 @@ description = "Google Protocol Buffer's compiler plugin implementation for puror
 
 [dependencies]
 puroro = "0.1.0"
-puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled" }
+puroro-protobuf-compiled = "0.1.0"
 askama = "0.10"
 itertools = "0.10.1"
 lazy_static = "1.4.0"
