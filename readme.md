@@ -19,7 +19,7 @@ Currently this library only supports Rust nightly channel.
 - tests -- Test cases
 - tests-pb -- Compiling .pb files used by tests crate
 - protobuf -- A git submodule of Google's official protobuf repository
-- protobuf-compiled -- Compiled .rs files in protobuf crate so that puroro-plugin crate can use it
+- puroro-protobuf-compiled -- Compiled .rs files in protobuf crate so that puroro-plugin crate can use it
     - update-plugin-protos.bat -- A batch file to generate the compiled .rs files
 
 ## Sample command to compile
@@ -71,11 +71,12 @@ want to make a separated crate containing only generated .rs code (and build.rs 
         - [ ] SliceView -- A viewer over a `&[u8]` slice, without allocating any extra memories
         - [x] Empty(Unit) -- `()`, which only returns default values
         - [x] Merged -- `(T, U)`
-        - [x] Either -- `::itertools::Either<T, U>`
+        - [x] Either -- `::either::Either<T, U>`
         - [x] Option -- `Option<T>`
         - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
             - [x] oneof field support
             - [x] Builder
+            - [ ] `Into<SomeIntType>` support for numerical fields
     - [ ] Support the `allocator_api`. Waiting for the `String` support
     - [ ] RPCs / services
     - [ ] Deserializer vulnerbility: Need to limit the recursion depth

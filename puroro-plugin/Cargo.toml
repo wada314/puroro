@@ -1,10 +1,11 @@
 [package]
 name = "puroro-plugin"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2018"
 license = "Apache-2.0"
 description = "Google Protocol Buffer's compiler plugin implementation for puroro"
+repository = "https://github.com/wada314/puroro"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
