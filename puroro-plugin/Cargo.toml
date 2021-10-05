@@ -9,7 +9,7 @@ description = "Google Protocol Buffer's compiler plugin implementation for puror
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-puroro = { path = "../puroro" }
+puroro = "0.1.0"
 puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled" }
 askama = "0.10"
 itertools = "0.10.1"
