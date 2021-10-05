@@ -9,7 +9,7 @@ license = "Apache-2.0"
 
 [dependencies]
 puroro = { path = "../puroro" }
-protobuf-compiled = { path = "../protobuf-compiled" }
+puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled" }
 askama = "0.10"
 itertools = "0.10.1"
 lazy_static = "1.4.0"
