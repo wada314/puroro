@@ -3,6 +3,8 @@
 A yet another protocol buffer compiler implementation for Rust language.
 This project is licensed under Apache 2.0 license.
 
+This is not an officially supported Google product.
+
 See puroro/src/lib.rs for more documents (TODO: Add link here).
 
 ## important notes
@@ -21,15 +23,20 @@ Currently this library only supports Rust nightly channel.
     - update-plugin-protos.bat -- A batch file to generate the compiled .rs files
 
 ## Sample command to compile
-Check `tests-pb/build.rs` for a sample build script.
-puroro generates root `lib.rs` and submodule files and directories, so you will
-want to make a separated crate containing only generated .rs code (and build.rs and the source .pb files).
+The crate `puroro-plugin` generates an executable file which can be used as
+a `protoc` command's `--plugin=` flag target.
+So once you build `puroro-plugin` somehow you can run `protoc` command like this
+(The sample below is for Windows OS. For Linux, just replace .exe):
 
 ```
 $ protoc <protofile-path> --plugin=protoc-gen-rust=./target/debug/puroro-plugin.exe --rust_out=<output-dir> --proto_path=<protofile-dir>
 ```
 
-Keep in mind that protoc command not work properly with Windows path separator "\\". Use "/" instead.
+(Keep in mind that protoc command not work properly with Windows path separator "\\". Use "/" instead)
+
+Check `tests-pb/build.rs` and `tests-pb/Cargo.toml` for a sample build script.
+This library generates root `lib.rs` file and submodule files and directories, so you will
+want to make a separated crate containing only generated .rs code (and build.rs and the source .pb files).
 
 ## TODOs
 - proto2
@@ -61,11 +68,11 @@ Keep in mind that protoc command not work properly with Windows path separator "
     - [ ] Required field checker
     - [ ] Other implementations
         - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
-        - [ ] SliceView -- A viewer over a `&[u8]` slice
+        - [ ] SliceView -- A viewer over a `&[u8]` slice, without allocating any extra memories
         - [x] Empty(Unit) -- `()`, which only returns default values
         - [x] Merged -- `(T, U)`
         - [x] Either -- `::itertools::Either<T, U>`
-        - [x] Option -- `Some<T>`
+        - [x] Option -- `Option<T>`
         - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
             - [x] oneof field support
             - [x] Builder
