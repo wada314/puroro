@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::fmt::Debug;
+
+#[derive(Clone, PartialEq, Debug)]
 pub struct True();
+#[derive(Clone, PartialEq, Debug)]
 pub struct False();
 
-pub trait BoolTypes {}
-impl BoolTypes for True {}
-impl BoolTypes for False {}
+pub trait BoolType {
+    type Choose<T: Clone + PartialEq + Debug, F: Clone + PartialEq + Debug>: Clone
+        + PartialEq
+        + Debug;
+}
+impl BoolType for True {
+    type Choose<T: Clone + PartialEq + Debug, F: Clone + PartialEq + Debug> = T;
+}
+impl BoolType for False {
+    type Choose<T: Clone + PartialEq + Debug, F: Clone + PartialEq + Debug> = F;
+}

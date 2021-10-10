@@ -122,8 +122,7 @@
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
-//!     type Field2StringType<'this>: Deref<Target=str>;
-//!     type Field2RepeatedType<'this>: IntoIterator<Item=Self::Field2StringType<'this>>;
+//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str>;
 //!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
 //!     type Field3MessageType<'this>: MyMessageTrait;
 //!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
@@ -171,7 +170,7 @@
 //!     -> MyMessageBuilder<(T, MyMessageSingleField2<U, V>)>
 //!     where
 //!         for<'a> &'a U: IntoIterator<Item=&'a V>,
-//!         V: Deref<Target=str>,
+//!         V: AsRef<str>,
 //!     {
 //! #       todo!()
 //!         /* ... */

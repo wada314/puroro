@@ -1,16 +1,4 @@
 
-{%- if f.is_bytes %}
-type Field{{ f.number }}BytesType<'this> where Self: 'this = ::puroro::Either<
-    <T as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
-    <U as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
->;
-{%- endif %}
-{%- if f.is_string %}
-type Field{{ f.number }}StringType<'this> where Self: 'this = ::puroro::Either<
-    <T as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
-    <U as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
->;
-{%- endif %}
 {%- if f.is_message %}
 type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
@@ -21,7 +9,7 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
 {%- if f.trait_has_scalar_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 {
-    {%- if f.is_length_delimited %}
+    {%- if f.is_message %}
     self.as_ref().either(
         |t| ::puroro::Either::Left(<T as {{ m.trait_ident }}>::{{ f.ident }}(t)),
         |u| ::puroro::Either::Right(<U as {{ m.trait_ident }}>::{{ f.ident }}(u)),
@@ -38,7 +26,6 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 {%- if f.trait_has_optional_getter && !f.is_explicit_oneof_field %}
 fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {
-    {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     self.as_ref().either(
         |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t).map(
@@ -50,12 +37,6 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
     )
     {%- else %}
     self.as_ref().either(
-        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t).map(|t| ::puroro::Either::Left(t)),
-        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u).map(|u| ::puroro::Either::Right(u)),
-    )
-    {%- endif %}
-    {%- else %}
-    self.as_ref().either(
         |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t),
         |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u),
     )
@@ -65,12 +46,8 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 
 {%- if f.trait_has_repeated_getter %}
 {%- let either_repeated_field_type %}
-{%- if f.is_length_delimited %}
 {%- if f.is_message %}
 {%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
-{%- else %}
-{%- let either_repeated_field_type = "EitherRepeatedLDField" %}
-{%- endif %}
 {%- else %}
 {%- let either_repeated_field_type = "EitherRepeatedField" %}
 {%- endif %}

@@ -9,8 +9,12 @@ pub struct {{ m.simple_ident }} {
     {%- for oneof in m.oneofs %}
     pub {{ oneof.field_ident }}: ::std::option::Option<
         super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-        {%- if oneof.has_reference_field %}
-            <'static, super::_puroro_impls::{{ m.simple_by_value_ident }}>
+        {%- if oneof.has_ld_field %}
+        {%- if oneof.has_message_field %}
+        <'static, ::puroro::internal::bool::True, Self>
+        {%- else %}
+        <'static, ::puroro::internal::bool::True>
+        {%- endif %}
         {%- endif %}
     >,
     {%- endfor %}
@@ -26,8 +30,12 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_reference_field %}
-            <'this, Self>
+            {%- if oneof.has_ld_field %}
+            {%- if oneof.has_message_field %}
+            <'this, ::puroro::internal::bool::False, Self>
+            {%- else %}
+            <'this, ::puroro::internal::bool::False>
+            {%- endif %}
             {%- endif %}
         >
     {

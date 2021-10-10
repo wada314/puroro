@@ -14,21 +14,22 @@
 
 pub mod se;
 
-use ::std::ops::Deref;
+use ::std::marker::PhantomData;
 
-pub struct DerefIter<I>(I);
-impl<I> DerefIter<I> {
+pub struct AsRefIter<I, R: ?Sized>(I, PhantomData<R>);
+impl<I, R: ?Sized> AsRefIter<I, R> {
     pub fn new(iter: I) -> Self {
-        Self(iter)
+        Self(iter, PhantomData)
     }
 }
-impl<'a, I, T> Iterator for DerefIter<I>
+impl<'a, I, T, R> Iterator for AsRefIter<I, R>
 where
     I: Iterator<Item = &'a T>,
-    T: 'a + Deref,
+    T: 'a + AsRef<R>,
+    R: 'a + ?Sized,
 {
-    type Item = &'a <T as Deref>::Target;
+    type Item = &'a R;
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.next().map(|r| <T as Deref>::deref(r))
+        self.0.next().map(|r| r.as_ref())
     }
 }

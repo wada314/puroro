@@ -71,7 +71,6 @@ struct Message {
     oneofs: Vec<Oneof>,
     simple_ident: String,
     single_field_ident: String,
-    simple_by_value_ident: String,
     builder_ident: String,
 }
 
@@ -114,7 +113,6 @@ impl Message {
             oneofs,
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
-            simple_by_value_ident: m.rust_impl_ident("SimpleByValue"),
             builder_ident: m.rust_impl_ident("Builder"),
         })
     }
@@ -260,7 +258,8 @@ struct Oneof {
     enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
-    has_reference_field: bool,
+    has_ld_field: bool,
+    has_message_field: bool,
     owner_message_trait_path: String,
 }
 
@@ -275,7 +274,7 @@ impl Oneof {
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
-            has_reference_field: o.fields()?.into_iter().any(|f| {
+            has_ld_field: o.fields()?.into_iter().any(|f| {
                 matches!(
                     f.field_type(),
                     Ok(wrappers::FieldType::Bytes
@@ -283,6 +282,10 @@ impl Oneof {
                         | wrappers::FieldType::Message(_))
                 )
             }),
+            has_message_field: o
+                .fields()?
+                .into_iter()
+                .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_)))),
             owner_message_trait_path: o.message()?.rust_trait_path(),
         })
     }
@@ -294,7 +297,7 @@ struct OneofField {
     number: i32,
     is_length_delimited: bool,
     is_message: bool,
-    trait_field_type: String,
+    field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
 }
@@ -312,7 +315,7 @@ impl OneofField {
                     | wrappers::FieldType::Message(_)
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
-            trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
+            field_type: f.oneof_field_type()?,
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(

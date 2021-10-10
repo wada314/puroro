@@ -1,24 +1,42 @@
+
+{%- let maybe_gp %}
+{%- if has_ld_field %}
+{%- if has_message_field %}
+{%- let maybe_gp = "<'msg, IsOwned, T>" %}
+{%- else %}
+{%- let maybe_gp = "<'msg, IsOwned>" %}
+{%- endif %}
+{%- else %}
+{%- let maybe_gp = "" %}
+{%- endif %}
+
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub enum {{ enum_ident }}
-{%- if has_reference_field %}
-<'msg, T: 'msg + ?Sized + {{ owner_message_trait_path }}>
+pub enum {{ enum_ident }}{{ maybe_gp }}
+{%- if has_ld_field %}
+where
+    IsOwned: ::puroro::internal::bool::BoolType,
+    {%- if has_message_field %}
+    T: 'msg + ?Sized + {{ owner_message_trait_path }},
+    {%- endif %}
 {%- else %}
 {%- endif %}
 {
     {%- for field in fields %}
-    {{ field.ident }}({{ field.trait_field_type }}),
+    {{ field.ident }}({{ field.field_type }}),
     {%- endfor %}
 }
 
-
-{%- if has_reference_field %}
-impl <'msg, T: 'msg + ?Sized + {{ owner_message_trait_path }}> {{ enum_ident }}<'msg, T>
-{%- else %}
-impl {{ enum_ident }}
+impl{{ maybe_gp }} {{ enum_ident }}{{ maybe_gp }}
+{%- if has_ld_field %}
+where
+    IsOwned: ::puroro::internal::bool::BoolType,
+    {%- if has_message_field %}
+    T: 'msg + ?Sized + {{ owner_message_trait_path }},
+    {%- endif %}
 {%- endif %}
 {
     {%- for field in fields %}
-    pub fn {{ field.getter_ident }}(self) -> ::std::option::Option<{{ field.trait_field_type }}> {
+    pub fn {{ field.getter_ident }}(self) -> ::std::option::Option<{{ field.field_type }}> {
         match self {
             Self::{{ field.ident }}(v) => ::std::option::Option::Some(v),
             #[allow(unreachable_patterns)]
@@ -28,13 +46,14 @@ impl {{ enum_ident }}
     {%- endfor %}
 }
 
-{%- if has_reference_field %}
-impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>>
-for {{ enum_ident }}<'msg, &'_ T>
+{%- if has_message_field %}
+impl{{ maybe_gp }} ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
+for {{ enum_ident }}<'msg, IsOwned, &'_ T>
 where
+    IsOwned: ::puroro::internal::bool::BoolType,
     T: 'msg + {{ owner_message_trait_path }},
 {
-    fn from(value: {{ enum_ident }}<'msg, T>) -> Self {
+    fn from(value: {{ enum_ident }}{{ maybe_gp }}) -> Self {
         match value {
             {%- for field in fields %}
             {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
@@ -44,13 +63,14 @@ where
 }
 {%- endif %}
 
-{%- if has_reference_field %}
-impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>>
-for {{ enum_ident }}<'msg, &'_ mut T>
+{%- if has_message_field %}
+impl{{ maybe_gp }} ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
+for {{ enum_ident }}<'msg, IsOwned, &'_ mut T>
 where
+    IsOwned: ::puroro::internal::bool::BoolType,
     T: 'msg + {{ owner_message_trait_path }},
 {
-    fn from(value: {{ enum_ident }}<'msg, T>) -> Self {
+    fn from(value: {{ enum_ident }}{{ maybe_gp }}) -> Self {
         match value {
             {%- for field in fields %}
             {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
@@ -60,13 +80,14 @@ where
 }
 {%- endif %}
 
-{%- if has_reference_field %}
-impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>>
-for {{ enum_ident }}<'msg, ::std::boxed::Box<T>>
+{%- if has_message_field %}
+impl{{ maybe_gp }} ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
+for {{ enum_ident }}<'msg, IsOwned, ::std::boxed::Box<T>>
 where
+    IsOwned: ::puroro::internal::bool::BoolType,
     T: 'msg + {{ owner_message_trait_path }},
 {
-    fn from(value: {{ enum_ident }}<'msg, T>) -> Self {
+    fn from(value: {{ enum_ident }}{{ maybe_gp }}) -> Self {
         match value {
             {%- for field in fields %}
             {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),

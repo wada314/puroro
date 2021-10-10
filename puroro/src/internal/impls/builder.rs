@@ -48,7 +48,7 @@
 //!     -> MyMessageBuilder<(T, MyMessageSingleField2<U, V>)>
 //!     where
 //!         for<'a> &'a U: IntoIterator<Item=&'a V>,
-//!         V: Deref<Target=str>,
+//!         V: AsRef<str>,
 //!     {
 //! #       todo!()
 //!         /* ... */
@@ -99,8 +99,8 @@
 //! |--------------------|----------------------- |-----------------------------|------------|
 //! | `int32` | `Option<i32>` | `i32` | (see below) |
 //! | (any numeric types) | `Option<T>` | `T` | (see below) |
-//! | `bytes` | `Option<impl Deref<Target=[u8]>>` | impl Deref<Target=[u8]> | (see below) |
-//! | `string` | `Option<impl Deref<Target=str>>` | impl Deref<Target=str> | (see below) |
+//! | `bytes` | `Option<impl AsRef<[u8]>>` | impl AsRef<[u8]> | (see below) |
+//! | `string` | `Option<impl AsRef<str>>` | impl AsRef<str> | (see below) |
 //! | `SomeMessage` | `Option<impl SomeMessageTrait>` | Option<impl SomeMessageTrait> | (see below) |
 //!
 //! For repeated fields, a type `<RepeatedType>` where:
