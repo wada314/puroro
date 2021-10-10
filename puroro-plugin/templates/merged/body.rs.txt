@@ -11,8 +11,12 @@ where
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_reference_field %}
-            <'this, Self>
+            {%- if oneof.has_ld_field %}
+            {%- if oneof.has_message_field %}
+            <'this, ::puroro::internal::bool::False, Self>
+            {%- else %}
+            <'this, ::puroro::internal::bool::False>
+            {%- endif %}
             {%- endif %}
         >
     {
@@ -25,12 +29,8 @@ where
                 Some(E::{{ field.ident }}({% if field.is_message %}left{% else %}_{% endif %})),
                 Some(E::{{ field.ident }}(right))
             ) => {
-                {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
                 E::{{ field.ident }}((Some(left), Some(right)))
-                {%- else %}
-                E::{{ field.ident }}(::puroro::Either::Right(right))
-                {%- endif %}
                 {%- else %}
                 E::{{ field.ident }}(right)
                 {%- endif %}
@@ -39,12 +39,8 @@ where
 
             {%- for field in oneof.fields %}
             (_, Some(E::{{ field.ident }}(right))) => {
-                {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
                 E::{{ field.ident }}((None, Some(right)))
-                {%- else %}
-                E::{{ field.ident }}(::puroro::Either::Right(right))
-                {%- endif %}
                 {%- else %}
                 E::{{ field.ident }}(right)
                 {%- endif %}
@@ -53,12 +49,8 @@ where
 
             {%- for field in oneof.fields %}
             (Some(E::{{ field.ident }}(left)), None) => {
-                {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
                 E::{{ field.ident }}((Some(left), None))
-                {%- else %}
-                E::{{ field.ident }}(::puroro::Either::Left(left))
-                {%- endif %}
                 {%- else %}
                 E::{{ field.ident }}(left)
                 {%- endif %}

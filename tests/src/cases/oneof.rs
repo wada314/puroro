@@ -25,6 +25,8 @@ use ::tests_pb::oneofs3::{Msg as Msg3, MsgTrait as _, Submsg as Submsg3};
 #[test]
 fn test_oneof_simple2() {
     let mut msg = Msg2::default();
+
+    // Check the default values are empty
     assert!(msg.group_one.is_none());
     assert!(msg.group_two.is_none());
     assert!(msg.group_three.is_none());
@@ -38,6 +40,7 @@ fn test_oneof_simple2() {
     assert!(msg.g2_submsg().is_none());
     assert!(msg.g3_int32().is_none());
 
+    // Set values and check it via trait's getter methods
     msg.group_one = Some(GroupOne2::G1Int32(100));
     assert!(matches!(msg.group_one(), Some(GroupOne2::G1Int32(100))));
     assert!(matches!(msg.g1_int32(), Some(100)));
@@ -88,6 +91,8 @@ fn test_oneof_simple2() {
 #[test]
 fn test_oneof_simple3() {
     let mut msg = Msg3::default();
+
+    // Check the default values are empty
     assert!(msg.group_one.is_none());
     assert!(msg.group_two.is_none());
     assert!(msg.group_three.is_none());
@@ -101,6 +106,7 @@ fn test_oneof_simple3() {
     assert!(msg.g2_submsg().is_none());
     assert!(msg.g3_int32().is_none());
 
+    // Set values and check it via trait's getter methods
     msg.group_one = Some(GroupOne3::G1Int32(100));
     assert!(matches!(msg.group_one(), Some(GroupOne3::G1Int32(100))));
     assert!(matches!(msg.g1_int32(), Some(100)));

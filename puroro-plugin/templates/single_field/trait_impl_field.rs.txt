@@ -1,9 +1,3 @@
-{%- if f.is_bytes %}
-type Field{{ f.number }}BytesType<'this> where Self: 'this = &'this [u8];
-{%- endif %}
-{%- if f.is_string %}
-type Field{{ f.number }}StringType<'this> where Self: 'this = &'this str;
-{%- endif %}
 {%- match f.simple_maybe_field_message_path %}
 {%- when Some with (struct_path) %}
 type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this ScalarType;
@@ -13,7 +7,7 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this ScalarType
 {%- if f.trait_has_scalar_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
     {%- if f.is_length_delimited %}
-    self.{{ f.ident }}.deref()
+    self.{{ f.ident }}.as_ref()
     {%- else %}
     Clone::clone(&self.{{ f.ident }})
     {%- endif %}
@@ -26,7 +20,7 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
     {%- if f.is_message %}
     self.{{ f.ident }}.as_ref()
     {%- else %}
-    self.{{ f.ident }}.as_deref()
+    self.{{ f.ident }}.as_ref().map(|r| r.as_ref())
     {%- endif %}
     {%- else %}
     Clone::clone(&self.{{ f.ident }})
@@ -41,8 +35,14 @@ type Field{{ f.number }}RepeatedType<'this> where Self: 'this
     = <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = ::puroro::internal::impls::single_field::DerefIter<
-        <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter
+    = ::puroro::internal::impls::single_field::AsRefIter<
+        <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+        {%- if f.is_bytes %}
+        [u8],
+        {%- endif %}
+        {%- if f.is_string %}
+        str,
+        {%- endif %}
     >;
 {%- endif %}
 {%- else %}
@@ -55,7 +55,7 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
     {%- if f.is_message %}
     ::std::iter::IntoIterator::into_iter(&self.{{ f.ident }})
     {%- else %}
-    ::puroro::internal::impls::single_field::DerefIter::new(
+    ::puroro::internal::impls::single_field::AsRefIter::new(
         ::std::iter::IntoIterator::into_iter(&self.{{ f.ident }})
     )
     {%- endif %}

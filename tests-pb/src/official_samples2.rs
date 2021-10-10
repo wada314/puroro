@@ -107,11 +107,7 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Test2> for Test2 {}
 
     impl super::_puroro_traits::Test2Trait for Test2 {
-        type Field2StringType<'this>
-        where
-            Self: 'this,
-        = &'this str;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+        fn b<'this>(&'this self) -> Option<&'this str> {
             self.b.as_ref().map(|v| v.as_ref())
         }
     }
@@ -446,17 +442,6 @@ pub mod _puroro_impls {
             Self { a: value }
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test1SimpleByValue {}
-    impl ::puroro::Message<super::Test1> for Test1SimpleByValue {}
-
-    impl Test1Trait for Test1SimpleByValue {
-        fn a<'this>(&'this self) -> Option<i32> {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-    }
     pub struct Test1Builder<T>(T);
 
     impl<T> Test1Builder<T>
@@ -480,32 +465,14 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    impl Test2Trait for () {
-        type Field2StringType<'this>
-        where
-            Self: 'this,
-        = &'static str;
-    }
+    impl Test2Trait for () {}
     impl<T, U> Test2Trait for (T, U)
     where
         T: Test2Trait,
         U: Test2Trait,
     {
-        type Field2StringType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
-            <T as Test2Trait>::Field2StringType<'this>,
-            <U as Test2Trait>::Field2StringType<'this>,
-        >;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            if let Some(right) = <U as Test2Trait>::b(&self.1) {
-                Some(::puroro::Either::Right(right))
-            } else if let Some(left) = <T as Test2Trait>::b(&self.0) {
-                Some(::puroro::Either::Left(left))
-            } else {
-                None
-            }
+        fn b<'this>(&'this self) -> Option<&'this str> {
+            <U as Test2Trait>::b(&self.1).or_else(|| <T as Test2Trait>::b(&self.0))
         }
     }
     impl<T, U> Test2Trait for ::puroro::Either<T, U>
@@ -513,29 +480,16 @@ pub mod _puroro_impls {
         T: Test2Trait,
         U: Test2Trait,
     {
-        type Field2StringType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
-            <T as Test2Trait>::Field2StringType<'this>,
-            <U as Test2Trait>::Field2StringType<'this>,
-        >;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.as_ref().either(
-                |t| <T as Test2Trait>::b(t).map(|t| ::puroro::Either::Left(t)),
-                |u| <U as Test2Trait>::b(u).map(|u| ::puroro::Either::Right(u)),
-            )
+        fn b<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref()
+                .either(|t| <T as Test2Trait>::b(t), |u| <U as Test2Trait>::b(u))
         }
     }
     impl<T> Test2Trait for ::std::option::Option<T>
     where
         T: Test2Trait,
     {
-        type Field2StringType<'this>
-        where
-            Self: 'this,
-        = T::Field2StringType<'this>;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
+        fn b<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.b())
         }
     }
@@ -544,7 +498,7 @@ pub mod _puroro_impls {
 
     pub struct Test2SingleField2<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -553,7 +507,7 @@ pub mod _puroro_impls {
     }
 
     impl<ScalarType> ::puroro::Message<super::Test2> for Test2SingleField2<ScalarType> where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
@@ -562,23 +516,19 @@ pub mod _puroro_impls {
 
     impl<ScalarType> super::_puroro_traits::Test2Trait for Test2SingleField2<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field2StringType<'this>
-        where
-            Self: 'this,
-        = &'this str;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.b.as_deref()
+        fn b<'this>(&'this self) -> Option<&'this str> {
+            self.b.as_ref().map(|r| r.as_ref())
         }
     }
 
     impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test2SingleField2<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -600,25 +550,13 @@ pub mod _puroro_impls {
     impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
         for Test2SingleField2<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
         fn from(value: ::std::option::Option<ScalarType>) -> Self {
             Self { b: value }
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test2SimpleByValue {}
-    impl ::puroro::Message<super::Test2> for Test2SimpleByValue {}
-
-    impl Test2Trait for Test2SimpleByValue {
-        type Field2StringType<'this> = ::std::string::String;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
     pub struct Test2Builder<T>(T);
@@ -632,7 +570,7 @@ pub mod _puroro_impls {
             value: ::std::option::Option<ScalarType>,
         ) -> Test2Builder<(T, Test2SingleField2<ScalarType>)>
         where
-            ScalarType: ::std::ops::Deref<Target = str>
+            ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
@@ -781,19 +719,6 @@ pub mod _puroro_impls {
     {
         fn from(value: ::std::option::Option<ScalarType>) -> Self {
             Self { c: value }
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test3SimpleByValue {}
-    impl ::puroro::Message<super::Test3> for Test3SimpleByValue {}
-
-    impl Test3Trait for Test3SimpleByValue {
-        type Field3MessageType<'this> =
-            ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>;
-        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
     pub struct Test3Builder<T>(T);
@@ -950,18 +875,6 @@ pub mod _puroro_impls {
             Self { d: value }
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test4SimpleByValue {}
-    impl ::puroro::Message<super::Test4> for Test4SimpleByValue {}
-
-    impl Test4Trait for Test4SimpleByValue {
-        type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-    }
     pub struct Test4Builder<T>(T);
 
     impl<T> Test4Builder<T>
@@ -1030,24 +943,14 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
     pub trait Test2Trait {
-        type Field2StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
-        where
-            Self: 'this;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
+        fn b<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::default::Default::default()
         }
     }
 
     macro_rules! test2_delegate {
         ($ty:ty) => {
-            type Field2StringType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field2StringType<'this>;
-            fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
+            fn b<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).b()
             }
         };

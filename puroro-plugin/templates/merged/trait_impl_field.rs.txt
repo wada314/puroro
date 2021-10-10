@@ -17,32 +17,23 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = (
 {%- else %}
 {%- endmatch %}
 
-{%- if f.is_bytes %}
-type Field{{ f.number }}BytesType<'this> where Self: 'this = ::puroro::Either<
-    <T as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
-    <U as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
->;
-{%- endif %}
-{%- if f.is_string %}
-type Field{{ f.number }}StringType<'this> where Self: 'this = ::puroro::Either<
-    <T as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
-    <U as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
->;
-{%- endif %}
-
 {%- if f.trait_has_scalar_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 {
-    {%- if f.is_length_delimited %}
     let right = <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1);
-    if !right.is_empty() {
+    {%- if f.is_length_delimited %}
+    if !right.is_empty()
+    {%- else  %}
+    if right != ::std::default::Default::default()
+    {%- endif %}
+    {%- if f.is_message %}
+    {
         ::puroro::Either::Right(right)
     } else {
         ::puroro::Either::Left(<T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0))
     }
     {%- else %}
-    let right = <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1);
-    if right != ::std::default::Default::default() {
+    {
         right
     } else {
         <T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0)
@@ -54,7 +45,6 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 {%- if f.trait_has_optional_getter && !f.is_explicit_oneof_field %}
 fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {
-    {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     match (
         <T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0),
@@ -66,15 +56,6 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
         (Some(t), Some(u)) => Some((Some(t), Some(u))),
     }
     {%- else %}
-    if let Some(right) = <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1) {
-        Some(::puroro::Either::Right(right))
-    } else if let Some(left) = <T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0) {
-        Some(::puroro::Either::Left(left))
-    } else {
-        None
-    }
-    {%- endif %}
-    {%- else %}
     <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1)
         .or_else(|| <T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0))
     {%- endif %}
@@ -83,12 +64,8 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 
 {%- if f.trait_has_repeated_getter %}
 {%- let merged_repeated_field_type %}
-{%- if f.is_length_delimited %}
 {%- if f.is_message %}
 {%- let merged_repeated_field_type = "MergedRepeatedMessageField" %}
-{%- else %}
-{%- let merged_repeated_field_type = "MergedRepeatedLDField" %}
-{%- endif %}
 {%- else %}
 {%- let merged_repeated_field_type = "MergedRepeatedField" %}
 {%- endif %}

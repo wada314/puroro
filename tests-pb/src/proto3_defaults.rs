@@ -41,11 +41,7 @@ pub mod _puroro_simple_impl {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Clone::clone(&self.f32_unlabeled)
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'this str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             self.string_unlabeled.as_ref()
         }
         type Field6MessageType<'this>
@@ -334,11 +330,7 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'static str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             ""
         }
         type Field6MessageType<'this>
@@ -385,19 +377,12 @@ pub mod _puroro_impls {
                 <T as MsgTrait>::f32_unlabeled(&self.0)
             }
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
-            <T as MsgTrait>::Field5StringType<'this>,
-            <U as MsgTrait>::Field5StringType<'this>,
-        >;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             let right = <U as MsgTrait>::string_unlabeled(&self.1);
             if !right.is_empty() {
-                ::puroro::Either::Right(right)
+                right
             } else {
-                ::puroro::Either::Left(<T as MsgTrait>::string_unlabeled(&self.0))
+                <T as MsgTrait>::string_unlabeled(&self.0)
             }
         }
         type Field6MessageType<'this>
@@ -457,17 +442,10 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::f32_unlabeled(u),
             )
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
-            <T as MsgTrait>::Field5StringType<'this>,
-            <U as MsgTrait>::Field5StringType<'this>,
-        >;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             self.as_ref().either(
-                |t| ::puroro::Either::Left(<T as MsgTrait>::string_unlabeled(t)),
-                |u| ::puroro::Either::Right(<U as MsgTrait>::string_unlabeled(u)),
+                |t| <T as MsgTrait>::string_unlabeled(t),
+                |u| <U as MsgTrait>::string_unlabeled(u),
             )
         }
         type Field6MessageType<'this>
@@ -513,14 +491,11 @@ pub mod _puroro_impls {
             self.as_ref()
                 .map_or_else(::std::default::Default::default, |msg| msg.f32_unlabeled())
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<T::Field5StringType<'this>, &'static str>;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            self.as_ref().map_or(::puroro::Either::Right(""), |msg| {
-                ::puroro::Either::Left(msg.string_unlabeled())
-            })
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            self.as_ref()
+                .map_or_else(::std::default::Default::default, |msg| {
+                    msg.string_unlabeled()
+                })
         }
         type Field6MessageType<'this>
         where
@@ -555,11 +530,7 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'static str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             ""
         }
         type Field6MessageType<'this>
@@ -616,11 +587,7 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'static str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             ""
         }
         type Field6MessageType<'this>
@@ -684,11 +651,7 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'static str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             ""
         }
         type Field6MessageType<'this>
@@ -749,11 +712,7 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Clone::clone(&self.f32_unlabeled)
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'static str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             ""
         }
         type Field6MessageType<'this>
@@ -789,7 +748,7 @@ pub mod _puroro_impls {
 
     pub struct MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -798,7 +757,7 @@ pub mod _puroro_impls {
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField5<ScalarType> where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
@@ -807,7 +766,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -825,12 +784,8 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'this str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            self.string_unlabeled.deref()
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            self.string_unlabeled.as_ref()
         }
         type Field6MessageType<'this>
         where
@@ -840,7 +795,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -861,7 +816,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::ops::Deref<Target = str>
+        ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -913,11 +868,7 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field5StringType<'this>
-        where
-            Self: 'this,
-        = &'static str;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
             ""
         }
         type Field6MessageType<'this>
@@ -967,36 +918,6 @@ pub mod _puroro_impls {
             Self {
                 submsg_unlabeled: value,
             }
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MsgSimpleByValue {}
-    impl ::puroro::Message<super::Msg> for MsgSimpleByValue {}
-
-    impl MsgTrait for MsgSimpleByValue {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-        type Field5StringType<'this> = ::std::string::String;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-        type Field6MessageType<'this> =
-            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>;
-        fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -1055,7 +976,7 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
         where
-            ScalarType: ::std::ops::Deref<Target = str>
+            ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
@@ -1173,17 +1094,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct SubmsgSimpleByValue {}
-    impl ::puroro::Message<super::Submsg> for SubmsgSimpleByValue {}
-
-    impl SubmsgTrait for SubmsgSimpleByValue {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-    }
     pub struct SubmsgBuilder<T>(T);
 
     impl<T> SubmsgBuilder<T>
@@ -1227,13 +1137,7 @@ pub mod _puroro_traits {
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
         fn f32_unlabeled<'this>(&'this self) -> f32;
-        type Field5StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
-        where
-            Self: 'this;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this>;
+        fn string_unlabeled<'this>(&'this self) -> &'this str;
         type Field6MessageType<'this>:
             self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
             where Self: 'this;
@@ -1262,11 +1166,7 @@ pub mod _puroro_traits {
             fn f32_unlabeled<'this>(&'this self) -> f32 {
                 (**self).f32_unlabeled()
             }
-            type Field5StringType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field5StringType<'this>;
-            fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+            fn string_unlabeled<'this>(&'this self) -> &'this str {
                 (**self).string_unlabeled()
             }
             type Field6MessageType<'this>

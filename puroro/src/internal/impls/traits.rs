@@ -36,8 +36,7 @@
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
-//!     type Field2StringType<'this>: Deref<Target=str> + Clone + PartialEq + Debug where Self: 'this;
-//!     type Field2RepeatedType<'this>: IntoIterator<Item=Self::Field2StringType<'this>> where Self: 'this;
+//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str> where Self: 'this;
 //!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
 //!     type Field3MessageType<'this>: MyMessageTrait + Clone + PartialEq + Debug where Self: 'this;
 //!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
@@ -46,12 +45,9 @@
 //!
 //! Each message field will have a single getter method which has same name
 //! (lower_snake_case_nized if it's not) with the original protobuf fields.
-//! If the field type is oneof string, bytes or a message, then an associated type
-//! `Field[number][String|Bytes|Message]Type` is generated.
-//! This associated type implements:
-//! - [`Deref<Target=[u8]>`](std::ops::Deref) for Bytes
-//! - [`Deref<Target=str>`](std::ops::Deref) for String
-//! - ***`SomeMessageTrait`*** for a Message.
+//! If the field is a message type, then an associated type
+//! `Field[number]MessageType` which implements the message type's trait
+//! (something like `SomeMessageTrait`) is generated.
 //!
 //! And if the field is a repeated type, another associated type
 //! `Field[number]RepeatedType` is generated.
@@ -61,12 +57,12 @@
 //! The list of the generated methods' return types:
 //!
 //! | base protobuf type | `required` / `optional` / `oneof` field | (unlabeled) | `repeated` |
-//! |--------------------|-------------------------|-------------|------------|
-//! | `int32`            | `Option<i32>`           | `i32`       | `impl IntoIterator<Item=i32>`|
-//! | (Any numeric types)| `Option<T>`             | `T`         | `impl IntoIterator<Item=T>`|
-//! | `bytes`            | `Option<impl Deref<Target=[u8]>>`|`impl Deref<Target=[u8]>`|`impl IntoIterator<Item=impl Deref<Target=[u8]>>`|
-//! | `string`           | `Option<impl Deref<Target=str>>`|`impl Deref<Target=str>`|`impl IntoIterator<Item=impl Deref<Target=str>>`|
-//! | `SomeMessage`      | `Option<impl SomeMessage>`|`Option<impl SomeMessage>`|`impl IntoIterator<Item=impl SomeMessage>`|
+//! |--------------------|-----------------------------------------|-------------|------------|
+//! | `int32`            | `Option<i32>`                           | `i32`       | `impl IntoIterator<Item=i32>`|
+//! | (Any numeric types)| `Option<T>`                             | `T`         | `impl IntoIterator<Item=T>`|
+//! | `bytes`            | `Option<&[u8]>`                         | `&[u8]`     | `impl IntoIterator<Item=&[u8]>`|
+//! | `string`           | `Option<&str>`                          | `&str`      | `impl IntoIterator<Item=&str>`|
+//! | `SomeMessage`      | `Option<impl SomeMessageTrait>`         | `Option<impl SomeMessageTrait>`|`impl IntoIterator<Item=impl SomeMessageTrait>`|
 //!
 //! ## oneofs
 //!

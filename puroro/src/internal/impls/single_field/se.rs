@@ -21,7 +21,6 @@ use crate::{tags, Result};
 use ::std::convert::TryInto;
 use ::std::io::Write;
 use ::std::marker::PhantomData;
-use ::std::ops::Deref;
 
 struct NullWrite(usize);
 impl Write for NullWrite {
@@ -178,20 +177,21 @@ where
         out: &mut W,
     ) -> Result<()>
     where
-        BytesType: 'a + Deref<Target = [u8]>,
+        BytesType: 'a + AsRef<[u8]>,
         FieldType: 'a,
         FieldType: IntoIterator<Item = &'a BytesType>,
         W: Write,
     {
         for item in field.into_iter() {
-            if !L::DO_DEFAULT_CHECK || !item.deref().is_empty() {
+            if !L::DO_DEFAULT_CHECK || !item.as_ref().is_empty() {
                 write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
                 let len_i32: i32 = item
+                    .as_ref()
                     .len()
                     .try_into()
                     .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
                 Variant::from_i32(len_i32)?.encode_bytes(out)?;
-                out.write(item.deref())?;
+                out.write(item.as_ref())?;
             }
         }
         Ok(())
@@ -208,20 +208,21 @@ where
         out: &mut W,
     ) -> Result<()>
     where
-        StringType: 'a + Deref<Target = str>,
+        StringType: 'a + AsRef<str>,
         FieldType: 'a,
         FieldType: IntoIterator<Item = &'a StringType>,
         W: Write,
     {
         for item in field.into_iter() {
-            if !L::DO_DEFAULT_CHECK || !item.deref().is_empty() {
+            if !L::DO_DEFAULT_CHECK || !item.as_ref().is_empty() {
                 write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
                 let len_i32: i32 = item
+                    .as_ref()
                     .len()
                     .try_into()
                     .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
                 Variant::from_i32(len_i32)?.encode_bytes(out)?;
-                out.write(item.deref().as_bytes())?;
+                out.write(item.as_ref().as_bytes())?;
             }
         }
         Ok(())

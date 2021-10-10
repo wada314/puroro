@@ -257,19 +257,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MsgSimpleByValue {}
-    impl ::puroro::Message<super::Msg> for MsgSimpleByValue {}
-
-    impl MsgTrait for MsgSimpleByValue {
-        type Field1MessageType<'this> =
-            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>;
-        fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            unimplemented!("Please don't use / instantiate this struct!!")
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>

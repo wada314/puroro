@@ -103,9 +103,7 @@
             "command": "doc",
             "args": [
                 "-p",
-                "puroro",
-                "-p",
-                "puroro-plugin"
+                "puroro"
             ],
             "problemMatcher": [
                 "$rustc"

@@ -2,16 +2,6 @@
 pub trait {{ m.trait_ident }} {
     {%- for field in m.fields %}
 
-    {%- if field.is_bytes %}
-    type Field{{ field.number }}BytesType<'this>:
-        ::std::ops::Deref<Target=[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
-        where Self: 'this;
-    {%- endif %}
-    {%- if field.is_string %}
-    type Field{{ field.number }}StringType<'this>:
-        ::std::ops::Deref<Target=str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
-        where Self: 'this;
-    {%- endif %}
     {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
     type Field{{ field.number }}MessageType<'this>:
@@ -41,8 +31,12 @@ pub trait {{ m.trait_ident }} {
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_reference_field %}
-            <'this, Self>
+            {%- if oneof.has_ld_field %}
+            {%- if oneof.has_message_field %}
+            <'this, ::puroro::internal::bool::False, Self>
+            {%- else %}
+            <'this, ::puroro::internal::bool::False>
+            {%- endif %}
             {%- endif %}
         >
     {
@@ -68,12 +62,6 @@ pub trait {{ m.trait_ident }} {
 macro_rules! {{ m.trait_delegate_macro_ident }} {
     ($ty:ty) => {
         {%- for field in m.fields %}
-        {%- if field.is_bytes %}
-        type Field{{ field.number }}BytesType<'this> where Self: 'this = <$ty>::Field{{ field.number }}BytesType<'this>;
-        {%- endif %}
-        {%- if field.is_string %}
-        type Field{{ field.number }}StringType<'this> where Self: 'this = <$ty>::Field{{ field.number }}StringType<'this>;
-        {%- endif %}
         {%- if field.is_message %}
         type Field{{ field.number }}MessageType<'this> where Self: 'this = <$ty>::Field{{ field.number }}MessageType<'this>;
         {%- endif %}
@@ -100,8 +88,12 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
         fn {{ oneof.field_ident }}<'this>(&'this self) ->
             ::std::option::Option<
                 super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-                {%- if oneof.has_reference_field %}
-                <'this, Self>
+                {%- if oneof.has_ld_field %}
+                {%- if oneof.has_message_field %}
+                <'this, ::puroro::internal::bool::False, Self>
+                {%- else %}
+                <'this, ::puroro::internal::bool::False>
+                {%- endif %}
                 {%- endif %}
             >
         {

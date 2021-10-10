@@ -624,14 +624,8 @@ impl Field {
             FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => format!(
-                "Self::Field{number}StringType<'this>",
-                number = self.number()
-            ),
-            FieldType::Bytes => format!(
-                "Self::Field{number}BytesType<'this>",
-                number = self.number()
-            ),
+            FieldType::String => "&'this str".to_string(),
+            FieldType::Bytes => "&'this [u8]".to_string(),
             FieldType::Message(_) => format!(
                 "Self::Field{number}MessageType<'this>",
                 number = self.number()
@@ -655,20 +649,8 @@ impl Field {
             FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => format!(
-                "<{trait_impl} as {trait_path}>::Field{number}StringType<{lt}>",
-                lt = lt,
-                trait_impl = trait_impl,
-                trait_path = self.message()?.rust_trait_path(),
-                number = self.number(),
-            ),
-            FieldType::Bytes => format!(
-                "<{trait_impl} as {trait_path}>::Field{number}BytesType<{lt}>",
-                lt = lt,
-                trait_impl = trait_impl,
-                trait_path = self.message()?.rust_trait_path(),
-                number = self.number(),
-            ),
+            FieldType::String => format!("&{lt} str", lt = lt),
+            FieldType::Bytes => format!("&{lt} [u8]", lt = lt),
             FieldType::Message(_) => format!(
                 "<{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>",
                 lt = lt,
@@ -713,6 +695,46 @@ impl Field {
     }
     pub fn has_repeated_getter(&self) -> Result<bool> {
         Ok(matches!(self.field_label(), Ok(FieldLabel::Repeated)))
+    }
+
+    pub fn oneof_field_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Double => "f64".to_string(),
+            FieldType::Float => "f32".to_string(),
+            FieldType::Int32 => "i32".to_string(),
+            FieldType::Int64 => "i64".to_string(),
+            FieldType::UInt32 => "u32".to_string(),
+            FieldType::UInt64 => "u64".to_string(),
+            FieldType::SInt32 => "i32".to_string(),
+            FieldType::SInt64 => "i64".to_string(),
+            FieldType::Fixed32 => "u32".to_string(),
+            FieldType::Fixed64 => "u64".to_string(),
+            FieldType::SFixed32 => "i32".to_string(),
+            FieldType::SFixed64 => "i64".to_string(),
+            FieldType::Bool => "bool".to_string(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::String => "<IsOwned as ::puroro::internal::bool::BoolType>\
+                ::Choose<::std::string::String, &'msg str>"
+                .to_string(),
+            FieldType::Bytes => "<IsOwned as ::puroro::internal::bool::BoolType>\
+                ::Choose<::std::vec::Vec<u8>, &'msg [u8]>"
+                .to_string(),
+            FieldType::Message(m) => {
+                let simple_message_type = upgrade(&m)?.rust_impl_path("Simple");
+                let trait_getter_type = format!(
+                    "<T as {trait_path}>::Field{number}MessageType<'msg>",
+                    trait_path = self.message()?.rust_trait_path(),
+                    number = self.number(),
+                );
+                format!(
+                    "<IsOwned as ::puroro::internal::bool::BoolType>\
+                    ::Choose<::std::boxed::Box<{message_type}>, {trait_getter_type}>",
+                    message_type = simple_message_type,
+                    trait_getter_type = trait_getter_type,
+                )
+            }
+        })
     }
 
     pub fn simple_field_type(&self) -> Result<String> {

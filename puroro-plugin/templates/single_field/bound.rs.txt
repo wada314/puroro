@@ -6,11 +6,11 @@ where
 {%- if f.is_length_delimited %}
 
 {%- if f.is_bytes %}
-ScalarType: ::std::ops::Deref<Target=[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: ::std::convert::AsRef<[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {%- endif %}
 
 {%- if f.is_string %}
-ScalarType: ::std::ops::Deref<Target=str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: ::std::convert::AsRef<str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {%- endif %}
 
 {%- match f.trait_maybe_field_message_trait_path %}

@@ -44,8 +44,12 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_reference_field %}
-            <'this, Self>
+            {%- if oneof.has_ld_field %}
+            {%- if oneof.has_message_field %}
+            <'this, ::puroro::internal::bool::False, Self>
+            {%- else %}
+            <'this, ::puroro::internal::bool::False>
+            {%- endif %}
             {%- endif %}
         >
     {
@@ -57,7 +61,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
                 {%- if sfield.is_message %}
                 &self.{{ sfield.ident }}
                 {%- else %}
-                ::std::ops::Deref::deref(&self.{{ sfield.ident }})
+                self.{{ sfield.ident }}.as_ref()
                 {%- endif %}
                 {%- else %}
                 self.{{ sfield.ident }}
