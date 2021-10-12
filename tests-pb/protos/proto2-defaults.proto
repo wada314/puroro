@@ -61,6 +61,8 @@ message Msg {
     optional float f32_inf = 51 [default = inf];
     optional float f32_minf = 52 [default = -inf];
     optional float f32_nan = 53 [default = nan];
+    optional float f32_mnan = 54 [default = -nan];
+    
 }
 
 message Submsg {

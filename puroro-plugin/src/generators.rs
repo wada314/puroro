@@ -259,7 +259,21 @@ impl Field {
     }
 
     fn convert_default_value(input: &str, field_type: FieldType) -> Result<String> {
-        todo!()
+        Ok(match field_type {
+            FieldType::Float => match input {
+                "inf" => "f32::INFINITY".to_string(),
+                "-inf" => "f32::NEG_INFINITY".to_string(),
+                "nan" | "-nan" => "f32::NAN".to_string(),
+                digits => format!("{}0f32", digits),
+            },
+            FieldType::Double => match input {
+                "inf" => "f64::INFINITY".to_string(),
+                "-inf" => "f64::NEG_INFINITY".to_string(),
+                "nan" | "-nan" => "f64::NAN".to_string(),
+                digits => format!("{}0f64", digits),
+            },
+            _ => "".to_string(),
+        })
     }
 }
 

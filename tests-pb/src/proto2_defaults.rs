@@ -56,6 +56,7 @@ pub mod _puroro_simple_impl {
         pub f32_inf: ::std::option::Option<f32>,
         pub f32_minf: ::std::option::Option<f32>,
         pub f32_nan: ::std::option::Option<f32>,
+        pub f32_mnan: ::std::option::Option<f32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -183,12 +184,15 @@ pub mod _puroro_simple_impl {
         fn f32_nan<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.f32_nan)
         }
+        fn f32_mnan<'this>(&'this self) -> Option<f32> {
+            Clone::clone(&self.f32_mnan)
+        }
     }
 
     impl ::puroro::MessageRepresentativeImpl for Msg {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 41]> =
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 42]> =
                 Lazy::new(|| {
                     [
                         {
@@ -601,6 +605,16 @@ pub mod _puroro_simple_impl {
                             };
                             ::puroro::internal::init_field_descriptor(init)
                         },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "f32_mnan",
+                                number: 54,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
                     ]
                 });
             static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
@@ -759,6 +773,9 @@ pub mod _puroro_simple_impl {
             53 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
             >::deser_field(&mut self.f32_nan, data),
+            54 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Float
+            >::deser_field(&mut self.f32_mnan, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -974,6 +991,11 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                 &self.f32_nan,
                 53,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
+                &self.f32_mnan,
+                54,
                 out,
             )?;
 
@@ -1209,6 +1231,9 @@ pub mod _puroro_impls {
         }
         fn f32_nan<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::f32_nan(&self.1).or_else(|| <T as MsgTrait>::f32_nan(&self.0))
+        }
+        fn f32_mnan<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_mnan(&self.1).or_else(|| <T as MsgTrait>::f32_mnan(&self.0))
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -1452,6 +1477,12 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::f32_nan(u),
             )
         }
+        fn f32_mnan<'this>(&'this self) -> Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_mnan(t),
+                |u| <U as MsgTrait>::f32_mnan(u),
+            )
+        }
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
@@ -1579,6 +1610,9 @@ pub mod _puroro_impls {
         }
         fn f32_nan<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.f32_nan())
+        }
+        fn f32_mnan<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_mnan())
         }
     }
 
@@ -3028,6 +3062,41 @@ pub mod _puroro_impls {
             Self { f32_nan: value }
         }
     }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField54 {
+        pub f32_mnan: ::std::option::Option<f32>,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField54 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField54 {
+        fn f32_mnan<'this>(&'this self) -> Option<f32> {
+            Clone::clone(&self.f32_mnan)
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField54 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.f32_mnan, 54, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<f32>> for MsgSingleField54 {
+        fn from(value: ::std::option::Option<f32>) -> Self {
+            Self { f32_mnan: value }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -3351,6 +3420,13 @@ pub mod _puroro_impls {
             MsgBuilder((self.0, MsgSingleField53 { f32_nan: value }))
         }
 
+        pub fn append_f32_mnan(
+            self,
+            value: ::std::option::Option<f32>,
+        ) -> MsgBuilder<(T, MsgSingleField54)> {
+            MsgBuilder((self.0, MsgSingleField54 { f32_mnan: value }))
+        }
+
         pub fn build(self) -> T {
             self.0
         }
@@ -3581,6 +3657,9 @@ pub mod _puroro_traits {
         fn f32_nan<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::default::Default::default()
         }
+        fn f32_mnan<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::default::Default::default()
+        }
     }
 
     macro_rules! msg_delegate {
@@ -3707,6 +3786,9 @@ pub mod _puroro_traits {
             }
             fn f32_nan<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_nan()
+            }
+            fn f32_mnan<'this>(&'this self) -> ::std::option::Option<f32> {
+                (**self).f32_mnan()
             }
         };
     }
