@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::utils::upgrade;
-use crate::wrappers;
+use crate::wrappers::{self, FieldType};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -176,6 +176,8 @@ struct Field {
     is_length_delimited: bool,
     is_explicit_oneof_field: bool,
     is_repeated: bool,
+    has_default_value: bool,
+    default_value: String,
     trait_has_scalar_getter: bool,
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
@@ -223,6 +225,12 @@ impl Field {
             ),
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
+            has_default_value: f.default_value().is_some(),
+            default_value: f
+                .default_value()
+                .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
+                .transpose()?
+                .unwrap_or(Default::default()),
             trait_has_scalar_getter: f.has_scalar_getter()?,
             trait_has_optional_getter: f.has_scalar_optional_getter()?,
             trait_has_repeated_getter: f.has_repeated_getter()?,
@@ -248,6 +256,10 @@ impl Field {
             single_field_label_and_type_tags: f
                 .rust_label_and_type_tags(|_| Ok("ScalarType".to_string()))?,
         })
+    }
+
+    fn convert_default_value(input: &str, field_type: FieldType) -> Result<String> {
+        todo!()
     }
 }
 
