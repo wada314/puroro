@@ -379,11 +379,7 @@ pub mod _puroro_impls {
         pub use super::super::_puroro_root::*;
     }
     use super::_puroro_traits::*;
-    impl Test1Trait for () {
-        fn a<'this>(&'this self) -> i32 {
-            Default::default()
-        }
-    }
+    impl Test1Trait for () {}
     impl<T, U> Test1Trait for (T, U)
     where
         T: Test1Trait,
@@ -472,11 +468,7 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    impl Test2Trait for () {
-        fn b<'this>(&'this self) -> &'this str {
-            ""
-        }
-    }
+    impl Test2Trait for () {}
     impl<T, U> Test2Trait for (T, U)
     where
         T: Test2Trait,
@@ -925,7 +917,9 @@ pub mod _puroro_traits {
     }
 
     pub trait Test1Trait {
-        fn a<'this>(&'this self) -> i32;
+        fn a<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
 
     macro_rules! test1_delegate {
@@ -957,7 +951,9 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
     pub trait Test2Trait {
-        fn b<'this>(&'this self) -> &'this str;
+        fn b<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
     }
 
     macro_rules! test2_delegate {

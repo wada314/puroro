@@ -11,7 +11,9 @@ pub trait {{ m.trait_ident }} {
     {%- endmatch %}
 
     {%- if field.trait_has_scalar_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }};
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        ::std::default::Default::default()
+    }
     {%- endif %}
     {%- if field.trait_has_optional_getter && !field.is_explicit_oneof_field %}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
