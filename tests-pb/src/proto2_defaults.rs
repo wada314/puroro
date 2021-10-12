@@ -6,7 +6,6 @@ pub mod _puroro_root {
 }
 
 pub use _puroro_simple_impl::Msg;
-pub use _puroro_simple_impl::Submsg;
 pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
@@ -71,6 +70,9 @@ pub mod _puroro_simple_impl {
         pub bytes_empty: ::std::option::Option<::std::vec::Vec<u8>>,
         pub bytes_abc: ::std::option::Option<::std::vec::Vec<u8>>,
         pub bytes_aiu: ::std::option::Option<::std::vec::Vec<u8>>,
+        pub enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        pub enum_one: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        pub enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -243,12 +245,23 @@ pub mod _puroro_simple_impl {
         fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
             self.bytes_aiu.as_ref().map(|v| v.as_ref())
         }
+        fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            Clone::clone(&self.enum_default)
+        }
+        fn enum_one<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            Clone::clone(&self.enum_one)
+        }
+        fn enum_fourty_two<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            Clone::clone(&self.enum_fourty_two)
+        }
     }
 
     impl ::puroro::MessageRepresentativeImpl for Msg {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 56]> =
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 59]> =
                 Lazy::new(|| {
                     [
                         {
@@ -811,6 +824,36 @@ pub mod _puroro_simple_impl {
                             };
                             ::puroro::internal::init_field_descriptor(init)
                         },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "enum_default",
+                                number: 91,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "enum_one",
+                                number: 92,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "enum_fourty_two",
+                                number: 93,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
                     ]
                 });
             static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
@@ -1014,6 +1057,15 @@ pub mod _puroro_simple_impl {
             84 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
             >::deser_field(&mut self.bytes_aiu, data),
+            91 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
+            >::deser_field(&mut self.enum_default, data),
+            92 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
+            >::deser_field(&mut self.enum_one, data),
+            93 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
+            >::deser_field(&mut self.enum_fourty_two, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -1306,93 +1358,18 @@ pub mod _puroro_simple_impl {
                 84,
                 out,
             )?;
-
-            ::std::result::Result::Ok(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Submsg {
-        pub i32_default: ::std::option::Option<i32>,
-    }
-    impl ::puroro::Message<Submsg> for Submsg {}
-
-    impl super::_puroro_traits::SubmsgTrait for Submsg {
-        fn i32_default<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_default)
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for Submsg {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "i32_default",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Submsg",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Submsg {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Submsg {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::internal::types::FieldData<
-                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
-            >,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_default, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::internal::SerializableMessageToIoWrite for Submsg {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_default,
-                1,
-                out,
-            )?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+            >::ser_field(&self.enum_default, 91, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+            >::ser_field(&self.enum_one, 92, out)?;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+            >::ser_field(&self.enum_fourty_two, 93, out)?;
 
             ::std::result::Result::Ok(())
         }
@@ -1589,6 +1566,19 @@ pub mod _puroro_impls {
         }
         fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
             <U as MsgTrait>::bytes_aiu(&self.1).or_else(|| <T as MsgTrait>::bytes_aiu(&self.0))
+        }
+        fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_default(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_default(&self.0))
+        }
+        fn enum_one<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_one(&self.1).or_else(|| <T as MsgTrait>::enum_one(&self.0))
+        }
+        fn enum_fourty_two<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_fourty_two(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_fourty_two(&self.0))
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -1922,6 +1912,26 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::bytes_aiu(u),
             )
         }
+        fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_default(t),
+                |u| <U as MsgTrait>::enum_default(u),
+            )
+        }
+        fn enum_one<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_one(t),
+                |u| <U as MsgTrait>::enum_one(u),
+            )
+        }
+        fn enum_fourty_two<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_fourty_two(t),
+                |u| <U as MsgTrait>::enum_fourty_two(u),
+            )
+        }
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
@@ -2094,6 +2104,21 @@ pub mod _puroro_impls {
         }
         fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             self.as_ref().and_then(|msg| msg.bytes_aiu())
+        }
+        fn enum_default<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_default())
+        }
+        fn enum_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_one())
+        }
+        fn enum_fourty_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_fourty_two())
         }
     }
 
@@ -4419,6 +4444,120 @@ pub mod _puroro_impls {
             Self { bytes_aiu: value }
         }
     }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField91 {
+        pub enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField91 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField91 {
+        fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            Clone::clone(&self.enum_default)
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField91 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+            >::ser_field::<(), _, _>(&self.enum_default, 91, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>>
+        for MsgSingleField91
+    {
+        fn from(value: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>) -> Self {
+            Self {
+                enum_default: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField92 {
+        pub enum_one: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField92 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField92 {
+        fn enum_one<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            Clone::clone(&self.enum_one)
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField92 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+            >::ser_field::<(), _, _>(&self.enum_one, 92, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>>
+        for MsgSingleField92
+    {
+        fn from(value: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>) -> Self {
+            Self { enum_one: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField93 {
+        pub enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField93 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField93 {
+        fn enum_fourty_two<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            Clone::clone(&self.enum_fourty_two)
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField93 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+            >::ser_field::<(), _, _>(&self.enum_fourty_two, 93, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>>
+        for MsgSingleField93
+    {
+        fn from(value: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>) -> Self {
+            Self {
+                enum_fourty_two: value,
+            }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -4938,101 +5077,43 @@ pub mod _puroro_impls {
             MsgBuilder((self.0, MsgSingleField84 { bytes_aiu: value }))
         }
 
+        pub fn append_enum_default(
+            self,
+            value: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        ) -> MsgBuilder<(T, MsgSingleField91)> {
+            MsgBuilder((
+                self.0,
+                MsgSingleField91 {
+                    enum_default: value,
+                },
+            ))
+        }
+
+        pub fn append_enum_one(
+            self,
+            value: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        ) -> MsgBuilder<(T, MsgSingleField92)> {
+            MsgBuilder((self.0, MsgSingleField92 { enum_one: value }))
+        }
+
+        pub fn append_enum_fourty_two(
+            self,
+            value: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        ) -> MsgBuilder<(T, MsgSingleField93)> {
+            MsgBuilder((
+                self.0,
+                MsgSingleField93 {
+                    enum_fourty_two: value,
+                },
+            ))
+        }
+
         pub fn build(self) -> T {
             self.0
         }
     }
 
     impl MsgBuilder<()> {
-        pub fn new() -> Self {
-            Self(())
-        }
-    }
-    impl SubmsgTrait for () {}
-    impl<T, U> SubmsgTrait for (T, U)
-    where
-        T: SubmsgTrait,
-        U: SubmsgTrait,
-    {
-        fn i32_default<'this>(&'this self) -> Option<i32> {
-            <U as SubmsgTrait>::i32_default(&self.1)
-                .or_else(|| <T as SubmsgTrait>::i32_default(&self.0))
-        }
-    }
-    impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
-    where
-        T: SubmsgTrait,
-        U: SubmsgTrait,
-    {
-        fn i32_default<'this>(&'this self) -> Option<i32> {
-            self.as_ref().either(
-                |t| <T as SubmsgTrait>::i32_default(t),
-                |u| <U as SubmsgTrait>::i32_default(u),
-            )
-        }
-    }
-    impl<T> SubmsgTrait for ::std::option::Option<T>
-    where
-        T: SubmsgTrait,
-    {
-        fn i32_default<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_default())
-        }
-    }
-
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-
-    pub struct SubmsgSingleField1 {
-        pub i32_default: ::std::option::Option<i32>,
-    }
-
-    impl ::puroro::Message<super::Submsg> for SubmsgSingleField1 {}
-
-    impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
-        fn i32_default<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_default)
-        }
-    }
-
-    impl ::puroro::internal::SerializableMessageToIoWrite for SubmsgSingleField1 {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
-                (),
-                _,
-                _,
-            >(&self.i32_default, 1, out)?;
-            ::std::result::Result::Ok(())
-        }
-    }
-
-    impl ::std::convert::From<::std::option::Option<i32>> for SubmsgSingleField1 {
-        fn from(value: ::std::option::Option<i32>) -> Self {
-            Self { i32_default: value }
-        }
-    }
-    pub struct SubmsgBuilder<T>(T);
-
-    impl<T> SubmsgBuilder<T>
-    where
-        T: SubmsgTrait,
-    {
-        pub fn append_i32_default(
-            self,
-            value: ::std::option::Option<i32>,
-        ) -> SubmsgBuilder<(T, SubmsgSingleField1)> {
-            SubmsgBuilder((self.0, SubmsgSingleField1 { i32_default: value }))
-        }
-
-        pub fn build(self) -> T {
-            self.0
-        }
-    }
-
-    impl SubmsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }
@@ -5213,6 +5294,21 @@ pub mod _puroro_traits {
         fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::Some(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
         }
+        fn enum_default<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            ::std::option::Option::Some(self::_puroro_root::proto2_defaults::MyEnum::One)
+        }
+        fn enum_fourty_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            ::std::option::Option::Some(self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo)
+        }
     }
 
     macro_rules! msg_delegate {
@@ -5385,6 +5481,21 @@ pub mod _puroro_traits {
             fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_aiu()
             }
+            fn enum_default<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+                (**self).enum_default()
+            }
+            fn enum_one<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+                (**self).enum_one()
+            }
+            fn enum_fourty_two<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+                (**self).enum_fourty_two()
+            }
         };
     }
 
@@ -5408,49 +5519,42 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-    pub trait SubmsgTrait {
-        fn i32_default<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+}
+#[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
+pub enum MyEnum {
+    One,
+    FourtyTwo,
+}
+
+impl ::puroro::Enum2 for MyEnum {}
+impl ::std::convert::TryFrom<i32> for MyEnum {
+    type Error = i32;
+    fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
+        ::std::result::Result::Ok(match value {
+            1 => MyEnum::One,
+            42 => MyEnum::FourtyTwo,
+            _ => Err(value)?,
+        })
+    }
+}
+
+impl ::std::convert::From<MyEnum> for i32 {
+    fn from(value: MyEnum) -> i32 {
+        match value {
+            MyEnum::One => 1,
+            MyEnum::FourtyTwo => 42,
         }
     }
+}
 
-    macro_rules! submsg_delegate {
-        ($ty:ty) => {
-            fn i32_default<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).i32_default()
-            }
-        };
-    }
-
-    impl<T> SubmsgTrait for &'_ T
-    where
-        T: SubmsgTrait,
-    {
-        submsg_delegate!(T);
-    }
-
-    impl<T> SubmsgTrait for &'_ mut T
-    where
-        T: SubmsgTrait,
-    {
-        submsg_delegate!(T);
-    }
-
-    impl<T> SubmsgTrait for ::std::boxed::Box<T>
-    where
-        T: SubmsgTrait,
-    {
-        submsg_delegate!(T);
+impl ::std::default::Default for MyEnum {
+    fn default() -> Self {
+        MyEnum::One
     }
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     pub mod msg {
-        mod _puroro_root {
-            pub use super::super::super::_puroro_root::*;
-        }
-    }
-    pub mod submsg {
         mod _puroro_root {
             pub use super::super::super::_puroro_root::*;
         }

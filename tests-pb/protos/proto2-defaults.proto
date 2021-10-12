@@ -79,8 +79,13 @@ message Msg {
     optional bytes bytes_empty = 82 [default = ""];
     optional bytes bytes_abc = 83 [default = "abc"];
     optional bytes bytes_aiu = 84 [default = "あいう"];
+
+    optional MyEnum enum_default = 91;
+    optional MyEnum enum_one = 92 [default = ONE];
+    optional MyEnum enum_fourty_two = 93 [default = FOURTY_TWO];
 }
 
-message Submsg {
-    optional int32 i32_default = 1;
+enum MyEnum {
+    ONE = 1;
+    FOURTY_TWO = 42;
 }

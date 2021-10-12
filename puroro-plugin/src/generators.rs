@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::utils::upgrade;
+use crate::utils::{get_keyword_safe_ident, to_camel_case, upgrade};
 use crate::wrappers::{self, FieldType};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
@@ -350,7 +350,16 @@ impl Field {
                     .collect::<String>();
                 format!(r#"b"{}""#, reencoded)
             }
-            _ => "todo!()".to_string(),
+            FieldType::Enum2(e) | FieldType::Enum3(e) => {
+                format!(
+                    "{}::{}",
+                    upgrade(&e)?.rust_path(),
+                    get_keyword_safe_ident(&to_camel_case(input))
+                )
+            }
+            FieldType::Message(_) | FieldType::Group => {
+                unreachable!("Message and Group should not have default values")
+            }
         })
     }
 }
