@@ -12,16 +12,16 @@ pub trait {{ m.trait_ident }} {
 
     {%- if field.trait_has_scalar_getter %}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-        {%- if field.has_default_value -%}
-        {{ field.default_value }}
-        {%- else %}
         ::std::default::Default::default()
-        {%- endif %}
     }
     {%- endif %}
     {%- if field.trait_has_optional_getter && !field.is_explicit_oneof_field %}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        {%- if field.has_default_value -%}
+        ::std::option::Option::Some({{ field.default_value }})
+        {%- else %}
         ::std::default::Default::default()
+        {%- endif %}
     }
     {%- endif %}
     {%- if field.trait_has_repeated_getter %}

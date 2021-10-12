@@ -63,6 +63,22 @@ message Msg {
     optional float f32_nan = 53 [default = nan];
     optional float f32_mnan = 54 [default = -nan];
     
+    optional bool bool_default = 61;
+    optional bool bool_true = 62 [default = true];
+    optional bool bool_false = 63 [default = false];
+
+    optional string string_default = 71;
+    optional string string_empty = 72 [default = ""];
+    optional string string_abc = 73 [default = "abc"];
+    optional string string_aiu = 74 [default = "あいう"];
+    optional string string_backslash = 75 [default = "\\"];
+    optional string string_tab = 76 [default = "	"];
+    optional string string_crlf = 77 [default = "\r\n"];
+
+    optional bytes bytes_default = 81;
+    optional bytes bytes_empty = 82 [default = ""];
+    optional bytes bytes_abc = 83 [default = "abc"];
+    optional bytes bytes_aiu = 84 [default = "あいう"];
 }
 
 message Submsg {

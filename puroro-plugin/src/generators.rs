@@ -264,15 +264,93 @@ impl Field {
                 "inf" => "f32::INFINITY".to_string(),
                 "-inf" => "f32::NEG_INFINITY".to_string(),
                 "nan" | "-nan" => "f32::NAN".to_string(),
-                digits => format!("{}0f32", digits),
+                digits => {
+                    let append_zero = if digits.ends_with('.') { "0" } else { "" };
+                    format!("{}{}f32", digits, append_zero)
+                }
             },
             FieldType::Double => match input {
                 "inf" => "f64::INFINITY".to_string(),
                 "-inf" => "f64::NEG_INFINITY".to_string(),
                 "nan" | "-nan" => "f64::NAN".to_string(),
-                digits => format!("{}0f64", digits),
+                digits => {
+                    let append_zero = if digits.ends_with('.') { "0" } else { "" };
+                    format!("{}{}f64", digits, append_zero)
+                }
             },
-            _ => "".to_string(),
+            FieldType::Int32
+            | FieldType::Int64
+            | FieldType::UInt32
+            | FieldType::UInt64
+            | FieldType::SInt32
+            | FieldType::SInt64
+            | FieldType::Fixed32
+            | FieldType::Fixed64
+            | FieldType::SFixed32
+            | FieldType::SFixed64 => {
+                // As-is is okay. Even if the input is octal of hexadecimal format,
+                // the protoc command automatically converts it to decimal format
+                // so we only need to treat a decimal format.
+                input.to_string()
+            }
+            FieldType::Bool => {
+                // the possible input is "true" or "false", so as-is is okay.
+                input.to_string()
+            }
+            FieldType::String => {
+                format!(r###""{}""###, input.escape_default().collect::<String>())
+            }
+            FieldType::Bytes => {
+                // protoc escapes 0x7F~0xFF character as octal escape "\234".
+                // Rust does not support that style so we need to re-encode it.
+                let mut decoded = Vec::new();
+                let mut bytes = input.bytes();
+                loop {
+                    if let Some(c) = bytes.next() {
+                        if c == b'\\' {
+                            if let Some(d) = bytes.next() {
+                                if d == b'\\' {
+                                    decoded.push(b'\\');
+                                } else {
+                                    let e_opt = bytes.next();
+                                    let f_opt = bytes.next();
+                                    match (d, e_opt, f_opt) {
+                                        (
+                                            (b'0'..=b'9'),
+                                            Some(e @ (b'0'..=b'9')),
+                                            Some(f @ (b'0'..=b'9')),
+                                        ) => {
+                                            let u8_value = u8::from_str_radix(
+                                                &format!("{}{}{}", d - b'0', e - b'0', f - b'0'),
+                                                8,
+                                            )
+                                            .map_err(|e| ErrorKind::ParseIntError { source: e })?;
+                                            decoded.push(u8_value);
+                                        }
+                                        _ => Err(ErrorKind::InvalidString {
+                                            string: input.to_string(),
+                                        })?,
+                                    }
+                                }
+                            } else {
+                                Err(ErrorKind::InvalidString {
+                                    string: input.to_string(),
+                                })?
+                            }
+                        } else {
+                            decoded.push(c);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                let reencoded = decoded
+                    .into_iter()
+                    .map(|b| format!(r"\x{:02x}", b))
+                    .collect::<String>();
+                format!(r#"b"{}""#, reencoded)
+            }
+            _ => "todo!()".to_string(),
         })
     }
 }

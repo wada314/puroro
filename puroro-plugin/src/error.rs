@@ -36,6 +36,10 @@ pub enum ErrorKind {
     TooLargeLength,
     #[error(r#"An error from formatter: "{source}""#)]
     WriteError { source: std::fmt::Error },
+    #[error(r#"An error from ParseIntError: "{source}""#)]
+    ParseIntError { source: std::num::ParseIntError },
+    #[error(r#"Bad format string: "{string}""#)]
+    InvalidString { string: String },
     #[error(r#"An error from puroro: "{source}""#)]
     PuroroError { source: ::puroro::PuroroError },
     #[error(r#"Something went wrong: "{detail}""#)]

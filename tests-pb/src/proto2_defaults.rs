@@ -57,6 +57,20 @@ pub mod _puroro_simple_impl {
         pub f32_minf: ::std::option::Option<f32>,
         pub f32_nan: ::std::option::Option<f32>,
         pub f32_mnan: ::std::option::Option<f32>,
+        pub bool_default: ::std::option::Option<bool>,
+        pub bool_true: ::std::option::Option<bool>,
+        pub bool_false: ::std::option::Option<bool>,
+        pub string_default: ::std::option::Option<::std::string::String>,
+        pub string_empty: ::std::option::Option<::std::string::String>,
+        pub string_abc: ::std::option::Option<::std::string::String>,
+        pub string_aiu: ::std::option::Option<::std::string::String>,
+        pub string_backslash: ::std::option::Option<::std::string::String>,
+        pub string_tab: ::std::option::Option<::std::string::String>,
+        pub string_crlf: ::std::option::Option<::std::string::String>,
+        pub bytes_default: ::std::option::Option<::std::vec::Vec<u8>>,
+        pub bytes_empty: ::std::option::Option<::std::vec::Vec<u8>>,
+        pub bytes_abc: ::std::option::Option<::std::vec::Vec<u8>>,
+        pub bytes_aiu: ::std::option::Option<::std::vec::Vec<u8>>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -187,12 +201,54 @@ pub mod _puroro_simple_impl {
         fn f32_mnan<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.f32_mnan)
         }
+        fn bool_default<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.bool_default)
+        }
+        fn bool_true<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.bool_true)
+        }
+        fn bool_false<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.bool_false)
+        }
+        fn string_default<'this>(&'this self) -> Option<&'this str> {
+            self.string_default.as_ref().map(|v| v.as_ref())
+        }
+        fn string_empty<'this>(&'this self) -> Option<&'this str> {
+            self.string_empty.as_ref().map(|v| v.as_ref())
+        }
+        fn string_abc<'this>(&'this self) -> Option<&'this str> {
+            self.string_abc.as_ref().map(|v| v.as_ref())
+        }
+        fn string_aiu<'this>(&'this self) -> Option<&'this str> {
+            self.string_aiu.as_ref().map(|v| v.as_ref())
+        }
+        fn string_backslash<'this>(&'this self) -> Option<&'this str> {
+            self.string_backslash.as_ref().map(|v| v.as_ref())
+        }
+        fn string_tab<'this>(&'this self) -> Option<&'this str> {
+            self.string_tab.as_ref().map(|v| v.as_ref())
+        }
+        fn string_crlf<'this>(&'this self) -> Option<&'this str> {
+            self.string_crlf.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_default<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_default.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_empty<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_empty.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_abc<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_abc.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_aiu.as_ref().map(|v| v.as_ref())
+        }
     }
 
     impl ::puroro::MessageRepresentativeImpl for Msg {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 42]> =
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 56]> =
                 Lazy::new(|| {
                     [
                         {
@@ -615,6 +671,146 @@ pub mod _puroro_simple_impl {
                             };
                             ::puroro::internal::init_field_descriptor(init)
                         },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bool_default",
+                                number: 61,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bool_true",
+                                number: 62,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bool_false",
+                                number: 63,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_default",
+                                number: 71,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_empty",
+                                number: 72,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_abc",
+                                number: 73,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_aiu",
+                                number: 74,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_backslash",
+                                number: 75,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_tab",
+                                number: 76,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_crlf",
+                                number: 77,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bytes_default",
+                                number: 81,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bytes_empty",
+                                number: 82,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bytes_abc",
+                                number: 83,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bytes_aiu",
+                                number: 84,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
                     ]
                 });
             static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
@@ -776,6 +972,48 @@ pub mod _puroro_simple_impl {
             54 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
             >::deser_field(&mut self.f32_mnan, data),
+            61 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.bool_default, data),
+            62 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.bool_true, data),
+            63 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bool
+            >::deser_field(&mut self.bool_false, data),
+            71 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_default, data),
+            72 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_empty, data),
+            73 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_abc, data),
+            74 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_aiu, data),
+            75 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_backslash, data),
+            76 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_tab, data),
+            77 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_crlf, data),
+            81 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_default, data),
+            82 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_empty, data),
+            83 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_abc, data),
+            84 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_aiu, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -996,6 +1234,76 @@ pub mod _puroro_simple_impl {
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                 &self.f32_mnan,
                 54,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.bool_default,
+                61,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.bool_true,
+                62,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
+                &self.bool_false,
+                63,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_default,
+                71,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_empty,
+                72,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_abc,
+                73,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_aiu,
+                74,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_backslash,
+                75,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_tab,
+                76,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_crlf,
+                77,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_default,
+                81,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_empty,
+                82,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_abc,
+                83,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_aiu,
+                84,
                 out,
             )?;
 
@@ -1234,6 +1542,53 @@ pub mod _puroro_impls {
         }
         fn f32_mnan<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::f32_mnan(&self.1).or_else(|| <T as MsgTrait>::f32_mnan(&self.0))
+        }
+        fn bool_default<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_default(&self.1)
+                .or_else(|| <T as MsgTrait>::bool_default(&self.0))
+        }
+        fn bool_true<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_true(&self.1).or_else(|| <T as MsgTrait>::bool_true(&self.0))
+        }
+        fn bool_false<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_false(&self.1).or_else(|| <T as MsgTrait>::bool_false(&self.0))
+        }
+        fn string_default<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_default(&self.1)
+                .or_else(|| <T as MsgTrait>::string_default(&self.0))
+        }
+        fn string_empty<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_empty(&self.1)
+                .or_else(|| <T as MsgTrait>::string_empty(&self.0))
+        }
+        fn string_abc<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_abc(&self.1).or_else(|| <T as MsgTrait>::string_abc(&self.0))
+        }
+        fn string_aiu<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_aiu(&self.1).or_else(|| <T as MsgTrait>::string_aiu(&self.0))
+        }
+        fn string_backslash<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_backslash(&self.1)
+                .or_else(|| <T as MsgTrait>::string_backslash(&self.0))
+        }
+        fn string_tab<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_tab(&self.1).or_else(|| <T as MsgTrait>::string_tab(&self.0))
+        }
+        fn string_crlf<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_crlf(&self.1).or_else(|| <T as MsgTrait>::string_crlf(&self.0))
+        }
+        fn bytes_default<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_default(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_default(&self.0))
+        }
+        fn bytes_empty<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_empty(&self.1).or_else(|| <T as MsgTrait>::bytes_empty(&self.0))
+        }
+        fn bytes_abc<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_abc(&self.1).or_else(|| <T as MsgTrait>::bytes_abc(&self.0))
+        }
+        fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_aiu(&self.1).or_else(|| <T as MsgTrait>::bytes_aiu(&self.0))
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -1483,6 +1838,90 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::f32_mnan(u),
             )
         }
+        fn bool_default<'this>(&'this self) -> Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_default(t),
+                |u| <U as MsgTrait>::bool_default(u),
+            )
+        }
+        fn bool_true<'this>(&'this self) -> Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_true(t),
+                |u| <U as MsgTrait>::bool_true(u),
+            )
+        }
+        fn bool_false<'this>(&'this self) -> Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_false(t),
+                |u| <U as MsgTrait>::bool_false(u),
+            )
+        }
+        fn string_default<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_default(t),
+                |u| <U as MsgTrait>::string_default(u),
+            )
+        }
+        fn string_empty<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_empty(t),
+                |u| <U as MsgTrait>::string_empty(u),
+            )
+        }
+        fn string_abc<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_abc(t),
+                |u| <U as MsgTrait>::string_abc(u),
+            )
+        }
+        fn string_aiu<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_aiu(t),
+                |u| <U as MsgTrait>::string_aiu(u),
+            )
+        }
+        fn string_backslash<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_backslash(t),
+                |u| <U as MsgTrait>::string_backslash(u),
+            )
+        }
+        fn string_tab<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_tab(t),
+                |u| <U as MsgTrait>::string_tab(u),
+            )
+        }
+        fn string_crlf<'this>(&'this self) -> Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_crlf(t),
+                |u| <U as MsgTrait>::string_crlf(u),
+            )
+        }
+        fn bytes_default<'this>(&'this self) -> Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_default(t),
+                |u| <U as MsgTrait>::bytes_default(u),
+            )
+        }
+        fn bytes_empty<'this>(&'this self) -> Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_empty(t),
+                |u| <U as MsgTrait>::bytes_empty(u),
+            )
+        }
+        fn bytes_abc<'this>(&'this self) -> Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_abc(t),
+                |u| <U as MsgTrait>::bytes_abc(u),
+            )
+        }
+        fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_aiu(t),
+                |u| <U as MsgTrait>::bytes_aiu(u),
+            )
+        }
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
@@ -1613,6 +2052,48 @@ pub mod _puroro_impls {
         }
         fn f32_mnan<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.f32_mnan())
+        }
+        fn bool_default<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_default())
+        }
+        fn bool_true<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_true())
+        }
+        fn bool_false<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_false())
+        }
+        fn string_default<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_default())
+        }
+        fn string_empty<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_empty())
+        }
+        fn string_abc<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_abc())
+        }
+        fn string_aiu<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_aiu())
+        }
+        fn string_backslash<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_backslash())
+        }
+        fn string_tab<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_tab())
+        }
+        fn string_crlf<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_crlf())
+        }
+        fn bytes_default<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_default())
+        }
+        fn bytes_empty<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_empty())
+        }
+        fn bytes_abc<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_abc())
+        }
+        fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_aiu())
         }
     }
 
@@ -3097,6 +3578,847 @@ pub mod _puroro_impls {
             Self { f32_mnan: value }
         }
     }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField61 {
+        pub bool_default: ::std::option::Option<bool>,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField61 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField61 {
+        fn bool_default<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.bool_default)
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField61 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.bool_default, 61, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<bool>> for MsgSingleField61 {
+        fn from(value: ::std::option::Option<bool>) -> Self {
+            Self {
+                bool_default: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField62 {
+        pub bool_true: ::std::option::Option<bool>,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField62 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField62 {
+        fn bool_true<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.bool_true)
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField62 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.bool_true, 62, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<bool>> for MsgSingleField62 {
+        fn from(value: ::std::option::Option<bool>) -> Self {
+            Self { bool_true: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField63 {
+        pub bool_false: ::std::option::Option<bool>,
+    }
+
+    impl ::puroro::Message<super::Msg> for MsgSingleField63 {}
+
+    impl super::_puroro_traits::MsgTrait for MsgSingleField63 {
+        fn bool_false<'this>(&'this self) -> Option<bool> {
+            Clone::clone(&self.bool_false)
+        }
+    }
+
+    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField63 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
+                (),
+                _,
+                _,
+            >(&self.bool_false, 63, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<bool>> for MsgSingleField63 {
+        fn from(value: ::std::option::Option<bool>) -> Self {
+            Self { bool_false: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField71<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_default: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField71<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField71<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn string_default<'this>(&'this self) -> Option<&'this str> {
+            self.string_default.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField71<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.string_default, 71, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField71<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self {
+                string_default: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField72<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_empty: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField72<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField72<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn string_empty<'this>(&'this self) -> Option<&'this str> {
+            self.string_empty.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField72<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.string_empty, 72, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField72<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self {
+                string_empty: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField73<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_abc: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField73<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField73<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn string_abc<'this>(&'this self) -> Option<&'this str> {
+            self.string_abc.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField73<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.string_abc, 73, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField73<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { string_abc: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField74<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_aiu: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField74<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField74<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn string_aiu<'this>(&'this self) -> Option<&'this str> {
+            self.string_aiu.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField74<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.string_aiu, 74, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField74<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { string_aiu: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField75<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_backslash: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField75<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField75<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn string_backslash<'this>(&'this self) -> Option<&'this str> {
+            self.string_backslash.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField75<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.string_backslash, 75, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField75<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self {
+                string_backslash: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField76<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_tab: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField76<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField76<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn string_tab<'this>(&'this self) -> Option<&'this str> {
+            self.string_tab.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField76<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.string_tab, 76, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField76<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { string_tab: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField77<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_crlf: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField77<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField77<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn string_crlf<'this>(&'this self) -> Option<&'this str> {
+            self.string_crlf.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField77<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.string_crlf, 77, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField77<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { string_crlf: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField81<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub bytes_default: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField81<ScalarType> where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField81<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn bytes_default<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_default.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField81<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.bytes_default, 81, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField81<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self {
+                bytes_default: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField82<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub bytes_empty: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField82<ScalarType> where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField82<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn bytes_empty<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_empty.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField82<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.bytes_empty, 82, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField82<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { bytes_empty: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField83<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub bytes_abc: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField83<ScalarType> where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField83<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn bytes_abc<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_abc.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField83<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.bytes_abc, 83, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField83<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { bytes_abc: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField84<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub bytes_aiu: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField84<ScalarType> where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField84<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_aiu.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField84<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.bytes_aiu, 84, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField84<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { bytes_aiu: value }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -3427,6 +4749,195 @@ pub mod _puroro_impls {
             MsgBuilder((self.0, MsgSingleField54 { f32_mnan: value }))
         }
 
+        pub fn append_bool_default(
+            self,
+            value: ::std::option::Option<bool>,
+        ) -> MsgBuilder<(T, MsgSingleField61)> {
+            MsgBuilder((
+                self.0,
+                MsgSingleField61 {
+                    bool_default: value,
+                },
+            ))
+        }
+
+        pub fn append_bool_true(
+            self,
+            value: ::std::option::Option<bool>,
+        ) -> MsgBuilder<(T, MsgSingleField62)> {
+            MsgBuilder((self.0, MsgSingleField62 { bool_true: value }))
+        }
+
+        pub fn append_bool_false(
+            self,
+            value: ::std::option::Option<bool>,
+        ) -> MsgBuilder<(T, MsgSingleField63)> {
+            MsgBuilder((self.0, MsgSingleField63 { bool_false: value }))
+        }
+
+        pub fn append_string_default<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField71<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField71 {
+                    string_default: value,
+                },
+            ))
+        }
+
+        pub fn append_string_empty<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField72<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField72 {
+                    string_empty: value,
+                },
+            ))
+        }
+
+        pub fn append_string_abc<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField73<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField73 { string_abc: value }))
+        }
+
+        pub fn append_string_aiu<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField74<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField74 { string_aiu: value }))
+        }
+
+        pub fn append_string_backslash<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField75<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField75 {
+                    string_backslash: value,
+                },
+            ))
+        }
+
+        pub fn append_string_tab<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField76<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField76 { string_tab: value }))
+        }
+
+        pub fn append_string_crlf<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField77<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField77 { string_crlf: value }))
+        }
+
+        pub fn append_bytes_default<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField81<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<[u8]>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField81 {
+                    bytes_default: value,
+                },
+            ))
+        }
+
+        pub fn append_bytes_empty<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField82<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<[u8]>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField82 { bytes_empty: value }))
+        }
+
+        pub fn append_bytes_abc<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField83<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<[u8]>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField83 { bytes_abc: value }))
+        }
+
+        pub fn append_bytes_aiu<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField84<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<[u8]>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField84 { bytes_aiu: value }))
+        }
+
         pub fn build(self) -> T {
             self.0
         }
@@ -3538,127 +5049,169 @@ pub mod _puroro_traits {
             ::std::default::Default::default()
         }
         fn i32_0<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0)
         }
         fn i32_42<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(42)
         }
         fn i32_m42<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(-42)
         }
         fn i32_2147483647<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(2147483647)
         }
         fn i32_m2147483648<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(-2147483648)
         }
         fn i32_0123<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(83)
         }
         fn i32_0x123<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(291)
         }
         fn u32_default<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::default::Default::default()
         }
         fn u32_0<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0)
         }
         fn u32_42<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(42)
         }
         fn u32_4294967295<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(4294967295)
         }
         fn u32_0123<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(83)
         }
         fn u32_0x123<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(291)
         }
         fn i64_default<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::default::Default::default()
         }
         fn i64_0<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0)
         }
         fn i64_42<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(42)
         }
         fn i64_m42<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(-42)
         }
         fn i64_9223372036854775807<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(9223372036854775807)
         }
         fn i64_m9223372036854775808<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(-9223372036854775808)
         }
         fn i64_0123<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(83)
         }
         fn i64_0x123<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(291)
         }
         fn u64_default<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::default::Default::default()
         }
         fn u64_0<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0)
         }
         fn u64_42<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(42)
         }
         fn u64_18446744073709551615<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(18446744073709551615)
         }
         fn u64_0123<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(83)
         }
         fn u64_0x123<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(291)
         }
         fn f32_default<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::default::Default::default()
         }
         fn f32_0<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0f32)
         }
         fn f32_m0<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(-0f32)
         }
         fn f32_0p<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0f32)
         }
         fn f32_p0<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0f32)
         }
         fn f32_0p0<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0f32)
         }
         fn f32_42<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(42f32)
         }
         fn f32_m42<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(-42f32)
         }
         fn f32_0p25<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(0.25f32)
         }
         fn f32_1p5e2<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(150f32)
         }
         fn f32_inf<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(f32::INFINITY)
         }
         fn f32_minf<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(f32::NEG_INFINITY)
         }
         fn f32_nan<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+            ::std::option::Option::Some(f32::NAN)
         }
         fn f32_mnan<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::option::Option::Some(f32::NAN)
+        }
+        fn bool_default<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> ::std::option::Option<bool> {
+            ::std::option::Option::Some(true)
+        }
+        fn bool_false<'this>(&'this self) -> ::std::option::Option<bool> {
+            ::std::option::Option::Some(false)
+        }
+        fn string_default<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some("")
+        }
+        fn string_abc<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some("abc")
+        }
+        fn string_aiu<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some("\u{3042}\u{3044}\u{3046}")
+        }
+        fn string_backslash<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some("\\")
+        }
+        fn string_tab<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some("\t")
+        }
+        fn string_crlf<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some("\r\n")
+        }
+        fn bytes_default<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(b"")
+        }
+        fn bytes_abc<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(b"\x61\x62\x63")
+        }
+        fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
         }
     }
 
@@ -3789,6 +5342,48 @@ pub mod _puroro_traits {
             }
             fn f32_mnan<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_mnan()
+            }
+            fn bool_default<'this>(&'this self) -> ::std::option::Option<bool> {
+                (**self).bool_default()
+            }
+            fn bool_true<'this>(&'this self) -> ::std::option::Option<bool> {
+                (**self).bool_true()
+            }
+            fn bool_false<'this>(&'this self) -> ::std::option::Option<bool> {
+                (**self).bool_false()
+            }
+            fn string_default<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_default()
+            }
+            fn string_empty<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_empty()
+            }
+            fn string_abc<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_abc()
+            }
+            fn string_aiu<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_aiu()
+            }
+            fn string_backslash<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_backslash()
+            }
+            fn string_tab<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_tab()
+            }
+            fn string_crlf<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_crlf()
+            }
+            fn bytes_default<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_default()
+            }
+            fn bytes_empty<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_empty()
+            }
+            fn bytes_abc<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_abc()
+            }
+            fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_aiu()
             }
         };
     }
