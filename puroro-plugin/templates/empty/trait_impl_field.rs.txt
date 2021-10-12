@@ -2,21 +2,6 @@
 type Field{{ f.number }}MessageType<'this> where Self: 'this = ();
 {%- endif %}
 
-{%- if f.trait_has_scalar_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
-    {%- if f.is_bytes %}
-    &[]
-    {%- endif %}
-    {%- if f.is_string %}
-    ""
-    {%- endif %}
-    {#- No need to consider message type case here, message is always wrapped by Optional -#}
-    {%- if !f.is_length_delimited %}
-    Default::default()
-    {%- endif %}
-}
-{%- endif %}
-
 {%- if f.trait_has_repeated_getter %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {

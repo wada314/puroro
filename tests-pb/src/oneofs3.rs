@@ -1191,11 +1191,7 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    impl SubmsgTrait for () {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            Default::default()
-        }
-    }
+    impl SubmsgTrait for () {}
     impl<T, U> SubmsgTrait for (T, U)
     where
         T: SubmsgTrait,
@@ -1483,7 +1479,9 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     pub trait SubmsgTrait {
-        fn i32_unlabeled<'this>(&'this self) -> i32;
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
 
     macro_rules! submsg_delegate {
