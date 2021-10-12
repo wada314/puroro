@@ -7,6 +7,7 @@ pub mod official_samples2;
 pub mod official_samples3;
 pub mod oneofs2;
 pub mod oneofs3;
+pub mod proto2_defaults;
 pub mod proto3_defaults;
 pub mod self_recursive;
 pub mod ser_tests2;

@@ -1,0 +1,60 @@
+// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto2";
+package proto2_defaults;
+
+message Msg {
+    optional int32 i32_default = 1;
+    optional int32 i32_0 = 2 [default = 0];
+    optional int32 i32_42 = 3 [default = 42];
+    optional int32 i32_m42 = 4 [default = -42];
+    optional int32 i32_2147483647 = 5 [default = 2147483647];
+    optional int32 i32_m2147483648 = 6 [default = -2147483648];
+    optional int32 i32_0123 = 7 [default = 0123];
+    optional int32 i32_0x123 = 8 [default = 0x123];
+    
+    optional uint32 u32_default = 11;
+    optional uint32 u32_0 = 12 [default = 0];
+    optional uint32 u32_42 = 13 [default = 42];
+    optional uint32 u32_2147483647 = 15 [default = 2147483647];
+    optional uint32 u32_4294967295 = 16 [default = 4294967295];
+    optional uint32 u32_0123 = 17 [default = 0123];
+    optional uint32 u32_0x123 = 18 [default = 0x123];
+
+    optional int64 i64_default = 21;
+    optional int64 i64_0 = 22 [default = 0];
+    optional int64 i64_42 = 23 [default = 42];
+    optional int64 i64_m42 = 24 [default = -42];
+    optional int64 i64_9223372036854775807 = 25 [default = 9223372036854775807];
+    optional int64 i64_m9223372036854775808 = 26 [default = -9223372036854775808];
+    optional int64 i64_0123 = 27 [default = 0123];
+    optional int64 i64_0x123 = 28 [default = 0x123];
+    
+    optional uint64 u64_default = 31;
+    optional uint64 u64_0 = 32 [default = 0];
+    optional uint64 u64_42 = 33 [default = 42];
+    optional uint64 u64_2147483647 = 35 [default = 2147483647];
+    optional uint64 u64_4294967295 = 36 [default = 4294967295];
+    optional uint64 u64_0123 = 37 [default = 0123];
+    optional uint64 u64_0x123 = 38 [default = 0x123];
+
+    optional float f32_unlabeled = 4;
+    optional string string_unlabeled = 5;
+    optional Submsg submsg_unlabeled = 6;
+}
+
+message Submsg {
+    optional int32 i32_default = 1;
+}
