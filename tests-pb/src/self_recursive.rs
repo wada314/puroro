@@ -10,9 +10,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub recursive_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
@@ -107,6 +105,14 @@ pub mod _puroro_simple_impl {
             >::ser_field(&self.recursive_unlabeled, 1, out)?;
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                recursive_unlabeled: ::std::default::Default::default(),
+            }
         }
     }
 }

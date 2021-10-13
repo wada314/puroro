@@ -79,6 +79,9 @@ message Msg {
     optional bytes bytes_empty = 82 [default = ""];
     optional bytes bytes_abc = 83 [default = "abc"];
     optional bytes bytes_aiu = 84 [default = "あいう"];
+    optional bytes bytes_backslash = 85 [default = "\\"];
+    optional bytes bytes_tab = 86 [default = "	"];
+    optional bytes bytes_crlf = 87 [default = "\r\n"];
 
     optional MyEnum enum_default = 91;
     optional MyEnum enum_one = 92 [default = ONE];

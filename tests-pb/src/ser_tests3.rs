@@ -10,9 +10,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_unlabeled: i32,
         pub i32_repeated: ::std::vec::Vec<i32>,
@@ -345,6 +343,24 @@ pub mod _puroro_simple_impl {
             )?;
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_unlabeled: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                enum_unlabeled: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                very_large_field_number: ::std::default::Default::default(),
+            }
         }
     }
 }
@@ -2279,12 +2295,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Submsg {
                 pub i32_unlabeled: i32,
             }
@@ -2370,6 +2381,14 @@ pub mod _puroro_nested {
                 >::ser_field(&self.i32_unlabeled, 1, out)?;
 
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for Submsg {
+                fn default() -> Self {
+                    Self {
+                        i32_unlabeled: ::std::default::Default::default(),
+                    }
                 }
             }
         }

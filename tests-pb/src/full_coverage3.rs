@@ -10,9 +10,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
     pub i32_unlabeled: i32,
     pub i32_optional: ::std::option::Option<i32>,
@@ -1167,6 +1165,61 @@ pub mod _puroro_simple_impl {
             )?;
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_unlabeled: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                bytes_unlabeled: ::std::default::Default::default(),
+                bytes_optional: ::std::default::Default::default(),
+                bytes_repeated: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                enum_unlabeled: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                i64_unlabeled: ::std::default::Default::default(),
+                i64_optional: ::std::default::Default::default(),
+                i64_repeated: ::std::default::Default::default(),
+                u32_unlabeled: ::std::default::Default::default(),
+                u32_optional: ::std::default::Default::default(),
+                u32_repeated: ::std::default::Default::default(),
+                u64_unlabeled: ::std::default::Default::default(),
+                u64_optional: ::std::default::Default::default(),
+                u64_repeated: ::std::default::Default::default(),
+                s32_unlabeled: ::std::default::Default::default(),
+                s32_optional: ::std::default::Default::default(),
+                s32_repeated: ::std::default::Default::default(),
+                s64_unlabeled: ::std::default::Default::default(),
+                s64_optional: ::std::default::Default::default(),
+                s64_repeated: ::std::default::Default::default(),
+                fixed32_unlabeled: ::std::default::Default::default(),
+                fixed32_optional: ::std::default::Default::default(),
+                fixed32_repeated: ::std::default::Default::default(),
+                fixed64_unlabeled: ::std::default::Default::default(),
+                fixed64_optional: ::std::default::Default::default(),
+                fixed64_repeated: ::std::default::Default::default(),
+                sfixed32_unlabeled: ::std::default::Default::default(),
+                sfixed32_optional: ::std::default::Default::default(),
+                sfixed32_repeated: ::std::default::Default::default(),
+                sfixed64_unlabeled: ::std::default::Default::default(),
+                sfixed64_optional: ::std::default::Default::default(),
+                sfixed64_repeated: ::std::default::Default::default(),
+                f64_unlabeled: ::std::default::Default::default(),
+                f64_optional: ::std::default::Default::default(),
+                f64_repeated: ::std::default::Default::default(),
+            }
         }
     }
 }
@@ -12086,12 +12139,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Submsg {
                 pub i32_unlabeled: i32,
                 pub i64_unlabeled: i64,
@@ -12199,6 +12247,15 @@ pub mod _puroro_nested {
                 >::ser_field(&self.i64_unlabeled, 101, out)?;
 
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for Submsg {
+                fn default() -> Self {
+                    Self {
+                        i32_unlabeled: ::std::default::Default::default(),
+                        i64_unlabeled: ::std::default::Default::default(),
+                    }
                 }
             }
         }

@@ -10,9 +10,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_default: ::std::option::Option<i32>,
         pub i32_0: ::std::option::Option<i32>,
@@ -70,6 +68,9 @@ pub mod _puroro_simple_impl {
         pub bytes_empty: ::std::option::Option<::std::vec::Vec<u8>>,
         pub bytes_abc: ::std::option::Option<::std::vec::Vec<u8>>,
         pub bytes_aiu: ::std::option::Option<::std::vec::Vec<u8>>,
+        pub bytes_backslash: ::std::option::Option<::std::vec::Vec<u8>>,
+        pub bytes_tab: ::std::option::Option<::std::vec::Vec<u8>>,
+        pub bytes_crlf: ::std::option::Option<::std::vec::Vec<u8>>,
         pub enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
         pub enum_one: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
         pub enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
@@ -245,6 +246,15 @@ pub mod _puroro_simple_impl {
         fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
             self.bytes_aiu.as_ref().map(|v| v.as_ref())
         }
+        fn bytes_backslash<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_backslash.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_tab<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_tab.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_crlf<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_crlf.as_ref().map(|v| v.as_ref())
+        }
         fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
             Clone::clone(&self.enum_default)
         }
@@ -261,7 +271,7 @@ pub mod _puroro_simple_impl {
     impl ::puroro::MessageRepresentativeImpl for Msg {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 59]> =
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 62]> =
                 Lazy::new(|| {
                     [
                         {
@@ -826,6 +836,36 @@ pub mod _puroro_simple_impl {
                         },
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bytes_backslash",
+                                number: 85,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bytes_tab",
+                                number: 86,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "bytes_crlf",
+                                number: 87,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "enum_default",
                                 number: 91,
                                 lazy_containing_type: Lazy::new(|| {
@@ -1057,6 +1097,15 @@ pub mod _puroro_simple_impl {
             84 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
             >::deser_field(&mut self.bytes_aiu, data),
+            85 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_backslash, data),
+            86 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_tab, data),
+            87 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_crlf, data),
             91 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
             >::deser_field(&mut self.enum_default, data),
@@ -1358,6 +1407,21 @@ pub mod _puroro_simple_impl {
                 84,
                 out,
             )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_backslash,
+                85,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_tab,
+                86,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_crlf,
+                87,
+                out,
+            )?;
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
@@ -1372,6 +1436,81 @@ pub mod _puroro_simple_impl {
             >::ser_field(&self.enum_fourty_two, 93, out)?;
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                i32_default: ::std::default::Default::default(),
+                i32_0: ::std::option::Option::Some(0),
+                i32_42: ::std::option::Option::Some(42),
+                i32_m42: ::std::option::Option::Some(-42),
+                i32_2147483647: ::std::option::Option::Some(2147483647),
+                i32_m2147483648: ::std::option::Option::Some(-2147483648),
+                i32_0123: ::std::option::Option::Some(83),
+                i32_0x123: ::std::option::Option::Some(291),
+                u32_default: ::std::default::Default::default(),
+                u32_0: ::std::option::Option::Some(0),
+                u32_42: ::std::option::Option::Some(42),
+                u32_4294967295: ::std::option::Option::Some(4294967295),
+                u32_0123: ::std::option::Option::Some(83),
+                u32_0x123: ::std::option::Option::Some(291),
+                i64_default: ::std::default::Default::default(),
+                i64_0: ::std::option::Option::Some(0),
+                i64_42: ::std::option::Option::Some(42),
+                i64_m42: ::std::option::Option::Some(-42),
+                i64_9223372036854775807: ::std::option::Option::Some(9223372036854775807),
+                i64_m9223372036854775808: ::std::option::Option::Some(-9223372036854775808),
+                i64_0123: ::std::option::Option::Some(83),
+                i64_0x123: ::std::option::Option::Some(291),
+                u64_default: ::std::default::Default::default(),
+                u64_0: ::std::option::Option::Some(0),
+                u64_42: ::std::option::Option::Some(42),
+                u64_18446744073709551615: ::std::option::Option::Some(18446744073709551615),
+                u64_0123: ::std::option::Option::Some(83),
+                u64_0x123: ::std::option::Option::Some(291),
+                f32_default: ::std::default::Default::default(),
+                f32_0: ::std::option::Option::Some(0f32),
+                f32_m0: ::std::option::Option::Some(-0f32),
+                f32_0p: ::std::option::Option::Some(0f32),
+                f32_p0: ::std::option::Option::Some(0f32),
+                f32_0p0: ::std::option::Option::Some(0f32),
+                f32_42: ::std::option::Option::Some(42f32),
+                f32_m42: ::std::option::Option::Some(-42f32),
+                f32_0p25: ::std::option::Option::Some(0.25f32),
+                f32_1p5e2: ::std::option::Option::Some(150f32),
+                f32_inf: ::std::option::Option::Some(f32::INFINITY),
+                f32_minf: ::std::option::Option::Some(f32::NEG_INFINITY),
+                f32_nan: ::std::option::Option::Some(f32::NAN),
+                f32_mnan: ::std::option::Option::Some(f32::NAN),
+                bool_default: ::std::default::Default::default(),
+                bool_true: ::std::option::Option::Some(true),
+                bool_false: ::std::option::Option::Some(false),
+                string_default: ::std::default::Default::default(),
+                string_empty: ::std::option::Option::Some("".to_string()),
+                string_abc: ::std::option::Option::Some("abc".to_string()),
+                string_aiu: ::std::option::Option::Some("\u{3042}\u{3044}\u{3046}".to_string()),
+                string_backslash: ::std::option::Option::Some("\\".to_string()),
+                string_tab: ::std::option::Option::Some("\t".to_string()),
+                string_crlf: ::std::option::Option::Some("\r\n".to_string()),
+                bytes_default: ::std::default::Default::default(),
+                bytes_empty: ::std::option::Option::Some(b"".to_vec()),
+                bytes_abc: ::std::option::Option::Some(b"\x61\x62\x63".to_vec()),
+                bytes_aiu: ::std::option::Option::Some(
+                    b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86".to_vec(),
+                ),
+                bytes_backslash: ::std::option::Option::Some(b"\x5c".to_vec()),
+                bytes_tab: ::std::option::Option::Some(b"\x09".to_vec()),
+                bytes_crlf: ::std::option::Option::Some(b"\x0d\x0a".to_vec()),
+                enum_default: ::std::default::Default::default(),
+                enum_one: ::std::option::Option::Some(
+                    self::_puroro_root::proto2_defaults::MyEnum::One,
+                ),
+                enum_fourty_two: ::std::option::Option::Some(
+                    self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo,
+                ),
+            }
         }
     }
 }
@@ -1566,6 +1705,16 @@ pub mod _puroro_impls {
         }
         fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
             <U as MsgTrait>::bytes_aiu(&self.1).or_else(|| <T as MsgTrait>::bytes_aiu(&self.0))
+        }
+        fn bytes_backslash<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_backslash(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_backslash(&self.0))
+        }
+        fn bytes_tab<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_tab(&self.1).or_else(|| <T as MsgTrait>::bytes_tab(&self.0))
+        }
+        fn bytes_crlf<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_crlf(&self.1).or_else(|| <T as MsgTrait>::bytes_crlf(&self.0))
         }
         fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
             <U as MsgTrait>::enum_default(&self.1)
@@ -1912,6 +2061,24 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::bytes_aiu(u),
             )
         }
+        fn bytes_backslash<'this>(&'this self) -> Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_backslash(t),
+                |u| <U as MsgTrait>::bytes_backslash(u),
+            )
+        }
+        fn bytes_tab<'this>(&'this self) -> Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_tab(t),
+                |u| <U as MsgTrait>::bytes_tab(u),
+            )
+        }
+        fn bytes_crlf<'this>(&'this self) -> Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_crlf(t),
+                |u| <U as MsgTrait>::bytes_crlf(u),
+            )
+        }
         fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::enum_default(t),
@@ -2104,6 +2271,15 @@ pub mod _puroro_impls {
         }
         fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             self.as_ref().and_then(|msg| msg.bytes_aiu())
+        }
+        fn bytes_backslash<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_backslash())
+        }
+        fn bytes_tab<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_tab())
+        }
+        fn bytes_crlf<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_crlf())
         }
         fn enum_default<'this>(
             &'this self,
@@ -4447,6 +4623,206 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
+    pub struct MsgSingleField85<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub bytes_backslash: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField85<ScalarType> where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField85<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn bytes_backslash<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_backslash.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField85<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.bytes_backslash, 85, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField85<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self {
+                bytes_backslash: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField86<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub bytes_tab: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField86<ScalarType> where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField86<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn bytes_tab<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_tab.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField86<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.bytes_tab, 86, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField86<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { bytes_tab: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField87<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub bytes_crlf: ::std::option::Option<ScalarType>,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField87<ScalarType> where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField87<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn bytes_crlf<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_crlf.as_ref().map(|r| r.as_ref())
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField87<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
+                ScalarType,
+                _,
+                _,
+            >(&self.bytes_crlf, 87, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
+        for MsgSingleField87<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<[u8]>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+            Self { bytes_crlf: value }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
     pub struct MsgSingleField91 {
         pub enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
     }
@@ -5077,6 +5453,50 @@ pub mod _puroro_impls {
             MsgBuilder((self.0, MsgSingleField84 { bytes_aiu: value }))
         }
 
+        pub fn append_bytes_backslash<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField85<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<[u8]>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField85 {
+                    bytes_backslash: value,
+                },
+            ))
+        }
+
+        pub fn append_bytes_tab<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField86<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<[u8]>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField86 { bytes_tab: value }))
+        }
+
+        pub fn append_bytes_crlf<ScalarType>(
+            self,
+            value: ::std::option::Option<ScalarType>,
+        ) -> MsgBuilder<(T, MsgSingleField87<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<[u8]>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField87 { bytes_crlf: value }))
+        }
+
         pub fn append_enum_default(
             self,
             value: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
@@ -5294,6 +5714,15 @@ pub mod _puroro_traits {
         fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::Some(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
         }
+        fn bytes_backslash<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(b"\x5c")
+        }
+        fn bytes_tab<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(b"\x09")
+        }
+        fn bytes_crlf<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(b"\x0d\x0a")
+        }
         fn enum_default<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
@@ -5480,6 +5909,15 @@ pub mod _puroro_traits {
             }
             fn bytes_aiu<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_aiu()
+            }
+            fn bytes_backslash<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_backslash()
+            }
+            fn bytes_tab<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_tab()
+            }
+            fn bytes_crlf<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_crlf()
             }
             fn enum_default<'this>(
                 &'this self,

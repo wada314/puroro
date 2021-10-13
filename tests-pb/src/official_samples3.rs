@@ -13,9 +13,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test1 {
         pub a: i32,
     }
@@ -98,9 +96,15 @@ pub mod _puroro_simple_impl {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for Test1 {
+        fn default() -> Self {
+            Self {
+                a: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test2 {
         pub b: ::std::string::String,
     }
@@ -183,9 +187,15 @@ pub mod _puroro_simple_impl {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for Test2 {
+        fn default() -> Self {
+            Self {
+                b: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test3 {
         pub c: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>,
@@ -284,9 +294,15 @@ pub mod _puroro_simple_impl {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for Test3 {
+        fn default() -> Self {
+            Self {
+                c: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test4 {
         pub d: ::std::vec::Vec<i32>,
     }
@@ -369,6 +385,14 @@ pub mod _puroro_simple_impl {
             )?;
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Test4 {
+        fn default() -> Self {
+            Self {
+                d: ::std::default::Default::default(),
+            }
         }
     }
 }

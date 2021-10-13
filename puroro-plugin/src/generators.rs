@@ -309,27 +309,40 @@ impl Field {
                     if let Some(c) = bytes.next() {
                         if c == b'\\' {
                             if let Some(d) = bytes.next() {
-                                if d == b'\\' {
-                                    decoded.push(b'\\');
-                                } else {
-                                    let e_opt = bytes.next();
-                                    let f_opt = bytes.next();
-                                    match (d, e_opt, f_opt) {
-                                        (
-                                            (b'0'..=b'9'),
-                                            Some(e @ (b'0'..=b'9')),
-                                            Some(f @ (b'0'..=b'9')),
-                                        ) => {
-                                            let u8_value = u8::from_str_radix(
-                                                &format!("{}{}{}", d - b'0', e - b'0', f - b'0'),
-                                                8,
-                                            )
-                                            .map_err(|e| ErrorKind::ParseIntError { source: e })?;
-                                            decoded.push(u8_value);
+                                match d {
+                                    b'\\' | b'\"' | b'\'' => {
+                                        decoded.push(d);
+                                    }
+                                    b'r' => decoded.push(b'\r'),
+                                    b'n' => decoded.push(b'\n'),
+                                    b't' => decoded.push(b'\t'),
+                                    _ => {
+                                        let e_opt = bytes.next();
+                                        let f_opt = bytes.next();
+                                        match (d, e_opt, f_opt) {
+                                            (
+                                                (b'0'..=b'9'),
+                                                Some(e @ (b'0'..=b'9')),
+                                                Some(f @ (b'0'..=b'9')),
+                                            ) => {
+                                                let u8_value = u8::from_str_radix(
+                                                    &format!(
+                                                        "{}{}{}",
+                                                        d - b'0',
+                                                        e - b'0',
+                                                        f - b'0'
+                                                    ),
+                                                    8,
+                                                )
+                                                .map_err(|e| ErrorKind::ParseIntError {
+                                                    source: e,
+                                                })?;
+                                                decoded.push(u8_value);
+                                            }
+                                            _ => Err(ErrorKind::InvalidString {
+                                                string: input.to_string(),
+                                            })?,
                                         }
-                                        _ => Err(ErrorKind::InvalidString {
-                                            string: input.to_string(),
-                                        })?,
                                     }
                                 }
                             } else {

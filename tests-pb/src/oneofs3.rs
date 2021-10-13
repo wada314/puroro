@@ -11,9 +11,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub group_one: ::std::option::Option<
             super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
@@ -324,9 +322,17 @@ pub mod _puroro_simple_impl {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                group_one: ::std::default::Default::default(),
+                group_two: ::std::default::Default::default(),
+                group_three: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -409,6 +415,14 @@ pub mod _puroro_simple_impl {
             )?;
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Submsg {
+        fn default() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+            }
         }
     }
 }
