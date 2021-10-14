@@ -25,6 +25,11 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
     {%- else %}
     Clone::clone(&self.{{ f.ident }})
     {%- endif %}
+    {%- if field.has_default_value %}
+    .or(
+        <() as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&())
+    )
+    {%- endif %}
 }
 {%- endif %}
 

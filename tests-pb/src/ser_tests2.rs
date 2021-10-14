@@ -446,8 +446,8 @@ pub mod _puroro_impls {
         U: MsgTrait,
     {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_optional(&self.0))
+            let u = <U as MsgTrait>::i32_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::i32_optional(&self.0))
         }
         type Field2RepeatedType<'this>
         where
@@ -464,8 +464,8 @@ pub mod _puroro_impls {
             )
         }
         fn float_optional<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::float_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::float_optional(&self.0))
+            let u = <U as MsgTrait>::float_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::float_optional(&self.0))
         }
         type Field4RepeatedType<'this>
         where
@@ -482,8 +482,8 @@ pub mod _puroro_impls {
             )
         }
         fn string_optional<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::string_optional(&self.0))
+            let u = <U as MsgTrait>::string_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::string_optional(&self.0))
         }
         type Field6RepeatedType<'this>
         where
@@ -539,8 +539,8 @@ pub mod _puroro_impls {
             )
         }
         fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
-            <U as MsgTrait>::enum_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_optional(&self.0))
+            let u = <U as MsgTrait>::enum_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::enum_optional(&self.0))
         }
         type Field10RepeatedType<'this>
         where
@@ -557,8 +557,8 @@ pub mod _puroro_impls {
             )
         }
         fn very_large_field_number<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::very_large_field_number(&self.1)
-                .or_else(|| <T as MsgTrait>::very_large_field_number(&self.0))
+            let u = <U as MsgTrait>::very_large_field_number(&self.1);
+            u.or_else(|| <T as MsgTrait>::very_large_field_number(&self.0))
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -2409,8 +2409,8 @@ pub mod _puroro_nested {
                 U: SubmsgTrait,
             {
                 fn i32_optional<'this>(&'this self) -> Option<i32> {
-                    <U as SubmsgTrait>::i32_optional(&self.1)
-                        .or_else(|| <T as SubmsgTrait>::i32_optional(&self.0))
+                    let u = <U as SubmsgTrait>::i32_optional(&self.1);
+                    u.or_else(|| <T as SubmsgTrait>::i32_optional(&self.0))
                 }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>

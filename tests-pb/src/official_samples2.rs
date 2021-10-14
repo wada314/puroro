@@ -418,7 +418,8 @@ pub mod _puroro_impls {
         U: Test1Trait,
     {
         fn a<'this>(&'this self) -> Option<i32> {
-            <U as Test1Trait>::a(&self.1).or_else(|| <T as Test1Trait>::a(&self.0))
+            let u = <U as Test1Trait>::a(&self.1);
+            u.or_else(|| <T as Test1Trait>::a(&self.0))
         }
     }
     impl<T, U> Test1Trait for ::puroro::Either<T, U>
@@ -504,7 +505,8 @@ pub mod _puroro_impls {
         U: Test2Trait,
     {
         fn b<'this>(&'this self) -> Option<&'this str> {
-            <U as Test2Trait>::b(&self.1).or_else(|| <T as Test2Trait>::b(&self.0))
+            let u = <U as Test2Trait>::b(&self.1);
+            u.or_else(|| <T as Test2Trait>::b(&self.0))
         }
     }
     impl<T, U> Test2Trait for ::puroro::Either<T, U>

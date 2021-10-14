@@ -1460,12 +1460,12 @@ pub mod _puroro_impls {
         U: MsgTrait,
     {
         fn i32_required<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_required(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_required(&self.0))
+            let u = <U as MsgTrait>::i32_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::i32_required(&self.0))
         }
         fn i32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_optional(&self.0))
+            let u = <U as MsgTrait>::i32_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::i32_optional(&self.0))
         }
         type Field3RepeatedType<'this>
         where
@@ -1482,12 +1482,12 @@ pub mod _puroro_impls {
             )
         }
         fn float_required<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::float_required(&self.1)
-                .or_else(|| <T as MsgTrait>::float_required(&self.0))
+            let u = <U as MsgTrait>::float_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::float_required(&self.0))
         }
         fn float_optional<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::float_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::float_optional(&self.0))
+            let u = <U as MsgTrait>::float_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::float_optional(&self.0))
         }
         type Field13RepeatedType<'this>
         where
@@ -1504,12 +1504,12 @@ pub mod _puroro_impls {
             )
         }
         fn bytes_required<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_required(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_required(&self.0))
+            let u = <U as MsgTrait>::bytes_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::bytes_required(&self.0))
         }
         fn bytes_optional<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_optional(&self.0))
+            let u = <U as MsgTrait>::bytes_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::bytes_optional(&self.0))
         }
         type Field23RepeatedType<'this>
         where
@@ -1526,12 +1526,12 @@ pub mod _puroro_impls {
             )
         }
         fn string_required<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_required(&self.1)
-                .or_else(|| <T as MsgTrait>::string_required(&self.0))
+            let u = <U as MsgTrait>::string_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::string_required(&self.0))
         }
         fn string_optional<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::string_optional(&self.0))
+            let u = <U as MsgTrait>::string_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::string_optional(&self.0))
         }
         type Field33RepeatedType<'this>
         where
@@ -1548,12 +1548,12 @@ pub mod _puroro_impls {
             )
         }
         fn enum_required<'this>(&'this self) -> Option<self::_puroro_root::full_coverage2::Enum> {
-            <U as MsgTrait>::enum_required(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_required(&self.0))
+            let u = <U as MsgTrait>::enum_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::enum_required(&self.0))
         }
         fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::full_coverage2::Enum> {
-            <U as MsgTrait>::enum_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_optional(&self.0))
+            let u = <U as MsgTrait>::enum_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::enum_optional(&self.0))
         }
         type Field43RepeatedType<'this>
         where
@@ -1627,12 +1627,12 @@ pub mod _puroro_impls {
             )
         }
         fn i64_required<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_required(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_required(&self.0))
+            let u = <U as MsgTrait>::i64_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::i64_required(&self.0))
         }
         fn i64_optional<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_optional(&self.0))
+            let u = <U as MsgTrait>::i64_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::i64_optional(&self.0))
         }
         type Field103RepeatedType<'this>
         where
@@ -1649,12 +1649,12 @@ pub mod _puroro_impls {
             )
         }
         fn u32_required<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_required(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_required(&self.0))
+            let u = <U as MsgTrait>::u32_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::u32_required(&self.0))
         }
         fn u32_optional<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_optional(&self.0))
+            let u = <U as MsgTrait>::u32_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::u32_optional(&self.0))
         }
         type Field113RepeatedType<'this>
         where
@@ -1671,12 +1671,12 @@ pub mod _puroro_impls {
             )
         }
         fn u64_required<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_required(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_required(&self.0))
+            let u = <U as MsgTrait>::u64_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::u64_required(&self.0))
         }
         fn u64_optional<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_optional(&self.0))
+            let u = <U as MsgTrait>::u64_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::u64_optional(&self.0))
         }
         type Field123RepeatedType<'this>
         where
@@ -1693,12 +1693,12 @@ pub mod _puroro_impls {
             )
         }
         fn s32_required<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::s32_required(&self.1)
-                .or_else(|| <T as MsgTrait>::s32_required(&self.0))
+            let u = <U as MsgTrait>::s32_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::s32_required(&self.0))
         }
         fn s32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::s32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::s32_optional(&self.0))
+            let u = <U as MsgTrait>::s32_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::s32_optional(&self.0))
         }
         type Field133RepeatedType<'this>
         where
@@ -1715,12 +1715,12 @@ pub mod _puroro_impls {
             )
         }
         fn s64_required<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::s64_required(&self.1)
-                .or_else(|| <T as MsgTrait>::s64_required(&self.0))
+            let u = <U as MsgTrait>::s64_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::s64_required(&self.0))
         }
         fn s64_optional<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::s64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::s64_optional(&self.0))
+            let u = <U as MsgTrait>::s64_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::s64_optional(&self.0))
         }
         type Field143RepeatedType<'this>
         where
@@ -1737,12 +1737,12 @@ pub mod _puroro_impls {
             )
         }
         fn fixed32_required<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::fixed32_required(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed32_required(&self.0))
+            let u = <U as MsgTrait>::fixed32_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::fixed32_required(&self.0))
         }
         fn fixed32_optional<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::fixed32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed32_optional(&self.0))
+            let u = <U as MsgTrait>::fixed32_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::fixed32_optional(&self.0))
         }
         type Field153RepeatedType<'this>
         where
@@ -1759,12 +1759,12 @@ pub mod _puroro_impls {
             )
         }
         fn fixed64_required<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::fixed64_required(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed64_required(&self.0))
+            let u = <U as MsgTrait>::fixed64_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::fixed64_required(&self.0))
         }
         fn fixed64_optional<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::fixed64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed64_optional(&self.0))
+            let u = <U as MsgTrait>::fixed64_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::fixed64_optional(&self.0))
         }
         type Field163RepeatedType<'this>
         where
@@ -1781,12 +1781,12 @@ pub mod _puroro_impls {
             )
         }
         fn sfixed32_required<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::sfixed32_required(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed32_required(&self.0))
+            let u = <U as MsgTrait>::sfixed32_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::sfixed32_required(&self.0))
         }
         fn sfixed32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::sfixed32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed32_optional(&self.0))
+            let u = <U as MsgTrait>::sfixed32_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::sfixed32_optional(&self.0))
         }
         type Field173RepeatedType<'this>
         where
@@ -1803,12 +1803,12 @@ pub mod _puroro_impls {
             )
         }
         fn sfixed64_required<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::sfixed64_required(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed64_required(&self.0))
+            let u = <U as MsgTrait>::sfixed64_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::sfixed64_required(&self.0))
         }
         fn sfixed64_optional<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::sfixed64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed64_optional(&self.0))
+            let u = <U as MsgTrait>::sfixed64_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::sfixed64_optional(&self.0))
         }
         type Field183RepeatedType<'this>
         where
@@ -1825,12 +1825,12 @@ pub mod _puroro_impls {
             )
         }
         fn f64_required<'this>(&'this self) -> Option<f64> {
-            <U as MsgTrait>::f64_required(&self.1)
-                .or_else(|| <T as MsgTrait>::f64_required(&self.0))
+            let u = <U as MsgTrait>::f64_required(&self.1);
+            u.or_else(|| <T as MsgTrait>::f64_required(&self.0))
         }
         fn f64_optional<'this>(&'this self) -> Option<f64> {
-            <U as MsgTrait>::f64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::f64_optional(&self.0))
+            let u = <U as MsgTrait>::f64_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::f64_optional(&self.0))
         }
         type Field193RepeatedType<'this>
         where
@@ -12329,12 +12329,12 @@ pub mod _puroro_nested {
                 U: SubmsgTrait,
             {
                 fn i32_required<'this>(&'this self) -> Option<i32> {
-                    <U as SubmsgTrait>::i32_required(&self.1)
-                        .or_else(|| <T as SubmsgTrait>::i32_required(&self.0))
+                    let u = <U as SubmsgTrait>::i32_required(&self.1);
+                    u.or_else(|| <T as SubmsgTrait>::i32_required(&self.0))
                 }
                 fn i64_required<'this>(&'this self) -> Option<i64> {
-                    <U as SubmsgTrait>::i64_required(&self.1)
-                        .or_else(|| <T as SubmsgTrait>::i64_required(&self.0))
+                    let u = <U as SubmsgTrait>::i64_required(&self.1);
+                    u.or_else(|| <T as SubmsgTrait>::i64_required(&self.0))
                 }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>

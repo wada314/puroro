@@ -149,7 +149,7 @@ impl ::puroro::internal::SerializableMessageToIoWrite for {{ m.simple_ident }} {
         {%- for field in m.fields %}
         {%- if !field.is_explicit_oneof_field %}
         {%- if field.has_default_value %}
-        if <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(self) == 
+        if <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(self) !=
             <() as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(&())
         {%- endif %}
         {

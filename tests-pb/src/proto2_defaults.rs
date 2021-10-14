@@ -1184,7 +1184,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i32_0(self)
-                == <() as super::_puroro_traits::MsgTrait>::i32_0(&())
+                != <() as super::_puroro_traits::MsgTrait>::i32_0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                     &self.i32_0,
@@ -1193,7 +1193,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i32_42(self)
-                == <() as super::_puroro_traits::MsgTrait>::i32_42(&())
+                != <() as super::_puroro_traits::MsgTrait>::i32_42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                     &self.i32_42,
@@ -1202,7 +1202,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i32_m42(self)
-                == <() as super::_puroro_traits::MsgTrait>::i32_m42(&())
+                != <() as super::_puroro_traits::MsgTrait>::i32_m42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                     &self.i32_m42,
@@ -1211,7 +1211,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i32_2147483647(self)
-                == <() as super::_puroro_traits::MsgTrait>::i32_2147483647(&())
+                != <() as super::_puroro_traits::MsgTrait>::i32_2147483647(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                     &self.i32_2147483647,
@@ -1220,7 +1220,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i32_m2147483648(self)
-                == <() as super::_puroro_traits::MsgTrait>::i32_m2147483648(&())
+                != <() as super::_puroro_traits::MsgTrait>::i32_m2147483648(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                     &self.i32_m2147483648,
@@ -1229,7 +1229,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i32_0123(self)
-                == <() as super::_puroro_traits::MsgTrait>::i32_0123(&())
+                != <() as super::_puroro_traits::MsgTrait>::i32_0123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                     &self.i32_0123,
@@ -1238,7 +1238,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i32_0x123(self)
-                == <() as super::_puroro_traits::MsgTrait>::i32_0x123(&())
+                != <() as super::_puroro_traits::MsgTrait>::i32_0x123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                     &self.i32_0x123,
@@ -1254,7 +1254,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u32_0(self)
-                == <() as super::_puroro_traits::MsgTrait>::u32_0(&())
+                != <() as super::_puroro_traits::MsgTrait>::u32_0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
                     &self.u32_0,
@@ -1263,7 +1263,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u32_42(self)
-                == <() as super::_puroro_traits::MsgTrait>::u32_42(&())
+                != <() as super::_puroro_traits::MsgTrait>::u32_42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
                     &self.u32_42,
@@ -1272,7 +1272,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u32_4294967295(self)
-                == <() as super::_puroro_traits::MsgTrait>::u32_4294967295(&())
+                != <() as super::_puroro_traits::MsgTrait>::u32_4294967295(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
                     &self.u32_4294967295,
@@ -1281,7 +1281,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u32_0123(self)
-                == <() as super::_puroro_traits::MsgTrait>::u32_0123(&())
+                != <() as super::_puroro_traits::MsgTrait>::u32_0123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
                     &self.u32_0123,
@@ -1290,7 +1290,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u32_0x123(self)
-                == <() as super::_puroro_traits::MsgTrait>::u32_0x123(&())
+                != <() as super::_puroro_traits::MsgTrait>::u32_0x123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
                     &self.u32_0x123,
@@ -1306,7 +1306,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i64_0(self)
-                == <() as super::_puroro_traits::MsgTrait>::i64_0(&())
+                != <() as super::_puroro_traits::MsgTrait>::i64_0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
                     &self.i64_0,
@@ -1315,7 +1315,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i64_42(self)
-                == <() as super::_puroro_traits::MsgTrait>::i64_42(&())
+                != <() as super::_puroro_traits::MsgTrait>::i64_42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
                     &self.i64_42,
@@ -1324,7 +1324,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i64_m42(self)
-                == <() as super::_puroro_traits::MsgTrait>::i64_m42(&())
+                != <() as super::_puroro_traits::MsgTrait>::i64_m42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
                     &self.i64_m42,
@@ -1333,7 +1333,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807(self)
-                == <() as super::_puroro_traits::MsgTrait>::i64_9223372036854775807(&())
+                != <() as super::_puroro_traits::MsgTrait>::i64_9223372036854775807(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
                     &self.i64_9223372036854775807,
@@ -1342,7 +1342,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808(self)
-                == <() as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808(&())
+                != <() as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
                     &self.i64_m9223372036854775808,
@@ -1351,7 +1351,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i64_0123(self)
-                == <() as super::_puroro_traits::MsgTrait>::i64_0123(&())
+                != <() as super::_puroro_traits::MsgTrait>::i64_0123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
                     &self.i64_0123,
@@ -1360,7 +1360,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::i64_0x123(self)
-                == <() as super::_puroro_traits::MsgTrait>::i64_0x123(&())
+                != <() as super::_puroro_traits::MsgTrait>::i64_0x123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
                     &self.i64_0x123,
@@ -1376,7 +1376,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u64_0(self)
-                == <() as super::_puroro_traits::MsgTrait>::u64_0(&())
+                != <() as super::_puroro_traits::MsgTrait>::u64_0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
                     &self.u64_0,
@@ -1385,7 +1385,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u64_42(self)
-                == <() as super::_puroro_traits::MsgTrait>::u64_42(&())
+                != <() as super::_puroro_traits::MsgTrait>::u64_42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
                     &self.u64_42,
@@ -1394,7 +1394,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615(self)
-                == <() as super::_puroro_traits::MsgTrait>::u64_18446744073709551615(&())
+                != <() as super::_puroro_traits::MsgTrait>::u64_18446744073709551615(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
                     &self.u64_18446744073709551615,
@@ -1403,7 +1403,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u64_0123(self)
-                == <() as super::_puroro_traits::MsgTrait>::u64_0123(&())
+                != <() as super::_puroro_traits::MsgTrait>::u64_0123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
                     &self.u64_0123,
@@ -1412,7 +1412,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::u64_0x123(self)
-                == <() as super::_puroro_traits::MsgTrait>::u64_0x123(&())
+                != <() as super::_puroro_traits::MsgTrait>::u64_0x123(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
                     &self.u64_0x123,
@@ -1428,7 +1428,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_0(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_0(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_0,
@@ -1437,7 +1437,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_m0(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_m0(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_m0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_m0,
@@ -1446,7 +1446,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_0p(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_0p(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_0p(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_0p,
@@ -1455,7 +1455,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_p0(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_p0(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_p0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_p0,
@@ -1464,7 +1464,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_0p0(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_0p0(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_0p0(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_0p0,
@@ -1473,7 +1473,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_42(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_42(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_42,
@@ -1482,7 +1482,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_m42(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_m42(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_m42(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_m42,
@@ -1491,7 +1491,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_0p25(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_0p25(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_0p25(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_0p25,
@@ -1500,7 +1500,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_1p5e2(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_1p5e2(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_1p5e2(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_1p5e2,
@@ -1509,7 +1509,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_inf(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_inf(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_inf(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_inf,
@@ -1518,7 +1518,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_minf(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_minf(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_minf(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_minf,
@@ -1527,7 +1527,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_nan(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_nan(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_nan(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_nan,
@@ -1536,7 +1536,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::f32_mnan(self)
-                == <() as super::_puroro_traits::MsgTrait>::f32_mnan(&())
+                != <() as super::_puroro_traits::MsgTrait>::f32_mnan(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
                     &self.f32_mnan,
@@ -1552,7 +1552,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bool_true(self)
-                == <() as super::_puroro_traits::MsgTrait>::bool_true(&())
+                != <() as super::_puroro_traits::MsgTrait>::bool_true(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
                     &self.bool_true,
@@ -1561,7 +1561,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bool_false(self)
-                == <() as super::_puroro_traits::MsgTrait>::bool_false(&())
+                != <() as super::_puroro_traits::MsgTrait>::bool_false(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
                     &self.bool_false,
@@ -1577,7 +1577,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::string_empty(self)
-                == <() as super::_puroro_traits::MsgTrait>::string_empty(&())
+                != <() as super::_puroro_traits::MsgTrait>::string_empty(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
                     &self.string_empty,
@@ -1586,7 +1586,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::string_abc(self)
-                == <() as super::_puroro_traits::MsgTrait>::string_abc(&())
+                != <() as super::_puroro_traits::MsgTrait>::string_abc(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
                     &self.string_abc,
@@ -1595,7 +1595,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::string_aiu(self)
-                == <() as super::_puroro_traits::MsgTrait>::string_aiu(&())
+                != <() as super::_puroro_traits::MsgTrait>::string_aiu(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
                     &self.string_aiu,
@@ -1604,7 +1604,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::string_backslash(self)
-                == <() as super::_puroro_traits::MsgTrait>::string_backslash(&())
+                != <() as super::_puroro_traits::MsgTrait>::string_backslash(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
                     &self.string_backslash,
@@ -1613,7 +1613,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::string_tab(self)
-                == <() as super::_puroro_traits::MsgTrait>::string_tab(&())
+                != <() as super::_puroro_traits::MsgTrait>::string_tab(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
                     &self.string_tab,
@@ -1622,7 +1622,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::string_crlf(self)
-                == <() as super::_puroro_traits::MsgTrait>::string_crlf(&())
+                != <() as super::_puroro_traits::MsgTrait>::string_crlf(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
                     &self.string_crlf,
@@ -1638,7 +1638,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bytes_empty(self)
-                == <() as super::_puroro_traits::MsgTrait>::bytes_empty(&())
+                != <() as super::_puroro_traits::MsgTrait>::bytes_empty(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
                     &self.bytes_empty,
@@ -1647,7 +1647,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bytes_abc(self)
-                == <() as super::_puroro_traits::MsgTrait>::bytes_abc(&())
+                != <() as super::_puroro_traits::MsgTrait>::bytes_abc(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
                     &self.bytes_abc,
@@ -1656,7 +1656,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bytes_aiu(self)
-                == <() as super::_puroro_traits::MsgTrait>::bytes_aiu(&())
+                != <() as super::_puroro_traits::MsgTrait>::bytes_aiu(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
                     &self.bytes_aiu,
@@ -1665,7 +1665,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bytes_backslash(self)
-                == <() as super::_puroro_traits::MsgTrait>::bytes_backslash(&())
+                != <() as super::_puroro_traits::MsgTrait>::bytes_backslash(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
                     &self.bytes_backslash,
@@ -1674,7 +1674,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bytes_tab(self)
-                == <() as super::_puroro_traits::MsgTrait>::bytes_tab(&())
+                != <() as super::_puroro_traits::MsgTrait>::bytes_tab(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
                     &self.bytes_tab,
@@ -1683,7 +1683,7 @@ pub mod _puroro_simple_impl {
                 )?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::bytes_crlf(self)
-                == <() as super::_puroro_traits::MsgTrait>::bytes_crlf(&())
+                != <() as super::_puroro_traits::MsgTrait>::bytes_crlf(&())
             {
                 SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
                     &self.bytes_crlf,
@@ -1698,7 +1698,7 @@ pub mod _puroro_simple_impl {
                 >::ser_field(&self.enum_default, 91, out)?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::enum_one(self)
-                == <() as super::_puroro_traits::MsgTrait>::enum_one(&())
+                != <() as super::_puroro_traits::MsgTrait>::enum_one(&())
             {
                 SerFieldToIoWrite::<
                     ::puroro::tags::Optional,
@@ -1706,7 +1706,7 @@ pub mod _puroro_simple_impl {
                 >::ser_field(&self.enum_one, 92, out)?;
             }
             if <Self as super::_puroro_traits::MsgTrait>::enum_fourty_two(self)
-                == <() as super::_puroro_traits::MsgTrait>::enum_fourty_two(&())
+                != <() as super::_puroro_traits::MsgTrait>::enum_fourty_two(&())
             {
                 SerFieldToIoWrite::<
                     ::puroro::tags::Optional,
@@ -1807,206 +1807,466 @@ pub mod _puroro_impls {
         U: MsgTrait,
     {
         fn i32_default<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_default(&self.1).or_else(|| <T as MsgTrait>::i32_default(&self.0))
+            let u = <U as MsgTrait>::i32_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::i32_default(&self.0))
         }
         fn i32_0<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_0(&self.1).or_else(|| <T as MsgTrait>::i32_0(&self.0))
+            let u = <U as MsgTrait>::i32_0(&self.1);
+            if u == <() as MsgTrait>::i32_0(&()) {
+                <T as MsgTrait>::i32_0(&self.0)
+            } else {
+                u
+            }
         }
         fn i32_42<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_42(&self.1).or_else(|| <T as MsgTrait>::i32_42(&self.0))
+            let u = <U as MsgTrait>::i32_42(&self.1);
+            if u == <() as MsgTrait>::i32_42(&()) {
+                <T as MsgTrait>::i32_42(&self.0)
+            } else {
+                u
+            }
         }
         fn i32_m42<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_m42(&self.1).or_else(|| <T as MsgTrait>::i32_m42(&self.0))
+            let u = <U as MsgTrait>::i32_m42(&self.1);
+            if u == <() as MsgTrait>::i32_m42(&()) {
+                <T as MsgTrait>::i32_m42(&self.0)
+            } else {
+                u
+            }
         }
         fn i32_2147483647<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_2147483647(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_2147483647(&self.0))
+            let u = <U as MsgTrait>::i32_2147483647(&self.1);
+            if u == <() as MsgTrait>::i32_2147483647(&()) {
+                <T as MsgTrait>::i32_2147483647(&self.0)
+            } else {
+                u
+            }
         }
         fn i32_m2147483648<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_m2147483648(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_m2147483648(&self.0))
+            let u = <U as MsgTrait>::i32_m2147483648(&self.1);
+            if u == <() as MsgTrait>::i32_m2147483648(&()) {
+                <T as MsgTrait>::i32_m2147483648(&self.0)
+            } else {
+                u
+            }
         }
         fn i32_0123<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_0123(&self.1).or_else(|| <T as MsgTrait>::i32_0123(&self.0))
+            let u = <U as MsgTrait>::i32_0123(&self.1);
+            if u == <() as MsgTrait>::i32_0123(&()) {
+                <T as MsgTrait>::i32_0123(&self.0)
+            } else {
+                u
+            }
         }
         fn i32_0x123<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_0x123(&self.1).or_else(|| <T as MsgTrait>::i32_0x123(&self.0))
+            let u = <U as MsgTrait>::i32_0x123(&self.1);
+            if u == <() as MsgTrait>::i32_0x123(&()) {
+                <T as MsgTrait>::i32_0x123(&self.0)
+            } else {
+                u
+            }
         }
         fn u32_default<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_default(&self.1).or_else(|| <T as MsgTrait>::u32_default(&self.0))
+            let u = <U as MsgTrait>::u32_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::u32_default(&self.0))
         }
         fn u32_0<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_0(&self.1).or_else(|| <T as MsgTrait>::u32_0(&self.0))
+            let u = <U as MsgTrait>::u32_0(&self.1);
+            if u == <() as MsgTrait>::u32_0(&()) {
+                <T as MsgTrait>::u32_0(&self.0)
+            } else {
+                u
+            }
         }
         fn u32_42<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_42(&self.1).or_else(|| <T as MsgTrait>::u32_42(&self.0))
+            let u = <U as MsgTrait>::u32_42(&self.1);
+            if u == <() as MsgTrait>::u32_42(&()) {
+                <T as MsgTrait>::u32_42(&self.0)
+            } else {
+                u
+            }
         }
         fn u32_4294967295<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_4294967295(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_4294967295(&self.0))
+            let u = <U as MsgTrait>::u32_4294967295(&self.1);
+            if u == <() as MsgTrait>::u32_4294967295(&()) {
+                <T as MsgTrait>::u32_4294967295(&self.0)
+            } else {
+                u
+            }
         }
         fn u32_0123<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_0123(&self.1).or_else(|| <T as MsgTrait>::u32_0123(&self.0))
+            let u = <U as MsgTrait>::u32_0123(&self.1);
+            if u == <() as MsgTrait>::u32_0123(&()) {
+                <T as MsgTrait>::u32_0123(&self.0)
+            } else {
+                u
+            }
         }
         fn u32_0x123<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_0x123(&self.1).or_else(|| <T as MsgTrait>::u32_0x123(&self.0))
+            let u = <U as MsgTrait>::u32_0x123(&self.1);
+            if u == <() as MsgTrait>::u32_0x123(&()) {
+                <T as MsgTrait>::u32_0x123(&self.0)
+            } else {
+                u
+            }
         }
         fn i64_default<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_default(&self.1).or_else(|| <T as MsgTrait>::i64_default(&self.0))
+            let u = <U as MsgTrait>::i64_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::i64_default(&self.0))
         }
         fn i64_0<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_0(&self.1).or_else(|| <T as MsgTrait>::i64_0(&self.0))
+            let u = <U as MsgTrait>::i64_0(&self.1);
+            if u == <() as MsgTrait>::i64_0(&()) {
+                <T as MsgTrait>::i64_0(&self.0)
+            } else {
+                u
+            }
         }
         fn i64_42<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_42(&self.1).or_else(|| <T as MsgTrait>::i64_42(&self.0))
+            let u = <U as MsgTrait>::i64_42(&self.1);
+            if u == <() as MsgTrait>::i64_42(&()) {
+                <T as MsgTrait>::i64_42(&self.0)
+            } else {
+                u
+            }
         }
         fn i64_m42<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_m42(&self.1).or_else(|| <T as MsgTrait>::i64_m42(&self.0))
+            let u = <U as MsgTrait>::i64_m42(&self.1);
+            if u == <() as MsgTrait>::i64_m42(&()) {
+                <T as MsgTrait>::i64_m42(&self.0)
+            } else {
+                u
+            }
         }
         fn i64_9223372036854775807<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_9223372036854775807(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_9223372036854775807(&self.0))
+            let u = <U as MsgTrait>::i64_9223372036854775807(&self.1);
+            if u == <() as MsgTrait>::i64_9223372036854775807(&()) {
+                <T as MsgTrait>::i64_9223372036854775807(&self.0)
+            } else {
+                u
+            }
         }
         fn i64_m9223372036854775808<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_m9223372036854775808(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_m9223372036854775808(&self.0))
+            let u = <U as MsgTrait>::i64_m9223372036854775808(&self.1);
+            if u == <() as MsgTrait>::i64_m9223372036854775808(&()) {
+                <T as MsgTrait>::i64_m9223372036854775808(&self.0)
+            } else {
+                u
+            }
         }
         fn i64_0123<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_0123(&self.1).or_else(|| <T as MsgTrait>::i64_0123(&self.0))
+            let u = <U as MsgTrait>::i64_0123(&self.1);
+            if u == <() as MsgTrait>::i64_0123(&()) {
+                <T as MsgTrait>::i64_0123(&self.0)
+            } else {
+                u
+            }
         }
         fn i64_0x123<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_0x123(&self.1).or_else(|| <T as MsgTrait>::i64_0x123(&self.0))
+            let u = <U as MsgTrait>::i64_0x123(&self.1);
+            if u == <() as MsgTrait>::i64_0x123(&()) {
+                <T as MsgTrait>::i64_0x123(&self.0)
+            } else {
+                u
+            }
         }
         fn u64_default<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_default(&self.1).or_else(|| <T as MsgTrait>::u64_default(&self.0))
+            let u = <U as MsgTrait>::u64_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::u64_default(&self.0))
         }
         fn u64_0<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_0(&self.1).or_else(|| <T as MsgTrait>::u64_0(&self.0))
+            let u = <U as MsgTrait>::u64_0(&self.1);
+            if u == <() as MsgTrait>::u64_0(&()) {
+                <T as MsgTrait>::u64_0(&self.0)
+            } else {
+                u
+            }
         }
         fn u64_42<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_42(&self.1).or_else(|| <T as MsgTrait>::u64_42(&self.0))
+            let u = <U as MsgTrait>::u64_42(&self.1);
+            if u == <() as MsgTrait>::u64_42(&()) {
+                <T as MsgTrait>::u64_42(&self.0)
+            } else {
+                u
+            }
         }
         fn u64_18446744073709551615<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_18446744073709551615(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_18446744073709551615(&self.0))
+            let u = <U as MsgTrait>::u64_18446744073709551615(&self.1);
+            if u == <() as MsgTrait>::u64_18446744073709551615(&()) {
+                <T as MsgTrait>::u64_18446744073709551615(&self.0)
+            } else {
+                u
+            }
         }
         fn u64_0123<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_0123(&self.1).or_else(|| <T as MsgTrait>::u64_0123(&self.0))
+            let u = <U as MsgTrait>::u64_0123(&self.1);
+            if u == <() as MsgTrait>::u64_0123(&()) {
+                <T as MsgTrait>::u64_0123(&self.0)
+            } else {
+                u
+            }
         }
         fn u64_0x123<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_0x123(&self.1).or_else(|| <T as MsgTrait>::u64_0x123(&self.0))
+            let u = <U as MsgTrait>::u64_0x123(&self.1);
+            if u == <() as MsgTrait>::u64_0x123(&()) {
+                <T as MsgTrait>::u64_0x123(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_default<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_default(&self.1).or_else(|| <T as MsgTrait>::f32_default(&self.0))
+            let u = <U as MsgTrait>::f32_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::f32_default(&self.0))
         }
         fn f32_0<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0(&self.1).or_else(|| <T as MsgTrait>::f32_0(&self.0))
+            let u = <U as MsgTrait>::f32_0(&self.1);
+            if u == <() as MsgTrait>::f32_0(&()) {
+                <T as MsgTrait>::f32_0(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_m0<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_m0(&self.1).or_else(|| <T as MsgTrait>::f32_m0(&self.0))
+            let u = <U as MsgTrait>::f32_m0(&self.1);
+            if u == <() as MsgTrait>::f32_m0(&()) {
+                <T as MsgTrait>::f32_m0(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_0p<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0p(&self.1).or_else(|| <T as MsgTrait>::f32_0p(&self.0))
+            let u = <U as MsgTrait>::f32_0p(&self.1);
+            if u == <() as MsgTrait>::f32_0p(&()) {
+                <T as MsgTrait>::f32_0p(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_p0<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_p0(&self.1).or_else(|| <T as MsgTrait>::f32_p0(&self.0))
+            let u = <U as MsgTrait>::f32_p0(&self.1);
+            if u == <() as MsgTrait>::f32_p0(&()) {
+                <T as MsgTrait>::f32_p0(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_0p0<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0p0(&self.1).or_else(|| <T as MsgTrait>::f32_0p0(&self.0))
+            let u = <U as MsgTrait>::f32_0p0(&self.1);
+            if u == <() as MsgTrait>::f32_0p0(&()) {
+                <T as MsgTrait>::f32_0p0(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_42<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_42(&self.1).or_else(|| <T as MsgTrait>::f32_42(&self.0))
+            let u = <U as MsgTrait>::f32_42(&self.1);
+            if u == <() as MsgTrait>::f32_42(&()) {
+                <T as MsgTrait>::f32_42(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_m42<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_m42(&self.1).or_else(|| <T as MsgTrait>::f32_m42(&self.0))
+            let u = <U as MsgTrait>::f32_m42(&self.1);
+            if u == <() as MsgTrait>::f32_m42(&()) {
+                <T as MsgTrait>::f32_m42(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_0p25<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0p25(&self.1).or_else(|| <T as MsgTrait>::f32_0p25(&self.0))
+            let u = <U as MsgTrait>::f32_0p25(&self.1);
+            if u == <() as MsgTrait>::f32_0p25(&()) {
+                <T as MsgTrait>::f32_0p25(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_1p5e2<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_1p5e2(&self.1).or_else(|| <T as MsgTrait>::f32_1p5e2(&self.0))
+            let u = <U as MsgTrait>::f32_1p5e2(&self.1);
+            if u == <() as MsgTrait>::f32_1p5e2(&()) {
+                <T as MsgTrait>::f32_1p5e2(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_inf<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_inf(&self.1).or_else(|| <T as MsgTrait>::f32_inf(&self.0))
+            let u = <U as MsgTrait>::f32_inf(&self.1);
+            if u == <() as MsgTrait>::f32_inf(&()) {
+                <T as MsgTrait>::f32_inf(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_minf<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_minf(&self.1).or_else(|| <T as MsgTrait>::f32_minf(&self.0))
+            let u = <U as MsgTrait>::f32_minf(&self.1);
+            if u == <() as MsgTrait>::f32_minf(&()) {
+                <T as MsgTrait>::f32_minf(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_nan<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_nan(&self.1).or_else(|| <T as MsgTrait>::f32_nan(&self.0))
+            let u = <U as MsgTrait>::f32_nan(&self.1);
+            if u == <() as MsgTrait>::f32_nan(&()) {
+                <T as MsgTrait>::f32_nan(&self.0)
+            } else {
+                u
+            }
         }
         fn f32_mnan<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_mnan(&self.1).or_else(|| <T as MsgTrait>::f32_mnan(&self.0))
+            let u = <U as MsgTrait>::f32_mnan(&self.1);
+            if u == <() as MsgTrait>::f32_mnan(&()) {
+                <T as MsgTrait>::f32_mnan(&self.0)
+            } else {
+                u
+            }
         }
         fn bool_default<'this>(&'this self) -> Option<bool> {
-            <U as MsgTrait>::bool_default(&self.1)
-                .or_else(|| <T as MsgTrait>::bool_default(&self.0))
+            let u = <U as MsgTrait>::bool_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::bool_default(&self.0))
         }
         fn bool_true<'this>(&'this self) -> Option<bool> {
-            <U as MsgTrait>::bool_true(&self.1).or_else(|| <T as MsgTrait>::bool_true(&self.0))
+            let u = <U as MsgTrait>::bool_true(&self.1);
+            if u == <() as MsgTrait>::bool_true(&()) {
+                <T as MsgTrait>::bool_true(&self.0)
+            } else {
+                u
+            }
         }
         fn bool_false<'this>(&'this self) -> Option<bool> {
-            <U as MsgTrait>::bool_false(&self.1).or_else(|| <T as MsgTrait>::bool_false(&self.0))
+            let u = <U as MsgTrait>::bool_false(&self.1);
+            if u == <() as MsgTrait>::bool_false(&()) {
+                <T as MsgTrait>::bool_false(&self.0)
+            } else {
+                u
+            }
         }
         fn string_default<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_default(&self.1)
-                .or_else(|| <T as MsgTrait>::string_default(&self.0))
+            let u = <U as MsgTrait>::string_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::string_default(&self.0))
         }
         fn string_empty<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_empty(&self.1)
-                .or_else(|| <T as MsgTrait>::string_empty(&self.0))
+            let u = <U as MsgTrait>::string_empty(&self.1);
+            if u == <() as MsgTrait>::string_empty(&()) {
+                <T as MsgTrait>::string_empty(&self.0)
+            } else {
+                u
+            }
         }
         fn string_abc<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_abc(&self.1).or_else(|| <T as MsgTrait>::string_abc(&self.0))
+            let u = <U as MsgTrait>::string_abc(&self.1);
+            if u == <() as MsgTrait>::string_abc(&()) {
+                <T as MsgTrait>::string_abc(&self.0)
+            } else {
+                u
+            }
         }
         fn string_aiu<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_aiu(&self.1).or_else(|| <T as MsgTrait>::string_aiu(&self.0))
+            let u = <U as MsgTrait>::string_aiu(&self.1);
+            if u == <() as MsgTrait>::string_aiu(&()) {
+                <T as MsgTrait>::string_aiu(&self.0)
+            } else {
+                u
+            }
         }
         fn string_backslash<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_backslash(&self.1)
-                .or_else(|| <T as MsgTrait>::string_backslash(&self.0))
+            let u = <U as MsgTrait>::string_backslash(&self.1);
+            if u == <() as MsgTrait>::string_backslash(&()) {
+                <T as MsgTrait>::string_backslash(&self.0)
+            } else {
+                u
+            }
         }
         fn string_tab<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_tab(&self.1).or_else(|| <T as MsgTrait>::string_tab(&self.0))
+            let u = <U as MsgTrait>::string_tab(&self.1);
+            if u == <() as MsgTrait>::string_tab(&()) {
+                <T as MsgTrait>::string_tab(&self.0)
+            } else {
+                u
+            }
         }
         fn string_crlf<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_crlf(&self.1).or_else(|| <T as MsgTrait>::string_crlf(&self.0))
+            let u = <U as MsgTrait>::string_crlf(&self.1);
+            if u == <() as MsgTrait>::string_crlf(&()) {
+                <T as MsgTrait>::string_crlf(&self.0)
+            } else {
+                u
+            }
         }
         fn bytes_default<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_default(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_default(&self.0))
+            let u = <U as MsgTrait>::bytes_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::bytes_default(&self.0))
         }
         fn bytes_empty<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_empty(&self.1).or_else(|| <T as MsgTrait>::bytes_empty(&self.0))
+            let u = <U as MsgTrait>::bytes_empty(&self.1);
+            if u == <() as MsgTrait>::bytes_empty(&()) {
+                <T as MsgTrait>::bytes_empty(&self.0)
+            } else {
+                u
+            }
         }
         fn bytes_abc<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_abc(&self.1).or_else(|| <T as MsgTrait>::bytes_abc(&self.0))
+            let u = <U as MsgTrait>::bytes_abc(&self.1);
+            if u == <() as MsgTrait>::bytes_abc(&()) {
+                <T as MsgTrait>::bytes_abc(&self.0)
+            } else {
+                u
+            }
         }
         fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_aiu(&self.1).or_else(|| <T as MsgTrait>::bytes_aiu(&self.0))
+            let u = <U as MsgTrait>::bytes_aiu(&self.1);
+            if u == <() as MsgTrait>::bytes_aiu(&()) {
+                <T as MsgTrait>::bytes_aiu(&self.0)
+            } else {
+                u
+            }
         }
         fn bytes_backslash<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_backslash(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_backslash(&self.0))
+            let u = <U as MsgTrait>::bytes_backslash(&self.1);
+            if u == <() as MsgTrait>::bytes_backslash(&()) {
+                <T as MsgTrait>::bytes_backslash(&self.0)
+            } else {
+                u
+            }
         }
         fn bytes_tab<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_tab(&self.1).or_else(|| <T as MsgTrait>::bytes_tab(&self.0))
+            let u = <U as MsgTrait>::bytes_tab(&self.1);
+            if u == <() as MsgTrait>::bytes_tab(&()) {
+                <T as MsgTrait>::bytes_tab(&self.0)
+            } else {
+                u
+            }
         }
         fn bytes_crlf<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_crlf(&self.1).or_else(|| <T as MsgTrait>::bytes_crlf(&self.0))
+            let u = <U as MsgTrait>::bytes_crlf(&self.1);
+            if u == <() as MsgTrait>::bytes_crlf(&()) {
+                <T as MsgTrait>::bytes_crlf(&self.0)
+            } else {
+                u
+            }
         }
         fn enum_default<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            <U as MsgTrait>::enum_default(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_default(&self.0))
+            let u = <U as MsgTrait>::enum_default(&self.1);
+            u.or_else(|| <T as MsgTrait>::enum_default(&self.0))
         }
         fn enum_one<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            <U as MsgTrait>::enum_one(&self.1).or_else(|| <T as MsgTrait>::enum_one(&self.0))
+            let u = <U as MsgTrait>::enum_one(&self.1);
+            if u == <() as MsgTrait>::enum_one(&()) {
+                <T as MsgTrait>::enum_one(&self.0)
+            } else {
+                u
+            }
         }
         fn enum_fourty_two<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            <U as MsgTrait>::enum_fourty_two(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_fourty_two(&self.0))
+            let u = <U as MsgTrait>::enum_fourty_two(&self.1);
+            if u == <() as MsgTrait>::enum_fourty_two(&()) {
+                <T as MsgTrait>::enum_fourty_two(&self.0)
+            } else {
+                u
+            }
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -2622,7 +2882,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField2 {
         fn i32_0<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0)
+            Clone::clone(&self.i32_0).or(<() as super::_puroro_traits::MsgTrait>::i32_0(&()))
         }
     }
 
@@ -2632,6 +2892,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i32_0(self)
+                == <() as super::_puroro_traits::MsgTrait>::i32_0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
                 (),
                 _,
@@ -2657,7 +2922,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField3 {
         fn i32_42<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_42)
+            Clone::clone(&self.i32_42).or(<() as super::_puroro_traits::MsgTrait>::i32_42(&()))
         }
     }
 
@@ -2667,6 +2932,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i32_42(self)
+                == <() as super::_puroro_traits::MsgTrait>::i32_42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
                 (),
                 _,
@@ -2692,7 +2962,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField4 {
         fn i32_m42<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_m42)
+            Clone::clone(&self.i32_m42).or(<() as super::_puroro_traits::MsgTrait>::i32_m42(&()))
         }
     }
 
@@ -2702,6 +2972,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i32_m42(self)
+                == <() as super::_puroro_traits::MsgTrait>::i32_m42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
                 (),
                 _,
@@ -2728,6 +3003,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField5 {
         fn i32_2147483647<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_2147483647)
+                .or(<() as super::_puroro_traits::MsgTrait>::i32_2147483647(&()))
         }
     }
 
@@ -2737,6 +3013,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i32_2147483647(self)
+                == <() as super::_puroro_traits::MsgTrait>::i32_2147483647(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
                 (),
                 _,
@@ -2765,6 +3046,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField6 {
         fn i32_m2147483648<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_m2147483648)
+                .or(<() as super::_puroro_traits::MsgTrait>::i32_m2147483648(&()))
         }
     }
 
@@ -2774,6 +3056,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i32_m2147483648(self)
+                == <() as super::_puroro_traits::MsgTrait>::i32_m2147483648(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
                 (),
                 _,
@@ -2801,7 +3088,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField7 {
         fn i32_0123<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0123)
+            Clone::clone(&self.i32_0123).or(<() as super::_puroro_traits::MsgTrait>::i32_0123(&()))
         }
     }
 
@@ -2811,6 +3098,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i32_0123(self)
+                == <() as super::_puroro_traits::MsgTrait>::i32_0123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
                 (),
                 _,
@@ -2837,6 +3129,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField8 {
         fn i32_0x123<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_0x123)
+                .or(<() as super::_puroro_traits::MsgTrait>::i32_0x123(&()))
         }
     }
 
@@ -2846,6 +3139,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i32_0x123(self)
+                == <() as super::_puroro_traits::MsgTrait>::i32_0x123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
                 (),
                 _,
@@ -2906,7 +3204,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField12 {
         fn u32_0<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0)
+            Clone::clone(&self.u32_0).or(<() as super::_puroro_traits::MsgTrait>::u32_0(&()))
         }
     }
 
@@ -2916,6 +3214,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u32_0(self)
+                == <() as super::_puroro_traits::MsgTrait>::u32_0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field::<
                 (),
                 _,
@@ -2941,7 +3244,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField13 {
         fn u32_42<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_42)
+            Clone::clone(&self.u32_42).or(<() as super::_puroro_traits::MsgTrait>::u32_42(&()))
         }
     }
 
@@ -2951,6 +3254,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u32_42(self)
+                == <() as super::_puroro_traits::MsgTrait>::u32_42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field::<
                 (),
                 _,
@@ -2977,6 +3285,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField15 {
         fn u32_4294967295<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.u32_4294967295)
+                .or(<() as super::_puroro_traits::MsgTrait>::u32_4294967295(&()))
         }
     }
 
@@ -2986,6 +3295,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u32_4294967295(self)
+                == <() as super::_puroro_traits::MsgTrait>::u32_4294967295(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field::<
                 (),
                 _,
@@ -3013,7 +3327,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField17 {
         fn u32_0123<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0123)
+            Clone::clone(&self.u32_0123).or(<() as super::_puroro_traits::MsgTrait>::u32_0123(&()))
         }
     }
 
@@ -3023,6 +3337,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u32_0123(self)
+                == <() as super::_puroro_traits::MsgTrait>::u32_0123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field::<
                 (),
                 _,
@@ -3049,6 +3368,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField18 {
         fn u32_0x123<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.u32_0x123)
+                .or(<() as super::_puroro_traits::MsgTrait>::u32_0x123(&()))
         }
     }
 
@@ -3058,6 +3378,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u32_0x123(self)
+                == <() as super::_puroro_traits::MsgTrait>::u32_0x123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field::<
                 (),
                 _,
@@ -3118,7 +3443,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField22 {
         fn i64_0<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0)
+            Clone::clone(&self.i64_0).or(<() as super::_puroro_traits::MsgTrait>::i64_0(&()))
         }
     }
 
@@ -3128,6 +3453,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i64_0(self)
+                == <() as super::_puroro_traits::MsgTrait>::i64_0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
                 (),
                 _,
@@ -3153,7 +3483,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField23 {
         fn i64_42<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_42)
+            Clone::clone(&self.i64_42).or(<() as super::_puroro_traits::MsgTrait>::i64_42(&()))
         }
     }
 
@@ -3163,6 +3493,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i64_42(self)
+                == <() as super::_puroro_traits::MsgTrait>::i64_42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
                 (),
                 _,
@@ -3188,7 +3523,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField24 {
         fn i64_m42<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_m42)
+            Clone::clone(&self.i64_m42).or(<() as super::_puroro_traits::MsgTrait>::i64_m42(&()))
         }
     }
 
@@ -3198,6 +3533,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i64_m42(self)
+                == <() as super::_puroro_traits::MsgTrait>::i64_m42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
                 (),
                 _,
@@ -3224,6 +3564,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField25 {
         fn i64_9223372036854775807<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_9223372036854775807)
+                .or(<() as super::_puroro_traits::MsgTrait>::i64_9223372036854775807(&()))
         }
     }
 
@@ -3233,6 +3574,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807(self)
+                == <() as super::_puroro_traits::MsgTrait>::i64_9223372036854775807(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
                 (),
                 _,
@@ -3261,6 +3607,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField26 {
         fn i64_m9223372036854775808<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_m9223372036854775808)
+                .or(<() as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808(&()))
         }
     }
 
@@ -3270,6 +3617,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808(self)
+                == <() as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
                 (),
                 _,
@@ -3297,7 +3649,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField27 {
         fn i64_0123<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0123)
+            Clone::clone(&self.i64_0123).or(<() as super::_puroro_traits::MsgTrait>::i64_0123(&()))
         }
     }
 
@@ -3307,6 +3659,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i64_0123(self)
+                == <() as super::_puroro_traits::MsgTrait>::i64_0123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
                 (),
                 _,
@@ -3333,6 +3690,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField28 {
         fn i64_0x123<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_0x123)
+                .or(<() as super::_puroro_traits::MsgTrait>::i64_0x123(&()))
         }
     }
 
@@ -3342,6 +3700,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::i64_0x123(self)
+                == <() as super::_puroro_traits::MsgTrait>::i64_0x123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
                 (),
                 _,
@@ -3402,7 +3765,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField32 {
         fn u64_0<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0)
+            Clone::clone(&self.u64_0).or(<() as super::_puroro_traits::MsgTrait>::u64_0(&()))
         }
     }
 
@@ -3412,6 +3775,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u64_0(self)
+                == <() as super::_puroro_traits::MsgTrait>::u64_0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field::<
                 (),
                 _,
@@ -3437,7 +3805,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField33 {
         fn u64_42<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_42)
+            Clone::clone(&self.u64_42).or(<() as super::_puroro_traits::MsgTrait>::u64_42(&()))
         }
     }
 
@@ -3447,6 +3815,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u64_42(self)
+                == <() as super::_puroro_traits::MsgTrait>::u64_42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field::<
                 (),
                 _,
@@ -3473,6 +3846,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField35 {
         fn u64_18446744073709551615<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.u64_18446744073709551615)
+                .or(<() as super::_puroro_traits::MsgTrait>::u64_18446744073709551615(&()))
         }
     }
 
@@ -3482,6 +3856,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615(self)
+                == <() as super::_puroro_traits::MsgTrait>::u64_18446744073709551615(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field::<
                 (),
                 _,
@@ -3509,7 +3888,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField37 {
         fn u64_0123<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0123)
+            Clone::clone(&self.u64_0123).or(<() as super::_puroro_traits::MsgTrait>::u64_0123(&()))
         }
     }
 
@@ -3519,6 +3898,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u64_0123(self)
+                == <() as super::_puroro_traits::MsgTrait>::u64_0123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field::<
                 (),
                 _,
@@ -3545,6 +3929,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField38 {
         fn u64_0x123<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.u64_0x123)
+                .or(<() as super::_puroro_traits::MsgTrait>::u64_0x123(&()))
         }
     }
 
@@ -3554,6 +3939,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::u64_0x123(self)
+                == <() as super::_puroro_traits::MsgTrait>::u64_0x123(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field::<
                 (),
                 _,
@@ -3614,7 +4004,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField42 {
         fn f32_0<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0)
+            Clone::clone(&self.f32_0).or(<() as super::_puroro_traits::MsgTrait>::f32_0(&()))
         }
     }
 
@@ -3624,6 +4014,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_0(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3649,7 +4044,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField43 {
         fn f32_m0<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_m0)
+            Clone::clone(&self.f32_m0).or(<() as super::_puroro_traits::MsgTrait>::f32_m0(&()))
         }
     }
 
@@ -3659,6 +4054,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_m0(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_m0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3684,7 +4084,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField44 {
         fn f32_0p<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p)
+            Clone::clone(&self.f32_0p).or(<() as super::_puroro_traits::MsgTrait>::f32_0p(&()))
         }
     }
 
@@ -3694,6 +4094,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_0p(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_0p(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3719,7 +4124,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField45 {
         fn f32_p0<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_p0)
+            Clone::clone(&self.f32_p0).or(<() as super::_puroro_traits::MsgTrait>::f32_p0(&()))
         }
     }
 
@@ -3729,6 +4134,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_p0(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_p0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3754,7 +4164,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField46 {
         fn f32_0p0<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p0)
+            Clone::clone(&self.f32_0p0).or(<() as super::_puroro_traits::MsgTrait>::f32_0p0(&()))
         }
     }
 
@@ -3764,6 +4174,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_0p0(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_0p0(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3789,7 +4204,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField47 {
         fn f32_42<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_42)
+            Clone::clone(&self.f32_42).or(<() as super::_puroro_traits::MsgTrait>::f32_42(&()))
         }
     }
 
@@ -3799,6 +4214,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_42(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3824,7 +4244,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField48 {
         fn f32_m42<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_m42)
+            Clone::clone(&self.f32_m42).or(<() as super::_puroro_traits::MsgTrait>::f32_m42(&()))
         }
     }
 
@@ -3834,6 +4254,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_m42(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_m42(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3859,7 +4284,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField49 {
         fn f32_0p25<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p25)
+            Clone::clone(&self.f32_0p25).or(<() as super::_puroro_traits::MsgTrait>::f32_0p25(&()))
         }
     }
 
@@ -3869,6 +4294,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_0p25(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_0p25(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3895,6 +4325,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField50 {
         fn f32_1p5e2<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.f32_1p5e2)
+                .or(<() as super::_puroro_traits::MsgTrait>::f32_1p5e2(&()))
         }
     }
 
@@ -3904,6 +4335,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_1p5e2(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_1p5e2(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3929,7 +4365,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField51 {
         fn f32_inf<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_inf)
+            Clone::clone(&self.f32_inf).or(<() as super::_puroro_traits::MsgTrait>::f32_inf(&()))
         }
     }
 
@@ -3939,6 +4375,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_inf(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_inf(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3964,7 +4405,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField52 {
         fn f32_minf<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_minf)
+            Clone::clone(&self.f32_minf).or(<() as super::_puroro_traits::MsgTrait>::f32_minf(&()))
         }
     }
 
@@ -3974,6 +4415,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_minf(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_minf(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -3999,7 +4445,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField53 {
         fn f32_nan<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_nan)
+            Clone::clone(&self.f32_nan).or(<() as super::_puroro_traits::MsgTrait>::f32_nan(&()))
         }
     }
 
@@ -4009,6 +4455,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_nan(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_nan(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -4034,7 +4485,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField54 {
         fn f32_mnan<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_mnan)
+            Clone::clone(&self.f32_mnan).or(<() as super::_puroro_traits::MsgTrait>::f32_mnan(&()))
         }
     }
 
@@ -4044,6 +4495,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::f32_mnan(self)
+                == <() as super::_puroro_traits::MsgTrait>::f32_mnan(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field::<
                 (),
                 _,
@@ -4107,6 +4563,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField62 {
         fn bool_true<'this>(&'this self) -> Option<bool> {
             Clone::clone(&self.bool_true)
+                .or(<() as super::_puroro_traits::MsgTrait>::bool_true(&()))
         }
     }
 
@@ -4116,6 +4573,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bool_true(self)
+                == <() as super::_puroro_traits::MsgTrait>::bool_true(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
                 (),
                 _,
@@ -4142,6 +4604,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSingleField63 {
         fn bool_false<'this>(&'this self) -> Option<bool> {
             Clone::clone(&self.bool_false)
+                .or(<() as super::_puroro_traits::MsgTrait>::bool_false(&()))
         }
     }
 
@@ -4151,6 +4614,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bool_false(self)
+                == <() as super::_puroro_traits::MsgTrait>::bool_false(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
                 (),
                 _,
@@ -4262,7 +4730,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn string_empty<'this>(&'this self) -> Option<&'this str> {
-            self.string_empty.as_ref().map(|r| r.as_ref())
+            self.string_empty
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::string_empty(&()))
         }
     }
 
@@ -4278,6 +4749,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::string_empty(self)
+                == <() as super::_puroro_traits::MsgTrait>::string_empty(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
                 ScalarType,
                 _,
@@ -4330,7 +4806,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn string_abc<'this>(&'this self) -> Option<&'this str> {
-            self.string_abc.as_ref().map(|r| r.as_ref())
+            self.string_abc
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::string_abc(&()))
         }
     }
 
@@ -4346,6 +4825,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::string_abc(self)
+                == <() as super::_puroro_traits::MsgTrait>::string_abc(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
                 ScalarType,
                 _,
@@ -4396,7 +4880,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn string_aiu<'this>(&'this self) -> Option<&'this str> {
-            self.string_aiu.as_ref().map(|r| r.as_ref())
+            self.string_aiu
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::string_aiu(&()))
         }
     }
 
@@ -4412,6 +4899,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::string_aiu(self)
+                == <() as super::_puroro_traits::MsgTrait>::string_aiu(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
                 ScalarType,
                 _,
@@ -4462,7 +4954,9 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn string_backslash<'this>(&'this self) -> Option<&'this str> {
-            self.string_backslash.as_ref().map(|r| r.as_ref())
+            self.string_backslash.as_ref().map(|r| r.as_ref()).or(
+                <() as super::_puroro_traits::MsgTrait>::string_backslash(&()),
+            )
         }
     }
 
@@ -4478,6 +4972,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::string_backslash(self)
+                == <() as super::_puroro_traits::MsgTrait>::string_backslash(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
                 ScalarType,
                 _,
@@ -4530,7 +5029,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn string_tab<'this>(&'this self) -> Option<&'this str> {
-            self.string_tab.as_ref().map(|r| r.as_ref())
+            self.string_tab
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::string_tab(&()))
         }
     }
 
@@ -4546,6 +5048,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::string_tab(self)
+                == <() as super::_puroro_traits::MsgTrait>::string_tab(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
                 ScalarType,
                 _,
@@ -4596,7 +5103,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn string_crlf<'this>(&'this self) -> Option<&'this str> {
-            self.string_crlf.as_ref().map(|r| r.as_ref())
+            self.string_crlf
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::string_crlf(&()))
         }
     }
 
@@ -4612,6 +5122,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::string_crlf(self)
+                == <() as super::_puroro_traits::MsgTrait>::string_crlf(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
                 ScalarType,
                 _,
@@ -4730,7 +5245,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn bytes_empty<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_empty.as_ref().map(|r| r.as_ref())
+            self.bytes_empty
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::bytes_empty(&()))
         }
     }
 
@@ -4746,6 +5264,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bytes_empty(self)
+                == <() as super::_puroro_traits::MsgTrait>::bytes_empty(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
                 ScalarType,
                 _,
@@ -4796,7 +5319,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn bytes_abc<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_abc.as_ref().map(|r| r.as_ref())
+            self.bytes_abc
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::bytes_abc(&()))
         }
     }
 
@@ -4812,6 +5338,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bytes_abc(self)
+                == <() as super::_puroro_traits::MsgTrait>::bytes_abc(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
                 ScalarType,
                 _,
@@ -4862,7 +5393,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn bytes_aiu<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_aiu.as_ref().map(|r| r.as_ref())
+            self.bytes_aiu
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::bytes_aiu(&()))
         }
     }
 
@@ -4878,6 +5412,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bytes_aiu(self)
+                == <() as super::_puroro_traits::MsgTrait>::bytes_aiu(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
                 ScalarType,
                 _,
@@ -4928,7 +5467,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn bytes_backslash<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_backslash.as_ref().map(|r| r.as_ref())
+            self.bytes_backslash
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::bytes_backslash(&()))
         }
     }
 
@@ -4944,6 +5486,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bytes_backslash(self)
+                == <() as super::_puroro_traits::MsgTrait>::bytes_backslash(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
                 ScalarType,
                 _,
@@ -4996,7 +5543,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn bytes_tab<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_tab.as_ref().map(|r| r.as_ref())
+            self.bytes_tab
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::bytes_tab(&()))
         }
     }
 
@@ -5012,6 +5562,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bytes_tab(self)
+                == <() as super::_puroro_traits::MsgTrait>::bytes_tab(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
                 ScalarType,
                 _,
@@ -5062,7 +5617,10 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn bytes_crlf<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_crlf.as_ref().map(|r| r.as_ref())
+            self.bytes_crlf
+                .as_ref()
+                .map(|r| r.as_ref())
+                .or(<() as super::_puroro_traits::MsgTrait>::bytes_crlf(&()))
         }
     }
 
@@ -5078,6 +5636,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::bytes_crlf(self)
+                == <() as super::_puroro_traits::MsgTrait>::bytes_crlf(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
                 ScalarType,
                 _,
@@ -5148,7 +5711,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField92 {
         fn enum_one<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            Clone::clone(&self.enum_one)
+            Clone::clone(&self.enum_one).or(<() as super::_puroro_traits::MsgTrait>::enum_one(&()))
         }
     }
 
@@ -5158,6 +5721,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::enum_one(self)
+                == <() as super::_puroro_traits::MsgTrait>::enum_one(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
@@ -5187,6 +5755,7 @@ pub mod _puroro_impls {
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
             Clone::clone(&self.enum_fourty_two)
+                .or(<() as super::_puroro_traits::MsgTrait>::enum_fourty_two(&()))
         }
     }
 
@@ -5196,6 +5765,11 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+            if <Self as super::_puroro_traits::MsgTrait>::enum_fourty_two(self)
+                == <() as super::_puroro_traits::MsgTrait>::enum_fourty_two(&())
+            {
+                return ::std::result::Result::Ok(());
+            }
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,

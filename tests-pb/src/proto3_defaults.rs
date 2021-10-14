@@ -374,8 +374,8 @@ pub mod _puroro_impls {
             }
         }
         fn i32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_optional(&self.0))
+            let u = <U as MsgTrait>::i32_optional(&self.1);
+            u.or_else(|| <T as MsgTrait>::i32_optional(&self.0))
         }
         type Field3RepeatedType<'this>
         where

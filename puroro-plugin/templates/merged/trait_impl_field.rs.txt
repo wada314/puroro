@@ -56,8 +56,16 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
         (Some(t), Some(u)) => Some((Some(t), Some(u))),
     }
     {%- else %}
-    <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1)
-        .or_else(|| <T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0))
+    let u = <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1);
+    {%- if f.has_default_value %}
+    if u == <() as {{ m.trait_ident }}>::{{ f.ident }}(&()) {
+        <T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0)
+    } else {
+        u
+    }
+    {%- else %}
+    u.or_else(|| <T as {{ m.trait_ident }}>::{{ f.ident }}(&self.0))
+    {%- endif %}
     {%- endif %}
 }
 {%- endif %}
