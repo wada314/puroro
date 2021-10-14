@@ -3,7 +3,7 @@ Proto2 has a feature to set a default value like this:
 
 `optional int32 foo = 1; [default = 42]`
 
-However, in puroro implementation there are a difficulty to implement this. This is because of our initial design decision -- map `optional int32` type into `Option<i32>`. This looks very straightforward, but the official C++ and Java (I haven't checked others but I assume the others are the same) implementation are using 2 fields, the bare value `int32_t` field and the field existence `bool` value field.
+However, in puroro implementation there is a difficulty to implement this. This is because of our initial design decision -- map `optional int32` type into `Option<i32>`. This looks very straightforward, but the official C++ and Java (I haven't checked others but I assume the others are the same) implementation are using 2 fields, the bare value `int32_t` field and the field existence `bool` value field.
 What's the difference between these two implementations? That is, where the official implementations allow a status that "the field is cleared but the value is available" but our implementation does not. And the proto2 default value behavior is tightly connected to this implementation. The proto2 default value is explicitly set to the field when the message structure is constructed, or when the `clear_foo()` method is called, and in the both cases the field existence bit is cleared. This makes lots of interesting (and good) behaviors:
 
  1. When the message class is constructed by a default constructor and then immediately be serialized, then no fields are serialized because the field existence bit is not set.
