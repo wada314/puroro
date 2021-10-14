@@ -30,7 +30,18 @@ Though this requires `.unwrap()` so it might be a option to define an associated
 
 Another problem rose here is the behavior of trait getter methods. If the field is `None` internally, should the getter method return the default value or just return `None`? Similar question is, if the field is undefined for the impl type (e.g. `()`), then should the getter method return the default value or `None`?
 
-First of all, answers to these two questions must be consistent. In `impl MyMessageTrait for (T, U)` code's scalar getter methods, we are doing something like check the `U`'s getter method return value and if it's default then return `T`'s getter method return value. For this default check behavior, we must strictly define what the default value is.
+In `impl MyMessageTrait for (T, U)` code's scalar getter methods, we are doing something like checking the `U`'s getter method return value and if it's default then return `T`'s getter method return value. For this default check behavior, we must strictly define what the default value is.
+
+If we consider `Some(42)` also be a default value in addition to `None`, then we need a code change in few places but it's acceptable. The trait methods *can* return `Some(42)` when the internal field value is `None` or not exist. 
+We might also want to ignore the `Some(42)` field when serializing the message, but this is a bad idea I think because the user loses a way to explicitly serialize `Some(42)` value (remember, this is possible in the official protobuf implementation). These different behaviors between `(T, U)` and serialization might make the users confused.
+
+If we do not consider `Some(42)` as a default value, then the trait methods can only return `None` as-is for the `None` fields or not existing fields. This can cause another confusion to the user:
+```rust
+use MyMessageTrait;
+assert_eq!(Some(42), MyMessage::default().foo());
+assert_eq!(None, ()::default().foo()); // (did you know `()` implements `Default`?)
+```
+Why these two almost same code behaves differently? We can only say that because `MyMessage` has a field value instance but `()` does not. This is not clear to the user...
 
 ### Option 3. Define a custom `Option<T>` type
 
