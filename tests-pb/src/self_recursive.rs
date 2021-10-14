@@ -97,12 +97,16 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
-                >,
-            >::ser_field(&self.recursive_unlabeled, 1, out)?;
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Unlabeled,
+                    ::puroro::tags::Message<
+                        ::std::boxed::Box<
+                            self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+                        >,
+                    >,
+                >::ser_field(&self.recursive_unlabeled, 1, out)?;
+            }
 
             ::std::result::Result::Ok(())
         }

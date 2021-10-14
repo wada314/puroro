@@ -182,39 +182,51 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
-                &self.i32_unlabeled,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_optional,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.i32_repeated,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Float>::ser_field(
-                &self.f32_unlabeled,
-                4,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
-                &self.string_unlabeled,
-                5,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_unlabeled,
+                    1,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_optional,
+                    2,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_repeated,
+                    3,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Float>::ser_field(
+                    &self.f32_unlabeled,
+                    4,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                    &self.string_unlabeled,
+                    5,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Unlabeled,
+                    ::puroro::tags::Message<
+                        ::std::boxed::Box<
+                            self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+                        >,
                     >,
-                >,
-            >::ser_field(&self.submsg_unlabeled, 6, out)?;
+                >::ser_field(&self.submsg_unlabeled, 6, out)?;
+            }
 
             ::std::result::Result::Ok(())
         }
@@ -308,11 +320,13 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
-                &self.i32_unlabeled,
-                1,
-                out,
-            )?;
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_unlabeled,
+                    1,
+                    out,
+                )?;
+            }
 
             ::std::result::Result::Ok(())
         }

@@ -408,11 +408,13 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_optional,
-                1,
-                out,
-            )?;
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_optional,
+                    1,
+                    out,
+                )?;
+            }
 
             ::std::result::Result::Ok(())
         }

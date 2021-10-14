@@ -292,55 +292,77 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_optional,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.i32_repeated,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
-                &self.float_optional,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
-                &self.float_repeated,
-                4,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.string_optional,
-                5,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.string_repeated,
-                6,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
-        >::ser_field(&self.submsg_optional, 7, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
-        >::ser_field(&self.submsg_repeated, 8, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(&self.enum_optional, 9, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(&self.enum_repeated, 10, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.very_large_field_number,
-                536870911,
-                out,
-            )?;
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_optional,
+                    1,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_repeated,
+                    2,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
+                    &self.float_optional,
+                    3,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
+                    &self.float_repeated,
+                    4,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                    &self.string_optional,
+                    5,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                    &self.string_repeated,
+                    6,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
+            >::ser_field(&self.submsg_optional, 7, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+            >::ser_field(&self.submsg_repeated, 8, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Optional,
+                    ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+                >::ser_field(&self.enum_optional, 9, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Repeated,
+                    ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+                >::ser_field(&self.enum_repeated, 10, out)?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                    &self.very_large_field_number,
+                    536870911,
+                    out,
+                )?;
+            }
 
             ::std::result::Result::Ok(())
         }
@@ -2355,9 +2377,11 @@ pub mod _puroro_nested {
                     W: ::std::io::Write,
                 {
                     use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.i32_optional, 1, out)?;
+                    {
+                        SerFieldToIoWrite::<
+                        ::puroro::tags::Optional, ::puroro::tags::Int32
+                    >::ser_field(&self.i32_optional, 1, out)?;
+                    }
 
                     ::std::result::Result::Ok(())
                 }
