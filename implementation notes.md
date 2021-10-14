@@ -1,8 +1,8 @@
-# Implementation notes of puroro
-
-## proto2 default values
+# proto2 default values
 Proto2 has a feature to set a default value like this:
+
 `optional int32 foo = 1; [default = 42]`
+
 However, in puroro implementation there are a difficulty to implement this. This is because of our initial design decision -- map `optional int32` type into `Option<i32>`. This looks very straightforward, but the official C++ and Java (I haven't checked others but I assume the others are the same) implementation are using 2 fields, the bare value `int32_t` field and the field existence `bool` value field.
 What's the difference between these two implementations? That is, where the official implementations allow a status that "the field is cleared but the value is available" but our implementation does not. And the proto2 default value behavior is tightly connected to this implementation. The proto2 default value is explicitly set to the field when the message structure is constructed, or when the `clear_foo()` method is called, and in the both cases the field existence bit is cleared. This makes lots of interesting (and good) behaviors:
 
@@ -12,10 +12,10 @@ What's the difference between these two implementations? That is, where the offi
 
 It is difficult to reproduce all these behaviors in puroro as long as we are using `Option<i32>` as a type of the field and as a return type of trait's getter methods. There are few options I can take:
 
-### Option 1. Give up using `Option<T>` and use a pair of `T` and `bool` fields
+## Option 1. Give up using `Option<T>` and use a pair of `T` and `bool` fields
 This is almost identical to give up using a public field struct for the generated message struct. At least for now, I don't want to do that.
 
-### Option 2. Set field default values in `Default::default()` method
+## Option 2. Set field default values in `Default::default()` method
 This looks like a most straightforward way, but the behavior will be different with the official protobuf implementation in 1. above. Also, even when the user explicitly set `None` as a field value, the default value is not set. This is a different behavior with the official implementation but it's more natural to Rust language users so I think it's acceptable. User can retrieve the default value anytime using a code like this:
 
 ```rust
@@ -26,7 +26,7 @@ let value_or_default = my_message.foo.or(MyMessage::default().foo).unwrap();
 
 Though this requires `.unwrap()` so it might be a option to define an associated constant with bare (non-optional) default value.
 
-#### Subproblem: Trait getter method behavior
+### Subproblem: Trait getter method behavior
 
 Another problem rose here is the behavior of trait getter methods. If the field is `None` internally, should the getter method return the default value or just return `None`? Similar question is, if the field is undefined for the impl type (e.g. `()`), then should the getter method return the default value or `None`?
 
@@ -43,5 +43,5 @@ assert_eq!(None, ()::default().foo()); // (did you know `()` implements `Default
 ```
 Why these two almost same code behaves differently? We can only say that because `MyMessage` has a field value instance but `()` does not. This is not clear to the user...
 
-### Option 3. Define a custom `Option<T>` type
+## Option 3. Define a custom `Option<T>` type
 
