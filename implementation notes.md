@@ -45,3 +45,41 @@ Why these two almost same code behaves differently? We can only say that because
 
 ## Option 3. Define a custom `Option<T>` type
 
+Seriously?
+
+Yes, it's true that maybe we can copy-and-paste the `Option<T>` code and add something like this:
+
+```rust
+pub enum NewOption<T> {
+    Some(T),
+    None(T), // <= What!?
+}
+impl<T> NewOption<T> {
+    pub fn unwrap_or_default(self) -> T {
+        match self {
+            Some(t) => t,
+            None(t) => t,
+        }
+    }
+}
+```
+
+If the field does not have the default value then we can set the protobuf-defined default value to the `None(T)` variant. It doesn't add memory footprint because we already have `Some(T)` variant. Hooray, it works! ...Really??
+
+Of course normally it's not a good idea to write a custom version of language core library feature.
+
+```rust
+// generated code
+pub struct MyMessage {
+    pub foo: Option<i32>,
+}
+impl MyMessageTrait for MyMessage {
+    fn foo(&self) -> NewOption<i32> {
+        match self.foo {
+            Some(x) => NewOption::Some(x),
+            None => NewOption::None(42),
+        }
+    }
+}
+```
+
