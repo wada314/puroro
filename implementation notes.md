@@ -3,7 +3,7 @@ Proto2 has a feature to set a default value like this:
 
 `optional int32 foo = 1; [default = 42]`
 
-However, in puroro implementation there is a difficulty to implement this. This is because of our initial design decision -- map `optional int32` type into `Option<i32>`. This looks very straightforward, but the official C++ and Java (I haven't checked others but I assume the others are the same) implementation are using 2 fields, the bare value `int32_t` field and the field existence `bool` value field.
+However, in puroro implementation there is a difficulty to implement this. This is because of our initial design decision -- map `optional int32` type into `Option<i32>`. This looks like very straightforward in Rust, but the official C++ and Java (I haven't checked others but I assume the others are the same) implementation are using 2 fields, the bare value `int32_t` field and the field existence `bool` value field.
 What's the difference between these two implementations? That is, where the official implementations allow a status that "the field is cleared but the value is available" but our implementation does not. And the proto2 default value behavior is tightly connected to this implementation. The proto2 default value is explicitly set to the field when the message structure is constructed, or when the `clear_foo()` method is called, and in the both cases the field existence bit is cleared. This makes lots of interesting (and good) behaviors:
 
  1. When the message class is constructed by a default constructor and then immediately be serialized, then no fields are serialized because the field existence bit is not set.
@@ -28,7 +28,7 @@ Though this requires `.unwrap()` so it might be a option to define an associated
 
 ### Subproblem: Trait getter method behavior
 
-Another problem rose here is the behavior of trait getter methods. If the field is `None` internally, should the getter method return the default value or just return `None`? Similar question is, if the field is undefined for the impl type (e.g. `()`), then should the getter method return the default value or `None`?
+Another problem rose here is the behavior of trait getter methods. If the field value is `None` internally, should the getter method return the default value or just return `None`? Similar question is, if the field is undefined for the impl type (e.g. `()`), then should the getter method return the default value or `None`?
 
 In `impl MyMessageTrait for (T, U)` code's scalar getter methods, we are doing something like checking the `U`'s getter method return value and if it's default then return `T`'s getter method return value. For this default check behavior, we must strictly define what the default value is.
 
@@ -41,15 +41,16 @@ use MyMessageTrait;
 assert_eq!(Some(42), MyMessage::default().foo());
 assert_eq!(None, ()::default().foo()); // (did you know `()` implements `Default`?)
 ```
-Why these two almost same code behaves differently? We can only say that because `MyMessage` has a field value instance but `()` does not. This is not clear to the user...
+Why these two almost identical code behaves differently? We can only say that because `MyMessage` has a field value instance but `()` does not. This is not clear to the user...
 
 ## Option 3. Define a custom `Option<T>` type
 
-Seriously?
+~~Seriously?~~
 
-Yes, it's true that maybe we can copy-and-paste the `Option<T>` code and add something like this:
+Maybe we can copy-and-paste the `Option<T>` code and add something like this:
 
 ```rust
+// name TBD
 pub enum NewOption<T> {
     Some(T),
     None(T), // <= What!?
@@ -57,20 +58,26 @@ pub enum NewOption<T> {
 impl<T> NewOption<T> {
     pub fn unwrap_or_default(self) -> T {
         match self {
-            Some(t) => t,
-            None(t) => t,
+            NewOption::Some(t) => t,
+            NewOption::None(t) => t,
+        }
+    }
+    pub fn take_some(self) -> Option<T> {
+        match self {
+            NewOption::Some(t) => Some(t),
+            NewOption::None(_) => None,
         }
     }
 }
 ```
 
 If the field does not have the default value then we can set the protobuf-defined default value to the `None(T)` variant. It doesn't add memory footprint because we already have `Some(T)` variant. Hooray, it works! ...Really??
-
 Of course normally it's not a good idea to write a custom version of language core library feature.
 
 ```rust
-// generated code
+// begin generated code
 pub struct MyMessage {
+    // Probably this can also be `NewOption<i32>`
     pub foo: Option<i32>,
 }
 impl MyMessageTrait for MyMessage {
@@ -81,5 +88,16 @@ impl MyMessageTrait for MyMessage {
         }
     }
 }
+// end generated code
+
+let msg = MyMessage::default();
+assert_eq!(42, msg.foo().unwrap_or_default());
+assert_eq!(None, msg.foo().take_some());
 ```
 
+It would be better to limit the use of this `NewOption<T>` fields / getters only for proto2 default_value fields.
+The user who got this value explicitly need to select if they want a maybe-default value (via `unwrap_or_default()` method above), or make sure to get only an explicitly set value (via `take_some()` method above).
+
+I'm starting to feel like this is a possible solution, though the struct's raw field users (who don't use trait's getter methods) still cannot get benefit of the default value.
+
+Another similar idea is to encode the default value into the custom option type's const generic param, though as of the current rust version (2021 Oct.) the const generic param supports only integral types, not float or string types. ([rfc](https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md))
