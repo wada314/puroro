@@ -101,3 +101,10 @@ The user who got this value explicitly need to select if they want a maybe-defau
 I'm starting to feel like this is a possible solution, though the struct's raw field users (who don't use trait's getter methods) still cannot get benefit of the default value.
 
 Another similar idea is to encode the default value into the custom option type's const generic param, though as of the current rust version (2021 Oct.) the const generic param supports only integral types, not float or string types. ([rfc](https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md))
+
+## My thoughts
+
+I designed the bare fields struct (`struct MyMessage`) for easy to use and it does not suit for performance critical purpose anyway. So I think the struct's code should be simple and straightforward. Let's just keep using `Option<T>` for the default value fields, and set the default value when it's constructed via `Default::default()` method.
+
+OTOH, the getter trait (`trait MyMessageTrait`) should be able to accept the heavily performance tuned implementation. The current trait interface for proto2 `optional` field returns `Option<T>`, though this interface cannot express the state "The field is not set but the default value is available" as I mentioned above.
+Probably I should redesign the getter method and split it to two methods; `foo(&self) -> T` and `has_foo(&self) -> bool`. One of the concern for this method is name conflict. How C++ and Java are treating the case that 2 fields named `foo` and `has_foo` are existing? Needs investigation...
