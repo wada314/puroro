@@ -39,6 +39,11 @@
 //!     }
 //! }
 //! impl<T: MyMessageTrait> MyMessageBuilder<T> {
+//!     pub fn build(self) -> T {
+//! #       todo!()
+//!         /* ... */
+//!     }
+//!
 //!     pub fn append_my_number(self, value: i32)
 //!     -> MyMessageBuilder<(T, MyMessageSingleField1)> {
 //! #       todo!()
@@ -95,15 +100,15 @@
 //! a method `append_<fieldname>` is generated for the builder struct.
 //! The parameter types that these `append_*` methods can take are:
 //!
-//! | base protobuf type | `required` / `optional | (unlabeled) / `oneof` field | `repeated` |
-//! |--------------------|----------------------- |-----------------------------|------------|
-//! | `int32` | `Option<i32>` | `i32` | (see below) |
-//! | (any numeric types) | `Option<T>` | `T` | (see below) |
-//! | `bytes` | `Option<impl AsRef<[u8]>>` | impl AsRef<[u8]> | (see below) |
-//! | `string` | `Option<impl AsRef<str>>` | impl AsRef<str> | (see below) |
-//! | `SomeMessage` | `Option<impl SomeMessageTrait>` | Option<impl SomeMessageTrait> | (see below) |
+//! | base protobuf type  | non-`repeated` field | `repeated`  |
+//! |---------------------|----------------------|-------------|
+//! | `int32`             | `i32`                | (see below) |
+//! | (any numeric types) | `T`                  | (see below) |
+//! | `bytes`             | impl AsRef<[u8]>     | (see below) |
+//! | `string`            | impl AsRef<str>      | (see below) |
+//! | `SomeMessage`       | `impl SomeMessageTrait`|(see below)|
 //!
-//! For repeated fields, a type `<RepeatedType>` where:
+//! For repeated fields, a type `RepeatedType` where:
 //!
 //! `for <'a> &'a RepeatedType: IntoIterator<Item=&'a ScalarType>`
 //!
@@ -113,8 +118,8 @@
 //! You may feel strange that the methods are named as `append_something`, not `set_something`.
 //! This is because that our builder methods have some limitations:
 //!
-//! - For non-message optional / required fields, you cannot "clear" the field
-//! once you have set some value.
+//! - For non-message && (`optional` || `required`) fields, you cannot "clear"
+//! the field once you have set some value. You can only overwrite it.
 //! - Same for message non-repeated fields, you cannot "clear" the existing field
 //! but you can only merge into the existing field.
 //! - For non-message proto3 unlabeled fields, you cannot set the field value to
@@ -123,9 +128,9 @@
 //! items from the existing field.
 //!
 //! These limitations come from the protobuf language spec and our implementation
-//! of builder structs. Our builder's append methods are literally appending the
-//! field into the existing message. When the generated message is serialized,
-//! the fields are serialized in the same order with the append methods' call order.
+//! of builder structs. Our builder's append methods works as appending a serilized
+//! field into a serialized message.
+//!
 //! In the protocol buffer's specification, it is legal that the same field appears
 //! several times in the serialized bytes array and the behavior for that is well
 //! defined (as the above limitations).

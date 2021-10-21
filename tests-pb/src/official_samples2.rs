@@ -22,7 +22,7 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Test1> for Test1 {}
 
     impl super::_puroro_traits::Test1Trait for Test1 {
-        fn a<'this>(&'this self) -> Option<i32> {
+        fn a_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.a)
         }
     }
@@ -107,7 +107,7 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Test2> for Test2 {}
 
     impl super::_puroro_traits::Test2Trait for Test2 {
-        fn b<'this>(&'this self) -> Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> Option<&'this str> {
             self.b.as_ref().map(|v| v.as_ref())
         }
     }
@@ -198,7 +198,7 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
-        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
@@ -385,8 +385,8 @@ pub mod _puroro_impls {
         T: Test1Trait,
         U: Test1Trait,
     {
-        fn a<'this>(&'this self) -> Option<i32> {
-            <U as Test1Trait>::a(&self.1).or_else(|| <T as Test1Trait>::a(&self.0))
+        fn a_opt<'this>(&'this self) -> Option<i32> {
+            <U as Test1Trait>::a_opt(&self.1).or_else(|| <T as Test1Trait>::a_opt(&self.0))
         }
     }
     impl<T, U> Test1Trait for ::puroro::Either<T, U>
@@ -394,31 +394,33 @@ pub mod _puroro_impls {
         T: Test1Trait,
         U: Test1Trait,
     {
-        fn a<'this>(&'this self) -> Option<i32> {
-            self.as_ref()
-                .either(|t| <T as Test1Trait>::a(t), |u| <U as Test1Trait>::a(u))
+        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as Test1Trait>::a_opt(t),
+                |u| <U as Test1Trait>::a_opt(u),
+            )
         }
     }
     impl<T> Test1Trait for ::std::option::Option<T>
     where
         T: Test1Trait,
     {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.a())
+        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.a_opt())
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct Test1SingleField1 {
-        pub a: ::std::option::Option<i32>,
+        pub a: i32,
     }
 
     impl ::puroro::Message<super::Test1> for Test1SingleField1 {}
 
     impl super::_puroro_traits::Test1Trait for Test1SingleField1 {
-        fn a<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.a)
+        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
         }
     }
 
@@ -432,13 +434,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.a, 1, out)?;
+            >(::std::iter::once(&self.a), 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for Test1SingleField1 {
-        fn from(value: ::std::option::Option<i32>) -> Self {
+    impl ::std::convert::From<i32> for Test1SingleField1 {
+        fn from(value: i32) -> Self {
             Self { a: value }
         }
     }
@@ -448,10 +450,7 @@ pub mod _puroro_impls {
     where
         T: Test1Trait,
     {
-        pub fn append_a(
-            self,
-            value: ::std::option::Option<i32>,
-        ) -> Test1Builder<(T, Test1SingleField1)> {
+        pub fn append_a(self, value: i32) -> Test1Builder<(T, Test1SingleField1)> {
             Test1Builder((self.0, Test1SingleField1 { a: value }))
         }
 
@@ -471,8 +470,8 @@ pub mod _puroro_impls {
         T: Test2Trait,
         U: Test2Trait,
     {
-        fn b<'this>(&'this self) -> Option<&'this str> {
-            <U as Test2Trait>::b(&self.1).or_else(|| <T as Test2Trait>::b(&self.0))
+        fn b_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as Test2Trait>::b_opt(&self.1).or_else(|| <T as Test2Trait>::b_opt(&self.0))
         }
     }
     impl<T, U> Test2Trait for ::puroro::Either<T, U>
@@ -480,17 +479,19 @@ pub mod _puroro_impls {
         T: Test2Trait,
         U: Test2Trait,
     {
-        fn b<'this>(&'this self) -> Option<&'this str> {
-            self.as_ref()
-                .either(|t| <T as Test2Trait>::b(t), |u| <U as Test2Trait>::b(u))
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as Test2Trait>::b_opt(t),
+                |u| <U as Test2Trait>::b_opt(u),
+            )
         }
     }
     impl<T> Test2Trait for ::std::option::Option<T>
     where
         T: Test2Trait,
     {
-        fn b<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.b())
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.b_opt())
         }
     }
 
@@ -503,7 +504,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub b: ::std::option::Option<ScalarType>,
+        pub b: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Test2> for Test2SingleField2<ScalarType> where
@@ -521,8 +522,8 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn b<'this>(&'this self) -> Option<&'this str> {
-            self.b.as_ref().map(|r| r.as_ref())
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some(self.b.as_ref())
         }
     }
 
@@ -542,20 +543,19 @@ pub mod _puroro_impls {
                 ScalarType,
                 _,
                 _,
-            >(&self.b, 2, out)?;
+            >(::std::iter::once(&self.b), 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
-        for Test2SingleField2<ScalarType>
+    impl<ScalarType> ::std::convert::From<ScalarType> for Test2SingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { b: value }
         }
     }
@@ -567,7 +567,7 @@ pub mod _puroro_impls {
     {
         pub fn append_b<ScalarType>(
             self,
-            value: ::std::option::Option<ScalarType>,
+            value: ScalarType,
         ) -> Test2Builder<(T, Test2SingleField2<ScalarType>)>
         where
             ScalarType: ::std::convert::AsRef<str>
@@ -606,8 +606,11 @@ pub mod _puroro_impls {
             ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
         );
-        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            match (<T as Test3Trait>::c(&self.0), <U as Test3Trait>::c(&self.1)) {
+        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            match (
+                <T as Test3Trait>::c_opt(&self.0),
+                <U as Test3Trait>::c_opt(&self.1),
+            ) {
                 (None, None) => None,
                 (Some(t), None) => Some((Some(t), None)),
                 (None, Some(u)) => Some((None, Some(u))),
@@ -627,10 +630,10 @@ pub mod _puroro_impls {
             <T as Test3Trait>::Field3MessageType<'this>,
             <U as Test3Trait>::Field3MessageType<'this>,
         >;
-        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.as_ref().either(
-                |t| <T as Test3Trait>::c(t).map(|t| ::puroro::Either::Left(t)),
-                |u| <U as Test3Trait>::c(u).map(|u| ::puroro::Either::Right(u)),
+                |t| <T as Test3Trait>::c_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as Test3Trait>::c_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
     }
@@ -642,8 +645,8 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = T::Field3MessageType<'this>;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            self.as_ref().and_then(|msg| msg.c())
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            self.as_ref().and_then(|msg| msg.c_opt())
         }
     }
 
@@ -656,7 +659,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub c: ::std::option::Option<ScalarType>,
+        pub c: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Test3> for Test3SingleField3<ScalarType> where
@@ -678,8 +681,9 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
-        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref()
+
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            ::std::option::Option::Some(&self.c)
         }
     }
 
@@ -701,7 +705,7 @@ pub mod _puroro_impls {
         >::ser_field::
         <ScalarType, _, _>
         (
-            &self.c,
+            ::std::iter::once(&self.c),
             3,
             out
         )?;
@@ -709,15 +713,14 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
-        for Test3SingleField3<ScalarType>
+    impl<ScalarType> ::std::convert::From<ScalarType> for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { c: value }
         }
     }
@@ -729,7 +732,7 @@ pub mod _puroro_impls {
     {
         pub fn append_c<ScalarType>(
             self,
-            value: ::std::option::Option<ScalarType>,
+            value: ScalarType,
         ) -> Test3Builder<(T, Test3SingleField3<ScalarType>)>
         where
             ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
@@ -909,15 +912,22 @@ pub mod _puroro_traits {
     }
 
     pub trait Test1Trait {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+        fn a<'this>(&'this self) -> i32 {
+            self.a_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_a<'this>(&'this self) -> bool {
+            self.a_opt().is_some()
+        }
+        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
         }
     }
 
     macro_rules! test1_delegate {
         ($ty:ty) => {
-            fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).a()
+            fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).a_opt()
             }
         };
     }
@@ -943,15 +953,22 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
     pub trait Test2Trait {
-        fn b<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::default::Default::default()
+        fn b<'this>(&'this self) -> &'this str {
+            self.b_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_b<'this>(&'this self) -> bool {
+            self.b_opt().is_some()
+        }
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::None
         }
     }
 
     macro_rules! test2_delegate {
         ($ty:ty) => {
-            fn b<'this>(&'this self) -> ::std::option::Option<&'this str> {
-                (**self).b()
+            fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).b_opt()
             }
         };
     }
@@ -981,7 +998,13 @@ pub mod _puroro_traits {
             self::_puroro_root::official_samples2::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
             where Self: 'this;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            ::std::default::Default::default()
+            self.c_opt()
+        }
+        fn has_c<'this>(&'this self) -> bool {
+            self.c_opt().is_some()
+        }
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            ::std::option::Option::None
         }
     }
 
@@ -991,8 +1014,8 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::Field3MessageType<'this>;
-            fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-                (**self).c()
+            fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+                (**self).c_opt()
             }
         };
     }

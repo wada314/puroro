@@ -36,14 +36,21 @@
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
+//!     fn my_number_opt(&self) -> Option<i32>;
+//!     fn has_my_number(&self) -> bool;
+//!
 //!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str> where Self: 'this;
 //!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
+//!     fn has_my_name(&self) -> bool;
+//!
 //!     type Field3MessageType<'this>: MyMessageTrait + Clone + PartialEq + Debug where Self: 'this;
 //!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
+//!     fn my_name_opt(&self) -> Option<Self::Field3MessageType<'_>>;
+//!     fn has_my_child(&self) -> bool;
 //! }
 //! ```
 //!
-//! Each message field will have a single getter method which has same name
+//! Each message field will generate a getter method which has same name
 //! (lower_snake_case_nized if it's not) with the original protobuf fields.
 //! If the field is a message type, then an associated type
 //! `Field[number]MessageType` which implements the message type's trait
@@ -54,15 +61,21 @@
 //! This type implements [`puroro::RepeatedField`](crate::RepeatedField), which is the same
 //! as the [`IntoIterator`].
 //!
-//! The list of the generated methods' return types:
+//! The list of the generated getter methods' return types:
 //!
-//! | base protobuf type | `required` / `optional` / `oneof` field | (unlabeled) | `repeated` |
-//! |--------------------|-----------------------------------------|-------------|------------|
-//! | `int32`            | `Option<i32>`                           | `i32`       | `impl IntoIterator<Item=i32>`|
-//! | (Any numeric types)| `Option<T>`                             | `T`         | `impl IntoIterator<Item=T>`|
-//! | `bytes`            | `Option<&[u8]>`                         | `&[u8]`     | `impl IntoIterator<Item=&[u8]>`|
-//! | `string`           | `Option<&str>`                          | `&str`      | `impl IntoIterator<Item=&str>`|
-//! | `SomeMessage`      | `Option<impl SomeMessageTrait>`         | `Option<impl SomeMessageTrait>`|`impl IntoIterator<Item=impl SomeMessageTrait>`|
+//! | base protobuf type | non-`repeated` fields | `repeated`                     |
+//! |--------------------|-----------------------|--------------------------------|
+//! | `int32`            | `i32`                 | `impl IntoIterator<Item=i32>`  |
+//! | (Any numeric types)| `T`                   | `impl IntoIterator<Item=T>`    |
+//! | `bytes`            | `&[u8]`               | `impl IntoIterator<Item=&[u8]>`|
+//! | `string`           | `&str`                | `impl IntoIterator<Item=&str>` |
+//! | `SomeMessage`      | `Option<impl SomeMessageTrait>`|`impl IntoIterator<Item=impl SomeMessageTrait>`|
+//!
+//! It also generates a getter method with postfix `_opt`, which always returns `Option` type.
+//! If the field value is not set (`optional` or `required` fields) or the field value is
+//! default (unlabeled fields) then this method returns `None`, otherwise `Some`.
+//!
+//! And a method with prefix `has_` is generated, which is a shortcut of `self.foo_opt().is_some()`.
 //!
 //! ## oneofs
 //!
@@ -82,6 +95,13 @@
 //! ```rust
 //! pub trait MyMessageTrait {
 //!     fn my_oneofs(&self) -> Option<my_message::MyOneofs>;
+//!
+//!     fn item1(&self) -> i32;
+//!     fn item1_opt(&self) -> Option<i32>;
+//!     fn has_item1(&self) -> bool;
+//!     fn item2(&self) -> f32;
+//!     fn item2_opt(&self) -> Option<f32>;
+//!     fn has_item2(&self) -> bool;
 //! }
 //! pub mod my_message {
 //!     pub enum MyOneofs {
