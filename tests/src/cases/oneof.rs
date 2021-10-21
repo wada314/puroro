@@ -33,37 +33,37 @@ fn test_oneof_simple2() {
     assert!(msg.group_one().is_none());
     assert!(msg.group_two().is_none());
     assert!(msg.group_three().is_none());
-    assert!(msg.g1_int32().is_none());
-    assert!(msg.g1_string().is_none());
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_string().is_none());
-    assert!(msg.g2_submsg().is_none());
-    assert!(msg.g3_int32().is_none());
+    assert!(!msg.has_g1_int32());
+    assert!(!msg.has_g1_string());
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_string());
+    assert!(!msg.has_g2_submsg());
+    assert!(!msg.has_g3_int32());
 
     // Set values and check it via trait's getter methods
     msg.group_one = Some(GroupOne2::G1Int32(100));
     assert!(matches!(msg.group_one(), Some(GroupOne2::G1Int32(100))));
-    assert!(matches!(msg.g1_int32(), Some(100)));
-    assert!(msg.g1_string().is_none());
+    assert_eq!(msg.g1_int32(), 100);
+    assert!(!msg.has_g1_string());
     msg.group_one = Some(GroupOne2::G1String("Test".to_string()));
     assert!(matches!(msg.group_one(), Some(GroupOne2::G1String("Test"))));
-    assert!(matches!(msg.g1_string(), Some("Test")));
-    assert!(msg.g1_int32().is_none());
+    assert_eq!(msg.g1_string(), "Test");
+    assert!(!msg.has_g1_int32());
     msg.group_one = None;
     assert!(msg.group_one().is_none());
-    assert!(msg.g1_int32().is_none());
-    assert!(msg.g1_string().is_none());
+    assert!(!msg.has_g1_int32());
+    assert!(!msg.has_g1_string());
 
     msg.group_two = Some(GroupTwo2::G2F32(100.0));
     assert_eq!(msg.group_two(), Some(GroupTwo2::G2F32(100.0)));
-    assert_eq!(msg.g2_f32(), Some(100.0));
-    assert!(msg.g2_string().is_none());
-    assert!(msg.g2_submsg().is_none());
+    assert_eq!(msg.g2_f32(), 100.0);
+    assert!(!msg.has_g2_string());
+    assert!(!msg.has_g2_submsg());
     msg.group_two = Some(GroupTwo2::G2String("Test".to_string()));
     assert_eq!(msg.group_two(), Some(GroupTwo2::G2String("Test")));
-    assert_eq!(msg.g2_string(), Some("Test"));
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_submsg().is_none());
+    assert_eq!(msg.g2_string(), "Test");
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_submsg());
     msg.group_two = Some(GroupTwo2::G2Submsg({
         let mut submsg = Submsg2::default();
         submsg.i32_optional = Some(100);
@@ -72,20 +72,20 @@ fn test_oneof_simple2() {
     assert!(matches!(msg.group_two(), Some(GroupTwo2::G2Submsg(_))));
     assert!(msg.g2_submsg().is_some());
     assert_eq!(msg.g2_submsg().unwrap().i32_optional, Some(100));
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_string().is_none());
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_string());
     msg.group_two = None;
     assert!(msg.group_two().is_none());
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_string().is_none());
-    assert!(msg.g2_submsg().is_none());
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_string());
+    assert!(!msg.has_g2_submsg());
 
     msg.group_three = Some(GroupThree2::G3Int32(100));
     assert!(matches!(msg.group_three(), Some(GroupThree2::G3Int32(100))));
-    assert!(matches!(msg.g3_int32(), Some(100)));
+    assert_eq!(msg.g3_int32(), 100);
     msg.group_three = None;
     assert!(msg.group_three().is_none());
-    assert!(msg.g3_int32().is_none());
+    assert!(!msg.has_g3_int32());
 }
 
 #[test]
@@ -99,37 +99,37 @@ fn test_oneof_simple3() {
     assert!(msg.group_one().is_none());
     assert!(msg.group_two().is_none());
     assert!(msg.group_three().is_none());
-    assert!(msg.g1_int32().is_none());
-    assert!(msg.g1_string().is_none());
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_string().is_none());
-    assert!(msg.g2_submsg().is_none());
-    assert!(msg.g3_int32().is_none());
+    assert!(!msg.has_g1_int32());
+    assert!(!msg.has_g1_string());
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_string());
+    assert!(!msg.has_g2_submsg());
+    assert!(!msg.has_g3_int32());
 
     // Set values and check it via trait's getter methods
     msg.group_one = Some(GroupOne3::G1Int32(100));
     assert!(matches!(msg.group_one(), Some(GroupOne3::G1Int32(100))));
-    assert!(matches!(msg.g1_int32(), Some(100)));
-    assert!(msg.g1_string().is_none());
+    assert_eq!(msg.g1_int32(), 100);
+    assert!(!msg.has_g1_string());
     msg.group_one = Some(GroupOne3::G1String("Test".to_string()));
     assert!(matches!(msg.group_one(), Some(GroupOne3::G1String("Test"))));
-    assert!(matches!(msg.g1_string(), Some("Test")));
-    assert!(msg.g1_int32().is_none());
+    assert_eq!(msg.g1_string(), "Test");
+    assert!(!msg.has_g1_int32());
     msg.group_one = None;
     assert!(msg.group_one().is_none());
-    assert!(msg.g1_int32().is_none());
-    assert!(msg.g1_string().is_none());
+    assert!(!msg.has_g1_int32());
+    assert!(!msg.has_g1_string());
 
     msg.group_two = Some(GroupTwo3::G2F32(100.0));
     assert_eq!(msg.group_two(), Some(GroupTwo3::G2F32(100.0)));
-    assert_eq!(msg.g2_f32(), Some(100.0));
-    assert!(msg.g2_string().is_none());
-    assert!(msg.g2_submsg().is_none());
+    assert_eq!(msg.g2_f32(), 100.0);
+    assert!(!msg.has_g2_string());
+    assert!(!msg.has_g2_submsg());
     msg.group_two = Some(GroupTwo3::G2String("Test".to_string()));
     assert_eq!(msg.group_two(), Some(GroupTwo3::G2String("Test")));
-    assert_eq!(msg.g2_string(), Some("Test"));
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_submsg().is_none());
+    assert_eq!(msg.g2_string(), "Test");
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_submsg());
     msg.group_two = Some(GroupTwo3::G2Submsg({
         let mut submsg = Submsg3::default();
         submsg.i32_unlabeled = 100;
@@ -138,18 +138,18 @@ fn test_oneof_simple3() {
     assert!(matches!(msg.group_two(), Some(GroupTwo3::G2Submsg(_))));
     assert!(msg.g2_submsg().is_some());
     assert_eq!(msg.g2_submsg().unwrap().i32_unlabeled, 100);
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_string().is_none());
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_string());
     msg.group_two = None;
     assert!(msg.group_two().is_none());
-    assert!(msg.g2_f32().is_none());
-    assert!(msg.g2_string().is_none());
-    assert!(msg.g2_submsg().is_none());
+    assert!(!msg.has_g2_f32());
+    assert!(!msg.has_g2_string());
+    assert!(!msg.has_g2_submsg());
 
     msg.group_three = Some(GroupThree3::G3Int32(100));
     assert!(matches!(msg.group_three(), Some(GroupThree3::G3Int32(100))));
-    assert!(matches!(msg.g3_int32(), Some(100)));
+    assert_eq!(msg.g3_int32(), 100);
     msg.group_three = None;
     assert!(msg.group_three().is_none());
-    assert!(msg.g3_int32().is_none());
+    assert!(!msg.has_g3_int32());
 }

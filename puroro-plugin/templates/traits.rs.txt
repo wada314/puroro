@@ -10,23 +10,40 @@ pub trait {{ m.trait_ident }} {
     {%- else %}
     {%- endmatch %}
 
-    {%- if field.trait_has_scalar_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-        ::std::default::Default::default()
-    }
-    {%- endif %}
-    {%- if field.trait_has_optional_getter && !field.is_explicit_oneof_field %}
-    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        ::std::default::Default::default()
-    }
-    {%- endif %}
-    {%- if field.trait_has_repeated_getter %}
+    {%- if field.is_repeated %}
+
     type Field{{ field.number }}RepeatedType<'this>:
         ::puroro::RepeatedField<'this>
         + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>
     where Self: 'this;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
+
+    {%- else %} {#- if field.is_repeated #}
+
+    {%- if field.is_message %}
+    {#- the getter method returns Option<T> for message field #}
+    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        self.{{ field.ident }}_opt()
+    }
+    {%- else %}
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        self.{{ field.ident }}_opt().unwrap_or_else(::std::default::Default::default)
+    }
     {%- endif %}
+    fn has_{{ field.ident }}<'this>(&'this self) -> bool {
+        self.{{ field.ident }}_opt().is_some()
+    }
+    {#-
+     # Oneof items will have same interfaces with the scalar fields, but its default implementation 
+     # can depend on the oneof field getter's return value so skip it for now and define those at below.
+     #}
+    {%- if !field.is_explicit_oneof_field %}
+    fn {{ field.ident }}_opt<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        ::std::option::Option::None
+    }
+    {%- endif %}
+
+    {%- endif %} {#- if field.is_repeated #}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
@@ -46,14 +63,14 @@ pub trait {{ m.trait_ident }} {
     }
 
     {%- for field in oneof.fields %}
-    pub fn {{ field.getter_ident }}<'this>(&'this self) -> Option<{{ field.trait_getter_type }}> {
+    pub fn {{ field.getter_ident }}_opt<'this>(&'this self) -> Option<{{ field.trait_getter_type }}> {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
         self.{{ oneof.field_ident }}().and_then(|oneof| {
             #[allow(irrefutable_let_patterns)]
             if let E::{{ field.ident }}(v) = oneof {
-                Some(v)
+                ::std::option::Option::Some(v)
             } else {
-                None
+                ::std::option::Option::None
             }
         })
     }
@@ -68,22 +85,23 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
         type Field{{ field.number }}MessageType<'this> where Self: 'this = <$ty>::Field{{ field.number }}MessageType<'this>;
         {%- endif %}
 
-        {%- if field.trait_has_scalar_getter %}
-        fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-            (**self).{{ field.ident }}()
-        }
-        {%- endif %}
-        {%- if field.trait_has_optional_getter %}
-        fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-            (**self).{{ field.ident }}()
-        }
-        {%- endif %}
-        {%- if field.trait_has_repeated_getter %}
+        {%- if field.is_repeated %}
+
         type Field{{ field.number }}RepeatedType<'this> where Self: 'this = <$ty>::Field{{ field.number }}RepeatedType<'this>;
         fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
             (**self).{{ field.ident }}()
         }
+
+        {%- else %} {#- if field.is_repeated #}
+
+        {%- if !field.is_explicit_oneof_field %}
+        fn {{ field.ident }}_opt<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+            (**self).{{ field.ident }}_opt()
+        }
         {%- endif %}
+
+        {%- endif %} {#- if field.is_repeated #}
+
         {%- endfor %}
 
         {%- for oneof in m.oneofs %}

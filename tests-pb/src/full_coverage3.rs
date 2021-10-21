@@ -66,10 +66,14 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Msg> for Msg {}
 
     impl super::_puroro_traits::MsgTrait for Msg {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            Clone::clone(&self.i32_unlabeled)
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            if self.i32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.i32_unlabeled.clone())
+            }
         }
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
         type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -77,10 +81,14 @@ pub mod _puroro_simple_impl {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             self.i32_repeated.iter().cloned()
         }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            Clone::clone(&self.float_unlabeled)
+        fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
+            if self.float_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.float_unlabeled.clone())
+            }
         }
-        fn float_optional<'this>(&'this self) -> Option<f32> {
+        fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_optional)
         }
         type Field13RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
@@ -88,10 +96,14 @@ pub mod _puroro_simple_impl {
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             self.float_repeated.iter().cloned()
         }
-        fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
-            self.bytes_unlabeled.as_ref()
+        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            if self.bytes_unlabeled.is_empty() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
+            }
         }
-        fn bytes_optional<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             self.bytes_optional.as_ref().map(|v| v.as_ref())
         }
         type Field23RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
@@ -102,10 +114,14 @@ pub mod _puroro_simple_impl {
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
         }
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
-            self.string_unlabeled.as_ref()
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+            if self.string_unlabeled.is_empty() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.string_unlabeled.as_ref())
+            }
         }
-        fn string_optional<'this>(&'this self) -> Option<&'this str> {
+        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
         type Field33RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
@@ -116,10 +132,18 @@ pub mod _puroro_simple_impl {
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
         }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            Clone::clone(&self.enum_unlabeled)
+        fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage3::Enum> {
+            if self.enum_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.enum_unlabeled.clone())
+            }
         }
-        fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::full_coverage3::Enum> {
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             Clone::clone(&self.enum_optional)
         }
         type Field43RepeatedType<'this> = ::std::iter::Cloned<
@@ -130,11 +154,11 @@ pub mod _puroro_simple_impl {
             self.enum_repeated.iter().cloned()
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
@@ -145,10 +169,14 @@ pub mod _puroro_simple_impl {
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
-        fn i64_unlabeled<'this>(&'this self) -> i64 {
-            Clone::clone(&self.i64_unlabeled)
+        fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            if self.i64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.i64_unlabeled.clone())
+            }
         }
-        fn i64_optional<'this>(&'this self) -> Option<i64> {
+        fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_optional)
         }
         type Field103RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
@@ -156,10 +184,14 @@ pub mod _puroro_simple_impl {
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
             self.i64_repeated.iter().cloned()
         }
-        fn u32_unlabeled<'this>(&'this self) -> u32 {
-            Clone::clone(&self.u32_unlabeled)
+        fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
+            if self.u32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.u32_unlabeled.clone())
+            }
         }
-        fn u32_optional<'this>(&'this self) -> Option<u32> {
+        fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.u32_optional)
         }
         type Field113RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
@@ -167,10 +199,14 @@ pub mod _puroro_simple_impl {
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
             self.u32_repeated.iter().cloned()
         }
-        fn u64_unlabeled<'this>(&'this self) -> u64 {
-            Clone::clone(&self.u64_unlabeled)
+        fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
+            if self.u64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.u64_unlabeled.clone())
+            }
         }
-        fn u64_optional<'this>(&'this self) -> Option<u64> {
+        fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.u64_optional)
         }
         type Field123RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
@@ -178,10 +214,14 @@ pub mod _puroro_simple_impl {
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
             self.u64_repeated.iter().cloned()
         }
-        fn s32_unlabeled<'this>(&'this self) -> i32 {
-            Clone::clone(&self.s32_unlabeled)
+        fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            if self.s32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.s32_unlabeled.clone())
+            }
         }
-        fn s32_optional<'this>(&'this self) -> Option<i32> {
+        fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.s32_optional)
         }
         type Field133RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -189,10 +229,14 @@ pub mod _puroro_simple_impl {
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
             self.s32_repeated.iter().cloned()
         }
-        fn s64_unlabeled<'this>(&'this self) -> i64 {
-            Clone::clone(&self.s64_unlabeled)
+        fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            if self.s64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.s64_unlabeled.clone())
+            }
         }
-        fn s64_optional<'this>(&'this self) -> Option<i64> {
+        fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.s64_optional)
         }
         type Field143RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
@@ -200,10 +244,14 @@ pub mod _puroro_simple_impl {
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
             self.s64_repeated.iter().cloned()
         }
-        fn fixed32_unlabeled<'this>(&'this self) -> u32 {
-            Clone::clone(&self.fixed32_unlabeled)
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
+            if self.fixed32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.fixed32_unlabeled.clone())
+            }
         }
-        fn fixed32_optional<'this>(&'this self) -> Option<u32> {
+        fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.fixed32_optional)
         }
         type Field153RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
@@ -211,10 +259,14 @@ pub mod _puroro_simple_impl {
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
             self.fixed32_repeated.iter().cloned()
         }
-        fn fixed64_unlabeled<'this>(&'this self) -> u64 {
-            Clone::clone(&self.fixed64_unlabeled)
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
+            if self.fixed64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.fixed64_unlabeled.clone())
+            }
         }
-        fn fixed64_optional<'this>(&'this self) -> Option<u64> {
+        fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.fixed64_optional)
         }
         type Field163RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
@@ -222,10 +274,14 @@ pub mod _puroro_simple_impl {
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
             self.fixed64_repeated.iter().cloned()
         }
-        fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
-            Clone::clone(&self.sfixed32_unlabeled)
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            if self.sfixed32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.sfixed32_unlabeled.clone())
+            }
         }
-        fn sfixed32_optional<'this>(&'this self) -> Option<i32> {
+        fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.sfixed32_optional)
         }
         type Field173RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -233,10 +289,14 @@ pub mod _puroro_simple_impl {
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
             self.sfixed32_repeated.iter().cloned()
         }
-        fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
-            Clone::clone(&self.sfixed64_unlabeled)
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            if self.sfixed64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.sfixed64_unlabeled.clone())
+            }
         }
-        fn sfixed64_optional<'this>(&'this self) -> Option<i64> {
+        fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.sfixed64_optional)
         }
         type Field183RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
@@ -244,10 +304,14 @@ pub mod _puroro_simple_impl {
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
             self.sfixed64_repeated.iter().cloned()
         }
-        fn f64_unlabeled<'this>(&'this self) -> f64 {
-            Clone::clone(&self.f64_unlabeled)
+        fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
+            if self.f64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.f64_unlabeled.clone())
+            }
         }
-        fn f64_optional<'this>(&'this self) -> Option<f64> {
+        fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             Clone::clone(&self.f64_optional)
         }
         type Field193RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f64>>;
@@ -1310,17 +1374,13 @@ pub mod _puroro_impls {
         T: MsgTrait,
         U: MsgTrait,
     {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            let right = <U as MsgTrait>::i32_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::i32_unlabeled(&self.0)
-            }
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_unlabeled_opt(&self.0))
         }
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_optional(&self.0))
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
         }
         type Field3RepeatedType<'this>
         where
@@ -1336,17 +1396,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::i32_repeated(&self.1),
             )
         }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            let right = <U as MsgTrait>::float_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::float_unlabeled(&self.0)
-            }
+        fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::float_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::float_unlabeled_opt(&self.0))
         }
-        fn float_optional<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::float_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::float_optional(&self.0))
+        fn float_optional_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::float_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::float_optional_opt(&self.0))
         }
         type Field13RepeatedType<'this>
         where
@@ -1362,17 +1418,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::float_repeated(&self.1),
             )
         }
-        fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
-            let right = <U as MsgTrait>::bytes_unlabeled(&self.1);
-            if !right.is_empty() {
-                right
-            } else {
-                <T as MsgTrait>::bytes_unlabeled(&self.0)
-            }
+        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_unlabeled_opt(&self.0))
         }
-        fn bytes_optional<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_optional(&self.0))
+        fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_optional_opt(&self.0))
         }
         type Field23RepeatedType<'this>
         where
@@ -1388,17 +1440,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::bytes_repeated(&self.1),
             )
         }
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
-            let right = <U as MsgTrait>::string_unlabeled(&self.1);
-            if !right.is_empty() {
-                right
-            } else {
-                <T as MsgTrait>::string_unlabeled(&self.0)
-            }
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
         }
-        fn string_optional<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::string_optional(&self.0))
+        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_optional_opt(&self.0))
         }
         type Field33RepeatedType<'this>
         where
@@ -1414,17 +1462,17 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::string_repeated(&self.1),
             )
         }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            let right = <U as MsgTrait>::enum_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::enum_unlabeled(&self.0)
-            }
+        fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage3::Enum> {
+            <U as MsgTrait>::enum_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_unlabeled_opt(&self.0))
         }
-        fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::full_coverage3::Enum> {
-            <U as MsgTrait>::enum_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_optional(&self.0))
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage3::Enum> {
+            <U as MsgTrait>::enum_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_optional_opt(&self.0))
         }
         type Field43RepeatedType<'this>
         where
@@ -1447,10 +1495,10 @@ pub mod _puroro_impls {
             ::std::option::Option<<T as MsgTrait>::Field51MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field51MessageType<'this>>,
         );
-        fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             match (
-                <T as MsgTrait>::submsg_unlabeled(&self.0),
-                <U as MsgTrait>::submsg_unlabeled(&self.1),
+                <T as MsgTrait>::submsg_unlabeled_opt(&self.0),
+                <U as MsgTrait>::submsg_unlabeled_opt(&self.1),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some((Some(t), None)),
@@ -1465,10 +1513,10 @@ pub mod _puroro_impls {
             ::std::option::Option<<T as MsgTrait>::Field52MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field52MessageType<'this>>,
         );
-        fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             match (
-                <T as MsgTrait>::submsg_optional(&self.0),
-                <U as MsgTrait>::submsg_optional(&self.1),
+                <T as MsgTrait>::submsg_optional_opt(&self.0),
+                <U as MsgTrait>::submsg_optional_opt(&self.1),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some((Some(t), None)),
@@ -1497,17 +1545,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::submsg_repeated(&self.1),
             )
         }
-        fn i64_unlabeled<'this>(&'this self) -> i64 {
-            let right = <U as MsgTrait>::i64_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::i64_unlabeled(&self.0)
-            }
+        fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_unlabeled_opt(&self.0))
         }
-        fn i64_optional<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_optional(&self.0))
+        fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_optional_opt(&self.0))
         }
         type Field103RepeatedType<'this>
         where
@@ -1523,17 +1567,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::i64_repeated(&self.1),
             )
         }
-        fn u32_unlabeled<'this>(&'this self) -> u32 {
-            let right = <U as MsgTrait>::u32_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::u32_unlabeled(&self.0)
-            }
+        fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_unlabeled_opt(&self.0))
         }
-        fn u32_optional<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_optional(&self.0))
+        fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_optional_opt(&self.0))
         }
         type Field113RepeatedType<'this>
         where
@@ -1549,17 +1589,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::u32_repeated(&self.1),
             )
         }
-        fn u64_unlabeled<'this>(&'this self) -> u64 {
-            let right = <U as MsgTrait>::u64_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::u64_unlabeled(&self.0)
-            }
+        fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_unlabeled_opt(&self.0))
         }
-        fn u64_optional<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_optional(&self.0))
+        fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_optional_opt(&self.0))
         }
         type Field123RepeatedType<'this>
         where
@@ -1575,17 +1611,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::u64_repeated(&self.1),
             )
         }
-        fn s32_unlabeled<'this>(&'this self) -> i32 {
-            let right = <U as MsgTrait>::s32_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::s32_unlabeled(&self.0)
-            }
+        fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::s32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s32_unlabeled_opt(&self.0))
         }
-        fn s32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::s32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::s32_optional(&self.0))
+        fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::s32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s32_optional_opt(&self.0))
         }
         type Field133RepeatedType<'this>
         where
@@ -1601,17 +1633,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::s32_repeated(&self.1),
             )
         }
-        fn s64_unlabeled<'this>(&'this self) -> i64 {
-            let right = <U as MsgTrait>::s64_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::s64_unlabeled(&self.0)
-            }
+        fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::s64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s64_unlabeled_opt(&self.0))
         }
-        fn s64_optional<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::s64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::s64_optional(&self.0))
+        fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::s64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s64_optional_opt(&self.0))
         }
         type Field143RepeatedType<'this>
         where
@@ -1627,17 +1655,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::s64_repeated(&self.1),
             )
         }
-        fn fixed32_unlabeled<'this>(&'this self) -> u32 {
-            let right = <U as MsgTrait>::fixed32_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::fixed32_unlabeled(&self.0)
-            }
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::fixed32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed32_unlabeled_opt(&self.0))
         }
-        fn fixed32_optional<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::fixed32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed32_optional(&self.0))
+        fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::fixed32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed32_optional_opt(&self.0))
         }
         type Field153RepeatedType<'this>
         where
@@ -1653,17 +1677,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::fixed32_repeated(&self.1),
             )
         }
-        fn fixed64_unlabeled<'this>(&'this self) -> u64 {
-            let right = <U as MsgTrait>::fixed64_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::fixed64_unlabeled(&self.0)
-            }
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::fixed64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed64_unlabeled_opt(&self.0))
         }
-        fn fixed64_optional<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::fixed64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed64_optional(&self.0))
+        fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::fixed64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed64_optional_opt(&self.0))
         }
         type Field163RepeatedType<'this>
         where
@@ -1679,17 +1699,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::fixed64_repeated(&self.1),
             )
         }
-        fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
-            let right = <U as MsgTrait>::sfixed32_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::sfixed32_unlabeled(&self.0)
-            }
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::sfixed32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed32_unlabeled_opt(&self.0))
         }
-        fn sfixed32_optional<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::sfixed32_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed32_optional(&self.0))
+        fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::sfixed32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed32_optional_opt(&self.0))
         }
         type Field173RepeatedType<'this>
         where
@@ -1705,17 +1721,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::sfixed32_repeated(&self.1),
             )
         }
-        fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
-            let right = <U as MsgTrait>::sfixed64_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::sfixed64_unlabeled(&self.0)
-            }
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::sfixed64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed64_unlabeled_opt(&self.0))
         }
-        fn sfixed64_optional<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::sfixed64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed64_optional(&self.0))
+        fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::sfixed64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed64_optional_opt(&self.0))
         }
         type Field183RepeatedType<'this>
         where
@@ -1731,17 +1743,13 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::sfixed64_repeated(&self.1),
             )
         }
-        fn f64_unlabeled<'this>(&'this self) -> f64 {
-            let right = <U as MsgTrait>::f64_unlabeled(&self.1);
-            if right != ::std::default::Default::default() {
-                right
-            } else {
-                <T as MsgTrait>::f64_unlabeled(&self.0)
-            }
+        fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
+            <U as MsgTrait>::f64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f64_unlabeled_opt(&self.0))
         }
-        fn f64_optional<'this>(&'this self) -> Option<f64> {
-            <U as MsgTrait>::f64_optional(&self.1)
-                .or_else(|| <T as MsgTrait>::f64_optional(&self.0))
+        fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
+            <U as MsgTrait>::f64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f64_optional_opt(&self.0))
         }
         type Field193RepeatedType<'this>
         where
@@ -1763,16 +1771,16 @@ pub mod _puroro_impls {
         T: MsgTrait,
         U: MsgTrait,
     {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::i32_unlabeled(t),
-                |u| <U as MsgTrait>::i32_unlabeled(u),
+                |t| <T as MsgTrait>::i32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::i32_unlabeled_opt(u),
             )
         }
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::i32_optional(t),
-                |u| <U as MsgTrait>::i32_optional(u),
+                |t| <T as MsgTrait>::i32_optional_opt(t),
+                |u| <U as MsgTrait>::i32_optional_opt(u),
             )
         }
         type Field3RepeatedType<'this>
@@ -1790,16 +1798,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::i32_repeated(u)),
             )
         }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
+        fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::float_unlabeled(t),
-                |u| <U as MsgTrait>::float_unlabeled(u),
+                |t| <T as MsgTrait>::float_unlabeled_opt(t),
+                |u| <U as MsgTrait>::float_unlabeled_opt(u),
             )
         }
-        fn float_optional<'this>(&'this self) -> Option<f32> {
+        fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::float_optional(t),
-                |u| <U as MsgTrait>::float_optional(u),
+                |t| <T as MsgTrait>::float_optional_opt(t),
+                |u| <U as MsgTrait>::float_optional_opt(u),
             )
         }
         type Field13RepeatedType<'this>
@@ -1817,16 +1825,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::float_repeated(u)),
             )
         }
-        fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
+        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_unlabeled(t),
-                |u| <U as MsgTrait>::bytes_unlabeled(u),
+                |t| <T as MsgTrait>::bytes_unlabeled_opt(t),
+                |u| <U as MsgTrait>::bytes_unlabeled_opt(u),
             )
         }
-        fn bytes_optional<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_optional(t),
-                |u| <U as MsgTrait>::bytes_optional(u),
+                |t| <T as MsgTrait>::bytes_optional_opt(t),
+                |u| <U as MsgTrait>::bytes_optional_opt(u),
             )
         }
         type Field23RepeatedType<'this>
@@ -1844,16 +1852,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::bytes_repeated(u)),
             )
         }
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
+        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_unlabeled(t),
-                |u| <U as MsgTrait>::string_unlabeled(u),
+                |t| <T as MsgTrait>::string_unlabeled_opt(t),
+                |u| <U as MsgTrait>::string_unlabeled_opt(u),
             )
         }
-        fn string_optional<'this>(&'this self) -> Option<&'this str> {
+        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_optional(t),
-                |u| <U as MsgTrait>::string_optional(u),
+                |t| <T as MsgTrait>::string_optional_opt(t),
+                |u| <U as MsgTrait>::string_optional_opt(u),
             )
         }
         type Field33RepeatedType<'this>
@@ -1871,16 +1879,20 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::string_repeated(u)),
             )
         }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+        fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::enum_unlabeled(t),
-                |u| <U as MsgTrait>::enum_unlabeled(u),
+                |t| <T as MsgTrait>::enum_unlabeled_opt(t),
+                |u| <U as MsgTrait>::enum_unlabeled_opt(u),
             )
         }
-        fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::full_coverage3::Enum> {
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::enum_optional(t),
-                |u| <U as MsgTrait>::enum_optional(u),
+                |t| <T as MsgTrait>::enum_optional_opt(t),
+                |u| <U as MsgTrait>::enum_optional_opt(u),
             )
         }
         type Field43RepeatedType<'this>
@@ -1905,10 +1917,12 @@ pub mod _puroro_impls {
             <T as MsgTrait>::Field51MessageType<'this>,
             <U as MsgTrait>::Field51MessageType<'this>,
         >;
-        fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::submsg_unlabeled(t).map(|t| ::puroro::Either::Left(t)),
-                |u| <U as MsgTrait>::submsg_unlabeled(u).map(|u| ::puroro::Either::Right(u)),
+                |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
         type Field52MessageType<'this>
@@ -1918,10 +1932,12 @@ pub mod _puroro_impls {
             <T as MsgTrait>::Field52MessageType<'this>,
             <U as MsgTrait>::Field52MessageType<'this>,
         >;
-        fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+        fn submsg_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::submsg_optional(t).map(|t| ::puroro::Either::Left(t)),
-                |u| <U as MsgTrait>::submsg_optional(u).map(|u| ::puroro::Either::Right(u)),
+                |t| <T as MsgTrait>::submsg_optional_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::submsg_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
         type Field53MessageType<'this>
@@ -1946,16 +1962,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::submsg_repeated(u)),
             )
         }
-        fn i64_unlabeled<'this>(&'this self) -> i64 {
+        fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::i64_unlabeled(t),
-                |u| <U as MsgTrait>::i64_unlabeled(u),
+                |t| <T as MsgTrait>::i64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::i64_unlabeled_opt(u),
             )
         }
-        fn i64_optional<'this>(&'this self) -> Option<i64> {
+        fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::i64_optional(t),
-                |u| <U as MsgTrait>::i64_optional(u),
+                |t| <T as MsgTrait>::i64_optional_opt(t),
+                |u| <U as MsgTrait>::i64_optional_opt(u),
             )
         }
         type Field103RepeatedType<'this>
@@ -1973,16 +1989,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::i64_repeated(u)),
             )
         }
-        fn u32_unlabeled<'this>(&'this self) -> u32 {
+        fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::u32_unlabeled(t),
-                |u| <U as MsgTrait>::u32_unlabeled(u),
+                |t| <T as MsgTrait>::u32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::u32_unlabeled_opt(u),
             )
         }
-        fn u32_optional<'this>(&'this self) -> Option<u32> {
+        fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::u32_optional(t),
-                |u| <U as MsgTrait>::u32_optional(u),
+                |t| <T as MsgTrait>::u32_optional_opt(t),
+                |u| <U as MsgTrait>::u32_optional_opt(u),
             )
         }
         type Field113RepeatedType<'this>
@@ -2000,16 +2016,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::u32_repeated(u)),
             )
         }
-        fn u64_unlabeled<'this>(&'this self) -> u64 {
+        fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::u64_unlabeled(t),
-                |u| <U as MsgTrait>::u64_unlabeled(u),
+                |t| <T as MsgTrait>::u64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::u64_unlabeled_opt(u),
             )
         }
-        fn u64_optional<'this>(&'this self) -> Option<u64> {
+        fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::u64_optional(t),
-                |u| <U as MsgTrait>::u64_optional(u),
+                |t| <T as MsgTrait>::u64_optional_opt(t),
+                |u| <U as MsgTrait>::u64_optional_opt(u),
             )
         }
         type Field123RepeatedType<'this>
@@ -2027,16 +2043,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::u64_repeated(u)),
             )
         }
-        fn s32_unlabeled<'this>(&'this self) -> i32 {
+        fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::s32_unlabeled(t),
-                |u| <U as MsgTrait>::s32_unlabeled(u),
+                |t| <T as MsgTrait>::s32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::s32_unlabeled_opt(u),
             )
         }
-        fn s32_optional<'this>(&'this self) -> Option<i32> {
+        fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::s32_optional(t),
-                |u| <U as MsgTrait>::s32_optional(u),
+                |t| <T as MsgTrait>::s32_optional_opt(t),
+                |u| <U as MsgTrait>::s32_optional_opt(u),
             )
         }
         type Field133RepeatedType<'this>
@@ -2054,16 +2070,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::s32_repeated(u)),
             )
         }
-        fn s64_unlabeled<'this>(&'this self) -> i64 {
+        fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::s64_unlabeled(t),
-                |u| <U as MsgTrait>::s64_unlabeled(u),
+                |t| <T as MsgTrait>::s64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::s64_unlabeled_opt(u),
             )
         }
-        fn s64_optional<'this>(&'this self) -> Option<i64> {
+        fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::s64_optional(t),
-                |u| <U as MsgTrait>::s64_optional(u),
+                |t| <T as MsgTrait>::s64_optional_opt(t),
+                |u| <U as MsgTrait>::s64_optional_opt(u),
             )
         }
         type Field143RepeatedType<'this>
@@ -2081,16 +2097,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::s64_repeated(u)),
             )
         }
-        fn fixed32_unlabeled<'this>(&'this self) -> u32 {
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::fixed32_unlabeled(t),
-                |u| <U as MsgTrait>::fixed32_unlabeled(u),
+                |t| <T as MsgTrait>::fixed32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::fixed32_unlabeled_opt(u),
             )
         }
-        fn fixed32_optional<'this>(&'this self) -> Option<u32> {
+        fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::fixed32_optional(t),
-                |u| <U as MsgTrait>::fixed32_optional(u),
+                |t| <T as MsgTrait>::fixed32_optional_opt(t),
+                |u| <U as MsgTrait>::fixed32_optional_opt(u),
             )
         }
         type Field153RepeatedType<'this>
@@ -2108,16 +2124,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::fixed32_repeated(u)),
             )
         }
-        fn fixed64_unlabeled<'this>(&'this self) -> u64 {
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::fixed64_unlabeled(t),
-                |u| <U as MsgTrait>::fixed64_unlabeled(u),
+                |t| <T as MsgTrait>::fixed64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::fixed64_unlabeled_opt(u),
             )
         }
-        fn fixed64_optional<'this>(&'this self) -> Option<u64> {
+        fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::fixed64_optional(t),
-                |u| <U as MsgTrait>::fixed64_optional(u),
+                |t| <T as MsgTrait>::fixed64_optional_opt(t),
+                |u| <U as MsgTrait>::fixed64_optional_opt(u),
             )
         }
         type Field163RepeatedType<'this>
@@ -2135,16 +2151,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::fixed64_repeated(u)),
             )
         }
-        fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::sfixed32_unlabeled(t),
-                |u| <U as MsgTrait>::sfixed32_unlabeled(u),
+                |t| <T as MsgTrait>::sfixed32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::sfixed32_unlabeled_opt(u),
             )
         }
-        fn sfixed32_optional<'this>(&'this self) -> Option<i32> {
+        fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::sfixed32_optional(t),
-                |u| <U as MsgTrait>::sfixed32_optional(u),
+                |t| <T as MsgTrait>::sfixed32_optional_opt(t),
+                |u| <U as MsgTrait>::sfixed32_optional_opt(u),
             )
         }
         type Field173RepeatedType<'this>
@@ -2162,16 +2178,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::sfixed32_repeated(u)),
             )
         }
-        fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::sfixed64_unlabeled(t),
-                |u| <U as MsgTrait>::sfixed64_unlabeled(u),
+                |t| <T as MsgTrait>::sfixed64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::sfixed64_unlabeled_opt(u),
             )
         }
-        fn sfixed64_optional<'this>(&'this self) -> Option<i64> {
+        fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::sfixed64_optional(t),
-                |u| <U as MsgTrait>::sfixed64_optional(u),
+                |t| <T as MsgTrait>::sfixed64_optional_opt(t),
+                |u| <U as MsgTrait>::sfixed64_optional_opt(u),
             )
         }
         type Field183RepeatedType<'this>
@@ -2189,16 +2205,16 @@ pub mod _puroro_impls {
                     .map_right(|u| <U as MsgTrait>::sfixed64_repeated(u)),
             )
         }
-        fn f64_unlabeled<'this>(&'this self) -> f64 {
+        fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::f64_unlabeled(t),
-                |u| <U as MsgTrait>::f64_unlabeled(u),
+                |t| <T as MsgTrait>::f64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::f64_unlabeled_opt(u),
             )
         }
-        fn f64_optional<'this>(&'this self) -> Option<f64> {
+        fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::f64_optional(t),
-                |u| <U as MsgTrait>::f64_optional(u),
+                |t| <T as MsgTrait>::f64_optional_opt(t),
+                |u| <U as MsgTrait>::f64_optional_opt(u),
             )
         }
         type Field193RepeatedType<'this>
@@ -2221,13 +2237,13 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
         }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_optional())
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_optional_opt())
         }
+
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -2242,15 +2258,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| {
-                    msg.float_unlabeled()
-                })
+        fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.float_unlabeled_opt())
         }
-        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.float_optional())
+        fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.float_optional_opt())
         }
+
         type Field13RepeatedType<'this>
         where
             Self: 'this,
@@ -2265,15 +2279,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| {
-                    msg.bytes_unlabeled()
-                })
+        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_unlabeled_opt())
         }
-        fn bytes_optional<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_optional())
+        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_optional_opt())
         }
+
         type Field23RepeatedType<'this>
         where
             Self: 'this,
@@ -2288,15 +2300,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| {
-                    msg.string_unlabeled()
-                })
+        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
-        fn string_optional<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_optional())
+        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_optional_opt())
         }
+
         type Field33RepeatedType<'this>
         where
             Self: 'this,
@@ -2311,15 +2321,17 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.enum_unlabeled())
-        }
-        fn enum_optional<'this>(
+        fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-            self.as_ref().and_then(|msg| msg.enum_optional())
+            self.as_ref().and_then(|msg| msg.enum_unlabeled_opt())
         }
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            self.as_ref().and_then(|msg| msg.enum_optional_opt())
+        }
+
         type Field43RepeatedType<'this>
         where
             Self: 'this,
@@ -2338,24 +2350,25 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = T::Field51MessageType<'this>;
-        fn submsg_unlabeled<'this>(
+        fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
-            self.as_ref().and_then(|msg| msg.submsg_unlabeled())
+            self.as_ref().and_then(|msg| msg.submsg_unlabeled_opt())
         }
         type Field52MessageType<'this>
         where
             Self: 'this,
         = T::Field52MessageType<'this>;
-        fn submsg_optional<'this>(
+        fn submsg_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
-            self.as_ref().and_then(|msg| msg.submsg_optional())
+            self.as_ref().and_then(|msg| msg.submsg_optional_opt())
         }
         type Field53MessageType<'this>
         where
             Self: 'this,
         = T::Field53MessageType<'this>;
+
         type Field53RepeatedType<'this>
         where
             Self: 'this,
@@ -2370,13 +2383,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn i64_unlabeled<'this>(&'this self) -> i64 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.i64_unlabeled())
+        fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_unlabeled_opt())
         }
-        fn i64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.i64_optional())
+        fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_optional_opt())
         }
+
         type Field103RepeatedType<'this>
         where
             Self: 'this,
@@ -2391,13 +2404,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn u32_unlabeled<'this>(&'this self) -> u32 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.u32_unlabeled())
+        fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_unlabeled_opt())
         }
-        fn u32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.u32_optional())
+        fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_optional_opt())
         }
+
         type Field113RepeatedType<'this>
         where
             Self: 'this,
@@ -2412,13 +2425,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn u64_unlabeled<'this>(&'this self) -> u64 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.u64_unlabeled())
+        fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_unlabeled_opt())
         }
-        fn u64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().and_then(|msg| msg.u64_optional())
+        fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_optional_opt())
         }
+
         type Field123RepeatedType<'this>
         where
             Self: 'this,
@@ -2433,13 +2446,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn s32_unlabeled<'this>(&'this self) -> i32 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.s32_unlabeled())
+        fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.s32_unlabeled_opt())
         }
-        fn s32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.s32_optional())
+        fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.s32_optional_opt())
         }
+
         type Field133RepeatedType<'this>
         where
             Self: 'this,
@@ -2454,13 +2467,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn s64_unlabeled<'this>(&'this self) -> i64 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.s64_unlabeled())
+        fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.s64_unlabeled_opt())
         }
-        fn s64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.s64_optional())
+        fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.s64_optional_opt())
         }
+
         type Field143RepeatedType<'this>
         where
             Self: 'this,
@@ -2475,15 +2488,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn fixed32_unlabeled<'this>(&'this self) -> u32 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| {
-                    msg.fixed32_unlabeled()
-                })
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.fixed32_unlabeled_opt())
         }
-        fn fixed32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.fixed32_optional())
+        fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.fixed32_optional_opt())
         }
+
         type Field153RepeatedType<'this>
         where
             Self: 'this,
@@ -2498,15 +2509,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn fixed64_unlabeled<'this>(&'this self) -> u64 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| {
-                    msg.fixed64_unlabeled()
-                })
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.fixed64_unlabeled_opt())
         }
-        fn fixed64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().and_then(|msg| msg.fixed64_optional())
+        fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.fixed64_optional_opt())
         }
+
         type Field163RepeatedType<'this>
         where
             Self: 'this,
@@ -2521,15 +2530,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| {
-                    msg.sfixed32_unlabeled()
-                })
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.sfixed32_unlabeled_opt())
         }
-        fn sfixed32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.sfixed32_optional())
+        fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.sfixed32_optional_opt())
         }
+
         type Field173RepeatedType<'this>
         where
             Self: 'this,
@@ -2544,15 +2551,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| {
-                    msg.sfixed64_unlabeled()
-                })
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.sfixed64_unlabeled_opt())
         }
-        fn sfixed64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.sfixed64_optional())
+        fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.sfixed64_optional_opt())
         }
+
         type Field183RepeatedType<'this>
         where
             Self: 'this,
@@ -2567,13 +2572,13 @@ pub mod _puroro_impls {
                 .into_iter()
                 .flatten()
         }
-        fn f64_unlabeled<'this>(&'this self) -> f64 {
-            self.as_ref()
-                .map_or_else(::std::default::Default::default, |msg| msg.f64_unlabeled())
+        fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            self.as_ref().and_then(|msg| msg.f64_unlabeled_opt())
         }
-        fn f64_optional<'this>(&'this self) -> ::std::option::Option<f64> {
-            self.as_ref().and_then(|msg| msg.f64_optional())
+        fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            self.as_ref().and_then(|msg| msg.f64_optional_opt())
         }
+
         type Field193RepeatedType<'this>
         where
             Self: 'this,
@@ -2599,8 +2604,8 @@ pub mod _puroro_impls {
     impl ::puroro::Message<super::Msg> for MsgSingleField1 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            Clone::clone(&self.i32_unlabeled)
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
         type Field3RepeatedType<'this>
         where
@@ -2756,14 +2761,14 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField2 {
-        pub i32_optional: ::std::option::Option<i32>,
+        pub i32_optional: i32,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField2 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSingleField2 {
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
         }
         type Field3RepeatedType<'this>
         where
@@ -2903,13 +2908,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.i32_optional, 2, out)?;
+            >(::std::iter::once(&self.i32_optional), 2, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for MsgSingleField2 {
-        fn from(value: ::std::option::Option<i32>) -> Self {
+    impl ::std::convert::From<i32> for MsgSingleField2 {
+        fn from(value: i32) -> Self {
             Self {
                 i32_optional: value,
             }
@@ -3109,8 +3114,9 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            Clone::clone(&self.float_unlabeled)
+
+        fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
         }
         type Field13RepeatedType<'this>
         where
@@ -3259,7 +3265,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField12 {
-        pub float_optional: ::std::option::Option<f32>,
+        pub float_optional: f32,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField12 {}
@@ -3272,8 +3278,9 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn float_optional<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.float_optional)
+
+        fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_optional))
         }
         type Field13RepeatedType<'this>
         where
@@ -3406,13 +3413,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.float_optional, 12, out)?;
+            >(::std::iter::once(&self.float_optional), 12, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<f32>> for MsgSingleField12 {
-        fn from(value: ::std::option::Option<f32>) -> Self {
+    impl ::std::convert::From<f32> for MsgSingleField12 {
+        fn from(value: f32) -> Self {
             Self {
                 float_optional: value,
             }
@@ -3639,8 +3646,9 @@ pub mod _puroro_impls {
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
-            self.bytes_unlabeled.as_ref()
+
+        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
         }
         type Field23RepeatedType<'this>
         where
@@ -3800,7 +3808,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub bytes_optional: ::std::option::Option<ScalarType>,
+        pub bytes_optional: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField22<ScalarType> where
@@ -3832,8 +3840,9 @@ pub mod _puroro_impls {
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn bytes_optional<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_optional.as_ref().map(|r| r.as_ref())
+
+        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::Some(self.bytes_optional.as_ref())
         }
         type Field23RepeatedType<'this>
         where
@@ -3965,20 +3974,19 @@ pub mod _puroro_impls {
                 ScalarType,
                 _,
                 _,
-            >(&self.bytes_optional, 22, out)?;
+            >(::std::iter::once(&self.bytes_optional), 22, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
-        for MsgSingleField22<ScalarType>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField22<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<[u8]>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self {
                 bytes_optional: value,
             }
@@ -4239,8 +4247,9 @@ pub mod _puroro_impls {
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
-            self.string_unlabeled.as_ref()
+
+        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
         type Field33RepeatedType<'this>
         where
@@ -4393,7 +4402,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        pub string_optional: ::std::option::Option<ScalarType>,
+        pub string_optional: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField32<ScalarType> where
@@ -4432,8 +4441,9 @@ pub mod _puroro_impls {
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn string_optional<'this>(&'this self) -> Option<&'this str> {
-            self.string_optional.as_ref().map(|r| r.as_ref())
+
+        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some(self.string_optional.as_ref())
         }
         type Field33RepeatedType<'this>
         where
@@ -4558,20 +4568,19 @@ pub mod _puroro_impls {
                 ScalarType,
                 _,
                 _,
-            >(&self.string_optional, 32, out)?;
+            >(::std::iter::once(&self.string_optional), 32, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
-        for MsgSingleField32<ScalarType>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField32<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self {
                 string_optional: value,
             }
@@ -4821,8 +4830,11 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            Clone::clone(&self.enum_unlabeled)
+
+        fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
         }
         type Field43RepeatedType<'this>
         where
@@ -4949,7 +4961,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField42 {
-        pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
+        pub enum_optional: self::_puroro_root::full_coverage3::Enum,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField42 {}
@@ -4983,8 +4995,11 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::full_coverage3::Enum> {
-            Clone::clone(&self.enum_optional)
+
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_optional))
         }
         type Field43RepeatedType<'this>
         where
@@ -5095,15 +5110,13 @@ pub mod _puroro_impls {
             SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
-            >::ser_field::<(), _, _>(&self.enum_optional, 42, out)?;
+            >::ser_field::<(), _, _>(::std::iter::once(&self.enum_optional), 42, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<self::_puroro_root::full_coverage3::Enum>>
-        for MsgSingleField42
-    {
-        fn from(value: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>) -> Self {
+    impl ::std::convert::From<self::_puroro_root::full_coverage3::Enum> for MsgSingleField42 {
+        fn from(value: self::_puroro_root::full_coverage3::Enum) -> Self {
             Self {
                 enum_optional: value,
             }
@@ -5299,7 +5312,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
     {
-        pub submsg_unlabeled: ::std::option::Option<ScalarType>,
+        pub submsg_unlabeled: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField51<ScalarType> where
@@ -5360,8 +5373,11 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
-        fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
-            self.submsg_unlabeled.as_ref()
+
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+            ::std::option::Option::Some(&self.submsg_unlabeled)
         }
         type Field52MessageType<'this>
         where
@@ -5469,7 +5485,7 @@ pub mod _puroro_impls {
         >::ser_field::
         <ScalarType, _, _>
         (
-            &self.submsg_unlabeled,
+            ::std::iter::once(&self.submsg_unlabeled),
             51,
             out
         )?;
@@ -5477,8 +5493,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
-        for MsgSingleField51<ScalarType>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField51<ScalarType>
     where
         ScalarType:
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
@@ -5486,7 +5501,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self {
                 submsg_unlabeled: value,
             }
@@ -5503,7 +5518,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
     {
-        pub submsg_optional: ::std::option::Option<ScalarType>,
+        pub submsg_optional: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField52<ScalarType> where
@@ -5568,8 +5583,11 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
-        fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
-            self.submsg_optional.as_ref()
+
+        fn submsg_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+            ::std::option::Option::Some(&self.submsg_optional)
         }
         type Field53MessageType<'this>
         where
@@ -5673,7 +5691,7 @@ pub mod _puroro_impls {
         >::ser_field::
         <ScalarType, _, _>
         (
-            &self.submsg_optional,
+            ::std::iter::once(&self.submsg_optional),
             52,
             out
         )?;
@@ -5681,8 +5699,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::std::convert::From<::std::option::Option<ScalarType>>
-        for MsgSingleField52<ScalarType>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField52<ScalarType>
     where
         ScalarType:
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
@@ -5690,7 +5707,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
     {
-        fn from(value: ::std::option::Option<ScalarType>) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self {
                 submsg_optional: value,
             }
@@ -5973,8 +5990,9 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn i64_unlabeled<'this>(&'this self) -> i64 {
-            Clone::clone(&self.i64_unlabeled)
+
+        fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
         }
         type Field103RepeatedType<'this>
         where
@@ -6074,7 +6092,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField102 {
-        pub i64_optional: ::std::option::Option<i64>,
+        pub i64_optional: i64,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField102 {}
@@ -6136,8 +6154,9 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn i64_optional<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_optional)
+
+        fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_optional))
         }
         type Field103RepeatedType<'this>
         where
@@ -6221,13 +6240,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.i64_optional, 102, out)?;
+            >(::std::iter::once(&self.i64_optional), 102, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i64>> for MsgSingleField102 {
-        fn from(value: ::std::option::Option<i64>) -> Self {
+    impl ::std::convert::From<i64> for MsgSingleField102 {
+        fn from(value: i64) -> Self {
             Self {
                 i64_optional: value,
             }
@@ -6483,8 +6502,9 @@ pub mod _puroro_impls {
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn u32_unlabeled<'this>(&'this self) -> u32 {
-            Clone::clone(&self.u32_unlabeled)
+
+        fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_unlabeled))
         }
         type Field113RepeatedType<'this>
         where
@@ -6577,7 +6597,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField112 {
-        pub u32_optional: ::std::option::Option<u32>,
+        pub u32_optional: u32,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField112 {}
@@ -6646,8 +6666,9 @@ pub mod _puroro_impls {
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn u32_optional<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_optional)
+
+        fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_optional))
         }
         type Field113RepeatedType<'this>
         where
@@ -6724,13 +6745,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.u32_optional, 112, out)?;
+            >(::std::iter::once(&self.u32_optional), 112, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<u32>> for MsgSingleField112 {
-        fn from(value: ::std::option::Option<u32>) -> Self {
+    impl ::std::convert::From<u32> for MsgSingleField112 {
+        fn from(value: u32) -> Self {
             Self {
                 u32_optional: value,
             }
@@ -6993,8 +7014,9 @@ pub mod _puroro_impls {
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn u64_unlabeled<'this>(&'this self) -> u64 {
-            Clone::clone(&self.u64_unlabeled)
+
+        fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_unlabeled))
         }
         type Field123RepeatedType<'this>
         where
@@ -7080,7 +7102,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField122 {
-        pub u64_optional: ::std::option::Option<u64>,
+        pub u64_optional: u64,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField122 {}
@@ -7156,8 +7178,9 @@ pub mod _puroro_impls {
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn u64_optional<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_optional)
+
+        fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_optional))
         }
         type Field123RepeatedType<'this>
         where
@@ -7227,13 +7250,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.u64_optional, 122, out)?;
+            >(::std::iter::once(&self.u64_optional), 122, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<u64>> for MsgSingleField122 {
-        fn from(value: ::std::option::Option<u64>) -> Self {
+    impl ::std::convert::From<u64> for MsgSingleField122 {
+        fn from(value: u64) -> Self {
             Self {
                 u64_optional: value,
             }
@@ -7503,8 +7526,9 @@ pub mod _puroro_impls {
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn s32_unlabeled<'this>(&'this self) -> i32 {
-            Clone::clone(&self.s32_unlabeled)
+
+        fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_unlabeled))
         }
         type Field133RepeatedType<'this>
         where
@@ -7583,7 +7607,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField132 {
-        pub s32_optional: ::std::option::Option<i32>,
+        pub s32_optional: i32,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField132 {}
@@ -7666,8 +7690,9 @@ pub mod _puroro_impls {
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn s32_optional<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.s32_optional)
+
+        fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_optional))
         }
         type Field133RepeatedType<'this>
         where
@@ -7730,13 +7755,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.s32_optional, 132, out)?;
+            >(::std::iter::once(&self.s32_optional), 132, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for MsgSingleField132 {
-        fn from(value: ::std::option::Option<i32>) -> Self {
+    impl ::std::convert::From<i32> for MsgSingleField132 {
+        fn from(value: i32) -> Self {
             Self {
                 s32_optional: value,
             }
@@ -8013,8 +8038,9 @@ pub mod _puroro_impls {
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn s64_unlabeled<'this>(&'this self) -> i64 {
-            Clone::clone(&self.s64_unlabeled)
+
+        fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_unlabeled))
         }
         type Field143RepeatedType<'this>
         where
@@ -8086,7 +8112,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField142 {
-        pub s64_optional: ::std::option::Option<i64>,
+        pub s64_optional: i64,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField142 {}
@@ -8176,8 +8202,9 @@ pub mod _puroro_impls {
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn s64_optional<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.s64_optional)
+
+        fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_optional))
         }
         type Field143RepeatedType<'this>
         where
@@ -8233,13 +8260,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.s64_optional, 142, out)?;
+            >(::std::iter::once(&self.s64_optional), 142, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i64>> for MsgSingleField142 {
-        fn from(value: ::std::option::Option<i64>) -> Self {
+    impl ::std::convert::From<i64> for MsgSingleField142 {
+        fn from(value: i64) -> Self {
             Self {
                 s64_optional: value,
             }
@@ -8523,8 +8550,9 @@ pub mod _puroro_impls {
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn fixed32_unlabeled<'this>(&'this self) -> u32 {
-            Clone::clone(&self.fixed32_unlabeled)
+
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_unlabeled))
         }
         type Field153RepeatedType<'this>
         where
@@ -8589,7 +8617,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField152 {
-        pub fixed32_optional: ::std::option::Option<u32>,
+        pub fixed32_optional: u32,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField152 {}
@@ -8686,8 +8714,9 @@ pub mod _puroro_impls {
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn fixed32_optional<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.fixed32_optional)
+
+        fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_optional))
         }
         type Field153RepeatedType<'this>
         where
@@ -8736,13 +8765,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.fixed32_optional, 152, out)?;
+            >(::std::iter::once(&self.fixed32_optional), 152, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<u32>> for MsgSingleField152 {
-        fn from(value: ::std::option::Option<u32>) -> Self {
+    impl ::std::convert::From<u32> for MsgSingleField152 {
+        fn from(value: u32) -> Self {
             Self {
                 fixed32_optional: value,
             }
@@ -9035,8 +9064,9 @@ pub mod _puroro_impls {
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn fixed64_unlabeled<'this>(&'this self) -> u64 {
-            Clone::clone(&self.fixed64_unlabeled)
+
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_unlabeled))
         }
         type Field163RepeatedType<'this>
         where
@@ -9094,7 +9124,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField162 {
-        pub fixed64_optional: ::std::option::Option<u64>,
+        pub fixed64_optional: u64,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField162 {}
@@ -9198,8 +9228,9 @@ pub mod _puroro_impls {
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn fixed64_optional<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.fixed64_optional)
+
+        fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_optional))
         }
         type Field163RepeatedType<'this>
         where
@@ -9241,13 +9272,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.fixed64_optional, 162, out)?;
+            >(::std::iter::once(&self.fixed64_optional), 162, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<u64>> for MsgSingleField162 {
-        fn from(value: ::std::option::Option<u64>) -> Self {
+    impl ::std::convert::From<u64> for MsgSingleField162 {
+        fn from(value: u64) -> Self {
             Self {
                 fixed64_optional: value,
             }
@@ -9547,8 +9578,9 @@ pub mod _puroro_impls {
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
-            Clone::clone(&self.sfixed32_unlabeled)
+
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_unlabeled))
         }
         type Field173RepeatedType<'this>
         where
@@ -9599,7 +9631,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField172 {
-        pub sfixed32_optional: ::std::option::Option<i32>,
+        pub sfixed32_optional: i32,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField172 {}
@@ -9710,8 +9742,9 @@ pub mod _puroro_impls {
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn sfixed32_optional<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.sfixed32_optional)
+
+        fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_optional))
         }
         type Field173RepeatedType<'this>
         where
@@ -9746,13 +9779,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.sfixed32_optional, 172, out)?;
+            >(::std::iter::once(&self.sfixed32_optional), 172, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for MsgSingleField172 {
-        fn from(value: ::std::option::Option<i32>) -> Self {
+    impl ::std::convert::From<i32> for MsgSingleField172 {
+        fn from(value: i32) -> Self {
             Self {
                 sfixed32_optional: value,
             }
@@ -10059,8 +10092,9 @@ pub mod _puroro_impls {
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
-            Clone::clone(&self.sfixed64_unlabeled)
+
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_unlabeled))
         }
         type Field183RepeatedType<'this>
         where
@@ -10104,7 +10138,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField182 {
-        pub sfixed64_optional: ::std::option::Option<i64>,
+        pub sfixed64_optional: i64,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField182 {}
@@ -10222,8 +10256,9 @@ pub mod _puroro_impls {
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn sfixed64_optional<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.sfixed64_optional)
+
+        fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_optional))
         }
         type Field183RepeatedType<'this>
         where
@@ -10251,13 +10286,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.sfixed64_optional, 182, out)?;
+            >(::std::iter::once(&self.sfixed64_optional), 182, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i64>> for MsgSingleField182 {
-        fn from(value: ::std::option::Option<i64>) -> Self {
+    impl ::std::convert::From<i64> for MsgSingleField182 {
+        fn from(value: i64) -> Self {
             Self {
                 sfixed64_optional: value,
             }
@@ -10571,8 +10606,9 @@ pub mod _puroro_impls {
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn f64_unlabeled<'this>(&'this self) -> f64 {
-            Clone::clone(&self.f64_unlabeled)
+
+        fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_unlabeled))
         }
         type Field193RepeatedType<'this>
         where
@@ -10609,7 +10645,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField192 {
-        pub f64_optional: ::std::option::Option<f64>,
+        pub f64_optional: f64,
     }
 
     impl ::puroro::Message<super::Msg> for MsgSingleField192 {}
@@ -10734,8 +10770,9 @@ pub mod _puroro_impls {
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn f64_optional<'this>(&'this self) -> Option<f64> {
-            Clone::clone(&self.f64_optional)
+
+        fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_optional))
         }
         type Field193RepeatedType<'this>
         where
@@ -10756,13 +10793,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.f64_optional, 192, out)?;
+            >(::std::iter::once(&self.f64_optional), 192, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<f64>> for MsgSingleField192 {
-        fn from(value: ::std::option::Option<f64>) -> Self {
+    impl ::std::convert::From<f64> for MsgSingleField192 {
+        fn from(value: f64) -> Self {
             Self {
                 f64_optional: value,
             }
@@ -10960,10 +10997,7 @@ pub mod _puroro_impls {
             ))
         }
 
-        pub fn append_i32_optional(
-            self,
-            value: ::std::option::Option<i32>,
-        ) -> MsgBuilder<(T, MsgSingleField2)> {
+        pub fn append_i32_optional(self, value: i32) -> MsgBuilder<(T, MsgSingleField2)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField2 {
@@ -10996,10 +11030,7 @@ pub mod _puroro_impls {
             ))
         }
 
-        pub fn append_float_optional(
-            self,
-            value: ::std::option::Option<f32>,
-        ) -> MsgBuilder<(T, MsgSingleField12)> {
+        pub fn append_float_optional(self, value: f32) -> MsgBuilder<(T, MsgSingleField12)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField12 {
@@ -11043,7 +11074,7 @@ pub mod _puroro_impls {
 
         pub fn append_bytes_optional<ScalarType>(
             self,
-            value: ::std::option::Option<ScalarType>,
+            value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField22<ScalarType>)>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
@@ -11098,7 +11129,7 @@ pub mod _puroro_impls {
 
         pub fn append_string_optional<ScalarType>(
             self,
-            value: ::std::option::Option<ScalarType>,
+            value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField32<ScalarType>)>
         where
             ScalarType: ::std::convert::AsRef<str>
@@ -11147,7 +11178,7 @@ pub mod _puroro_impls {
 
         pub fn append_enum_optional(
             self,
-            value: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
+            value: self::_puroro_root::full_coverage3::Enum,
         ) -> MsgBuilder<(T, MsgSingleField42)> {
             MsgBuilder((
                 self.0,
@@ -11173,7 +11204,7 @@ pub mod _puroro_impls {
             ))
         }
 
-    pub fn append_submsg_unlabeled<ScalarType>(self, value: ::std::option::Option<ScalarType>)
+    pub fn append_submsg_unlabeled<ScalarType>(self, value: ScalarType)
         -> MsgBuilder<(T, MsgSingleField51<ScalarType>)>
 where
 ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
@@ -11186,7 +11217,7 @@ ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_tra
             ))
         }
 
-    pub fn append_submsg_optional<ScalarType>(self, value: ::std::option::Option<ScalarType>)
+    pub fn append_submsg_optional<ScalarType>(self, value: ScalarType)
         -> MsgBuilder<(T, MsgSingleField52<ScalarType>)>
 where
 ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
@@ -11224,10 +11255,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_i64_optional(
-            self,
-            value: ::std::option::Option<i64>,
-        ) -> MsgBuilder<(T, MsgSingleField102)> {
+        pub fn append_i64_optional(self, value: i64) -> MsgBuilder<(T, MsgSingleField102)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField102 {
@@ -11260,10 +11288,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_u32_optional(
-            self,
-            value: ::std::option::Option<u32>,
-        ) -> MsgBuilder<(T, MsgSingleField112)> {
+        pub fn append_u32_optional(self, value: u32) -> MsgBuilder<(T, MsgSingleField112)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField112 {
@@ -11296,10 +11321,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_u64_optional(
-            self,
-            value: ::std::option::Option<u64>,
-        ) -> MsgBuilder<(T, MsgSingleField122)> {
+        pub fn append_u64_optional(self, value: u64) -> MsgBuilder<(T, MsgSingleField122)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField122 {
@@ -11332,10 +11354,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_s32_optional(
-            self,
-            value: ::std::option::Option<i32>,
-        ) -> MsgBuilder<(T, MsgSingleField132)> {
+        pub fn append_s32_optional(self, value: i32) -> MsgBuilder<(T, MsgSingleField132)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField132 {
@@ -11368,10 +11387,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_s64_optional(
-            self,
-            value: ::std::option::Option<i64>,
-        ) -> MsgBuilder<(T, MsgSingleField142)> {
+        pub fn append_s64_optional(self, value: i64) -> MsgBuilder<(T, MsgSingleField142)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField142 {
@@ -11404,10 +11420,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_fixed32_optional(
-            self,
-            value: ::std::option::Option<u32>,
-        ) -> MsgBuilder<(T, MsgSingleField152)> {
+        pub fn append_fixed32_optional(self, value: u32) -> MsgBuilder<(T, MsgSingleField152)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField152 {
@@ -11440,10 +11453,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_fixed64_optional(
-            self,
-            value: ::std::option::Option<u64>,
-        ) -> MsgBuilder<(T, MsgSingleField162)> {
+        pub fn append_fixed64_optional(self, value: u64) -> MsgBuilder<(T, MsgSingleField162)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField162 {
@@ -11476,10 +11486,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_sfixed32_optional(
-            self,
-            value: ::std::option::Option<i32>,
-        ) -> MsgBuilder<(T, MsgSingleField172)> {
+        pub fn append_sfixed32_optional(self, value: i32) -> MsgBuilder<(T, MsgSingleField172)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField172 {
@@ -11512,10 +11519,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_sfixed64_optional(
-            self,
-            value: ::std::option::Option<i64>,
-        ) -> MsgBuilder<(T, MsgSingleField182)> {
+        pub fn append_sfixed64_optional(self, value: i64) -> MsgBuilder<(T, MsgSingleField182)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField182 {
@@ -11548,10 +11552,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_f64_optional(
-            self,
-            value: ::std::option::Option<f64>,
-        ) -> MsgBuilder<(T, MsgSingleField192)> {
+        pub fn append_f64_optional(self, value: f64) -> MsgBuilder<(T, MsgSingleField192)> {
             MsgBuilder((
                 self.0,
                 MsgSingleField192 {
@@ -11594,57 +11595,134 @@ pub mod _puroro_traits {
 
     pub trait MsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
+            self.i32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+        fn has_i32_unlabeled<'this>(&'this self) -> bool {
+            self.i32_unlabeled_opt().is_some()
         }
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.i32_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_i32_optional<'this>(&'this self) -> bool {
+            self.i32_optional_opt().is_some()
+        }
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
+        }
+
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
         fn float_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
+            self.float_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::default::Default::default()
+        fn has_float_unlabeled<'this>(&'this self) -> bool {
+            self.float_unlabeled_opt().is_some()
         }
+        fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::option::Option::None
+        }
+        fn float_optional<'this>(&'this self) -> f32 {
+            self.float_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_float_optional<'this>(&'this self) -> bool {
+            self.float_optional_opt().is_some()
+        }
+        fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::option::Option::None
+        }
+
         type Field13RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = f32>
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this>;
         fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
-            ::std::default::Default::default()
+            self.bytes_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn bytes_optional<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::default::Default::default()
+        fn has_bytes_unlabeled<'this>(&'this self) -> bool {
+            self.bytes_unlabeled_opt().is_some()
         }
+        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::None
+        }
+        fn bytes_optional<'this>(&'this self) -> &'this [u8] {
+            self.bytes_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_bytes_optional<'this>(&'this self) -> bool {
+            self.bytes_optional_opt().is_some()
+        }
+        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            ::std::option::Option::None
+        }
+
         type Field23RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = &'this [u8]>
         where
             Self: 'this;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this>;
         fn string_unlabeled<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
+            self.string_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn string_optional<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::default::Default::default()
+        fn has_string_unlabeled<'this>(&'this self) -> bool {
+            self.string_unlabeled_opt().is_some()
         }
+        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::None
+        }
+        fn string_optional<'this>(&'this self) -> &'this str {
+            self.string_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_string_optional<'this>(&'this self) -> bool {
+            self.string_optional_opt().is_some()
+        }
+        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::None
+        }
+
         type Field33RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = &'this str>
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this>;
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            ::std::default::Default::default()
+            self.enum_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn enum_optional<'this>(
+        fn has_enum_unlabeled<'this>(&'this self) -> bool {
+            self.enum_unlabeled_opt().is_some()
+        }
+        fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-            ::std::default::Default::default()
+            ::std::option::Option::None
         }
+        fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+            self.enum_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_enum_optional<'this>(&'this self) -> bool {
+            self.enum_optional_opt().is_some()
+        }
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            ::std::option::Option::None
+        }
+
         type Field43RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = self::_puroro_root::full_coverage3::Enum>
         where
@@ -11656,7 +11734,15 @@ pub mod _puroro_traits {
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
-            ::std::default::Default::default()
+            self.submsg_unlabeled_opt()
+        }
+        fn has_submsg_unlabeled<'this>(&'this self) -> bool {
+            self.submsg_unlabeled_opt().is_some()
+        }
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+            ::std::option::Option::None
         }
         type Field52MessageType<'this>:
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
@@ -11664,121 +11750,280 @@ pub mod _puroro_traits {
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
-            ::std::default::Default::default()
+            self.submsg_optional_opt()
+        }
+        fn has_submsg_optional<'this>(&'this self) -> bool {
+            self.submsg_optional_opt().is_some()
+        }
+        fn submsg_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+            ::std::option::Option::None
         }
         type Field53MessageType<'this>:
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
             where Self: 'this;
+
         type Field53RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field53MessageType<'this>>
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this>;
         fn i64_unlabeled<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
+            self.i64_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn i64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+        fn has_i64_unlabeled<'this>(&'this self) -> bool {
+            self.i64_unlabeled_opt().is_some()
         }
+        fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::None
+        }
+        fn i64_optional<'this>(&'this self) -> i64 {
+            self.i64_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_i64_optional<'this>(&'this self) -> bool {
+            self.i64_optional_opt().is_some()
+        }
+        fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::None
+        }
+
         type Field103RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i64>
         where
             Self: 'this;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this>;
         fn u32_unlabeled<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
+            self.u32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn u32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::default::Default::default()
+        fn has_u32_unlabeled<'this>(&'this self) -> bool {
+            self.u32_unlabeled_opt().is_some()
         }
+        fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::None
+        }
+        fn u32_optional<'this>(&'this self) -> u32 {
+            self.u32_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_u32_optional<'this>(&'this self) -> bool {
+            self.u32_optional_opt().is_some()
+        }
+        fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::None
+        }
+
         type Field113RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = u32>
         where
             Self: 'this;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this>;
         fn u64_unlabeled<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
+            self.u64_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn u64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::default::Default::default()
+        fn has_u64_unlabeled<'this>(&'this self) -> bool {
+            self.u64_unlabeled_opt().is_some()
         }
+        fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::None
+        }
+        fn u64_optional<'this>(&'this self) -> u64 {
+            self.u64_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_u64_optional<'this>(&'this self) -> bool {
+            self.u64_optional_opt().is_some()
+        }
+        fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::None
+        }
+
         type Field123RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = u64>
         where
             Self: 'this;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this>;
         fn s32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
+            self.s32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn s32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+        fn has_s32_unlabeled<'this>(&'this self) -> bool {
+            self.s32_unlabeled_opt().is_some()
         }
+        fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
+        }
+        fn s32_optional<'this>(&'this self) -> i32 {
+            self.s32_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_s32_optional<'this>(&'this self) -> bool {
+            self.s32_optional_opt().is_some()
+        }
+        fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
+        }
+
         type Field133RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this>;
         fn s64_unlabeled<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
+            self.s64_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn s64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+        fn has_s64_unlabeled<'this>(&'this self) -> bool {
+            self.s64_unlabeled_opt().is_some()
         }
+        fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::None
+        }
+        fn s64_optional<'this>(&'this self) -> i64 {
+            self.s64_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_s64_optional<'this>(&'this self) -> bool {
+            self.s64_optional_opt().is_some()
+        }
+        fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::None
+        }
+
         type Field143RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i64>
         where
             Self: 'this;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this>;
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
+            self.fixed32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn fixed32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::default::Default::default()
+        fn has_fixed32_unlabeled<'this>(&'this self) -> bool {
+            self.fixed32_unlabeled_opt().is_some()
         }
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::None
+        }
+        fn fixed32_optional<'this>(&'this self) -> u32 {
+            self.fixed32_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_fixed32_optional<'this>(&'this self) -> bool {
+            self.fixed32_optional_opt().is_some()
+        }
+        fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            ::std::option::Option::None
+        }
+
         type Field153RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = u32>
         where
             Self: 'this;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this>;
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
+            self.fixed64_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn fixed64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::default::Default::default()
+        fn has_fixed64_unlabeled<'this>(&'this self) -> bool {
+            self.fixed64_unlabeled_opt().is_some()
         }
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::None
+        }
+        fn fixed64_optional<'this>(&'this self) -> u64 {
+            self.fixed64_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_fixed64_optional<'this>(&'this self) -> bool {
+            self.fixed64_optional_opt().is_some()
+        }
+        fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            ::std::option::Option::None
+        }
+
         type Field163RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = u64>
         where
             Self: 'this;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this>;
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
+            self.sfixed32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn sfixed32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+        fn has_sfixed32_unlabeled<'this>(&'this self) -> bool {
+            self.sfixed32_unlabeled_opt().is_some()
         }
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
+        }
+        fn sfixed32_optional<'this>(&'this self) -> i32 {
+            self.sfixed32_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_sfixed32_optional<'this>(&'this self) -> bool {
+            self.sfixed32_optional_opt().is_some()
+        }
+        fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
+        }
+
         type Field173RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this>;
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
+            self.sfixed64_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn sfixed64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::default::Default::default()
+        fn has_sfixed64_unlabeled<'this>(&'this self) -> bool {
+            self.sfixed64_unlabeled_opt().is_some()
         }
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::None
+        }
+        fn sfixed64_optional<'this>(&'this self) -> i64 {
+            self.sfixed64_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_sfixed64_optional<'this>(&'this self) -> bool {
+            self.sfixed64_optional_opt().is_some()
+        }
+        fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            ::std::option::Option::None
+        }
+
         type Field183RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i64>
         where
             Self: 'this;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this>;
         fn f64_unlabeled<'this>(&'this self) -> f64 {
-            ::std::default::Default::default()
+            self.f64_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
-        fn f64_optional<'this>(&'this self) -> ::std::option::Option<f64> {
-            ::std::default::Default::default()
+        fn has_f64_unlabeled<'this>(&'this self) -> bool {
+            self.f64_unlabeled_opt().is_some()
         }
+        fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            ::std::option::Option::None
+        }
+        fn f64_optional<'this>(&'this self) -> f64 {
+            self.f64_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_f64_optional<'this>(&'this self) -> bool {
+            self.f64_optional_opt().is_some()
+        }
+        fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            ::std::option::Option::None
+        }
+
         type Field193RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = f64>
         where
@@ -11788,12 +12033,13 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            fn i32_unlabeled<'this>(&'this self) -> i32 {
-                (**self).i32_unlabeled()
+            fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).i32_unlabeled_opt()
             }
-            fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).i32_optional()
+            fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).i32_optional_opt()
             }
+
             type Field3RepeatedType<'this>
             where
                 Self: 'this,
@@ -11801,12 +12047,13 @@ pub mod _puroro_traits {
             fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
                 (**self).i32_repeated()
             }
-            fn float_unlabeled<'this>(&'this self) -> f32 {
-                (**self).float_unlabeled()
+            fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+                (**self).float_unlabeled_opt()
             }
-            fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-                (**self).float_optional()
+            fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+                (**self).float_optional_opt()
             }
+
             type Field13RepeatedType<'this>
             where
                 Self: 'this,
@@ -11814,12 +12061,13 @@ pub mod _puroro_traits {
             fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
                 (**self).float_repeated()
             }
-            fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
-                (**self).bytes_unlabeled()
+            fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_unlabeled_opt()
             }
-            fn bytes_optional<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-                (**self).bytes_optional()
+            fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+                (**self).bytes_optional_opt()
             }
+
             type Field23RepeatedType<'this>
             where
                 Self: 'this,
@@ -11827,12 +12075,13 @@ pub mod _puroro_traits {
             fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
                 (**self).bytes_repeated()
             }
-            fn string_unlabeled<'this>(&'this self) -> &'this str {
-                (**self).string_unlabeled()
+            fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_unlabeled_opt()
             }
-            fn string_optional<'this>(&'this self) -> ::std::option::Option<&'this str> {
-                (**self).string_optional()
+            fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+                (**self).string_optional_opt()
             }
+
             type Field33RepeatedType<'this>
             where
                 Self: 'this,
@@ -11840,14 +12089,17 @@ pub mod _puroro_traits {
             fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
                 (**self).string_repeated()
             }
-            fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-                (**self).enum_unlabeled()
-            }
-            fn enum_optional<'this>(
+            fn enum_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-                (**self).enum_optional()
+                (**self).enum_unlabeled_opt()
             }
+            fn enum_optional_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+                (**self).enum_optional_opt()
+            }
+
             type Field43RepeatedType<'this>
             where
                 Self: 'this,
@@ -11859,24 +12111,25 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::Field51MessageType<'this>;
-            fn submsg_unlabeled<'this>(
+            fn submsg_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
-                (**self).submsg_unlabeled()
+                (**self).submsg_unlabeled_opt()
             }
             type Field52MessageType<'this>
             where
                 Self: 'this,
             = <$ty>::Field52MessageType<'this>;
-            fn submsg_optional<'this>(
+            fn submsg_optional_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
-                (**self).submsg_optional()
+                (**self).submsg_optional_opt()
             }
             type Field53MessageType<'this>
             where
                 Self: 'this,
             = <$ty>::Field53MessageType<'this>;
+
             type Field53RepeatedType<'this>
             where
                 Self: 'this,
@@ -11884,12 +12137,13 @@ pub mod _puroro_traits {
             fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
                 (**self).submsg_repeated()
             }
-            fn i64_unlabeled<'this>(&'this self) -> i64 {
-                (**self).i64_unlabeled()
+            fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                (**self).i64_unlabeled_opt()
             }
-            fn i64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-                (**self).i64_optional()
+            fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                (**self).i64_optional_opt()
             }
+
             type Field103RepeatedType<'this>
             where
                 Self: 'this,
@@ -11897,12 +12151,13 @@ pub mod _puroro_traits {
             fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
                 (**self).i64_repeated()
             }
-            fn u32_unlabeled<'this>(&'this self) -> u32 {
-                (**self).u32_unlabeled()
+            fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+                (**self).u32_unlabeled_opt()
             }
-            fn u32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
-                (**self).u32_optional()
+            fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+                (**self).u32_optional_opt()
             }
+
             type Field113RepeatedType<'this>
             where
                 Self: 'this,
@@ -11910,12 +12165,13 @@ pub mod _puroro_traits {
             fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
                 (**self).u32_repeated()
             }
-            fn u64_unlabeled<'this>(&'this self) -> u64 {
-                (**self).u64_unlabeled()
+            fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+                (**self).u64_unlabeled_opt()
             }
-            fn u64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
-                (**self).u64_optional()
+            fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+                (**self).u64_optional_opt()
             }
+
             type Field123RepeatedType<'this>
             where
                 Self: 'this,
@@ -11923,12 +12179,13 @@ pub mod _puroro_traits {
             fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
                 (**self).u64_repeated()
             }
-            fn s32_unlabeled<'this>(&'this self) -> i32 {
-                (**self).s32_unlabeled()
+            fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).s32_unlabeled_opt()
             }
-            fn s32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).s32_optional()
+            fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).s32_optional_opt()
             }
+
             type Field133RepeatedType<'this>
             where
                 Self: 'this,
@@ -11936,12 +12193,13 @@ pub mod _puroro_traits {
             fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
                 (**self).s32_repeated()
             }
-            fn s64_unlabeled<'this>(&'this self) -> i64 {
-                (**self).s64_unlabeled()
+            fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                (**self).s64_unlabeled_opt()
             }
-            fn s64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-                (**self).s64_optional()
+            fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                (**self).s64_optional_opt()
             }
+
             type Field143RepeatedType<'this>
             where
                 Self: 'this,
@@ -11949,12 +12207,13 @@ pub mod _puroro_traits {
             fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
                 (**self).s64_repeated()
             }
-            fn fixed32_unlabeled<'this>(&'this self) -> u32 {
-                (**self).fixed32_unlabeled()
+            fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+                (**self).fixed32_unlabeled_opt()
             }
-            fn fixed32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
-                (**self).fixed32_optional()
+            fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+                (**self).fixed32_optional_opt()
             }
+
             type Field153RepeatedType<'this>
             where
                 Self: 'this,
@@ -11962,12 +12221,13 @@ pub mod _puroro_traits {
             fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
                 (**self).fixed32_repeated()
             }
-            fn fixed64_unlabeled<'this>(&'this self) -> u64 {
-                (**self).fixed64_unlabeled()
+            fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+                (**self).fixed64_unlabeled_opt()
             }
-            fn fixed64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
-                (**self).fixed64_optional()
+            fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+                (**self).fixed64_optional_opt()
             }
+
             type Field163RepeatedType<'this>
             where
                 Self: 'this,
@@ -11975,12 +12235,13 @@ pub mod _puroro_traits {
             fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
                 (**self).fixed64_repeated()
             }
-            fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
-                (**self).sfixed32_unlabeled()
+            fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).sfixed32_unlabeled_opt()
             }
-            fn sfixed32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).sfixed32_optional()
+            fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).sfixed32_optional_opt()
             }
+
             type Field173RepeatedType<'this>
             where
                 Self: 'this,
@@ -11988,12 +12249,13 @@ pub mod _puroro_traits {
             fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
                 (**self).sfixed32_repeated()
             }
-            fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
-                (**self).sfixed64_unlabeled()
+            fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                (**self).sfixed64_unlabeled_opt()
             }
-            fn sfixed64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
-                (**self).sfixed64_optional()
+            fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                (**self).sfixed64_optional_opt()
             }
+
             type Field183RepeatedType<'this>
             where
                 Self: 'this,
@@ -12001,12 +12263,13 @@ pub mod _puroro_traits {
             fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
                 (**self).sfixed64_repeated()
             }
-            fn f64_unlabeled<'this>(&'this self) -> f64 {
-                (**self).f64_unlabeled()
+            fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+                (**self).f64_unlabeled_opt()
             }
-            fn f64_optional<'this>(&'this self) -> ::std::option::Option<f64> {
-                (**self).f64_optional()
+            fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+                (**self).f64_optional_opt()
             }
+
             type Field193RepeatedType<'this>
             where
                 Self: 'this,
@@ -12099,11 +12362,19 @@ pub mod _puroro_nested {
             impl ::puroro::Message<Submsg> for Submsg {}
 
             impl super::_puroro_traits::SubmsgTrait for Submsg {
-                fn i32_unlabeled<'this>(&'this self) -> i32 {
-                    Clone::clone(&self.i32_unlabeled)
+                fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+                    if self.i32_unlabeled == ::std::default::Default::default() {
+                        ::std::option::Option::None
+                    } else {
+                        ::std::option::Option::Some(self.i32_unlabeled.clone())
+                    }
                 }
-                fn i64_unlabeled<'this>(&'this self) -> i64 {
-                    Clone::clone(&self.i64_unlabeled)
+                fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+                    if self.i64_unlabeled == ::std::default::Default::default() {
+                        ::std::option::Option::None
+                    } else {
+                        ::std::option::Option::Some(self.i64_unlabeled.clone())
+                    }
                 }
             }
 
@@ -12215,21 +12486,13 @@ pub mod _puroro_nested {
                 T: SubmsgTrait,
                 U: SubmsgTrait,
             {
-                fn i32_unlabeled<'this>(&'this self) -> i32 {
-                    let right = <U as SubmsgTrait>::i32_unlabeled(&self.1);
-                    if right != ::std::default::Default::default() {
-                        right
-                    } else {
-                        <T as SubmsgTrait>::i32_unlabeled(&self.0)
-                    }
+                fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+                    <U as SubmsgTrait>::i32_unlabeled_opt(&self.1)
+                        .or_else(|| <T as SubmsgTrait>::i32_unlabeled_opt(&self.0))
                 }
-                fn i64_unlabeled<'this>(&'this self) -> i64 {
-                    let right = <U as SubmsgTrait>::i64_unlabeled(&self.1);
-                    if right != ::std::default::Default::default() {
-                        right
-                    } else {
-                        <T as SubmsgTrait>::i64_unlabeled(&self.0)
-                    }
+                fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+                    <U as SubmsgTrait>::i64_unlabeled_opt(&self.1)
+                        .or_else(|| <T as SubmsgTrait>::i64_unlabeled_opt(&self.0))
                 }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
@@ -12237,16 +12500,16 @@ pub mod _puroro_nested {
                 T: SubmsgTrait,
                 U: SubmsgTrait,
             {
-                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().either(
-                        |t| <T as SubmsgTrait>::i32_unlabeled(t),
-                        |u| <U as SubmsgTrait>::i32_unlabeled(u),
+                        |t| <T as SubmsgTrait>::i32_unlabeled_opt(t),
+                        |u| <U as SubmsgTrait>::i32_unlabeled_opt(u),
                     )
                 }
-                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     self.as_ref().either(
-                        |t| <T as SubmsgTrait>::i64_unlabeled(t),
-                        |u| <U as SubmsgTrait>::i64_unlabeled(u),
+                        |t| <T as SubmsgTrait>::i64_unlabeled_opt(t),
+                        |u| <U as SubmsgTrait>::i64_unlabeled_opt(u),
                     )
                 }
             }
@@ -12254,13 +12517,11 @@ pub mod _puroro_nested {
             where
                 T: SubmsgTrait,
             {
-                fn i32_unlabeled<'this>(&'this self) -> i32 {
-                    self.as_ref()
-                        .map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+                fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
                 }
-                fn i64_unlabeled<'this>(&'this self) -> i64 {
-                    self.as_ref()
-                        .map_or_else(::std::default::Default::default, |msg| msg.i64_unlabeled())
+                fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                    self.as_ref().and_then(|msg| msg.i64_unlabeled_opt())
                 }
             }
 
@@ -12273,8 +12534,8 @@ pub mod _puroro_nested {
             impl ::puroro::Message<super::Submsg> for SubmsgSingleField1 {}
 
             impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
-                fn i32_unlabeled<'this>(&'this self) -> i32 {
-                    Clone::clone(&self.i32_unlabeled)
+                fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
                 }
             }
 
@@ -12314,8 +12575,8 @@ pub mod _puroro_nested {
             impl ::puroro::Message<super::Submsg> for SubmsgSingleField101 {}
 
             impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField101 {
-                fn i64_unlabeled<'this>(&'this self) -> i64 {
-                    Clone::clone(&self.i64_unlabeled)
+                fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
                 }
             }
 
@@ -12394,20 +12655,34 @@ pub mod _puroro_nested {
 
             pub trait SubmsgTrait {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
-                    ::std::default::Default::default()
+                    self.i32_unlabeled_opt()
+                        .unwrap_or_else(::std::default::Default::default)
+                }
+                fn has_i32_unlabeled<'this>(&'this self) -> bool {
+                    self.i32_unlabeled_opt().is_some()
+                }
+                fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    ::std::option::Option::None
                 }
                 fn i64_unlabeled<'this>(&'this self) -> i64 {
-                    ::std::default::Default::default()
+                    self.i64_unlabeled_opt()
+                        .unwrap_or_else(::std::default::Default::default)
+                }
+                fn has_i64_unlabeled<'this>(&'this self) -> bool {
+                    self.i64_unlabeled_opt().is_some()
+                }
+                fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                    ::std::option::Option::None
                 }
             }
 
             macro_rules! submsg_delegate {
                 ($ty:ty) => {
-                    fn i32_unlabeled<'this>(&'this self) -> i32 {
-                        (**self).i32_unlabeled()
+                    fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                        (**self).i32_unlabeled_opt()
                     }
-                    fn i64_unlabeled<'this>(&'this self) -> i64 {
-                        (**self).i64_unlabeled()
+                    fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                        (**self).i64_unlabeled_opt()
                     }
                 };
             }

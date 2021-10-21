@@ -6,45 +6,8 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
 >;
 {%- endif %}
 
-{%- if f.trait_has_scalar_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
-{
-    {%- if f.is_message %}
-    self.as_ref().either(
-        |t| ::puroro::Either::Left(<T as {{ m.trait_ident }}>::{{ f.ident }}(t)),
-        |u| ::puroro::Either::Right(<U as {{ m.trait_ident }}>::{{ f.ident }}(u)),
-    )
-    {%- else %}
-    self.as_ref().either(
-        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t),
-        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u),
-    )
-    {%- endif %}
-}
-{%- endif %}
+{%- if f.is_repeated %}
 
-{%- if f.trait_has_optional_getter && !f.is_explicit_oneof_field %}
-fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
-{
-    {%- if f.is_message %}
-    self.as_ref().either(
-        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t).map(
-            |t| ::puroro::Either::Left(t)
-        ),
-        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u).map(
-            |u| ::puroro::Either::Right(u)
-        ),
-    )
-    {%- else %}
-    self.as_ref().either(
-        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t),
-        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u),
-    )
-    {%- endif %}
-}
-{%- endif %}
-
-{%- if f.trait_has_repeated_getter %}
 {%- let either_repeated_field_type %}
 {%- if f.is_message %}
 {%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
@@ -69,4 +32,28 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
         )
     )
 }
+
+{%- else %} {#- if f.is_repeated #}
+
+{%- if !f.is_explicit_oneof_field %}
+fn {{ f.ident }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}>
+{
+    {%- if f.is_message %}
+    self.as_ref().either(
+        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}_opt(t).map(
+            |t| ::puroro::Either::Left(t)
+        ),
+        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}_opt(u).map(
+            |u| ::puroro::Either::Right(u)
+        ),
+    )
+    {%- else %}
+    self.as_ref().either(
+        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}_opt(t),
+        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}_opt(u),
+    )
+    {%- endif %}
+}
 {%- endif %}
+
+{%- endif %} {#- if f.is_repeated #}

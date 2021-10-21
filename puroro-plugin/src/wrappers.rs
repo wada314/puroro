@@ -782,18 +782,8 @@ impl Field {
     pub fn single_field_type(&self) -> Result<String> {
         let scalar_type = self.single_scalar_field_type()?;
         Ok(match self.field_label()? {
-            FieldLabel::OneofField => scalar_type,
-            FieldLabel::Required | FieldLabel::Optional => {
-                format!("::std::option::Option<{}>", scalar_type)
-            }
-            FieldLabel::Unlabeled => {
-                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
-                    format!("::std::option::Option<{}>", scalar_type)
-                } else {
-                    scalar_type
-                }
-            }
             FieldLabel::Repeated => "RepeatedType".to_string(),
+            _ => scalar_type,
         })
     }
 
