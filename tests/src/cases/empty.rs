@@ -19,20 +19,20 @@ use ::tests_pb::full_coverage3::MsgTrait as MsgTrait3;
 
 #[test]
 fn test_getters2() {
-    assert!(<() as MsgTrait2>::i32_required(&()).is_none());
-    assert!(<() as MsgTrait2>::i32_optional(&()).is_none());
+    assert!(!<() as MsgTrait2>::has_i32_required(&()));
+    assert!(!<() as MsgTrait2>::has_i32_optional(&()));
     assert_eq!(0, <() as MsgTrait2>::i32_repeated(&()).into_iter().count());
-    assert!(<() as MsgTrait2>::enum_required(&()).is_none());
-    assert!(<() as MsgTrait2>::enum_optional(&()).is_none());
+    assert!(!<() as MsgTrait2>::has_enum_required(&()));
+    assert!(!<() as MsgTrait2>::has_enum_optional(&()));
     assert_eq!(0, <() as MsgTrait2>::enum_repeated(&()).into_iter().count());
-    assert!(<() as MsgTrait2>::string_required(&()).is_none());
-    assert!(<() as MsgTrait2>::string_optional(&()).is_none());
+    assert!(!<() as MsgTrait2>::has_string_required(&()));
+    assert!(!<() as MsgTrait2>::has_string_optional(&()));
     assert_eq!(
         0,
         <() as MsgTrait2>::string_repeated(&()).into_iter().count()
     );
-    assert!(<() as MsgTrait2>::submsg_required(&()).is_none());
-    assert!(<() as MsgTrait2>::submsg_optional(&()).is_none());
+    assert!(!<() as MsgTrait2>::has_submsg_required(&()));
+    assert!(!<() as MsgTrait2>::has_submsg_optional(&()));
     assert_eq!(
         0,
         <() as MsgTrait2>::submsg_repeated(&()).into_iter().count()
@@ -42,19 +42,19 @@ fn test_getters2() {
 #[test]
 fn test_getters3() {
     assert_eq!(0, <() as MsgTrait3>::i32_unlabeled(&()));
-    assert!(<() as MsgTrait3>::i32_optional(&()).is_none());
+    assert!(!<() as MsgTrait3>::has_i32_optional(&()));
     assert_eq!(0, <() as MsgTrait3>::i32_repeated(&()).into_iter().count());
     assert_eq!(Enum3::Zeroth, <() as MsgTrait3>::enum_unlabeled(&()));
-    assert!(<() as MsgTrait3>::enum_optional(&()).is_none());
+    assert!(!<() as MsgTrait3>::has_enum_optional(&()));
     assert_eq!(0, <() as MsgTrait3>::enum_repeated(&()).into_iter().count());
     assert_eq!("", <() as MsgTrait3>::string_unlabeled(&()));
-    assert!(<() as MsgTrait3>::string_optional(&()).is_none());
+    assert!(!<() as MsgTrait3>::has_string_optional(&()));
     assert_eq!(
         0,
         <() as MsgTrait3>::string_repeated(&()).into_iter().count()
     );
-    assert!(<() as MsgTrait3>::submsg_unlabeled(&()).is_none());
-    assert!(<() as MsgTrait3>::submsg_optional(&()).is_none());
+    assert!(!<() as MsgTrait3>::has_submsg_unlabeled(&()));
+    assert!(!<() as MsgTrait3>::has_submsg_optional(&()));
     assert_eq!(
         0,
         <() as MsgTrait3>::submsg_repeated(&()).into_iter().count()

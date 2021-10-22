@@ -32,10 +32,10 @@ fn test_get_i32_optional_field() {
         i32_optional: Some(7),
         ..Default::default()
     };
-    assert_eq!(None, (&none, &none).i32_optional());
-    assert_eq!(Some(3), (&none, &some_3).i32_optional());
-    assert_eq!(Some(3), (&some_3, &none).i32_optional());
-    assert_eq!(Some(7), (&some_3, &some_7).i32_optional());
+    assert!(!(&none, &none).has_i32_optional());
+    assert_eq!(3, (&none, &some_3).i32_optional());
+    assert_eq!(3, (&some_3, &none).i32_optional());
+    assert_eq!(7, (&some_3, &some_7).i32_optional());
 }
 
 #[test]
@@ -52,7 +52,7 @@ fn test_get_i32_unlabeled_field() {
         i32_unlabeled: 7,
         ..Default::default()
     };
-    assert_eq!(0, (&msg_0, &msg_0).i32_unlabeled());
+    assert!(!(&msg_0, &msg_0).has_i32_unlabeled());
     assert_eq!(3, (&msg_0, &msg_3).i32_unlabeled());
     assert_eq!(3, (&msg_3, &msg_0).i32_unlabeled());
     assert_eq!(7, (&msg_3, &msg_7).i32_unlabeled());
@@ -112,8 +112,7 @@ fn test_get_msg_optional_field() {
         submsg_optional: Some(Box::new(submsg_7.clone())),
         ..Default::default()
     };
-    assert_eq!(None, (&none, &none).submsg_optional());
-    assert_eq!(0, (&none, &none).submsg_optional().i32_unlabeled());
+    assert!(!(&none, &none).has_submsg_optional());
     assert_eq!(3, (&msg_3, &none).submsg_optional().i32_unlabeled());
     assert_eq!(3, (&none, &msg_3).submsg_optional().i32_unlabeled());
     assert_eq!(7, (&msg_3, &msg_7).submsg_optional().i32_unlabeled());
@@ -220,17 +219,11 @@ fn test_get_oneof_field() {
     );
     assert_eq!(
         Some("Test"),
-        (&msg_test, &none)
-            .group_two()
-            .and_then(|o| o.g2_string())
-            .as_deref()
+        (&msg_test, &none).group_two().and_then(|o| o.g2_string())
     );
     assert_eq!(
         Some("Test"),
-        (&none, &msg_test)
-            .group_two()
-            .and_then(|o| o.g2_string())
-            .as_deref()
+        (&none, &msg_test).group_two().and_then(|o| o.g2_string())
     );
     assert_eq!(
         Some(3),
@@ -255,7 +248,6 @@ fn test_get_oneof_field() {
         (&msg_test, &msg_test2)
             .group_two()
             .and_then(|o| o.g2_string())
-            .as_deref()
     );
     assert_eq!(
         Some(3),
@@ -273,10 +265,7 @@ fn test_get_oneof_field() {
     // Some x Some, different types
     assert_eq!(
         Some("Test"),
-        (&msg_3, &msg_test)
-            .group_two()
-            .and_then(|o| o.g2_string())
-            .as_deref()
+        (&msg_3, &msg_test).group_two().and_then(|o| o.g2_string())
     );
     assert_eq!(
         Some(0),
@@ -303,6 +292,5 @@ fn test_get_oneof_field() {
         (&msg_submsg_3, &msg_test)
             .group_two()
             .and_then(|o| o.g2_string())
-            .as_deref()
     );
 }

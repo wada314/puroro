@@ -167,6 +167,7 @@ impl EnumValue {
 
 struct Field {
     ident: String,
+    ident_unesc: String,
     proto_name: String,
     number: i32,
     oneof_index: i32,
@@ -176,11 +177,9 @@ struct Field {
     is_length_delimited: bool,
     is_explicit_oneof_field: bool,
     is_repeated: bool,
+    is_unlabeled: bool,
     has_default_value: bool,
     default_value: String,
-    trait_has_scalar_getter: bool,
-    trait_has_optional_getter: bool,
-    trait_has_repeated_getter: bool,
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
     oneof_enum_value_ident: String,
@@ -211,6 +210,7 @@ impl Field {
 
         Ok(Field {
             ident: f.rust_ident().to_string(),
+            ident_unesc: f.rust_ident_unesc().to_string(),
             proto_name: f.proto_name().to_string(),
             number: f.number(),
             oneof_index: f.oneof_index().unwrap_or(-1),
@@ -225,15 +225,8 @@ impl Field {
             ),
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
+            is_unlabeled: matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled),
             has_default_value: f.default_value().is_some(),
-            default_value: f
-                .default_value()
-                .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
-                .transpose()?
-                .unwrap_or(Default::default()),
-            trait_has_scalar_getter: f.has_scalar_getter()?,
-            trait_has_optional_getter: f.has_scalar_optional_getter()?,
-            trait_has_repeated_getter: f.has_repeated_getter()?,
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
@@ -420,6 +413,7 @@ impl Oneof {
 struct OneofField {
     ident: String,
     getter_ident: String,
+    getter_ident_unesc: String,
     number: i32,
     is_length_delimited: bool,
     is_message: bool,
@@ -433,6 +427,7 @@ impl OneofField {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
             getter_ident: f.rust_ident().to_string(),
+            getter_ident_unesc: f.rust_ident_unesc().to_string(),
             number: f.number(),
             is_length_delimited: matches!(
                 f.field_type()?,

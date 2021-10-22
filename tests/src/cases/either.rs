@@ -26,10 +26,10 @@ fn test_get_i32_optional_field() {
         i32_optional: Some(3),
         ..Default::default()
     };
-    assert_eq!(None, Either::<&Msg, &Msg>::Left(&none).i32_optional());
-    assert_eq!(None, Either::<&Msg, &Msg>::Right(&none).i32_optional());
-    assert_eq!(Some(3), Either::<&Msg, &Msg>::Left(&some_3).i32_optional());
-    assert_eq!(Some(3), Either::<&Msg, &Msg>::Right(&some_3).i32_optional());
+    assert!(!Either::<&Msg, &Msg>::Left(&none).has_i32_optional());
+    assert!(!Either::<&Msg, &Msg>::Right(&none).has_i32_optional());
+    assert_eq!(3, Either::<&Msg, &Msg>::Left(&some_3).i32_optional());
+    assert_eq!(3, Either::<&Msg, &Msg>::Right(&some_3).i32_optional());
 }
 
 #[test]

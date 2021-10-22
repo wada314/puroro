@@ -1,6 +1,6 @@
 [package]
 name = "puroro-plugin"
-version = "0.1.1"
+version = "0.2.1"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -11,8 +11,10 @@ documentation = "https://docs.rs/puroro/0.1.0/puroro/"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-puroro = "0.1.0"
-puroro-protobuf-compiled = "0.1.0"
+puroro = "0.2.1"
+# puroro = { path = "../puroro" }
+puroro-protobuf-compiled = "0.2.1"
+# puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled" }
 askama = "0.10"
 itertools = "0.10.1"
 lazy_static = "1.4.0"

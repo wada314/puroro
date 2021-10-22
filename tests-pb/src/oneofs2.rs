@@ -339,7 +339,7 @@ pub mod _puroro_simple_impl {
     impl ::puroro::Message<Submsg> for Submsg {}
 
     impl super::_puroro_traits::SubmsgTrait for Submsg {
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
     }
@@ -1213,9 +1213,9 @@ pub mod _puroro_impls {
         T: SubmsgTrait,
         U: SubmsgTrait,
     {
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
-            let u = <U as SubmsgTrait>::i32_optional(&self.1);
-            u.or_else(|| <T as SubmsgTrait>::i32_optional(&self.0))
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <U as SubmsgTrait>::i32_optional_opt(&self.1)
+                .or_else(|| <T as SubmsgTrait>::i32_optional_opt(&self.0))
         }
     }
     impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
@@ -1223,10 +1223,10 @@ pub mod _puroro_impls {
         T: SubmsgTrait,
         U: SubmsgTrait,
     {
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T as SubmsgTrait>::i32_optional(t),
-                |u| <U as SubmsgTrait>::i32_optional(u),
+                |t| <T as SubmsgTrait>::i32_optional_opt(t),
+                |u| <U as SubmsgTrait>::i32_optional_opt(u),
             )
         }
     }
@@ -1234,22 +1234,22 @@ pub mod _puroro_impls {
     where
         T: SubmsgTrait,
     {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_optional())
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_optional_opt())
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct SubmsgSingleField1 {
-        pub i32_optional: ::std::option::Option<i32>,
+        pub i32_optional: i32,
     }
 
     impl ::puroro::Message<super::Submsg> for SubmsgSingleField1 {}
 
     impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
         }
     }
 
@@ -1263,13 +1263,13 @@ pub mod _puroro_impls {
                 (),
                 _,
                 _,
-            >(&self.i32_optional, 1, out)?;
+            >(::std::iter::once(&self.i32_optional), 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<i32>> for SubmsgSingleField1 {
-        fn from(value: ::std::option::Option<i32>) -> Self {
+    impl ::std::convert::From<i32> for SubmsgSingleField1 {
+        fn from(value: i32) -> Self {
             Self {
                 i32_optional: value,
             }
@@ -1281,10 +1281,7 @@ pub mod _puroro_impls {
     where
         T: SubmsgTrait,
     {
-        pub fn append_i32_optional(
-            self,
-            value: ::std::option::Option<i32>,
-        ) -> SubmsgBuilder<(T, SubmsgSingleField1)> {
+        pub fn append_i32_optional(self, value: i32) -> SubmsgBuilder<(T, SubmsgSingleField1)> {
             SubmsgBuilder((
                 self.0,
                 SubmsgSingleField1 {
@@ -1311,12 +1308,53 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            self.g1_int32_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_g1_int32<'this>(&'this self) -> bool {
+            self.g1_int32_opt().is_some()
+        }
+        fn g1_string<'this>(&'this self) -> &'this str {
+            self.g1_string_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_g1_string<'this>(&'this self) -> bool {
+            self.g1_string_opt().is_some()
+        }
+        fn g2_f32<'this>(&'this self) -> f32 {
+            self.g2_f32_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_g2_f32<'this>(&'this self) -> bool {
+            self.g2_f32_opt().is_some()
+        }
+        fn g2_string<'this>(&'this self) -> &'this str {
+            self.g2_string_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_g2_string<'this>(&'this self) -> bool {
+            self.g2_string_opt().is_some()
+        }
         type Field5MessageType<'this>: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
         where
             Self: 'this;
+        fn g2_submsg<'this>(&'this self) -> ::std::option::Option<Self::Field5MessageType<'this>> {
+            self.g2_submsg_opt()
+        }
+        fn has_g2_submsg<'this>(&'this self) -> bool {
+            self.g2_submsg_opt().is_some()
+        }
+        fn g3_int32<'this>(&'this self) -> i32 {
+            self.g3_int32_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_g3_int32<'this>(&'this self) -> bool {
+            self.g3_int32_opt().is_some()
+        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -1327,25 +1365,25 @@ pub mod _puroro_traits {
         > {
             ::std::option::Option::None
         }
-        fn g1_int32<'this>(&'this self) -> Option<i32> {
+        fn g1_int32_opt<'this>(&'this self) -> Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.group_one().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
                 if let E::G1Int32(v) = oneof {
-                    Some(v)
+                    ::std::option::Option::Some(v)
                 } else {
-                    None
+                    ::std::option::Option::None
                 }
             })
         }
-        fn g1_string<'this>(&'this self) -> Option<&'this str> {
+        fn g1_string_opt<'this>(&'this self) -> Option<&'this str> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.group_one().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
                 if let E::G1String(v) = oneof {
-                    Some(v)
+                    ::std::option::Option::Some(v)
                 } else {
-                    None
+                    ::std::option::Option::None
                 }
             })
         }
@@ -1360,29 +1398,29 @@ pub mod _puroro_traits {
         > {
             ::std::option::Option::None
         }
-        fn g2_f32<'this>(&'this self) -> Option<f32> {
+        fn g2_f32_opt<'this>(&'this self) -> Option<f32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             self.group_two().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
                 if let E::G2F32(v) = oneof {
-                    Some(v)
+                    ::std::option::Option::Some(v)
                 } else {
-                    None
+                    ::std::option::Option::None
                 }
             })
         }
-        fn g2_string<'this>(&'this self) -> Option<&'this str> {
+        fn g2_string_opt<'this>(&'this self) -> Option<&'this str> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             self.group_two().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
                 if let E::G2String(v) = oneof {
-                    Some(v)
+                    ::std::option::Option::Some(v)
                 } else {
-                    None
+                    ::std::option::Option::None
                 }
             })
         }
-        fn g2_submsg<'this>(
+        fn g2_submsg_opt<'this>(
             &'this self,
         ) -> Option<
             <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
@@ -1393,9 +1431,9 @@ pub mod _puroro_traits {
             self.group_two().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
                 if let E::G2Submsg(v) = oneof {
-                    Some(v)
+                    ::std::option::Option::Some(v)
                 } else {
-                    None
+                    ::std::option::Option::None
                 }
             })
         }
@@ -1404,14 +1442,14 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             ::std::option::Option::None
         }
-        fn g3_int32<'this>(&'this self) -> Option<i32> {
+        fn g3_int32_opt<'this>(&'this self) -> Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             self.group_three().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
                 if let E::G3Int32(v) = oneof {
-                    Some(v)
+                    ::std::option::Option::Some(v)
                 } else {
-                    None
+                    ::std::option::Option::None
                 }
             })
         }
@@ -1419,30 +1457,10 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            fn g1_int32<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).g1_int32()
-            }
-            fn g1_string<'this>(&'this self) -> ::std::option::Option<&'this str> {
-                (**self).g1_string()
-            }
-            fn g2_f32<'this>(&'this self) -> ::std::option::Option<f32> {
-                (**self).g2_f32()
-            }
-            fn g2_string<'this>(&'this self) -> ::std::option::Option<&'this str> {
-                (**self).g2_string()
-            }
             type Field5MessageType<'this>
             where
                 Self: 'this,
             = <$ty>::Field5MessageType<'this>;
-            fn g2_submsg<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field5MessageType<'this>> {
-                (**self).g2_submsg()
-            }
-            fn g3_int32<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).g3_int32()
-            }
             fn group_one<'this>(
                 &'this self,
             ) -> ::std::option::Option<
@@ -1493,15 +1511,22 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     pub trait SubmsgTrait {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.i32_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
+        }
+        fn has_i32_optional<'this>(&'this self) -> bool {
+            self.i32_optional_opt().is_some()
+        }
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::None
         }
     }
 
     macro_rules! submsg_delegate {
         ($ty:ty) => {
-            fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-                (**self).i32_optional()
+            fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).i32_optional_opt()
             }
         };
     }

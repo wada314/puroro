@@ -470,6 +470,7 @@ impl Enum {
 pub struct Field {
     message: Weak<Message>,
     rust_ident: String,
+    rust_ident_unesc: String,
     rust_oneof_ident: String,
     lazy_proto_type: OnceCell<FieldType>,
     proto_name: String,
@@ -493,7 +494,7 @@ impl Field {
             })?
             .to_string();
         let proto_type_name = proto.type_name.clone().unwrap_or_default().to_string();
-        let proto_type_enum = proto.type_.clone().ok_or(ErrorKind::InternalError {
+        let proto_type_enum = proto.r#type.clone().ok_or(ErrorKind::InternalError {
             detail: "currently we are assuming the field type enum is always set.".to_string(),
         })?;
         let proto_label = proto.label.clone().ok_or(ErrorKind::InternalError {
@@ -505,6 +506,7 @@ impl Field {
         Ok(Self {
             message: Clone::clone(&message),
             rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)).to_string(),
+            rust_ident_unesc: to_lower_snake_case(&proto_name).to_string(),
             rust_oneof_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
             proto_name,
             proto_type_name,
@@ -521,6 +523,9 @@ impl Field {
 
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
+    }
+    pub fn rust_ident_unesc(&self) -> &str {
+        &self.rust_ident_unesc
     }
     pub fn proto_name(&self) -> &str {
         &self.proto_name
@@ -787,18 +792,8 @@ impl Field {
     pub fn single_field_type(&self) -> Result<String> {
         let scalar_type = self.single_scalar_field_type()?;
         Ok(match self.field_label()? {
-            FieldLabel::OneofField => scalar_type,
-            FieldLabel::Required | FieldLabel::Optional => {
-                format!("::std::option::Option<{}>", scalar_type)
-            }
-            FieldLabel::Unlabeled => {
-                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
-                    format!("::std::option::Option<{}>", scalar_type)
-                } else {
-                    scalar_type
-                }
-            }
             FieldLabel::Repeated => "RepeatedType".to_string(),
+            _ => scalar_type,
         })
     }
 
