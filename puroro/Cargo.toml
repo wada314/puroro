@@ -1,6 +1,6 @@
 [package]
 name = "puroro"
-version = "0.2.0"
+version = "0.1.4"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2018"
 license = "Apache-2.0"
