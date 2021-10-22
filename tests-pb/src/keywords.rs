@@ -10,9 +10,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub r#type: ::std::option::Option<i32>,
     }
@@ -88,13 +86,23 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.r#type,
-                1,
-                out,
-            )?;
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                    &self.r#type,
+                    1,
+                    out,
+                )?;
+            }
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                r#type: ::std::default::Default::default(),
+            }
         }
     }
 }

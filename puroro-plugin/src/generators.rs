@@ -227,6 +227,11 @@ impl Field {
             is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
             is_unlabeled: matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled),
             has_default_value: f.default_value().is_some(),
+            default_value: f
+                .default_value()
+                .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
+                .transpose()?
+                .unwrap_or(Default::default()),
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),

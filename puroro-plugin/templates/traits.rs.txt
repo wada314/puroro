@@ -10,6 +10,8 @@ pub trait {{ m.trait_ident }} {
     {%- else %}
     {%- endmatch %}
 
+    {%- if field.is_repeated %}
+
     type Field{{ field.number }}RepeatedType<'this>:
         ::puroro::RepeatedField<'this>
         + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>
@@ -21,7 +23,7 @@ pub trait {{ m.trait_ident }} {
     {%- if field.is_message %}
     {#- the getter method returns Option<T> for message field #}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        {%- if field.has_default_value -%}
+        {%- if field.has_default_value %}
         self.{{ field.ident_unesc }}_opt().or(::std::option::Option::Some({{ field.default_value }}))
         {%- else %}
         self.{{ field.ident_unesc }}_opt()
