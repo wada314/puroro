@@ -10,5 +10,6 @@ description = "A compiled Google Protocol Buffer's interface proto. Normal user 
 
 [dependencies]
 puroro = "0.1.0"
+# puroro = { path = "../puroro" }
 
 [lib]
