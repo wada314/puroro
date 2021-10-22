@@ -21,7 +21,7 @@ where
         {%- endif %}
     {%- endif %}
 
-    pub fn append_{{ field.ident }}{{ maybe_gp }}(self, value: {{ field.single_field_type }})
+    pub fn append_{{ field.ident_unesc }}{{ maybe_gp }}(self, value: {{ field.single_field_type }})
         -> {{ m.builder_ident }}<(T, {{ m.single_field_ident }}{{ field.number }}{{ maybe_gp }})>
     {%- call single_field_bound(field) %}
     {

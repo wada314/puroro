@@ -42,12 +42,12 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 {%- else %} {#- if field.is_repeated #}
 
 {%- if !f.is_explicit_oneof_field %}
-fn {{ f.ident }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
+fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {
     {%- if f.is_message %}
     match (
-        <T as {{ m.trait_ident }}>::{{ f.ident }}_opt(&self.0),
-        <U as {{ m.trait_ident }}>::{{ f.ident }}_opt(&self.1)
+        <T as {{ m.trait_ident }}>::{{ f.ident_unesc }}_opt(&self.0),
+        <U as {{ m.trait_ident }}>::{{ f.ident_unesc }}_opt(&self.1)
     ) {
         (None, None) => None,
         (Some(t), None) => Some((Some(t), None)),
@@ -55,8 +55,8 @@ fn {{ f.ident }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type
         (Some(t), Some(u)) => Some((Some(t), Some(u))),
     }
     {%- else %}
-    <U as {{ m.trait_ident }}>::{{ f.ident }}_opt(&self.1)
-        .or_else(|| <T as {{ m.trait_ident }}>::{{ f.ident }}_opt(&self.0))
+    <U as {{ m.trait_ident }}>::{{ f.ident_unesc }}_opt(&self.1)
+        .or_else(|| <T as {{ m.trait_ident }}>::{{ f.ident_unesc }}_opt(&self.0))
     {%- endif %}
 }
 {%- endif %}

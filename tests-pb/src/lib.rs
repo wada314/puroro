@@ -3,6 +3,7 @@
 // package (root)
 pub mod full_coverage2;
 pub mod full_coverage3;
+pub mod keywords;
 pub mod official_samples2;
 pub mod official_samples3;
 pub mod oneofs2;

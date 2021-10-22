@@ -167,6 +167,7 @@ impl EnumValue {
 
 struct Field {
     ident: String,
+    ident_unesc: String,
     proto_name: String,
     number: i32,
     oneof_index: i32,
@@ -207,6 +208,7 @@ impl Field {
 
         Ok(Field {
             ident: f.rust_ident().to_string(),
+            ident_unesc: f.rust_ident_unesc().to_string(),
             proto_name: f.proto_name().to_string(),
             number: f.number(),
             oneof_index: f.oneof_index().unwrap_or(-1),
@@ -290,6 +292,7 @@ impl Oneof {
 struct OneofField {
     ident: String,
     getter_ident: String,
+    getter_ident_unesc: String,
     number: i32,
     is_length_delimited: bool,
     is_message: bool,
@@ -303,6 +306,7 @@ impl OneofField {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
             getter_ident: f.rust_ident().to_string(),
+            getter_ident_unesc: f.rust_ident_unesc().to_string(),
             number: f.number(),
             is_length_delimited: matches!(
                 f.field_type()?,
