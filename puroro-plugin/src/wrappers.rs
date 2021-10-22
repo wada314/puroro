@@ -493,7 +493,7 @@ impl Field {
             })?
             .to_string();
         let proto_type_name = proto.type_name.clone().unwrap_or_default().to_string();
-        let proto_type_enum = proto.type_.clone().ok_or(ErrorKind::InternalError {
+        let proto_type_enum = proto.r#type.clone().ok_or(ErrorKind::InternalError {
             detail: "currently we are assuming the field type enum is always set.".to_string(),
         })?;
         let proto_label = proto.label.clone().ok_or(ErrorKind::InternalError {

@@ -9,7 +9,7 @@ description = "A compiled Google Protocol Buffer's interface proto. Normal user 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-puroro = "0.1.0"
-# puroro = { path = "../puroro" }
+# puroro = "0.1.0"
+puroro = { path = "../puroro" }
 
 [lib]
