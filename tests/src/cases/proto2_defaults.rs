@@ -345,3 +345,75 @@ fn test_simple_float() {
     assert!(!msg.has_f32_inf());
     assert!(!msg.has_f32_minf());
 }
+
+#[test]
+fn test_simple_bool() {
+    let mut msg = Msg::default();
+
+    // Check struct fields are initialized by the specified default values
+    assert_eq!(None, msg.bool_default);
+    assert_eq!(false, msg.bool_default());
+    assert!(!msg.has_bool_default());
+
+    // When the fields are explicitly set to None, then it's None anyway.
+    msg.bool_default = None;
+    assert_eq!(None, msg.bool_default);
+
+    // But the trait methods still return the default values.
+    assert_eq!(false, msg.bool_default());
+    assert!(!msg.has_bool_default());
+}
+
+#[test]
+fn test_simple_string() {
+    let mut msg = Msg::default();
+
+    // Check struct fields are initialized by the specified default values
+    assert_eq!(None, msg.string_default);
+    assert_eq!("", msg.string_default());
+    assert!(!msg.has_string_default());
+
+    // When the fields are explicitly set to None, then it's None anyway.
+    msg.string_default = None;
+    assert_eq!(None, msg.string_default);
+
+    // But the trait methods still return the default values.
+    assert_eq!("", msg.string_default());
+    assert!(!msg.has_string_default());
+}
+
+#[test]
+fn test_simple_bytes() {
+    let mut msg = Msg::default();
+
+    // Check struct fields are initialized by the specified default values
+    assert_eq!(None, msg.bytes_default);
+    assert_eq!(b"", msg.bytes_default());
+    assert!(!msg.has_bytes_default());
+
+    // When the fields are explicitly set to None, then it's None anyway.
+    msg.bytes_default = None;
+    assert_eq!(None, msg.bytes_default);
+
+    // But the trait methods still return the default values.
+    assert_eq!(b"", msg.bytes_default());
+    assert!(!msg.has_bytes_default());
+}
+
+#[test]
+fn test_simple_enum() {
+    let mut msg = Msg::default();
+
+    // Check struct fields are initialized by the specified default values
+    assert_eq!(None, msg.enum_default);
+    assert_eq!(MyEnum::One, msg.enum_default());
+    assert!(!msg.has_enum_default());
+
+    // When the fields are explicitly set to None, then it's None anyway.
+    msg.enum_default = None;
+    assert_eq!(None, msg.enum_default);
+
+    // But the trait methods still return the default values.
+    assert_eq!(MyEnum::One, msg.enum_default());
+    assert!(!msg.has_enum_default());
+}
