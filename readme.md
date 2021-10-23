@@ -42,7 +42,7 @@ want to make a separated crate containing only generated .rs code (and build.rs 
 - proto2
     - [ ] Groups, at least correctly ignore it
     - [x] Enums (In proto2 we need to refuse the unknown value)
-    - [ ] default value (something like `optional int32 foo = 1; [default=10]`)
+    - [x] default value (something like `optional int32 foo = 1; [default=10]`)
     - [ ] extensions
 - proto2 & 3
     - [ ] Maps
