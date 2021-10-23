@@ -10,9 +10,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
     pub i32_required: ::std::option::Option<i32>,
     pub i32_optional: ::std::option::Option<i32>,
@@ -938,239 +936,390 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Int32>::ser_field(
-                &self.i32_required,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_optional,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.i32_repeated,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Float>::ser_field(
-                &self.float_required,
-                11,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
-                &self.float_optional,
-                12,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
-                &self.float_repeated,
-                13,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Bytes>::ser_field(
-                &self.bytes_required,
-                21,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
-                &self.bytes_optional,
-                22,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Bytes>::ser_field(
-                &self.bytes_repeated,
-                23,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::String>::ser_field(
-                &self.string_required,
-                31,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.string_optional,
-                32,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.string_repeated,
-                33,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Required,
-                ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
-            >::ser_field(&self.enum_required, 41, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
-            >::ser_field(&self.enum_optional, 42, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
-            >::ser_field(&self.enum_repeated, 43, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Required, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
-        >::ser_field(&self.submsg_required, 51, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
-        >::ser_field(&self.submsg_optional, 52, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
-        >::ser_field(&self.submsg_repeated, 53, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Int64>::ser_field(
-                &self.i64_required,
-                101,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
-                &self.i64_optional,
-                102,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int64>::ser_field(
-                &self.i64_repeated,
-                103,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::UInt32>::ser_field(
-                &self.u32_required,
-                111,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
-                &self.u32_optional,
-                112,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt32>::ser_field(
-                &self.u32_repeated,
-                113,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::UInt64>::ser_field(
-                &self.u64_required,
-                121,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
-                &self.u64_optional,
-                122,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt64>::ser_field(
-                &self.u64_repeated,
-                123,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SInt32>::ser_field(
-                &self.s32_required,
-                131,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt32>::ser_field(
-                &self.s32_optional,
-                132,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt32>::ser_field(
-                &self.s32_repeated,
-                133,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SInt64>::ser_field(
-                &self.s64_required,
-                141,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt64>::ser_field(
-                &self.s64_optional,
-                142,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt64>::ser_field(
-                &self.s64_repeated,
-                143,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Fixed32>::ser_field(
-                &self.fixed32_required,
-                151,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed32>::ser_field(
-                &self.fixed32_optional,
-                152,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed32>::ser_field(
-                &self.fixed32_repeated,
-                153,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Fixed64>::ser_field(
-                &self.fixed64_required,
-                161,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed64>::ser_field(
-                &self.fixed64_optional,
-                162,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed64>::ser_field(
-                &self.fixed64_repeated,
-                163,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SFixed32>::ser_field(
-                &self.sfixed32_required,
-                171,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed32>::ser_field(
-                &self.sfixed32_optional,
-                172,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed32>::ser_field(
-                &self.sfixed32_repeated,
-                173,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SFixed64>::ser_field(
-                &self.sfixed64_required,
-                181,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed64>::ser_field(
-                &self.sfixed64_optional,
-                182,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed64>::ser_field(
-                &self.sfixed64_repeated,
-                183,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Double>::ser_field(
-                &self.f64_required,
-                191,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field(
-                &self.f64_optional,
-                192,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Double>::ser_field(
-                &self.f64_repeated,
-                193,
-                out,
-            )?;
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_required,
+                    1,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_optional,
+                    2,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_repeated,
+                    3,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Float>::ser_field(
+                    &self.float_required,
+                    11,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
+                    &self.float_optional,
+                    12,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
+                    &self.float_repeated,
+                    13,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Bytes>::ser_field(
+                    &self.bytes_required,
+                    21,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                    &self.bytes_optional,
+                    22,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Bytes>::ser_field(
+                    &self.bytes_repeated,
+                    23,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::String>::ser_field(
+                    &self.string_required,
+                    31,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                    &self.string_optional,
+                    32,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                    &self.string_repeated,
+                    33,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Required,
+                    ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
+                >::ser_field(&self.enum_required, 41, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Optional,
+                    ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
+                >::ser_field(&self.enum_optional, 42, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Repeated,
+                    ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
+                >::ser_field(&self.enum_repeated, 43, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                ::puroro::tags::Required, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
+            >::ser_field(&self.submsg_required, 51, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
+            >::ser_field(&self.submsg_optional, 52, out)?;
+            }
+            {
+                SerFieldToIoWrite::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+            >::ser_field(&self.submsg_repeated, 53, out)?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Int64>::ser_field(
+                    &self.i64_required,
+                    101,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
+                    &self.i64_optional,
+                    102,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int64>::ser_field(
+                    &self.i64_repeated,
+                    103,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::UInt32>::ser_field(
+                    &self.u32_required,
+                    111,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
+                    &self.u32_optional,
+                    112,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt32>::ser_field(
+                    &self.u32_repeated,
+                    113,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::UInt64>::ser_field(
+                    &self.u64_required,
+                    121,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
+                    &self.u64_optional,
+                    122,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt64>::ser_field(
+                    &self.u64_repeated,
+                    123,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SInt32>::ser_field(
+                    &self.s32_required,
+                    131,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt32>::ser_field(
+                    &self.s32_optional,
+                    132,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt32>::ser_field(
+                    &self.s32_repeated,
+                    133,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SInt64>::ser_field(
+                    &self.s64_required,
+                    141,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt64>::ser_field(
+                    &self.s64_optional,
+                    142,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt64>::ser_field(
+                    &self.s64_repeated,
+                    143,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Fixed32>::ser_field(
+                    &self.fixed32_required,
+                    151,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed32>::ser_field(
+                    &self.fixed32_optional,
+                    152,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed32>::ser_field(
+                    &self.fixed32_repeated,
+                    153,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Fixed64>::ser_field(
+                    &self.fixed64_required,
+                    161,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed64>::ser_field(
+                    &self.fixed64_optional,
+                    162,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed64>::ser_field(
+                    &self.fixed64_repeated,
+                    163,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SFixed32>::ser_field(
+                    &self.sfixed32_required,
+                    171,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed32>::ser_field(
+                    &self.sfixed32_optional,
+                    172,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed32>::ser_field(
+                    &self.sfixed32_repeated,
+                    173,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::SFixed64>::ser_field(
+                    &self.sfixed64_required,
+                    181,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed64>::ser_field(
+                    &self.sfixed64_optional,
+                    182,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed64>::ser_field(
+                    &self.sfixed64_repeated,
+                    183,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Double>::ser_field(
+                    &self.f64_required,
+                    191,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field(
+                    &self.f64_optional,
+                    192,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Double>::ser_field(
+                    &self.f64_repeated,
+                    193,
+                    out,
+                )?;
+            }
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                i32_required: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_required: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                bytes_required: ::std::default::Default::default(),
+                bytes_optional: ::std::default::Default::default(),
+                bytes_repeated: ::std::default::Default::default(),
+                string_required: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                enum_required: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                submsg_required: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                i64_required: ::std::default::Default::default(),
+                i64_optional: ::std::default::Default::default(),
+                i64_repeated: ::std::default::Default::default(),
+                u32_required: ::std::default::Default::default(),
+                u32_optional: ::std::default::Default::default(),
+                u32_repeated: ::std::default::Default::default(),
+                u64_required: ::std::default::Default::default(),
+                u64_optional: ::std::default::Default::default(),
+                u64_repeated: ::std::default::Default::default(),
+                s32_required: ::std::default::Default::default(),
+                s32_optional: ::std::default::Default::default(),
+                s32_repeated: ::std::default::Default::default(),
+                s64_required: ::std::default::Default::default(),
+                s64_optional: ::std::default::Default::default(),
+                s64_repeated: ::std::default::Default::default(),
+                fixed32_required: ::std::default::Default::default(),
+                fixed32_optional: ::std::default::Default::default(),
+                fixed32_repeated: ::std::default::Default::default(),
+                fixed64_required: ::std::default::Default::default(),
+                fixed64_optional: ::std::default::Default::default(),
+                fixed64_repeated: ::std::default::Default::default(),
+                sfixed32_required: ::std::default::Default::default(),
+                sfixed32_optional: ::std::default::Default::default(),
+                sfixed32_repeated: ::std::default::Default::default(),
+                sfixed64_required: ::std::default::Default::default(),
+                sfixed64_optional: ::std::default::Default::default(),
+                sfixed64_repeated: ::std::default::Default::default(),
+                f64_required: ::std::default::Default::default(),
+                f64_optional: ::std::default::Default::default(),
+                f64_repeated: ::std::default::Default::default(),
+            }
         }
     }
 }
@@ -12288,12 +12437,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Submsg {
                 pub i32_required: ::std::option::Option<i32>,
                 pub i64_required: ::std::option::Option<i64>,
@@ -12393,14 +12537,27 @@ pub mod _puroro_nested {
                     W: ::std::io::Write,
                 {
                     use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Required, ::puroro::tags::Int32
-                >::ser_field(&self.i32_required, 1, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Required, ::puroro::tags::Int64
-                >::ser_field(&self.i64_required, 101, out)?;
+                    {
+                        SerFieldToIoWrite::<
+                        ::puroro::tags::Required, ::puroro::tags::Int32
+                    >::ser_field(&self.i32_required, 1, out)?;
+                    }
+                    {
+                        SerFieldToIoWrite::<
+                        ::puroro::tags::Required, ::puroro::tags::Int64
+                    >::ser_field(&self.i64_required, 101, out)?;
+                    }
 
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for Submsg {
+                fn default() -> Self {
+                    Self {
+                        i32_required: ::std::default::Default::default(),
+                        i64_required: ::std::default::Default::default(),
+                    }
                 }
             }
         }

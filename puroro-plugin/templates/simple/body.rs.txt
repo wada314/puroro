@@ -1,4 +1,4 @@
-#[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
@@ -148,9 +148,15 @@ impl ::puroro::internal::SerializableMessageToIoWrite for {{ m.simple_ident }} {
 
         {%- for field in m.fields %}
         {%- if !field.is_explicit_oneof_field %}
-        SerFieldToIoWrite::<
-            {{ field.simple_label_and_type_tags }}
-        >::ser_field(&self.{{ field.ident }}, {{ field.number }}, out)?;
+        {%- if field.has_default_value %}
+        if <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(self) !=
+            <() as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(&())
+        {%- endif %}
+        {
+            SerFieldToIoWrite::<
+                {{ field.simple_label_and_type_tags }}
+            >::ser_field(&self.{{ field.ident }}, {{ field.number }}, out)?;
+        }
         {%- endif %}
         {%- endfor %}
 
@@ -171,3 +177,31 @@ impl ::puroro::internal::SerializableMessageToIoWrite for {{ m.simple_ident }} {
     }
 }
 
+impl ::std::default::Default for {{ m.simple_ident }} {
+    fn default() -> Self {
+        Self {        
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {%- if field.has_default_value %}
+            {%- if field.is_length_delimited %}
+            {%- if field.is_bytes %}
+            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}.to_vec()),
+            {%- endif %}
+            {%- if field.is_string %}
+            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}.to_string()),
+            {%- endif %}
+            {%- else %}
+            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}),
+            {%- endif %}
+            {%- else %}
+            {{ field.ident }}: ::std::default::Default::default(),
+            {%- endif %}
+            {%- endif %}
+            {%- endfor %}
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::std::default::Default::default(),
+            {%- endfor %}
+        }
+    }
+}

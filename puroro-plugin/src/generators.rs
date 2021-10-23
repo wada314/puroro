@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::utils::upgrade;
-use crate::wrappers;
+use crate::utils::{get_keyword_safe_ident, to_camel_case, upgrade};
+use crate::wrappers::{self, FieldType};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -178,6 +178,8 @@ struct Field {
     is_explicit_oneof_field: bool,
     is_repeated: bool,
     is_unlabeled: bool,
+    has_default_value: bool,
+    default_value: String,
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
     oneof_enum_value_ident: String,
@@ -224,6 +226,12 @@ impl Field {
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
             is_unlabeled: matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled),
+            has_default_value: f.default_value().is_some(),
+            default_value: f
+                .default_value()
+                .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
+                .transpose()?
+                .unwrap_or(Default::default()),
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
@@ -245,6 +253,124 @@ impl Field {
             single_scalar_field_type: f.single_scalar_field_type()?,
             single_field_label_and_type_tags: f
                 .rust_label_and_type_tags(|_| Ok("ScalarType".to_string()))?,
+        })
+    }
+
+    fn convert_default_value(input: &str, field_type: FieldType) -> Result<String> {
+        Ok(match field_type {
+            FieldType::Float => match input {
+                "inf" => "f32::INFINITY".to_string(),
+                "-inf" => "f32::NEG_INFINITY".to_string(),
+                "nan" | "-nan" => "f32::NAN".to_string(),
+                digits => {
+                    let append_zero = if digits.ends_with('.') { "0" } else { "" };
+                    format!("{}{}f32", digits, append_zero)
+                }
+            },
+            FieldType::Double => match input {
+                "inf" => "f64::INFINITY".to_string(),
+                "-inf" => "f64::NEG_INFINITY".to_string(),
+                "nan" | "-nan" => "f64::NAN".to_string(),
+                digits => {
+                    let append_zero = if digits.ends_with('.') { "0" } else { "" };
+                    format!("{}{}f64", digits, append_zero)
+                }
+            },
+            FieldType::Int32
+            | FieldType::Int64
+            | FieldType::UInt32
+            | FieldType::UInt64
+            | FieldType::SInt32
+            | FieldType::SInt64
+            | FieldType::Fixed32
+            | FieldType::Fixed64
+            | FieldType::SFixed32
+            | FieldType::SFixed64 => {
+                // As-is is okay. Even if the input is octal of hexadecimal format,
+                // the protoc command automatically converts it to decimal format
+                // so we only need to treat a decimal format.
+                input.to_string()
+            }
+            FieldType::Bool => {
+                // the possible input is "true" or "false", so as-is is okay.
+                input.to_string()
+            }
+            FieldType::String => {
+                format!(r###""{}""###, input.escape_default().collect::<String>())
+            }
+            FieldType::Bytes => {
+                // protoc escapes 0x7F~0xFF character as octal escape "\234".
+                // Rust does not support that style so we need to re-encode it.
+                let mut decoded = Vec::new();
+                let mut bytes = input.bytes();
+                loop {
+                    if let Some(c) = bytes.next() {
+                        if c == b'\\' {
+                            if let Some(d) = bytes.next() {
+                                match d {
+                                    b'\\' | b'\"' | b'\'' => {
+                                        decoded.push(d);
+                                    }
+                                    b'r' => decoded.push(b'\r'),
+                                    b'n' => decoded.push(b'\n'),
+                                    b't' => decoded.push(b'\t'),
+                                    _ => {
+                                        let e_opt = bytes.next();
+                                        let f_opt = bytes.next();
+                                        match (d, e_opt, f_opt) {
+                                            (
+                                                (b'0'..=b'9'),
+                                                Some(e @ (b'0'..=b'9')),
+                                                Some(f @ (b'0'..=b'9')),
+                                            ) => {
+                                                let u8_value = u8::from_str_radix(
+                                                    &format!(
+                                                        "{}{}{}",
+                                                        d - b'0',
+                                                        e - b'0',
+                                                        f - b'0'
+                                                    ),
+                                                    8,
+                                                )
+                                                .map_err(|e| ErrorKind::ParseIntError {
+                                                    source: e,
+                                                })?;
+                                                decoded.push(u8_value);
+                                            }
+                                            _ => Err(ErrorKind::InvalidString {
+                                                string: input.to_string(),
+                                            })?,
+                                        }
+                                    }
+                                }
+                            } else {
+                                Err(ErrorKind::InvalidString {
+                                    string: input.to_string(),
+                                })?
+                            }
+                        } else {
+                            decoded.push(c);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                let reencoded = decoded
+                    .into_iter()
+                    .map(|b| format!(r"\x{:02x}", b))
+                    .collect::<String>();
+                format!(r#"b"{}""#, reencoded)
+            }
+            FieldType::Enum2(e) | FieldType::Enum3(e) => {
+                format!(
+                    "{}::{}",
+                    upgrade(&e)?.rust_path(),
+                    get_keyword_safe_ident(&to_camel_case(input))
+                )
+            }
+            FieldType::Message(_) | FieldType::Group => {
+                unreachable!("Message and Group should not have default values")
+            }
         })
     }
 }

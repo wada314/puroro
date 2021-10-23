@@ -206,6 +206,39 @@
 //!     }
 //! }
 //! ```
+//!
+//! # Default values
+//!
+//! ## proto2
+//!
+//! In proto2, you can set a field's default value:
+//! ```protobuf
+//! syntax = "proto2";
+//! message MyMessage {
+//!     optional int32 my_number = 1 [default = 42];
+//! }
+//! ```
+//!
+//! For the generated struct, the value is initialized by the default value:
+//!
+//! ```rust
+//! # pub struct MyMessage {
+//! #     pub my_number: i32,
+//! # }
+//! # impl Default for MyMessage {
+//! #     fn default() -> Self {
+//! #         Self { my_number: 42 }
+//! #     }
+//! # }
+//! let mut msg = MyMessage::default();
+//! assert_eq!(42, msg.my_number);
+//! ```
+//!
+//! ## proto3
+//!
+//! Because proto3 does not allow to set the default value explicitly,
+//! the field's default values are always the same as default `std::default::Default` impl.
+//!
 
 pub mod de;
 pub mod se;

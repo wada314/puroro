@@ -87,6 +87,13 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         W: ::std::io::Write
     {
         use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
+        {%- if sfield.has_default_value %}
+        if <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ sfield.ident }}(self) == 
+            <() as super::_puroro_traits::{{ m.trait_ident }}>::{{ sfield.ident }}(&())
+        {
+            return ::std::result::Result::Ok(())
+        }
+        {%- endif %}
         SerFieldToIoWrite::<
             {{ sfield.single_field_label_and_type_tags }}
         >::ser_field::

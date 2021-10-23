@@ -478,6 +478,7 @@ pub struct Field {
     proto_type_enum: FieldTypeProto,
     proto_label: FieldLabelProto,
     proto_is_optional3: bool,
+    proto_default_value: Option<String>,
     lazy_label: OnceCell<FieldLabel>,
     number: i32,
     proto_oneof_index: Option<i32>,
@@ -513,6 +514,7 @@ impl Field {
             lazy_proto_type: OnceCell::new(),
             proto_label,
             proto_is_optional3,
+            proto_default_value: proto.default_value,
             lazy_label: OnceCell::new(),
             number: proto_number,
             proto_oneof_index,
@@ -569,6 +571,9 @@ impl Field {
     }
     pub fn is_optional3(&self) -> bool {
         self.proto_is_optional3
+    }
+    pub fn default_value(&self) -> Option<&str> {
+        self.proto_default_value.as_ref().map(|v| v.as_str())
     }
     pub fn number(&self) -> i32 {
         self.number

@@ -11,9 +11,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_unlabeled: i32,
         pub i32_optional: ::std::option::Option<i32>,
@@ -196,46 +194,69 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
-                &self.i32_unlabeled,
-                1,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_optional,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.i32_repeated,
-                3,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Float>::ser_field(
-                &self.f32_unlabeled,
-                4,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
-                &self.string_unlabeled,
-                5,
-                out,
-            )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_unlabeled,
+                    1,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_optional,
+                    2,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_repeated,
+                    3,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Float>::ser_field(
+                    &self.f32_unlabeled,
+                    4,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                    &self.string_unlabeled,
+                    5,
+                    out,
+                )?;
+            }
+            {
+                SerFieldToIoWrite::<
+                    ::puroro::tags::Unlabeled,
+                    ::puroro::tags::Message<
+                        ::std::boxed::Box<
+                            self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+                        >,
                     >,
-                >,
-            >::ser_field(&self.submsg_unlabeled, 6, out)?;
+                >::ser_field(&self.submsg_unlabeled, 6, out)?;
+            }
 
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                f32_unlabeled: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -315,13 +336,23 @@ pub mod _puroro_simple_impl {
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
-                &self.i32_unlabeled,
-                1,
-                out,
-            )?;
+            {
+                SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                    &self.i32_unlabeled,
+                    1,
+                    out,
+                )?;
+            }
 
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for Submsg {
+        fn default() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+            }
         }
     }
 }
