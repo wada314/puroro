@@ -104,8 +104,8 @@
 //! |---------------------|----------------------|-------------|
 //! | `int32`             | `i32`                | (see below) |
 //! | (any numeric types) | `T`                  | (see below) |
-//! | `bytes`             | impl AsRef<[u8]>     | (see below) |
-//! | `string`            | impl AsRef<str>      | (see below) |
+//! | `bytes`             | `impl AsRef<[u8]>`   | (see below) |
+//! | `string`            | `impl AsRef<str>`    | (see below) |
 //! | `SomeMessage`       | `impl SomeMessageTrait`|(see below)|
 //!
 //! For repeated fields, a type `RepeatedType` where:
