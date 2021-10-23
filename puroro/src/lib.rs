@@ -122,10 +122,14 @@
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
+//!     fn my_number_opt(&self) -> Option<i32>;
+//!     fn has_my_number(&self) -> bool;
 //!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str>;
 //!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
 //!     type Field3MessageType<'this>: MyMessageTrait;
 //!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
+//!     fn my_child_opt(&self) -> Option<Self::Field3MessageType<'_>>;
+//!     fn has_my_child(&self) -> bool;
 //! }
 //! ```
 //!
