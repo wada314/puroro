@@ -538,3 +538,26 @@ fn test_simple_enum() {
     assert!(!msg.has_enum_one());
     assert!(!msg.has_enum_fourty_two());
 }
+
+#[test]
+fn test_empty_int32() {
+    let msg = ();
+
+    // The trait values are "not set" but return the default values
+    assert_eq!(0, msg.i32_default());
+    assert_eq!(0, msg.i32_0());
+    assert_eq!(42, msg.i32_42());
+    assert_eq!(-42, msg.i32_m42());
+    assert_eq!(2147483647, msg.i32_2147483647());
+    assert_eq!(-2147483648, msg.i32_m2147483648());
+    assert_eq!(0o123, msg.i32_0123());
+    assert_eq!(0x123, msg.i32_0x123());
+    assert!(!msg.has_i32_default());
+    assert!(!msg.has_i32_0());
+    assert!(!msg.has_i32_42());
+    assert!(!msg.has_i32_m42());
+    assert!(!msg.has_i32_2147483647());
+    assert!(!msg.has_i32_m2147483648());
+    assert!(!msg.has_i32_0123());
+    assert!(!msg.has_i32_0x123());
+}
