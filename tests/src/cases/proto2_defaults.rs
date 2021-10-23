@@ -64,6 +64,7 @@ fn test_simple_int32() {
     assert_eq!(None, msg.i32_0x123);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(0, msg.i32_default());
     assert_eq!(0, msg.i32_0());
     assert_eq!(42, msg.i32_42());
@@ -121,6 +122,7 @@ fn test_simple_uint32() {
     assert_eq!(None, msg.u32_0x123);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(0, msg.u32_default());
     assert_eq!(0, msg.u32_0());
     assert_eq!(42, msg.u32_42());
@@ -184,6 +186,7 @@ fn test_simple_int64() {
     assert_eq!(None, msg.i64_0x123);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(0, msg.i64_default());
     assert_eq!(0, msg.i64_0());
     assert_eq!(42, msg.i64_42());
@@ -241,6 +244,7 @@ fn test_simple_uint64() {
     assert_eq!(None, msg.u64_0x123);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(0, msg.u64_default());
     assert_eq!(0, msg.u64_0());
     assert_eq!(42, msg.u64_42());
@@ -318,6 +322,7 @@ fn test_simple_float() {
     msg.f32_mnan = None;
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(0.0, msg.f32_default());
     assert_eq!(0.0, msg.f32_0());
     assert_eq!(-0.0, msg.f32_m0());
@@ -352,16 +357,31 @@ fn test_simple_bool() {
 
     // Check struct fields are initialized by the specified default values
     assert_eq!(None, msg.bool_default);
+    assert_eq!(Some(false), msg.bool_false);
+    assert_eq!(Some(true), msg.bool_true);
     assert_eq!(false, msg.bool_default());
+    assert_eq!(false, msg.bool_false());
+    assert_eq!(true, msg.bool_true());
     assert!(!msg.has_bool_default());
+    assert!(msg.has_bool_false());
+    assert!(msg.has_bool_true());
 
     // When the fields are explicitly set to None, then it's None anyway.
     msg.bool_default = None;
+    msg.bool_false = None;
+    msg.bool_true = None;
     assert_eq!(None, msg.bool_default);
+    assert_eq!(None, msg.bool_false);
+    assert_eq!(None, msg.bool_true);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(false, msg.bool_default());
+    assert_eq!(false, msg.bool_false());
+    assert_eq!(true, msg.bool_true());
     assert!(!msg.has_bool_default());
+    assert!(!msg.has_bool_false());
+    assert!(!msg.has_bool_true());
 }
 
 #[test]
@@ -370,16 +390,59 @@ fn test_simple_string() {
 
     // Check struct fields are initialized by the specified default values
     assert_eq!(None, msg.string_default);
+    assert_eq!(Some("".to_string()), msg.string_empty);
+    assert_eq!(Some("abc".to_string()), msg.string_abc);
+    assert_eq!(Some("あいう".to_string()), msg.string_aiu);
+    assert_eq!(Some("\\".to_string()), msg.string_backslash);
+    assert_eq!(Some("\t".to_string()), msg.string_tab);
+    assert_eq!(Some("\r\n".to_string()), msg.string_crlf);
     assert_eq!("", msg.string_default());
+    assert_eq!("", msg.string_empty());
+    assert_eq!("abc", msg.string_abc());
+    assert_eq!("あいう", msg.string_aiu());
+    assert_eq!("\\", msg.string_backslash());
+    assert_eq!("\t", msg.string_tab());
+    assert_eq!("\r\n", msg.string_crlf());
     assert!(!msg.has_string_default());
+    assert!(msg.has_string_empty());
+    assert!(msg.has_string_abc());
+    assert!(msg.has_string_aiu());
+    assert!(msg.has_string_backslash());
+    assert!(msg.has_string_tab());
+    assert!(msg.has_string_crlf());
 
     // When the fields are explicitly set to None, then it's None anyway.
     msg.string_default = None;
+    msg.string_empty = None;
+    msg.string_abc = None;
+    msg.string_aiu = None;
+    msg.string_backslash = None;
+    msg.string_tab = None;
+    msg.string_crlf = None;
     assert_eq!(None, msg.string_default);
+    assert_eq!(None, msg.string_empty);
+    assert_eq!(None, msg.string_abc);
+    assert_eq!(None, msg.string_aiu);
+    assert_eq!(None, msg.string_backslash);
+    assert_eq!(None, msg.string_tab);
+    assert_eq!(None, msg.string_crlf);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!("", msg.string_default());
+    assert_eq!("", msg.string_empty());
+    assert_eq!("abc", msg.string_abc());
+    assert_eq!("あいう", msg.string_aiu());
+    assert_eq!("\\", msg.string_backslash());
+    assert_eq!("\t", msg.string_tab());
+    assert_eq!("\r\n", msg.string_crlf());
     assert!(!msg.has_string_default());
+    assert!(!msg.has_string_empty());
+    assert!(!msg.has_string_abc());
+    assert!(!msg.has_string_aiu());
+    assert!(!msg.has_string_backslash());
+    assert!(!msg.has_string_tab());
+    assert!(!msg.has_string_crlf());
 }
 
 #[test]
@@ -388,16 +451,59 @@ fn test_simple_bytes() {
 
     // Check struct fields are initialized by the specified default values
     assert_eq!(None, msg.bytes_default);
+    assert_eq!(Some(b"".to_vec()), msg.bytes_empty);
+    assert_eq!(Some(b"abc".to_vec()), msg.bytes_abc);
+    assert_eq!(Some("あいう".as_bytes().to_vec()), msg.bytes_aiu);
+    assert_eq!(Some(b"\\".to_vec()), msg.bytes_backslash);
+    assert_eq!(Some(b"\t".to_vec()), msg.bytes_tab);
+    assert_eq!(Some(b"\r\n".to_vec()), msg.bytes_crlf);
     assert_eq!(b"", msg.bytes_default());
+    assert_eq!(b"", msg.bytes_empty());
+    assert_eq!(b"abc", msg.bytes_abc());
+    assert_eq!("あいう".as_bytes(), msg.bytes_aiu());
+    assert_eq!(b"\\", msg.bytes_backslash());
+    assert_eq!(b"\t", msg.bytes_tab());
+    assert_eq!(b"\r\n", msg.bytes_crlf());
     assert!(!msg.has_bytes_default());
+    assert!(msg.has_bytes_empty());
+    assert!(msg.has_bytes_abc());
+    assert!(msg.has_bytes_aiu());
+    assert!(msg.has_bytes_backslash());
+    assert!(msg.has_bytes_tab());
+    assert!(msg.has_bytes_crlf());
 
     // When the fields are explicitly set to None, then it's None anyway.
     msg.bytes_default = None;
+    msg.bytes_empty = None;
+    msg.bytes_abc = None;
+    msg.bytes_aiu = None;
+    msg.bytes_backslash = None;
+    msg.bytes_tab = None;
+    msg.bytes_crlf = None;
     assert_eq!(None, msg.bytes_default);
+    assert_eq!(None, msg.bytes_empty);
+    assert_eq!(None, msg.bytes_abc);
+    assert_eq!(None, msg.bytes_aiu);
+    assert_eq!(None, msg.bytes_backslash);
+    assert_eq!(None, msg.bytes_tab);
+    assert_eq!(None, msg.bytes_crlf);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(b"", msg.bytes_default());
+    assert_eq!(b"", msg.bytes_empty());
+    assert_eq!(b"abc", msg.bytes_abc());
+    assert_eq!("あいう".as_bytes(), msg.bytes_aiu());
+    assert_eq!(b"\\", msg.bytes_backslash());
+    assert_eq!(b"\t", msg.bytes_tab());
+    assert_eq!(b"\r\n", msg.bytes_crlf());
     assert!(!msg.has_bytes_default());
+    assert!(!msg.has_bytes_empty());
+    assert!(!msg.has_bytes_abc());
+    assert!(!msg.has_bytes_aiu());
+    assert!(!msg.has_bytes_backslash());
+    assert!(!msg.has_bytes_tab());
+    assert!(!msg.has_bytes_crlf());
 }
 
 #[test]
@@ -406,14 +512,29 @@ fn test_simple_enum() {
 
     // Check struct fields are initialized by the specified default values
     assert_eq!(None, msg.enum_default);
+    assert_eq!(Some(MyEnum::One), msg.enum_one);
+    assert_eq!(Some(MyEnum::FourtyTwo), msg.enum_fourty_two);
     assert_eq!(MyEnum::One, msg.enum_default());
+    assert_eq!(MyEnum::One, msg.enum_one());
+    assert_eq!(MyEnum::FourtyTwo, msg.enum_fourty_two());
     assert!(!msg.has_enum_default());
+    assert!(msg.has_enum_one());
+    assert!(msg.has_enum_fourty_two());
 
     // When the fields are explicitly set to None, then it's None anyway.
     msg.enum_default = None;
+    msg.enum_one = None;
+    msg.enum_fourty_two = None;
     assert_eq!(None, msg.enum_default);
+    assert_eq!(None, msg.enum_one);
+    assert_eq!(None, msg.enum_fourty_two);
 
     // But the trait methods still return the default values.
+    // Though has_xxx methods return false.
     assert_eq!(MyEnum::One, msg.enum_default());
+    assert_eq!(MyEnum::One, msg.enum_one());
+    assert_eq!(MyEnum::FourtyTwo, msg.enum_fourty_two());
     assert!(!msg.has_enum_default());
+    assert!(!msg.has_enum_one());
+    assert!(!msg.has_enum_fourty_two());
 }
