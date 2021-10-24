@@ -3,18 +3,10 @@
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
 {%- let maybe_gp %}
-{%- if sfield.is_length_delimited %}
-    {%- if sfield.is_repeated %}
-        {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
-    {%- else %}
-        {%- let maybe_gp = "<ScalarType>" %}
-    {%- endif %}
+{%- if sfield.is_repeated %}
+    {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
 {%- else %}
-    {%- if sfield.is_repeated %}
-        {%- let maybe_gp = "<RepeatedType>" %}
-    {%- else %}
-        {%- let maybe_gp = "" %}
-    {%- endif %}
+    {%- let maybe_gp = "<ScalarType>" %}
 {%- endif %}
 
 pub struct {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
@@ -64,7 +56,9 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
                 self.{{ sfield.ident }}.as_ref()
                 {%- endif %}
                 {%- else %}
-                self.{{ sfield.ident }}
+                ::std::convert::Into::into(
+                    ::std::clone::Clone::clone(&self.{{ sfield.ident }})
+                )
                 {%- endif %}
             )
         )
@@ -103,10 +97,10 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         <(), _, _>
         {%- endif %}
         (
-            {%- if sfield.single_field_type == sfield.single_scalar_field_type %}
-            ::std::iter::once(&self.{{ sfield.ident }}),
-            {%- else %}
+            {%- if sfield.is_repeated %}
             &self.{{ sfield.ident }},
+            {%- else %}
+            ::std::iter::once(&self.{{ sfield.ident }}),
             {%- endif %}
             {{ sfield.number }},
             out

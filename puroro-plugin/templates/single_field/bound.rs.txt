@@ -1,7 +1,5 @@
 
-{%- if f.is_length_delimited || f.is_repeated %}
 where
-{%- endif %}
 
 {%- if f.is_length_delimited %}
 
@@ -19,10 +17,15 @@ ScalarType: {{ field_msg_path }} + ::std::clone::Clone + ::std::cmp::PartialEq +
 {%- else %}
 {%- endmatch %}
 
-{%- endif %}
+{%- else %} {#- if f.is_length_delimited #}
+
+ScalarType: ::std::convert::Into<{{ f.single_numerical_rust_type }}> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+
+{%- endif %} {#- if f.is_length_delimited #}
 
 {%- if f.is_repeated %}
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
-    Item = &'a {{ f.single_scalar_field_type }}
+    Item = &'a ScalarType
 >,
 {%- endif %}

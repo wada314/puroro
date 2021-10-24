@@ -189,7 +189,7 @@ struct Field {
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
     single_field_type: String,
-    single_scalar_field_type: String,
+    single_numerical_rust_type: String,
     single_field_label_and_type_tags: String,
 }
 
@@ -250,7 +250,7 @@ impl Field {
                 )
             })?,
             single_field_type: f.single_field_type()?,
-            single_scalar_field_type: f.single_scalar_field_type()?,
+            single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
             single_field_label_and_type_tags: f
                 .rust_label_and_type_tags(|_| Ok("ScalarType".to_string()))?,
         })
