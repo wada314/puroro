@@ -50,3 +50,11 @@ where
         self.0.next().map(|v| Into::into(Clone::clone(v)))
     }
 }
+impl<I, T> Clone for CloneThenIntoIter<I, T>
+where
+    I: Clone,
+{
+    fn clone(&self) -> Self {
+        Self(self.0.clone(), PhantomData)
+    }
+}
