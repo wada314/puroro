@@ -903,6 +903,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub d: RepeatedType,
     }
@@ -915,6 +916,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -926,6 +928,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field4RepeatedType<'this>
         where
@@ -950,6 +953,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -973,6 +977,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self { d: value }
@@ -994,6 +999,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             Test4Builder((self.0, Test4SingleField4 { d: value }))
         }

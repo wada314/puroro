@@ -3139,6 +3139,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub i32_repeated: RepeatedType,
     }
@@ -3151,6 +3152,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -3162,6 +3164,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -3305,6 +3308,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -3328,6 +3332,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -3737,6 +3742,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub float_repeated: RepeatedType,
     }
@@ -3749,6 +3755,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -3760,6 +3767,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -3903,6 +3911,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -3926,6 +3935,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -4331,6 +4341,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub bytes_repeated: RepeatedType,
     }
@@ -4343,6 +4354,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -4354,6 +4366,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -4497,6 +4510,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -4520,6 +4534,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -4924,6 +4939,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub string_repeated: RepeatedType,
     }
@@ -4936,6 +4952,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -4947,6 +4964,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -5090,6 +5108,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -5113,6 +5132,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -5524,6 +5544,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub enum_repeated: RepeatedType,
     }
@@ -5536,6 +5557,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -5547,6 +5569,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -5688,6 +5711,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -5710,6 +5734,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -6136,6 +6161,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub submsg_repeated: RepeatedType,
     }
@@ -6149,6 +6175,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -6161,6 +6188,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -6300,6 +6328,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -6327,6 +6356,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -6736,6 +6766,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub i64_repeated: RepeatedType,
     }
@@ -6748,6 +6779,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -6759,6 +6791,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -6902,6 +6935,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6925,6 +6959,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -7333,6 +7368,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub u32_repeated: RepeatedType,
     }
@@ -7345,6 +7381,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -7356,6 +7393,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -7499,6 +7537,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -7522,6 +7561,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -7930,6 +7970,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub u64_repeated: RepeatedType,
     }
@@ -7942,6 +7983,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -7953,6 +7995,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -8096,6 +8139,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -8119,6 +8163,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -8527,6 +8572,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub s32_repeated: RepeatedType,
     }
@@ -8539,6 +8585,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -8550,6 +8597,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -8693,6 +8741,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -8716,6 +8765,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -9124,6 +9174,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub s64_repeated: RepeatedType,
     }
@@ -9136,6 +9187,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -9147,6 +9199,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -9290,6 +9343,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -9313,6 +9367,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -9720,6 +9775,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub fixed32_repeated: RepeatedType,
     }
@@ -9732,6 +9788,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -9743,6 +9800,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -9886,6 +9944,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -9908,6 +9967,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -10315,6 +10375,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub fixed64_repeated: RepeatedType,
     }
@@ -10327,6 +10388,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -10338,6 +10400,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -10481,6 +10544,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -10503,6 +10567,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -10910,6 +10975,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub sfixed32_repeated: RepeatedType,
     }
@@ -10922,6 +10988,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -10933,6 +11000,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -11076,6 +11144,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -11098,6 +11167,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -11505,6 +11575,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub sfixed64_repeated: RepeatedType,
     }
@@ -11517,6 +11588,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -11528,6 +11600,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -11671,6 +11744,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -11693,6 +11767,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -12101,6 +12176,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         pub f64_repeated: RepeatedType,
     }
@@ -12113,6 +12189,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
     }
 
@@ -12124,6 +12201,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         type Field3RepeatedType<'this>
         where
@@ -12267,6 +12345,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -12290,6 +12369,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -12349,6 +12429,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12404,6 +12485,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12459,6 +12541,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12514,6 +12597,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12569,6 +12653,7 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12611,6 +12696,7 @@ ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_tra
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
+for <'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
     {
             MsgBuilder((
                 self.0,
@@ -12666,6 +12752,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12721,6 +12808,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12776,6 +12864,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12831,6 +12920,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12886,6 +12976,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12941,6 +13032,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -12996,6 +13088,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -13051,6 +13144,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -13106,6 +13200,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -13161,6 +13256,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,

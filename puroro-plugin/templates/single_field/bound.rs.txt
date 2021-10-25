@@ -28,4 +28,5 @@ ScalarType: ::std::convert::Into<{{ f.single_numerical_rust_type }}> +
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
+for <'a> <&'a RepeatedType as ::std::iter::IntoIterator>::IntoIter: ::std::clone::Clone,
 {%- endif %}
