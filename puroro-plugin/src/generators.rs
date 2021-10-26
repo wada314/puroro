@@ -64,6 +64,7 @@ struct Message {
     proto_name: String,
     trait_ident: String,
     trait_delegate_macro_ident: String,
+    trait_generic_ser_function_ident: String,
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
@@ -103,6 +104,7 @@ impl Message {
             proto_name: m.proto_name().to_string(),
             trait_ident: m.rust_trait_ident().to_string(),
             trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
+            trait_generic_ser_function_ident: format!("{}_ser", m.rust_nested_module_ident()),
             submodule_ident: m.rust_nested_module_ident().to_string(),
             nested: MessagesAndEnums {
                 messages: nested_messages,
@@ -182,6 +184,7 @@ struct Field {
     default_value: String,
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
+    trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
     simple_field_type: String,
     simple_scalar_field_type: String,
@@ -234,6 +237,9 @@ impl Field {
                 .unwrap_or(Default::default()),
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
+            trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
+                Ok(format!("Self::Field{}MessageType", f.number()))
+            })?,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
             simple_field_type: f.simple_field_type()?,
             simple_scalar_field_type: f.simple_scalar_field_type()?,

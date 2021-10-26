@@ -83,18 +83,22 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test1 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test1
+    where
+        Self: super::_puroro_traits::Test1Trait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            {
-                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                    &self.a, 1, out,
-                )?;
-            }
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser(
+                <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -176,18 +180,22 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test2 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test2
+    where
+        Self: super::_puroro_traits::Test2Trait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            {
-                SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                    &self.b, 2, out,
-                )?;
-            }
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser(
+                <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -280,23 +288,22 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test3 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test3
+    where
+        Self: super::_puroro_traits::Test3Trait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            {
-                SerFieldToIoWrite::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Message<
-                        ::std::boxed::Box<
-                            self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
-                        >,
-                    >,
-                >::ser_field(&self.c, 3, out)?;
-            }
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<Self::Field3MessageType>,
+            >::ser(
+                <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -380,18 +387,18 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test4 {
+    impl ::puroro::internal::SerializableMessageToIoWrite for Test4
+    where
+        Self: super::_puroro_traits::Test4Trait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            {
-                SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                    &self.d, 4, out,
-                )?;
-            }
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -482,14 +489,17 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::Test1Trait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<_, _>(
-                self.a_opt().into_iter(),
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser(
+                <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
                 1,
                 out,
             )?;
@@ -606,14 +616,17 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::Test2Trait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<_, _>(
-                self.b_opt().into_iter(),
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser(
+                <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
                 2,
                 out,
             )?;
@@ -766,20 +779,21 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::Test3Trait,
         ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::<_, _>(
-            self.c_opt().into_iter(),
-            3,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<Self::Field3MessageType>,
+            >::ser(
+                <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -950,17 +964,16 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::Test4Trait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field::<_, _>(
-                self.d(),
-                4,
-                out,
-            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
             ::std::result::Result::Ok(())
         }
     }

@@ -13,3 +13,4 @@
 // limitations under the License.
 
 pub mod to_io_write;
+pub use to_io_write::SerFieldToIoWrite;
