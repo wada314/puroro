@@ -81,18 +81,14 @@ where
 {
     pub fn ser_field<FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
     where
-        FieldType:
-            IntoIterator<Item = <tags::Variant<V> as tags::NumericalTypeTag>::NativeType> + Clone,
+        FieldType: IntoIterator<Item = <tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
     {
-        let len = {
-            let mut null_out = NullWrite::new();
-            for item in field.clone().into_iter() {
-                Variant::from_native::<tags::Variant<V>>(item.clone())?
-                    .encode_bytes(&mut null_out)?;
-            }
-            null_out.len()
-        };
+        let mut encoded = Vec::new();
+        for item in field.into_iter() {
+            Variant::from_native::<tags::Variant<V>>(item.clone())?.encode_bytes(&mut encoded)?;
+        }
+        let len = encoded.len();
         if len == 0 {
             return Ok(());
         }
@@ -101,9 +97,7 @@ where
             .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
         write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
         Variant::from_i32(len_i32)?.encode_bytes(out)?;
-        for item in field.clone().into_iter() {
-            Variant::from_native::<tags::Variant<V>>(item.clone())?.encode_bytes(out)?;
-        }
+        out.write_all(&encoded)?;
         Ok(())
     }
 }

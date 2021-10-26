@@ -32,7 +32,7 @@ fn test_builder_append_repeated() {
     use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait};
     let msg = MsgBuilder::new()
         .append_i32_repeated(vec![1, 1])
-        .append_i32_repeated(vec![])
+        .append_i32_repeated(vec![] as Vec<i32>)
         .append_i32_repeated(vec![2, 3, 5])
         .build();
     assert_eq!(
