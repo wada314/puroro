@@ -78,7 +78,8 @@ want to make a separated crate containing only generated .rs code (and build.rs 
         - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
             - [x] oneof field support
             - [x] Builder
-            - [ ] `Into<SomeIntType>` support for numerical fields
+            - [x] `Into<SomeIntType>` support for numerical fields
+                - [ ] Allow the fields type to be non-`Clone`, `Debug`, `PartialEq` (currently we are just deriving those traits when defining a struct, but instead we should write a manual implementation which is only available when the field impls those traits).
     - [ ] Support the `allocator_api`. Waiting for the `String` support
     - [ ] RPCs / services
     - [ ] Deserializer vulnerbility: Need to limit the recursion depth
