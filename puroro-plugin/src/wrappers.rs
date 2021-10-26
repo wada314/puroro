@@ -619,19 +619,6 @@ impl Field {
 
     pub fn trait_scalar_getter_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
-            FieldType::Double => "f64".to_string(),
-            FieldType::Float => "f32".to_string(),
-            FieldType::Int32 => "i32".to_string(),
-            FieldType::Int64 => "i64".to_string(),
-            FieldType::UInt32 => "u32".to_string(),
-            FieldType::UInt64 => "u64".to_string(),
-            FieldType::SInt32 => "i32".to_string(),
-            FieldType::SInt64 => "i64".to_string(),
-            FieldType::Fixed32 => "u32".to_string(),
-            FieldType::Fixed64 => "u64".to_string(),
-            FieldType::SFixed32 => "i32".to_string(),
-            FieldType::SFixed64 => "i64".to_string(),
-            FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::String => "&'this str".to_string(),
@@ -640,23 +627,11 @@ impl Field {
                 "Self::Field{number}MessageType<'this>",
                 number = self.number()
             ),
+            t => t.numerical_rust_type()?.to_string(),
         })
     }
     pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<String> {
         Ok(match self.field_type()? {
-            FieldType::Double => "f64".to_string(),
-            FieldType::Float => "f32".to_string(),
-            FieldType::Int32 => "i32".to_string(),
-            FieldType::Int64 => "i64".to_string(),
-            FieldType::UInt32 => "u32".to_string(),
-            FieldType::UInt64 => "u64".to_string(),
-            FieldType::SInt32 => "i32".to_string(),
-            FieldType::SInt64 => "i64".to_string(),
-            FieldType::Fixed32 => "u32".to_string(),
-            FieldType::Fixed64 => "u64".to_string(),
-            FieldType::SFixed32 => "i32".to_string(),
-            FieldType::SFixed64 => "i64".to_string(),
-            FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::String => format!("&{lt} str", lt = lt),
@@ -668,6 +643,7 @@ impl Field {
                 trait_path = self.message()?.rust_trait_path(),
                 number = self.number(),
             ),
+            t => t.numerical_rust_type()?.to_string(),
         })
     }
 
@@ -709,19 +685,6 @@ impl Field {
 
     pub fn oneof_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
-            FieldType::Double => "f64".to_string(),
-            FieldType::Float => "f32".to_string(),
-            FieldType::Int32 => "i32".to_string(),
-            FieldType::Int64 => "i64".to_string(),
-            FieldType::UInt32 => "u32".to_string(),
-            FieldType::UInt64 => "u64".to_string(),
-            FieldType::SInt32 => "i32".to_string(),
-            FieldType::SInt64 => "i64".to_string(),
-            FieldType::Fixed32 => "u32".to_string(),
-            FieldType::Fixed64 => "u64".to_string(),
-            FieldType::SFixed32 => "i32".to_string(),
-            FieldType::SFixed64 => "i64".to_string(),
-            FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::String => "<IsOwned as ::puroro::internal::bool::BoolType>\
@@ -744,6 +707,7 @@ impl Field {
                     trait_getter_type = trait_getter_type,
                 )
             }
+            t => t.numerical_rust_type()?.to_string(),
         })
     }
 
@@ -790,19 +754,17 @@ impl Field {
     }
 
     pub fn single_field_type(&self) -> Result<String> {
-        let scalar_type = self.single_scalar_field_type()?;
-        Ok(match self.field_label()? {
-            FieldLabel::Repeated => "RepeatedType".to_string(),
-            _ => scalar_type,
-        })
+        Ok(if matches!(self.field_label()?, FieldLabel::Repeated) {
+            "RepeatedType"
+        } else {
+            "ScalarType"
+        }
+        .to_string())
     }
 
-    pub fn single_scalar_field_type(&self) -> Result<String> {
+    pub fn single_numerical_rust_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String | FieldType::Bytes | FieldType::Message(_) => {
-                "ScalarType".to_string()
-            }
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             t => t.numerical_rust_type()?.to_string(),
         })

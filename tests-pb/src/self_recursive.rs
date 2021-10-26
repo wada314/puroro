@@ -247,10 +247,8 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
             ::puroro::tags::Unlabeled, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.recursive_unlabeled),
+        >::ser_field::<_, _>(
+            self.recursive_unlabeled_opt().into_iter(),
             1,
             out
         )?;

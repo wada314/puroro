@@ -146,35 +146,67 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MsgSingleField1 {
-        pub r#type: i32,
+    pub struct MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub r#type: ScalarType,
     }
 
-    impl ::puroro::Message<super::Msg> for MsgSingleField1 {}
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.r#type))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.r#type,
+            )))
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
             use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.r#type), 1, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<_, _>(
+                self.type_opt().into_iter(),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<i32> for MsgSingleField1 {
-        fn from(value: i32) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { r#type: value }
         }
     }
@@ -184,7 +216,16 @@ pub mod _puroro_impls {
     where
         T: MsgTrait,
     {
-        pub fn append_type(self, value: i32) -> MsgBuilder<(T, MsgSingleField1)> {
+        pub fn append_type<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MsgBuilder((self.0, MsgSingleField1 { r#type: value }))
         }
 

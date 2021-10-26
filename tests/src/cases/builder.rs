@@ -28,11 +28,28 @@ fn test_builder() {
 }
 
 #[test]
+fn test_builder_into_numericals() {
+    use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait};
+    #[derive(Clone, Debug, PartialEq)]
+    struct Ten();
+    impl From<Ten> for i32 {
+        fn from(_: Ten) -> Self {
+            10
+        }
+    }
+    let msg = MsgBuilder::new().append_i32_unlabeled(Ten()).build();
+    assert_eq!(10, msg.i32_unlabeled());
+    assert_eq!("", msg.string_optional());
+    assert_eq!(0, msg.i64_unlabeled());
+    assert_eq!(0, ::std::mem::size_of_val(&msg));
+}
+
+#[test]
 fn test_builder_append_repeated() {
     use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait};
     let msg = MsgBuilder::new()
         .append_i32_repeated(vec![1, 1])
-        .append_i32_repeated(vec![])
+        .append_i32_repeated(vec![] as Vec<i32>)
         .append_i32_repeated(vec![2, 3, 5])
         .build();
     assert_eq!(

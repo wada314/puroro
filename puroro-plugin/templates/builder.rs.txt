@@ -7,18 +7,10 @@ where
     {%- for field in m.fields %}
 
     {%- let maybe_gp %}
-    {%- if field.is_length_delimited %}
-        {%- if field.is_repeated %}
-            {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
-        {%- else %}
-            {%- let maybe_gp = "<ScalarType>" %}
-        {%- endif %}
+    {%- if field.is_repeated %}
+        {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
     {%- else %}
-        {%- if field.is_repeated %}
-            {%- let maybe_gp = "<RepeatedType>" %}
-        {%- else %}
-            {%- let maybe_gp = "" %}
-        {%- endif %}
+        {%- let maybe_gp = "<ScalarType>" %}
     {%- endif %}
 
     pub fn append_{{ field.ident_unesc }}{{ maybe_gp }}(self, value: {{ field.single_field_type }})

@@ -33,3 +33,28 @@ where
         self.0.next().map(|r| r.as_ref())
     }
 }
+
+pub struct CloneThenIntoIter<I, T>(I, PhantomData<T>);
+impl<I, T> CloneThenIntoIter<I, T> {
+    pub fn new(iter: I) -> Self {
+        Self(iter, PhantomData)
+    }
+}
+impl<'a, I, T, R> Iterator for CloneThenIntoIter<I, T>
+where
+    I: Iterator<Item = &'a R>,
+    R: 'a + Clone + Into<T>,
+{
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next().map(|v| Into::into(Clone::clone(v)))
+    }
+}
+impl<I, T> Clone for CloneThenIntoIter<I, T>
+where
+    I: Clone,
+{
+    fn clone(&self) -> Self {
+        Self(self.0.clone(), PhantomData)
+    }
+}
