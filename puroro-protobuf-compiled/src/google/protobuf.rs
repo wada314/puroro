@@ -31,9 +31,7 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileDescriptorSet {
         pub file: ::std::vec::Vec<
             self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
@@ -117,25 +115,36 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorSet {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorSet
+    where
+        Self: super::_puroro_traits::FileDescriptorSetTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FileDescriptorProto,
+                    <Self as super::_puroro_traits::FileDescriptorSetTrait>::Field1MessageType<'_>,
                 >,
-            >::ser_field(&self.file, 1, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorSetTrait>::file(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for FileDescriptorSet {
+        fn default() -> Self {
+            Self {
+                file: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileDescriptorProto {
         pub name: ::std::option::Option<::std::string::String>,
         pub package: ::std::option::Option<::std::string::String>,
@@ -475,84 +484,159 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileDescriptorProto
+    where
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.package,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::package_opt(self),
                 2,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.dependency,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::dependency(self),
                 3,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.public_dependency,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::public_dependency(self),
                 10,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
-                &self.weak_dependency,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::weak_dependency(self),
                 11,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
-                >,
-            >::ser_field(&self.message_type, 4, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
-                >,
-            >::ser_field(&self.enum_type, 5, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceDescriptorProto>
-        >::ser_field(&self.service, 6, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
-                >,
-            >::ser_field(&self.extension, 7, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::FileOptions,
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field4MessageType<
+                        '_,
                     >,
                 >,
-            >::ser_field(&self.options, 8, out)?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::message_type(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::SourceCodeInfo,
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field5MessageType<
+                        '_,
                     >,
                 >,
-            >::ser_field(&self.source_code_info, 9, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.syntax,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::enum_type(self),
+                5,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field6MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::service(self),
+                6,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field7MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::extension(self),
+                7,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field8MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::options_opt(self),
+                8,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field9MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::source_code_info_opt(
+                    self,
+                ),
+                9,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::syntax_opt(self),
                 12,
                 out,
             )?;
-
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for FileDescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                package: ::std::default::Default::default(),
+                dependency: ::std::default::Default::default(),
+                public_dependency: ::std::default::Default::default(),
+                weak_dependency: ::std::default::Default::default(),
+                message_type: ::std::default::Default::default(),
+                enum_type: ::std::default::Default::default(),
+                service: ::std::default::Default::default(),
+                extension: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+                source_code_info: ::std::default::Default::default(),
+                syntax: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct DescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub field: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto>,
@@ -856,71 +940,131 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for DescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for DescriptorProto
+    where
+        Self: super::_puroro_traits::DescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field2MessageType<'_>,
                 >,
-            >::ser_field(&self.field, 2, out)?;
-            SerFieldToIoWrite::<
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::field(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldDescriptorProto,
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field6MessageType<'_>,
                 >,
-            >::ser_field(&self.extension, 6, out)?;
-            SerFieldToIoWrite::<
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::extension(self),
+                6,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::DescriptorProto,
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field3MessageType<'_>,
                 >,
-            >::ser_field(&self.nested_type, 3, out)?;
-            SerFieldToIoWrite::<
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::nested_type(self),
+                3,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumDescriptorProto,
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field4MessageType<'_>,
                 >,
-            >::ser_field(&self.enum_type, 4, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ExtensionRange>
-        >::ser_field(&self.extension_range, 5, out)?;
-            SerFieldToIoWrite::<
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::enum_type(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofDescriptorProto,
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field5MessageType<'_>,
                 >,
-            >::ser_field(&self.oneof_decl, 8, out)?;
-            SerFieldToIoWrite::<
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::extension_range(self),
+                5,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field8MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::oneof_decl(self),
+                8,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::MessageOptions,
-                    >,
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field7MessageType<'_>,
                 >,
-            >::ser_field(&self.options, 7, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::descriptor_proto::_puroro_simple_impl::ReservedRange>
-        >::ser_field(&self.reserved_range, 9, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.reserved_name,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::options_opt(self),
+                7,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field9MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_range(self),
+                9,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_name(self),
                 10,
                 out,
             )?;
-
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for DescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                field: ::std::default::Default::default(),
+                extension: ::std::default::Default::default(),
+                nested_type: ::std::default::Default::default(),
+                enum_type: ::std::default::Default::default(),
+                extension_range: ::std::default::Default::default(),
+                oneof_decl: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+                reserved_range: ::std::default::Default::default(),
+                reserved_name: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct ExtensionRangeOptions {
         pub uninterpreted_option: ::std::vec::Vec<
             self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
@@ -1004,25 +1148,33 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeOptions
+    where
+        Self: super::_puroro_traits::ExtensionRangeOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
-                >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::Field999MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::uninterpreted_option(self),
+            999,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for ExtensionRangeOptions {
+        fn default() -> Self {
+            Self {
+                uninterpreted_option: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FieldDescriptorProto {
         pub name: ::std::option::Option<::std::string::String>,
         pub number: ::std::option::Option<i32>,
@@ -1284,71 +1436,128 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProto
+    where
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.number,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::number_opt(self),
                 3,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
-        >::ser_field(&self.label, 4, out)?;
-            SerFieldToIoWrite::<
+        >::ser_field(
+            <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::label_opt(self),
+            4,
+            out
+        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
-        >::ser_field(&self.r#type, 5, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.type_name,
+        >::ser_field(
+            <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_opt(self),
+            5,
+            out
+        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_name_opt(self),
                 6,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.extendee,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::extendee_opt(self),
                 2,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.default_value,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::default_value_opt(self),
                 7,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.oneof_index,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::oneof_index_opt(self),
                 9,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.json_name,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::json_name_opt(self),
                 10,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::FieldOptions,
+                    <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::Field8MessageType<
+                        '_,
                     >,
                 >,
-            >::ser_field(&self.options, 8, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.proto3_optional,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::options_opt(self),
+                8,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::proto3_optional_opt(
+                    self,
+                ),
                 17,
                 out,
             )?;
-
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for FieldDescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                number: ::std::default::Default::default(),
+                label: ::std::default::Default::default(),
+                r#type: ::std::default::Default::default(),
+                type_name: ::std::default::Default::default(),
+                extendee: ::std::default::Default::default(),
+                default_value: ::std::default::Default::default(),
+                oneof_index: ::std::default::Default::default(),
+                json_name: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+                proto3_optional: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct OneofDescriptorProto {
         pub name: ::std::option::Option<::std::string::String>,
         pub options: ::std::option::Option<
@@ -1445,30 +1654,47 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for OneofDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for OneofDescriptorProto
+    where
+        Self: super::_puroro_traits::OneofDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::OneofOptions,
+                    <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::Field2MessageType<
+                        '_,
                     >,
                 >,
-            >::ser_field(&self.options, 2, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::options_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for OneofDescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub value: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto>,
@@ -1631,41 +1857,82 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumDescriptorProto
+    where
+        Self: super::_puroro_traits::EnumDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueDescriptorProto>
-        >::ser_field(&self.value, 2, out)?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumOptions,
+                    <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field2MessageType<
+                        '_,
                     >,
                 >,
-            >::ser_field(&self.options, 3, out)?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::enum_descriptor_proto::_puroro_simple_impl::EnumReservedRange>
-        >::ser_field(&self.reserved_range, 4, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
-                &self.reserved_name,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::value(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field3MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::options_opt(self),
+                3,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field4MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_range(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_name(self),
                 5,
                 out,
             )?;
-
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for EnumDescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                value: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+                reserved_range: ::std::default::Default::default(),
+                reserved_name: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumValueDescriptorProto {
         pub name: ::std::option::Option<::std::string::String>,
         pub number: ::std::option::Option<i32>,
@@ -1779,35 +2046,51 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueDescriptorProto
+    where
+        Self: super::_puroro_traits::EnumValueDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.number,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::number_opt(self),
                 2,
                 out,
             )?;
-            SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::EnumValueOptions,
-                    >,
-                >,
-            >::ser_field(&self.options, 3, out)?;
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::Field3MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::options_opt(self),
+            3,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for EnumValueDescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                number: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct ServiceDescriptorProto {
         pub name: ::std::option::Option<::std::string::String>,
         pub method: ::std::vec::Vec<
@@ -1935,33 +2218,60 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceDescriptorProto
+    where
+        Self: super::_puroro_traits::ServiceDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
-            )?;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodDescriptorProto>
-        >::ser_field(&self.method, 2, out)?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::ServiceOptions,
+                    <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::Field2MessageType<
+                        '_,
                     >,
                 >,
-            >::ser_field(&self.options, 3, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::method(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::Field3MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::options_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for ServiceDescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                method: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MethodDescriptorProto {
         pub name: ::std::option::Option<::std::string::String>,
         pub input_type: ::std::option::Option<::std::string::String>,
@@ -2126,50 +2436,87 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProto {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProto
+    where
+        Self: super::_puroro_traits::MethodDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.name, 1, out,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.input_type,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::input_type_opt(self),
                 2,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.output_type,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::output_type_opt(self),
                 3,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    ::std::boxed::Box<
-                        self::_puroro_root::google::protobuf::_puroro_simple_impl::MethodOptions,
+                    <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::Field4MessageType<
+                        '_,
                     >,
                 >,
-            >::ser_field(&self.options, 4, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.client_streaming,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::options_opt(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::client_streaming_opt(
+                    self,
+                ),
                 5,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.server_streaming,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::server_streaming_opt(
+                    self,
+                ),
                 6,
                 out,
             )?;
-
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for MethodDescriptorProto {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                input_type: ::std::default::Default::default(),
+                output_type: ::std::default::Default::default(),
+                options: ::std::default::Default::default(),
+                client_streaming: ::std::option::Option::Some(false),
+                server_streaming: ::std::option::Option::Some(false),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FileOptions {
         pub java_package: ::std::option::Option<::std::string::String>,
         pub java_outer_classname: ::std::option::Option<::std::string::String>,
@@ -2621,123 +2968,214 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptions
+    where
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.java_package,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_package_opt(self),
                 1,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.java_outer_classname,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_outer_classname_opt(self),
                 8,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_multiple_files,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_multiple_files_opt(self),
                 10,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_generate_equals_and_hash,
-                20,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_string_check_utf8,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Bool
+        >::ser_field(
+            <Self as super::_puroro_traits::FileOptionsTrait>::java_generate_equals_and_hash_opt(self),
+            20,
+            out
+        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_string_check_utf8_opt(self),
                 27,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
-        >::ser_field(&self.optimize_for, 9, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.go_package,
+        >::ser_field(
+            <Self as super::_puroro_traits::FileOptionsTrait>::optimize_for_opt(self),
+            9,
+            out
+        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::go_package_opt(self),
                 11,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.cc_generic_services,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::cc_generic_services_opt(self),
                 16,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.java_generic_services,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_generic_services_opt(self),
                 17,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.py_generic_services,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::py_generic_services_opt(self),
                 18,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.php_generic_services,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_generic_services_opt(self),
                 42,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::deprecated_opt(self),
                 23,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.cc_enable_arenas,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::cc_enable_arenas_opt(self),
                 31,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.objc_class_prefix,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::objc_class_prefix_opt(self),
                 36,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.csharp_namespace,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::csharp_namespace_opt(self),
                 37,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.swift_prefix,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::swift_prefix_opt(self),
                 39,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.php_class_prefix,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_class_prefix_opt(self),
                 40,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.php_namespace,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_namespace_opt(self),
                 41,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.php_metadata_namespace,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_metadata_namespace_opt(self),
                 44,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.ruby_package,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::ruby_package_opt(self),
                 45,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::FileOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for FileOptions {
+        fn default() -> Self {
+            Self {
+            java_package: ::std::default::Default::default(),
+            java_outer_classname: ::std::default::Default::default(),
+            java_multiple_files: ::std::option::Option::Some(false),
+            java_generate_equals_and_hash: ::std::default::Default::default(),
+            java_string_check_utf8: ::std::option::Option::Some(false),
+            optimize_for: ::std::option::Option::Some(self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode::Speed),
+            go_package: ::std::default::Default::default(),
+            cc_generic_services: ::std::option::Option::Some(false),
+            java_generic_services: ::std::option::Option::Some(false),
+            py_generic_services: ::std::option::Option::Some(false),
+            php_generic_services: ::std::option::Option::Some(false),
+            deprecated: ::std::option::Option::Some(false),
+            cc_enable_arenas: ::std::option::Option::Some(true),
+            objc_class_prefix: ::std::default::Default::default(),
+            csharp_namespace: ::std::default::Default::default(),
+            swift_prefix: ::std::default::Default::default(),
+            php_class_prefix: ::std::default::Default::default(),
+            php_namespace: ::std::default::Default::default(),
+            php_metadata_namespace: ::std::default::Default::default(),
+            ruby_package: ::std::default::Default::default(),
+            uninterpreted_option: ::std::default::Default::default(),
+        }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MessageOptions {
         pub message_set_wire_format: ::std::option::Option<bool>,
         pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
@@ -2891,45 +3329,73 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptions
+    where
+        Self: super::_puroro_traits::MessageOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.message_set_wire_format,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::message_set_wire_format_opt(
+                    self,
+                ),
                 1,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.no_standard_descriptor_accessor,
-                2,
-                out,
-            )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Bool
+        >::ser_field(
+            <Self as super::_puroro_traits::MessageOptionsTrait>::no_standard_descriptor_accessor_opt(self),
+            2,
+            out
+        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.map_entry,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::map_entry_opt(self),
                 7,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::MessageOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for MessageOptions {
+        fn default() -> Self {
+            Self {
+                message_set_wire_format: ::std::option::Option::Some(false),
+                no_standard_descriptor_accessor: ::std::option::Option::Some(false),
+                deprecated: ::std::option::Option::Some(false),
+                map_entry: ::std::default::Default::default(),
+                uninterpreted_option: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct FieldOptions {
         pub ctype: ::std::option::Option<
             self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
@@ -3127,53 +3593,94 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptions
+    where
+        Self: super::_puroro_traits::FieldOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<
                     self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
                 >,
-            >::ser_field(&self.ctype, 1, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.packed,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::ctype_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::packed_opt(self),
                 2,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<
                     self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
                 >,
-            >::ser_field(&self.jstype, 6, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.lazy, 5, out,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::jstype_opt(self),
+                6,
+                out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::lazy_opt(self),
+                5,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.weak, 10, out,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::weak_opt(self),
+                10,
+                out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::FieldOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for FieldOptions {
+        fn default() -> Self {
+            Self {
+            ctype: ::std::option::Option::Some(self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype::String),
+            packed: ::std::default::Default::default(),
+            jstype: ::std::option::Option::Some(self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype::JsNormal),
+            lazy: ::std::option::Option::Some(false),
+            deprecated: ::std::option::Option::Some(false),
+            weak: ::std::option::Option::Some(false),
+            uninterpreted_option: ::std::default::Default::default(),
+        }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct OneofOptions {
         pub uninterpreted_option: ::std::vec::Vec<
             self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
@@ -3257,25 +3764,36 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for OneofOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for OneofOptions
+    where
+        Self: super::_puroro_traits::OneofOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::OneofOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::OneofOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for OneofOptions {
+        fn default() -> Self {
+            Self {
+                uninterpreted_option: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumOptions {
         pub allow_alias: ::std::option::Option<bool>,
         pub deprecated: ::std::option::Option<bool>,
@@ -3398,35 +3916,54 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumOptions
+    where
+        Self: super::_puroro_traits::EnumOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.allow_alias,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumOptionsTrait>::allow_alias_opt(self),
                 2,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::EnumOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for EnumOptions {
+        fn default() -> Self {
+            Self {
+                allow_alias: ::std::default::Default::default(),
+                deprecated: ::std::option::Option::Some(false),
+                uninterpreted_option: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct EnumValueOptions {
         pub deprecated: ::std::option::Option<bool>,
         pub uninterpreted_option: ::std::vec::Vec<
@@ -3529,30 +4066,45 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueOptions
+    where
+        Self: super::_puroro_traits::EnumValueOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueOptionsTrait>::deprecated_opt(self),
                 1,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::EnumValueOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for EnumValueOptions {
+        fn default() -> Self {
+            Self {
+                deprecated: ::std::option::Option::Some(false),
+                uninterpreted_option: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct ServiceOptions {
         pub deprecated: ::std::option::Option<bool>,
         pub uninterpreted_option: ::std::vec::Vec<
@@ -3655,30 +4207,45 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceOptions
+    where
+        Self: super::_puroro_traits::ServiceOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::ServiceOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for ServiceOptions {
+        fn default() -> Self {
+            Self {
+                deprecated: ::std::option::Option::Some(false),
+                uninterpreted_option: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MethodOptions {
         pub deprecated: ::std::option::Option<bool>,
         pub idempotency_level: ::std::option::Option<
@@ -3804,33 +4371,53 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MethodOptions {
+    impl ::puroro::internal::SerializableMessageToIoWrite for MethodOptions
+    where
+        Self: super::_puroro_traits::MethodOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field(
-                &self.deprecated,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
             )?;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
-        >::ser_field(&self.idempotency_level, 34, out)?;
-            SerFieldToIoWrite::<
+        >::ser_field(
+            <Self as super::_puroro_traits::MethodOptionsTrait>::idempotency_level_opt(self),
+            34,
+            out
+        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    self::_puroro_root::google::protobuf::_puroro_simple_impl::UninterpretedOption,
+                    <Self as super::_puroro_traits::MethodOptionsTrait>::Field999MessageType<'_>,
                 >,
-            >::ser_field(&self.uninterpreted_option, 999, out)?;
-
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for MethodOptions {
+        fn default() -> Self {
+            Self {
+            deprecated: ::std::option::Option::Some(false),
+            idempotency_level: ::std::option::Option::Some(self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel::IdempotencyUnknown),
+            uninterpreted_option: ::std::default::Default::default(),
+        }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct UninterpretedOption {
     pub name: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>,
     pub identifier_value: ::std::option::Option<::std::string::String>,
@@ -4009,52 +4596,100 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOption {
+    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOption
+    where
+        Self: super::_puroro_traits::UninterpretedOptionTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_option::_puroro_simple_impl::NamePart>
-        >::ser_field(&self.name, 2, out)?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.identifier_value,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::UninterpretedOptionTrait>::Field2MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::name(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::identifier_value_opt(
+                    self,
+                ),
                 3,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
-                &self.positive_int_value,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::UInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::positive_int_value_opt(
+                    self,
+                ),
                 4,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
-                &self.negative_int_value,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int64,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::negative_int_value_opt(
+                    self,
+                ),
                 5,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field(
-                &self.double_value,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Double,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::double_value_opt(self),
                 6,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
-                &self.string_value,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bytes,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::string_value_opt(self),
                 7,
                 out,
             )?;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
-                &self.aggregate_value,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::aggregate_value_opt(
+                    self,
+                ),
                 8,
                 out,
             )?;
-
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for UninterpretedOption {
+        fn default() -> Self {
+            Self {
+                name: ::std::default::Default::default(),
+                identifier_value: ::std::default::Default::default(),
+                positive_int_value: ::std::default::Default::default(),
+                negative_int_value: ::std::default::Default::default(),
+                double_value: ::std::default::Default::default(),
+                string_value: ::std::default::Default::default(),
+                aggregate_value: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct SourceCodeInfo {
     pub location: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>,
 }
@@ -4130,22 +4765,36 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for SourceCodeInfo {
+    impl ::puroro::internal::SerializableMessageToIoWrite for SourceCodeInfo
+    where
+        Self: super::_puroro_traits::SourceCodeInfoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::source_code_info::_puroro_simple_impl::Location>
-        >::ser_field(&self.location, 1, out)?;
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::SourceCodeInfoTrait>::Field1MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::SourceCodeInfoTrait>::location(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
+
+    impl ::std::default::Default for SourceCodeInfo {
+        fn default() -> Self {
+            Self {
+                location: ::std::default::Default::default(),
+            }
+        }
+    }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct GeneratedCodeInfo {
     pub annotation: ::std::vec::Vec<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>,
 }
@@ -4220,17 +4869,33 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for GeneratedCodeInfo {
+    impl ::puroro::internal::SerializableMessageToIoWrite for GeneratedCodeInfo
+    where
+        Self: super::_puroro_traits::GeneratedCodeInfoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::google::protobuf::_puroro_nested::generated_code_info::_puroro_simple_impl::Annotation>
-        >::ser_field(&self.annotation, 1, out)?;
-
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::GeneratedCodeInfoTrait>::Field1MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::GeneratedCodeInfoTrait>::annotation(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::default::Default for GeneratedCodeInfo {
+        fn default() -> Self {
+            Self {
+                annotation: ::std::default::Default::default(),
+            }
         }
     }
 }
@@ -4389,22 +5054,24 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileDescriptorSetTrait,
+        for<'a> <Self as super::_puroro_traits::FileDescriptorSetTrait>::Field1MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.file,
-            1,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorSetTrait>::Field1MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorSetTrait>::file(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -5176,17 +5843,20 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -5318,17 +5988,20 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.package), 2, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::package_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -5467,17 +6140,20 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(&self.dependency, 3, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::dependency(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -5498,24 +6174,36 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileDescriptorProtoSingleField10<RepeatedType>
+    pub struct FileDescriptorProtoSingleField10<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub public_dependency: RepeatedType,
     }
 
-    impl<RepeatedType> ::puroro::Message<super::FileDescriptorProto>
-        for FileDescriptorProtoSingleField10<RepeatedType>
+    impl<ScalarType, RepeatedType> ::puroro::Message<super::FileDescriptorProto>
+        for FileDescriptorProtoSingleField10<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
-    impl<RepeatedType> super::_puroro_traits::FileDescriptorProtoTrait
-        for FileDescriptorProtoSingleField10<RepeatedType>
+    impl<ScalarType, RepeatedType> super::_puroro_traits::FileDescriptorProtoTrait
+        for FileDescriptorProtoSingleField10<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field3RepeatedType<'this>
         where
@@ -5527,12 +6215,15 @@ pub mod _puroro_impls {
         type Field10RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
+        = ::puroro::internal::impls::single_field::CloneThenIntoIter<
+            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+            i32,
+        >;
 
         fn public_dependency<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(
-                &self.public_dependency,
-            ))
+            ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
+                ::std::iter::IntoIterator::into_iter(&self.public_dependency),
+            )
         }
         type Field11RepeatedType<'this>
         where
@@ -5595,29 +6286,40 @@ pub mod _puroro_impls {
         = ();
     }
 
-    impl<RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
-        for FileDescriptorProtoSingleField10<RepeatedType>
+    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileDescriptorProtoSingleField10<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field::<
-                (),
-                _,
-                _,
-            >(&self.public_dependency, 10, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::public_dependency(self),
+                10,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<RepeatedType> ::std::convert::From<RepeatedType>
-        for FileDescriptorProtoSingleField10<RepeatedType>
+    impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
+        for FileDescriptorProtoSingleField10<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -5628,24 +6330,36 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileDescriptorProtoSingleField11<RepeatedType>
+    pub struct FileDescriptorProtoSingleField11<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub weak_dependency: RepeatedType,
     }
 
-    impl<RepeatedType> ::puroro::Message<super::FileDescriptorProto>
-        for FileDescriptorProtoSingleField11<RepeatedType>
+    impl<ScalarType, RepeatedType> ::puroro::Message<super::FileDescriptorProto>
+        for FileDescriptorProtoSingleField11<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
-    impl<RepeatedType> super::_puroro_traits::FileDescriptorProtoTrait
-        for FileDescriptorProtoSingleField11<RepeatedType>
+    impl<ScalarType, RepeatedType> super::_puroro_traits::FileDescriptorProtoTrait
+        for FileDescriptorProtoSingleField11<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field3RepeatedType<'this>
         where
@@ -5664,12 +6378,15 @@ pub mod _puroro_impls {
         type Field11RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
+        = ::puroro::internal::impls::single_field::CloneThenIntoIter<
+            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+            i32,
+        >;
 
         fn weak_dependency<'this>(&'this self) -> Self::Field11RepeatedType<'this> {
-            ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(
-                &self.weak_dependency,
-            ))
+            ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
+                ::std::iter::IntoIterator::into_iter(&self.weak_dependency),
+            )
         }
         type Field4MessageType<'this>
         where
@@ -5725,29 +6442,40 @@ pub mod _puroro_impls {
         = ();
     }
 
-    impl<RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
-        for FileDescriptorProtoSingleField11<RepeatedType>
+    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileDescriptorProtoSingleField11<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field::<
-                (),
-                _,
-                _,
-            >(&self.weak_dependency, 11, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::weak_dependency(self),
+                11,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl<RepeatedType> ::std::convert::From<RepeatedType>
-        for FileDescriptorProtoSingleField11<RepeatedType>
+    impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
+        for FileDescriptorProtoSingleField11<ScalarType, RepeatedType>
     where
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -5873,22 +6601,26 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field4MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.message_type,
-            4,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field4MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::message_type(self),
+                4,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6026,22 +6758,26 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field5MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.enum_type,
-            5,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field5MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::enum_type(self),
+                5,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6181,22 +6917,26 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field6MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.service,
-            6,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field6MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::service(self),
+                6,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6333,22 +7073,26 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field7MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.extension,
-            7,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field7MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::extension(self),
+                7,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6485,22 +7229,26 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field8MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
-            8,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field8MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::options_opt(self),
+                8,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6635,22 +7383,28 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field9MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.source_code_info),
-            9,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileDescriptorProtoTrait>::Field9MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::source_code_info_opt(
+                    self,
+                ),
+                9,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6785,17 +7539,20 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.syntax), 12, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileDescriptorProtoTrait>::syntax_opt(self),
+                12,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -6863,12 +7620,19 @@ pub mod _puroro_impls {
             ))
         }
 
-        pub fn append_public_dependency<RepeatedType>(
+        pub fn append_public_dependency<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSingleField10<RepeatedType>)>
+        ) -> FileDescriptorProtoBuilder<(
+            T,
+            FileDescriptorProtoSingleField10<ScalarType, RepeatedType>,
+        )>
         where
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             FileDescriptorProtoBuilder((
                 self.0,
@@ -6878,12 +7642,19 @@ pub mod _puroro_impls {
             ))
         }
 
-        pub fn append_weak_dependency<RepeatedType>(
+        pub fn append_weak_dependency<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> FileDescriptorProtoBuilder<(T, FileDescriptorProtoSingleField11<RepeatedType>)>
+        ) -> FileDescriptorProtoBuilder<(
+            T,
+            FileDescriptorProtoSingleField11<ScalarType, RepeatedType>,
+        )>
         where
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             FileDescriptorProtoBuilder((
                 self.0,
@@ -7793,17 +8564,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -7952,22 +8726,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field2MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.field,
-            2,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field2MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::field(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -8118,22 +8894,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field6MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.extension,
-            6,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field6MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::extension(self),
+                6,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -8284,22 +9062,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field3MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.nested_type,
-            3,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field3MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::nested_type(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -8450,22 +9230,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field4MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.enum_type,
-            4,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field4MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::enum_type(self),
+                4,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -8564,19 +9346,18 @@ ScalarType: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_pro
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    Self: super::_puroro_traits::DescriptorProtoTrait,
+    for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field5MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-        SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.extension_range,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::DescriptorProtoTrait>::Field5MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::DescriptorProtoTrait>::extension_range(self),
             5,
             out
         )?;
@@ -8731,22 +9512,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field8MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.oneof_decl,
-            8,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field8MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::oneof_decl(self),
+                8,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -8898,22 +9681,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field7MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
-            7,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::DescriptorProtoTrait>::Field7MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::options_opt(self),
+                7,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -9010,19 +9795,18 @@ ScalarType: self::_puroro_root::google::protobuf::_puroro_nested::descriptor_pro
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    Self: super::_puroro_traits::DescriptorProtoTrait,
+    for<'a> <Self as super::_puroro_traits::DescriptorProtoTrait>::Field9MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-        SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.reserved_range,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::DescriptorProtoTrait>::Field9MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_range(self),
             9,
             out
         )?;
@@ -9182,17 +9966,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::DescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(&self.reserved_name, 10, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_name(self),
+                10,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -9527,19 +10314,18 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::ExtensionRangeOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::Field999MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::uninterpreted_option(self),
             999,
             out
         )?;
@@ -9873,17 +10659,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -9902,15 +10691,38 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldDescriptorProtoSingleField3 {
-        pub number: i32,
+    pub struct FieldDescriptorProtoSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub number: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSingleField3 {}
+    impl<ScalarType> ::puroro::Message<super::FieldDescriptorProto>
+        for FieldDescriptorProtoSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSingleField3 {
+    impl<ScalarType> super::_puroro_traits::FieldDescriptorProtoTrait
+        for FieldDescriptorProtoSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.number))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.number,
+            )))
         }
         type Field8MessageType<'this>
         where
@@ -9918,43 +10730,84 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         = ();
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField3 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldDescriptorProtoSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.number), 3, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::number_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<i32> for FieldDescriptorProtoSingleField3 {
-        fn from(value: i32) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldDescriptorProtoSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { number: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldDescriptorProtoSingleField4 {
-        pub label:
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+    pub struct FieldDescriptorProtoSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub label: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSingleField4 {}
+    impl<ScalarType> ::puroro::Message<super::FieldDescriptorProto>
+        for FieldDescriptorProtoSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSingleField4 {
+    impl<ScalarType> super::_puroro_traits::FieldDescriptorProtoTrait
+        for FieldDescriptorProtoSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn label_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
             self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
         > {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.label))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.label,
+            )))
         }
         type Field8MessageType<'this>
         where
@@ -9962,18 +10815,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         = ();
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField4 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldDescriptorProtoSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
-        >::ser_field::
-        <(), _, _>
-        (
-            ::std::iter::once(&self.label),
+        >::ser_field(
+            <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::label_opt(self),
             4,
             out
         )?;
@@ -9981,34 +10840,60 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl
-        ::std::convert::From<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
-        > for FieldDescriptorProtoSingleField4
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldDescriptorProtoSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
-        ) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { label: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldDescriptorProtoSingleField5 {
-        pub r#type:
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+    pub struct FieldDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub r#type: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSingleField5 {}
+    impl<ScalarType> ::puroro::Message<super::FieldDescriptorProto>
+        for FieldDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSingleField5 {
+    impl<ScalarType> super::_puroro_traits::FieldDescriptorProtoTrait
+        for FieldDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn type_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
             self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
         > {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.r#type))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.r#type,
+            )))
         }
         type Field8MessageType<'this>
         where
@@ -10016,18 +10901,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         = ();
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField5 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
-        >::ser_field::
-        <(), _, _>
-        (
-            ::std::iter::once(&self.r#type),
+        >::ser_field(
+            <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_opt(self),
             5,
             out
         )?;
@@ -10035,14 +10926,15 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl
-        ::std::convert::From<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
-        > for FieldDescriptorProtoSingleField5
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
-        ) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { r#type: value }
         }
     }
@@ -10093,17 +10985,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.type_name), 6, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_name_opt(self),
+                6,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -10166,17 +11061,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.extendee), 2, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::extendee_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -10239,17 +11137,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.default_value), 7, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::default_value_opt(self),
+                7,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -10270,15 +11171,38 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldDescriptorProtoSingleField9 {
-        pub oneof_index: i32,
+    pub struct FieldDescriptorProtoSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub oneof_index: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSingleField9 {}
+    impl<ScalarType> ::puroro::Message<super::FieldDescriptorProto>
+        for FieldDescriptorProtoSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSingleField9 {
+    impl<ScalarType> super::_puroro_traits::FieldDescriptorProtoTrait
+        for FieldDescriptorProtoSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn oneof_index_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.oneof_index))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.oneof_index,
+            )))
         }
         type Field8MessageType<'this>
         where
@@ -10286,23 +11210,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         = ();
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField9 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldDescriptorProtoSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.oneof_index), 9, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::oneof_index_opt(self),
+                9,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<i32> for FieldDescriptorProtoSingleField9 {
-        fn from(value: i32) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldDescriptorProtoSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { oneof_index: value }
         }
     }
@@ -10353,17 +11293,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.json_name), 10, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::json_name_opt(self),
+                10,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -10429,22 +11372,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::Field8MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
-            8,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::Field8MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::options_opt(self),
+                8,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -10463,40 +11410,81 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldDescriptorProtoSingleField17 {
-        pub proto3_optional: bool,
+    pub struct FieldDescriptorProtoSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub proto3_optional: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldDescriptorProto> for FieldDescriptorProtoSingleField17 {}
+    impl<ScalarType> ::puroro::Message<super::FieldDescriptorProto>
+        for FieldDescriptorProtoSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::FieldDescriptorProtoTrait for FieldDescriptorProtoSingleField17 {
+    impl<ScalarType> super::_puroro_traits::FieldDescriptorProtoTrait
+        for FieldDescriptorProtoSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field8MessageType<'this>
         where
             Self: 'this,
         = ();
 
         fn proto3_optional_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.proto3_optional))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.proto3_optional,
+            )))
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldDescriptorProtoSingleField17 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldDescriptorProtoSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.proto3_optional), 17, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::proto3_optional_opt(
+                    self,
+                ),
+                17,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FieldDescriptorProtoSingleField17 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldDescriptorProtoSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 proto3_optional: value,
             }
@@ -10521,27 +11509,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             FieldDescriptorProtoBuilder((self.0, FieldDescriptorProtoSingleField1 { name: value }))
         }
 
-        pub fn append_number(
+        pub fn append_number<ScalarType>(
             self,
-            value: i32,
-        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField3)> {
+            value: ScalarType,
+        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField3<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldDescriptorProtoBuilder((
                 self.0,
                 FieldDescriptorProtoSingleField3 { number: value },
             ))
         }
 
-        pub fn append_label(
-            self,
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label,
-        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField4)> {
+    pub fn append_label<ScalarType>(self, value: ScalarType)
+        -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField4<ScalarType>)>
+where
+
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    {
             FieldDescriptorProtoBuilder((self.0, FieldDescriptorProtoSingleField4 { label: value }))
         }
 
-        pub fn append_type(
-            self,
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type,
-        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField5)> {
+    pub fn append_type<ScalarType>(self, value: ScalarType)
+        -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField5<ScalarType>)>
+where
+
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    {
             FieldDescriptorProtoBuilder((
                 self.0,
                 FieldDescriptorProtoSingleField5 { r#type: value },
@@ -10598,10 +11598,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_oneof_index(
+        pub fn append_oneof_index<ScalarType>(
             self,
-            value: i32,
-        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField9)> {
+            value: ScalarType,
+        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField9<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldDescriptorProtoBuilder((
                 self.0,
                 FieldDescriptorProtoSingleField9 { oneof_index: value },
@@ -10640,10 +11646,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_proto3_optional(
+        pub fn append_proto3_optional<ScalarType>(
             self,
-            value: bool,
-        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField17)> {
+            value: ScalarType,
+        ) -> FieldDescriptorProtoBuilder<(T, FieldDescriptorProtoSingleField17<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldDescriptorProtoBuilder((
                 self.0,
                 FieldDescriptorProtoSingleField17 {
@@ -10793,17 +11805,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::OneofDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -10869,22 +11884,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::OneofDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::Field2MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
-            2,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::Field2MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::options_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -11302,17 +12321,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::EnumDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -11410,22 +12432,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::EnumDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field2MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.value,
-            2,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field2MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::value(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -11523,22 +12549,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::EnumDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field3MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
-            3,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field3MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::options_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -11610,19 +12640,18 @@ ScalarType: self::_puroro_root::google::protobuf::_puroro_nested::enum_descripto
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    Self: super::_puroro_traits::EnumDescriptorProtoTrait,
+    for<'a> <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field4MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-        SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.reserved_range,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumDescriptorProtoTrait>::Field4MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_range(self),
             4,
             out
         )?;
@@ -11727,17 +12756,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::EnumDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(&self.reserved_name, 5, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_name(self),
+                5,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -11992,17 +13024,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::EnumValueDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -12022,15 +13057,38 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct EnumValueDescriptorProtoSingleField2 {
-        pub number: i32,
+    pub struct EnumValueDescriptorProtoSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub number: ScalarType,
     }
 
-    impl ::puroro::Message<super::EnumValueDescriptorProto> for EnumValueDescriptorProtoSingleField2 {}
+    impl<ScalarType> ::puroro::Message<super::EnumValueDescriptorProto>
+        for EnumValueDescriptorProtoSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoSingleField2 {
+    impl<ScalarType> super::_puroro_traits::EnumValueDescriptorProtoTrait
+        for EnumValueDescriptorProtoSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.number))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.number,
+            )))
         }
         type Field3MessageType<'this>
         where
@@ -12038,23 +13096,40 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         = ();
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueDescriptorProtoSingleField2 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for EnumValueDescriptorProtoSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::EnumValueDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.number), 2, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::number_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<i32> for EnumValueDescriptorProtoSingleField2 {
-        fn from(value: i32) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType>
+        for EnumValueDescriptorProtoSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { number: value }
         }
     }
@@ -12108,19 +13183,18 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::EnumValueDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::Field3MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::Field3MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::options_opt(self),
             3,
             out
         )?;
@@ -12162,10 +13236,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_number(
+        pub fn append_number<ScalarType>(
             self,
-            value: i32,
-        ) -> EnumValueDescriptorProtoBuilder<(T, EnumValueDescriptorProtoSingleField2)> {
+            value: ScalarType,
+        ) -> EnumValueDescriptorProtoBuilder<(T, EnumValueDescriptorProtoSingleField2<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             EnumValueDescriptorProtoBuilder((
                 self.0,
                 EnumValueDescriptorProtoSingleField2 { number: value },
@@ -12413,17 +13493,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::ServiceDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -12503,22 +13586,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::ServiceDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::Field2MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.method,
-            2,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::Field2MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::method(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -12598,22 +13685,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::ServiceDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::Field3MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
-            3,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::Field3MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::options_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -12881,17 +13972,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MethodDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.name), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::name_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -12954,17 +14048,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MethodDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.input_type), 2, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::input_type_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -13027,17 +14124,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MethodDescriptorProtoTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.output_type), 3, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::output_type_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -13103,22 +14203,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::MethodDescriptorProtoTrait,
+        for<'a> <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::Field4MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            ::std::iter::once(&self.options),
-            4,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::Field4MessageType<
+                        '_,
+                    >,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::options_opt(self),
+                4,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -13137,40 +14241,81 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MethodDescriptorProtoSingleField5 {
-        pub client_streaming: bool,
+    pub struct MethodDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub client_streaming: ScalarType,
     }
 
-    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSingleField5 {}
+    impl<ScalarType> ::puroro::Message<super::MethodDescriptorProto>
+        for MethodDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSingleField5 {
+    impl<ScalarType> super::_puroro_traits::MethodDescriptorProtoTrait
+        for MethodDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field4MessageType<'this>
         where
             Self: 'this,
         = ();
 
         fn client_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.client_streaming))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.client_streaming,
+            )))
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField5 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for MethodDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MethodDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.client_streaming), 5, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::client_streaming_opt(
+                    self,
+                ),
+                5,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for MethodDescriptorProtoSingleField5 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MethodDescriptorProtoSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 client_streaming: value,
             }
@@ -13179,40 +14324,81 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MethodDescriptorProtoSingleField6 {
-        pub server_streaming: bool,
+    pub struct MethodDescriptorProtoSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub server_streaming: ScalarType,
     }
 
-    impl ::puroro::Message<super::MethodDescriptorProto> for MethodDescriptorProtoSingleField6 {}
+    impl<ScalarType> ::puroro::Message<super::MethodDescriptorProto>
+        for MethodDescriptorProtoSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::MethodDescriptorProtoTrait for MethodDescriptorProtoSingleField6 {
+    impl<ScalarType> super::_puroro_traits::MethodDescriptorProtoTrait
+        for MethodDescriptorProtoSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field4MessageType<'this>
         where
             Self: 'this,
         = ();
 
         fn server_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.server_streaming))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.server_streaming,
+            )))
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MethodDescriptorProtoSingleField6 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for MethodDescriptorProtoSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MethodDescriptorProtoTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.server_streaming), 6, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::server_streaming_opt(
+                    self,
+                ),
+                6,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for MethodDescriptorProtoSingleField6 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MethodDescriptorProtoSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 server_streaming: value,
             }
@@ -13288,10 +14474,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_client_streaming(
+        pub fn append_client_streaming<ScalarType>(
             self,
-            value: bool,
-        ) -> MethodDescriptorProtoBuilder<(T, MethodDescriptorProtoSingleField5)> {
+            value: ScalarType,
+        ) -> MethodDescriptorProtoBuilder<(T, MethodDescriptorProtoSingleField5<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MethodDescriptorProtoBuilder((
                 self.0,
                 MethodDescriptorProtoSingleField5 {
@@ -13300,10 +14492,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_server_streaming(
+        pub fn append_server_streaming<ScalarType>(
             self,
-            value: bool,
-        ) -> MethodDescriptorProtoBuilder<(T, MethodDescriptorProtoSingleField6)> {
+            value: ScalarType,
+        ) -> MethodDescriptorProtoBuilder<(T, MethodDescriptorProtoSingleField6<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MethodDescriptorProtoBuilder((
                 self.0,
                 MethodDescriptorProtoSingleField6 {
@@ -13740,17 +14938,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.java_package), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_package_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -13819,17 +15020,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.java_outer_classname), 8, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_outer_classname_opt(self),
+                8,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -13850,15 +15054,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField10 {
-        pub java_multiple_files: bool,
+    pub struct FileOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub java_multiple_files: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField10 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField10<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField10 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn java_multiple_files_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.java_multiple_files))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.java_multiple_files,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -13873,23 +15097,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField10 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.java_multiple_files), 10, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_multiple_files_opt(self),
+                10,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField10 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 java_multiple_files: value,
             }
@@ -13898,17 +15138,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField20 {
-        pub java_generate_equals_and_hash: bool,
+    pub struct FileOptionsSingleField20<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub java_generate_equals_and_hash: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField20 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField20<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField20 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField20<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn java_generate_equals_and_hash_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
                 &self.java_generate_equals_and_hash,
-            ))
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -13923,27 +15181,38 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField20 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField20<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(
-                ::std::iter::once(&self.java_generate_equals_and_hash),
-                20,
-                out,
-            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Bool
+        >::ser_field(
+            <Self as super::_puroro_traits::FileOptionsTrait>::java_generate_equals_and_hash_opt(self),
+            20,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField20 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField20<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 java_generate_equals_and_hash: value,
             }
@@ -13952,15 +15221,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField27 {
-        pub java_string_check_utf8: bool,
+    pub struct FileOptionsSingleField27<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub java_string_check_utf8: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField27 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField27<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField27 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField27<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn java_string_check_utf8_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.java_string_check_utf8))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.java_string_check_utf8,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -13975,23 +15264,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField27 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField27<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.java_string_check_utf8), 27, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_string_check_utf8_opt(self),
+                27,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField27 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField27<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 java_string_check_utf8: value,
             }
@@ -14000,20 +15305,42 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField9 {
-        pub optimize_for:
-            self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
+    pub struct FileOptionsSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub optimize_for: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField9 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField9<ScalarType> where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField9 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn optimize_for_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
             self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
         > {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.optimize_for))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.optimize_for,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -14028,18 +15355,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField9 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
-        >::ser_field::
-        <(), _, _>
-        (
-            ::std::iter::once(&self.optimize_for),
+        >::ser_field(
+            <Self as super::_puroro_traits::FileOptionsTrait>::optimize_for_opt(self),
             9,
             out
         )?;
@@ -14047,14 +15380,15 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl
-        ::std::convert::From<
-            self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
-        > for FileOptionsSingleField9
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField9<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
-        ) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self {
                 optimize_for: value,
             }
@@ -14111,17 +15445,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.go_package), 11, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::go_package_opt(self),
+                11,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -14140,15 +15477,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField16 {
-        pub cc_generic_services: bool,
+    pub struct FileOptionsSingleField16<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub cc_generic_services: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField16 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField16<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField16 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField16<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn cc_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.cc_generic_services))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.cc_generic_services,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -14163,23 +15520,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField16 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField16<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.cc_generic_services), 16, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::cc_generic_services_opt(self),
+                16,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField16 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField16<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 cc_generic_services: value,
             }
@@ -14188,15 +15561,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField17 {
-        pub java_generic_services: bool,
+    pub struct FileOptionsSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub java_generic_services: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField17 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField17<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField17 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn java_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.java_generic_services))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.java_generic_services,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -14211,23 +15604,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField17 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.java_generic_services), 17, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::java_generic_services_opt(self),
+                17,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField17 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField17<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 java_generic_services: value,
             }
@@ -14236,15 +15645,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField18 {
-        pub py_generic_services: bool,
+    pub struct FileOptionsSingleField18<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub py_generic_services: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField18 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField18<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField18 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField18<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn py_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.py_generic_services))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.py_generic_services,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -14259,23 +15688,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField18 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField18<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.py_generic_services), 18, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::py_generic_services_opt(self),
+                18,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField18 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField18<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 py_generic_services: value,
             }
@@ -14284,15 +15729,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField42 {
-        pub php_generic_services: bool,
+    pub struct FileOptionsSingleField42<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub php_generic_services: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField42 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField42<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField42 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField42<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn php_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.php_generic_services))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.php_generic_services,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -14307,23 +15772,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField42 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField42<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.php_generic_services), 42, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_generic_services_opt(self),
+                42,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField42 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField42<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 php_generic_services: value,
             }
@@ -14332,15 +15813,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField23 {
-        pub deprecated: bool,
+    pub struct FileOptionsSingleField23<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub deprecated: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField23 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField23<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField23 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField23<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.deprecated))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.deprecated,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -14355,38 +15856,74 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField23 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField23<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.deprecated), 23, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::deprecated_opt(self),
+                23,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField23 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField23<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { deprecated: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FileOptionsSingleField31 {
-        pub cc_enable_arenas: bool,
+    pub struct FileOptionsSingleField31<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub cc_enable_arenas: ScalarType,
     }
 
-    impl ::puroro::Message<super::FileOptions> for FileOptionsSingleField31 {}
+    impl<ScalarType> ::puroro::Message<super::FileOptions> for FileOptionsSingleField31<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField31 {
+    impl<ScalarType> super::_puroro_traits::FileOptionsTrait for FileOptionsSingleField31<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn cc_enable_arenas_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.cc_enable_arenas))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.cc_enable_arenas,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -14401,23 +15938,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FileOptionsSingleField31 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FileOptionsSingleField31<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.cc_enable_arenas), 31, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::cc_enable_arenas_opt(self),
+                31,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FileOptionsSingleField31 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FileOptionsSingleField31<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 cc_enable_arenas: value,
             }
@@ -14474,17 +16027,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.objc_class_prefix), 36, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::objc_class_prefix_opt(self),
+                36,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -14553,17 +16109,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.csharp_namespace), 37, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::csharp_namespace_opt(self),
+                37,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -14632,17 +16191,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.swift_prefix), 39, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::swift_prefix_opt(self),
+                39,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -14711,17 +16273,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.php_class_prefix), 40, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_class_prefix_opt(self),
+                40,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -14790,17 +16355,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.php_namespace), 41, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_namespace_opt(self),
+                41,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -14869,17 +16437,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.php_metadata_namespace), 44, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::php_metadata_namespace_opt(self),
+                44,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -14948,17 +16519,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FileOptionsTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.ruby_package), 45, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::ruby_package_opt(self),
+                45,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -15032,22 +16606,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FileOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::FileOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FileOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FileOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -15109,10 +16685,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_java_multiple_files(
+        pub fn append_java_multiple_files<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField10)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField10<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField10 {
@@ -15121,10 +16703,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_java_generate_equals_and_hash(
+        pub fn append_java_generate_equals_and_hash<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField20)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField20<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField20 {
@@ -15133,10 +16721,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_java_string_check_utf8(
+        pub fn append_java_string_check_utf8<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField27)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField27<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField27 {
@@ -15145,10 +16739,13 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_optimize_for(
-            self,
-            value: self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField9)> {
+    pub fn append_optimize_for<ScalarType>(self, value: ScalarType)
+        -> FileOptionsBuilder<(T, FileOptionsSingleField9<ScalarType>)>
+where
+
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField9 {
@@ -15170,10 +16767,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             FileOptionsBuilder((self.0, FileOptionsSingleField11 { go_package: value }))
         }
 
-        pub fn append_cc_generic_services(
+        pub fn append_cc_generic_services<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField16)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField16<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField16 {
@@ -15182,10 +16785,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_java_generic_services(
+        pub fn append_java_generic_services<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField17)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField17<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField17 {
@@ -15194,10 +16803,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_py_generic_services(
+        pub fn append_py_generic_services<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField18)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField18<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField18 {
@@ -15206,10 +16821,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_php_generic_services(
+        pub fn append_php_generic_services<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField42)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField42<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField42 {
@@ -15218,17 +16839,29 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_deprecated(
+        pub fn append_deprecated<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField23)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField23<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((self.0, FileOptionsSingleField23 { deprecated: value }))
         }
 
-        pub fn append_cc_enable_arenas(
+        pub fn append_cc_enable_arenas<ScalarType>(
             self,
-            value: bool,
-        ) -> FileOptionsBuilder<(T, FileOptionsSingleField31)> {
+            value: ScalarType,
+        ) -> FileOptionsBuilder<(T, FileOptionsSingleField31<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FileOptionsBuilder((
                 self.0,
                 FileOptionsSingleField31 {
@@ -15543,15 +17176,36 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MessageOptionsSingleField1 {
-        pub message_set_wire_format: bool,
+    pub struct MessageOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub message_set_wire_format: ScalarType,
     }
 
-    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField1 {}
+    impl<ScalarType> ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField1<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSingleField1 {
+    impl<ScalarType> super::_puroro_traits::MessageOptionsTrait
+        for MessageOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn message_set_wire_format_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.message_set_wire_format))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.message_set_wire_format,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -15566,23 +17220,41 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField1 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for MessageOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MessageOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.message_set_wire_format), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::message_set_wire_format_opt(
+                    self,
+                ),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for MessageOptionsSingleField1 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MessageOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 message_set_wire_format: value,
             }
@@ -15591,17 +17263,36 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MessageOptionsSingleField2 {
-        pub no_standard_descriptor_accessor: bool,
+    pub struct MessageOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub no_standard_descriptor_accessor: ScalarType,
     }
 
-    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField2 {}
+    impl<ScalarType> ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField2<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSingleField2 {
+    impl<ScalarType> super::_puroro_traits::MessageOptionsTrait
+        for MessageOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn no_standard_descriptor_accessor_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
                 &self.no_standard_descriptor_accessor,
-            ))
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -15616,27 +17307,38 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField2 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for MessageOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MessageOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(
-                ::std::iter::once(&self.no_standard_descriptor_accessor),
-                2,
-                out,
-            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Bool
+        >::ser_field(
+            <Self as super::_puroro_traits::MessageOptionsTrait>::no_standard_descriptor_accessor_opt(self),
+            2,
+            out
+        )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for MessageOptionsSingleField2 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MessageOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 no_standard_descriptor_accessor: value,
             }
@@ -15645,15 +17347,36 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MessageOptionsSingleField3 {
-        pub deprecated: bool,
+    pub struct MessageOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub deprecated: ScalarType,
     }
 
-    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField3 {}
+    impl<ScalarType> ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField3<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSingleField3 {
+    impl<ScalarType> super::_puroro_traits::MessageOptionsTrait
+        for MessageOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.deprecated))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.deprecated,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -15668,38 +17391,75 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField3 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for MessageOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MessageOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.deprecated), 3, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::deprecated_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for MessageOptionsSingleField3 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MessageOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { deprecated: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MessageOptionsSingleField7 {
-        pub map_entry: bool,
+    pub struct MessageOptionsSingleField7<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub map_entry: ScalarType,
     }
 
-    impl ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField7 {}
+    impl<ScalarType> ::puroro::Message<super::MessageOptions> for MessageOptionsSingleField7<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MessageOptionsTrait for MessageOptionsSingleField7 {
+    impl<ScalarType> super::_puroro_traits::MessageOptionsTrait
+        for MessageOptionsSingleField7<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn map_entry_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.map_entry))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.map_entry,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -15714,23 +17474,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MessageOptionsSingleField7 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for MessageOptionsSingleField7<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MessageOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.map_entry), 7, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::map_entry_opt(self),
+                7,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for MessageOptionsSingleField7 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MessageOptionsSingleField7<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { map_entry: value }
         }
     }
@@ -15790,22 +17566,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::MessageOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::MessageOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MessageOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MessageOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -15831,10 +17609,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     where
         T: MessageOptionsTrait,
     {
-        pub fn append_message_set_wire_format(
+        pub fn append_message_set_wire_format<ScalarType>(
             self,
-            value: bool,
-        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField1)> {
+            value: ScalarType,
+        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MessageOptionsBuilder((
                 self.0,
                 MessageOptionsSingleField1 {
@@ -15843,10 +17627,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_no_standard_descriptor_accessor(
+        pub fn append_no_standard_descriptor_accessor<ScalarType>(
             self,
-            value: bool,
-        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField2)> {
+            value: ScalarType,
+        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField2<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MessageOptionsBuilder((
                 self.0,
                 MessageOptionsSingleField2 {
@@ -15855,17 +17645,29 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_deprecated(
+        pub fn append_deprecated<ScalarType>(
             self,
-            value: bool,
-        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField3)> {
+            value: ScalarType,
+        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField3<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MessageOptionsBuilder((self.0, MessageOptionsSingleField3 { deprecated: value }))
         }
 
-        pub fn append_map_entry(
+        pub fn append_map_entry<ScalarType>(
             self,
-            value: bool,
-        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField7)> {
+            value: ScalarType,
+        ) -> MessageOptionsBuilder<(T, MessageOptionsSingleField7<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MessageOptionsBuilder((self.0, MessageOptionsSingleField7 { map_entry: value }))
         }
 
@@ -16094,19 +17896,42 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldOptionsSingleField1 {
-        pub ctype: self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+    pub struct FieldOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub ctype: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField1 {}
+    impl<ScalarType> ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField1<ScalarType> where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField1 {
+    impl<ScalarType> super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn ctype_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
             self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
         > {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.ctype))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.ctype,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16121,45 +17946,78 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField1 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<
                     self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
                 >,
-            >::ser_field::<(), _, _>(::std::iter::once(&self.ctype), 1, out)?;
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::ctype_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
-        ::std::convert::From<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
-        > for FieldOptionsSingleField1
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
-        ) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { ctype: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldOptionsSingleField2 {
-        pub packed: bool,
+    pub struct FieldOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub packed: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField2 {}
+    impl<ScalarType> ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField2<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField2 {
+    impl<ScalarType> super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn packed_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.packed))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.packed,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16174,42 +18032,81 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField2 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.packed), 2, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::packed_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FieldOptionsSingleField2 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { packed: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldOptionsSingleField6 {
-        pub jstype: self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+    pub struct FieldOptionsSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub jstype: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField6 {}
+    impl<ScalarType> ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField6<ScalarType> where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField6 {
+    impl<ScalarType> super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn jstype_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
             self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
         > {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.jstype))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.jstype,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16224,45 +18121,78 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField6 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldOptionsSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+            ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<
                     self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
                 >,
-            >::ser_field::<(), _, _>(::std::iter::once(&self.jstype), 6, out)?;
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::jstype_opt(self),
+                6,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl
-        ::std::convert::From<
-            self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
-        > for FieldOptionsSingleField6
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldOptionsSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+            > + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
     {
-        fn from(
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
-        ) -> Self {
+        fn from(value: ScalarType) -> Self {
             Self { jstype: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldOptionsSingleField5 {
-        pub lazy: bool,
+    pub struct FieldOptionsSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub lazy: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField5 {}
+    impl<ScalarType> ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField5<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField5 {
+    impl<ScalarType> super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn lazy_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.lazy))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.lazy,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16277,38 +18207,74 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField5 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldOptionsSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.lazy), 5, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::lazy_opt(self),
+                5,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FieldOptionsSingleField5 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldOptionsSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { lazy: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldOptionsSingleField3 {
-        pub deprecated: bool,
+    pub struct FieldOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub deprecated: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField3 {}
+    impl<ScalarType> ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField3<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField3 {
+    impl<ScalarType> super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.deprecated))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.deprecated,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16323,38 +18289,74 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField3 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.deprecated), 3, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::deprecated_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FieldOptionsSingleField3 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { deprecated: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct FieldOptionsSingleField10 {
-        pub weak: bool,
+    pub struct FieldOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub weak: ScalarType,
     }
 
-    impl ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField10 {}
+    impl<ScalarType> ::puroro::Message<super::FieldOptions> for FieldOptionsSingleField10<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField10 {
+    impl<ScalarType> super::_puroro_traits::FieldOptionsTrait for FieldOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn weak_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.weak))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.weak,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16369,23 +18371,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for FieldOptionsSingleField10 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for FieldOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::FieldOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.weak), 10, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::weak_opt(self),
+                10,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for FieldOptionsSingleField10 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for FieldOptionsSingleField10<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { weak: value }
         }
     }
@@ -16445,22 +18463,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::FieldOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::FieldOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::FieldOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::FieldOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -16486,45 +18506,83 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     where
         T: FieldOptionsTrait,
     {
-        pub fn append_ctype(
+        pub fn append_ctype<ScalarType>(
             self,
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
-        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField1)> {
+            value: ScalarType,
+        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<
+                    self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype,
+                > + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldOptionsBuilder((self.0, FieldOptionsSingleField1 { ctype: value }))
         }
 
-        pub fn append_packed(
+        pub fn append_packed<ScalarType>(
             self,
-            value: bool,
-        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField2)> {
+            value: ScalarType,
+        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField2<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldOptionsBuilder((self.0, FieldOptionsSingleField2 { packed: value }))
         }
 
-        pub fn append_jstype(
+        pub fn append_jstype<ScalarType>(
             self,
-            value: self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
-        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField6)> {
+            value: ScalarType,
+        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField6<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<
+                    self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype,
+                > + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldOptionsBuilder((self.0, FieldOptionsSingleField6 { jstype: value }))
         }
 
-        pub fn append_lazy(
+        pub fn append_lazy<ScalarType>(
             self,
-            value: bool,
-        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField5)> {
+            value: ScalarType,
+        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField5<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldOptionsBuilder((self.0, FieldOptionsSingleField5 { lazy: value }))
         }
 
-        pub fn append_deprecated(
+        pub fn append_deprecated<ScalarType>(
             self,
-            value: bool,
-        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField3)> {
+            value: ScalarType,
+        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField3<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldOptionsBuilder((self.0, FieldOptionsSingleField3 { deprecated: value }))
         }
 
-        pub fn append_weak(
+        pub fn append_weak<ScalarType>(
             self,
-            value: bool,
-        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField10)> {
+            value: ScalarType,
+        ) -> FieldOptionsBuilder<(T, FieldOptionsSingleField10<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             FieldOptionsBuilder((self.0, FieldOptionsSingleField10 { weak: value }))
         }
 
@@ -16706,22 +18764,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::OneofOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::OneofOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::OneofOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::OneofOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -16898,15 +18958,35 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct EnumOptionsSingleField2 {
-        pub allow_alias: bool,
+    pub struct EnumOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub allow_alias: ScalarType,
     }
 
-    impl ::puroro::Message<super::EnumOptions> for EnumOptionsSingleField2 {}
+    impl<ScalarType> ::puroro::Message<super::EnumOptions> for EnumOptionsSingleField2<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::EnumOptionsTrait for EnumOptionsSingleField2 {
+    impl<ScalarType> super::_puroro_traits::EnumOptionsTrait for EnumOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn allow_alias_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.allow_alias))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.allow_alias,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16921,38 +19001,74 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumOptionsSingleField2 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for EnumOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::EnumOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.allow_alias), 2, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumOptionsTrait>::allow_alias_opt(self),
+                2,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for EnumOptionsSingleField2 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for EnumOptionsSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { allow_alias: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct EnumOptionsSingleField3 {
-        pub deprecated: bool,
+    pub struct EnumOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub deprecated: ScalarType,
     }
 
-    impl ::puroro::Message<super::EnumOptions> for EnumOptionsSingleField3 {}
+    impl<ScalarType> ::puroro::Message<super::EnumOptions> for EnumOptionsSingleField3<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::EnumOptionsTrait for EnumOptionsSingleField3 {
+    impl<ScalarType> super::_puroro_traits::EnumOptionsTrait for EnumOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.deprecated))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.deprecated,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -16967,23 +19083,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumOptionsSingleField3 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for EnumOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::EnumOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.deprecated), 3, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumOptionsTrait>::deprecated_opt(self),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for EnumOptionsSingleField3 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for EnumOptionsSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { deprecated: value }
         }
     }
@@ -17043,22 +19175,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::EnumOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::EnumOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::EnumOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -17084,17 +19218,29 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     where
         T: EnumOptionsTrait,
     {
-        pub fn append_allow_alias(
+        pub fn append_allow_alias<ScalarType>(
             self,
-            value: bool,
-        ) -> EnumOptionsBuilder<(T, EnumOptionsSingleField2)> {
+            value: ScalarType,
+        ) -> EnumOptionsBuilder<(T, EnumOptionsSingleField2<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             EnumOptionsBuilder((self.0, EnumOptionsSingleField2 { allow_alias: value }))
         }
 
-        pub fn append_deprecated(
+        pub fn append_deprecated<ScalarType>(
             self,
-            value: bool,
-        ) -> EnumOptionsBuilder<(T, EnumOptionsSingleField3)> {
+            value: ScalarType,
+        ) -> EnumOptionsBuilder<(T, EnumOptionsSingleField3<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             EnumOptionsBuilder((self.0, EnumOptionsSingleField3 { deprecated: value }))
         }
 
@@ -17236,15 +19382,38 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct EnumValueOptionsSingleField1 {
-        pub deprecated: bool,
+    pub struct EnumValueOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub deprecated: ScalarType,
     }
 
-    impl ::puroro::Message<super::EnumValueOptions> for EnumValueOptionsSingleField1 {}
+    impl<ScalarType> ::puroro::Message<super::EnumValueOptions>
+        for EnumValueOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::EnumValueOptionsTrait for EnumValueOptionsSingleField1 {
+    impl<ScalarType> super::_puroro_traits::EnumValueOptionsTrait
+        for EnumValueOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.deprecated))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.deprecated,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -17259,23 +19428,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for EnumValueOptionsSingleField1 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for EnumValueOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::EnumValueOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.deprecated), 1, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueOptionsTrait>::deprecated_opt(self),
+                1,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for EnumValueOptionsSingleField1 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for EnumValueOptionsSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { deprecated: value }
         }
     }
@@ -17335,22 +19520,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::EnumValueOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::EnumValueOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::EnumValueOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::EnumValueOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -17376,10 +19563,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     where
         T: EnumValueOptionsTrait,
     {
-        pub fn append_deprecated(
+        pub fn append_deprecated<ScalarType>(
             self,
-            value: bool,
-        ) -> EnumValueOptionsBuilder<(T, EnumValueOptionsSingleField1)> {
+            value: ScalarType,
+        ) -> EnumValueOptionsBuilder<(T, EnumValueOptionsSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             EnumValueOptionsBuilder((self.0, EnumValueOptionsSingleField1 { deprecated: value }))
         }
 
@@ -17521,15 +19714,38 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct ServiceOptionsSingleField33 {
-        pub deprecated: bool,
+    pub struct ServiceOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub deprecated: ScalarType,
     }
 
-    impl ::puroro::Message<super::ServiceOptions> for ServiceOptionsSingleField33 {}
+    impl<ScalarType> ::puroro::Message<super::ServiceOptions>
+        for ServiceOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::ServiceOptionsTrait for ServiceOptionsSingleField33 {
+    impl<ScalarType> super::_puroro_traits::ServiceOptionsTrait
+        for ServiceOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.deprecated))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.deprecated,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -17544,23 +19760,39 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for ServiceOptionsSingleField33 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for ServiceOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::ServiceOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.deprecated), 33, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceOptionsTrait>::deprecated_opt(self),
+                33,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for ServiceOptionsSingleField33 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for ServiceOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { deprecated: value }
         }
     }
@@ -17620,22 +19852,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::ServiceOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::ServiceOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::ServiceOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::ServiceOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -17661,10 +19895,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     where
         T: ServiceOptionsTrait,
     {
-        pub fn append_deprecated(
+        pub fn append_deprecated<ScalarType>(
             self,
-            value: bool,
-        ) -> ServiceOptionsBuilder<(T, ServiceOptionsSingleField33)> {
+            value: ScalarType,
+        ) -> ServiceOptionsBuilder<(T, ServiceOptionsSingleField33<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             ServiceOptionsBuilder((self.0, ServiceOptionsSingleField33 { deprecated: value }))
         }
 
@@ -17831,15 +20071,36 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MethodOptionsSingleField33 {
-        pub deprecated: bool,
+    pub struct MethodOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub deprecated: ScalarType,
     }
 
-    impl ::puroro::Message<super::MethodOptions> for MethodOptionsSingleField33 {}
+    impl<ScalarType> ::puroro::Message<super::MethodOptions> for MethodOptionsSingleField33<ScalarType> where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
 
-    impl super::_puroro_traits::MethodOptionsTrait for MethodOptionsSingleField33 {
+    impl<ScalarType> super::_puroro_traits::MethodOptionsTrait
+        for MethodOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.deprecated))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.deprecated,
+            )))
         }
         type Field999MessageType<'this>
         where
@@ -17854,89 +20115,118 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MethodOptionsSingleField33 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for MethodOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MethodOptionsTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bool>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.deprecated), 33, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bool,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodOptionsTrait>::deprecated_opt(self),
+                33,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<bool> for MethodOptionsSingleField33 {
-        fn from(value: bool) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for MethodOptionsSingleField33<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<bool>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self { deprecated: value }
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct MethodOptionsSingleField34 {
-        pub idempotency_level:
-            self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
-    }
+    pub struct MethodOptionsSingleField34<ScalarType>
+where
 
-    impl ::puroro::Message<super::MethodOptions> for MethodOptionsSingleField34 {}
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    pub idempotency_level: ScalarType,
+}
 
-    impl super::_puroro_traits::MethodOptionsTrait for MethodOptionsSingleField34 {
-        fn idempotency_level_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<
-            self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
-        > {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.idempotency_level))
-        }
-        type Field999MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type Field999RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
-        fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-    }
+    impl<ScalarType> ::puroro::Message<super::MethodOptions>
+for MethodOptionsSingleField34<ScalarType>
+where
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for MethodOptionsSingleField34 {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{}
+
+    impl<ScalarType> super::_puroro_traits::MethodOptionsTrait
+for MethodOptionsSingleField34<ScalarType>
+where
+
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+
+fn idempotency_level_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> {
+    ::std::option::Option::Some(
+        ::std::convert::Into::into(::std::clone::Clone::clone(&self.idempotency_level))
+    )
+}
+type Field999MessageType<'this> where Self: 'this = ();
+type Field999RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field999MessageType<'this>>;
+fn uninterpreted_option<'this>(&'this self) -> Self::Field999RepeatedType<'this> {
+    ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+}
+}
+
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+for MethodOptionsSingleField34<ScalarType>
+where
+
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    Self: super::_puroro_traits::MethodOptionsTrait,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write,
+    {
+        ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
-        >::ser_field::
-        <(), _, _>
-        (
-            ::std::iter::once(&self.idempotency_level),
+        >::ser_field(
+            <Self as super::_puroro_traits::MethodOptionsTrait>::idempotency_level_opt(self),
             34,
             out
         )?;
-            ::std::result::Result::Ok(())
-        }
+        ::std::result::Result::Ok(())
     }
+}
 
-    impl
-        ::std::convert::From<
-            self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
-        > for MethodOptionsSingleField34
-    {
-        fn from(
-            value: self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
-        ) -> Self {
-            Self {
-                idempotency_level: value,
-            }
+    impl<ScalarType> ::std::convert::From<ScalarType>
+for MethodOptionsSingleField34<ScalarType>
+where
+
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn from(value: ScalarType) -> Self {
+        Self {
+            idempotency_level: value,
         }
     }
+}
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -17993,22 +20283,24 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        Self: super::_puroro_traits::MethodOptionsTrait,
+        for<'a> <Self as super::_puroro_traits::MethodOptionsTrait>::Field999MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.uninterpreted_option,
-            999,
-            out
-        )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MethodOptionsTrait>::Field999MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MethodOptionsTrait>::uninterpreted_option(self),
+                999,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -18034,17 +20326,26 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     where
         T: MethodOptionsTrait,
     {
-        pub fn append_deprecated(
+        pub fn append_deprecated<ScalarType>(
             self,
-            value: bool,
-        ) -> MethodOptionsBuilder<(T, MethodOptionsSingleField33)> {
+            value: ScalarType,
+        ) -> MethodOptionsBuilder<(T, MethodOptionsSingleField33<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<bool>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             MethodOptionsBuilder((self.0, MethodOptionsSingleField33 { deprecated: value }))
         }
 
-        pub fn append_idempotency_level(
-            self,
-            value: self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel,
-        ) -> MethodOptionsBuilder<(T, MethodOptionsSingleField34)> {
+    pub fn append_idempotency_level<ScalarType>(self, value: ScalarType)
+        -> MethodOptionsBuilder<(T, MethodOptionsSingleField34<ScalarType>)>
+where
+
+ScalarType: ::std::convert::Into<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    {
             MethodOptionsBuilder((
                 self.0,
                 MethodOptionsSingleField34 {
@@ -18299,19 +20600,18 @@ ScalarType: self::_puroro_root::google::protobuf::_puroro_nested::uninterpreted_
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    Self: super::_puroro_traits::UninterpretedOptionTrait,
+    for<'a> <Self as super::_puroro_traits::UninterpretedOptionTrait>::Field2MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-        SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.name,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::UninterpretedOptionTrait>::Field2MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::UninterpretedOptionTrait>::name(self),
             2,
             out
         )?;
@@ -18388,17 +20688,22 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::UninterpretedOptionTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.identifier_value), 3, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::identifier_value_opt(
+                    self,
+                ),
+                3,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -18419,13 +20724,34 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct UninterpretedOptionSingleField4 {
-        pub positive_int_value: u64,
+    pub struct UninterpretedOptionSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<u64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub positive_int_value: ScalarType,
     }
 
-    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSingleField4 {}
+    impl<ScalarType> ::puroro::Message<super::UninterpretedOption>
+        for UninterpretedOptionSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<u64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSingleField4 {
+    impl<ScalarType> super::_puroro_traits::UninterpretedOptionTrait
+        for UninterpretedOptionSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<u64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field2MessageType<'this>
         where
             Self: 'this,
@@ -18439,27 +20765,47 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
 
         fn positive_int_value_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.positive_int_value))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.positive_int_value,
+            )))
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField4 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for UninterpretedOptionSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<u64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::UninterpretedOptionTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.positive_int_value), 4, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::UInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::positive_int_value_opt(
+                    self,
+                ),
+                4,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<u64> for UninterpretedOptionSingleField4 {
-        fn from(value: u64) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for UninterpretedOptionSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<u64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 positive_int_value: value,
             }
@@ -18468,13 +20814,34 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct UninterpretedOptionSingleField5 {
-        pub negative_int_value: i64,
+    pub struct UninterpretedOptionSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub negative_int_value: ScalarType,
     }
 
-    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSingleField5 {}
+    impl<ScalarType> ::puroro::Message<super::UninterpretedOption>
+        for UninterpretedOptionSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSingleField5 {
+    impl<ScalarType> super::_puroro_traits::UninterpretedOptionTrait
+        for UninterpretedOptionSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field2MessageType<'this>
         where
             Self: 'this,
@@ -18488,27 +20855,47 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
 
         fn negative_int_value_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.negative_int_value))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.negative_int_value,
+            )))
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField5 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for UninterpretedOptionSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::UninterpretedOptionTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.negative_int_value), 5, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int64,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::negative_int_value_opt(
+                    self,
+                ),
+                5,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<i64> for UninterpretedOptionSingleField5 {
-        fn from(value: i64) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for UninterpretedOptionSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 negative_int_value: value,
             }
@@ -18517,13 +20904,34 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-    pub struct UninterpretedOptionSingleField6 {
-        pub double_value: f64,
+    pub struct UninterpretedOptionSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub double_value: ScalarType,
     }
 
-    impl ::puroro::Message<super::UninterpretedOption> for UninterpretedOptionSingleField6 {}
+    impl<ScalarType> ::puroro::Message<super::UninterpretedOption>
+        for UninterpretedOptionSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+    }
 
-    impl super::_puroro_traits::UninterpretedOptionTrait for UninterpretedOptionSingleField6 {
+    impl<ScalarType> super::_puroro_traits::UninterpretedOptionTrait
+        for UninterpretedOptionSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
         type Field2MessageType<'this>
         where
             Self: 'this,
@@ -18537,27 +20945,45 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         }
 
         fn double_value_opt<'this>(&'this self) -> ::std::option::Option<f64> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.double_value))
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.double_value,
+            )))
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for UninterpretedOptionSingleField6 {
+    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+        for UninterpretedOptionSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::UninterpretedOptionTrait,
+    {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field::<
-                (),
-                _,
-                _,
-            >(::std::iter::once(&self.double_value), 6, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Double,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::double_value_opt(self),
+                6,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<f64> for UninterpretedOptionSingleField6 {
-        fn from(value: f64) -> Self {
+    impl<ScalarType> ::std::convert::From<ScalarType> for UninterpretedOptionSingleField6<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f64>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
             Self {
                 double_value: value,
             }
@@ -18618,17 +21044,20 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::UninterpretedOptionTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.string_value), 7, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bytes,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::string_value_opt(self),
+                7,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -18701,17 +21130,22 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
+        Self: super::_puroro_traits::UninterpretedOptionTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
         {
-            use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field::<
-                ScalarType,
-                _,
-                _,
-            >(::std::iter::once(&self.aggregate_value), 8, out)?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::UninterpretedOptionTrait>::aggregate_value_opt(
+                    self,
+                ),
+                8,
+                out,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -18764,10 +21198,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_positive_int_value(
+        pub fn append_positive_int_value<ScalarType>(
             self,
-            value: u64,
-        ) -> UninterpretedOptionBuilder<(T, UninterpretedOptionSingleField4)> {
+            value: ScalarType,
+        ) -> UninterpretedOptionBuilder<(T, UninterpretedOptionSingleField4<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<u64>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             UninterpretedOptionBuilder((
                 self.0,
                 UninterpretedOptionSingleField4 {
@@ -18776,10 +21216,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_negative_int_value(
+        pub fn append_negative_int_value<ScalarType>(
             self,
-            value: i64,
-        ) -> UninterpretedOptionBuilder<(T, UninterpretedOptionSingleField5)> {
+            value: ScalarType,
+        ) -> UninterpretedOptionBuilder<(T, UninterpretedOptionSingleField5<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i64>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             UninterpretedOptionBuilder((
                 self.0,
                 UninterpretedOptionSingleField5 {
@@ -18788,10 +21234,16 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
             ))
         }
 
-        pub fn append_double_value(
+        pub fn append_double_value<ScalarType>(
             self,
-            value: f64,
-        ) -> UninterpretedOptionBuilder<(T, UninterpretedOptionSingleField6)> {
+            value: ScalarType,
+        ) -> UninterpretedOptionBuilder<(T, UninterpretedOptionSingleField6<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<f64>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
             UninterpretedOptionBuilder((
                 self.0,
                 UninterpretedOptionSingleField6 {
@@ -18984,19 +21436,18 @@ ScalarType: self::_puroro_root::google::protobuf::_puroro_nested::source_code_in
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    Self: super::_puroro_traits::SourceCodeInfoTrait,
+    for<'a> <Self as super::_puroro_traits::SourceCodeInfoTrait>::Field1MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-        SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.location,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::SourceCodeInfoTrait>::Field1MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::SourceCodeInfoTrait>::location(self),
             1,
             out
         )?;
@@ -19183,19 +21634,18 @@ ScalarType: self::_puroro_root::google::protobuf::_puroro_nested::generated_code
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    Self: super::_puroro_traits::GeneratedCodeInfoTrait,
+    for<'a> <Self as super::_puroro_traits::GeneratedCodeInfoTrait>::Field1MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-        SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<ScalarType>
-        >::ser_field::
-        <ScalarType, _, _>
-        (
-            &self.annotation,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::GeneratedCodeInfoTrait>::Field1MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::GeneratedCodeInfoTrait>::annotation(self),
             1,
             out
         )?;
@@ -20410,8 +22860,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn client_streaming<'this>(&'this self) -> bool {
-            self.client_streaming_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.client_streaming_opt().unwrap_or(false)
         }
         fn has_client_streaming<'this>(&'this self) -> bool {
             self.client_streaming_opt().is_some()
@@ -20420,8 +22869,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn server_streaming<'this>(&'this self) -> bool {
-            self.server_streaming_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.server_streaming_opt().unwrap_or(false)
         }
         fn has_server_streaming<'this>(&'this self) -> bool {
             self.server_streaming_opt().is_some()
@@ -20502,8 +22950,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn java_multiple_files<'this>(&'this self) -> bool {
-            self.java_multiple_files_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.java_multiple_files_opt().unwrap_or(false)
         }
         fn has_java_multiple_files<'this>(&'this self) -> bool {
             self.java_multiple_files_opt().is_some()
@@ -20522,8 +22969,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn java_string_check_utf8<'this>(&'this self) -> bool {
-            self.java_string_check_utf8_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.java_string_check_utf8_opt().unwrap_or(false)
         }
         fn has_java_string_check_utf8<'this>(&'this self) -> bool {
             self.java_string_check_utf8_opt().is_some()
@@ -20535,8 +22981,7 @@ pub mod _puroro_traits {
             &'this self,
         ) -> self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode
         {
-            self.optimize_for_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.optimize_for_opt().unwrap_or(self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode::Speed)
         }
         fn has_optimize_for<'this>(&'this self) -> bool {
             self.optimize_for_opt().is_some()
@@ -20559,8 +23004,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn cc_generic_services<'this>(&'this self) -> bool {
-            self.cc_generic_services_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.cc_generic_services_opt().unwrap_or(false)
         }
         fn has_cc_generic_services<'this>(&'this self) -> bool {
             self.cc_generic_services_opt().is_some()
@@ -20569,8 +23013,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn java_generic_services<'this>(&'this self) -> bool {
-            self.java_generic_services_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.java_generic_services_opt().unwrap_or(false)
         }
         fn has_java_generic_services<'this>(&'this self) -> bool {
             self.java_generic_services_opt().is_some()
@@ -20579,8 +23022,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn py_generic_services<'this>(&'this self) -> bool {
-            self.py_generic_services_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.py_generic_services_opt().unwrap_or(false)
         }
         fn has_py_generic_services<'this>(&'this self) -> bool {
             self.py_generic_services_opt().is_some()
@@ -20589,8 +23031,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn php_generic_services<'this>(&'this self) -> bool {
-            self.php_generic_services_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.php_generic_services_opt().unwrap_or(false)
         }
         fn has_php_generic_services<'this>(&'this self) -> bool {
             self.php_generic_services_opt().is_some()
@@ -20599,8 +23040,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn deprecated<'this>(&'this self) -> bool {
-            self.deprecated_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.deprecated_opt().unwrap_or(false)
         }
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
@@ -20609,8 +23049,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn cc_enable_arenas<'this>(&'this self) -> bool {
-            self.cc_enable_arenas_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.cc_enable_arenas_opt().unwrap_or(true)
         }
         fn has_cc_enable_arenas<'this>(&'this self) -> bool {
             self.cc_enable_arenas_opt().is_some()
@@ -20804,8 +23243,7 @@ pub mod _puroro_traits {
     }
     pub trait MessageOptionsTrait {
         fn message_set_wire_format<'this>(&'this self) -> bool {
-            self.message_set_wire_format_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.message_set_wire_format_opt().unwrap_or(false)
         }
         fn has_message_set_wire_format<'this>(&'this self) -> bool {
             self.message_set_wire_format_opt().is_some()
@@ -20814,8 +23252,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn no_standard_descriptor_accessor<'this>(&'this self) -> bool {
-            self.no_standard_descriptor_accessor_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.no_standard_descriptor_accessor_opt().unwrap_or(false)
         }
         fn has_no_standard_descriptor_accessor<'this>(&'this self) -> bool {
             self.no_standard_descriptor_accessor_opt().is_some()
@@ -20824,8 +23261,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn deprecated<'this>(&'this self) -> bool {
-            self.deprecated_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.deprecated_opt().unwrap_or(false)
         }
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
@@ -20909,8 +23345,9 @@ pub mod _puroro_traits {
         fn ctype<'this>(
             &'this self,
         ) -> self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype {
-            self.ctype_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.ctype_opt().unwrap_or(
+                self::_puroro_root::google::protobuf::_puroro_nested::field_options::Ctype::String,
+            )
         }
         fn has_ctype<'this>(&'this self) -> bool {
             self.ctype_opt().is_some()
@@ -20935,8 +23372,7 @@ pub mod _puroro_traits {
         fn jstype<'this>(
             &'this self,
         ) -> self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype {
-            self.jstype_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.jstype_opt().unwrap_or(self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype::JsNormal)
         }
         fn has_jstype<'this>(&'this self) -> bool {
             self.jstype_opt().is_some()
@@ -20949,8 +23385,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn lazy<'this>(&'this self) -> bool {
-            self.lazy_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.lazy_opt().unwrap_or(false)
         }
         fn has_lazy<'this>(&'this self) -> bool {
             self.lazy_opt().is_some()
@@ -20959,8 +23394,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn deprecated<'this>(&'this self) -> bool {
-            self.deprecated_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.deprecated_opt().unwrap_or(false)
         }
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
@@ -20969,8 +23403,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn weak<'this>(&'this self) -> bool {
-            self.weak_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.weak_opt().unwrap_or(false)
         }
         fn has_weak<'this>(&'this self) -> bool {
             self.weak_opt().is_some()
@@ -21113,8 +23546,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
         fn deprecated<'this>(&'this self) -> bool {
-            self.deprecated_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.deprecated_opt().unwrap_or(false)
         }
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
@@ -21178,8 +23610,7 @@ pub mod _puroro_traits {
     }
     pub trait EnumValueOptionsTrait {
         fn deprecated<'this>(&'this self) -> bool {
-            self.deprecated_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.deprecated_opt().unwrap_or(false)
         }
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
@@ -21240,8 +23671,7 @@ pub mod _puroro_traits {
     }
     pub trait ServiceOptionsTrait {
         fn deprecated<'this>(&'this self) -> bool {
-            self.deprecated_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.deprecated_opt().unwrap_or(false)
         }
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
@@ -21302,8 +23732,7 @@ pub mod _puroro_traits {
     }
     pub trait MethodOptionsTrait {
         fn deprecated<'this>(&'this self) -> bool {
-            self.deprecated_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.deprecated_opt().unwrap_or(false)
         }
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
@@ -21315,8 +23744,7 @@ pub mod _puroro_traits {
             &'this self,
         ) -> self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel
         {
-            self.idempotency_level_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.idempotency_level_opt().unwrap_or(self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel::IdempotencyUnknown)
         }
         fn has_idempotency_level<'this>(&'this self) -> bool {
             self.idempotency_level_opt().is_some()
@@ -21625,12 +24053,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct ExtensionRange {
             pub start: ::std::option::Option<i32>,
             pub end: ::std::option::Option<i32>,
@@ -21740,31 +24163,56 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRange {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRange
+            where
+                Self: super::_puroro_traits::ExtensionRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.start, 1, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.end, 2, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::google::protobuf::_puroro_simple_impl::ExtensionRangeOptions>>
-                >::ser_field(&self.options, 3, out)?;
-
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ExtensionRangeTrait>::start_opt(self),
+                        1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ExtensionRangeTrait>::end_opt(self),
+                        2,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Message<
+                            <Self as super::_puroro_traits::ExtensionRangeTrait>::Field3MessageType<
+                                '_,
+                            >,
+                        >,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ExtensionRangeTrait>::options_opt(self),
+                        3,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+
+            impl ::std::default::Default for ExtensionRange {
+                fn default() -> Self {
+                    Self {
+                        start: ::std::default::Default::default(),
+                        end: ::std::default::Default::default(),
+                        options: ::std::default::Default::default(),
+                    }
+                }
+            }
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct ReservedRange {
                 pub start: ::std::option::Option<i32>,
                 pub end: ::std::option::Option<i32>,
@@ -21858,20 +24306,40 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for ReservedRange {
+            impl ::puroro::internal::SerializableMessageToIoWrite for ReservedRange
+            where
+                Self: super::_puroro_traits::ReservedRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.start, 1, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.end, 2, out)?;
-
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ReservedRangeTrait>::start_opt(self),
+                        1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ReservedRangeTrait>::end_opt(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for ReservedRange {
+                fn default() -> Self {
+                    Self {
+                        start: ::std::default::Default::default(),
+                        end: ::std::default::Default::default(),
+                    }
                 }
             }
         }
@@ -21982,15 +24450,36 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct ExtensionRangeSingleField1 {
-                pub start: i32,
+            pub struct ExtensionRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub start: ScalarType,
             }
 
-            impl ::puroro::Message<super::ExtensionRange> for ExtensionRangeSingleField1 {}
+            impl<ScalarType> ::puroro::Message<super::ExtensionRange> for ExtensionRangeSingleField1<ScalarType> where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::ExtensionRangeTrait for ExtensionRangeSingleField1 {
+            impl<ScalarType> super::_puroro_traits::ExtensionRangeTrait
+                for ExtensionRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.start))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.start),
+                    ))
                 }
                 type Field3MessageType<'this>
                 where
@@ -21998,42 +24487,75 @@ pub mod _puroro_nested {
                 = ();
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeSingleField1 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for ExtensionRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::ExtensionRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.start),
-                    1,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ExtensionRangeTrait>::start_opt(self),
+                        1,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for ExtensionRangeSingleField1 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for ExtensionRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { start: value }
                 }
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct ExtensionRangeSingleField2 {
-                pub end: i32,
+            pub struct ExtensionRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub end: ScalarType,
             }
 
-            impl ::puroro::Message<super::ExtensionRange> for ExtensionRangeSingleField2 {}
+            impl<ScalarType> ::puroro::Message<super::ExtensionRange> for ExtensionRangeSingleField2<ScalarType> where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::ExtensionRangeTrait for ExtensionRangeSingleField2 {
+            impl<ScalarType> super::_puroro_traits::ExtensionRangeTrait
+                for ExtensionRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.end))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.end),
+                    ))
                 }
                 type Field3MessageType<'this>
                 where
@@ -22041,27 +24563,39 @@ pub mod _puroro_nested {
                 = ();
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for ExtensionRangeSingleField2 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for ExtensionRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::ExtensionRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.end),
-                    2,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ExtensionRangeTrait>::end_opt(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for ExtensionRangeSingleField2 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for ExtensionRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { end: value }
                 }
             }
@@ -22097,19 +24631,18 @@ pub mod _puroro_nested {
         for ExtensionRangeSingleField3<ScalarType>
         where
         ScalarType: self::_puroro_root::google::protobuf::_puroro_traits::ExtensionRangeOptionsTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-            ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+            Self: super::_puroro_traits::ExtensionRangeTrait,
+            for<'a> <Self as super::_puroro_traits::ExtensionRangeTrait>::Field3MessageType<'a> :
+                ::puroro::internal::SerializableMessageToIoWrite,
         {
             fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
             where
-                W: ::std::io::Write
+                W: ::std::io::Write,
             {
-                use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<ScalarType>
-                >::ser_field::
-                <ScalarType, _, _>
-                (
-                    ::std::iter::once(&self.options),
+                ::puroro::internal::se::SerFieldToIoWrite::<
+                    ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::ExtensionRangeTrait>::Field3MessageType<'_>>
+                >::ser_field(
+                    <Self as super::_puroro_traits::ExtensionRangeTrait>::options_opt(self),
                     3,
                     out
                 )?;
@@ -22134,17 +24667,29 @@ pub mod _puroro_nested {
             where
                 T: ExtensionRangeTrait,
             {
-                pub fn append_start(
+                pub fn append_start<ScalarType>(
                     self,
-                    value: i32,
-                ) -> ExtensionRangeBuilder<(T, ExtensionRangeSingleField1)> {
+                    value: ScalarType,
+                ) -> ExtensionRangeBuilder<(T, ExtensionRangeSingleField1<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     ExtensionRangeBuilder((self.0, ExtensionRangeSingleField1 { start: value }))
                 }
 
-                pub fn append_end(
+                pub fn append_end<ScalarType>(
                     self,
-                    value: i32,
-                ) -> ExtensionRangeBuilder<(T, ExtensionRangeSingleField2)> {
+                    value: ScalarType,
+                ) -> ExtensionRangeBuilder<(T, ExtensionRangeSingleField2<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     ExtensionRangeBuilder((self.0, ExtensionRangeSingleField2 { end: value }))
                 }
         
@@ -22213,78 +24758,142 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct ReservedRangeSingleField1 {
-                pub start: i32,
+            pub struct ReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub start: ScalarType,
             }
 
-            impl ::puroro::Message<super::ReservedRange> for ReservedRangeSingleField1 {}
+            impl<ScalarType> ::puroro::Message<super::ReservedRange> for ReservedRangeSingleField1<ScalarType> where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::ReservedRangeTrait for ReservedRangeSingleField1 {
+            impl<ScalarType> super::_puroro_traits::ReservedRangeTrait for ReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.start))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.start),
+                    ))
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for ReservedRangeSingleField1 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for ReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::ReservedRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.start),
-                    1,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ReservedRangeTrait>::start_opt(self),
+                        1,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for ReservedRangeSingleField1 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for ReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { start: value }
                 }
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct ReservedRangeSingleField2 {
-                pub end: i32,
+            pub struct ReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub end: ScalarType,
             }
 
-            impl ::puroro::Message<super::ReservedRange> for ReservedRangeSingleField2 {}
+            impl<ScalarType> ::puroro::Message<super::ReservedRange> for ReservedRangeSingleField2<ScalarType> where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::ReservedRangeTrait for ReservedRangeSingleField2 {
+            impl<ScalarType> super::_puroro_traits::ReservedRangeTrait for ReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.end))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.end),
+                    ))
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for ReservedRangeSingleField2 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for ReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::ReservedRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.end),
-                    2,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::ReservedRangeTrait>::end_opt(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for ReservedRangeSingleField2 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for ReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { end: value }
                 }
             }
@@ -22294,17 +24903,29 @@ pub mod _puroro_nested {
             where
                 T: ReservedRangeTrait,
             {
-                pub fn append_start(
+                pub fn append_start<ScalarType>(
                     self,
-                    value: i32,
-                ) -> ReservedRangeBuilder<(T, ReservedRangeSingleField1)> {
+                    value: ScalarType,
+                ) -> ReservedRangeBuilder<(T, ReservedRangeSingleField1<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     ReservedRangeBuilder((self.0, ReservedRangeSingleField1 { start: value }))
                 }
 
-                pub fn append_end(
+                pub fn append_end<ScalarType>(
                     self,
-                    value: i32,
-                ) -> ReservedRangeBuilder<(T, ReservedRangeSingleField2)> {
+                    value: ScalarType,
+                ) -> ReservedRangeBuilder<(T, ReservedRangeSingleField2<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     ReservedRangeBuilder((self.0, ReservedRangeSingleField2 { end: value }))
                 }
 
@@ -22614,12 +25235,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct EnumReservedRange {
                 pub start: ::std::option::Option<i32>,
                 pub end: ::std::option::Option<i32>,
@@ -22713,20 +25329,40 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for EnumReservedRange {
+            impl ::puroro::internal::SerializableMessageToIoWrite for EnumReservedRange
+            where
+                Self: super::_puroro_traits::EnumReservedRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.start, 1, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.end, 2, out)?;
-
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::EnumReservedRangeTrait>::start_opt(self),
+                        1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::EnumReservedRangeTrait>::end_opt(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for EnumReservedRange {
+                fn default() -> Self {
+                    Self {
+                        start: ::std::default::Default::default(),
+                        end: ::std::default::Default::default(),
+                    }
                 }
             }
         }
@@ -22784,78 +25420,148 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct EnumReservedRangeSingleField1 {
-                pub start: i32,
+            pub struct EnumReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub start: ScalarType,
             }
 
-            impl ::puroro::Message<super::EnumReservedRange> for EnumReservedRangeSingleField1 {}
+            impl<ScalarType> ::puroro::Message<super::EnumReservedRange>
+                for EnumReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+            }
 
-            impl super::_puroro_traits::EnumReservedRangeTrait for EnumReservedRangeSingleField1 {
+            impl<ScalarType> super::_puroro_traits::EnumReservedRangeTrait
+                for EnumReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.start))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.start),
+                    ))
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for EnumReservedRangeSingleField1 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for EnumReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::EnumReservedRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.start),
-                    1,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::EnumReservedRangeTrait>::start_opt(self),
+                        1,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for EnumReservedRangeSingleField1 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for EnumReservedRangeSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { start: value }
                 }
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct EnumReservedRangeSingleField2 {
-                pub end: i32,
+            pub struct EnumReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub end: ScalarType,
             }
 
-            impl ::puroro::Message<super::EnumReservedRange> for EnumReservedRangeSingleField2 {}
+            impl<ScalarType> ::puroro::Message<super::EnumReservedRange>
+                for EnumReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+            }
 
-            impl super::_puroro_traits::EnumReservedRangeTrait for EnumReservedRangeSingleField2 {
+            impl<ScalarType> super::_puroro_traits::EnumReservedRangeTrait
+                for EnumReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.end))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.end),
+                    ))
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for EnumReservedRangeSingleField2 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for EnumReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::EnumReservedRangeTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.end),
-                    2,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::EnumReservedRangeTrait>::end_opt(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for EnumReservedRangeSingleField2 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for EnumReservedRangeSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { end: value }
                 }
             }
@@ -22865,20 +25571,32 @@ pub mod _puroro_nested {
             where
                 T: EnumReservedRangeTrait,
             {
-                pub fn append_start(
+                pub fn append_start<ScalarType>(
                     self,
-                    value: i32,
-                ) -> EnumReservedRangeBuilder<(T, EnumReservedRangeSingleField1)> {
+                    value: ScalarType,
+                ) -> EnumReservedRangeBuilder<(T, EnumReservedRangeSingleField1<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     EnumReservedRangeBuilder((
                         self.0,
                         EnumReservedRangeSingleField1 { start: value },
                     ))
                 }
 
-                pub fn append_end(
+                pub fn append_end<ScalarType>(
                     self,
-                    value: i32,
-                ) -> EnumReservedRangeBuilder<(T, EnumReservedRangeSingleField2)> {
+                    value: ScalarType,
+                ) -> EnumReservedRangeBuilder<(T, EnumReservedRangeSingleField2<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     EnumReservedRangeBuilder((self.0, EnumReservedRangeSingleField2 { end: value }))
                 }
 
@@ -23171,12 +25889,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct NamePart {
                 pub name_part: ::std::option::Option<::std::string::String>,
                 pub is_extension: ::std::option::Option<bool>,
@@ -23270,22 +25983,40 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for NamePart {
+            impl ::puroro::internal::SerializableMessageToIoWrite for NamePart
+            where
+                Self: super::_puroro_traits::NamePartTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Required, ::puroro::tags::String
-                >::ser_field(&self.name_part, 1, out)?;
-                    SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Bool>::ser_field(
-                        &self.is_extension,
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Required,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::NamePartTrait>::name_part_opt(self),
+                        1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Required,
+                        ::puroro::tags::Bool,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::NamePartTrait>::is_extension_opt(self),
                         2,
                         out,
                     )?;
-
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for NamePart {
+                fn default() -> Self {
+                    Self {
+                        name_part: ::std::default::Default::default(),
+                        is_extension: ::std::default::Default::default(),
+                    }
                 }
             }
         }
@@ -23380,21 +26111,20 @@ pub mod _puroro_nested {
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
+                Self: super::_puroro_traits::NamePartTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Required, ::puroro::tags::String
-                >::ser_field::
-                <ScalarType, _, _>
-                (
-                    ::std::iter::once(&self.name_part),
-                    1,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Required,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::NamePartTrait>::name_part_opt(self),
+                        1,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
@@ -23413,35 +26143,71 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct NamePartSingleField2 {
-                pub is_extension: bool,
+            pub struct NamePartSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<bool>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub is_extension: ScalarType,
             }
 
-            impl ::puroro::Message<super::NamePart> for NamePartSingleField2 {}
+            impl<ScalarType> ::puroro::Message<super::NamePart> for NamePartSingleField2<ScalarType> where
+                ScalarType: ::std::convert::Into<bool>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::NamePartTrait for NamePartSingleField2 {
+            impl<ScalarType> super::_puroro_traits::NamePartTrait for NamePartSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<bool>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 fn is_extension_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.is_extension))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.is_extension),
+                    ))
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for NamePartSingleField2 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for NamePartSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<bool>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::NamePartTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<::puroro::tags::Required, ::puroro::tags::Bool>::ser_field::<
-                        (),
-                        _,
-                        _,
-                    >(::std::iter::once(&self.is_extension), 2, out)?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Required,
+                        ::puroro::tags::Bool,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::NamePartTrait>::is_extension_opt(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<bool> for NamePartSingleField2 {
-                fn from(value: bool) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for NamePartSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<bool>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self {
                         is_extension: value,
                     }
@@ -23466,10 +26232,16 @@ pub mod _puroro_nested {
                     NamePartBuilder((self.0, NamePartSingleField1 { name_part: value }))
                 }
 
-                pub fn append_is_extension(
+                pub fn append_is_extension<ScalarType>(
                     self,
-                    value: bool,
-                ) -> NamePartBuilder<(T, NamePartSingleField2)> {
+                    value: ScalarType,
+                ) -> NamePartBuilder<(T, NamePartSingleField2<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<bool>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     NamePartBuilder((
                         self.0,
                         NamePartSingleField2 {
@@ -23569,12 +26341,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Location {
                 pub path: ::std::vec::Vec<i32>,
                 pub span: ::std::vec::Vec<i32>,
@@ -23743,29 +26510,69 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for Location {
+            impl ::puroro::internal::SerializableMessageToIoWrite for Location
+            where
+                Self: super::_puroro_traits::LocationTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::ser_field(&self.path, 1, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::ser_field(&self.span, 2, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field(&self.leading_comments, 3, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field(&self.trailing_comments, 4, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::String
-                >::ser_field(&self.leading_detached_comments, 6, out)?;
-
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::path(self),
+                        1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::span(self),
+                        2,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::leading_comments_opt(self),
+                        3,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::trailing_comments_opt(self),
+                        4,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::leading_detached_comments(
+                            self,
+                        ),
+                        6,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for Location {
+                fn default() -> Self {
+                    Self {
+                        path: ::std::default::Default::default(),
+                        span: ::std::default::Default::default(),
+                        leading_comments: ::std::default::Default::default(),
+                        trailing_comments: ::std::default::Default::default(),
+                        leading_detached_comments: ::std::default::Default::default(),
+                    }
                 }
             }
         }
@@ -23984,29 +26791,49 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct LocationSingleField1<RepeatedType>
+            pub struct LocationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 pub path: RepeatedType,
             }
 
-            impl<RepeatedType> ::puroro::Message<super::Location> for LocationSingleField1<RepeatedType> where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>
+            impl<ScalarType, RepeatedType> ::puroro::Message<super::Location>
+                for LocationSingleField1<ScalarType, RepeatedType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
             }
 
-            impl<RepeatedType> super::_puroro_traits::LocationTrait for LocationSingleField1<RepeatedType>
+            impl<ScalarType, RepeatedType> super::_puroro_traits::LocationTrait
+                for LocationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 type Field1RepeatedType<'this>
                 where
                     Self: 'this,
-                = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
+                = ::puroro::internal::impls::single_field::CloneThenIntoIter<
+                    <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+                    i32,
+                >;
 
                 fn path<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
-                    ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.path))
+                    ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
+                        ::std::iter::IntoIterator::into_iter(&self.path),
+                    )
                 }
                 type Field2RepeatedType<'this>
                 where
@@ -24026,32 +26853,40 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
-                for LocationSingleField1<RepeatedType>
+            impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+                for LocationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+                Self: super::_puroro_traits::LocationTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    &self.path,
-                    1,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::path(self),
+                        1,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl<RepeatedType> ::std::convert::From<RepeatedType> for LocationSingleField1<RepeatedType>
+            impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
+                for LocationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 fn from(value: RepeatedType) -> Self {
                     Self { path: value }
@@ -24060,21 +26895,36 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct LocationSingleField2<RepeatedType>
+            pub struct LocationSingleField2<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 pub span: RepeatedType,
             }
 
-            impl<RepeatedType> ::puroro::Message<super::Location> for LocationSingleField2<RepeatedType> where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>
+            impl<ScalarType, RepeatedType> ::puroro::Message<super::Location>
+                for LocationSingleField2<ScalarType, RepeatedType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
             }
 
-            impl<RepeatedType> super::_puroro_traits::LocationTrait for LocationSingleField2<RepeatedType>
+            impl<ScalarType, RepeatedType> super::_puroro_traits::LocationTrait
+                for LocationSingleField2<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 type Field1RepeatedType<'this>
                 where
@@ -24086,10 +26936,15 @@ pub mod _puroro_nested {
                 type Field2RepeatedType<'this>
                 where
                     Self: 'this,
-                = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
+                = ::puroro::internal::impls::single_field::CloneThenIntoIter<
+                    <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+                    i32,
+                >;
 
                 fn span<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-                    ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.span))
+                    ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
+                        ::std::iter::IntoIterator::into_iter(&self.span),
+                    )
                 }
                 type Field6RepeatedType<'this>
                 where
@@ -24102,32 +26957,40 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
-                for LocationSingleField2<RepeatedType>
+            impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+                for LocationSingleField2<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+                Self: super::_puroro_traits::LocationTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    &self.span,
-                    2,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::span(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl<RepeatedType> ::std::convert::From<RepeatedType> for LocationSingleField2<RepeatedType>
+            impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
+                for LocationSingleField2<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 fn from(value: RepeatedType) -> Self {
                     Self { span: value }
@@ -24197,21 +27060,20 @@ pub mod _puroro_nested {
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
+                Self: super::_puroro_traits::LocationTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field::
-                <ScalarType, _, _>
-                (
-                    ::std::iter::once(&self.leading_comments),
-                    3,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::leading_comments_opt(self),
+                        3,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
@@ -24293,21 +27155,20 @@ pub mod _puroro_nested {
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
+                Self: super::_puroro_traits::LocationTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field::
-                <ScalarType, _, _>
-                (
-                    ::std::iter::once(&self.trailing_comments),
-                    4,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::trailing_comments_opt(self),
+                        4,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
@@ -24398,21 +27259,22 @@ pub mod _puroro_nested {
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
                 for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+                Self: super::_puroro_traits::LocationTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::String
-                >::ser_field::
-                <ScalarType, _, _>
-                (
-                    &self.leading_detached_comments,
-                    6,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::LocationTrait>::leading_detached_comments(
+                            self,
+                        ),
+                        6,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
@@ -24438,22 +27300,30 @@ pub mod _puroro_nested {
             where
                 T: LocationTrait,
             {
-                pub fn append_path<RepeatedType>(
+                pub fn append_path<ScalarType, RepeatedType>(
                     self,
                     value: RepeatedType,
-                ) -> LocationBuilder<(T, LocationSingleField1<RepeatedType>)>
+                ) -> LocationBuilder<(T, LocationSingleField1<ScalarType, RepeatedType>)>
                 where
-                    for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                    for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
                 {
                     LocationBuilder((self.0, LocationSingleField1 { path: value }))
                 }
 
-                pub fn append_span<RepeatedType>(
+                pub fn append_span<ScalarType, RepeatedType>(
                     self,
                     value: RepeatedType,
-                ) -> LocationBuilder<(T, LocationSingleField2<RepeatedType>)>
+                ) -> LocationBuilder<(T, LocationSingleField2<ScalarType, RepeatedType>)>
                 where
-                    for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                    for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
                 {
                     LocationBuilder((self.0, LocationSingleField2 { span: value }))
                 }
@@ -24651,12 +27521,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Annotation {
                 pub path: ::std::vec::Vec<i32>,
                 pub source_file: ::std::option::Option<::std::string::String>,
@@ -24789,26 +27654,58 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for Annotation {
+            impl ::puroro::internal::SerializableMessageToIoWrite for Annotation
+            where
+                Self: super::_puroro_traits::AnnotationTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::ser_field(&self.path, 1, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field(&self.source_file, 2, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.begin, 3, out)?;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field(&self.end, 4, out)?;
-
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::path(self),
+                        1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::source_file_opt(self),
+                        2,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::begin_opt(self),
+                        3,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::end_opt(self),
+                        4,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl ::std::default::Default for Annotation {
+                fn default() -> Self {
+                    Self {
+                        path: ::std::default::Default::default(),
+                        source_file: ::std::default::Default::default(),
+                        begin: ::std::default::Default::default(),
+                        end: ::std::default::Default::default(),
+                    }
                 }
             }
         }
@@ -24930,58 +27827,86 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct AnnotationSingleField1<RepeatedType>
+            pub struct AnnotationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 pub path: RepeatedType,
             }
 
-            impl<RepeatedType> ::puroro::Message<super::Annotation> for AnnotationSingleField1<RepeatedType> where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>
+            impl<ScalarType, RepeatedType> ::puroro::Message<super::Annotation>
+                for AnnotationSingleField1<ScalarType, RepeatedType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
             }
 
-            impl<RepeatedType> super::_puroro_traits::AnnotationTrait for AnnotationSingleField1<RepeatedType>
+            impl<ScalarType, RepeatedType> super::_puroro_traits::AnnotationTrait
+                for AnnotationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 type Field1RepeatedType<'this>
                 where
                     Self: 'this,
-                = ::std::iter::Cloned<<&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter>;
+                = ::puroro::internal::impls::single_field::CloneThenIntoIter<
+                    <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+                    i32,
+                >;
 
                 fn path<'this>(&'this self) -> Self::Field1RepeatedType<'this> {
-                    ::std::iter::Iterator::cloned(::std::iter::IntoIterator::into_iter(&self.path))
+                    ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
+                        ::std::iter::IntoIterator::into_iter(&self.path),
+                    )
                 }
             }
 
-            impl<RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
-                for AnnotationSingleField1<RepeatedType>
+            impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+                for AnnotationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+                Self: super::_puroro_traits::AnnotationTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    &self.path,
-                    1,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Repeated,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::path(self),
+                        1,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl<RepeatedType> ::std::convert::From<RepeatedType> for AnnotationSingleField1<RepeatedType>
+            impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
+                for AnnotationSingleField1<ScalarType, RepeatedType>
             where
-                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
             {
                 fn from(value: RepeatedType) -> Self {
                     Self { path: value }
@@ -25035,21 +27960,20 @@ pub mod _puroro_nested {
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
+                Self: super::_puroro_traits::AnnotationTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::String
-                >::ser_field::
-                <ScalarType, _, _>
-                (
-                    ::std::iter::once(&self.source_file),
-                    2,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::String,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::source_file_opt(self),
+                        2,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
@@ -25068,13 +27992,31 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct AnnotationSingleField3 {
-                pub begin: i32,
+            pub struct AnnotationSingleField3<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub begin: ScalarType,
             }
 
-            impl ::puroro::Message<super::Annotation> for AnnotationSingleField3 {}
+            impl<ScalarType> ::puroro::Message<super::Annotation> for AnnotationSingleField3<ScalarType> where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::AnnotationTrait for AnnotationSingleField3 {
+            impl<ScalarType> super::_puroro_traits::AnnotationTrait for AnnotationSingleField3<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 type Field1RepeatedType<'this>
                 where
                     Self: 'this,
@@ -25084,44 +28026,76 @@ pub mod _puroro_nested {
                 }
 
                 fn begin_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.begin))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.begin),
+                    ))
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for AnnotationSingleField3 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for AnnotationSingleField3<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::AnnotationTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.begin),
-                    3,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::begin_opt(self),
+                        3,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for AnnotationSingleField3 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for AnnotationSingleField3<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { begin: value }
                 }
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
-            pub struct AnnotationSingleField4 {
-                pub end: i32,
+            pub struct AnnotationSingleField4<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub end: ScalarType,
             }
 
-            impl ::puroro::Message<super::Annotation> for AnnotationSingleField4 {}
+            impl<ScalarType> ::puroro::Message<super::Annotation> for AnnotationSingleField4<ScalarType> where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
 
-            impl super::_puroro_traits::AnnotationTrait for AnnotationSingleField4 {
+            impl<ScalarType> super::_puroro_traits::AnnotationTrait for AnnotationSingleField4<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
                 type Field1RepeatedType<'this>
                 where
                     Self: 'this,
@@ -25131,31 +28105,45 @@ pub mod _puroro_nested {
                 }
 
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.end))
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.end),
+                    ))
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for AnnotationSingleField4 {
+            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
+                for AnnotationSingleField4<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::AnnotationTrait,
+            {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-                    SerFieldToIoWrite::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::ser_field::
-                <(), _, _>
-                (
-                    ::std::iter::once(&self.end),
-                    4,
-                    out
-                )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::AnnotationTrait>::end_opt(self),
+                        4,
+                        out,
+                    )?;
                     ::std::result::Result::Ok(())
                 }
             }
 
-            impl ::std::convert::From<i32> for AnnotationSingleField4 {
-                fn from(value: i32) -> Self {
+            impl<ScalarType> ::std::convert::From<ScalarType> for AnnotationSingleField4<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
                     Self { end: value }
                 }
             }
@@ -25165,12 +28153,16 @@ pub mod _puroro_nested {
             where
                 T: AnnotationTrait,
             {
-                pub fn append_path<RepeatedType>(
+                pub fn append_path<ScalarType, RepeatedType>(
                     self,
                     value: RepeatedType,
-                ) -> AnnotationBuilder<(T, AnnotationSingleField1<RepeatedType>)>
+                ) -> AnnotationBuilder<(T, AnnotationSingleField1<ScalarType, RepeatedType>)>
                 where
-                    for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a i32>,
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                    for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
                 {
                     AnnotationBuilder((self.0, AnnotationSingleField1 { path: value }))
                 }
@@ -25188,17 +28180,29 @@ pub mod _puroro_nested {
                     AnnotationBuilder((self.0, AnnotationSingleField2 { source_file: value }))
                 }
 
-                pub fn append_begin(
+                pub fn append_begin<ScalarType>(
                     self,
-                    value: i32,
-                ) -> AnnotationBuilder<(T, AnnotationSingleField3)> {
+                    value: ScalarType,
+                ) -> AnnotationBuilder<(T, AnnotationSingleField3<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     AnnotationBuilder((self.0, AnnotationSingleField3 { begin: value }))
                 }
 
-                pub fn append_end(
+                pub fn append_end<ScalarType>(
                     self,
-                    value: i32,
-                ) -> AnnotationBuilder<(T, AnnotationSingleField4)> {
+                    value: ScalarType,
+                ) -> AnnotationBuilder<(T, AnnotationSingleField4<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
                     AnnotationBuilder((self.0, AnnotationSingleField4 { end: value }))
                 }
 
