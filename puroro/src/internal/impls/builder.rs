@@ -136,6 +136,6 @@
 //! defined (as the above limitations).
 //!
 //! # Samples
-//! File `tests/src/cases/builder.rs` contains some test cases against
-//! `tests-pb/protos/full-coverage3.proto` .
+//! File [`tests/src/cases/builder.rs`](https://github.com/wada314/puroro/blob/master/tests/src/cases/builder.rs)
+//! contains some test cases against `tests-pb/protos/full-coverage3.proto` .
 //!
