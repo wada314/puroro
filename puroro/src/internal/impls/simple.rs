@@ -241,7 +241,6 @@
 //!
 
 pub mod de;
-pub mod se;
 
 use ::std::borrow::Borrow;
 use ::std::marker::PhantomData;

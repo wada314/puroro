@@ -64,7 +64,6 @@ struct Message {
     proto_name: String,
     trait_ident: String,
     trait_delegate_macro_ident: String,
-    trait_generic_ser_function_ident: String,
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
@@ -104,7 +103,6 @@ impl Message {
             proto_name: m.proto_name().to_string(),
             trait_ident: m.rust_trait_ident().to_string(),
             trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
-            trait_generic_ser_function_ident: format!("{}_ser", m.rust_nested_module_ident()),
             submodule_ident: m.rust_nested_module_ident().to_string(),
             nested: MessagesAndEnums {
                 messages: nested_messages,
@@ -193,7 +191,6 @@ struct Field {
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
-    single_field_label_and_type_tags: String,
 }
 
 impl Field {
@@ -261,8 +258,6 @@ impl Field {
             })?,
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
-            single_field_label_and_type_tags: f
-                .rust_label_and_type_tags(|_| Ok("ScalarType".to_string()))?,
         })
     }
 
