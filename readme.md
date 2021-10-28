@@ -65,7 +65,7 @@ want to make a separated crate containing only generated .rs code (and build.rs 
     - [ ] Keep unknown fields
     - [ ] Deserializer from a slice
     - [ ] Serializer performance improvement
-        - [ ] Allow heap memory allocation for serializer (maybe keep the v0.1's no-alloc ver as a choice, but anyway no-alloc ver is too slow)
+        - [x] Allow heap memory allocation for serializer (maybe keep the v0.1's no-alloc ver as a choice, but anyway no-alloc ver is too slow)
     - [ ] Custom deserializer (?)
     - [ ] Required field checker
     - [ ] Other implementations
