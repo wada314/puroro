@@ -14,6 +14,13 @@ pub mod _puroro_traits {
     }
     {{ messages|print_traits|indent(4) }}
 }
+pub use _puroro_mut_traits::*;
+pub mod _puroro_mut_traits {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    {{ messages|print_mut_traits|indent(4) }}
+}
 {%- endif %}
 
 {#-################ Enums ################}

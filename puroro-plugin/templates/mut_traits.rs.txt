@@ -1,0 +1,4 @@
+{%- for m in messages %}
+pub trait {{ m.mut_trait_ident }} {
+}
+{%- endfor %} {#- for m in messages #}

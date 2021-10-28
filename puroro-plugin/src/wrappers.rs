@@ -340,6 +340,9 @@ impl Message {
     pub fn rust_trait_ident(&self) -> String {
         format!("{}Trait", &self.rust_ident)
     }
+    pub fn rust_mut_trait_ident(&self) -> String {
+        format!("{}MutTrait", &self.rust_ident)
+    }
     pub fn rust_impl_ident(&self, impl_name: &str) -> String {
         // Simple impl uses raw name without suffix.
         if impl_name == "Simple" {

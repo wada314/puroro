@@ -1750,6 +1750,15 @@ pub mod _puroro_traits {
         submsg_delegate!(T);
     }
 }
+pub use _puroro_mut_traits::*;
+pub mod _puroro_mut_traits {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+
+    pub trait MsgMutTrait {}
+    pub trait SubmsgMutTrait {}
+}
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     pub mod msg {

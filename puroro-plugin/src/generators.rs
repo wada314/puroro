@@ -64,6 +64,7 @@ struct Message {
     proto_name: String,
     trait_ident: String,
     trait_delegate_macro_ident: String,
+    mut_trait_ident: String,
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
@@ -103,6 +104,7 @@ impl Message {
             proto_name: m.proto_name().to_string(),
             trait_ident: m.rust_trait_ident().to_string(),
             trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
+            mut_trait_ident: m.rust_mut_trait_ident().to_string(),
             submodule_ident: m.rust_nested_module_ident().to_string(),
             nested: MessagesAndEnums {
                 messages: nested_messages,
@@ -473,6 +475,12 @@ struct Traits<'a> {
     messages: &'a [Message],
 }
 
+#[derive(Template)]
+#[template(path = "mut_traits.rs.txt")]
+struct MutTraits<'a> {
+    messages: &'a [Message],
+}
+
 mod filters {
     use super::*;
     pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
@@ -480,5 +488,8 @@ mod filters {
     }
     pub(super) fn print_traits(messages: &[Message]) -> ::askama::Result<Traits> {
         Ok(Traits { messages })
+    }
+    pub(super) fn print_mut_traits(messages: &[Message]) -> ::askama::Result<MutTraits> {
+        Ok(MutTraits { messages })
     }
 }

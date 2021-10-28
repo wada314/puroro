@@ -2616,6 +2616,14 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
 }
+pub use _puroro_mut_traits::*;
+pub mod _puroro_mut_traits {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+
+    pub trait MsgMutTrait {}
+}
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
     Zeroth,
@@ -2958,6 +2966,14 @@ pub mod _puroro_nested {
             {
                 submsg_delegate!(T);
             }
+        }
+        pub use _puroro_mut_traits::*;
+        pub mod _puroro_mut_traits {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+
+            pub trait SubmsgMutTrait {}
         }
         pub use _puroro_nested::*;
         pub mod _puroro_nested {

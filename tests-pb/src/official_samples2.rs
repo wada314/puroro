@@ -1203,6 +1203,17 @@ pub mod _puroro_traits {
         test4_delegate!(T);
     }
 }
+pub use _puroro_mut_traits::*;
+pub mod _puroro_mut_traits {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+
+    pub trait Test1MutTrait {}
+    pub trait Test2MutTrait {}
+    pub trait Test3MutTrait {}
+    pub trait Test4MutTrait {}
+}
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     pub mod test1 {
