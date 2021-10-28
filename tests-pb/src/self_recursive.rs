@@ -101,8 +101,10 @@ pub mod _puroro_simple_impl {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<Self::Field1MessageType>,
-            >::ser(
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'_>,
+                >,
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
                 1,
                 out,
@@ -238,7 +240,8 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         Self: super::_puroro_traits::MsgTrait,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -246,8 +249,10 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<Self::Field1MessageType>,
-            >::ser(
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'_>,
+                >,
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
                 1,
                 out,

@@ -75,7 +75,8 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield) %}
     Self: super::_puroro_traits::{{ m.ident }}Trait,
 {%- if sfield.is_message %}
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ sfield.number }}MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {%- endif %}
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -84,7 +85,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     {
         ::puroro::internal::se::SerFieldToIoWrite::<
             {{ sfield.trait_label_and_type_tags }}
-        >::ser(
+        >::ser_field(
             {%- if sfield.is_repeated %}
             <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ sfield.ident }}(self),
             {%- else %}

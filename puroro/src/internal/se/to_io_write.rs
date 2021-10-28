@@ -179,23 +179,19 @@ where
 {
     pub fn ser_field<'a, FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
     where
-        M: 'a,
-        FieldType: 'a + IntoIterator<Item = &'a M>,
+        FieldType: IntoIterator<Item = M>,
         W: Write,
     {
         for item in field.into_iter() {
             let mut encoded = Vec::new();
-            <M as SerializableMessageToIoWrite>::ser(item, &mut encoded)?;
+            <M as SerializableMessageToIoWrite>::ser(&item, &mut encoded)?;
             let len = encoded.len();
-            if len == 0 {
-                return Ok(());
-            }
             let len_i32: i32 = len
                 .try_into()
                 .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            <M as SerializableMessageToIoWrite>::ser(item, out)?;
+            out.write_all(&encoded)?;
         }
         Ok(())
     }

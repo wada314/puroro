@@ -150,7 +150,7 @@ where
         {%- for field in m.fields %}
         ::puroro::internal::se::SerFieldToIoWrite::<
             {{ field.trait_label_and_type_tags }}
-        >::ser(
+        >::ser_field(
             {%- if field.is_repeated %}
             <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self),
             {%- else %}

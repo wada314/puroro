@@ -91,7 +91,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::type_opt(self),
                 1,
                 out,
@@ -195,7 +195,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::type_opt(self),
                 1,
                 out,

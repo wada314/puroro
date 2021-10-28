@@ -317,7 +317,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
                 1,
                 out,
@@ -325,7 +325,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
                 2,
                 out,
@@ -333,7 +333,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Float,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::float_unlabeled_opt(self),
                 3,
                 out,
@@ -341,7 +341,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Float,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
                 4,
                 out,
@@ -349,7 +349,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::String,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
                 5,
                 out,
@@ -357,23 +357,27 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::String,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
                 6,
                 out,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<Self::Field7MessageType>,
-            >::ser(
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
+                >,
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
                 7,
                 out,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<Self::Field8MessageType>,
-            >::ser(
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
+                >,
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
                 8,
                 out,
@@ -381,7 +385,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::enum_unlabeled_opt(self),
                 9,
                 out,
@@ -389,7 +393,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
                 10,
                 out,
@@ -397,7 +401,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
                 536870911,
                 out,
@@ -940,7 +944,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
                 1,
                 out,
@@ -1066,7 +1070,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
                 2,
                 out,
@@ -1186,7 +1190,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Float,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::float_unlabeled_opt(self),
                 3,
                 out,
@@ -1312,7 +1316,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Float,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
                 4,
                 out,
@@ -1430,7 +1434,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::String,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
                 5,
                 out,
@@ -1556,7 +1560,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::String,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
                 6,
                 out,
@@ -1672,7 +1676,8 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         Self: super::_puroro_traits::MsgTrait,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1680,8 +1685,10 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<Self::Field7MessageType>,
-            >::ser(
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
+                >,
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
                 7,
                 out,
@@ -1799,7 +1806,8 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
-        ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
+            ::puroro::internal::SerializableMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1807,8 +1815,10 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<Self::Field8MessageType>,
-            >::ser(
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
+                >,
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
                 8,
                 out,
@@ -1931,7 +1941,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::enum_unlabeled_opt(self),
                 9,
                 out,
@@ -2055,7 +2065,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
                 10,
                 out,
@@ -2176,7 +2186,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Int32,
-            >::ser(
+            >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
                 536870911,
                 out,
@@ -2764,7 +2774,7 @@ pub mod _puroro_nested {
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Unlabeled,
                         ::puroro::tags::Int32,
-                    >::ser(
+                    >::ser_field(
                         <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
                         1,
                         out,
@@ -2869,7 +2879,7 @@ pub mod _puroro_nested {
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Unlabeled,
                         ::puroro::tags::Int32,
-                    >::ser(
+                    >::ser_field(
                         <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
                         1,
                         out,
