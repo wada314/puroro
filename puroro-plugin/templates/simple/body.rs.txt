@@ -139,40 +139,27 @@ impl ::puroro::internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
     }
 }
 
-impl ::puroro::internal::SerializableMessageToIoWrite for {{ m.simple_ident }} {
+impl ::puroro::internal::SerializableMessageToIoWrite for {{ m.simple_ident }}
+where
+    Self: super::_puroro_traits::{{ m.ident }}Trait,
+{
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-
         {%- for field in m.fields %}
-        {%- if !field.is_explicit_oneof_field %}
-        {%- if field.has_default_value %}
-        if <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(self) !=
-            <() as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(&())
-        {%- endif %}
-        {
-            SerFieldToIoWrite::<
-                {{ field.simple_label_and_type_tags }}
-            >::ser_field(&self.{{ field.ident }}, {{ field.number }}, out)?;
-        }
-        {%- endif %}
-        {%- endfor %}
-
-        {%- for oneof in m.oneofs %}
-        if let Some(oneof) = self.{{ oneof.field_ident }}.as_ref() {
-            use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
-            match oneof {
-                {%- for field in oneof.fields %}
-                E::{{ field.ident }}(v) => SerFieldToIoWrite::<
-                    ::puroro::tags::OneofField, {{ field.simple_field_type_tag }}
-                >::ser_field(v, {{ field.number }}, out)?,
-                {%- endfor %}
-            }
-        }
-        {%- endfor %}
-
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            {{ field.trait_label_and_type_tags }}
+        >::ser_field(
+            {%- if field.is_repeated %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self),
+            {%- else %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_opt(self),
+            {%- endif %}
+            {{ field.number }},
+            out
+        )?;
+        {%- endfor %} {#- for field in m.fields #}
         ::std::result::Result::Ok(())
     }
 }

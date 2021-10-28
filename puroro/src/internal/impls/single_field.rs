@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod se;
-
 use ::std::marker::PhantomData;
 
 pub struct AsRefIter<I, R: ?Sized>(I, PhantomData<R>);

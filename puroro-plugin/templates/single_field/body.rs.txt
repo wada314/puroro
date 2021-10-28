@@ -69,32 +69,27 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     {%- endfor %}
 }
 
+
 impl{{ maybe_gp }} ::puroro::internal::SerializableMessageToIoWrite
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield) %}
+    Self: super::_puroro_traits::{{ m.ident }}Trait,
 {%- if sfield.is_message %}
-    ScalarType: ::puroro::internal::SerializableMessageToIoWrite,
+    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ sfield.number }}MessageType<'a> :
+        ::puroro::internal::SerializableMessageToIoWrite,
 {%- endif %}
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        W: ::std::io::Write
+        W: ::std::io::Write,
     {
-        use ::puroro::internal::impls::single_field::se::SerFieldToIoWrite;
-        {%- if sfield.has_default_value %}
-        if <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ sfield.ident }}(self) == 
-            <() as super::_puroro_traits::{{ m.trait_ident }}>::{{ sfield.ident }}(&())
-        {
-            return ::std::result::Result::Ok(())
-        }
-        {%- endif %}
-        SerFieldToIoWrite::<
-            {{ sfield.single_field_label_and_type_tags }}
-        >::ser_field::<_, _>(
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            {{ sfield.trait_label_and_type_tags }}
+        >::ser_field(
             {%- if sfield.is_repeated %}
-            self.{{ sfield.ident }}(),
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ sfield.ident }}(self),
             {%- else %}
-            self.{{ sfield.ident_unesc }}_opt().into_iter(),
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ sfield.ident_unesc }}_opt(self),
             {%- endif %}
             {{ sfield.number }},
             out

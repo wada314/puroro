@@ -152,4 +152,4 @@ where
     {{ m.trait_delegate_macro_ident }}!(T);
 }
 
-{%- endfor %}
+{%- endfor %} {#- for m in messages #}

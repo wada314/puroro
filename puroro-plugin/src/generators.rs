@@ -182,6 +182,7 @@ struct Field {
     default_value: String,
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
+    trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
     simple_field_type: String,
     simple_scalar_field_type: String,
@@ -190,7 +191,6 @@ struct Field {
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
-    single_field_label_and_type_tags: String,
 }
 
 impl Field {
@@ -234,6 +234,13 @@ impl Field {
                 .unwrap_or(Default::default()),
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
+            trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
+                Ok(format!(
+                    "<Self as super::_puroro_traits::{trait_ident}>::Field{number}MessageType<'_>",
+                    trait_ident = f.message()?.rust_trait_ident(),
+                    number = f.number(),
+                ))
+            })?,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
             simple_field_type: f.simple_field_type()?,
             simple_scalar_field_type: f.simple_scalar_field_type()?,
@@ -251,8 +258,6 @@ impl Field {
             })?,
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
-            single_field_label_and_type_tags: f
-                .rust_label_and_type_tags(|_| Ok("ScalarType".to_string()))?,
         })
     }
 
