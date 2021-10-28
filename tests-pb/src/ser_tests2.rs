@@ -2622,7 +2622,66 @@ pub mod _puroro_mut_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait MsgMutTrait {}
+    pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
+        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn i32_optional_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
+        fn set_i32_optional(&mut self, value: i32) {
+            *self.i32_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i32_optional(&mut self) {
+            *self.i32_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field3RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
+        fn float_optional_opt_mut<'this>(&'this mut self) -> Self::Field3RefOptMutType<'this>;
+        fn set_float_optional(&mut self, value: f32) {
+            *self.float_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_float_optional(&mut self) {
+            *self.float_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field5RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
+        fn string_optional_opt_mut<'this>(&'this mut self) -> Self::Field5RefOptMutType<'this>;
+        fn set_string_optional(&mut self, value: &str) {
+            *self.string_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_string_optional(&mut self) {
+            *self.string_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field7RefOptMutType<'this>: ::puroro::RefOptMut<'this, T>;
+        fn submsg_optional_opt_mut<'this>(&'this mut self) -> Self::Field7RefOptMutType<'this>;
+        fn set_submsg_optional(&mut self, value: T) {
+            *self.submsg_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_submsg_optional(&mut self) {
+            *self.submsg_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field9RefOptMutType<'this>: ::puroro::RefOptMut<
+            'this,
+            self::_puroro_root::ser_tests2::Enum,
+        >;
+        fn enum_optional_opt_mut<'this>(&'this mut self) -> Self::Field9RefOptMutType<'this>;
+        fn set_enum_optional(&mut self, value: self::_puroro_root::ser_tests2::Enum) {
+            *self.enum_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_enum_optional(&mut self) {
+            *self.enum_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field536870911RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn very_large_field_number_opt_mut<'this>(
+            &'this mut self,
+        ) -> Self::Field536870911RefOptMutType<'this>;
+        fn set_very_large_field_number(&mut self, value: i32) {
+            *self.very_large_field_number_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_very_large_field_number(&mut self) {
+            *self.very_large_field_number_opt_mut() = ::std::option::Option::None;
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -2973,7 +3032,17 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            pub trait SubmsgMutTrait {}
+            pub trait SubmsgMutTrait: super::_puroro_traits::SubmsgTrait {
+                type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+                fn i32_optional_opt_mut<'this>(&'this mut self)
+                -> Self::Field1RefOptMutType<'this>;
+                fn set_i32_optional(&mut self, value: i32) {
+                    *self.i32_optional_opt_mut() = ::std::option::Option::Some(value);
+                }
+                fn clear_i32_optional(&mut self) {
+                    *self.i32_optional_opt_mut() = ::std::option::Option::None;
+                }
+            }
         }
         pub use _puroro_nested::*;
         pub mod _puroro_nested {

@@ -1,4 +1,21 @@
 {%- for m in messages %}
-pub trait {{ m.mut_trait_ident }} {
+pub trait {{ m.mut_trait_ident }}: super::_puroro_traits::{{ m.trait_ident }} {
+    {%- for field in m.fields %}
+
+    {%- if field.is_repeated %}
+    {%- else %} {#- if field.is_repeated #}
+
+    type Field{{ field.number }}RefOptMutType<'this>: ::puroro::RefOptMut<'this, {{ field.trait_scalar_mutable_target_type }}>;
+    fn {{ field.ident_unesc }}_opt_mut<'this>(&'this mut self) -> Self::Field{{ field.number }}RefOptMutType<'this>;
+    fn set_{{ field.ident_unesc }}(&mut self, value: {{ field.trait_scalar_mutable_target_type }}) {
+        *self.{{ field.ident_unesc }}_opt_mut() = ::std::option::Option::Some(value);
+    }
+    fn clear_{{ field.ident_unesc }}(&mut self) {
+        *self.{{ field.ident_unesc }}_opt_mut() = ::std::option::Option::None;
+    }
+
+    {%- endif %} {#- if field.is_repeated #}
+
+    {%- endfor %} {#- for field in m.fields #}
 }
 {%- endfor %} {#- for m in messages #}

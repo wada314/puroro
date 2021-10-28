@@ -1489,8 +1489,62 @@ pub mod _puroro_mut_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait MsgMutTrait {}
-    pub trait SubmsgMutTrait {}
+    pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
+        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn i32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
+        fn set_i32_unlabeled(&mut self, value: i32) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i32_unlabeled(&mut self) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field2RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn i32_optional_opt_mut<'this>(&'this mut self) -> Self::Field2RefOptMutType<'this>;
+        fn set_i32_optional(&mut self, value: i32) {
+            *self.i32_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i32_optional(&mut self) {
+            *self.i32_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field4RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
+        fn f32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field4RefOptMutType<'this>;
+        fn set_f32_unlabeled(&mut self, value: f32) {
+            *self.f32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_f32_unlabeled(&mut self) {
+            *self.f32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field5RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
+        fn string_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field5RefOptMutType<'this>;
+        fn set_string_unlabeled(&mut self, value: &str) {
+            *self.string_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_string_unlabeled(&mut self) {
+            *self.string_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field6RefOptMutType<'this>: ::puroro::RefOptMut<'this, T>;
+        fn submsg_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field6RefOptMutType<'this>;
+        fn set_submsg_unlabeled(&mut self, value: T) {
+            *self.submsg_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_submsg_unlabeled(&mut self) {
+            *self.submsg_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+    }
+    pub trait SubmsgMutTrait: super::_puroro_traits::SubmsgTrait {
+        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn i32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
+        fn set_i32_unlabeled(&mut self, value: i32) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i32_unlabeled(&mut self) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+    }
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {

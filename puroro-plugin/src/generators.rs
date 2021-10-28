@@ -183,6 +183,7 @@ struct Field {
     has_default_value: bool,
     default_value: String,
     trait_scalar_getter_type: String,
+    trait_scalar_mutable_target_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
     trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
@@ -235,6 +236,7 @@ impl Field {
                 .transpose()?
                 .unwrap_or(Default::default()),
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
+            trait_scalar_mutable_target_type: f.trait_scalar_mutable_target_type()?,
             trait_maybe_field_message_trait_path,
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(

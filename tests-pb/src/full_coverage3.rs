@@ -14137,7 +14137,303 @@ pub mod _puroro_mut_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait MsgMutTrait {}
+    pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
+        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn i32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
+        fn set_i32_unlabeled(&mut self, value: i32) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i32_unlabeled(&mut self) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field2RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn i32_optional_opt_mut<'this>(&'this mut self) -> Self::Field2RefOptMutType<'this>;
+        fn set_i32_optional(&mut self, value: i32) {
+            *self.i32_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i32_optional(&mut self) {
+            *self.i32_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field11RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
+        fn float_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field11RefOptMutType<'this>;
+        fn set_float_unlabeled(&mut self, value: f32) {
+            *self.float_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_float_unlabeled(&mut self) {
+            *self.float_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field12RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
+        fn float_optional_opt_mut<'this>(&'this mut self) -> Self::Field12RefOptMutType<'this>;
+        fn set_float_optional(&mut self, value: f32) {
+            *self.float_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_float_optional(&mut self) {
+            *self.float_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field21RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
+        fn bytes_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field21RefOptMutType<'this>;
+        fn set_bytes_unlabeled(&mut self, value: &[u8]) {
+            *self.bytes_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_bytes_unlabeled(&mut self) {
+            *self.bytes_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field22RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
+        fn bytes_optional_opt_mut<'this>(&'this mut self) -> Self::Field22RefOptMutType<'this>;
+        fn set_bytes_optional(&mut self, value: &[u8]) {
+            *self.bytes_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_bytes_optional(&mut self) {
+            *self.bytes_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field31RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
+        fn string_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field31RefOptMutType<'this>;
+        fn set_string_unlabeled(&mut self, value: &str) {
+            *self.string_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_string_unlabeled(&mut self) {
+            *self.string_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field32RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
+        fn string_optional_opt_mut<'this>(&'this mut self) -> Self::Field32RefOptMutType<'this>;
+        fn set_string_optional(&mut self, value: &str) {
+            *self.string_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_string_optional(&mut self) {
+            *self.string_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field41RefOptMutType<'this>: ::puroro::RefOptMut<
+            'this,
+            self::_puroro_root::full_coverage3::Enum,
+        >;
+        fn enum_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field41RefOptMutType<'this>;
+        fn set_enum_unlabeled(&mut self, value: self::_puroro_root::full_coverage3::Enum) {
+            *self.enum_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_enum_unlabeled(&mut self) {
+            *self.enum_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field42RefOptMutType<'this>: ::puroro::RefOptMut<
+            'this,
+            self::_puroro_root::full_coverage3::Enum,
+        >;
+        fn enum_optional_opt_mut<'this>(&'this mut self) -> Self::Field42RefOptMutType<'this>;
+        fn set_enum_optional(&mut self, value: self::_puroro_root::full_coverage3::Enum) {
+            *self.enum_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_enum_optional(&mut self) {
+            *self.enum_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field51RefOptMutType<'this>: ::puroro::RefOptMut<'this, T>;
+        fn submsg_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field51RefOptMutType<'this>;
+        fn set_submsg_unlabeled(&mut self, value: T) {
+            *self.submsg_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_submsg_unlabeled(&mut self) {
+            *self.submsg_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field52RefOptMutType<'this>: ::puroro::RefOptMut<'this, T>;
+        fn submsg_optional_opt_mut<'this>(&'this mut self) -> Self::Field52RefOptMutType<'this>;
+        fn set_submsg_optional(&mut self, value: T) {
+            *self.submsg_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_submsg_optional(&mut self) {
+            *self.submsg_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field101RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
+        fn i64_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field101RefOptMutType<'this>;
+        fn set_i64_unlabeled(&mut self, value: i64) {
+            *self.i64_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i64_unlabeled(&mut self) {
+            *self.i64_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field102RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
+        fn i64_optional_opt_mut<'this>(&'this mut self) -> Self::Field102RefOptMutType<'this>;
+        fn set_i64_optional(&mut self, value: i64) {
+            *self.i64_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i64_optional(&mut self) {
+            *self.i64_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field111RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
+        fn u32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field111RefOptMutType<'this>;
+        fn set_u32_unlabeled(&mut self, value: u32) {
+            *self.u32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_u32_unlabeled(&mut self) {
+            *self.u32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field112RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
+        fn u32_optional_opt_mut<'this>(&'this mut self) -> Self::Field112RefOptMutType<'this>;
+        fn set_u32_optional(&mut self, value: u32) {
+            *self.u32_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_u32_optional(&mut self) {
+            *self.u32_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field121RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
+        fn u64_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field121RefOptMutType<'this>;
+        fn set_u64_unlabeled(&mut self, value: u64) {
+            *self.u64_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_u64_unlabeled(&mut self) {
+            *self.u64_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field122RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
+        fn u64_optional_opt_mut<'this>(&'this mut self) -> Self::Field122RefOptMutType<'this>;
+        fn set_u64_optional(&mut self, value: u64) {
+            *self.u64_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_u64_optional(&mut self) {
+            *self.u64_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field131RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn s32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field131RefOptMutType<'this>;
+        fn set_s32_unlabeled(&mut self, value: i32) {
+            *self.s32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_s32_unlabeled(&mut self) {
+            *self.s32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field132RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn s32_optional_opt_mut<'this>(&'this mut self) -> Self::Field132RefOptMutType<'this>;
+        fn set_s32_optional(&mut self, value: i32) {
+            *self.s32_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_s32_optional(&mut self) {
+            *self.s32_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field141RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
+        fn s64_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field141RefOptMutType<'this>;
+        fn set_s64_unlabeled(&mut self, value: i64) {
+            *self.s64_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_s64_unlabeled(&mut self) {
+            *self.s64_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field142RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
+        fn s64_optional_opt_mut<'this>(&'this mut self) -> Self::Field142RefOptMutType<'this>;
+        fn set_s64_optional(&mut self, value: i64) {
+            *self.s64_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_s64_optional(&mut self) {
+            *self.s64_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field151RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
+        fn fixed32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field151RefOptMutType<'this>;
+        fn set_fixed32_unlabeled(&mut self, value: u32) {
+            *self.fixed32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_fixed32_unlabeled(&mut self) {
+            *self.fixed32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field152RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
+        fn fixed32_optional_opt_mut<'this>(&'this mut self) -> Self::Field152RefOptMutType<'this>;
+        fn set_fixed32_optional(&mut self, value: u32) {
+            *self.fixed32_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_fixed32_optional(&mut self) {
+            *self.fixed32_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field161RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
+        fn fixed64_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field161RefOptMutType<'this>;
+        fn set_fixed64_unlabeled(&mut self, value: u64) {
+            *self.fixed64_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_fixed64_unlabeled(&mut self) {
+            *self.fixed64_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field162RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
+        fn fixed64_optional_opt_mut<'this>(&'this mut self) -> Self::Field162RefOptMutType<'this>;
+        fn set_fixed64_optional(&mut self, value: u64) {
+            *self.fixed64_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_fixed64_optional(&mut self) {
+            *self.fixed64_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field171RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn sfixed32_unlabeled_opt_mut<'this>(&'this mut self)
+        -> Self::Field171RefOptMutType<'this>;
+        fn set_sfixed32_unlabeled(&mut self, value: i32) {
+            *self.sfixed32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_sfixed32_unlabeled(&mut self) {
+            *self.sfixed32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field172RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn sfixed32_optional_opt_mut<'this>(&'this mut self) -> Self::Field172RefOptMutType<'this>;
+        fn set_sfixed32_optional(&mut self, value: i32) {
+            *self.sfixed32_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_sfixed32_optional(&mut self) {
+            *self.sfixed32_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field181RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
+        fn sfixed64_unlabeled_opt_mut<'this>(&'this mut self)
+        -> Self::Field181RefOptMutType<'this>;
+        fn set_sfixed64_unlabeled(&mut self, value: i64) {
+            *self.sfixed64_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_sfixed64_unlabeled(&mut self) {
+            *self.sfixed64_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field182RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
+        fn sfixed64_optional_opt_mut<'this>(&'this mut self) -> Self::Field182RefOptMutType<'this>;
+        fn set_sfixed64_optional(&mut self, value: i64) {
+            *self.sfixed64_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_sfixed64_optional(&mut self) {
+            *self.sfixed64_optional_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field191RefOptMutType<'this>: ::puroro::RefOptMut<'this, f64>;
+        fn f64_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field191RefOptMutType<'this>;
+        fn set_f64_unlabeled(&mut self, value: f64) {
+            *self.f64_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_f64_unlabeled(&mut self) {
+            *self.f64_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field192RefOptMutType<'this>: ::puroro::RefOptMut<'this, f64>;
+        fn f64_optional_opt_mut<'this>(&'this mut self) -> Self::Field192RefOptMutType<'this>;
+        fn set_f64_optional(&mut self, value: f64) {
+            *self.f64_optional_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_f64_optional(&mut self) {
+            *self.f64_optional_opt_mut() = ::std::option::Option::None;
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -14642,7 +14938,29 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            pub trait SubmsgMutTrait {}
+            pub trait SubmsgMutTrait: super::_puroro_traits::SubmsgTrait {
+                type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+                fn i32_unlabeled_opt_mut<'this>(
+                    &'this mut self,
+                ) -> Self::Field1RefOptMutType<'this>;
+                fn set_i32_unlabeled(&mut self, value: i32) {
+                    *self.i32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+                }
+                fn clear_i32_unlabeled(&mut self) {
+                    *self.i32_unlabeled_opt_mut() = ::std::option::Option::None;
+                }
+
+                type Field101RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
+                fn i64_unlabeled_opt_mut<'this>(
+                    &'this mut self,
+                ) -> Self::Field101RefOptMutType<'this>;
+                fn set_i64_unlabeled(&mut self, value: i64) {
+                    *self.i64_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+                }
+                fn clear_i64_unlabeled(&mut self) {
+                    *self.i64_unlabeled_opt_mut() = ::std::option::Option::None;
+                }
+            }
         }
         pub use _puroro_nested::*;
         pub mod _puroro_nested {

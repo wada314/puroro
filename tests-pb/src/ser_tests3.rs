@@ -2642,7 +2642,66 @@ pub mod _puroro_mut_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait MsgMutTrait {}
+    pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
+        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn i32_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
+        fn set_i32_unlabeled(&mut self, value: i32) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_i32_unlabeled(&mut self) {
+            *self.i32_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field3RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
+        fn float_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field3RefOptMutType<'this>;
+        fn set_float_unlabeled(&mut self, value: f32) {
+            *self.float_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_float_unlabeled(&mut self) {
+            *self.float_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field5RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
+        fn string_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field5RefOptMutType<'this>;
+        fn set_string_unlabeled(&mut self, value: &str) {
+            *self.string_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_string_unlabeled(&mut self) {
+            *self.string_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field7RefOptMutType<'this>: ::puroro::RefOptMut<'this, T>;
+        fn submsg_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field7RefOptMutType<'this>;
+        fn set_submsg_unlabeled(&mut self, value: T) {
+            *self.submsg_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_submsg_unlabeled(&mut self) {
+            *self.submsg_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field9RefOptMutType<'this>: ::puroro::RefOptMut<
+            'this,
+            self::_puroro_root::ser_tests3::Enum,
+        >;
+        fn enum_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field9RefOptMutType<'this>;
+        fn set_enum_unlabeled(&mut self, value: self::_puroro_root::ser_tests3::Enum) {
+            *self.enum_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_enum_unlabeled(&mut self) {
+            *self.enum_unlabeled_opt_mut() = ::std::option::Option::None;
+        }
+
+        type Field536870911RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+        fn very_large_field_number_opt_mut<'this>(
+            &'this mut self,
+        ) -> Self::Field536870911RefOptMutType<'this>;
+        fn set_very_large_field_number(&mut self, value: i32) {
+            *self.very_large_field_number_opt_mut() = ::std::option::Option::Some(value);
+        }
+        fn clear_very_large_field_number(&mut self) {
+            *self.very_large_field_number_opt_mut() = ::std::option::Option::None;
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -2998,7 +3057,18 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            pub trait SubmsgMutTrait {}
+            pub trait SubmsgMutTrait: super::_puroro_traits::SubmsgTrait {
+                type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
+                fn i32_unlabeled_opt_mut<'this>(
+                    &'this mut self,
+                ) -> Self::Field1RefOptMutType<'this>;
+                fn set_i32_unlabeled(&mut self, value: i32) {
+                    *self.i32_unlabeled_opt_mut() = ::std::option::Option::Some(value);
+                }
+                fn clear_i32_unlabeled(&mut self) {
+                    *self.i32_unlabeled_opt_mut() = ::std::option::Option::None;
+                }
+            }
         }
         pub use _puroro_nested::*;
         pub mod _puroro_nested {
