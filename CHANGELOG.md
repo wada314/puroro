@@ -1,3 +1,7 @@
+# v 0.3.0
+- Changed the serializer method to use heap memory
+- Changed the builder's `append_my_i32_field()` methods for numerical types to accept `Into<i32>` types.
+
 # v 0.2.0
 - Changed the message trait's getter methods entirely.
     - non-repeated field `foo` generates `foo(&self) -> T`, `foo_opt(&self) -> Option<T>`, and `has_foo(&self) -> bool`.
