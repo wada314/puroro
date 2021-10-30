@@ -18,6 +18,45 @@ use from_iter::ScopedIter;
 
 pub mod from_iter;
 
+pub trait DeserMessageFromBytesIter {
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
+}
+impl<'a, T> DeserMessageFromBytesIter for &'a mut T
+where
+    T: DeserMessageFromBytesIter,
+{
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        <T as DeserMessageFromBytesIter>::deser(*self, iter)
+    }
+}
+impl<T> DeserMessageFromBytesIter for Box<T>
+where
+    T: DeserMessageFromBytesIter,
+{
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        <T as DeserMessageFromBytesIter>::deser(self.as_mut(), iter)
+    }
+}
+impl<T> DeserMessageFromBytesIter for Option<T>
+where
+    T: DeserMessageFromBytesIter + Default,
+{
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        <T as DeserMessageFromBytesIter>::deser(self.get_or_insert_with(Default::default), iter)
+    }
+}
+
 pub trait DeserFieldsFromBytesIter {
     fn deser_field<I>(
         &mut self,

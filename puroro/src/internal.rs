@@ -51,48 +51,6 @@ pub fn init_field_descriptor(init: FieldDescriptorInitializer) -> FieldDescripto
     }
 }
 
-pub trait DeserializableMessageFromBytesIterator {
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>;
-}
-impl<'a, T> DeserializableMessageFromBytesIterator for &'a mut T
-where
-    T: DeserializableMessageFromBytesIterator,
-{
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <T as DeserializableMessageFromBytesIterator>::deser(*self, iter)
-    }
-}
-impl<T> DeserializableMessageFromBytesIterator for Box<T>
-where
-    T: DeserializableMessageFromBytesIterator,
-{
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <T as DeserializableMessageFromBytesIterator>::deser(self.as_mut(), iter)
-    }
-}
-impl<T> DeserializableMessageFromBytesIterator for Option<T>
-where
-    T: DeserializableMessageFromBytesIterator + Default,
-{
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <T as DeserializableMessageFromBytesIterator>::deser(
-            self.get_or_insert_with(Default::default),
-            iter,
-        )
-    }
-}
-
 pub trait SerializableMessageToIoWrite {
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where

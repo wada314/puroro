@@ -56,7 +56,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test1 {
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for Test1 {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -157,7 +157,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test2 {
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for Test2 {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -260,7 +260,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test3 {
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for Test3 {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -366,7 +366,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Test4 {
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for Test4 {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
