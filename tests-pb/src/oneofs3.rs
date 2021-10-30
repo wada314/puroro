@@ -1267,6 +1267,8 @@ pub mod _puroro_impls {
             Self { g3_int32: value }
         }
     }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    pub struct MsgBumpalo {}
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -1464,6 +1466,8 @@ pub mod _puroro_impls {
             }
         }
     }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    pub struct SubmsgBumpalo {}
     pub struct SubmsgBuilder<T>(T);
 
     impl<T> SubmsgBuilder<T>

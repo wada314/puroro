@@ -215,6 +215,8 @@ pub mod _puroro_impls {
             Self { r#type: value }
         }
     }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    pub struct MsgBumpalo {}
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>

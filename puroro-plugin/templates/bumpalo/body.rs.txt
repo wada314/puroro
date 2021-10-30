@@ -1,0 +1,4 @@
+#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+pub struct {{ m.bumpalo_ident }} {
+    
+}

@@ -71,6 +71,7 @@ struct Message {
     oneofs: Vec<Oneof>,
     simple_ident: String,
     single_field_ident: String,
+    bumpalo_ident: String,
     builder_ident: String,
 }
 
@@ -113,6 +114,7 @@ impl Message {
             oneofs,
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
+            bumpalo_ident: m.rust_impl_ident("Bumpalo"),
             builder_ident: m.rust_impl_ident("Builder"),
         })
     }

@@ -528,6 +528,8 @@ pub mod _puroro_impls {
             Self { a: value }
         }
     }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    pub struct Test1Bumpalo {}
     pub struct Test1Builder<T>(T);
 
     impl<T> Test1Builder<T>
@@ -655,6 +657,8 @@ pub mod _puroro_impls {
             Self { b: value }
         }
     }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    pub struct Test2Bumpalo {}
     pub struct Test2Builder<T>(T);
 
     impl<T> Test2Builder<T>
@@ -822,6 +826,8 @@ pub mod _puroro_impls {
             Self { c: value }
         }
     }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    pub struct Test3Bumpalo {}
     pub struct Test3Builder<T>(T);
 
     impl<T> Test3Builder<T>
@@ -1004,6 +1010,8 @@ pub mod _puroro_impls {
             Self { d: value }
         }
     }
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    pub struct Test4Bumpalo {}
     pub struct Test4Builder<T>(T);
 
     impl<T> Test4Builder<T>
