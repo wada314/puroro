@@ -16,8 +16,7 @@ use crate::tests_pb::ser_tests2::msg::Submsg as Submsg2;
 use crate::tests_pb::ser_tests2::{Enum as Enum2, Msg as Msg2};
 use crate::tests_pb::ser_tests3::msg::Submsg as Submsg3;
 use crate::tests_pb::ser_tests3::{Enum as Enum3, Msg as Msg3};
-use ::puroro::internal::de::DeserMessageFromBytesIter;
-use ::puroro::internal::SerializableMessageToIoWrite;
+use ::puroro::Message;
 
 #[test]
 fn test_empty2() {
@@ -117,7 +116,7 @@ fn test_ser_and_then_deser() {
     msg.ser(&mut buf).unwrap();
     use ::std::io::Read as _;
     let mut new_msg: Msg3 = Msg3::default();
-    new_msg.deser(buf.bytes()).unwrap();
+    new_msg.merge_from_bytes(buf.bytes()).unwrap();
 
     assert_eq!(msg, new_msg);
 }

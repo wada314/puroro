@@ -14,6 +14,7 @@
 
 use crate::desc::MessageDescriptor;
 use crate::internal::de::DeserMessageFromBytesIter;
+use crate::internal::de::from_iter::deser_from_iter;
 use crate::internal::SerializableMessageToIoWrite;
 use crate::Result;
 use ::std::convert::TryFrom;
@@ -50,7 +51,7 @@ pub trait Message<M> {
         Self: DeserMessageFromBytesIter,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
-        <Self as DeserMessageFromBytesIter>::deser(self, iter)
+        deser_from_iter(self, iter)
     }
 
     /// A shorthand method that allocates and deserializes the message.

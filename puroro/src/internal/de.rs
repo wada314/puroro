@@ -19,45 +19,6 @@ use from_iter::ScopedIter;
 pub mod from_iter;
 
 pub trait DeserMessageFromBytesIter {
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>;
-}
-impl<'a, T> DeserMessageFromBytesIter for &'a mut T
-where
-    T: DeserMessageFromBytesIter,
-{
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <T as DeserMessageFromBytesIter>::deser(*self, iter)
-    }
-}
-impl<T> DeserMessageFromBytesIter for Box<T>
-where
-    T: DeserMessageFromBytesIter,
-{
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <T as DeserMessageFromBytesIter>::deser(self.as_mut(), iter)
-    }
-}
-impl<T> DeserMessageFromBytesIter for Option<T>
-where
-    T: DeserMessageFromBytesIter + Default,
-{
-    fn deser<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <T as DeserMessageFromBytesIter>::deser(self.get_or_insert_with(Default::default), iter)
-    }
-}
-
-pub trait DeserFieldsFromBytesIter {
     fn deser_field<I>(
         &mut self,
         field_number: i32,
@@ -66,9 +27,24 @@ pub trait DeserFieldsFromBytesIter {
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
-impl<T> DeserFieldsFromBytesIter for Box<T>
+impl<T> DeserMessageFromBytesIter for &'_ mut T
 where
-    T: DeserFieldsFromBytesIter,
+    T: DeserMessageFromBytesIter,
+{
+    fn deser_field<I>(
+        &mut self,
+        field_number: i32,
+        data: FieldData<&mut ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        (*self).deser_field(field_number, data)
+    }
+}
+impl<T> DeserMessageFromBytesIter for Box<T>
+where
+    T: DeserMessageFromBytesIter,
 {
     fn deser_field<I>(
         &mut self,
@@ -81,9 +57,9 @@ where
         Box::as_mut(self).deser_field(field_number, data)
     }
 }
-impl<T> DeserFieldsFromBytesIter for Option<T>
+impl<T> DeserMessageFromBytesIter for Option<T>
 where
-    T: DeserFieldsFromBytesIter + Default,
+    T: DeserMessageFromBytesIter + Default,
 {
     fn deser_field<I>(
         &mut self,

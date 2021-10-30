@@ -15,7 +15,7 @@
 /// About the proto3's default values, check the following official document:
 /// https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md
 use crate::tests_pb::proto3_defaults::{Msg, MsgTrait, Submsg};
-use ::puroro::internal::de::DeserMessageFromBytesIter;
+use ::puroro::Message;
 
 const INPUT_FIELD1_I32_ZERO: &[u8] = &[(1 << 3) | 0, 0x00];
 const INPUT_FIELD1_I32_ONE: &[u8] = &[(1 << 3) | 0, 0x01];
@@ -55,18 +55,19 @@ fn test_i32_unlabeled() {
     assert_eq!(10, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
 
-    // Deser 0 into the field, but it is a default value so it should be ignored
-    msg.deser(INPUT_FIELD1_I32_ZERO.bytes()).unwrap();
+    // merge_from_bytes 0 into the field, but it is a default value so it should be ignored
+    msg.merge_from_bytes(INPUT_FIELD1_I32_ZERO.bytes()).unwrap();
     assert_eq!(10, msg.i32_unlabeled);
     assert_eq!(10, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
-    msg.deser(INPUT_FIELD1_I32_PACKED_ZERO.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD1_I32_PACKED_ZERO.bytes())
+        .unwrap();
     assert_eq!(10, msg.i32_unlabeled);
     assert_eq!(10, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
 
-    // Deser 1 into the field. Should overwrite the value.
-    msg.deser(INPUT_FIELD1_I32_ONE.bytes()).unwrap();
+    // merge_from_bytes 1 into the field. Should overwrite the value.
+    msg.merge_from_bytes(INPUT_FIELD1_I32_ONE.bytes()).unwrap();
     assert_eq!(1, msg.i32_unlabeled);
     assert_eq!(1, msg.i32_unlabeled());
     assert!(msg.has_i32_unlabeled());
@@ -85,17 +86,18 @@ fn test_i32_optional() {
     assert_eq!(10, msg.i32_optional());
     assert!(msg.has_i32_optional());
 
-    msg.deser(INPUT_FIELD2_I32_ZERO.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD2_I32_ZERO.bytes()).unwrap();
     assert_eq!(Some(0), msg.i32_optional);
     msg.i32_optional = Some(10);
     assert_eq!(10, msg.i32_optional());
     assert!(msg.has_i32_optional());
-    msg.deser(INPUT_FIELD2_I32_PACKED_ZERO.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD2_I32_PACKED_ZERO.bytes())
+        .unwrap();
     assert_eq!(Some(0), msg.i32_optional);
     assert_eq!(0, msg.i32_optional());
     assert!(msg.has_i32_optional());
 
-    msg.deser(INPUT_FIELD2_I32_ONE.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD2_I32_ONE.bytes()).unwrap();
     assert_eq!(Some(1), msg.i32_optional);
     assert_eq!(1, msg.i32_optional());
     assert!(msg.has_i32_optional());
@@ -111,13 +113,13 @@ fn test_i32_repeated() {
     msg.i32_repeated = vec![10, 20];
     assert_eq!(&vec![10, 20], &msg.i32_repeated);
 
-    msg.deser(INPUT_FIELD3_I32_ZERO.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD3_I32_ZERO.bytes()).unwrap();
     assert_eq!(&vec![10, 20, 0], &msg.i32_repeated);
 
-    msg.deser(INPUT_FIELD3_I32_ONE.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD3_I32_ONE.bytes()).unwrap();
     assert_eq!(&vec![10, 20, 0, 1], &msg.i32_repeated);
 
-    msg.deser(INPUT_FIELD3_I32_PACKED_ZERO_TO_THREE.bytes())
+    msg.merge_from_bytes(INPUT_FIELD3_I32_PACKED_ZERO_TO_THREE.bytes())
         .unwrap();
     assert_eq!(&vec![10, 20, 0, 1, 0, 1, 2, 3], &msg.i32_repeated);
 }
@@ -135,12 +137,14 @@ fn test_string_unlabeled() {
     assert_eq!("test1", msg.string_unlabeled());
     assert!(msg.has_string_unlabeled());
 
-    msg.deser(INPUT_FIELD5_STRING_EMPTY.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD5_STRING_EMPTY.bytes())
+        .unwrap();
     assert_eq!("test1", msg.string_unlabeled);
     assert_eq!("test1", msg.string_unlabeled());
     assert!(msg.has_string_unlabeled());
 
-    msg.deser(INPUT_FIELD5_STRING_TEST2.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELD5_STRING_TEST2.bytes())
+        .unwrap();
     assert_eq!("test2", msg.string_unlabeled);
     assert_eq!("test2", msg.string_unlabeled());
     assert!(msg.has_string_unlabeled());
@@ -169,7 +173,7 @@ fn test_message_unlabeled() {
     assert_eq!(Some(10), msg.submsg_unlabeled().map(|m| m.i32_unlabeled));
     assert!(msg.has_submsg_unlabeled());
 
-    msg.deser(INPUT_FIELDS6_MSG_FIELD1_I32_ZERO.bytes())
+    msg.merge_from_bytes(INPUT_FIELDS6_MSG_FIELD1_I32_ZERO.bytes())
         .unwrap();
     assert_eq!(
         Some(10),
@@ -178,7 +182,8 @@ fn test_message_unlabeled() {
     assert_eq!(Some(10), msg.submsg_unlabeled().map(|m| m.i32_unlabeled));
     assert!(msg.has_submsg_unlabeled());
 
-    msg.deser(INPUT_FIELDS6_MSG_FIELD1_I32_ONE.bytes()).unwrap();
+    msg.merge_from_bytes(INPUT_FIELDS6_MSG_FIELD1_I32_ONE.bytes())
+        .unwrap();
     assert_eq!(
         Some(1),
         msg.submsg_unlabeled.as_ref().map(|m| m.i32_unlabeled)

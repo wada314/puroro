@@ -57,15 +57,6 @@ pub mod _puroro_simple_impl {
     }
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test1 {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test1 {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -158,15 +149,6 @@ pub mod _puroro_simple_impl {
     }
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test2 {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test2 {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -261,15 +243,6 @@ pub mod _puroro_simple_impl {
     }
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test3 {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test3 {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -367,15 +340,6 @@ pub mod _puroro_simple_impl {
     }
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test4 {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test4 {
         fn deser_field<I>(
             &mut self,
             field_number: i32,

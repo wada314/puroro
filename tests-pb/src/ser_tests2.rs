@@ -226,15 +226,6 @@ pub mod _puroro_simple_impl {
     }
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Msg {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Msg {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -2707,15 +2698,6 @@ pub mod _puroro_nested {
             }
 
             impl ::puroro::internal::de::DeserMessageFromBytesIter for Submsg {
-                fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-                where
-                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-                {
-                    ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-                }
-            }
-
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for Submsg {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
