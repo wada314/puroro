@@ -223,53 +223,28 @@ pub use ::once_cell;
 
 use ::bumpalo::collections::String as BString;
 use ::bumpalo::Bump;
+use ::std::ops::Deref;
 
-struct ARef<'b> {
-    s: BString<'b>,
-    b: &'b BOwned,
+struct A<'b> {
+    a: BString<'b>,
+    bump: &'b Bump,
 }
-
-impl<'b> ARef<'b> {
-    fn new(b: &'b BOwned) -> Self {
+impl<'b> A<'b> {
+    fn new(bump: &'b Bump) -> Self {
         Self {
-            s: BString::new_in(&b.b),
-            b,
+            a: BString::new_in(bump),
+            bump,
         }
     }
 }
-struct BOwned {
-    b: Bump,
+struct Own<T> {
+    // The field order matters, `Drop` drops the field in decl order.
+    t: T,
+    bump: Bump,
 }
-trait MTrait {
-    fn s_opt(&self) -> Option<&str>;
-}
-impl<'b> MTrait for ARef<'b> {
-    fn s_opt(&self) -> Option<&str> {
-        Some(&self.s)
+impl<T> Deref for Own<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.t
     }
-}
-impl MTrait for BOwned {
-    fn s_opt(&self) -> Option<&str> {
-        None
-    }
-}
-struct Merged<A, B>(A, B);
-impl<A, B> Drop for Merged<A, B> {
-    fn drop(&mut self) {
-        
-    }
-}
-impl<A, B> MTrait for Merged<A, B>
-where
-    A: MTrait,
-    B: MTrait,
-{
-    fn s_opt(&self) -> Option<&str> {
-        self.1.s_opt().or_else(|| self.0.s_opt())
-    }
-}
-fn test() {
-    let b = BOwned { b: Bump::new() };
-    let mut ba = Merged(b, None);
-    ba.1 = Some(ARef::new(&ba.0));
 }
