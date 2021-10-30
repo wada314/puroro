@@ -220,3 +220,56 @@ pub type Result<T> = ::std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::either::Either;
 pub use ::once_cell;
+
+use ::bumpalo::collections::String as BString;
+use ::bumpalo::Bump;
+
+struct ARef<'b> {
+    s: BString<'b>,
+    b: &'b BOwned,
+}
+
+impl<'b> ARef<'b> {
+    fn new(b: &'b BOwned) -> Self {
+        Self {
+            s: BString::new_in(&b.b),
+            b,
+        }
+    }
+}
+struct BOwned {
+    b: Bump,
+}
+trait MTrait {
+    fn s_opt(&self) -> Option<&str>;
+}
+impl<'b> MTrait for ARef<'b> {
+    fn s_opt(&self) -> Option<&str> {
+        Some(&self.s)
+    }
+}
+impl MTrait for BOwned {
+    fn s_opt(&self) -> Option<&str> {
+        None
+    }
+}
+struct Merged<A, B>(A, B);
+impl<A, B> Drop for Merged<A, B> {
+    fn drop(&mut self) {
+        
+    }
+}
+impl<A, B> MTrait for Merged<A, B>
+where
+    A: MTrait,
+    B: MTrait,
+{
+    fn s_opt(&self) -> Option<&str> {
+        self.1.s_opt().or_else(|| self.0.s_opt())
+    }
+}
+fn test() {
+    let b = BOwned { b: Bump::new() };
+    let mut ba = Merged(b, None);
+    ba.1 = Some(ARef::new(&ba.0));
+}
