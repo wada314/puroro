@@ -2239,7 +2239,10 @@ pub mod _puroro_impls {
                 ::std::option::Option::Some(self.i32_unlabeled.clone())
             }
         }
-        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field2RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             self.i32_repeated.iter().cloned()
@@ -2251,7 +2254,10 @@ pub mod _puroro_impls {
                 ::std::option::Option::Some(self.float_unlabeled.clone())
             }
         }
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             self.float_repeated.iter().cloned()
@@ -2314,8 +2320,10 @@ pub mod _puroro_impls {
                 ::std::option::Option::Some(self.enum_unlabeled.clone())
             }
         }
-        type Field10RepeatedType<'this> =
-            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests3::Enum>>;
+        type Field10RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests3::Enum>>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             self.enum_repeated.iter().cloned()

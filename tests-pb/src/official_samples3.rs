@@ -1165,7 +1165,10 @@ pub mod _puroro_impls {
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
 
     impl<'bump> super::_puroro_traits::Test4Trait for Test4Bumpalo<'bump> {
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             self.d.iter().cloned()
