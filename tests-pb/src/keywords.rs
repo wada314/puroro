@@ -211,42 +211,15 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub r#type: ::std::option::Option<i32>,
     }
-    impl ::puroro::Message<MsgBumpalo> for MsgBumpalo {}
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
-    impl super::_puroro_traits::MsgTrait for MsgBumpalo {
+    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.r#type)
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for MsgBumpalo {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "type",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Msg",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo {
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -268,7 +241,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
     where
         Self: super::_puroro_traits::MsgTrait,
     {

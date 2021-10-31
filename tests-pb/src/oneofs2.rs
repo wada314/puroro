@@ -1264,9 +1264,9 @@ pub mod _puroro_impls {
         pub group_three:
             ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>,
     }
-    impl ::puroro::Message<MsgBumpalo> for MsgBumpalo {}
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
-    impl super::_puroro_traits::MsgTrait for MsgBumpalo {
+    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         type Field5MessageType<'this>
         where
             Self: 'this,
@@ -1314,92 +1314,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for MsgBumpalo {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 6]> =
-                Lazy::new(|| {
-                    [
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "g1_int32",
-                                number: 1,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                    )
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "g1_string",
-                                number: 2,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                    )
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "g2_f32",
-                                number: 3,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                    )
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "g2_string",
-                                number: 4,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                    )
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "g2_submsg",
-                                number: 5,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                    )
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                        {
-                            let init = ::puroro::internal::FieldDescriptorInitializer {
-                                name: "g3_int32",
-                                number: 6,
-                                lazy_containing_type: Lazy::new(|| {
-                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
-                                    )
-                                }),
-                            };
-                            ::puroro::internal::init_field_descriptor(init)
-                        },
-                    ]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Msg",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo {
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -1502,7 +1417,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
     where
         Self: super::_puroro_traits::MsgTrait,
     {
@@ -1765,42 +1680,15 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_optional: ::std::option::Option<i32>,
     }
-    impl ::puroro::Message<SubmsgBumpalo> for SubmsgBumpalo {}
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgBumpalo {
+    impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for SubmsgBumpalo {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "i32_optional",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <SubmsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Submsg",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo {
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -1822,7 +1710,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
     where
         Self: super::_puroro_traits::SubmsgTrait,
     {
