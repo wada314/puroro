@@ -753,6 +753,46 @@ impl Field {
         })
     }
 
+    pub fn bumpalo_field_type(&self) -> Result<String> {
+        let scalar_type = self.bumpalo_scalar_field_type()?;
+        Ok(match self.field_label()? {
+            FieldLabel::OneofField => scalar_type,
+            FieldLabel::Required | FieldLabel::Optional => {
+                format!("::std::option::Option<{}>", scalar_type)
+            }
+            FieldLabel::Unlabeled => {
+                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{}>", scalar_type)
+                } else {
+                    scalar_type
+                }
+            }
+            FieldLabel::Repeated => format!(
+                "::puroro::bumpalo::collections::Vec<'bump, {}>",
+                scalar_type
+            ),
+        })
+    }
+
+    pub fn bumpalo_scalar_field_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "::puroro::bumpalo::collections::String<'bump>".to_string(),
+            FieldType::Bytes => "::puroro::bumpalo::collections::Vec<'bump, u8>".to_string(),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::Message(m) => {
+                let bare_msg = upgrade(&m)?.rust_impl_path("Bumpalo");
+                if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
+                    bare_msg
+                } else {
+                    format!("::puroro::bumpalo::boxed::Box<'bump, {}>", bare_msg)
+                }
+            }
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
+
     pub fn single_field_type(&self) -> Result<String> {
         Ok(if matches!(self.field_label()?, FieldLabel::Repeated) {
             "RepeatedType"

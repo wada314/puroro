@@ -2179,8 +2179,396 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgBumpaloRef<'bump> {
-        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    pub struct MsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub i32_optional: ::std::option::Option<i32>,
+        pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        pub float_optional: ::std::option::Option<f32>,
+        pub float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
+        pub string_optional: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+        pub string_repeated: ::puroro::bumpalo::collections::Vec<
+            'bump,
+            ::puroro::bumpalo::collections::String<'bump>,
+        >,
+        pub submsg_optional: ::std::option::Option<
+            ::puroro::bumpalo::boxed::Box<
+                'bump,
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo,
+            >,
+        >,
+        pub submsg_repeated: ::puroro::bumpalo::collections::Vec<
+            'bump,
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo,
+        >,
+        pub enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
+        pub enum_repeated:
+            ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::ser_tests2::Enum>,
+        pub very_large_field_number: ::std::option::Option<i32>,
+    }
+    impl ::puroro::Message<MsgBumpalo> for MsgBumpalo {}
+
+    impl super::_puroro_traits::MsgTrait for MsgBumpalo {
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
+        }
+        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            self.i32_repeated.iter().cloned()
+        }
+        fn float_optional_opt<'this>(&'this self) -> Option<f32> {
+            Clone::clone(&self.float_optional)
+        }
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.float_repeated.iter().cloned()
+        }
+        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+            self.string_optional.as_ref().map(|v| v.as_ref())
+        }
+        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            str,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
+        >;
+
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+        }
+        type Field7MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+            'bump,
+        >;
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
+            self.submsg_optional.as_ref().map(|v| v.as_ref())
+        }
+        type Field8MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+            'bump,
+        >;
+        type Field8RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo,
+            >,
+        >;
+
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+        }
+        fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
+            Clone::clone(&self.enum_optional)
+        }
+        type Field10RepeatedType<'this> =
+            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests2::Enum>>;
+
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            self.enum_repeated.iter().cloned()
+        }
+        fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.very_large_field_number)
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for MsgBumpalo {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 11]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "i32_optional",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "i32_repeated",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "float_optional",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "float_repeated",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_optional",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_repeated",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "submsg_optional",
+                                number: 7,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "submsg_repeated",
+                                number: 8,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "enum_optional",
+                                number: 9,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "enum_repeated",
+                                number: 10,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "very_large_field_number",
+                                number: 536870911,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Msg",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_repeated, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Float
+            >::deser_field(&mut self.float_optional, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Float
+            >::deser_field(&mut self.float_repeated, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_optional, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.string_repeated, data),
+            7 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo>>
+            >::deser_field(&mut self.submsg_optional, data),
+            8 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo>
+            >::deser_field(&mut self.submsg_repeated, data),
+            9 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>
+            >::deser_field(&mut self.enum_optional, data),
+            10 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>
+            >::deser_field(&mut self.enum_repeated, data),
+            536870911 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.very_large_field_number, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
+                3,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
+                5,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
+                6,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
+                7,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
+                8,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
+                9,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
+                10,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
+                536870911,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
     }
     pub struct MsgBuilder<T>(T);
 
@@ -2862,8 +3250,89 @@ pub mod _puroro_nested {
                 }
             }
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub struct SubmsgBumpaloRef<'bump> {
-                _phantom: ::std::marker::PhantomData<&'bump ()>,
+            pub struct SubmsgBumpalo<'bump> {
+                _bump: &'bump ::puroro::bumpalo::Bump,
+                pub i32_optional: ::std::option::Option<i32>,
+            }
+            impl ::puroro::Message<SubmsgBumpalo> for SubmsgBumpalo {}
+
+            impl super::_puroro_traits::SubmsgTrait for SubmsgBumpalo {
+                fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+                    Clone::clone(&self.i32_optional)
+                }
+            }
+
+            impl ::puroro::MessageRepresentativeImpl for SubmsgBumpalo {
+                fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+                    use ::puroro::once_cell::sync::Lazy;
+                    static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                        Lazy::new(|| {
+                            [{
+                                let init = ::puroro::internal::FieldDescriptorInitializer {
+                                    name: "i32_optional",
+                                    number: 1,
+                                    lazy_containing_type: Lazy::new(|| {
+                                        <SubmsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    }),
+                                };
+                                ::puroro::internal::init_field_descriptor(init)
+                            }]
+                        });
+                    static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> =
+                        Lazy::new(|| {
+                            let init = ::puroro::internal::MessageDescriptorInitializer {
+                                name: "Submsg",
+                                lazy_fields: Lazy::new(|| {
+                                    Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()
+                                }),
+                            };
+                            ::puroro::internal::init_message_descriptor(init)
+                        });
+                    Lazy::force(&LAZY_DESCRIPTOR)
+                }
+            }
+
+            impl ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo {
+                fn deser_field<I>(
+                    &mut self,
+                    field_number: i32,
+                    data: ::puroro::internal::types::FieldData<
+                        &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+                    >,
+                ) -> ::puroro::Result<()>
+                where
+                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+                {
+                    use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+                    match field_number {
+                        1 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Optional,
+                            ::puroro::tags::Int32,
+                        >::deser_field(&mut self.i32_optional, data),
+
+                        _ => unimplemented!("TODO: This case should be handled properly..."),
+                    }
+                }
+            }
+
+            impl ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo
+            where
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                        1,
+                        out,
+                    )?;
+                    ::std::result::Result::Ok(())
+                }
             }
             pub struct SubmsgBuilder<T>(T);
 

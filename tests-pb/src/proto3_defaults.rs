@@ -1036,8 +1036,243 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgBumpaloRef<'bump> {
-        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    pub struct MsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub i32_unlabeled: i32,
+        pub i32_optional: ::std::option::Option<i32>,
+        pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        pub f32_unlabeled: f32,
+        pub string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
+        pub submsg_unlabeled: ::std::option::Option<
+            ::puroro::bumpalo::boxed::Box<
+                'bump,
+                self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo,
+            >,
+        >,
+    }
+    impl ::puroro::Message<MsgBumpalo> for MsgBumpalo {}
+
+    impl super::_puroro_traits::MsgTrait for MsgBumpalo {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            if self.i32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.i32_unlabeled.clone())
+            }
+        }
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
+        }
+        type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            self.i32_repeated.iter().cloned()
+        }
+        fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
+            if self.f32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.f32_unlabeled.clone())
+            }
+        }
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+            if self.string_unlabeled.is_empty() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.string_unlabeled.as_ref())
+            }
+        }
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>;
+        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
+            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for MsgBumpalo {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 6]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "i32_unlabeled",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "i32_optional",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "i32_repeated",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "f32_unlabeled",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "string_unlabeled",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "submsg_unlabeled",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Msg",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_unlabeled, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_repeated, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Float
+            >::deser_field(&mut self.f32_unlabeled, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::String
+            >::deser_field(&mut self.string_unlabeled, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo>>
+            >::deser_field(&mut self.submsg_unlabeled, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                3,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
+                5,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field6MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
+                6,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
     }
     pub struct MsgBuilder<T>(T);
 
@@ -1268,8 +1503,89 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct SubmsgBumpaloRef<'bump> {
-        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    pub struct SubmsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub i32_unlabeled: i32,
+    }
+    impl ::puroro::Message<SubmsgBumpalo> for SubmsgBumpalo {}
+
+    impl super::_puroro_traits::SubmsgTrait for SubmsgBumpalo {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            if self.i32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(self.i32_unlabeled.clone())
+            }
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for SubmsgBumpalo {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "i32_unlabeled",
+                            number: 1,
+                            lazy_containing_type: Lazy::new(|| {
+                                <SubmsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Submsg",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_unlabeled, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
     }
     pub struct SubmsgBuilder<T>(T);
 

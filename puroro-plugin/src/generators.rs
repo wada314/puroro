@@ -72,7 +72,7 @@ struct Message {
     simple_ident: String,
     single_field_ident: String,
     bumpalo_ident: String,
-    bumpalo_ref_ident: String,
+    bumpalo_owned_ident: String,
     builder_ident: String,
 }
 
@@ -116,7 +116,7 @@ impl Message {
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
             bumpalo_ident: m.rust_impl_ident("Bumpalo"),
-            bumpalo_ref_ident: m.rust_impl_ident("BumpaloRef"),
+            bumpalo_owned_ident: m.rust_impl_ident("BumpaloOwned"),
             builder_ident: m.rust_impl_ident("Builder"),
         })
     }
@@ -195,6 +195,11 @@ struct Field {
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
+    bumpalo_field_type: String,
+    bumpalo_scalar_field_type: String,
+    bumpalo_maybe_field_message_path: Option<String>,
+    bumpalo_maybe_borrowed_field_type: Option<String>,
+    bumpalo_label_and_type_tags: String,
 }
 
 impl Field {
@@ -208,6 +213,12 @@ impl Field {
         let simple_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_impl_path("Simple"))
+            } else {
+                None
+            };
+        let bumpalo_maybe_field_message_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo"))
             } else {
                 None
             };
@@ -262,6 +273,23 @@ impl Field {
             })?,
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
+            bumpalo_field_type: f.bumpalo_field_type()?,
+            bumpalo_scalar_field_type: f.bumpalo_scalar_field_type()?,
+            bumpalo_maybe_field_message_path,
+            bumpalo_maybe_borrowed_field_type: f
+                .maybe_trait_scalar_getter_type_borrowed("Bumpalo")?,
+            bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
+                Ok(
+                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
+                        msg.rust_impl_path("Bumpalo")
+                    } else {
+                        format!(
+                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            msg.rust_impl_path("Bumpalo")
+                        )
+                    },
+                )
+            })?,
         })
     }
 
@@ -434,6 +462,7 @@ struct OneofField {
     field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
+    bumpalo_field_type_tag: String,
 }
 
 impl OneofField {
@@ -458,6 +487,18 @@ impl OneofField {
                         msg.rust_impl_path("Simple")
                     } else {
                         format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple"))
+                    },
+                )
+            })?,
+            bumpalo_field_type_tag: f.rust_type_tag(|msg| {
+                Ok(
+                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
+                        msg.rust_impl_path("Bumpalo")
+                    } else {
+                        format!(
+                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            msg.rust_impl_path("Bumpalo")
+                        )
                     },
                 )
             })?,

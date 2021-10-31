@@ -1,4 +1,158 @@
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub struct {{ m.bumpalo_ref_ident }}<'bump> {
-    _phantom: ::std::marker::PhantomData<&'bump ()>, {#- For code generator's simplicity #}
+pub struct {{ m.bumpalo_ident }}<'bump> {
+    _bump: &'bump ::puroro::bumpalo::Bump,
+
+    {%- for field in m.fields %}
+    {%- if !field.is_explicit_oneof_field %}
+    pub {{ field.ident }}: {{ field.bumpalo_field_type }},
+    {%- endif %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    pub {{ oneof.field_ident }}: ::std::option::Option<
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+        {%- if oneof.has_ld_field %}
+        {%- if oneof.has_message_field %}
+        <'static, ::puroro::internal::bool::True, Self>
+        {%- else %}
+        <'static, ::puroro::internal::bool::True>
+        {%- endif %}
+        {%- endif %}
+    >,
+    {%- endfor %}
+}
+impl ::puroro::Message<{{ m.bumpalo_ident }}> for {{ m.bumpalo_ident }} {}
+
+impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }} {
+    {%- for field in m.fields %}
+    {%- call bumpalo_trait_impl_field(field) %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_ld_field %}
+            {%- if oneof.has_message_field %}
+            <'this, ::puroro::internal::bool::False, Self>
+            {%- else %}
+            <'this, ::puroro::internal::bool::False>
+            {%- endif %}
+            {%- endif %}
+        >
+    {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
+            {%- for field in oneof.fields %}
+            {% if field.is_length_delimited %}
+            E::{{ field.ident }}(v) => E::{{ field.ident }}(v.as_ref()),
+            {%- else %}
+            E::{{ field.ident }}(v) => E::{{ field.ident }}(v.clone()),
+            {%- endif %}
+            {%- endfor %}
+        })
+    }
+    {%- endfor %}
+}
+
+impl ::puroro::MessageRepresentativeImpl for {{ m.bumpalo_ident }} {
+    fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+        use ::puroro::once_cell::sync::Lazy;
+        static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; {{ m.fields_len }}]> = Lazy::new(|| {
+            [
+                {%- for field in m.fields %}
+                {
+                    let init = ::puroro::internal::FieldDescriptorInitializer {
+                        name: "{{ field.proto_name }}",
+                        number: {{ field.number }},
+                        lazy_containing_type: Lazy::new(|| <{{ m.bumpalo_ident }} as ::puroro::MessageRepresentativeImpl>::descriptor()),
+                    };
+                    ::puroro::internal::init_field_descriptor(init)
+                },
+                {%- endfor %}
+            ]
+        });
+        static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+            let init = ::puroro::internal::MessageDescriptorInitializer {
+                name: "{{ m.proto_name }}",
+                lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+            };
+            ::puroro::internal::init_message_descriptor(init)
+        });
+        Lazy::force(&LAZY_DESCRIPTOR)
+    }
+}
+
+impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_ident }} {
+    fn deser_field<I>(
+        &mut self,
+        field_number: i32,
+        data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+    ) -> ::puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
+    {
+        use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+        match field_number {
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {{ field.number }} => DeserFieldFromBytesIter::<
+                {{ field.bumpalo_label_and_type_tags }}
+            >::deser_field(&mut self.{{ field.ident }}, data),
+            {%- endif %}
+            {%- endfor %}
+
+            {%- for oneof in m.oneofs %}
+            {%- for field in oneof.fields %}
+            {{ field.number }} => {
+                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+                if !matches!(
+                    &self.{{ oneof.field_ident }},
+                    Some(E::{{ field.ident }}(_)))
+                {
+                    self.{{ oneof.field_ident }} = Some(
+                        E::{{ field.ident }}(
+                            ::std::default::Default::default()
+                        )
+                    );
+                }
+                let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
+                    Some(E::{{ field.ident }}(v)) => v,
+                    _ => unreachable!(),
+                };
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}
+                >::deser_field(field_value_mut_ref, data)
+            }
+            {%- endfor %}
+            {%- endfor %}
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+    }
+}
+
+impl ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}
+where
+    Self: super::_puroro_traits::{{ m.ident }}Trait,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write,
+    {
+        {%- for field in m.fields %}
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            {{ field.trait_label_and_type_tags }}
+        >::ser_field(
+            {%- if field.is_repeated %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self),
+            {%- else %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_opt(self),
+            {%- endif %}
+            {{ field.number }},
+            out
+        )?;
+        {%- endfor %} {#- for field in m.fields #}
+        ::std::result::Result::Ok(())
+    }
 }

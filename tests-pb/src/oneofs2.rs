@@ -1246,8 +1246,322 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgBumpaloRef<'bump> {
-        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    pub struct MsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub group_one: ::std::option::Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
+                'static,
+                ::puroro::internal::bool::True,
+            >,
+        >,
+        pub group_two: ::std::option::Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
+                'static,
+                ::puroro::internal::bool::True,
+                Self,
+            >,
+        >,
+        pub group_three:
+            ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>,
+    }
+    impl ::puroro::Message<MsgBumpalo> for MsgBumpalo {}
+
+    impl super::_puroro_traits::MsgTrait for MsgBumpalo {
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'bump>;
+        fn group_one<'this>(
+            &'this self,
+        ) -> Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
+                'this,
+                ::puroro::internal::bool::False,
+            >,
+        > {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            self.group_one.as_ref().map(|oneof| match oneof {
+                E::G1Int32(v) => E::G1Int32(v.clone()),
+
+                E::G1String(v) => E::G1String(v.as_ref()),
+            })
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
+                'this,
+                ::puroro::internal::bool::False,
+                Self,
+            >,
+        > {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            self.group_two.as_ref().map(|oneof| match oneof {
+                E::G2F32(v) => E::G2F32(v.clone()),
+
+                E::G2String(v) => E::G2String(v.as_ref()),
+
+                E::G2Submsg(v) => E::G2Submsg(v.as_ref()),
+            })
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            self.group_three.as_ref().map(|oneof| match oneof {
+                E::G3Int32(v) => E::G3Int32(v.clone()),
+            })
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for MsgBumpalo {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 6]> =
+                Lazy::new(|| {
+                    [
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "g1_int32",
+                                number: 1,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "g1_string",
+                                number: 2,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "g2_f32",
+                                number: 3,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "g2_string",
+                                number: 4,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "g2_submsg",
+                                number: 5,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                        {
+                            let init = ::puroro::internal::FieldDescriptorInitializer {
+                                name: "g3_int32",
+                                number: 6,
+                                lazy_containing_type: Lazy::new(|| {
+                                    <MsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                    )
+                                }),
+                            };
+                            ::puroro::internal::init_field_descriptor(init)
+                        },
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Msg",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+                1 => {
+                    use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+                    if !matches!(&self.group_one, Some(E::G1Int32(_))) {
+                        self.group_one = Some(E::G1Int32(::std::default::Default::default()));
+                    }
+                    let field_value_mut_ref = match &mut self.group_one {
+                        Some(E::G1Int32(v)) => v,
+                        _ => unreachable!(),
+                    };
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofField, ::puroro::tags::Int32
+                >::deser_field(field_value_mut_ref, data)
+                }
+                2 => {
+                    use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+                    if !matches!(&self.group_one, Some(E::G1String(_))) {
+                        self.group_one = Some(E::G1String(::std::default::Default::default()));
+                    }
+                    let field_value_mut_ref = match &mut self.group_one {
+                        Some(E::G1String(v)) => v,
+                        _ => unreachable!(),
+                    };
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofField, ::puroro::tags::String
+                >::deser_field(field_value_mut_ref, data)
+                }
+                3 => {
+                    use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+                    if !matches!(&self.group_two, Some(E::G2F32(_))) {
+                        self.group_two = Some(E::G2F32(::std::default::Default::default()));
+                    }
+                    let field_value_mut_ref = match &mut self.group_two {
+                        Some(E::G2F32(v)) => v,
+                        _ => unreachable!(),
+                    };
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofField, ::puroro::tags::Float
+                >::deser_field(field_value_mut_ref, data)
+                }
+                4 => {
+                    use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+                    if !matches!(&self.group_two, Some(E::G2String(_))) {
+                        self.group_two = Some(E::G2String(::std::default::Default::default()));
+                    }
+                    let field_value_mut_ref = match &mut self.group_two {
+                        Some(E::G2String(v)) => v,
+                        _ => unreachable!(),
+                    };
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofField, ::puroro::tags::String
+                >::deser_field(field_value_mut_ref, data)
+                }
+                5 => {
+                    use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+                    if !matches!(&self.group_two, Some(E::G2Submsg(_))) {
+                        self.group_two = Some(E::G2Submsg(::std::default::Default::default()));
+                    }
+                    let field_value_mut_ref = match &mut self.group_two {
+                        Some(E::G2Submsg(v)) => v,
+                        _ => unreachable!(),
+                    };
+                    DeserFieldFromBytesIter::<
+                        ::puroro::tags::OneofField,
+                        ::puroro::tags::Message<
+                            ::puroro::bumpalo::boxed::Box<
+                                'bump,
+                                self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo,
+                            >,
+                        >,
+                    >::deser_field(field_value_mut_ref, data)
+                }
+                6 => {
+                    use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+                    if !matches!(&self.group_three, Some(E::G3Int32(_))) {
+                        self.group_three = Some(E::G3Int32(::std::default::Default::default()));
+                    }
+                    let field_value_mut_ref = match &mut self.group_three {
+                        Some(E::G3Int32(v)) => v,
+                        _ => unreachable!(),
+                    };
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofField, ::puroro::tags::Int32
+                >::deser_field(field_value_mut_ref, data)
+                }
+
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
+        }
+    }
+
+    impl ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::OneofField,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::g1_int32_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::OneofField,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::g1_string_opt(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::OneofField,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::g2_f32_opt(self),
+                3,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::OneofField,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::g2_string_opt(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::OneofField,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
+                5,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::OneofField,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::g3_int32_opt(self),
+                6,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
     }
     pub struct MsgBuilder<T>(T);
 
@@ -1447,8 +1761,85 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct SubmsgBumpaloRef<'bump> {
-        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    pub struct SubmsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub i32_optional: ::std::option::Option<i32>,
+    }
+    impl ::puroro::Message<SubmsgBumpalo> for SubmsgBumpalo {}
+
+    impl super::_puroro_traits::SubmsgTrait for SubmsgBumpalo {
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for SubmsgBumpalo {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "i32_optional",
+                            number: 1,
+                            lazy_containing_type: Lazy::new(|| {
+                                <SubmsgBumpalo as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Submsg",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
     }
     pub struct SubmsgBuilder<T>(T);
 
