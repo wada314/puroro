@@ -271,7 +271,7 @@ pub mod _puroro_impls {
         pub recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
-                self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo,
+                self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
             >,
         >,
     }
@@ -332,7 +332,7 @@ pub mod _puroro_impls {
                     ::puroro::tags::Message<
                         ::puroro::bumpalo::boxed::Box<
                             'bump,
-                            self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo,
+                            self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
                         >,
                     >,
                 >::deser_field(&mut self.recursive_unlabeled, data),

@@ -212,13 +212,13 @@ impl Field {
             };
         let simple_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Simple"))
+                Some(upgrade(&m)?.rust_impl_path("Simple", &[]))
             } else {
                 None
             };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo"))
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]))
             } else {
                 None
             };
@@ -261,13 +261,13 @@ impl Field {
             simple_scalar_field_type: f.simple_scalar_field_type()?,
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Simple")?,
+                .maybe_trait_scalar_getter_type_borrowed("Simple", &[])?,
             simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Simple")
+                        msg.rust_impl_path("Simple", &[])
                     } else {
-                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple"))
+                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple", &[]))
                     },
                 )
             })?,
@@ -277,15 +277,15 @@ impl Field {
             bumpalo_scalar_field_type: f.bumpalo_scalar_field_type()?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Bumpalo")?,
+                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'bump"])?,
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo")
+                        msg.rust_impl_path("Bumpalo", &["'bump"])
                     } else {
                         format!(
                             "::puroro::bumpalo::boxed::Box<'bump, {}>",
-                            msg.rust_impl_path("Bumpalo")
+                            msg.rust_impl_path("Bumpalo", &["'bump"])
                         )
                     },
                 )
@@ -484,20 +484,20 @@ impl OneofField {
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Simple")
+                        msg.rust_impl_path("Simple", &[])
                     } else {
-                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple"))
+                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple", &[]))
                     },
                 )
             })?,
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo")
+                        msg.rust_impl_path("Bumpalo", &["'bump"])
                     } else {
                         format!(
                             "::puroro::bumpalo::boxed::Box<'bump, {}>",
-                            msg.rust_impl_path("Bumpalo")
+                            msg.rust_impl_path("Bumpalo", &["'bump"])
                         )
                     },
                 )

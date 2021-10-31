@@ -1,7 +1,7 @@
 
 {%- match f.bumpalo_maybe_field_message_path %}
 {%- when Some with (struct_path) %}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }}<'bump>;
+type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }};
 {%- else %}
 {%- endmatch %}
 

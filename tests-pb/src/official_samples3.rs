@@ -962,7 +962,7 @@ pub mod _puroro_impls {
         pub c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
-                self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo,
+                self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'bump>,
             >,
         >,
     }
@@ -1023,7 +1023,9 @@ pub mod _puroro_impls {
                     ::puroro::tags::Message<
                         ::puroro::bumpalo::boxed::Box<
                             'bump,
-                            self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo,
+                            self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
+                                'bump,
+                            >,
                         >,
                     >,
                 >::deser_field(&mut self.c, data),

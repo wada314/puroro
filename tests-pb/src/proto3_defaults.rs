@@ -1046,7 +1046,7 @@ pub mod _puroro_impls {
         pub submsg_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
-                self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo,
+                self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>,
             >,
         >,
     }
@@ -1205,7 +1205,7 @@ pub mod _puroro_impls {
                 ::puroro::tags::Unlabeled, ::puroro::tags::String
             >::deser_field(&mut self.string_unlabeled, data),
             6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo>>
+                ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>>>
             >::deser_field(&mut self.submsg_unlabeled, data),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),

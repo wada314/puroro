@@ -1478,7 +1478,7 @@ pub mod _puroro_impls {
                         ::puroro::tags::Message<
                             ::puroro::bumpalo::boxed::Box<
                                 'bump,
-                                self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo,
+                                self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'bump>,
                             >,
                         >,
                     >::deser_field(field_value_mut_ref, data)
