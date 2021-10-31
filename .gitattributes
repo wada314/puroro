@@ -1,0 +1,2 @@
+tests-pb/src/**/*.rs eol=lf
+puroro-protobuf-compiler/src/**/*.rs eol=lf
