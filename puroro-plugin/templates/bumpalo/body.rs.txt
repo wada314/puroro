@@ -64,13 +64,13 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+        use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
         match field_number {
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             {{ field.number }} => DeserFieldFromBytesIter::<
                 {{ field.bumpalo_label_and_type_tags }}
-            >::deser_field(&mut self.{{ field.ident }}, data),
+            >::deser_field(&mut self.{{ field.ident }}, data, &self._bump),
             {%- endif %}
             {%- endfor %}
 
@@ -94,7 +94,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 };
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}
-                >::deser_field(field_value_mut_ref, data)
+                >::deser_field(field_value_mut_ref, data, &self._bump)
             }
             {%- endfor %}
             {%- endfor %}

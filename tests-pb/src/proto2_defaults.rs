@@ -7146,194 +7146,194 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_default, data),
+            >::deser_field(&mut self.i32_default, data, &self._bump),
             2 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_0, data),
+            >::deser_field(&mut self.i32_0, data, &self._bump),
             3 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_42, data),
+            >::deser_field(&mut self.i32_42, data, &self._bump),
             4 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_m42, data),
+            >::deser_field(&mut self.i32_m42, data, &self._bump),
             5 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_2147483647, data),
+            >::deser_field(&mut self.i32_2147483647, data, &self._bump),
             6 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_m2147483648, data),
+            >::deser_field(&mut self.i32_m2147483648, data, &self._bump),
             7 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_0123, data),
+            >::deser_field(&mut self.i32_0123, data, &self._bump),
             8 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_0x123, data),
+            >::deser_field(&mut self.i32_0x123, data, &self._bump),
             11 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_default, data),
+            >::deser_field(&mut self.u32_default, data, &self._bump),
             12 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_0, data),
+            >::deser_field(&mut self.u32_0, data, &self._bump),
             13 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_42, data),
+            >::deser_field(&mut self.u32_42, data, &self._bump),
             15 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_4294967295, data),
+            >::deser_field(&mut self.u32_4294967295, data, &self._bump),
             17 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_0123, data),
+            >::deser_field(&mut self.u32_0123, data, &self._bump),
             18 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_0x123, data),
+            >::deser_field(&mut self.u32_0x123, data, &self._bump),
             21 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_default, data),
+            >::deser_field(&mut self.i64_default, data, &self._bump),
             22 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_0, data),
+            >::deser_field(&mut self.i64_0, data, &self._bump),
             23 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_42, data),
+            >::deser_field(&mut self.i64_42, data, &self._bump),
             24 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_m42, data),
+            >::deser_field(&mut self.i64_m42, data, &self._bump),
             25 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_9223372036854775807, data),
+            >::deser_field(&mut self.i64_9223372036854775807, data, &self._bump),
             26 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_m9223372036854775808, data),
+            >::deser_field(&mut self.i64_m9223372036854775808, data, &self._bump),
             27 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_0123, data),
+            >::deser_field(&mut self.i64_0123, data, &self._bump),
             28 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_0x123, data),
+            >::deser_field(&mut self.i64_0x123, data, &self._bump),
             31 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_default, data),
+            >::deser_field(&mut self.u64_default, data, &self._bump),
             32 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_0, data),
+            >::deser_field(&mut self.u64_0, data, &self._bump),
             33 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_42, data),
+            >::deser_field(&mut self.u64_42, data, &self._bump),
             35 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_18446744073709551615, data),
+            >::deser_field(&mut self.u64_18446744073709551615, data, &self._bump),
             37 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_0123, data),
+            >::deser_field(&mut self.u64_0123, data, &self._bump),
             38 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_0x123, data),
+            >::deser_field(&mut self.u64_0x123, data, &self._bump),
             41 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_default, data),
+            >::deser_field(&mut self.f32_default, data, &self._bump),
             42 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0, data),
+            >::deser_field(&mut self.f32_0, data, &self._bump),
             43 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_m0, data),
+            >::deser_field(&mut self.f32_m0, data, &self._bump),
             44 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0p, data),
+            >::deser_field(&mut self.f32_0p, data, &self._bump),
             45 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_p0, data),
+            >::deser_field(&mut self.f32_p0, data, &self._bump),
             46 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0p0, data),
+            >::deser_field(&mut self.f32_0p0, data, &self._bump),
             47 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_42, data),
+            >::deser_field(&mut self.f32_42, data, &self._bump),
             48 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_m42, data),
+            >::deser_field(&mut self.f32_m42, data, &self._bump),
             49 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0p25, data),
+            >::deser_field(&mut self.f32_0p25, data, &self._bump),
             50 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_1p5e2, data),
+            >::deser_field(&mut self.f32_1p5e2, data, &self._bump),
             51 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_inf, data),
+            >::deser_field(&mut self.f32_inf, data, &self._bump),
             52 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_minf, data),
+            >::deser_field(&mut self.f32_minf, data, &self._bump),
             53 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_nan, data),
+            >::deser_field(&mut self.f32_nan, data, &self._bump),
             54 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_mnan, data),
+            >::deser_field(&mut self.f32_mnan, data, &self._bump),
             61 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.bool_default, data),
+            >::deser_field(&mut self.bool_default, data, &self._bump),
             62 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.bool_true, data),
+            >::deser_field(&mut self.bool_true, data, &self._bump),
             63 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.bool_false, data),
+            >::deser_field(&mut self.bool_false, data, &self._bump),
             71 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_default, data),
+            >::deser_field(&mut self.string_default, data, &self._bump),
             72 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_empty, data),
+            >::deser_field(&mut self.string_empty, data, &self._bump),
             73 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_abc, data),
+            >::deser_field(&mut self.string_abc, data, &self._bump),
             74 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_aiu, data),
+            >::deser_field(&mut self.string_aiu, data, &self._bump),
             75 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_backslash, data),
+            >::deser_field(&mut self.string_backslash, data, &self._bump),
             76 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_tab, data),
+            >::deser_field(&mut self.string_tab, data, &self._bump),
             77 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_crlf, data),
+            >::deser_field(&mut self.string_crlf, data, &self._bump),
             81 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_default, data),
+            >::deser_field(&mut self.bytes_default, data, &self._bump),
             82 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_empty, data),
+            >::deser_field(&mut self.bytes_empty, data, &self._bump),
             83 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_abc, data),
+            >::deser_field(&mut self.bytes_abc, data, &self._bump),
             84 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_aiu, data),
+            >::deser_field(&mut self.bytes_aiu, data, &self._bump),
             85 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_backslash, data),
+            >::deser_field(&mut self.bytes_backslash, data, &self._bump),
             86 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_tab, data),
+            >::deser_field(&mut self.bytes_tab, data, &self._bump),
             87 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_crlf, data),
+            >::deser_field(&mut self.bytes_crlf, data, &self._bump),
             91 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
-            >::deser_field(&mut self.enum_default, data),
+            >::deser_field(&mut self.enum_default, data, &self._bump),
             92 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
-            >::deser_field(&mut self.enum_one, data),
+            >::deser_field(&mut self.enum_one, data, &self._bump),
             93 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
-            >::deser_field(&mut self.enum_fourty_two, data),
+            >::deser_field(&mut self.enum_fourty_two, data, &self._bump),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }

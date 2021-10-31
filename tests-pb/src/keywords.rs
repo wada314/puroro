@@ -230,11 +230,11 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.r#type, data),
+            >::deser_field(&mut self.r#type, data, &self._bump),
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }

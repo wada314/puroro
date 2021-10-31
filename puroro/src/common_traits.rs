@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::bumpalo::Bump;
 use crate::desc::MessageDescriptor;
 use crate::internal::de::from_iter::deser_from_iter;
 use crate::internal::de::DeserMessageFromBytesIter;
@@ -129,3 +130,7 @@ pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {
 /// Currently this trait is just an analogous of [`std::iter::IntoIterator`].
 pub trait RepeatedField<'msg>: IntoIterator {}
 impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
+
+pub trait BumpaloMessage<'bump, M>: Message<M> {
+    fn new_in(bump: &'bump Bump) -> Self;
+}

@@ -298,7 +298,7 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
                 1 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
@@ -308,7 +308,9 @@ pub mod _puroro_impls {
                             self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
                         >,
                     >,
-                >::deser_field(&mut self.recursive_unlabeled, data),
+                >::deser_field(
+                    &mut self.recursive_unlabeled, data, &self._bump
+                ),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
