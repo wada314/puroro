@@ -13,7 +13,9 @@
 // limitations under the License.
 
 use crate::desc::MessageDescriptor;
-use crate::internal::{DeserializableMessageFromBytesIterator, SerializableMessageToIoWrite};
+use crate::internal::de::from_iter::deser_from_iter;
+use crate::internal::de::DeserMessageFromBytesIter;
+use crate::internal::se::SerMessageToIoWrite;
 use crate::Result;
 use ::std::convert::TryFrom;
 use ::std::io::Write;
@@ -46,16 +48,16 @@ pub trait Message<M> {
     /// ```
     fn merge_from_bytes<I>(&mut self, iter: I) -> Result<()>
     where
-        Self: DeserializableMessageFromBytesIterator,
+        Self: DeserMessageFromBytesIter,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
-        <Self as DeserializableMessageFromBytesIterator>::deser(self, iter)
+        deser_from_iter(self, iter)
     }
 
     /// A shorthand method that allocates and deserializes the message.
     fn from_bytes<I>(iter: I) -> Result<Self>
     where
-        Self: DeserializableMessageFromBytesIterator + Default,
+        Self: DeserMessageFromBytesIter + Default,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         let mut msg = <Self as Default>::default();
@@ -66,10 +68,10 @@ pub trait Message<M> {
     /// Serializes the message into [`std::io::Write`].
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where
-        Self: SerializableMessageToIoWrite,
+        Self: SerMessageToIoWrite,
         W: Write,
     {
-        <Self as SerializableMessageToIoWrite>::ser(&self, out)
+        <Self as SerMessageToIoWrite>::ser(&self, out)
     }
 }
 impl<M> Message<M> for () where M: MessageRepresentativeImpl {}

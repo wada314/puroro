@@ -44,7 +44,7 @@
 //! # }
 //! # use ::puroro::*;
 //! # impl Message<MyMessage> for MyMessage {}
-//! # impl internal::DeserializableMessageFromBytesIterator for MyMessage {
+//! # impl internal::de::DeserMessageFromBytesIter for MyMessage {
 //! #     fn deser<I>(&mut self, iter: I) -> Result<()>
 //! #     where
 //! #         I: Iterator<Item = ::std::io::Result<u8>>

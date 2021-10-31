@@ -14,7 +14,7 @@
 
 use super::VecOrOptionOrBare;
 use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
-use crate::internal::de::DeserFieldsFromBytesIter;
+use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::FieldData;
 use crate::internal::variant::VariantTypeTag;
@@ -164,7 +164,7 @@ where
 impl<L, M> DeserFieldFromBytesIter<L, tags::Message<M>>
 where
     L: tags::FieldLabelTag,
-    M: DeserFieldsFromBytesIter + Default,
+    M: DeserMessageFromBytesIter + Default,
 {
     pub fn deser_field<FieldType, I>(
         field: &mut FieldType,
