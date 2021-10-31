@@ -13,9 +13,9 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
         super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
         {%- if oneof.has_ld_field %}
         {%- if oneof.has_message_field %}
-        <'static, ::puroro::internal::bool::True, Self>
+        <'bump, ::puroro::internal::bool::True, Self>
         {%- else %}
-        <'static, ::puroro::internal::bool::True>
+        <'bump, ::puroro::internal::bool::True>
         {%- endif %}
         {%- endif %}
     >,

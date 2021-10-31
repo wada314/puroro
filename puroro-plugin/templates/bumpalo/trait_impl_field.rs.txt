@@ -9,9 +9,10 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_
 
 {%- match f.bumpalo_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    {{ borrowed }},
-    ::std::slice::Iter<'this, {{ f.bumpalo_scalar_field_type }}>>;
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
+    ::puroro::internal::impls::simple::BorrowedIter<
+        {{ borrowed }},
+        ::std::slice::Iter<'this, {{ f.bumpalo_scalar_field_type }}>>;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, {{ f.trait_scalar_getter_type }}>>;
 {%- endmatch %}

@@ -2263,7 +2263,10 @@ pub mod _puroro_impls {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
-        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field6RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
         >;
@@ -2286,7 +2289,10 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
             'bump,
         >;
-        type Field8RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                 'bump,
             >,

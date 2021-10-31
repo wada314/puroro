@@ -1254,13 +1254,13 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub group_one: ::std::option::Option<
             super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
-                'static,
+                'bump,
                 ::puroro::internal::bool::True,
             >,
         >,
         pub group_two: ::std::option::Option<
             super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
-                'static,
+                'bump,
                 ::puroro::internal::bool::True,
                 Self,
             >,

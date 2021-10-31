@@ -12547,7 +12547,10 @@ pub mod _puroro_impls {
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             self.bytes_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field23RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field23RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
             [u8],
             ::std::slice::Iter<'this, ::puroro::bumpalo::collections::Vec<'bump, u8>>,
         >;
@@ -12561,7 +12564,10 @@ pub mod _puroro_impls {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field33RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field33RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
         >;
@@ -12595,9 +12601,10 @@ pub mod _puroro_impls {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
-        type Field53RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>,
-    ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>;
+        type Field53RepeatedType<'this> where Self: 'this =
+    ::puroro::internal::impls::simple::BorrowedIter<
+        self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>,
+        ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())

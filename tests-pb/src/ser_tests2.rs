@@ -2231,7 +2231,10 @@ pub mod _puroro_impls {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field6RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
         >;
@@ -2254,7 +2257,10 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
             'bump,
         >;
-        type Field8RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                 'bump,
             >,
