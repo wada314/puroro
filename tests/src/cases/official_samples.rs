@@ -14,7 +14,7 @@
 
 /// The sample cases documented in the Protobuf official encoding document:
 /// https://developers.google.com/protocol-buffers/docs/encoding
-use ::puroro::internal::DeserializableMessageFromBytesIterator;
+use ::puroro::Message;
 use ::std::borrow::Cow;
 use ::std::default::Default;
 use ::tests_pb::official_samples2 as s2;
@@ -34,7 +34,7 @@ const TEST4_EXPECTED: &[i32] = &[3, 270, 86942];
 fn proto2_test1_simple() {
     use std::io::Read as _;
     let mut t1 = s2::Test1::default();
-    t1.deser(TEST1_INPUT.bytes()).unwrap();
+    t1.merge_from_bytes(TEST1_INPUT.bytes()).unwrap();
     assert_eq!(Some(TEST1_EXPECTED), t1.a);
 }
 
@@ -42,7 +42,7 @@ fn proto2_test1_simple() {
 fn proto3_test1_simple() {
     use std::io::Read as _;
     let mut t1 = s3::Test1::default();
-    t1.deser(TEST1_INPUT.bytes()).unwrap();
+    t1.merge_from_bytes(TEST1_INPUT.bytes()).unwrap();
     assert_eq!(TEST1_EXPECTED, t1.a);
 }
 
@@ -50,7 +50,7 @@ fn proto3_test1_simple() {
 fn proto2_test2_simple() {
     use std::io::Read as _;
     let mut t2 = s2::Test2::default();
-    t2.deser(TEST2_INPUT.bytes()).unwrap();
+    t2.merge_from_bytes(TEST2_INPUT.bytes()).unwrap();
     assert_eq!(Some(TEST2_EXPECTED.to_string()), t2.b);
 }
 
@@ -58,7 +58,7 @@ fn proto2_test2_simple() {
 fn proto3_test2_simple() {
     use std::io::Read as _;
     let mut t2 = s3::Test2::default();
-    t2.deser(TEST2_INPUT.bytes()).unwrap();
+    t2.merge_from_bytes(TEST2_INPUT.bytes()).unwrap();
     assert_eq!(TEST2_EXPECTED, t2.b);
 }
 
@@ -66,7 +66,7 @@ fn proto3_test2_simple() {
 fn proto2_test3_simple() {
     use std::io::Read as _;
     let mut t3 = s2::Test3::default();
-    t3.deser(TEST3_INPUT.bytes()).unwrap();
+    t3.merge_from_bytes(TEST3_INPUT.bytes()).unwrap();
     assert!(t3.c.is_some());
     assert_eq!(Some(TEST3_EXPECTED), t3.c.unwrap().a);
 }
@@ -75,7 +75,7 @@ fn proto2_test3_simple() {
 fn proto3_test3_simple() {
     use std::io::Read as _;
     let mut t3 = s3::Test3::default();
-    t3.deser(TEST3_INPUT.bytes()).unwrap();
+    t3.merge_from_bytes(TEST3_INPUT.bytes()).unwrap();
     assert!(t3.c.is_some());
     assert_eq!(TEST3_EXPECTED, t3.c.unwrap().a);
 }
@@ -84,7 +84,7 @@ fn proto3_test3_simple() {
 fn proto2_test4_simple() {
     use std::io::Read as _;
     let mut t4 = s2::Test4::default();
-    t4.deser(TEST4_INPUT.bytes()).unwrap();
+    t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
     assert_eq!(TEST4_EXPECTED, &t4.d);
 }
 
@@ -92,6 +92,6 @@ fn proto2_test4_simple() {
 fn proto3_test4_simple() {
     use std::io::Read as _;
     let mut t4 = s3::Test4::default();
-    t4.deser(TEST4_INPUT.bytes()).unwrap();
+    t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
     assert_eq!(TEST4_EXPECTED, &t4.d);
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::DeserFieldsFromBytesIter;
+use super::DeserMessageFromBytesIter;
 use crate::internal::types::{FieldData, WireType};
 use crate::internal::variant::Variant;
 use crate::{ErrorKind, Result};
@@ -21,7 +21,7 @@ use ::std::io::Result as IoResult;
 
 pub fn deser_from_iter<Msg, I>(message: &mut Msg, input_iter: I) -> Result<()>
 where
-    Msg: DeserFieldsFromBytesIter,
+    Msg: ?Sized + DeserMessageFromBytesIter,
     I: Iterator<Item = IoResult<u8>>,
 {
     let mut scoped_iter = ScopedIter::new(input_iter);
@@ -30,7 +30,7 @@ where
 
 pub fn deser_from_scoped_iter<Msg, I>(message: &mut Msg, iter: &mut ScopedIter<I>) -> Result<()>
 where
-    Msg: DeserFieldsFromBytesIter,
+    Msg: ?Sized + DeserMessageFromBytesIter,
     I: Iterator<Item = IoResult<u8>>,
 {
     while let Some((wire_type, field_number)) = try_get_wire_type_and_field_number(iter)? {
@@ -61,7 +61,7 @@ where
             WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
         };
 
-        <Msg as DeserFieldsFromBytesIter>::deser_field(message, field_number, field_data)?;
+        <Msg as DeserMessageFromBytesIter>::deser_field(message, field_number, field_data)?;
 
         if let WireType::LengthDelimited = wire_type {
             iter.pop_scope();

@@ -14,3 +14,103 @@
 
 pub mod to_io_write;
 pub use to_io_write::SerFieldToIoWrite;
+
+use crate::{Either, Result};
+use ::std::io::Write;
+
+pub trait SerMessageToIoWrite {
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write;
+}
+impl SerMessageToIoWrite for () {
+    fn ser<W>(&self, _: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        Ok(())
+    }
+}
+impl<T, U> SerMessageToIoWrite for (T, U)
+where
+    T: SerMessageToIoWrite,
+    U: SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        self.0.ser(out)?;
+        self.1.ser(out)?;
+        Ok(())
+    }
+}
+impl<T, U> SerMessageToIoWrite for Either<T, U>
+where
+    T: SerMessageToIoWrite,
+    U: SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        match self {
+            Either::Left(v) => v.ser(out)?,
+            Either::Right(v) => v.ser(out)?,
+        }
+        Ok(())
+    }
+}
+impl<T> SerMessageToIoWrite for Option<T>
+where
+    T: SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        if let Some(ref msg) = self {
+            msg.ser(out)?;
+        }
+        Ok(())
+    }
+}
+impl<T> SerMessageToIoWrite for Box<T>
+where
+    T: SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        use ::std::ops::Deref;
+        <T as SerMessageToIoWrite>::ser(self.deref(), out)?;
+        Ok(())
+    }
+}
+impl<'a, T> SerMessageToIoWrite for &'a T
+where
+    T: SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        use ::std::ops::Deref;
+        <T as SerMessageToIoWrite>::ser(self.deref(), out)?;
+        Ok(())
+    }
+}
+impl<'a, T> SerMessageToIoWrite for &'a mut T
+where
+    T: SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        use ::std::ops::Deref;
+        <T as SerMessageToIoWrite>::ser(self.deref(), out)?;
+        Ok(())
+    }
+}

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::SerMessageToIoWrite;
 use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::WireType;
 use crate::internal::variant::{Variant, VariantTypeTag};
-use crate::internal::SerializableMessageToIoWrite;
 use crate::ErrorKind;
 use crate::{tags, Result};
 use ::std::convert::TryInto;
@@ -175,7 +175,7 @@ where
 impl<L, M> SerFieldToIoWrite<L, tags::Message<M>>
 where
     L: tags::FieldLabelTag,
-    M: SerializableMessageToIoWrite,
+    M: SerMessageToIoWrite,
 {
     pub fn ser_field<'a, FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
     where
@@ -184,7 +184,7 @@ where
     {
         for item in field.into_iter() {
             let mut encoded = Vec::new();
-            <M as SerializableMessageToIoWrite>::ser(&item, &mut encoded)?;
+            <M as SerMessageToIoWrite>::ser(&item, &mut encoded)?;
             let len = encoded.len();
             let len_i32: i32 = len
                 .try_into()
