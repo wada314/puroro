@@ -260,7 +260,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Msg
+    impl ::puroro::internal::se::SerMessageToIoWrite for Msg
     where
         Self: super::_puroro_traits::MsgTrait,
     {
@@ -396,7 +396,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Submsg
+    impl ::puroro::internal::se::SerMessageToIoWrite for Submsg
     where
         Self: super::_puroro_traits::SubmsgTrait,
     {
@@ -726,7 +726,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32>
             + ::std::clone::Clone
@@ -822,7 +822,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField2<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
@@ -920,7 +920,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField3<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField3<ScalarType>
     where
         ScalarType: ::std::convert::Into<f32>
             + ::std::clone::Clone
@@ -1016,7 +1016,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField4<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField4<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
@@ -1112,7 +1112,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField5<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
     where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
             + ::std::clone::Clone
@@ -1120,7 +1120,7 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
         Self: super::_puroro_traits::MsgTrait,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'a>:
-            ::puroro::internal::SerializableMessageToIoWrite,
+            ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1214,7 +1214,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField6<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField6<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32>
             + ::std::clone::Clone
@@ -1409,7 +1409,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for SubmsgSingleField1<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32>
             + ::std::clone::Clone

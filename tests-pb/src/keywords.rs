@@ -71,7 +71,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Msg
+    impl ::puroro::internal::se::SerMessageToIoWrite for Msg
     where
         Self: super::_puroro_traits::MsgTrait,
     {
@@ -171,7 +171,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32>
             + ::std::clone::Clone

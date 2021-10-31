@@ -78,7 +78,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test1
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test1
     where
         Self: super::_puroro_traits::Test1Trait,
     {
@@ -170,7 +170,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test2
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test2
     where
         Self: super::_puroro_traits::Test2Trait,
     {
@@ -269,7 +269,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test3
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test3
     where
         Self: super::_puroro_traits::Test3Trait,
     {
@@ -361,7 +361,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Test4
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test4
     where
         Self: super::_puroro_traits::Test4Trait,
     {
@@ -457,7 +457,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test1SingleField1<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test1SingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32>
             + ::std::clone::Clone
@@ -584,7 +584,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test2SingleField2<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test2SingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
@@ -747,7 +747,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for Test3SingleField3<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
             + ::std::clone::Clone
@@ -755,7 +755,7 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
         Self: super::_puroro_traits::Test3Trait,
         for<'a> <Self as super::_puroro_traits::Test3Trait>::Field3MessageType<'a>:
-            ::puroro::internal::SerializableMessageToIoWrite,
+            ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -933,7 +933,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for Test4SingleField4<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<i32>

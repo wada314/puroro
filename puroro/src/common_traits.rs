@@ -13,9 +13,9 @@
 // limitations under the License.
 
 use crate::desc::MessageDescriptor;
-use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::de::from_iter::deser_from_iter;
-use crate::internal::SerializableMessageToIoWrite;
+use crate::internal::de::DeserMessageFromBytesIter;
+use crate::internal::se::SerMessageToIoWrite;
 use crate::Result;
 use ::std::convert::TryFrom;
 use ::std::io::Write;
@@ -68,10 +68,10 @@ pub trait Message<M> {
     /// Serializes the message into [`std::io::Write`].
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where
-        Self: SerializableMessageToIoWrite,
+        Self: SerMessageToIoWrite,
         W: Write,
     {
-        <Self as SerializableMessageToIoWrite>::ser(&self, out)
+        <Self as SerMessageToIoWrite>::ser(&self, out)
     }
 }
 impl<M> Message<M> for () where M: MessageRepresentativeImpl {}

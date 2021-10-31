@@ -130,7 +130,7 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} 
     }
 }
 
-impl ::puroro::internal::SerializableMessageToIoWrite for {{ m.simple_ident }}
+impl ::puroro::internal::se::SerMessageToIoWrite for {{ m.simple_ident }}
 where
     Self: super::_puroro_traits::{{ m.ident }}Trait,
 {
