@@ -221,30 +221,27 @@ pub use ::bumpalo;
 pub use ::either::Either;
 pub use ::once_cell;
 
-use ::bumpalo::collections::String as BString;
-use ::bumpalo::Bump;
-use ::std::ops::Deref;
-
-struct A<'b> {
-    a: BString<'b>,
-    bump: &'b Bump,
-}
-impl<'b> A<'b> {
-    fn new(bump: &'b Bump) -> Self {
-        Self {
-            a: BString::new_in(bump),
-            bump,
-        }
-    }
-}
-struct Own<T> {
+// Bumpalo wrapper
+pub struct BumpaloOwned<T> {
     // The field order matters, `Drop` drops the field in decl order.
     t: T,
-    bump: Bump,
+    bump: Box<crate::bumpalo::Bump>,
 }
-impl<T> Deref for Own<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.t
+impl<T> BumpaloOwned<T> {
+    pub fn new_with<F: FnOnce(&'static crate::bumpalo::Bump) -> T>(f: F) -> Self {
+        let bump = Box::new(crate::bumpalo::Bump::new());
+        let t = (f)(unsafe { ::std::mem::transmute(bump.as_ref()) });
+        Self { t, bump }
+    }
+    pub fn bump(this: &BumpaloOwned<T>) -> &crate::bumpalo::Bump {
+        &this.bump
+    }
+    pub fn inner(this: &BumpaloOwned<T>) -> &T {
+        &this.t
+    }
+    pub fn inner_mut(this: &mut BumpaloOwned<T>) -> &mut T {
+        &mut this.t
     }
 }
+
+impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}

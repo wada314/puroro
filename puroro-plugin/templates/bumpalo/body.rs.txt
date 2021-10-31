@@ -1,4 +1,4 @@
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub struct {{ m.bumpalo_ident }} {
-    
+pub struct {{ m.bumpalo_ref_ident }}<'bump> {
+    _phantom: ::std::marker::PhantomData<&'bump ()>, {#- For code generator's simplicity #}
 }

@@ -2179,7 +2179,9 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct MsgBumpalo {}
+    pub struct MsgBumpaloRef<'bump> {
+        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -2860,7 +2862,9 @@ pub mod _puroro_nested {
                 }
             }
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub struct SubmsgBumpalo {}
+            pub struct SubmsgBumpaloRef<'bump> {
+                _phantom: ::std::marker::PhantomData<&'bump ()>,
+            }
             pub struct SubmsgBuilder<T>(T);
 
             impl<T> SubmsgBuilder<T>

@@ -72,6 +72,7 @@ struct Message {
     simple_ident: String,
     single_field_ident: String,
     bumpalo_ident: String,
+    bumpalo_ref_ident: String,
     builder_ident: String,
 }
 
@@ -115,6 +116,7 @@ impl Message {
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
             bumpalo_ident: m.rust_impl_ident("Bumpalo"),
+            bumpalo_ref_ident: m.rust_impl_ident("BumpaloRef"),
             builder_ident: m.rust_impl_ident("Builder"),
         })
     }

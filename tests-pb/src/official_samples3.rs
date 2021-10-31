@@ -493,7 +493,9 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test1Bumpalo {}
+    pub struct Test1BumpaloRef<'bump> {
+        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    }
     pub struct Test1Builder<T>(T);
 
     impl<T> Test1Builder<T>
@@ -622,7 +624,9 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test2Bumpalo {}
+    pub struct Test2BumpaloRef<'bump> {
+        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    }
     pub struct Test2Builder<T>(T);
 
     impl<T> Test2Builder<T>
@@ -791,7 +795,9 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test3Bumpalo {}
+    pub struct Test3BumpaloRef<'bump> {
+        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    }
     pub struct Test3Builder<T>(T);
 
     impl<T> Test3Builder<T>
@@ -975,7 +981,9 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    pub struct Test4Bumpalo {}
+    pub struct Test4BumpaloRef<'bump> {
+        _phantom: ::std::marker::PhantomData<&'bump ()>,
+    }
     pub struct Test4Builder<T>(T);
 
     impl<T> Test4Builder<T>
