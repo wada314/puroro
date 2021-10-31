@@ -125,15 +125,21 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &'bump Bump,
+        bump: &'bump Bump,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<String<'bump>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
-            let string = String::from_utf8(iter.collect::<::std::io::Result<Vec<'bump, _>>>()?)
-                .map_err(|e| ErrorKind::InvalidUtf8(e))?;
+            let mut bytes = Vec::new_in(bump);
+            if let Some(expected_size) = iter.size_hint().1 {
+                bytes.reserve_exact(expected_size);
+            }
+            for rbyte in iter {
+                bytes.push(rbyte?);
+            }
+            let string = String::from_utf8(bytes).map_err(|e| ErrorKind::InvalidUtf8Bumpalo())?;
             if !L::DO_DEFAULT_CHECK || !string.is_empty() {
                 field.push(string);
             }
@@ -151,14 +157,20 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &'bump Bump,
+        bump: &'bump Bump,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<Vec<'bump, u8>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
-            let bytes = iter.collect::<::std::io::Result<Vec<'bump, _>>>()?;
+            let mut bytes = Vec::new_in(bump);
+            if let Some(expected_size) = iter.size_hint().1 {
+                bytes.reserve_exact(expected_size);
+            }
+            for rbyte in iter {
+                bytes.push(rbyte?);
+            }
             if !L::DO_DEFAULT_CHECK || !bytes.is_empty() {
                 field.push(bytes);
             }
@@ -172,9 +184,9 @@ where
 impl<L, M> DeserFieldFromBytesIter<L, tags::Message<M>>
 where
     L: tags::FieldLabelTag,
-    M: DeserMessageFromBytesIter + BumpaloMessage,
+    M: DeserMessageFromBytesIter,
 {
-    pub fn deser_field<'bump, FieldType, I>(
+    pub fn deser_field<'bump, FieldType, I, MsgRepr>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
         bump: &'bump Bump,
@@ -182,9 +194,10 @@ where
     where
         FieldType: VecOrOptionOrBare<M>,
         I: Iterator<Item = ::std::io::Result<u8>>,
+        M: BumpaloMessage<'bump, MsgRepr>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
-            let msg = field.get_or_insert_with(BumpaloMessage::new_in(bump));
+            let msg = field.get_or_insert_with(|| BumpaloMessage::new_in(bump));
             deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;

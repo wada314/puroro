@@ -2198,7 +2198,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_unlabeled: i32,
@@ -2230,6 +2230,25 @@ pub mod _puroro_impls {
         pub very_large_field_number: i32,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_unlabeled: ::std::default::Default::default(),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_unlabeled: ::std::default::Default::default(),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_unlabeled: ::std::default::Default::default(),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                very_large_field_number: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
@@ -2490,6 +2509,24 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.i32_unlabeled == rhs.i32_unlabeled
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_unlabeled == rhs.float_unlabeled
+                && self.float_repeated == rhs.float_repeated
+                && self.string_unlabeled == rhs.string_unlabeled
+                && self.string_repeated == rhs.string_repeated
+                && self.submsg_unlabeled == rhs.submsg_unlabeled
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.enum_unlabeled == rhs.enum_unlabeled
+                && self.enum_repeated == rhs.enum_repeated
+                && self.very_large_field_number == rhs.very_large_field_number
+                && true
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -3176,12 +3213,23 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+            #[derive(::std::clone::Clone, ::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 pub i32_unlabeled: i32,
             }
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+            impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Submsg>
+                for SubmsgBumpalo<'bump>
+            {
+                fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self {
+                        _bump: bump,
+                        i32_unlabeled: ::std::default::Default::default(),
+                    }
+                }
+            }
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
@@ -3235,6 +3283,14 @@ pub mod _puroro_nested {
                         out,
                     )?;
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+                fn eq(&self, rhs: &Self) -> bool {
+                    ::std::ptr::eq(self._bump, rhs._bump)
+                        && self.i32_unlabeled == rhs.i32_unlabeled
+                        && true
                 }
             }
             pub struct SubmsgBuilder<T>(T);

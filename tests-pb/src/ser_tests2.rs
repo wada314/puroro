@@ -2178,7 +2178,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_optional: ::std::option::Option<i32>,
@@ -2210,6 +2210,25 @@ pub mod _puroro_impls {
         pub very_large_field_number: ::std::option::Option<i32>,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                very_large_field_number: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
@@ -2450,6 +2469,24 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.i32_optional == rhs.i32_optional
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_optional == rhs.float_optional
+                && self.float_repeated == rhs.float_repeated
+                && self.string_optional == rhs.string_optional
+                && self.string_repeated == rhs.string_repeated
+                && self.submsg_optional == rhs.submsg_optional
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.enum_optional == rhs.enum_optional
+                && self.enum_repeated == rhs.enum_repeated
+                && self.very_large_field_number == rhs.very_large_field_number
+                && true
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -3131,12 +3168,23 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+            #[derive(::std::clone::Clone, ::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 pub i32_optional: ::std::option::Option<i32>,
             }
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+            impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Submsg>
+                for SubmsgBumpalo<'bump>
+            {
+                fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self {
+                        _bump: bump,
+                        i32_optional: ::std::default::Default::default(),
+                    }
+                }
+            }
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
@@ -3186,6 +3234,14 @@ pub mod _puroro_nested {
                         out,
                     )?;
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+                fn eq(&self, rhs: &Self) -> bool {
+                    ::std::ptr::eq(self._bump, rhs._bump)
+                        && self.i32_optional == rhs.i32_optional
+                        && true
                 }
             }
             pub struct SubmsgBuilder<T>(T);

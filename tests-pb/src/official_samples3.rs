@@ -492,12 +492,23 @@ pub mod _puroro_impls {
             Self { a: value }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub a: i32,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Test1>
+        for Test1Bumpalo<'bump>
+    {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                a: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
@@ -548,6 +559,12 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test1Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.a == rhs.a && true
         }
     }
     pub struct Test1Builder<T>(T);
@@ -677,12 +694,23 @@ pub mod _puroro_impls {
             Self { b: value }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub b: ::puroro::bumpalo::collections::String<'bump>,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Test2>
+        for Test2Bumpalo<'bump>
+    {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                b: ::puroro::bumpalo::collections::String::new_in(bump),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
@@ -733,6 +761,12 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test2Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.b == rhs.b && true
         }
     }
     pub struct Test2Builder<T>(T);
@@ -902,7 +936,7 @@ pub mod _puroro_impls {
             Self { c: value }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub c: ::std::option::Option<
@@ -913,6 +947,17 @@ pub mod _puroro_impls {
         >,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Test3>
+        for Test3Bumpalo<'bump>
+    {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                c: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::Test3Trait for Test3Bumpalo<'bump> {
         type Field3MessageType<'this>
@@ -973,6 +1018,12 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test3Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.c == rhs.c && true
         }
     }
     pub struct Test3Builder<T>(T);
@@ -1157,12 +1208,23 @@ pub mod _puroro_impls {
             Self { d: value }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct Test4Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Test4>
+        for Test4Bumpalo<'bump>
+    {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                d: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::Test4Trait for Test4Bumpalo<'bump> {
         type Field4RepeatedType<'this>
@@ -1210,6 +1272,12 @@ pub mod _puroro_impls {
                 ::puroro::tags::Int32,
             >::ser_field(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test4Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.d == rhs.d && true
         }
     }
     pub struct Test4Builder<T>(T);

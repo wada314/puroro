@@ -1249,7 +1249,7 @@ pub mod _puroro_impls {
             Self { g3_int32: value }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub group_one: ::std::option::Option<
@@ -1269,6 +1269,17 @@ pub mod _puroro_impls {
             ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                group_one: ::std::option::Option::None,
+                group_two: ::std::option::Option::None,
+                group_three: ::std::option::Option::None,
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         type Field5MessageType<'this>
@@ -1482,6 +1493,16 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.group_one == rhs.group_one
+                && self.group_two == rhs.group_two
+                && self.group_three == rhs.group_three
+                && true
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -1679,12 +1700,23 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_unlabeled: i32,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Submsg>
+        for SubmsgBumpalo<'bump>
+    {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
@@ -1735,6 +1767,12 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.i32_unlabeled == rhs.i32_unlabeled && true
         }
     }
     pub struct SubmsgBuilder<T>(T);

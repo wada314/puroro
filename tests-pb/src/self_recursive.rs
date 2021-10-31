@@ -265,7 +265,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub recursive_unlabeled: ::std::option::Option<
@@ -276,6 +276,15 @@ pub mod _puroro_impls {
         >,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                recursive_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         type Field1MessageType<'this>
@@ -336,6 +345,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.recursive_unlabeled == rhs.recursive_unlabeled
+                && true
         }
     }
     pub struct MsgBuilder<T>(T);

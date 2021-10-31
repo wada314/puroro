@@ -12464,7 +12464,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
     pub i32_required: ::std::option::Option<i32>,
@@ -12517,6 +12517,62 @@ pub mod _puroro_impls {
     pub f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
 }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_required: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_required: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_required: ::std::default::Default::default(),
+                bytes_optional: ::std::default::Default::default(),
+                bytes_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                string_required: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_required: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_required: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i64_required: ::std::default::Default::default(),
+                i64_optional: ::std::default::Default::default(),
+                i64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u32_required: ::std::default::Default::default(),
+                u32_optional: ::std::default::Default::default(),
+                u32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u64_required: ::std::default::Default::default(),
+                u64_optional: ::std::default::Default::default(),
+                u64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s32_required: ::std::default::Default::default(),
+                s32_optional: ::std::default::Default::default(),
+                s32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s64_required: ::std::default::Default::default(),
+                s64_optional: ::std::default::Default::default(),
+                s64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed32_required: ::std::default::Default::default(),
+                fixed32_optional: ::std::default::Default::default(),
+                fixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed64_required: ::std::default::Default::default(),
+                fixed64_optional: ::std::default::Default::default(),
+                fixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed32_required: ::std::default::Default::default(),
+                sfixed32_optional: ::std::default::Default::default(),
+                sfixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed64_required: ::std::default::Default::default(),
+                sfixed64_optional: ::std::default::Default::default(),
+                sfixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                f64_required: ::std::default::Default::default(),
+                f64_optional: ::std::default::Default::default(),
+                f64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_required_opt<'this>(&'this self) -> Option<i32> {
@@ -13320,6 +13376,61 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.i32_required == rhs.i32_required
+                && self.i32_optional == rhs.i32_optional
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_required == rhs.float_required
+                && self.float_optional == rhs.float_optional
+                && self.float_repeated == rhs.float_repeated
+                && self.bytes_required == rhs.bytes_required
+                && self.bytes_optional == rhs.bytes_optional
+                && self.bytes_repeated == rhs.bytes_repeated
+                && self.string_required == rhs.string_required
+                && self.string_optional == rhs.string_optional
+                && self.string_repeated == rhs.string_repeated
+                && self.enum_required == rhs.enum_required
+                && self.enum_optional == rhs.enum_optional
+                && self.enum_repeated == rhs.enum_repeated
+                && self.submsg_required == rhs.submsg_required
+                && self.submsg_optional == rhs.submsg_optional
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.i64_required == rhs.i64_required
+                && self.i64_optional == rhs.i64_optional
+                && self.i64_repeated == rhs.i64_repeated
+                && self.u32_required == rhs.u32_required
+                && self.u32_optional == rhs.u32_optional
+                && self.u32_repeated == rhs.u32_repeated
+                && self.u64_required == rhs.u64_required
+                && self.u64_optional == rhs.u64_optional
+                && self.u64_repeated == rhs.u64_repeated
+                && self.s32_required == rhs.s32_required
+                && self.s32_optional == rhs.s32_optional
+                && self.s32_repeated == rhs.s32_repeated
+                && self.s64_required == rhs.s64_required
+                && self.s64_optional == rhs.s64_optional
+                && self.s64_repeated == rhs.s64_repeated
+                && self.fixed32_required == rhs.fixed32_required
+                && self.fixed32_optional == rhs.fixed32_optional
+                && self.fixed32_repeated == rhs.fixed32_repeated
+                && self.fixed64_required == rhs.fixed64_required
+                && self.fixed64_optional == rhs.fixed64_optional
+                && self.fixed64_repeated == rhs.fixed64_repeated
+                && self.sfixed32_required == rhs.sfixed32_required
+                && self.sfixed32_optional == rhs.sfixed32_optional
+                && self.sfixed32_repeated == rhs.sfixed32_repeated
+                && self.sfixed64_required == rhs.sfixed64_required
+                && self.sfixed64_optional == rhs.sfixed64_optional
+                && self.sfixed64_repeated == rhs.sfixed64_repeated
+                && self.f64_required == rhs.f64_required
+                && self.f64_optional == rhs.f64_optional
+                && self.f64_repeated == rhs.f64_repeated
+                && true
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -15284,13 +15395,25 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+            #[derive(::std::clone::Clone, ::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 pub i32_required: ::std::option::Option<i32>,
                 pub i64_required: ::std::option::Option<i64>,
             }
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+            impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Submsg>
+                for SubmsgBumpalo<'bump>
+            {
+                fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self {
+                        _bump: bump,
+                        i32_required: ::std::default::Default::default(),
+                        i64_required: ::std::default::Default::default(),
+                    }
+                }
+            }
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_required_opt<'this>(&'this self) -> Option<i32> {
@@ -15357,6 +15480,15 @@ pub mod _puroro_nested {
                         out,
                     )?;
                     ::std::result::Result::Ok(())
+                }
+            }
+
+            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+                fn eq(&self, rhs: &Self) -> bool {
+                    ::std::ptr::eq(self._bump, rhs._bump)
+                        && self.i32_required == rhs.i32_required
+                        && self.i64_required == rhs.i64_required
+                        && true
                 }
             }
             pub struct SubmsgBuilder<T>(T);

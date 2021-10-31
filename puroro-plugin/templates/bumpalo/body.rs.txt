@@ -1,4 +1,4 @@
-#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+#[derive(::std::clone::Clone, ::std::fmt::Debug)]
 pub struct {{ m.bumpalo_ident }}<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
 
@@ -22,6 +22,35 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     {%- endfor %}
 }
 impl<'bump> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {}
+
+impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {
+    fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+        Self {
+            _bump: bump,
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {%- if field.is_repeated %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            {%- else %}
+            {%- if field.is_unlabeled && field.is_string  %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump),
+            {%- else %}
+            {%- if field.is_unlabeled && field.is_bytes %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            {%- else %}
+            {{ field.ident }}: ::std::default::Default::default(),
+            {%- endif %} {#- if field.is_unlabeled && field.is_string #}
+            {%- endif %} {#- if field.is_unlabeled && field.is_bytes #}
+            {%- endif %} {#- if field.is_repeated #}
+            {%- endif %} {#- if !field.is_explicit_oneof_field #}
+            {%- endfor %} {#- for field in m.fields #}
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::std::option::Option::None,
+            {%- endfor %}
+        }
+    }
+}
 
 impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}<'bump> {
     {%- for field in m.fields %}
@@ -126,5 +155,20 @@ where
         )?;
         {%- endfor %} {#- for field in m.fields #}
         ::std::result::Result::Ok(())
+    }
+}
+
+impl<'bump> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<'bump> {
+    fn eq(&self, rhs: &Self) -> bool {
+        ::std::ptr::eq(self._bump, rhs._bump) &&
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            self.{{ field.ident }} == rhs.{{ field.ident }} &&
+            {%- endif %}
+            {%- endfor %} {#- for field in m.fields #}
+            {%- for oneof in m.oneofs %}
+            self.{{ oneof.field_ident }} == rhs.{{ oneof.field_ident }} &&
+            {%- endfor %}
+            true
     }
 }

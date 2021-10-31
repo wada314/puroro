@@ -6874,7 +6874,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_default: ::std::option::Option<i32>,
@@ -6941,6 +6941,76 @@ pub mod _puroro_impls {
         pub enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_default: ::std::default::Default::default(),
+                i32_0: ::std::default::Default::default(),
+                i32_42: ::std::default::Default::default(),
+                i32_m42: ::std::default::Default::default(),
+                i32_2147483647: ::std::default::Default::default(),
+                i32_m2147483648: ::std::default::Default::default(),
+                i32_0123: ::std::default::Default::default(),
+                i32_0x123: ::std::default::Default::default(),
+                u32_default: ::std::default::Default::default(),
+                u32_0: ::std::default::Default::default(),
+                u32_42: ::std::default::Default::default(),
+                u32_4294967295: ::std::default::Default::default(),
+                u32_0123: ::std::default::Default::default(),
+                u32_0x123: ::std::default::Default::default(),
+                i64_default: ::std::default::Default::default(),
+                i64_0: ::std::default::Default::default(),
+                i64_42: ::std::default::Default::default(),
+                i64_m42: ::std::default::Default::default(),
+                i64_9223372036854775807: ::std::default::Default::default(),
+                i64_m9223372036854775808: ::std::default::Default::default(),
+                i64_0123: ::std::default::Default::default(),
+                i64_0x123: ::std::default::Default::default(),
+                u64_default: ::std::default::Default::default(),
+                u64_0: ::std::default::Default::default(),
+                u64_42: ::std::default::Default::default(),
+                u64_18446744073709551615: ::std::default::Default::default(),
+                u64_0123: ::std::default::Default::default(),
+                u64_0x123: ::std::default::Default::default(),
+                f32_default: ::std::default::Default::default(),
+                f32_0: ::std::default::Default::default(),
+                f32_m0: ::std::default::Default::default(),
+                f32_0p: ::std::default::Default::default(),
+                f32_p0: ::std::default::Default::default(),
+                f32_0p0: ::std::default::Default::default(),
+                f32_42: ::std::default::Default::default(),
+                f32_m42: ::std::default::Default::default(),
+                f32_0p25: ::std::default::Default::default(),
+                f32_1p5e2: ::std::default::Default::default(),
+                f32_inf: ::std::default::Default::default(),
+                f32_minf: ::std::default::Default::default(),
+                f32_nan: ::std::default::Default::default(),
+                f32_mnan: ::std::default::Default::default(),
+                bool_default: ::std::default::Default::default(),
+                bool_true: ::std::default::Default::default(),
+                bool_false: ::std::default::Default::default(),
+                string_default: ::std::default::Default::default(),
+                string_empty: ::std::default::Default::default(),
+                string_abc: ::std::default::Default::default(),
+                string_aiu: ::std::default::Default::default(),
+                string_backslash: ::std::default::Default::default(),
+                string_tab: ::std::default::Default::default(),
+                string_crlf: ::std::default::Default::default(),
+                bytes_default: ::std::default::Default::default(),
+                bytes_empty: ::std::default::Default::default(),
+                bytes_abc: ::std::default::Default::default(),
+                bytes_aiu: ::std::default::Default::default(),
+                bytes_backslash: ::std::default::Default::default(),
+                bytes_tab: ::std::default::Default::default(),
+                bytes_crlf: ::std::default::Default::default(),
+                enum_default: ::std::default::Default::default(),
+                enum_one: ::std::default::Default::default(),
+                enum_fourty_two: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_default_opt<'this>(&'this self) -> Option<i32> {
@@ -7845,6 +7915,75 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.i32_default == rhs.i32_default
+                && self.i32_0 == rhs.i32_0
+                && self.i32_42 == rhs.i32_42
+                && self.i32_m42 == rhs.i32_m42
+                && self.i32_2147483647 == rhs.i32_2147483647
+                && self.i32_m2147483648 == rhs.i32_m2147483648
+                && self.i32_0123 == rhs.i32_0123
+                && self.i32_0x123 == rhs.i32_0x123
+                && self.u32_default == rhs.u32_default
+                && self.u32_0 == rhs.u32_0
+                && self.u32_42 == rhs.u32_42
+                && self.u32_4294967295 == rhs.u32_4294967295
+                && self.u32_0123 == rhs.u32_0123
+                && self.u32_0x123 == rhs.u32_0x123
+                && self.i64_default == rhs.i64_default
+                && self.i64_0 == rhs.i64_0
+                && self.i64_42 == rhs.i64_42
+                && self.i64_m42 == rhs.i64_m42
+                && self.i64_9223372036854775807 == rhs.i64_9223372036854775807
+                && self.i64_m9223372036854775808 == rhs.i64_m9223372036854775808
+                && self.i64_0123 == rhs.i64_0123
+                && self.i64_0x123 == rhs.i64_0x123
+                && self.u64_default == rhs.u64_default
+                && self.u64_0 == rhs.u64_0
+                && self.u64_42 == rhs.u64_42
+                && self.u64_18446744073709551615 == rhs.u64_18446744073709551615
+                && self.u64_0123 == rhs.u64_0123
+                && self.u64_0x123 == rhs.u64_0x123
+                && self.f32_default == rhs.f32_default
+                && self.f32_0 == rhs.f32_0
+                && self.f32_m0 == rhs.f32_m0
+                && self.f32_0p == rhs.f32_0p
+                && self.f32_p0 == rhs.f32_p0
+                && self.f32_0p0 == rhs.f32_0p0
+                && self.f32_42 == rhs.f32_42
+                && self.f32_m42 == rhs.f32_m42
+                && self.f32_0p25 == rhs.f32_0p25
+                && self.f32_1p5e2 == rhs.f32_1p5e2
+                && self.f32_inf == rhs.f32_inf
+                && self.f32_minf == rhs.f32_minf
+                && self.f32_nan == rhs.f32_nan
+                && self.f32_mnan == rhs.f32_mnan
+                && self.bool_default == rhs.bool_default
+                && self.bool_true == rhs.bool_true
+                && self.bool_false == rhs.bool_false
+                && self.string_default == rhs.string_default
+                && self.string_empty == rhs.string_empty
+                && self.string_abc == rhs.string_abc
+                && self.string_aiu == rhs.string_aiu
+                && self.string_backslash == rhs.string_backslash
+                && self.string_tab == rhs.string_tab
+                && self.string_crlf == rhs.string_crlf
+                && self.bytes_default == rhs.bytes_default
+                && self.bytes_empty == rhs.bytes_empty
+                && self.bytes_abc == rhs.bytes_abc
+                && self.bytes_aiu == rhs.bytes_aiu
+                && self.bytes_backslash == rhs.bytes_backslash
+                && self.bytes_tab == rhs.bytes_tab
+                && self.bytes_crlf == rhs.bytes_crlf
+                && self.enum_default == rhs.enum_default
+                && self.enum_one == rhs.enum_one
+                && self.enum_fourty_two == rhs.enum_fourty_two
+                && true
         }
     }
     pub struct MsgBuilder<T>(T);

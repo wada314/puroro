@@ -141,6 +141,14 @@ where
             }
         }
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let inner_size = self.iter.size_hint();
+        match self.end_stack.last() {
+            Some(end) => (inner_size.0, Some(end - self.pos)),
+            None => inner_size,
+        }
+    }
 }
 
 #[test]

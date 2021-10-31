@@ -62,6 +62,8 @@ pub enum ErrorKind {
     InvalidSliceViewType,
     #[error("Invalid UTF8 string is given.")]
     InvalidUtf8(#[from] std::string::FromUtf8Error),
+    #[error("Invalid UTF8 string is given.")]
+    InvalidUtf8Bumpalo(),
     #[error("Group is not supported.")]
     GroupNotSupported,
     #[error("Other error: {0}")]
