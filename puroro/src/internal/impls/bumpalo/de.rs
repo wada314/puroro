@@ -139,7 +139,7 @@ where
             for rbyte in iter {
                 bytes.push(rbyte?);
             }
-            let string = String::from_utf8(bytes).map_err(|e| ErrorKind::InvalidUtf8Bumpalo())?;
+            let string = String::from_utf8(bytes).map_err(|_| ErrorKind::InvalidUtf8Bumpalo())?;
             if !L::DO_DEFAULT_CHECK || !string.is_empty() {
                 field.push(string);
             }
