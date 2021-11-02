@@ -102,6 +102,12 @@ where
     M: MessageRepresentativeImpl,
 {
 }
+impl<'bump, M, T> Message<M> for crate::bumpalo::boxed::Box<'bump, T>
+where
+    T: Message<M>,
+    M: MessageRepresentativeImpl,
+{
+}
 impl<'a, M, T> Message<M> for &'a T
 where
     T: Message<M>,
@@ -133,4 +139,13 @@ impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
 
 pub trait BumpaloMessage<'bump, M>: Message<M> {
     fn new_in(bump: &'bump Bump) -> Self;
+}
+impl<'bump, M, T> BumpaloMessage<'bump, M> for crate::bumpalo::boxed::Box<'bump, T>
+where
+    T: BumpaloMessage<'bump, M>,
+    M: MessageRepresentativeImpl,
+{
+    fn new_in(bump: &'bump Bump) -> Self {
+        crate::bumpalo::boxed::Box::new_in(BumpaloMessage::new_in(bump), bump)
+    }
 }

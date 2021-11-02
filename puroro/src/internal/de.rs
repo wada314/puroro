@@ -57,6 +57,21 @@ where
         Box::as_mut(self).deser_field(field_number, data)
     }
 }
+impl<'bump, T> DeserMessageFromBytesIter for crate::bumpalo::boxed::Box<'bump, T>
+where
+    T: DeserMessageFromBytesIter,
+{
+    fn deser_field<I>(
+        &mut self,
+        field_number: i32,
+        data: FieldData<&mut ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        crate::bumpalo::boxed::Box::as_mut(self).deser_field(field_number, data)
+    }
+}
 impl<T> DeserMessageFromBytesIter for Option<T>
 where
     T: DeserMessageFromBytesIter + Default,
