@@ -1245,7 +1245,7 @@ pub mod _puroro_impls {
             Self { g3_int32: value }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub group_one: ::std::option::Option<
@@ -1499,6 +1499,17 @@ pub mod _puroro_impls {
                 && true
         }
     }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                group_one: ::std::clone::Clone::clone(&self.group_one),
+                group_two: ::std::clone::Clone::clone(&self.group_two),
+                group_three: ::std::clone::Clone::clone(&self.group_three),
+            }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -1696,7 +1707,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_optional: ::std::option::Option<i32>,
@@ -1765,6 +1776,15 @@ pub mod _puroro_impls {
     impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.i32_optional == rhs.i32_optional && true
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+            }
         }
     }
     pub struct SubmsgBuilder<T>(T);

@@ -265,7 +265,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub recursive_unlabeled: ::std::option::Option<
@@ -353,6 +353,20 @@ pub mod _puroro_impls {
             ::std::ptr::eq(self._bump, rhs._bump)
                 && self.recursive_unlabeled == rhs.recursive_unlabeled
                 && true
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                recursive_unlabeled: self.recursive_unlabeled.as_ref().map(|b| {
+                    ::puroro::bumpalo::boxed::Box::new_in(
+                        ::std::clone::Clone::clone(b.as_ref()),
+                        self._bump,
+                    )
+                }),
+            }
         }
     }
     pub struct MsgBuilder<T>(T);

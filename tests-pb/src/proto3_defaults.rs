@@ -1035,7 +1035,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_unlabeled: i32,
@@ -1217,6 +1217,25 @@ pub mod _puroro_impls {
                 && self.string_unlabeled == rhs.string_unlabeled
                 && self.submsg_unlabeled == rhs.submsg_unlabeled
                 && true
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                f32_unlabeled: ::std::clone::Clone::clone(&self.f32_unlabeled),
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+                submsg_unlabeled: self.submsg_unlabeled.as_ref().map(|b| {
+                    ::puroro::bumpalo::boxed::Box::new_in(
+                        ::std::clone::Clone::clone(b.as_ref()),
+                        self._bump,
+                    )
+                }),
+            }
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -1447,7 +1466,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_unlabeled: i32,
@@ -1520,6 +1539,15 @@ pub mod _puroro_impls {
     impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.i32_unlabeled == rhs.i32_unlabeled && true
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+            }
         }
     }
     pub struct SubmsgBuilder<T>(T);

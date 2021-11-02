@@ -1,4 +1,4 @@
-#[derive(::std::clone::Clone, ::std::fmt::Debug)]
+#[derive(::std::fmt::Debug)]
 pub struct {{ m.bumpalo_ident }}<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
 
@@ -170,5 +170,30 @@ impl<'bump> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<'bump> {
             self.{{ oneof.field_ident }} == rhs.{{ oneof.field_ident }} &&
             {%- endfor %}
             true
+    }
+}
+
+impl<'bump> ::std::clone::Clone for {{ m.bumpalo_ident }}<'bump> {
+    fn clone(&self) -> Self {
+        Self { 
+            _bump: self._bump,
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {%- if field.is_message && !field.is_repeated %}
+            {{ field.ident }}: self.{{ field.ident }}.as_ref().map(
+                |b| ::puroro::bumpalo::boxed::Box::new_in(
+                    ::std::clone::Clone::clone(b.as_ref()),
+                    self._bump,
+                )
+            ),
+            {%- else %}
+            {{ field.ident }}: ::std::clone::Clone::clone(&self.{{ field.ident }}),
+            {%- endif %}
+            {%- endif %}
+            {%- endfor %} {#- for field in m.fields #}
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::std::clone::Clone::clone(&self.{{ oneof.field_ident }}),
+            {%- endfor %}
+        }
     }
 }

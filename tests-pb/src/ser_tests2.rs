@@ -2178,7 +2178,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_optional: ::std::option::Option<i32>,
@@ -2487,6 +2487,30 @@ pub mod _puroro_impls {
                 && self.enum_repeated == rhs.enum_repeated
                 && self.very_large_field_number == rhs.very_large_field_number
                 && true
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_optional: ::std::clone::Clone::clone(&self.float_optional),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                string_optional: ::std::clone::Clone::clone(&self.string_optional),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                submsg_optional: self.submsg_optional.as_ref().map(|b| {
+                    ::puroro::bumpalo::boxed::Box::new_in(
+                        ::std::clone::Clone::clone(b.as_ref()),
+                        self._bump,
+                    )
+                }),
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+                enum_optional: ::std::clone::Clone::clone(&self.enum_optional),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                very_large_field_number: ::std::clone::Clone::clone(&self.very_large_field_number),
+            }
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -3168,7 +3192,7 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+            #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 pub i32_optional: ::std::option::Option<i32>,
@@ -3242,6 +3266,15 @@ pub mod _puroro_nested {
                     ::std::ptr::eq(self._bump, rhs._bump)
                         && self.i32_optional == rhs.i32_optional
                         && true
+                }
+            }
+
+            impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
+                fn clone(&self) -> Self {
+                    Self {
+                        _bump: self._bump,
+                        i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                    }
                 }
             }
             pub struct SubmsgBuilder<T>(T);

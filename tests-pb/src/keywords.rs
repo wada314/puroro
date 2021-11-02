@@ -206,7 +206,7 @@ pub mod _puroro_impls {
             Self { r#type: value }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub r#type: ::std::option::Option<i32>,
@@ -273,6 +273,15 @@ pub mod _puroro_impls {
     impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.r#type == rhs.r#type && true
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                r#type: ::std::clone::Clone::clone(&self.r#type),
+            }
         }
     }
     pub struct MsgBuilder<T>(T);

@@ -12524,7 +12524,7 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
     pub i32_unlabeled: i32,
@@ -13551,6 +13551,72 @@ pub mod _puroro_impls {
                 && self.f64_optional == rhs.f64_optional
                 && self.f64_repeated == rhs.f64_repeated
                 && true
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_unlabeled: ::std::clone::Clone::clone(&self.float_unlabeled),
+                float_optional: ::std::clone::Clone::clone(&self.float_optional),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                bytes_unlabeled: ::std::clone::Clone::clone(&self.bytes_unlabeled),
+                bytes_optional: ::std::clone::Clone::clone(&self.bytes_optional),
+                bytes_repeated: ::std::clone::Clone::clone(&self.bytes_repeated),
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+                string_optional: ::std::clone::Clone::clone(&self.string_optional),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                enum_unlabeled: ::std::clone::Clone::clone(&self.enum_unlabeled),
+                enum_optional: ::std::clone::Clone::clone(&self.enum_optional),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                submsg_unlabeled: self.submsg_unlabeled.as_ref().map(|b| {
+                    ::puroro::bumpalo::boxed::Box::new_in(
+                        ::std::clone::Clone::clone(b.as_ref()),
+                        self._bump,
+                    )
+                }),
+                submsg_optional: self.submsg_optional.as_ref().map(|b| {
+                    ::puroro::bumpalo::boxed::Box::new_in(
+                        ::std::clone::Clone::clone(b.as_ref()),
+                        self._bump,
+                    )
+                }),
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+                i64_unlabeled: ::std::clone::Clone::clone(&self.i64_unlabeled),
+                i64_optional: ::std::clone::Clone::clone(&self.i64_optional),
+                i64_repeated: ::std::clone::Clone::clone(&self.i64_repeated),
+                u32_unlabeled: ::std::clone::Clone::clone(&self.u32_unlabeled),
+                u32_optional: ::std::clone::Clone::clone(&self.u32_optional),
+                u32_repeated: ::std::clone::Clone::clone(&self.u32_repeated),
+                u64_unlabeled: ::std::clone::Clone::clone(&self.u64_unlabeled),
+                u64_optional: ::std::clone::Clone::clone(&self.u64_optional),
+                u64_repeated: ::std::clone::Clone::clone(&self.u64_repeated),
+                s32_unlabeled: ::std::clone::Clone::clone(&self.s32_unlabeled),
+                s32_optional: ::std::clone::Clone::clone(&self.s32_optional),
+                s32_repeated: ::std::clone::Clone::clone(&self.s32_repeated),
+                s64_unlabeled: ::std::clone::Clone::clone(&self.s64_unlabeled),
+                s64_optional: ::std::clone::Clone::clone(&self.s64_optional),
+                s64_repeated: ::std::clone::Clone::clone(&self.s64_repeated),
+                fixed32_unlabeled: ::std::clone::Clone::clone(&self.fixed32_unlabeled),
+                fixed32_optional: ::std::clone::Clone::clone(&self.fixed32_optional),
+                fixed32_repeated: ::std::clone::Clone::clone(&self.fixed32_repeated),
+                fixed64_unlabeled: ::std::clone::Clone::clone(&self.fixed64_unlabeled),
+                fixed64_optional: ::std::clone::Clone::clone(&self.fixed64_optional),
+                fixed64_repeated: ::std::clone::Clone::clone(&self.fixed64_repeated),
+                sfixed32_unlabeled: ::std::clone::Clone::clone(&self.sfixed32_unlabeled),
+                sfixed32_optional: ::std::clone::Clone::clone(&self.sfixed32_optional),
+                sfixed32_repeated: ::std::clone::Clone::clone(&self.sfixed32_repeated),
+                sfixed64_unlabeled: ::std::clone::Clone::clone(&self.sfixed64_unlabeled),
+                sfixed64_optional: ::std::clone::Clone::clone(&self.sfixed64_optional),
+                sfixed64_repeated: ::std::clone::Clone::clone(&self.sfixed64_repeated),
+                f64_unlabeled: ::std::clone::Clone::clone(&self.f64_unlabeled),
+                f64_optional: ::std::clone::Clone::clone(&self.f64_optional),
+                f64_repeated: ::std::clone::Clone::clone(&self.f64_repeated),
+            }
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -15524,7 +15590,7 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::clone::Clone, ::std::fmt::Debug)]
+            #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 pub i32_unlabeled: i32,
@@ -15626,6 +15692,16 @@ pub mod _puroro_nested {
                         && self.i32_unlabeled == rhs.i32_unlabeled
                         && self.i64_unlabeled == rhs.i64_unlabeled
                         && true
+                }
+            }
+
+            impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
+                fn clone(&self) -> Self {
+                    Self {
+                        _bump: self._bump,
+                        i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                        i64_unlabeled: ::std::clone::Clone::clone(&self.i64_unlabeled),
+                    }
                 }
             }
             pub struct SubmsgBuilder<T>(T);
