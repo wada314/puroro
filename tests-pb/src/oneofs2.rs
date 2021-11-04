@@ -2112,7 +2112,6 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_bumpalo_oneofs::*;
         pub use _puroro_oneofs::*;
         pub mod _puroro_oneofs {
             mod _puroro_root {
