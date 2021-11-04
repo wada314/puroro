@@ -1253,25 +1253,18 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub group_one: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
-                'bump,
-                ::puroro::internal::bool::True,
-            >,
+            super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne<'bump>,
         >,
         pub group_two: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
-                'bump,
-                ::puroro::internal::bool::True,
-                Self,
-            >,
+            super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo<'bump>,
         >,
         pub group_three:
-            ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>,
+            ::std::option::Option<super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree>,
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
-        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
                 group_one: ::std::option::Option::None,
@@ -1294,11 +1287,12 @@ pub mod _puroro_impls {
                 ::puroro::internal::bool::False,
             >,
         > {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as F;
             self.group_one.as_ref().map(|oneof| match oneof {
-                E::G1Int32(v) => E::G1Int32(v.clone()),
+                E::G1Int32(v) => F::G1Int32(v.clone()),
 
-                E::G1String(v) => E::G1String(v.as_ref()),
+                E::G1String(v) => F::G1String(v.as_ref()),
             })
         }
         fn group_two<'this>(
@@ -1310,21 +1304,23 @@ pub mod _puroro_impls {
                 Self,
             >,
         > {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as F;
             self.group_two.as_ref().map(|oneof| match oneof {
-                E::G2F32(v) => E::G2F32(v.clone()),
+                E::G2F32(v) => F::G2F32(v.clone()),
 
-                E::G2String(v) => E::G2String(v.as_ref()),
+                E::G2String(v) => F::G2String(v.as_ref()),
 
-                E::G2Submsg(v) => E::G2Submsg(v.as_ref()),
+                E::G2Submsg(v) => F::G2Submsg(v.as_ref()),
             })
         }
         fn group_three<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree as E;
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as F;
             self.group_three.as_ref().map(|oneof| match oneof {
-                E::G3Int32(v) => E::G3Int32(v.clone()),
+                E::G3Int32(v) => F::G3Int32(v.clone()),
             })
         }
     }
@@ -1343,7 +1339,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
                 1 => {
-                    use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+                    use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
                     if !matches!(&self.group_one, Some(E::G1Int32(_))) {
                         self.group_one = Some(E::G1Int32(::std::default::Default::default()));
                     }
@@ -1356,9 +1352,13 @@ pub mod _puroro_impls {
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 2 => {
-                    use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+                    use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
                     if !matches!(&self.group_one, Some(E::G1String(_))) {
-                        self.group_one = Some(E::G1String(::std::default::Default::default()));
+                        self.group_one = Some(E::G1String(
+                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
+                                &self._bump,
+                            ),
+                        ));
                     }
                     let field_value_mut_ref = match &mut self.group_one {
                         Some(E::G1String(v)) => v,
@@ -1369,7 +1369,7 @@ pub mod _puroro_impls {
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 3 => {
-                    use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+                    use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
                     if !matches!(&self.group_two, Some(E::G2F32(_))) {
                         self.group_two = Some(E::G2F32(::std::default::Default::default()));
                     }
@@ -1382,9 +1382,13 @@ pub mod _puroro_impls {
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 4 => {
-                    use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+                    use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
                     if !matches!(&self.group_two, Some(E::G2String(_))) {
-                        self.group_two = Some(E::G2String(::std::default::Default::default()));
+                        self.group_two = Some(E::G2String(
+                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
+                                &self._bump,
+                            ),
+                        ));
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         Some(E::G2String(v)) => v,
@@ -1395,9 +1399,13 @@ pub mod _puroro_impls {
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 5 => {
-                    use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+                    use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
                     if !matches!(&self.group_two, Some(E::G2Submsg(_))) {
-                        self.group_two = Some(E::G2Submsg(::std::default::Default::default()));
+                        self.group_two = Some(E::G2Submsg(
+                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
+                                &self._bump,
+                            ),
+                        ));
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         Some(E::G2Submsg(v)) => v,
@@ -1414,7 +1422,7 @@ pub mod _puroro_impls {
                     >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 6 => {
-                    use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+                    use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree as E;
                     if !matches!(&self.group_three, Some(E::G3Int32(_))) {
                         self.group_three = Some(E::G3Int32(::std::default::Default::default()));
                     }
@@ -1720,10 +1728,8 @@ pub mod _puroro_impls {
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Submsg>
-        for SubmsgBumpalo<'bump>
-    {
-        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
                 i32_unlabeled: ::std::default::Default::default(),
@@ -2090,6 +2096,7 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
+        pub use _puroro_bumpalo_oneofs::*;
         pub use _puroro_oneofs::*;
         pub mod _puroro_oneofs {
             mod _puroro_root {
@@ -2238,6 +2245,34 @@ pub mod _puroro_nested {
                         _ => None,
                     }
                 }
+            }
+        }
+        pub mod _puroro_bumpalo_oneofs {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+
+            #[derive(::std::fmt::Debug)]
+            pub enum GroupOne<'bump> {
+                G1Int32(i32),
+                G1String(::puroro::bumpalo::collections::String<'bump>),
+            }
+
+            #[derive(::std::fmt::Debug)]
+            pub enum GroupTwo<'bump> {
+                G2F32(f32),
+                G2String(::puroro::bumpalo::collections::String<'bump>),
+                G2Submsg(
+                    ::puroro::bumpalo::boxed::Box<
+                        'bump,
+                        self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
+                    >,
+                ),
+            }
+
+            #[derive(::std::fmt::Debug)]
+            pub enum GroupThree {
+                G3Int32(i32),
             }
         }
     }

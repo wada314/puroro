@@ -1,0 +1,14 @@
+
+{%- let maybe_gp %}
+{%- if oneof.has_ld_field %}
+{%- let maybe_gp = "<'bump>" %}
+{%- else %}
+{%- let maybe_gp = "" %}
+{%- endif %}
+
+#[derive(::std::fmt::Debug)]
+pub enum {{ oneof.bumpalo_enum_ident }}{{ maybe_gp }} {
+    {%- for field in oneof.fields %}
+    {{ field.ident }}({{ field.bumpalo_field_type }}),
+    {%- endfor %}
+}

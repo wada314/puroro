@@ -417,6 +417,7 @@ impl Field {
 struct Oneof {
     index: i32,
     enum_ident: String,
+    bumpalo_enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -429,6 +430,7 @@ impl Oneof {
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
+            bumpalo_enum_ident: o.rust_enum_ident().to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
@@ -460,6 +462,7 @@ struct OneofField {
     is_length_delimited: bool,
     is_message: bool,
     field_type: String,
+    bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
     bumpalo_field_type_tag: String,
@@ -480,6 +483,7 @@ impl OneofField {
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             field_type: f.oneof_field_type()?,
+            bumpalo_field_type: f.bumpalo_oneof_field_type()?,
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
@@ -518,6 +522,12 @@ struct Traits<'a> {
     messages: &'a [Message],
 }
 
+#[derive(Template)]
+#[template(path = "bumpalo/oneof.rs.txt")]
+struct BumpaloOneof<'a> {
+    oneof: &'a Oneof,
+}
+
 mod filters {
     use super::*;
     pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
@@ -525,5 +535,8 @@ mod filters {
     }
     pub(super) fn print_traits(messages: &[Message]) -> ::askama::Result<Traits> {
         Ok(Traits { messages })
+    }
+    pub(super) fn print_bumpalo_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
+        Ok(BumpaloOneof { oneof })
     }
 }

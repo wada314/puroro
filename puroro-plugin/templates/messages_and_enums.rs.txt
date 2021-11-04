@@ -41,6 +41,7 @@ pub mod _puroro_nested {
         {#-######## Oneof enums ########}
         {%- if !m.oneofs.is_empty() %}
         pub use _puroro_oneofs::*;
+        pub use _puroro_bumpalo_oneofs::*;
         pub mod _puroro_oneofs {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
@@ -48,6 +49,15 @@ pub mod _puroro_nested {
 
             {%- for oneof in m.oneofs %}
             {{ oneof|indent(12) }}
+            {%- endfor %}
+        }
+        pub mod _puroro_bumpalo_oneofs {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof|print_bumpalo_oneof|indent(12) }}
             {%- endfor %}
         }
         {%- endif %}

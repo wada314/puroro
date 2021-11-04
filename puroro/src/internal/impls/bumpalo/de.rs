@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::VecOrOptionOrBare;
+use super::{BumpaloDefault, VecOrOptionOrBare};
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
 use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
@@ -20,7 +20,6 @@ use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::FieldData;
 use crate::internal::variant::VariantTypeTag;
-use crate::BumpaloMessage;
 use crate::ErrorKind;
 use crate::{tags, Result};
 use ::std::marker::PhantomData;
@@ -186,7 +185,7 @@ where
     L: tags::FieldLabelTag,
     M: DeserMessageFromBytesIter,
 {
-    pub fn deser_field<'bump, FieldType, I, MsgRepr>(
+    pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
         bump: &'bump Bump,
@@ -194,10 +193,10 @@ where
     where
         FieldType: VecOrOptionOrBare<M>,
         I: Iterator<Item = ::std::io::Result<u8>>,
-        M: BumpaloMessage<'bump, MsgRepr>,
+        M: BumpaloDefault<'bump>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
-            let msg = field.get_or_insert_with(|| BumpaloMessage::new_in(bump));
+            let msg = field.get_or_insert_with(|| BumpaloDefault::default_in(bump));
             deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;

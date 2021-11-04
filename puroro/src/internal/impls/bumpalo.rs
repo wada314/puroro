@@ -14,7 +14,9 @@
 
 pub mod de;
 
-use crate::bumpalo::collections::Vec;
+use crate::bumpalo::boxed::Box;
+use crate::bumpalo::collections::{String, Vec};
+use crate::bumpalo::Bump;
 use ::std::borrow::Borrow;
 use ::std::marker::PhantomData;
 
@@ -99,5 +101,30 @@ impl<T> VecOrOptionOrBare<T> for T {
     = ::std::iter::Once<&'a T>;
     fn iter(&self) -> Self::Iter<'_> {
         ::std::iter::once(self)
+    }
+}
+
+pub trait BumpaloDefault<'bump> {
+    fn default_in(bump: &'bump Bump) -> Self;
+}
+impl<'bump> BumpaloDefault<'bump> for String<'bump> {
+    fn default_in(bump: &'bump Bump) -> Self {
+        String::new_in(bump)
+    }
+}
+impl<'bump, T> BumpaloDefault<'bump> for Vec<'bump, T>
+where
+    T: BumpaloDefault<'bump>,
+{
+    fn default_in(bump: &'bump Bump) -> Self {
+        Vec::new_in(bump)
+    }
+}
+impl<'bump, T> BumpaloDefault<'bump> for Box<'bump, T>
+where
+    T: BumpaloDefault<'bump>,
+{
+    fn default_in(bump: &'bump Bump) -> Self {
+        Box::new_in(BumpaloDefault::default_in(bump), bump)
     }
 }

@@ -718,6 +718,23 @@ impl Field {
         })
     }
 
+    pub fn bumpalo_oneof_field_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::String => "::puroro::bumpalo::collections::String<'bump>".to_string(),
+            FieldType::Bytes => "::puroro::bumpalo::collections::Vec<'bump, u8>".to_string(),
+            FieldType::Message(m) => {
+                let bumpalo_message_type = upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]);
+                format!(
+                    "::puroro::bumpalo::boxed::Box<'bump, {message_type}>",
+                    message_type = bumpalo_message_type,
+                )
+            }
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
+
     pub fn simple_field_type(&self) -> Result<String> {
         let scalar_type = self.simple_scalar_field_type()?;
         Ok(match self.field_label()? {

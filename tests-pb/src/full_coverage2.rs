@@ -12518,8 +12518,8 @@ pub mod _puroro_impls {
 }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {
-        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
                 i32_required: ::std::default::Default::default(),
@@ -15475,10 +15475,8 @@ pub mod _puroro_nested {
             }
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
 
-            impl<'bump> ::puroro::BumpaloMessage<'bump, super::_puroro_simple_impl::Submsg>
-                for SubmsgBumpalo<'bump>
-            {
-                fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+                fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
                         i32_required: ::std::default::Default::default(),
