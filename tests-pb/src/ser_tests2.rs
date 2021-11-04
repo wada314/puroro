@@ -2975,6 +2975,13 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -3405,6 +3412,13 @@ pub mod _puroro_nested {
             }
 
             impl<T> SubmsgTrait for ::std::boxed::Box<T>
+            where
+                T: SubmsgTrait,
+            {
+                submsg_delegate!(T);
+            }
+
+            impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
             where
                 T: SubmsgTrait,
             {

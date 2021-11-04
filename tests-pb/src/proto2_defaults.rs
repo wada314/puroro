@@ -9945,6 +9945,13 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum MyEnum {

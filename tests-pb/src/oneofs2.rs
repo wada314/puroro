@@ -2069,6 +2069,13 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
     pub trait SubmsgTrait {
         fn i32_optional<'this>(&'this self) -> i32 {
             self.i32_optional_opt()
@@ -2105,6 +2112,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> SubmsgTrait for ::std::boxed::Box<T>
+    where
+        T: SubmsgTrait,
+    {
+        submsg_delegate!(T);
+    }
+
+    impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
     where
         T: SubmsgTrait,
     {
@@ -2240,6 +2254,20 @@ pub mod _puroro_nested {
             }
             impl<'msg, IsOwned, T> ::std::convert::From<GroupTwo<'msg, IsOwned, T>>
                 for GroupTwo<'msg, IsOwned, ::std::boxed::Box<T>>
+            where
+                IsOwned: ::puroro::internal::bool::BoolType,
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupTwo<'msg, IsOwned, T>) -> Self {
+                    match value {
+                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
+                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
+                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
+                    }
+                }
+            }
+            impl<'msg, 'bump, IsOwned, T> ::std::convert::From<GroupTwo<'msg, IsOwned, T>>
+                for GroupTwo<'msg, IsOwned, ::puroro::bumpalo::boxed::Box<'bump, T>>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
                 T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,

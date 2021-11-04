@@ -1732,6 +1732,13 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             self.i32_unlabeled_opt()
@@ -1768,6 +1775,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> SubmsgTrait for ::std::boxed::Box<T>
+    where
+        T: SubmsgTrait,
+    {
+        submsg_delegate!(T);
+    }
+
+    impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
     where
         T: SubmsgTrait,
     {

@@ -221,6 +221,8 @@ pub use ::bumpalo;
 pub use ::either::Either;
 pub use ::once_cell;
 
+use ::std::ops::Deref;
+
 // Bumpalo wrapper
 pub struct BumpaloOwned<T> {
     // The field order matters, `Drop` drops the field in decl order.
@@ -238,9 +240,9 @@ impl<T> BumpaloOwned<T> {
         &mut this.t
     }
 }
-impl<'bump, T> BumpaloOwned<T>
+impl<T> BumpaloOwned<T>
 where
-    T: crate::internal::impls::bumpalo::BumpaloDefault<'bump>,
+    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
 {
     pub fn new() -> Self {
         let bump = Box::new(crate::bumpalo::Bump::new());
@@ -250,12 +252,21 @@ where
         Self { t, bump }
     }
 }
-impl<'bump, T> Default for BumpaloOwned<T>
+impl<T> Default for BumpaloOwned<T>
 where
-    T: crate::internal::impls::bumpalo::BumpaloDefault<'bump>,
+    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
 {
     fn default() -> Self {
         Self::new()
+    }
+}
+impl<T> Deref for BumpaloOwned<T>
+where
+    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
+{
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.t
     }
 }
 

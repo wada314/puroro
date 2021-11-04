@@ -1400,6 +1400,13 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
+
+    impl<'bump, T> Test1Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test1Trait,
+    {
+        test1_delegate!(T);
+    }
     pub trait Test2Trait {
         fn b<'this>(&'this self) -> &'this str {
             self.b_opt()
@@ -1436,6 +1443,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test2Trait for ::std::boxed::Box<T>
+    where
+        T: Test2Trait,
+    {
+        test2_delegate!(T);
+    }
+
+    impl<'bump, T> Test2Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
     where
         T: Test2Trait,
     {
@@ -1488,6 +1502,13 @@ pub mod _puroro_traits {
     {
         test3_delegate!(T);
     }
+
+    impl<'bump, T> Test3Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test3Trait,
+    {
+        test3_delegate!(T);
+    }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
@@ -1523,6 +1544,13 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test4Trait for ::std::boxed::Box<T>
+    where
+        T: Test4Trait,
+    {
+        test4_delegate!(T);
+    }
+
+    impl<'bump, T> Test4Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
     where
         T: Test4Trait,
     {
