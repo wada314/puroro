@@ -9791,6 +9791,18 @@ impl ::std::default::Default for MyEnum {
         MyEnum::One
     }
 }
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MyEnum {
+    fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::default::Default::default()
+    }
+}
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MyEnum {
+    fn clone_in(&self, _: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::clone::Clone::clone(self)
+    }
+}
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     pub mod msg {

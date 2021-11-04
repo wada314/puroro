@@ -110,11 +110,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 {
                     self.{{ oneof.field_ident }} = Some(
                         E::{{ field.ident }}(
-                            {%- if field.is_length_delimited %}
                             ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
-                            {%- else %}
-                            ::std::default::Default::default()
-                            {%- endif %}
                         )
                     );
                 }

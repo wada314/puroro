@@ -128,3 +128,60 @@ where
         Box::new_in(BumpaloDefault::default_in(bump), bump)
     }
 }
+macro_rules! impl_bumpalo_default {
+    ($ty:ty) => {
+        impl<'bump> BumpaloDefault<'bump> for $ty {
+            fn default_in(_: &'bump Bump) -> Self {
+                Default::default()
+            }
+        }
+    };
+}
+impl_bumpalo_default!(i32);
+impl_bumpalo_default!(u32);
+impl_bumpalo_default!(f32);
+impl_bumpalo_default!(i64);
+impl_bumpalo_default!(u64);
+impl_bumpalo_default!(f64);
+impl_bumpalo_default!(bool);
+
+pub trait BumpaloClone<'bump> {
+    fn clone_in(&self, bump: &'bump Bump) -> Self;
+}
+impl<'bump> BumpaloClone<'bump> for String<'bump> {
+    fn clone_in(&self, _: &'bump Bump) -> Self {
+        self.clone()
+    }
+}
+impl<'bump, T> BumpaloClone<'bump> for Vec<'bump, T>
+where
+    T: BumpaloClone<'bump>,
+{
+    fn clone_in(&self, bump: &'bump Bump) -> Self {
+        Vec::from_iter_in(<[T]>::iter(self).map(|t| t.clone_in(bump)), bump)
+    }
+}
+impl<'bump, T> BumpaloClone<'bump> for Box<'bump, T>
+where
+    T: BumpaloClone<'bump>,
+{
+    fn clone_in(&self, bump: &'bump Bump) -> Self {
+        Box::new_in(self.as_ref().clone_in(bump), bump)
+    }
+}
+macro_rules! impl_bumpalo_clone {
+    ($ty:ty) => {
+        impl<'bump> BumpaloClone<'bump> for $ty {
+            fn clone_in(&self, _: &'bump Bump) -> Self {
+                Clone::clone(self)
+            }
+        }
+    };
+}
+impl_bumpalo_clone!(i32);
+impl_bumpalo_clone!(u32);
+impl_bumpalo_clone!(f32);
+impl_bumpalo_clone!(i64);
+impl_bumpalo_clone!(u64);
+impl_bumpalo_clone!(f64);
+impl_bumpalo_clone!(bool);

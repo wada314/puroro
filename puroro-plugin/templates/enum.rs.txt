@@ -59,3 +59,15 @@ impl ::std::default::Default for {{ ident }} {
         {{ ident }}::{{ first_value_ident }}
     }
 }
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for {{ ident }} {
+    fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::default::Default::default()
+    }
+}
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ ident }} {
+    fn clone_in(&self, _: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::clone::Clone::clone(self)
+    }
+}

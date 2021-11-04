@@ -1341,7 +1341,11 @@ pub mod _puroro_impls {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
                     if !matches!(&self.group_one, Some(E::G1Int32(_))) {
-                        self.group_one = Some(E::G1Int32(::std::default::Default::default()));
+                        self.group_one = Some(E::G1Int32(
+                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
+                                &self._bump,
+                            ),
+                        ));
                     }
                     let field_value_mut_ref = match &mut self.group_one {
                         Some(E::G1Int32(v)) => v,
@@ -1371,7 +1375,11 @@ pub mod _puroro_impls {
                 3 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
                     if !matches!(&self.group_two, Some(E::G2F32(_))) {
-                        self.group_two = Some(E::G2F32(::std::default::Default::default()));
+                        self.group_two = Some(E::G2F32(
+                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
+                                &self._bump,
+                            ),
+                        ));
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         Some(E::G2F32(v)) => v,
@@ -1424,7 +1432,11 @@ pub mod _puroro_impls {
                 6 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree as E;
                     if !matches!(&self.group_three, Some(E::G3Int32(_))) {
-                        self.group_three = Some(E::G3Int32(::std::default::Default::default()));
+                        self.group_three = Some(E::G3Int32(
+                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
+                                &self._bump,
+                            ),
+                        ));
                     }
                     let field_value_mut_ref = match &mut self.group_three {
                         Some(E::G3Int32(v)) => v,
@@ -2252,13 +2264,13 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            #[derive(::std::fmt::Debug)]
+            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupOne<'bump> {
                 G1Int32(i32),
                 G1String(::puroro::bumpalo::collections::String<'bump>),
             }
 
-            #[derive(::std::fmt::Debug)]
+            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupTwo<'bump> {
                 G2F32(f32),
                 G2String(::puroro::bumpalo::collections::String<'bump>),
@@ -2270,7 +2282,7 @@ pub mod _puroro_nested {
                 ),
             }
 
-            #[derive(::std::fmt::Debug)]
+            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupThree {
                 G3Int32(i32),
             }
