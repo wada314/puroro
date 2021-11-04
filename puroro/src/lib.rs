@@ -221,7 +221,7 @@ pub use ::bumpalo;
 pub use ::either::Either;
 pub use ::once_cell;
 
-use ::std::ops::Deref;
+use ::std::ops::{Deref, DerefMut};
 
 // Bumpalo wrapper
 pub struct BumpaloOwned<T> {
@@ -260,13 +260,15 @@ where
         Self::new()
     }
 }
-impl<T> Deref for BumpaloOwned<T>
-where
-    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
-{
+impl<T> Deref for BumpaloOwned<T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {
         &self.t
+    }
+}
+impl<T> DerefMut for BumpaloOwned<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.t
     }
 }
 
