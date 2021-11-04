@@ -329,6 +329,8 @@ pub mod _puroro_impls {
     impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
     where
         Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where

@@ -1020,6 +1020,8 @@ pub mod _puroro_impls {
     impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test3Bumpalo<'bump>
     where
         Self: super::_puroro_traits::Test3Trait,
+        for<'a> <Self as super::_puroro_traits::Test3Trait>::Field3MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where

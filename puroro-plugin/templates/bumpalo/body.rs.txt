@@ -136,6 +136,12 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
 impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}<'bump>
 where
     Self: super::_puroro_traits::{{ m.ident }}Trait,
+{%- for field in m.fields %}
+{%- if field.is_message %}
+    for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'a> :
+        ::puroro::internal::se::SerMessageToIoWrite,
+{%- endif %}
+{%- endfor %}
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
