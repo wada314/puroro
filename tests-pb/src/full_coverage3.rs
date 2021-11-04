@@ -12576,6 +12576,9 @@ pub mod _puroro_impls {
     pub f64_optional: ::std::option::Option<f64>,
     pub f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
 }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
@@ -15748,6 +15751,9 @@ pub mod _puroro_nested {
                 pub i32_unlabeled: i32,
                 pub i64_unlabeled: i64,
             }
+
+            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
 
             impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {

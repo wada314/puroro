@@ -2209,6 +2209,9 @@ pub mod _puroro_impls {
             ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::ser_tests2::Enum>,
         pub very_large_field_number: ::std::option::Option<i32>,
     }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
@@ -3241,6 +3244,9 @@ pub mod _puroro_nested {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 pub i32_optional: ::std::option::Option<i32>,
             }
+
+            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
 
             impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {

@@ -48,6 +48,7 @@ pub mod _puroro_nested {
 
             {%- for oneof in m.oneofs %}
             {{ oneof|indent(12) }}
+
             {%- endfor %}
         }
         pub mod _puroro_bumpalo_oneofs {

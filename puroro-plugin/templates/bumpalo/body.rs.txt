@@ -17,6 +17,9 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     >,
     {%- endfor %}
 }
+
+pub type {{ m.bumpalo_owned_ident }} = ::puroro::BumpaloOwned<{{ m.bumpalo_ident }}<'static>>;
+
 impl<'bump> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {}
 
 impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for {{ m.bumpalo_ident }}<'bump> {

@@ -228,11 +228,6 @@ pub struct BumpaloOwned<T> {
     bump: Box<crate::bumpalo::Bump>,
 }
 impl<T> BumpaloOwned<T> {
-    pub fn new_with<F: FnOnce(&'static crate::bumpalo::Bump) -> T>(f: F) -> Self {
-        let bump = Box::new(crate::bumpalo::Bump::new());
-        let t = (f)(unsafe { ::std::mem::transmute(bump.as_ref()) });
-        Self { t, bump }
-    }
     pub fn bump(this: &BumpaloOwned<T>) -> &crate::bumpalo::Bump {
         &this.bump
     }
@@ -241,6 +236,26 @@ impl<T> BumpaloOwned<T> {
     }
     pub fn inner_mut(this: &mut BumpaloOwned<T>) -> &mut T {
         &mut this.t
+    }
+}
+impl<'bump, T> BumpaloOwned<T>
+where
+    T: crate::internal::impls::bumpalo::BumpaloDefault<'bump>,
+{
+    pub fn new() -> Self {
+        let bump = Box::new(crate::bumpalo::Bump::new());
+        let t = crate::internal::impls::bumpalo::BumpaloDefault::default_in(unsafe {
+            ::std::mem::transmute(bump.as_ref())
+        });
+        Self { t, bump }
+    }
+}
+impl<'bump, T> Default for BumpaloOwned<T>
+where
+    T: crate::internal::impls::bumpalo::BumpaloDefault<'bump>,
+{
+    fn default() -> Self {
+        Self::new()
     }
 }
 

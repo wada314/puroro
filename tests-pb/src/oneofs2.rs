@@ -1257,6 +1257,9 @@ pub mod _puroro_impls {
         pub group_three:
             ::std::option::Option<super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree>,
     }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
@@ -1743,6 +1746,9 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub i32_optional: ::std::option::Option<i32>,
     }
+
+    pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {

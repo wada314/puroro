@@ -497,6 +497,9 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub a: i32,
     }
+
+    pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test1Bumpalo<'bump> {
@@ -706,6 +709,9 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub b: ::puroro::bumpalo::collections::String<'bump>,
     }
+
+    pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test2Bumpalo<'bump> {
@@ -960,6 +966,9 @@ pub mod _puroro_impls {
             >,
         >,
     }
+
+    pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test3Bumpalo<'bump> {
@@ -1236,6 +1245,9 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         pub d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
+
+    pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
+
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test4Bumpalo<'bump> {
