@@ -12,3 +12,13 @@ pub enum {{ oneof.bumpalo_enum_ident }}{{ maybe_gp }} {
     {{ field.ident }}({{ field.bumpalo_field_type }}),
     {%- endfor %}
 }
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ oneof.bumpalo_enum_ident }}{{ maybe_gp }} {
+    fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+        match self {
+            {%- for field in oneof.fields %}
+            Self::{{ field.ident }}(x) => Self::{{field.ident}}(::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump)),
+            {%- endfor %}
+        }
+    }
+}

@@ -2282,6 +2282,19 @@ pub mod _puroro_nested {
                 G1String(::puroro::bumpalo::collections::String<'bump>),
             }
 
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupOne<'bump> {
+                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    match self {
+                        Self::G1Int32(x) => Self::G1Int32(
+                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
+                        ),
+                        Self::G1String(x) => Self::G1String(
+                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
+                        ),
+                    }
+                }
+            }
+
             #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupTwo<'bump> {
                 G2F32(f32),
@@ -2294,9 +2307,35 @@ pub mod _puroro_nested {
                 ),
             }
 
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupTwo<'bump> {
+                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    match self {
+                        Self::G2F32(x) => Self::G2F32(
+                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
+                        ),
+                        Self::G2String(x) => Self::G2String(
+                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
+                        ),
+                        Self::G2Submsg(x) => Self::G2Submsg(
+                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
+                        ),
+                    }
+                }
+            }
+
             #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupThree {
                 G3Int32(i32),
+            }
+
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupThree {
+                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    match self {
+                        Self::G3Int32(x) => Self::G3Int32(
+                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
+                        ),
+                    }
+                }
             }
         }
     }
