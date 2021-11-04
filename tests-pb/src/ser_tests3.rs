@@ -2534,26 +2534,54 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
-                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
-                float_unlabeled: ::std::clone::Clone::clone(&self.float_unlabeled),
-                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
-                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
-                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
-                submsg_unlabeled: self.submsg_unlabeled.as_ref().map(|b| {
-                    ::puroro::bumpalo::boxed::Box::new_in(
-                        ::std::clone::Clone::clone(b.as_ref()),
-                        self._bump,
-                    )
-                }),
-                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
-                enum_unlabeled: ::std::clone::Clone::clone(&self.enum_unlabeled),
-                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
-                very_large_field_number: ::std::clone::Clone::clone(&self.very_large_field_number),
+                _bump: bump,
+                i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_unlabeled,
+                    bump,
+                ),
+                i32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_repeated,
+                    bump,
+                ),
+                float_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.float_unlabeled,
+                    bump,
+                ),
+                float_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.float_repeated,
+                    bump,
+                ),
+                string_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_unlabeled,
+                    bump,
+                ),
+                string_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_repeated,
+                    bump,
+                ),
+                submsg_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_unlabeled,
+                    bump,
+                ),
+                submsg_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_repeated,
+                    bump,
+                ),
+                enum_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_unlabeled,
+                    bump,
+                ),
+                enum_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_repeated,
+                    bump,
+                ),
+                very_large_field_number: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.very_large_field_number,
+                    bump,
+                ),
             }
         }
     }
@@ -3332,11 +3360,14 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
-                fn clone(&self) -> Self {
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for SubmsgBumpalo<'bump> {
+                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
-                        _bump: self._bump,
-                        i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                        _bump: bump,
+                        i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                            &self.i32_unlabeled,
+                            bump,
+                        ),
                     }
                 }
             }

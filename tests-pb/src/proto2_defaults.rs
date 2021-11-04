@@ -7987,76 +7987,260 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                i32_default: ::std::clone::Clone::clone(&self.i32_default),
-                i32_0: ::std::clone::Clone::clone(&self.i32_0),
-                i32_42: ::std::clone::Clone::clone(&self.i32_42),
-                i32_m42: ::std::clone::Clone::clone(&self.i32_m42),
-                i32_2147483647: ::std::clone::Clone::clone(&self.i32_2147483647),
-                i32_m2147483648: ::std::clone::Clone::clone(&self.i32_m2147483648),
-                i32_0123: ::std::clone::Clone::clone(&self.i32_0123),
-                i32_0x123: ::std::clone::Clone::clone(&self.i32_0x123),
-                u32_default: ::std::clone::Clone::clone(&self.u32_default),
-                u32_0: ::std::clone::Clone::clone(&self.u32_0),
-                u32_42: ::std::clone::Clone::clone(&self.u32_42),
-                u32_4294967295: ::std::clone::Clone::clone(&self.u32_4294967295),
-                u32_0123: ::std::clone::Clone::clone(&self.u32_0123),
-                u32_0x123: ::std::clone::Clone::clone(&self.u32_0x123),
-                i64_default: ::std::clone::Clone::clone(&self.i64_default),
-                i64_0: ::std::clone::Clone::clone(&self.i64_0),
-                i64_42: ::std::clone::Clone::clone(&self.i64_42),
-                i64_m42: ::std::clone::Clone::clone(&self.i64_m42),
-                i64_9223372036854775807: ::std::clone::Clone::clone(&self.i64_9223372036854775807),
-                i64_m9223372036854775808: ::std::clone::Clone::clone(
-                    &self.i64_m9223372036854775808,
+                _bump: bump,
+                i32_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_default,
+                    bump,
                 ),
-                i64_0123: ::std::clone::Clone::clone(&self.i64_0123),
-                i64_0x123: ::std::clone::Clone::clone(&self.i64_0x123),
-                u64_default: ::std::clone::Clone::clone(&self.u64_default),
-                u64_0: ::std::clone::Clone::clone(&self.u64_0),
-                u64_42: ::std::clone::Clone::clone(&self.u64_42),
-                u64_18446744073709551615: ::std::clone::Clone::clone(
-                    &self.u64_18446744073709551615,
+                i32_0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_0,
+                    bump,
                 ),
-                u64_0123: ::std::clone::Clone::clone(&self.u64_0123),
-                u64_0x123: ::std::clone::Clone::clone(&self.u64_0x123),
-                f32_default: ::std::clone::Clone::clone(&self.f32_default),
-                f32_0: ::std::clone::Clone::clone(&self.f32_0),
-                f32_m0: ::std::clone::Clone::clone(&self.f32_m0),
-                f32_0p: ::std::clone::Clone::clone(&self.f32_0p),
-                f32_p0: ::std::clone::Clone::clone(&self.f32_p0),
-                f32_0p0: ::std::clone::Clone::clone(&self.f32_0p0),
-                f32_42: ::std::clone::Clone::clone(&self.f32_42),
-                f32_m42: ::std::clone::Clone::clone(&self.f32_m42),
-                f32_0p25: ::std::clone::Clone::clone(&self.f32_0p25),
-                f32_1p5e2: ::std::clone::Clone::clone(&self.f32_1p5e2),
-                f32_inf: ::std::clone::Clone::clone(&self.f32_inf),
-                f32_minf: ::std::clone::Clone::clone(&self.f32_minf),
-                f32_nan: ::std::clone::Clone::clone(&self.f32_nan),
-                f32_mnan: ::std::clone::Clone::clone(&self.f32_mnan),
-                bool_default: ::std::clone::Clone::clone(&self.bool_default),
-                bool_true: ::std::clone::Clone::clone(&self.bool_true),
-                bool_false: ::std::clone::Clone::clone(&self.bool_false),
-                string_default: ::std::clone::Clone::clone(&self.string_default),
-                string_empty: ::std::clone::Clone::clone(&self.string_empty),
-                string_abc: ::std::clone::Clone::clone(&self.string_abc),
-                string_aiu: ::std::clone::Clone::clone(&self.string_aiu),
-                string_backslash: ::std::clone::Clone::clone(&self.string_backslash),
-                string_tab: ::std::clone::Clone::clone(&self.string_tab),
-                string_crlf: ::std::clone::Clone::clone(&self.string_crlf),
-                bytes_default: ::std::clone::Clone::clone(&self.bytes_default),
-                bytes_empty: ::std::clone::Clone::clone(&self.bytes_empty),
-                bytes_abc: ::std::clone::Clone::clone(&self.bytes_abc),
-                bytes_aiu: ::std::clone::Clone::clone(&self.bytes_aiu),
-                bytes_backslash: ::std::clone::Clone::clone(&self.bytes_backslash),
-                bytes_tab: ::std::clone::Clone::clone(&self.bytes_tab),
-                bytes_crlf: ::std::clone::Clone::clone(&self.bytes_crlf),
-                enum_default: ::std::clone::Clone::clone(&self.enum_default),
-                enum_one: ::std::clone::Clone::clone(&self.enum_one),
-                enum_fourty_two: ::std::clone::Clone::clone(&self.enum_fourty_two),
+                i32_42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_42,
+                    bump,
+                ),
+                i32_m42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_m42,
+                    bump,
+                ),
+                i32_2147483647: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_2147483647,
+                    bump,
+                ),
+                i32_m2147483648: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_m2147483648,
+                    bump,
+                ),
+                i32_0123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_0123,
+                    bump,
+                ),
+                i32_0x123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_0x123,
+                    bump,
+                ),
+                u32_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_default,
+                    bump,
+                ),
+                u32_0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_0,
+                    bump,
+                ),
+                u32_42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_42,
+                    bump,
+                ),
+                u32_4294967295: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_4294967295,
+                    bump,
+                ),
+                u32_0123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_0123,
+                    bump,
+                ),
+                u32_0x123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_0x123,
+                    bump,
+                ),
+                i64_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_default,
+                    bump,
+                ),
+                i64_0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_0,
+                    bump,
+                ),
+                i64_42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_42,
+                    bump,
+                ),
+                i64_m42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_m42,
+                    bump,
+                ),
+                i64_9223372036854775807: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_9223372036854775807,
+                    bump,
+                ),
+                i64_m9223372036854775808:
+                    ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                        &self.i64_m9223372036854775808,
+                        bump,
+                    ),
+                i64_0123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_0123,
+                    bump,
+                ),
+                i64_0x123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_0x123,
+                    bump,
+                ),
+                u64_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_default,
+                    bump,
+                ),
+                u64_0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_0,
+                    bump,
+                ),
+                u64_42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_42,
+                    bump,
+                ),
+                u64_18446744073709551615:
+                    ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                        &self.u64_18446744073709551615,
+                        bump,
+                    ),
+                u64_0123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_0123,
+                    bump,
+                ),
+                u64_0x123: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_0x123,
+                    bump,
+                ),
+                f32_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_default,
+                    bump,
+                ),
+                f32_0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_0,
+                    bump,
+                ),
+                f32_m0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_m0,
+                    bump,
+                ),
+                f32_0p: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_0p,
+                    bump,
+                ),
+                f32_p0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_p0,
+                    bump,
+                ),
+                f32_0p0: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_0p0,
+                    bump,
+                ),
+                f32_42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_42,
+                    bump,
+                ),
+                f32_m42: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_m42,
+                    bump,
+                ),
+                f32_0p25: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_0p25,
+                    bump,
+                ),
+                f32_1p5e2: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_1p5e2,
+                    bump,
+                ),
+                f32_inf: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_inf,
+                    bump,
+                ),
+                f32_minf: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_minf,
+                    bump,
+                ),
+                f32_nan: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_nan,
+                    bump,
+                ),
+                f32_mnan: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_mnan,
+                    bump,
+                ),
+                bool_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bool_default,
+                    bump,
+                ),
+                bool_true: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bool_true,
+                    bump,
+                ),
+                bool_false: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bool_false,
+                    bump,
+                ),
+                string_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_default,
+                    bump,
+                ),
+                string_empty: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_empty,
+                    bump,
+                ),
+                string_abc: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_abc,
+                    bump,
+                ),
+                string_aiu: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_aiu,
+                    bump,
+                ),
+                string_backslash: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_backslash,
+                    bump,
+                ),
+                string_tab: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_tab,
+                    bump,
+                ),
+                string_crlf: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_crlf,
+                    bump,
+                ),
+                bytes_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_default,
+                    bump,
+                ),
+                bytes_empty: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_empty,
+                    bump,
+                ),
+                bytes_abc: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_abc,
+                    bump,
+                ),
+                bytes_aiu: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_aiu,
+                    bump,
+                ),
+                bytes_backslash: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_backslash,
+                    bump,
+                ),
+                bytes_tab: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_tab,
+                    bump,
+                ),
+                bytes_crlf: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_crlf,
+                    bump,
+                ),
+                enum_default: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_default,
+                    bump,
+                ),
+                enum_one: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_one,
+                    bump,
+                ),
+                enum_fourty_two: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_fourty_two,
+                    bump,
+                ),
             }
         }
     }

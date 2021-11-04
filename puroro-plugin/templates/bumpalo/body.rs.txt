@@ -176,26 +176,17 @@ impl<'bump> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<'bump> {
     }
 }
 
-impl<'bump> ::std::clone::Clone for {{ m.bumpalo_ident }}<'bump> {
-    fn clone(&self) -> Self {
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ m.bumpalo_ident }}<'bump> {
+    fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         Self { 
-            _bump: self._bump,
+            _bump: bump,
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
-            {%- if field.is_message && !field.is_repeated %}
-            {{ field.ident }}: self.{{ field.ident }}.as_ref().map(
-                |b| ::puroro::bumpalo::boxed::Box::new_in(
-                    ::std::clone::Clone::clone(b.as_ref()),
-                    self._bump,
-                )
-            ),
-            {%- else %}
-            {{ field.ident }}: ::std::clone::Clone::clone(&self.{{ field.ident }}),
-            {%- endif %}
+            {{ field.ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ field.ident }}, bump),
             {%- endif %}
             {%- endfor %} {#- for field in m.fields #}
             {%- for oneof in m.oneofs %}
-            {{ oneof.field_ident }}: ::std::clone::Clone::clone(&self.{{ oneof.field_ident }}),
+            {{ oneof.field_ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ oneof.field_ident }}, bump),
             {%- endfor %}
         }
     }

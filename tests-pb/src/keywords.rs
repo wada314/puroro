@@ -276,11 +276,14 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                r#type: ::std::clone::Clone::clone(&self.r#type),
+                _bump: bump,
+                r#type: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.r#type,
+                    bump,
+                ),
             }
         }
     }

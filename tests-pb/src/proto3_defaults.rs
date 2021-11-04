@@ -1222,21 +1222,34 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
-                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
-                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
-                f32_unlabeled: ::std::clone::Clone::clone(&self.f32_unlabeled),
-                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
-                submsg_unlabeled: self.submsg_unlabeled.as_ref().map(|b| {
-                    ::puroro::bumpalo::boxed::Box::new_in(
-                        ::std::clone::Clone::clone(b.as_ref()),
-                        self._bump,
-                    )
-                }),
+                _bump: bump,
+                i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_unlabeled,
+                    bump,
+                ),
+                i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_optional,
+                    bump,
+                ),
+                i32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_repeated,
+                    bump,
+                ),
+                f32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f32_unlabeled,
+                    bump,
+                ),
+                string_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_unlabeled,
+                    bump,
+                ),
+                submsg_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_unlabeled,
+                    bump,
+                ),
             }
         }
     }
@@ -1542,11 +1555,14 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for SubmsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                _bump: bump,
+                i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_unlabeled,
+                    bump,
+                ),
             }
         }
     }

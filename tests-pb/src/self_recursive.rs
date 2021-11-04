@@ -358,16 +358,14 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                recursive_unlabeled: self.recursive_unlabeled.as_ref().map(|b| {
-                    ::puroro::bumpalo::boxed::Box::new_in(
-                        ::std::clone::Clone::clone(b.as_ref()),
-                        self._bump,
-                    )
-                }),
+                _bump: bump,
+                recursive_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.recursive_unlabeled,
+                    bump,
+                ),
             }
         }
     }

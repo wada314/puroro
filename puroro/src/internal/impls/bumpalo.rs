@@ -112,10 +112,7 @@ impl<'bump> BumpaloDefault<'bump> for String<'bump> {
         String::new_in(bump)
     }
 }
-impl<'bump, T> BumpaloDefault<'bump> for Vec<'bump, T>
-where
-    T: BumpaloDefault<'bump>,
-{
+impl<'bump, T> BumpaloDefault<'bump> for Vec<'bump, T> {
     fn default_in(bump: &'bump Bump) -> Self {
         Vec::new_in(bump)
     }
@@ -126,6 +123,11 @@ where
 {
     fn default_in(bump: &'bump Bump) -> Self {
         Box::new_in(BumpaloDefault::default_in(bump), bump)
+    }
+}
+impl<'bump, T> BumpaloDefault<'bump> for Option<T> {
+    fn default_in(_: &'bump Bump) -> Self {
+        ::std::default::Default::default()
     }
 }
 macro_rules! impl_bumpalo_default {
@@ -169,6 +171,14 @@ where
         Box::new_in(self.as_ref().clone_in(bump), bump)
     }
 }
+impl<'bump, T> BumpaloClone<'bump> for Option<T>
+where
+    T: BumpaloClone<'bump>,
+{
+    fn clone_in(&self, bump: &'bump Bump) -> Self {
+        self.as_ref().map(|v| BumpaloClone::clone_in(v, bump))
+    }
+}
 macro_rules! impl_bumpalo_clone {
     ($ty:ty) => {
         impl<'bump> BumpaloClone<'bump> for $ty {
@@ -185,3 +195,4 @@ impl_bumpalo_clone!(i64);
 impl_bumpalo_clone!(u64);
 impl_bumpalo_clone!(f64);
 impl_bumpalo_clone!(bool);
+impl_bumpalo_clone!(u8);

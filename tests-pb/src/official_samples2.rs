@@ -554,11 +554,11 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for Test1Bumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test1Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                a: ::std::clone::Clone::clone(&self.a),
+                _bump: bump,
+                a: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.a, bump),
             }
         }
     }
@@ -759,11 +759,11 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for Test2Bumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test2Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                b: ::std::clone::Clone::clone(&self.b),
+                _bump: bump,
+                b: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.b, bump),
             }
         }
     }
@@ -1025,16 +1025,11 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for Test3Bumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test3Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                c: self.c.as_ref().map(|b| {
-                    ::puroro::bumpalo::boxed::Box::new_in(
-                        ::std::clone::Clone::clone(b.as_ref()),
-                        self._bump,
-                    )
-                }),
+                _bump: bump,
+                c: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.c, bump),
             }
         }
     }
@@ -1291,11 +1286,11 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::clone::Clone for Test4Bumpalo<'bump> {
-        fn clone(&self) -> Self {
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test4Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
-                _bump: self._bump,
-                d: ::std::clone::Clone::clone(&self.d),
+                _bump: bump,
+                d: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.d, bump),
             }
         }
     }
