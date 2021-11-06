@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod builder;
-mod bumpalo;
-mod descriptors;
-mod either;
-mod empty;
-mod merged;
-mod official_samples;
-mod oneof;
-mod proto2_defaults;
-mod proto3_defaults;
-mod self_recursive;
-mod simple_ser_tests;
-mod traits;
+use ::puroro::Message;
+use ::std::io::Read;
+
+#[test]
+fn test_owned() {
+    use ::tests_pb::official_samples3::*;
+    let mut t1 = Test1BumpaloOwned::new();
+    t1.merge_from_bytes([0x08, 0x01].bytes());
+    assert_eq!(1, t1.a());
+
+    let mut t3 = Test3BumpaloOwned::new();
+    t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
+    assert_eq!(1, t3.c().a());
+}
