@@ -44,7 +44,7 @@
 //! # }
 //! # use ::puroro::*;
 //! # impl Message<MyMessage> for MyMessage {}
-//! # impl internal::DeserializableMessageFromBytesIterator for MyMessage {
+//! # impl internal::de::DeserMessageFromBytesIter for MyMessage {
 //! #     fn deser<I>(&mut self, iter: I) -> Result<()>
 //! #     where
 //! #         I: Iterator<Item = ::std::io::Result<u8>>
@@ -216,5 +216,60 @@ pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
+#[cfg(feature = "puroro-bumpalo")]
+pub use ::bumpalo;
 pub use ::either::Either;
 pub use ::once_cell;
+
+use ::std::ops::{Deref, DerefMut};
+
+// Bumpalo wrapper
+pub struct BumpaloOwned<T> {
+    // The field order matters, `Drop` drops the field in decl order.
+    t: T,
+    bump: Box<crate::bumpalo::Bump>,
+}
+impl<T> BumpaloOwned<T> {
+    pub fn bump(this: &BumpaloOwned<T>) -> &crate::bumpalo::Bump {
+        &this.bump
+    }
+    pub fn inner(this: &BumpaloOwned<T>) -> &T {
+        &this.t
+    }
+    pub fn inner_mut(this: &mut BumpaloOwned<T>) -> &mut T {
+        &mut this.t
+    }
+}
+impl<T> BumpaloOwned<T>
+where
+    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
+{
+    pub fn new() -> Self {
+        let bump = Box::new(crate::bumpalo::Bump::new());
+        let t = crate::internal::impls::bumpalo::BumpaloDefault::default_in(unsafe {
+            ::std::mem::transmute(bump.as_ref())
+        });
+        Self { t, bump }
+    }
+}
+impl<T> Default for BumpaloOwned<T>
+where
+    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<T> Deref for BumpaloOwned<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.t
+    }
+}
+impl<T> DerefMut for BumpaloOwned<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.t
+    }
+}
+
+impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}

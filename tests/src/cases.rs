@@ -13,6 +13,7 @@
 // limitations under the License.
 
 mod builder;
+mod bumpalo;
 mod descriptors;
 mod either;
 mod empty;

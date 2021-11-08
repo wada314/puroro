@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::tests_pb::proto2_defaults::{Msg, MsgTrait, MyEnum};
-use ::puroro::internal::DeserializableMessageFromBytesIterator;
+use ::puroro::internal::de::DeserMessageFromBytesIter;
 
 #[test]
 fn test_simple_int32() {

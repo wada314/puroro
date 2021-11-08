@@ -70,13 +70,13 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 }
 
 
-impl{{ maybe_gp }} ::puroro::internal::SerializableMessageToIoWrite
+impl{{ maybe_gp }} ::puroro::internal::se::SerMessageToIoWrite
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield) %}
     Self: super::_puroro_traits::{{ m.ident }}Trait,
 {%- if sfield.is_message %}
     for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ sfield.number }}MessageType<'a> :
-        ::puroro::internal::SerializableMessageToIoWrite,
+        ::puroro::internal::se::SerMessageToIoWrite,
 {%- endif %}
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>

@@ -1,0 +1,202 @@
+#[derive(::std::fmt::Debug)]
+pub struct {{ m.bumpalo_ident }}<'bump> {
+    _bump: &'bump ::puroro::bumpalo::Bump,
+
+    {%- for field in m.fields %}
+    {%- if !field.is_explicit_oneof_field %}
+    pub {{ field.ident }}: {{ field.bumpalo_field_type }},
+    {%- endif %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    pub {{ oneof.field_ident }}: ::std::option::Option<
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }}
+        {%- if oneof.has_ld_field %}
+        <'bump>
+        {%- endif %}
+    >,
+    {%- endfor %}
+}
+
+pub type {{ m.bumpalo_owned_ident }} = ::puroro::BumpaloOwned<{{ m.bumpalo_ident }}<'static>>;
+
+impl<'bump> {{ m.bumpalo_ident }}<'bump> {
+    pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+        Self {
+            _bump: bump,
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {%- if field.is_repeated %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            {%- else %}
+            {%- if field.is_unlabeled && field.is_string  %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump),
+            {%- else %}
+            {%- if field.is_unlabeled && field.is_bytes %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            {%- else %}
+            {{ field.ident }}: ::std::default::Default::default(),
+            {%- endif %} {#- if field.is_unlabeled && field.is_string #}
+            {%- endif %} {#- if field.is_unlabeled && field.is_bytes #}
+            {%- endif %} {#- if field.is_repeated #}
+            {%- endif %} {#- if !field.is_explicit_oneof_field #}
+            {%- endfor %} {#- for field in m.fields #}
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::std::option::Option::None,
+            {%- endfor %}
+        }
+    }
+}
+
+impl<'bump> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {}
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for {{ m.bumpalo_ident }}<'bump> {
+    fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
+
+impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}<'bump> {
+    {%- for field in m.fields %}
+    {%- call bumpalo_trait_impl_field(field) %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_ld_field %}
+            {%- if oneof.has_message_field %}
+            <'this, ::puroro::internal::bool::False, Self>
+            {%- else %}
+            <'this, ::puroro::internal::bool::False>
+            {%- endif %}
+            {%- endif %}
+        >
+    {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
+        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
+            {%- for field in oneof.fields %}
+            {% if field.is_length_delimited %}
+            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.as_ref()),
+            {%- else %}
+            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.clone()),
+            {%- endif %}
+            {%- endfor %}
+        })
+    }
+    {%- endfor %}
+}
+
+impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_ident }}<'bump> {
+    fn deser_field<I>(
+        &mut self,
+        field_number: i32,
+        data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+    ) -> ::puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
+    {
+        use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+        match field_number {
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {{ field.number }} => DeserFieldFromBytesIter::<
+                {{ field.bumpalo_label_and_type_tags }}
+            >::deser_field(&mut self.{{ field.ident }}, data, &self._bump),
+            {%- endif %}
+            {%- endfor %}
+
+            {%- for oneof in m.oneofs %}
+            {%- for field in oneof.fields %}
+            {{ field.number }} => {
+                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
+                if !matches!(
+                    &self.{{ oneof.field_ident }},
+                    Some(E::{{ field.ident }}(_)))
+                {
+                    self.{{ oneof.field_ident }} = Some(
+                        E::{{ field.ident }}(
+                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
+                        )
+                    );
+                }
+                let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
+                    Some(E::{{ field.ident }}(v)) => v,
+                    _ => unreachable!(),
+                };
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}
+                >::deser_field(field_value_mut_ref, data, &self._bump)
+            }
+            {%- endfor %}
+            {%- endfor %}
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+    }
+}
+
+impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}<'bump>
+where
+    Self: super::_puroro_traits::{{ m.ident }}Trait,
+{%- for field in m.fields %}
+{%- if field.is_message %}
+    for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'a> :
+        ::puroro::internal::se::SerMessageToIoWrite,
+{%- endif %}
+{%- endfor %}
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write,
+    {
+        {%- for field in m.fields %}
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            {{ field.trait_label_and_type_tags }}
+        >::ser_field(
+            {%- if field.is_repeated %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self),
+            {%- else %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_opt(self),
+            {%- endif %}
+            {{ field.number }},
+            out
+        )?;
+        {%- endfor %} {#- for field in m.fields #}
+        ::std::result::Result::Ok(())
+    }
+}
+
+impl<'bump> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<'bump> {
+    fn eq(&self, rhs: &Self) -> bool {
+        ::std::ptr::eq(self._bump, rhs._bump) &&
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            self.{{ field.ident }} == rhs.{{ field.ident }} &&
+            {%- endif %}
+            {%- endfor %} {#- for field in m.fields #}
+            {%- for oneof in m.oneofs %}
+            self.{{ oneof.field_ident }} == rhs.{{ oneof.field_ident }} &&
+            {%- endfor %}
+            true
+    }
+}
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ m.bumpalo_ident }}<'bump> {
+    fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+        Self { 
+            _bump: bump,
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {{ field.ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ field.ident }}, bump),
+            {%- endif %}
+            {%- endfor %} {#- for field in m.fields #}
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ oneof.field_ident }}, bump),
+            {%- endfor %}
+        }
+    }
+}

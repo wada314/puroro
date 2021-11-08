@@ -97,3 +97,37 @@ where
 }
 {%- endif %}
 
+{%- if has_message_field %}
+impl<'msg, 'bump, IsOwned, T> ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
+for {{ enum_ident }}<'msg, IsOwned, ::puroro::bumpalo::boxed::Box<'bump, T>>
+where
+    IsOwned: ::puroro::internal::bool::BoolType,
+    T: 'msg + {{ owner_message_trait_path }},
+{
+    fn from(value: {{ enum_ident }}{{ maybe_gp }}) -> Self {
+        match value {
+            {%- for field in fields %}
+            {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
+            {%- endfor %}
+        }
+    }
+}
+{%- endif %}
+
+{%- if has_message_field %}
+impl<'msg, 'bump, IsOwned, T> ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
+for {{ enum_ident }}<'msg, IsOwned, ::puroro::BumpaloOwned<T>>
+where
+    IsOwned: ::puroro::internal::bool::BoolType,
+    T: 'msg + {{ owner_message_trait_path }},
+{
+    fn from(value: {{ enum_ident }}{{ maybe_gp }}) -> Self {
+        match value {
+            {%- for field in fields %}
+            {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
+            {%- endfor %}
+        }
+    }
+}
+{%- endif %}
+

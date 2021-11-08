@@ -71,7 +71,7 @@ pub trait {{ m.trait_ident }} {
     }
 
     {%- for field in oneof.fields %}
-    pub fn {{ field.getter_ident_unesc }}_opt<'this>(&'this self) -> Option<{{ field.trait_getter_type }}> {
+    fn {{ field.getter_ident_unesc }}_opt<'this>(&'this self) -> Option<{{ field.trait_getter_type }}> {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
         self.{{ oneof.field_ident }}().and_then(|oneof| {
             #[allow(irrefutable_let_patterns)]
@@ -146,6 +146,20 @@ where
 }
 
 impl<T> {{ m.trait_ident }} for ::std::boxed::Box<T>
+where
+    T: {{ m.trait_ident }}
+{
+    {{ m.trait_delegate_macro_ident }}!(T);
+}
+
+impl<'bump, T> {{ m.trait_ident }} for ::puroro::bumpalo::boxed::Box<'bump, T>
+where
+    T: {{ m.trait_ident }}
+{
+    {{ m.trait_delegate_macro_ident }}!(T);
+}
+
+impl<T> {{ m.trait_ident }} for ::puroro::BumpaloOwned<T>
 where
     T: {{ m.trait_ident }}
 {
