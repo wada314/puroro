@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! # Bumpalo message structs
+//!
+//! **The implementation is highly experimental and the interface will change
+//! in very soon. I'm planning to make the struct fields private and make a mutable
+//! trait interface in future.**
+//!
+
 pub mod de;
 
 use crate::bumpalo::boxed::Box;
