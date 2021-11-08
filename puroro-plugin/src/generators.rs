@@ -71,6 +71,8 @@ struct Message {
     oneofs: Vec<Oneof>,
     simple_ident: String,
     single_field_ident: String,
+    bumpalo_ident: String,
+    bumpalo_owned_ident: String,
     builder_ident: String,
 }
 
@@ -113,6 +115,8 @@ impl Message {
             oneofs,
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
+            bumpalo_ident: m.rust_impl_ident("Bumpalo"),
+            bumpalo_owned_ident: m.rust_impl_ident("BumpaloOwned"),
             builder_ident: m.rust_impl_ident("Builder"),
         })
     }
@@ -191,6 +195,11 @@ struct Field {
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
+    bumpalo_field_type: String,
+    bumpalo_scalar_field_type: String,
+    bumpalo_maybe_field_message_path: Option<String>,
+    bumpalo_maybe_borrowed_field_type: Option<String>,
+    bumpalo_label_and_type_tags: String,
 }
 
 impl Field {
@@ -203,7 +212,13 @@ impl Field {
             };
         let simple_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Simple"))
+                Some(upgrade(&m)?.rust_impl_path("Simple", &[]))
+            } else {
+                None
+            };
+        let bumpalo_maybe_field_message_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]))
             } else {
                 None
             };
@@ -246,18 +261,35 @@ impl Field {
             simple_scalar_field_type: f.simple_scalar_field_type()?,
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Simple")?,
+                .maybe_trait_scalar_getter_type_borrowed("Simple", &[])?,
             simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Simple")
+                        msg.rust_impl_path("Simple", &[])
                     } else {
-                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple"))
+                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple", &[]))
                     },
                 )
             })?,
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
+            bumpalo_field_type: f.bumpalo_field_type()?,
+            bumpalo_scalar_field_type: f.bumpalo_scalar_field_type()?,
+            bumpalo_maybe_field_message_path,
+            bumpalo_maybe_borrowed_field_type: f
+                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'bump"])?,
+            bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
+                Ok(
+                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
+                        msg.rust_impl_path("Bumpalo", &["'bump"])
+                    } else {
+                        format!(
+                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            msg.rust_impl_path("Bumpalo", &["'bump"])
+                        )
+                    },
+                )
+            })?,
         })
     }
 
@@ -385,6 +417,7 @@ impl Field {
 struct Oneof {
     index: i32,
     enum_ident: String,
+    bumpalo_enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -397,6 +430,7 @@ impl Oneof {
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
+            bumpalo_enum_ident: o.rust_enum_ident().to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
@@ -428,8 +462,10 @@ struct OneofField {
     is_length_delimited: bool,
     is_message: bool,
     field_type: String,
+    bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
+    bumpalo_field_type_tag: String,
 }
 
 impl OneofField {
@@ -447,13 +483,26 @@ impl OneofField {
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             field_type: f.oneof_field_type()?,
+            bumpalo_field_type: f.bumpalo_oneof_field_type()?,
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Simple")
+                        msg.rust_impl_path("Simple", &[])
                     } else {
-                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple"))
+                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple", &[]))
+                    },
+                )
+            })?,
+            bumpalo_field_type_tag: f.rust_type_tag(|msg| {
+                Ok(
+                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
+                        msg.rust_impl_path("Bumpalo", &["'bump"])
+                    } else {
+                        format!(
+                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            msg.rust_impl_path("Bumpalo", &["'bump"])
+                        )
                     },
                 )
             })?,
@@ -473,6 +522,12 @@ struct Traits<'a> {
     messages: &'a [Message],
 }
 
+#[derive(Template)]
+#[template(path = "bumpalo/oneof.rs.txt")]
+struct BumpaloOneof<'a> {
+    oneof: &'a Oneof,
+}
+
 mod filters {
     use super::*;
     pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
@@ -480,5 +535,8 @@ mod filters {
     }
     pub(super) fn print_traits(messages: &[Message]) -> ::askama::Result<Traits> {
         Ok(Traits { messages })
+    }
+    pub(super) fn print_bumpalo_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
+        Ok(BumpaloOneof { oneof })
     }
 }

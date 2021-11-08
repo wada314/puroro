@@ -18,6 +18,14 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Msg> for Msg {}
 
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                recursive_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::MsgTrait for Msg {
         type Field1MessageType<'this>
         where
@@ -106,9 +114,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Msg {
         fn default() -> Self {
-            Self {
-                recursive_unlabeled: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -265,6 +271,119 @@ pub mod _puroro_impls {
             }
         }
     }
+    #[derive(::std::fmt::Debug)]
+    pub struct MsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub recursive_unlabeled: ::std::option::Option<
+            ::puroro::bumpalo::boxed::Box<
+                'bump,
+                self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
+            >,
+        >,
+    }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                recursive_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
+    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>;
+        fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
+            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
+                1 => DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled,
+                    ::puroro::tags::Message<
+                        ::puroro::bumpalo::boxed::Box<
+                            'bump,
+                            self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
+                        >,
+                    >,
+                >::deser_field(
+                    &mut self.recursive_unlabeled, data, &self._bump
+                ),
+
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
+    where
+        Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.recursive_unlabeled == rhs.recursive_unlabeled
+                && true
+        }
+    }
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                recursive_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.recursive_unlabeled,
+                    bump,
+                ),
+            }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -357,6 +476,20 @@ pub mod _puroro_traits {
     }
 
     impl<T> MsgTrait for ::std::boxed::Box<T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
+    impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
+    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
     where
         T: MsgTrait,
     {

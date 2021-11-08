@@ -31,6 +31,7 @@ pub mod _puroro_impls {
     {%- include "either/body.rs.txt" %}
     {%- include "option/body.rs.txt" %}
     {%- include "single_field/body.rs.txt" %}
+    {%- include "bumpalo/body.rs.txt" %}
     {%- include "builder.rs.txt" %}
     {%- endfor %}
 }
@@ -63,5 +64,9 @@ pub mod _puroro_impls {
 
 {%- macro single_field_trait_impl_field(f) -%}
 {%- include "single_field/trait_impl_field.rs.txt" %}
+{%- endmacro -%}
+
+{%- macro bumpalo_trait_impl_field(f) -%}
+{%- include "bumpalo/trait_impl_field.rs.txt" %}
 {%- endmacro -%}
 

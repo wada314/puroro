@@ -13,6 +13,7 @@
 // limitations under the License.
 
 pub mod builder;
+pub mod bumpalo;
 pub mod either;
 pub mod empty;
 pub mod merged;

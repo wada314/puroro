@@ -63,6 +63,61 @@ pub mod _puroro_simple_impl {
 }
     impl ::puroro::Message<Msg> for Msg {}
 
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                i32_required: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_required: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                bytes_required: ::std::default::Default::default(),
+                bytes_optional: ::std::default::Default::default(),
+                bytes_repeated: ::std::default::Default::default(),
+                string_required: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                enum_required: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                submsg_required: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                i64_required: ::std::default::Default::default(),
+                i64_optional: ::std::default::Default::default(),
+                i64_repeated: ::std::default::Default::default(),
+                u32_required: ::std::default::Default::default(),
+                u32_optional: ::std::default::Default::default(),
+                u32_repeated: ::std::default::Default::default(),
+                u64_required: ::std::default::Default::default(),
+                u64_optional: ::std::default::Default::default(),
+                u64_repeated: ::std::default::Default::default(),
+                s32_required: ::std::default::Default::default(),
+                s32_optional: ::std::default::Default::default(),
+                s32_repeated: ::std::default::Default::default(),
+                s64_required: ::std::default::Default::default(),
+                s64_optional: ::std::default::Default::default(),
+                s64_repeated: ::std::default::Default::default(),
+                fixed32_required: ::std::default::Default::default(),
+                fixed32_optional: ::std::default::Default::default(),
+                fixed32_repeated: ::std::default::Default::default(),
+                fixed64_required: ::std::default::Default::default(),
+                fixed64_optional: ::std::default::Default::default(),
+                fixed64_repeated: ::std::default::Default::default(),
+                sfixed32_required: ::std::default::Default::default(),
+                sfixed32_optional: ::std::default::Default::default(),
+                sfixed32_repeated: ::std::default::Default::default(),
+                sfixed64_required: ::std::default::Default::default(),
+                sfixed64_optional: ::std::default::Default::default(),
+                sfixed64_repeated: ::std::default::Default::default(),
+                f64_required: ::std::default::Default::default(),
+                f64_optional: ::std::default::Default::default(),
+                f64_repeated: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_required_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_required)
@@ -1325,56 +1380,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Msg {
         fn default() -> Self {
-            Self {
-                i32_required: ::std::default::Default::default(),
-                i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::std::default::Default::default(),
-                float_required: ::std::default::Default::default(),
-                float_optional: ::std::default::Default::default(),
-                float_repeated: ::std::default::Default::default(),
-                bytes_required: ::std::default::Default::default(),
-                bytes_optional: ::std::default::Default::default(),
-                bytes_repeated: ::std::default::Default::default(),
-                string_required: ::std::default::Default::default(),
-                string_optional: ::std::default::Default::default(),
-                string_repeated: ::std::default::Default::default(),
-                enum_required: ::std::default::Default::default(),
-                enum_optional: ::std::default::Default::default(),
-                enum_repeated: ::std::default::Default::default(),
-                submsg_required: ::std::default::Default::default(),
-                submsg_optional: ::std::default::Default::default(),
-                submsg_repeated: ::std::default::Default::default(),
-                i64_required: ::std::default::Default::default(),
-                i64_optional: ::std::default::Default::default(),
-                i64_repeated: ::std::default::Default::default(),
-                u32_required: ::std::default::Default::default(),
-                u32_optional: ::std::default::Default::default(),
-                u32_repeated: ::std::default::Default::default(),
-                u64_required: ::std::default::Default::default(),
-                u64_optional: ::std::default::Default::default(),
-                u64_repeated: ::std::default::Default::default(),
-                s32_required: ::std::default::Default::default(),
-                s32_optional: ::std::default::Default::default(),
-                s32_repeated: ::std::default::Default::default(),
-                s64_required: ::std::default::Default::default(),
-                s64_optional: ::std::default::Default::default(),
-                s64_repeated: ::std::default::Default::default(),
-                fixed32_required: ::std::default::Default::default(),
-                fixed32_optional: ::std::default::Default::default(),
-                fixed32_repeated: ::std::default::Default::default(),
-                fixed64_required: ::std::default::Default::default(),
-                fixed64_optional: ::std::default::Default::default(),
-                fixed64_repeated: ::std::default::Default::default(),
-                sfixed32_required: ::std::default::Default::default(),
-                sfixed32_optional: ::std::default::Default::default(),
-                sfixed32_repeated: ::std::default::Default::default(),
-                sfixed64_required: ::std::default::Default::default(),
-                sfixed64_optional: ::std::default::Default::default(),
-                sfixed64_repeated: ::std::default::Default::default(),
-                f64_required: ::std::default::Default::default(),
-                f64_optional: ::std::default::Default::default(),
-                f64_repeated: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -12464,6 +12470,1190 @@ pub mod _puroro_impls {
             }
         }
     }
+    #[derive(::std::fmt::Debug)]
+    pub struct MsgBumpalo<'bump> {
+    _bump: &'bump ::puroro::bumpalo::Bump,
+    pub i32_required: ::std::option::Option<i32>,
+    pub i32_optional: ::std::option::Option<i32>,
+    pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    pub float_required: ::std::option::Option<f32>,
+    pub float_optional: ::std::option::Option<f32>,
+    pub float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
+    pub bytes_required: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
+    pub bytes_optional: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
+    pub bytes_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::Vec<'bump, u8>>,
+    pub string_required: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+    pub string_optional: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+    pub string_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::String<'bump>>,
+    pub enum_required: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
+    pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
+    pub enum_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage2::Enum>,
+    pub submsg_required: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
+    pub submsg_optional: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
+    pub submsg_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>,
+    pub i64_required: ::std::option::Option<i64>,
+    pub i64_optional: ::std::option::Option<i64>,
+    pub i64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    pub u32_required: ::std::option::Option<u32>,
+    pub u32_optional: ::std::option::Option<u32>,
+    pub u32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
+    pub u64_required: ::std::option::Option<u64>,
+    pub u64_optional: ::std::option::Option<u64>,
+    pub u64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
+    pub s32_required: ::std::option::Option<i32>,
+    pub s32_optional: ::std::option::Option<i32>,
+    pub s32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    pub s64_required: ::std::option::Option<i64>,
+    pub s64_optional: ::std::option::Option<i64>,
+    pub s64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    pub fixed32_required: ::std::option::Option<u32>,
+    pub fixed32_optional: ::std::option::Option<u32>,
+    pub fixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
+    pub fixed64_required: ::std::option::Option<u64>,
+    pub fixed64_optional: ::std::option::Option<u64>,
+    pub fixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
+    pub sfixed32_required: ::std::option::Option<i32>,
+    pub sfixed32_optional: ::std::option::Option<i32>,
+    pub sfixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    pub sfixed64_required: ::std::option::Option<i64>,
+    pub sfixed64_optional: ::std::option::Option<i64>,
+    pub sfixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    pub f64_required: ::std::option::Option<f64>,
+    pub f64_optional: ::std::option::Option<f64>,
+    pub f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
+}
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_required: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_required: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_required: ::std::default::Default::default(),
+                bytes_optional: ::std::default::Default::default(),
+                bytes_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                string_required: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_required: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_required: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i64_required: ::std::default::Default::default(),
+                i64_optional: ::std::default::Default::default(),
+                i64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u32_required: ::std::default::Default::default(),
+                u32_optional: ::std::default::Default::default(),
+                u32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u64_required: ::std::default::Default::default(),
+                u64_optional: ::std::default::Default::default(),
+                u64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s32_required: ::std::default::Default::default(),
+                s32_optional: ::std::default::Default::default(),
+                s32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s64_required: ::std::default::Default::default(),
+                s64_optional: ::std::default::Default::default(),
+                s64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed32_required: ::std::default::Default::default(),
+                fixed32_optional: ::std::default::Default::default(),
+                fixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed64_required: ::std::default::Default::default(),
+                fixed64_optional: ::std::default::Default::default(),
+                fixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed32_required: ::std::default::Default::default(),
+                sfixed32_optional: ::std::default::Default::default(),
+                sfixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed64_required: ::std::default::Default::default(),
+                sfixed64_optional: ::std::default::Default::default(),
+                sfixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                f64_required: ::std::default::Default::default(),
+                f64_optional: ::std::default::Default::default(),
+                f64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
+    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+        fn i32_required_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_required)
+        }
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
+        }
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            self.i32_repeated.iter().cloned()
+        }
+        fn float_required_opt<'this>(&'this self) -> Option<f32> {
+            Clone::clone(&self.float_required)
+        }
+        fn float_optional_opt<'this>(&'this self) -> Option<f32> {
+            Clone::clone(&self.float_optional)
+        }
+        type Field13RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            self.float_repeated.iter().cloned()
+        }
+        fn bytes_required_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_required.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            self.bytes_optional.as_ref().map(|v| v.as_ref())
+        }
+        type Field23RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
+            [u8],
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::Vec<'bump, u8>>,
+        >;
+
+        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
+        }
+        fn string_required_opt<'this>(&'this self) -> Option<&'this str> {
+            self.string_required.as_ref().map(|v| v.as_ref())
+        }
+        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+            self.string_optional.as_ref().map(|v| v.as_ref())
+        }
+        type Field33RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
+            str,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
+        >;
+
+        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+        }
+        fn enum_required_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage2::Enum> {
+            Clone::clone(&self.enum_required)
+        }
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage2::Enum> {
+            Clone::clone(&self.enum_optional)
+        }
+        type Field43RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::full_coverage2::Enum>>;
+
+        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            self.enum_repeated.iter().cloned()
+        }
+        type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
+        fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+            self.submsg_required.as_ref().map(|v| v.as_ref())
+        }
+        type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+            self.submsg_optional.as_ref().map(|v| v.as_ref())
+        }
+        type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
+        type Field53RepeatedType<'this> where Self: 'this =
+    ::puroro::internal::impls::simple::BorrowedIter<
+        self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>,
+        ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>;
+
+        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+        }
+        fn i64_required_opt<'this>(&'this self) -> Option<i64> {
+            Clone::clone(&self.i64_required)
+        }
+        fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
+            Clone::clone(&self.i64_optional)
+        }
+        type Field103RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+
+        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+            self.i64_repeated.iter().cloned()
+        }
+        fn u32_required_opt<'this>(&'this self) -> Option<u32> {
+            Clone::clone(&self.u32_required)
+        }
+        fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
+            Clone::clone(&self.u32_optional)
+        }
+        type Field113RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
+
+        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+            self.u32_repeated.iter().cloned()
+        }
+        fn u64_required_opt<'this>(&'this self) -> Option<u64> {
+            Clone::clone(&self.u64_required)
+        }
+        fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
+            Clone::clone(&self.u64_optional)
+        }
+        type Field123RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
+
+        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+            self.u64_repeated.iter().cloned()
+        }
+        fn s32_required_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.s32_required)
+        }
+        fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.s32_optional)
+        }
+        type Field133RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+            self.s32_repeated.iter().cloned()
+        }
+        fn s64_required_opt<'this>(&'this self) -> Option<i64> {
+            Clone::clone(&self.s64_required)
+        }
+        fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
+            Clone::clone(&self.s64_optional)
+        }
+        type Field143RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+
+        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+            self.s64_repeated.iter().cloned()
+        }
+        fn fixed32_required_opt<'this>(&'this self) -> Option<u32> {
+            Clone::clone(&self.fixed32_required)
+        }
+        fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
+            Clone::clone(&self.fixed32_optional)
+        }
+        type Field153RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
+
+        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+            self.fixed32_repeated.iter().cloned()
+        }
+        fn fixed64_required_opt<'this>(&'this self) -> Option<u64> {
+            Clone::clone(&self.fixed64_required)
+        }
+        fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
+            Clone::clone(&self.fixed64_optional)
+        }
+        type Field163RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
+
+        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+            self.fixed64_repeated.iter().cloned()
+        }
+        fn sfixed32_required_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.sfixed32_required)
+        }
+        fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.sfixed32_optional)
+        }
+        type Field173RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+            self.sfixed32_repeated.iter().cloned()
+        }
+        fn sfixed64_required_opt<'this>(&'this self) -> Option<i64> {
+            Clone::clone(&self.sfixed64_required)
+        }
+        fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
+            Clone::clone(&self.sfixed64_optional)
+        }
+        type Field183RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+
+        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+            self.sfixed64_repeated.iter().cloned()
+        }
+        fn f64_required_opt<'this>(&'this self) -> Option<f64> {
+            Clone::clone(&self.f64_required)
+        }
+        fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
+            Clone::clone(&self.f64_optional)
+        }
+        type Field193RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, f64>>;
+
+        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+            self.f64_repeated.iter().cloned()
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_required, data, &self._bump),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data, &self._bump),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_repeated, data, &self._bump),
+            11 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Float
+            >::deser_field(&mut self.float_required, data, &self._bump),
+            12 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Float
+            >::deser_field(&mut self.float_optional, data, &self._bump),
+            13 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Float
+            >::deser_field(&mut self.float_repeated, data, &self._bump),
+            21 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_required, data, &self._bump),
+            22 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_optional, data, &self._bump),
+            23 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Bytes
+            >::deser_field(&mut self.bytes_repeated, data, &self._bump),
+            31 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::String
+            >::deser_field(&mut self.string_required, data, &self._bump),
+            32 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_optional, data, &self._bump),
+            33 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.string_repeated, data, &self._bump),
+            41 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>
+            >::deser_field(&mut self.enum_required, data, &self._bump),
+            42 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>
+            >::deser_field(&mut self.enum_optional, data, &self._bump),
+            43 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>
+            >::deser_field(&mut self.enum_repeated, data, &self._bump),
+            51 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+            >::deser_field(&mut self.submsg_required, data, &self._bump),
+            52 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+            >::deser_field(&mut self.submsg_optional, data, &self._bump),
+            53 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
+            >::deser_field(&mut self.submsg_repeated, data, &self._bump),
+            101 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Int64
+            >::deser_field(&mut self.i64_required, data, &self._bump),
+            102 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int64
+            >::deser_field(&mut self.i64_optional, data, &self._bump),
+            103 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int64
+            >::deser_field(&mut self.i64_repeated, data, &self._bump),
+            111 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::UInt32
+            >::deser_field(&mut self.u32_required, data, &self._bump),
+            112 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::UInt32
+            >::deser_field(&mut self.u32_optional, data, &self._bump),
+            113 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::UInt32
+            >::deser_field(&mut self.u32_repeated, data, &self._bump),
+            121 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::UInt64
+            >::deser_field(&mut self.u64_required, data, &self._bump),
+            122 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::UInt64
+            >::deser_field(&mut self.u64_optional, data, &self._bump),
+            123 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::UInt64
+            >::deser_field(&mut self.u64_repeated, data, &self._bump),
+            131 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::SInt32
+            >::deser_field(&mut self.s32_required, data, &self._bump),
+            132 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::SInt32
+            >::deser_field(&mut self.s32_optional, data, &self._bump),
+            133 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::SInt32
+            >::deser_field(&mut self.s32_repeated, data, &self._bump),
+            141 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::SInt64
+            >::deser_field(&mut self.s64_required, data, &self._bump),
+            142 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::SInt64
+            >::deser_field(&mut self.s64_optional, data, &self._bump),
+            143 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::SInt64
+            >::deser_field(&mut self.s64_repeated, data, &self._bump),
+            151 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Fixed32
+            >::deser_field(&mut self.fixed32_required, data, &self._bump),
+            152 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Fixed32
+            >::deser_field(&mut self.fixed32_optional, data, &self._bump),
+            153 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Fixed32
+            >::deser_field(&mut self.fixed32_repeated, data, &self._bump),
+            161 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Fixed64
+            >::deser_field(&mut self.fixed64_required, data, &self._bump),
+            162 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Fixed64
+            >::deser_field(&mut self.fixed64_optional, data, &self._bump),
+            163 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Fixed64
+            >::deser_field(&mut self.fixed64_repeated, data, &self._bump),
+            171 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::SFixed32
+            >::deser_field(&mut self.sfixed32_required, data, &self._bump),
+            172 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::SFixed32
+            >::deser_field(&mut self.sfixed32_optional, data, &self._bump),
+            173 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::SFixed32
+            >::deser_field(&mut self.sfixed32_repeated, data, &self._bump),
+            181 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::SFixed64
+            >::deser_field(&mut self.sfixed64_required, data, &self._bump),
+            182 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::SFixed64
+            >::deser_field(&mut self.sfixed64_optional, data, &self._bump),
+            183 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::SFixed64
+            >::deser_field(&mut self.sfixed64_repeated, data, &self._bump),
+            191 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Required, ::puroro::tags::Double
+            >::deser_field(&mut self.f64_required, data, &self._bump),
+            192 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Double
+            >::deser_field(&mut self.f64_optional, data, &self._bump),
+            193 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Double
+            >::deser_field(&mut self.f64_repeated, data, &self._bump),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
+    where
+        Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field53MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_required_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                3,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::float_required_opt(self),
+                11,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
+                12,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
+                13,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Bytes,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::bytes_required_opt(self),
+                21,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Bytes,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::bytes_optional_opt(self),
+                22,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Bytes,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::bytes_repeated(self),
+                23,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_required_opt(self),
+                31,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
+                32,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
+                33,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::enum_required_opt(self),
+                41,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
+                42,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
+                43,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_required_opt(self),
+                51,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
+                52,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field53MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
+                53,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Int64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i64_required_opt(self),
+                101,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i64_optional_opt(self),
+                102,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i64_repeated(self),
+                103,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::UInt32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::u32_required_opt(self),
+                111,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::UInt32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::u32_optional_opt(self),
+                112,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::UInt32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::u32_repeated(self),
+                113,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::UInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::u64_required_opt(self),
+                121,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::UInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::u64_optional_opt(self),
+                122,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::UInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::u64_repeated(self),
+                123,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::SInt32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::s32_required_opt(self),
+                131,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::SInt32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::s32_optional_opt(self),
+                132,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::SInt32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::s32_repeated(self),
+                133,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::SInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::s64_required_opt(self),
+                141,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::SInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::s64_optional_opt(self),
+                142,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::SInt64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::s64_repeated(self),
+                143,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Fixed32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::fixed32_required_opt(self),
+                151,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Fixed32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::fixed32_optional_opt(self),
+                152,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Fixed32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::fixed32_repeated(self),
+                153,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Fixed64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::fixed64_required_opt(self),
+                161,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Fixed64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::fixed64_optional_opt(self),
+                162,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Fixed64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::fixed64_repeated(self),
+                163,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::SFixed32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::sfixed32_required_opt(self),
+                171,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::SFixed32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::sfixed32_optional_opt(self),
+                172,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::SFixed32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::sfixed32_repeated(self),
+                173,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::SFixed64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::sfixed64_required_opt(self),
+                181,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::SFixed64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::sfixed64_optional_opt(self),
+                182,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::SFixed64,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::sfixed64_repeated(self),
+                183,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Required,
+                ::puroro::tags::Double,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f64_required_opt(self),
+                191,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Double,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f64_optional_opt(self),
+                192,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Double,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f64_repeated(self),
+                193,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.i32_required == rhs.i32_required
+                && self.i32_optional == rhs.i32_optional
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_required == rhs.float_required
+                && self.float_optional == rhs.float_optional
+                && self.float_repeated == rhs.float_repeated
+                && self.bytes_required == rhs.bytes_required
+                && self.bytes_optional == rhs.bytes_optional
+                && self.bytes_repeated == rhs.bytes_repeated
+                && self.string_required == rhs.string_required
+                && self.string_optional == rhs.string_optional
+                && self.string_repeated == rhs.string_repeated
+                && self.enum_required == rhs.enum_required
+                && self.enum_optional == rhs.enum_optional
+                && self.enum_repeated == rhs.enum_repeated
+                && self.submsg_required == rhs.submsg_required
+                && self.submsg_optional == rhs.submsg_optional
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.i64_required == rhs.i64_required
+                && self.i64_optional == rhs.i64_optional
+                && self.i64_repeated == rhs.i64_repeated
+                && self.u32_required == rhs.u32_required
+                && self.u32_optional == rhs.u32_optional
+                && self.u32_repeated == rhs.u32_repeated
+                && self.u64_required == rhs.u64_required
+                && self.u64_optional == rhs.u64_optional
+                && self.u64_repeated == rhs.u64_repeated
+                && self.s32_required == rhs.s32_required
+                && self.s32_optional == rhs.s32_optional
+                && self.s32_repeated == rhs.s32_repeated
+                && self.s64_required == rhs.s64_required
+                && self.s64_optional == rhs.s64_optional
+                && self.s64_repeated == rhs.s64_repeated
+                && self.fixed32_required == rhs.fixed32_required
+                && self.fixed32_optional == rhs.fixed32_optional
+                && self.fixed32_repeated == rhs.fixed32_repeated
+                && self.fixed64_required == rhs.fixed64_required
+                && self.fixed64_optional == rhs.fixed64_optional
+                && self.fixed64_repeated == rhs.fixed64_repeated
+                && self.sfixed32_required == rhs.sfixed32_required
+                && self.sfixed32_optional == rhs.sfixed32_optional
+                && self.sfixed32_repeated == rhs.sfixed32_repeated
+                && self.sfixed64_required == rhs.sfixed64_required
+                && self.sfixed64_optional == rhs.sfixed64_optional
+                && self.sfixed64_repeated == rhs.sfixed64_repeated
+                && self.f64_required == rhs.f64_required
+                && self.f64_optional == rhs.f64_optional
+                && self.f64_repeated == rhs.f64_repeated
+                && true
+        }
+    }
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_required,
+                    bump,
+                ),
+                i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_optional,
+                    bump,
+                ),
+                i32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_repeated,
+                    bump,
+                ),
+                float_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.float_required,
+                    bump,
+                ),
+                float_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.float_optional,
+                    bump,
+                ),
+                float_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.float_repeated,
+                    bump,
+                ),
+                bytes_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_required,
+                    bump,
+                ),
+                bytes_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_optional,
+                    bump,
+                ),
+                bytes_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.bytes_repeated,
+                    bump,
+                ),
+                string_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_required,
+                    bump,
+                ),
+                string_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_optional,
+                    bump,
+                ),
+                string_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_repeated,
+                    bump,
+                ),
+                enum_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_required,
+                    bump,
+                ),
+                enum_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_optional,
+                    bump,
+                ),
+                enum_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_repeated,
+                    bump,
+                ),
+                submsg_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_required,
+                    bump,
+                ),
+                submsg_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_optional,
+                    bump,
+                ),
+                submsg_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_repeated,
+                    bump,
+                ),
+                i64_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_required,
+                    bump,
+                ),
+                i64_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_optional,
+                    bump,
+                ),
+                i64_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i64_repeated,
+                    bump,
+                ),
+                u32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_required,
+                    bump,
+                ),
+                u32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_optional,
+                    bump,
+                ),
+                u32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u32_repeated,
+                    bump,
+                ),
+                u64_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_required,
+                    bump,
+                ),
+                u64_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_optional,
+                    bump,
+                ),
+                u64_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.u64_repeated,
+                    bump,
+                ),
+                s32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.s32_required,
+                    bump,
+                ),
+                s32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.s32_optional,
+                    bump,
+                ),
+                s32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.s32_repeated,
+                    bump,
+                ),
+                s64_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.s64_required,
+                    bump,
+                ),
+                s64_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.s64_optional,
+                    bump,
+                ),
+                s64_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.s64_repeated,
+                    bump,
+                ),
+                fixed32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.fixed32_required,
+                    bump,
+                ),
+                fixed32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.fixed32_optional,
+                    bump,
+                ),
+                fixed32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.fixed32_repeated,
+                    bump,
+                ),
+                fixed64_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.fixed64_required,
+                    bump,
+                ),
+                fixed64_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.fixed64_optional,
+                    bump,
+                ),
+                fixed64_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.fixed64_repeated,
+                    bump,
+                ),
+                sfixed32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.sfixed32_required,
+                    bump,
+                ),
+                sfixed32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.sfixed32_optional,
+                    bump,
+                ),
+                sfixed32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.sfixed32_repeated,
+                    bump,
+                ),
+                sfixed64_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.sfixed64_required,
+                    bump,
+                ),
+                sfixed64_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.sfixed64_optional,
+                    bump,
+                ),
+                sfixed64_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.sfixed64_repeated,
+                    bump,
+                ),
+                f64_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f64_required,
+                    bump,
+                ),
+                f64_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f64_optional,
+                    bump,
+                ),
+                f64_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.f64_repeated,
+                    bump,
+                ),
+            }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -14061,6 +15251,20 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
+    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -14097,6 +15301,18 @@ impl ::std::default::Default for Enum {
         Enum::Zeroth
     }
 }
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Enum {
+    fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::default::Default::default()
+    }
+}
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Enum {
+    fn clone_in(&self, _: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::clone::Clone::clone(self)
+    }
+}
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     pub mod msg {
@@ -14115,6 +15331,15 @@ pub mod _puroro_nested {
                 pub i64_required: ::std::option::Option<i64>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
+
+            impl Submsg {
+                pub fn new() -> Self {
+                    Self {
+                        i32_required: ::std::default::Default::default(),
+                        i64_required: ::std::default::Default::default(),
+                    }
+                }
+            }
 
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_required_opt<'this>(&'this self) -> Option<i32> {
@@ -14224,10 +15449,7 @@ pub mod _puroro_nested {
 
             impl ::std::default::Default for Submsg {
                 fn default() -> Self {
-                    Self {
-                        i32_required: ::std::default::Default::default(),
-                        i64_required: ::std::default::Default::default(),
-                    }
+                    Self::new()
                 }
             }
         }
@@ -14426,6 +15648,125 @@ pub mod _puroro_nested {
                     }
                 }
             }
+            #[derive(::std::fmt::Debug)]
+            pub struct SubmsgBumpalo<'bump> {
+                _bump: &'bump ::puroro::bumpalo::Bump,
+                pub i32_required: ::std::option::Option<i32>,
+                pub i64_required: ::std::option::Option<i64>,
+            }
+
+            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+
+            impl<'bump> SubmsgBumpalo<'bump> {
+                pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self {
+                        _bump: bump,
+                        i32_required: ::std::default::Default::default(),
+                        i64_required: ::std::default::Default::default(),
+                    }
+                }
+            }
+
+            impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+                fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self::new_in(bump)
+                }
+            }
+
+            impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
+                fn i32_required_opt<'this>(&'this self) -> Option<i32> {
+                    Clone::clone(&self.i32_required)
+                }
+                fn i64_required_opt<'this>(&'this self) -> Option<i64> {
+                    Clone::clone(&self.i64_required)
+                }
+            }
+
+            impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
+                fn deser_field<I>(
+                    &mut self,
+                    field_number: i32,
+                    data: ::puroro::internal::types::FieldData<
+                        &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+                    >,
+                ) -> ::puroro::Result<()>
+                where
+                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+                {
+                    use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+                    match field_number {
+                        1 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Required,
+                            ::puroro::tags::Int32,
+                        >::deser_field(
+                            &mut self.i32_required, data, &self._bump
+                        ),
+                        101 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Required,
+                            ::puroro::tags::Int64,
+                        >::deser_field(
+                            &mut self.i64_required, data, &self._bump
+                        ),
+
+                        _ => unimplemented!("TODO: This case should be handled properly..."),
+                    }
+                }
+            }
+
+            impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
+            where
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Required,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::SubmsgTrait>::i32_required_opt(self),
+                        1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Required,
+                        ::puroro::tags::Int64,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::SubmsgTrait>::i64_required_opt(self),
+                        101,
+                        out,
+                    )?;
+                    ::std::result::Result::Ok(())
+                }
+            }
+
+            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+                fn eq(&self, rhs: &Self) -> bool {
+                    ::std::ptr::eq(self._bump, rhs._bump)
+                        && self.i32_required == rhs.i32_required
+                        && self.i64_required == rhs.i64_required
+                        && true
+                }
+            }
+
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for SubmsgBumpalo<'bump> {
+                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self {
+                        _bump: bump,
+                        i32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                            &self.i32_required,
+                            bump,
+                        ),
+                        i64_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                            &self.i64_required,
+                            bump,
+                        ),
+                    }
+                }
+            }
             pub struct SubmsgBuilder<T>(T);
 
             impl<T> SubmsgBuilder<T>
@@ -14534,6 +15875,20 @@ pub mod _puroro_nested {
             }
 
             impl<T> SubmsgTrait for ::std::boxed::Box<T>
+            where
+                T: SubmsgTrait,
+            {
+                submsg_delegate!(T);
+            }
+
+            impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+            where
+                T: SubmsgTrait,
+            {
+                submsg_delegate!(T);
+            }
+
+            impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
             where
                 T: SubmsgTrait,
             {

@@ -19,6 +19,14 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Test1> for Test1 {}
 
+    impl Test1 {
+        pub fn new() -> Self {
+            Self {
+                a: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::Test1Trait for Test1 {
         fn a_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.a)
@@ -96,9 +104,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test1 {
         fn default() -> Self {
-            Self {
-                a: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -106,6 +112,14 @@ pub mod _puroro_simple_impl {
         pub b: ::std::option::Option<::std::string::String>,
     }
     impl ::puroro::Message<Test2> for Test2 {}
+
+    impl Test2 {
+        pub fn new() -> Self {
+            Self {
+                b: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::Test2Trait for Test2 {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
@@ -184,9 +198,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test2 {
         fn default() -> Self {
-            Self {
-                b: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -196,6 +208,14 @@ pub mod _puroro_simple_impl {
         >,
     }
     impl ::puroro::Message<Test3> for Test3 {}
+
+    impl Test3 {
+        pub fn new() -> Self {
+            Self {
+                c: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::Test3Trait for Test3 {
         type Field3MessageType<'this>
@@ -285,9 +305,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test3 {
         fn default() -> Self {
-            Self {
-                c: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -295,6 +313,14 @@ pub mod _puroro_simple_impl {
         pub d: ::std::vec::Vec<i32>,
     }
     impl ::puroro::Message<Test4> for Test4 {}
+
+    impl Test4 {
+        pub fn new() -> Self {
+            Self {
+                d: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::Test4Trait for Test4 {
         type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -371,9 +397,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test4 {
         fn default() -> Self {
-            Self {
-                d: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -482,6 +506,93 @@ pub mod _puroro_impls {
     {
         fn from(value: ScalarType) -> Self {
             Self { a: value }
+        }
+    }
+    #[derive(::std::fmt::Debug)]
+    pub struct Test1Bumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub a: ::std::option::Option<i32>,
+    }
+
+    pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
+
+    impl<'bump> Test1Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                a: ::std::default::Default::default(),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test1Bumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
+    impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
+        fn a_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.a)
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test1Bumpalo<'bump> {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.a, data, &self._bump),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test1Bumpalo<'bump>
+    where
+        Self: super::_puroro_traits::Test1Trait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test1Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.a == rhs.a && true
+        }
+    }
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test1Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                a: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.a, bump),
+            }
         }
     }
     pub struct Test1Builder<T>(T);
@@ -609,6 +720,93 @@ pub mod _puroro_impls {
     {
         fn from(value: ScalarType) -> Self {
             Self { b: value }
+        }
+    }
+    #[derive(::std::fmt::Debug)]
+    pub struct Test2Bumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub b: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+    }
+
+    pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
+
+    impl<'bump> Test2Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                b: ::std::default::Default::default(),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test2Bumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
+    impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
+        fn b_opt<'this>(&'this self) -> Option<&'this str> {
+            self.b.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test2Bumpalo<'bump> {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.b, data, &self._bump),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test2Bumpalo<'bump>
+    where
+        Self: super::_puroro_traits::Test2Trait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
+                2,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test2Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.b == rhs.b && true
+        }
+    }
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test2Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                b: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.b, bump),
+            }
         }
     }
     pub struct Test2Builder<T>(T);
@@ -776,6 +974,114 @@ pub mod _puroro_impls {
     {
         fn from(value: ScalarType) -> Self {
             Self { c: value }
+        }
+    }
+    #[derive(::std::fmt::Debug)]
+    pub struct Test3Bumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub c: ::std::option::Option<
+            ::puroro::bumpalo::boxed::Box<
+                'bump,
+                self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>,
+            >,
+        >,
+    }
+
+    pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<'static>>;
+
+    impl<'bump> Test3Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                c: ::std::default::Default::default(),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test3Bumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
+    impl<'bump> super::_puroro_traits::Test3Trait for Test3Bumpalo<'bump> {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>;
+        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            self.c.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test3Bumpalo<'bump> {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
+                3 => DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional,
+                    ::puroro::tags::Message<
+                        ::puroro::bumpalo::boxed::Box<
+                            'bump,
+                            self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+                                'bump,
+                            >,
+                        >,
+                    >,
+                >::deser_field(&mut self.c, data, &self._bump),
+
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test3Bumpalo<'bump>
+    where
+        Self: super::_puroro_traits::Test3Trait,
+        for<'a> <Self as super::_puroro_traits::Test3Trait>::Field3MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::Test3Trait>::Field3MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
+                3,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test3Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.c == rhs.c && true
+        }
+    }
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test3Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                c: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.c, bump),
+            }
         }
     }
     pub struct Test3Builder<T>(T);
@@ -960,6 +1266,94 @@ pub mod _puroro_impls {
             Self { d: value }
         }
     }
+    #[derive(::std::fmt::Debug)]
+    pub struct Test4Bumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    }
+
+    pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
+
+    impl<'bump> Test4Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                d: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test4Bumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
+    impl<'bump> super::_puroro_traits::Test4Trait for Test4Bumpalo<'bump> {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.d.iter().cloned()
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test4Bumpalo<'bump> {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.d, data, &self._bump),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test4Bumpalo<'bump>
+    where
+        Self: super::_puroro_traits::Test4Trait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for Test4Bumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump) && self.d == rhs.d && true
+        }
+    }
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test4Bumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                d: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.d, bump),
+            }
+        }
+    }
     pub struct Test4Builder<T>(T);
 
     impl<T> Test4Builder<T>
@@ -1038,6 +1432,20 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
+
+    impl<'bump, T> Test1Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test1Trait,
+    {
+        test1_delegate!(T);
+    }
+
+    impl<T> Test1Trait for ::puroro::BumpaloOwned<T>
+    where
+        T: Test1Trait,
+    {
+        test1_delegate!(T);
+    }
     pub trait Test2Trait {
         fn b<'this>(&'this self) -> &'this str {
             self.b_opt()
@@ -1074,6 +1482,20 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test2Trait for ::std::boxed::Box<T>
+    where
+        T: Test2Trait,
+    {
+        test2_delegate!(T);
+    }
+
+    impl<'bump, T> Test2Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test2Trait,
+    {
+        test2_delegate!(T);
+    }
+
+    impl<T> Test2Trait for ::puroro::BumpaloOwned<T>
     where
         T: Test2Trait,
     {
@@ -1126,6 +1548,20 @@ pub mod _puroro_traits {
     {
         test3_delegate!(T);
     }
+
+    impl<'bump, T> Test3Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test3Trait,
+    {
+        test3_delegate!(T);
+    }
+
+    impl<T> Test3Trait for ::puroro::BumpaloOwned<T>
+    where
+        T: Test3Trait,
+    {
+        test3_delegate!(T);
+    }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
@@ -1161,6 +1597,20 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test4Trait for ::std::boxed::Box<T>
+    where
+        T: Test4Trait,
+    {
+        test4_delegate!(T);
+    }
+
+    impl<'bump, T> Test4Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test4Trait,
+    {
+        test4_delegate!(T);
+    }
+
+    impl<T> Test4Trait for ::puroro::BumpaloOwned<T>
     where
         T: Test4Trait,
     {

@@ -101,6 +101,12 @@ where
     M: MessageRepresentativeImpl,
 {
 }
+impl<'bump, M, T> Message<M> for crate::bumpalo::boxed::Box<'bump, T>
+where
+    T: Message<M>,
+    M: MessageRepresentativeImpl,
+{
+}
 impl<'a, M, T> Message<M> for &'a T
 where
     T: Message<M>,

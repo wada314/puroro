@@ -88,6 +88,19 @@ where
         Ok(())
     }
 }
+impl<'bump, T> SerMessageToIoWrite for crate::bumpalo::boxed::Box<'bump, T>
+where
+    T: SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        use ::std::ops::Deref;
+        <T as SerMessageToIoWrite>::ser(self.deref(), out)?;
+        Ok(())
+    }
+}
 impl<'a, T> SerMessageToIoWrite for &'a T
 where
     T: SerMessageToIoWrite,
