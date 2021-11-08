@@ -12579,10 +12579,8 @@ pub mod _puroro_impls {
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
 
-    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
-        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
                 i32_unlabeled: ::std::default::Default::default(),
@@ -12634,6 +12632,14 @@ pub mod _puroro_impls {
                 f64_optional: ::std::default::Default::default(),
                 f64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
             }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
         }
     }
 
@@ -15761,15 +15767,21 @@ pub mod _puroro_nested {
 
             pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
 
-            impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
-
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
-                fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            impl<'bump> SubmsgBumpalo<'bump> {
+                pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
                         i32_unlabeled: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
                     }
+                }
+            }
+
+            impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+                fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self::new_in(bump)
                 }
             }
 

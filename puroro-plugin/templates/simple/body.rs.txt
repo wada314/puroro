@@ -21,6 +21,35 @@ pub struct {{ m.simple_ident }} {
 }
 impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_ident }} {}
 
+impl {{ m.simple_ident }} {
+    pub fn new() -> Self {
+        Self {        
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {%- if field.has_default_value %}
+            {%- if field.is_length_delimited %}
+            {%- if field.is_bytes %}
+            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}.to_vec()),
+            {%- endif %}
+            {%- if field.is_string %}
+            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}.to_string()),
+            {%- endif %}
+            {%- else %}
+            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}),
+            {%- endif %}
+            {%- else %}
+            {{ field.ident }}: ::std::default::Default::default(),
+            {%- endif %}
+            {%- endif %}
+            {%- endfor %}
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::std::default::Default::default(),
+            {%- endfor %}
+        }
+    }
+}
+
 impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- call simple_trait_impl_field(field) %}
@@ -157,29 +186,6 @@ where
 
 impl ::std::default::Default for {{ m.simple_ident }} {
     fn default() -> Self {
-        Self {        
-            {%- for field in m.fields %}
-            {%- if !field.is_explicit_oneof_field %}
-            {%- if field.has_default_value %}
-            {%- if field.is_length_delimited %}
-            {%- if field.is_bytes %}
-            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}.to_vec()),
-            {%- endif %}
-            {%- if field.is_string %}
-            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}.to_string()),
-            {%- endif %}
-            {%- else %}
-            {{ field.ident }}: ::std::option::Option::Some({{ field.default_value }}),
-            {%- endif %}
-            {%- else %}
-            {{ field.ident }}: ::std::default::Default::default(),
-            {%- endif %}
-            {%- endif %}
-            {%- endfor %}
-
-            {%- for oneof in m.oneofs %}
-            {{ oneof.field_ident }}: ::std::default::Default::default(),
-            {%- endfor %}
-        }
+        Self::new()
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::puroro::bumpalo::Bump;
 use ::puroro::Message;
 use ::std::io::Read;
 
@@ -23,6 +24,19 @@ fn test_owned() {
     assert_eq!(1, t1.a());
 
     let mut t3 = Test3BumpaloOwned::new();
+    t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
+    assert_eq!(1, t3.c().a());
+}
+
+#[test]
+fn test_ref() {
+    use ::tests_pb::official_samples3::*;
+    let bump = Bump::new();
+    let mut t1 = Test1Bumpalo::new_in(&bump);
+    t1.merge_from_bytes([0x08, 0x01].bytes());
+    assert_eq!(1, t1.a());
+
+    let mut t3 = Test3Bumpalo::new_in(&bump);
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 }
