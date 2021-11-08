@@ -15,10 +15,14 @@
 use ::puroro::bumpalo::Bump;
 use ::puroro::Message;
 use ::std::io::Read;
+use ::tests_pb::official_samples3::*;
+
+fn is_test1_trait<T: Test1Trait>(t: &T) -> bool {
+    true
+}
 
 #[test]
 fn test_owned() {
-    use ::tests_pb::official_samples3::*;
     let mut t1 = Test1BumpaloOwned::new();
     t1.merge_from_bytes([0x08, 0x01].bytes());
     assert_eq!(1, t1.a());
@@ -26,11 +30,12 @@ fn test_owned() {
     let mut t3 = Test3BumpaloOwned::new();
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
+
+    assert!(is_test1_trait(&t1));
 }
 
 #[test]
 fn test_ref() {
-    use ::tests_pb::official_samples3::*;
     let bump = Bump::new();
     let mut t1 = Test1Bumpalo::new_in(&bump);
     t1.merge_from_bytes([0x08, 0x01].bytes());
@@ -39,4 +44,6 @@ fn test_ref() {
     let mut t3 = Test3Bumpalo::new_in(&bump);
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
+
+    assert!(is_test1_trait(&t1));
 }

@@ -24,6 +24,19 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Msg> for Msg {}
 
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                f32_unlabeled: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             if self.i32_unlabeled == ::std::default::Default::default() {
@@ -243,14 +256,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Msg {
         fn default() -> Self {
-            Self {
-                i32_unlabeled: ::std::default::Default::default(),
-                i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::std::default::Default::default(),
-                f32_unlabeled: ::std::default::Default::default(),
-                string_unlabeled: ::std::default::Default::default(),
-                submsg_unlabeled: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -258,6 +264,14 @@ pub mod _puroro_simple_impl {
         pub i32_unlabeled: i32,
     }
     impl ::puroro::Message<Submsg> for Submsg {}
+
+    impl Submsg {
+        pub fn new() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::SubmsgTrait for Submsg {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
@@ -340,9 +354,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Submsg {
         fn default() -> Self {
-            Self {
-                i32_unlabeled: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -1751,6 +1763,13 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             self.i32_unlabeled_opt()
@@ -1794,6 +1813,13 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: SubmsgTrait,
+    {
+        submsg_delegate!(T);
+    }
+
+    impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
     where
         T: SubmsgTrait,
     {

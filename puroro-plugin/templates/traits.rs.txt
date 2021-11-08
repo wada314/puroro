@@ -159,4 +159,11 @@ where
     {{ m.trait_delegate_macro_ident }}!(T);
 }
 
+impl<T> {{ m.trait_ident }} for ::puroro::BumpaloOwned<T>
+where
+    T: {{ m.trait_ident }}
+{
+    {{ m.trait_delegate_macro_ident }}!(T);
+}
+
 {%- endfor %} {#- for m in messages #}

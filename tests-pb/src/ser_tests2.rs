@@ -32,6 +32,24 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Msg> for Msg {}
 
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                very_large_field_number: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
@@ -383,19 +401,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Msg {
         fn default() -> Self {
-            Self {
-                i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::std::default::Default::default(),
-                float_optional: ::std::default::Default::default(),
-                float_repeated: ::std::default::Default::default(),
-                string_optional: ::std::default::Default::default(),
-                string_repeated: ::std::default::Default::default(),
-                submsg_optional: ::std::default::Default::default(),
-                submsg_repeated: ::std::default::Default::default(),
-                enum_optional: ::std::default::Default::default(),
-                enum_repeated: ::std::default::Default::default(),
-                very_large_field_number: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -2988,6 +2994,13 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -3053,6 +3066,14 @@ pub mod _puroro_nested {
                 pub i32_optional: ::std::option::Option<i32>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
+
+            impl Submsg {
+                pub fn new() -> Self {
+                    Self {
+                        i32_optional: ::std::default::Default::default(),
+                    }
+                }
+            }
 
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
@@ -3136,9 +3157,7 @@ pub mod _puroro_nested {
 
             impl ::std::default::Default for Submsg {
                 fn default() -> Self {
-                    Self {
-                        i32_optional: ::std::default::Default::default(),
-                    }
+                    Self::new()
                 }
             }
         }
@@ -3431,6 +3450,13 @@ pub mod _puroro_nested {
             }
 
             impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+            where
+                T: SubmsgTrait,
+            {
+                submsg_delegate!(T);
+            }
+
+            impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
             where
                 T: SubmsgTrait,
             {

@@ -16,6 +16,14 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Msg> for Msg {}
 
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                r#type: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::MsgTrait for Msg {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.r#type)
@@ -93,9 +101,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Msg {
         fn default() -> Self {
-            Self {
-                r#type: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -375,6 +381,13 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
+    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
     where
         T: MsgTrait,
     {

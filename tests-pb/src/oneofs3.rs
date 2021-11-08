@@ -31,6 +31,16 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Msg> for Msg {}
 
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                group_one: ::std::default::Default::default(),
+                group_two: ::std::default::Default::default(),
+                group_three: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::MsgTrait for Msg {
         type Field5MessageType<'this>
         where
@@ -324,11 +334,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Msg {
         fn default() -> Self {
-            Self {
-                group_one: ::std::default::Default::default(),
-                group_two: ::std::default::Default::default(),
-                group_three: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -336,6 +342,14 @@ pub mod _puroro_simple_impl {
         pub i32_unlabeled: i32,
     }
     impl ::puroro::Message<Submsg> for Submsg {}
+
+    impl Submsg {
+        pub fn new() -> Self {
+            Self {
+                i32_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::SubmsgTrait for Submsg {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
@@ -418,9 +432,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Submsg {
         fn default() -> Self {
-            Self {
-                i32_unlabeled: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -2096,6 +2108,13 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             self.i32_unlabeled_opt()
@@ -2139,6 +2158,13 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: SubmsgTrait,
+    {
+        submsg_delegate!(T);
+    }
+
+    impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
     where
         T: SubmsgTrait,
     {
@@ -2288,6 +2314,20 @@ pub mod _puroro_nested {
             }
             impl<'msg, 'bump, IsOwned, T> ::std::convert::From<GroupTwo<'msg, IsOwned, T>>
                 for GroupTwo<'msg, IsOwned, ::puroro::bumpalo::boxed::Box<'bump, T>>
+            where
+                IsOwned: ::puroro::internal::bool::BoolType,
+                T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupTwo<'msg, IsOwned, T>) -> Self {
+                    match value {
+                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
+                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
+                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
+                    }
+                }
+            }
+            impl<'msg, 'bump, IsOwned, T> ::std::convert::From<GroupTwo<'msg, IsOwned, T>>
+                for GroupTwo<'msg, IsOwned, ::puroro::BumpaloOwned<T>>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
                 T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,

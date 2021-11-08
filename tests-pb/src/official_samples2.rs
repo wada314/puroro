@@ -19,6 +19,14 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Test1> for Test1 {}
 
+    impl Test1 {
+        pub fn new() -> Self {
+            Self {
+                a: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::Test1Trait for Test1 {
         fn a_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.a)
@@ -96,9 +104,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test1 {
         fn default() -> Self {
-            Self {
-                a: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -106,6 +112,14 @@ pub mod _puroro_simple_impl {
         pub b: ::std::option::Option<::std::string::String>,
     }
     impl ::puroro::Message<Test2> for Test2 {}
+
+    impl Test2 {
+        pub fn new() -> Self {
+            Self {
+                b: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::Test2Trait for Test2 {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
@@ -184,9 +198,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test2 {
         fn default() -> Self {
-            Self {
-                b: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -196,6 +208,14 @@ pub mod _puroro_simple_impl {
         >,
     }
     impl ::puroro::Message<Test3> for Test3 {}
+
+    impl Test3 {
+        pub fn new() -> Self {
+            Self {
+                c: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::Test3Trait for Test3 {
         type Field3MessageType<'this>
@@ -285,9 +305,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test3 {
         fn default() -> Self {
-            Self {
-                c: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -295,6 +313,14 @@ pub mod _puroro_simple_impl {
         pub d: ::std::vec::Vec<i32>,
     }
     impl ::puroro::Message<Test4> for Test4 {}
+
+    impl Test4 {
+        pub fn new() -> Self {
+            Self {
+                d: ::std::default::Default::default(),
+            }
+        }
+    }
 
     impl super::_puroro_traits::Test4Trait for Test4 {
         type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -371,9 +397,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Test4 {
         fn default() -> Self {
-            Self {
-                d: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -1415,6 +1439,13 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
+
+    impl<T> Test1Trait for ::puroro::BumpaloOwned<T>
+    where
+        T: Test1Trait,
+    {
+        test1_delegate!(T);
+    }
     pub trait Test2Trait {
         fn b<'this>(&'this self) -> &'this str {
             self.b_opt()
@@ -1458,6 +1489,13 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> Test2Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test2Trait,
+    {
+        test2_delegate!(T);
+    }
+
+    impl<T> Test2Trait for ::puroro::BumpaloOwned<T>
     where
         T: Test2Trait,
     {
@@ -1517,6 +1555,13 @@ pub mod _puroro_traits {
     {
         test3_delegate!(T);
     }
+
+    impl<T> Test3Trait for ::puroro::BumpaloOwned<T>
+    where
+        T: Test3Trait,
+    {
+        test3_delegate!(T);
+    }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
@@ -1559,6 +1604,13 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> Test4Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: Test4Trait,
+    {
+        test4_delegate!(T);
+    }
+
+    impl<T> Test4Trait for ::puroro::BumpaloOwned<T>
     where
         T: Test4Trait,
     {
