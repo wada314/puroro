@@ -12473,7 +12473,10 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
-    _optional_bits: [u8; (30 + 7) / 8],
+    _bitfield: ::puroro::bitvec::array::BitArray<
+        ::puroro::bitvec::order::Lsb0,
+        [u32; (30) + 31 / 32],
+    >,
     pub i32_required: i32,
     pub i32_optional: i32,
     pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
@@ -12530,7 +12533,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
                 i32_required: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
                 i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
@@ -12546,8 +12549,8 @@ pub mod _puroro_impls {
                 enum_required: ::std::default::Default::default(),
                 enum_optional: ::std::default::Default::default(),
                 enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                submsg_required: ::std::default::Default::default(),
-                submsg_optional: ::std::default::Default::default(),
+                submsg_required: ::std::option::Option::None,
+                submsg_optional: ::std::option::Option::None,
                 submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 i64_required: ::std::default::Default::default(),
                 i64_optional: ::std::default::Default::default(),
@@ -12593,14 +12596,14 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_required_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+            if self._bitfield.get(0).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 1) {
+            if self._bitfield.get(1).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
             } else {
                 ::std::option::Option::None
@@ -12615,14 +12618,14 @@ pub mod _puroro_impls {
             self.i32_repeated.iter().cloned()
         }
         fn float_required_opt<'this>(&'this self) -> Option<f32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 2) {
+            if self._bitfield.get(2).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 3) {
+            if self._bitfield.get(3).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_optional))
             } else {
                 ::std::option::Option::None
@@ -12637,14 +12640,14 @@ pub mod _puroro_impls {
             self.float_repeated.iter().cloned()
         }
         fn bytes_required_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 4) {
+            if self._bitfield.get(4).map_or(false, |b| *b) {
                 ::std::option::Option::Some(self.bytes_required.as_ref())
             } else {
                 ::std::option::Option::None
             }
         }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 5) {
+            if self._bitfield.get(5).map_or(false, |b| *b) {
                 ::std::option::Option::Some(self.bytes_optional.as_ref())
             } else {
                 ::std::option::Option::None
@@ -12662,14 +12665,14 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
         }
         fn string_required_opt<'this>(&'this self) -> Option<&'this str> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 6) {
+            if self._bitfield.get(6).map_or(false, |b| *b) {
                 ::std::option::Option::Some(self.string_required.as_ref())
             } else {
                 ::std::option::Option::None
             }
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 7) {
+            if self._bitfield.get(7).map_or(false, |b| *b) {
                 ::std::option::Option::Some(self.string_optional.as_ref())
             } else {
                 ::std::option::Option::None
@@ -12689,7 +12692,7 @@ pub mod _puroro_impls {
         fn enum_required_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 8) {
+            if self._bitfield.get(8).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_required))
             } else {
                 ::std::option::Option::None
@@ -12698,7 +12701,7 @@ pub mod _puroro_impls {
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 9) {
+            if self._bitfield.get(9).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_optional))
             } else {
                 ::std::option::Option::None
@@ -12730,14 +12733,14 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 10) {
+            if self._bitfield.get(10).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 11) {
+            if self._bitfield.get(11).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_optional))
             } else {
                 ::std::option::Option::None
@@ -12752,14 +12755,14 @@ pub mod _puroro_impls {
             self.i64_repeated.iter().cloned()
         }
         fn u32_required_opt<'this>(&'this self) -> Option<u32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 12) {
+            if self._bitfield.get(12).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 13) {
+            if self._bitfield.get(13).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_optional))
             } else {
                 ::std::option::Option::None
@@ -12774,14 +12777,14 @@ pub mod _puroro_impls {
             self.u32_repeated.iter().cloned()
         }
         fn u64_required_opt<'this>(&'this self) -> Option<u64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 14) {
+            if self._bitfield.get(14).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 15) {
+            if self._bitfield.get(15).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_optional))
             } else {
                 ::std::option::Option::None
@@ -12796,14 +12799,14 @@ pub mod _puroro_impls {
             self.u64_repeated.iter().cloned()
         }
         fn s32_required_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 16) {
+            if self._bitfield.get(16).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 17) {
+            if self._bitfield.get(17).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_optional))
             } else {
                 ::std::option::Option::None
@@ -12818,14 +12821,14 @@ pub mod _puroro_impls {
             self.s32_repeated.iter().cloned()
         }
         fn s64_required_opt<'this>(&'this self) -> Option<i64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 18) {
+            if self._bitfield.get(18).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 19) {
+            if self._bitfield.get(19).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_optional))
             } else {
                 ::std::option::Option::None
@@ -12840,14 +12843,14 @@ pub mod _puroro_impls {
             self.s64_repeated.iter().cloned()
         }
         fn fixed32_required_opt<'this>(&'this self) -> Option<u32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 20) {
+            if self._bitfield.get(20).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 21) {
+            if self._bitfield.get(21).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_optional))
             } else {
                 ::std::option::Option::None
@@ -12862,14 +12865,14 @@ pub mod _puroro_impls {
             self.fixed32_repeated.iter().cloned()
         }
         fn fixed64_required_opt<'this>(&'this self) -> Option<u64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 22) {
+            if self._bitfield.get(22).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 23) {
+            if self._bitfield.get(23).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_optional))
             } else {
                 ::std::option::Option::None
@@ -12884,14 +12887,14 @@ pub mod _puroro_impls {
             self.fixed64_repeated.iter().cloned()
         }
         fn sfixed32_required_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 24) {
+            if self._bitfield.get(24).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 25) {
+            if self._bitfield.get(25).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_optional))
             } else {
                 ::std::option::Option::None
@@ -12906,14 +12909,14 @@ pub mod _puroro_impls {
             self.sfixed32_repeated.iter().cloned()
         }
         fn sfixed64_required_opt<'this>(&'this self) -> Option<i64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 26) {
+            if self._bitfield.get(26).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 27) {
+            if self._bitfield.get(27).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_optional))
             } else {
                 ::std::option::Option::None
@@ -12928,14 +12931,14 @@ pub mod _puroro_impls {
             self.sfixed64_repeated.iter().cloned()
         }
         fn f64_required_opt<'this>(&'this self) -> Option<f64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 28) {
+            if self._bitfield.get(28).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_required))
             } else {
                 ::std::option::Option::None
             }
         }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 29) {
+            if self._bitfield.get(29).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_optional))
             } else {
                 ::std::option::Option::None
@@ -13581,7 +13584,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: self._optional_bits,
+                _bitfield: self._bitfield,
                 i32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                     &self.i32_required,
                     bump,
@@ -15774,7 +15777,10 @@ pub mod _puroro_nested {
             #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
-                _optional_bits: [u8; (2 + 7) / 8],
+                _bitfield: ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (2) + 31 / 32],
+                >,
                 pub i32_required: i32,
                 pub i64_required: i64,
             }
@@ -15785,7 +15791,7 @@ pub mod _puroro_nested {
                 pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
-                        _optional_bits: ::std::default::Default::default(),
+                        _bitfield: ::std::default::Default::default(),
                         i32_required: ::std::default::Default::default(),
                         i64_required: ::std::default::Default::default(),
                     }
@@ -15802,14 +15808,14 @@ pub mod _puroro_nested {
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_required_opt<'this>(&'this self) -> Option<i32> {
-                    if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                    if self._bitfield.get(0).map_or(false, |b| *b) {
                         ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_required))
                     } else {
                         ::std::option::Option::None
                     }
                 }
                 fn i64_required_opt<'this>(&'this self) -> Option<i64> {
-                    if ::puroro::internal::check_optional_bit(&self._optional_bits, 1) {
+                    if self._bitfield.get(1).map_or(false, |b| *b) {
                         ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_required))
                     } else {
                         ::std::option::Option::None
@@ -15889,7 +15895,7 @@ pub mod _puroro_nested {
                 fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
-                        _optional_bits: self._optional_bits,
+                        _bitfield: self._bitfield,
                         i32_required: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                             &self.i32_required,
                             bump,

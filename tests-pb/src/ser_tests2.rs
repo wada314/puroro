@@ -2187,7 +2187,8 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (5 + 7) / 8],
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5) + 31 / 32]>,
         pub i32_optional: i32,
         pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
         pub float_optional: f32,
@@ -2223,14 +2224,14 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
                 i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 float_optional: ::std::default::Default::default(),
                 float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 string_optional: ::puroro::bumpalo::collections::String::new_in(bump),
                 string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                submsg_optional: ::std::default::Default::default(),
+                submsg_optional: ::std::option::Option::None,
                 submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 enum_optional: ::std::default::Default::default(),
                 enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
@@ -2249,7 +2250,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+            if self._bitfield.get(0).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
             } else {
                 ::std::option::Option::None
@@ -2264,7 +2265,7 @@ pub mod _puroro_impls {
             self.i32_repeated.iter().cloned()
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 1) {
+            if self._bitfield.get(1).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_optional))
             } else {
                 ::std::option::Option::None
@@ -2279,7 +2280,7 @@ pub mod _puroro_impls {
             self.float_repeated.iter().cloned()
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 2) {
+            if self._bitfield.get(2).map_or(false, |b| *b) {
                 ::std::option::Option::Some(self.string_optional.as_ref())
             } else {
                 ::std::option::Option::None
@@ -2330,7 +2331,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 3) {
+            if self._bitfield.get(3).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_optional))
             } else {
                 ::std::option::Option::None
@@ -2345,7 +2346,7 @@ pub mod _puroro_impls {
             self.enum_repeated.iter().cloned()
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 4) {
+            if self._bitfield.get(4).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(
                     &self.very_large_field_number,
                 ))
@@ -2537,7 +2538,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: self._optional_bits,
+                _bitfield: self._bitfield,
                 i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                     &self.i32_optional,
                     bump,
@@ -3299,7 +3300,10 @@ pub mod _puroro_nested {
             #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
-                _optional_bits: [u8; (1 + 7) / 8],
+                _bitfield: ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (1) + 31 / 32],
+                >,
                 pub i32_optional: i32,
             }
 
@@ -3309,7 +3313,7 @@ pub mod _puroro_nested {
                 pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
-                        _optional_bits: ::std::default::Default::default(),
+                        _bitfield: ::std::default::Default::default(),
                         i32_optional: ::std::default::Default::default(),
                     }
                 }
@@ -3325,7 +3329,7 @@ pub mod _puroro_nested {
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-                    if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                    if self._bitfield.get(0).map_or(false, |b| *b) {
                         ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
                     } else {
                         ::std::option::Option::None
@@ -3390,7 +3394,7 @@ pub mod _puroro_nested {
                 fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
-                        _optional_bits: self._optional_bits,
+                        _bitfield: self._bitfield,
                         i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                             &self.i32_optional,
                             bump,

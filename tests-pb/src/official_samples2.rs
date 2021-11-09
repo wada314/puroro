@@ -511,7 +511,8 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (1 + 7) / 8],
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1) + 31 / 32]>,
         pub a: i32,
     }
 
@@ -521,7 +522,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
         }
@@ -537,7 +538,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+            if self._bitfield.get(0).map_or(false, |b| *b) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
             } else {
                 ::std::option::Option::None
@@ -597,7 +598,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: self._optional_bits,
+                _bitfield: self._bitfield,
                 a: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.a, bump),
             }
         }
@@ -732,7 +733,8 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (1 + 7) / 8],
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1) + 31 / 32]>,
         pub b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
@@ -742,7 +744,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
                 b: ::puroro::bumpalo::collections::String::new_in(bump),
             }
         }
@@ -758,7 +760,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+            if self._bitfield.get(0).map_or(false, |b| *b) {
                 ::std::option::Option::Some(self.b.as_ref())
             } else {
                 ::std::option::Option::None
@@ -818,7 +820,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: self._optional_bits,
+                _bitfield: self._bitfield,
                 b: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.b, bump),
             }
         }
@@ -993,7 +995,8 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (0 + 7) / 8],
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
         pub c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -1008,8 +1011,8 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: ::std::default::Default::default(),
-                c: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
+                c: ::std::option::Option::None,
             }
         }
     }
@@ -1096,7 +1099,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: self._optional_bits,
+                _bitfield: self._bitfield,
                 c: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.c, bump),
             }
         }
@@ -1286,7 +1289,8 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test4Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (0 + 7) / 8],
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
         pub d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
 
@@ -1296,7 +1300,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
                 d: ::puroro::bumpalo::collections::Vec::new_in(bump),
             }
         }
@@ -1369,7 +1373,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                _optional_bits: self._optional_bits,
+                _bitfield: self._bitfield,
                 d: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.d, bump),
             }
         }
