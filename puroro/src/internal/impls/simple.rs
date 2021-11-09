@@ -270,6 +270,7 @@ pub trait VecOrOptionOrBare<T> {
         F: FnOnce() -> T;
     type Iter<'a>: Iterator<Item = &'a T>
     where
+        Self: 'a,
         T: 'a;
     fn iter(&self) -> Self::Iter<'_>;
 }
