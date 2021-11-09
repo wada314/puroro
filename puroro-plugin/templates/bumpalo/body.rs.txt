@@ -1,6 +1,7 @@
 #[derive(::std::fmt::Debug)]
 pub struct {{ m.bumpalo_ident }}<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
+    _optional_bits: [u8; ({{ m.optional_bits_len }} + 7) / 8],
 
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
@@ -24,6 +25,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         Self {
             _bump: bump,
+            _optional_bits: ::std::default::Default::default(),
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             {%- if field.is_repeated %}
@@ -189,6 +191,7 @@ impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ m.bum
     fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         Self { 
             _bump: bump,
+            _optional_bits: self._optional_bits,
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             {{ field.ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ field.ident }}, bump),

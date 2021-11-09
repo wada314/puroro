@@ -519,6 +519,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
+        _optional_bits: [u8; (0 + 7) / 8],
         pub a: i32,
     }
 
@@ -528,6 +529,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
         }
@@ -603,6 +605,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: self._optional_bits,
                 a: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.a, bump),
             }
         }
@@ -737,6 +740,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
+        _optional_bits: [u8; (0 + 7) / 8],
         pub b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
@@ -746,6 +750,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: ::std::default::Default::default(),
                 b: ::puroro::bumpalo::collections::String::new_in(bump),
             }
         }
@@ -821,6 +826,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: self._optional_bits,
                 b: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.b, bump),
             }
         }
@@ -995,6 +1001,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
+        _optional_bits: [u8; (1 + 7) / 8],
         pub c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -1009,6 +1016,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: ::std::default::Default::default(),
                 c: ::std::default::Default::default(),
             }
         }
@@ -1096,6 +1104,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: self._optional_bits,
                 c: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.c, bump),
             }
         }
@@ -1285,6 +1294,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test4Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
+        _optional_bits: [u8; (0 + 7) / 8],
         pub d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
 
@@ -1294,6 +1304,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: ::std::default::Default::default(),
                 d: ::puroro::bumpalo::collections::Vec::new_in(bump),
             }
         }
@@ -1366,6 +1377,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: self._optional_bits,
                 d: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.d, bump),
             }
         }

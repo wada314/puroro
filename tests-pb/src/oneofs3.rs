@@ -1264,6 +1264,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
+        _optional_bits: [u8; (9 + 7) / 8],
         pub group_one: ::std::option::Option<
             super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne<'bump>,
         >,
@@ -1280,6 +1281,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: ::std::default::Default::default(),
                 group_one: ::std::option::Option::None,
                 group_two: ::std::option::Option::None,
                 group_three: ::std::option::Option::None,
@@ -1551,6 +1553,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: self._optional_bits,
                 group_one: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                     &self.group_one,
                     bump,
@@ -1766,6 +1769,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
+        _optional_bits: [u8; (0 + 7) / 8],
         pub i32_unlabeled: i32,
     }
 
@@ -1775,6 +1779,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
             }
         }
@@ -1850,6 +1855,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: self._optional_bits,
                 i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                     &self.i32_unlabeled,
                     bump,

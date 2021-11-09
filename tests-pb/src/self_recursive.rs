@@ -274,6 +274,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
+        _optional_bits: [u8; (1 + 7) / 8],
         pub recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -288,6 +289,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: ::std::default::Default::default(),
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }
@@ -377,6 +379,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _optional_bits: self._optional_bits,
                 recursive_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                     &self.recursive_unlabeled,
                     bump,
