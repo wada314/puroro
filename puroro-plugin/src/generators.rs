@@ -69,7 +69,7 @@ struct Message {
     fields: Vec<Field>,
     fields_len: usize,
     oneofs: Vec<Oneof>,
-    optional_bits_len: i32,
+    bitfield_len: i32,
     simple_ident: String,
     single_field_ident: String,
     bumpalo_ident: String,
@@ -79,18 +79,18 @@ struct Message {
 
 impl Message {
     fn try_new(m: &wrappers::Message) -> Result<Self> {
-        let mut optional_bit_index = 0;
+        let mut bitfield_index = 0;
         let fields: Vec<Field> = m
             .fields()
             .into_iter()
-            .map(|f| Field::try_new(f, &mut optional_bit_index))
+            .map(|f| Field::try_new(f, &mut bitfield_index))
             .try_collect()?;
         let fields_len = fields.len();
         let oneofs = m
             .oneofs()
             .into_iter()
             .filter(|o| matches!(o.is_synthetic(), Ok(false)))
-            .map(|o| Oneof::try_new(o, &mut optional_bit_index))
+            .map(|o| Oneof::try_new(o, &mut bitfield_index))
             .try_collect()?;
         let nested_messages = m
             .nested_messages()
@@ -115,7 +115,7 @@ impl Message {
             fields,
             fields_len,
             oneofs,
-            optional_bits_len: optional_bit_index,
+            bitfield_len: bitfield_index,
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
             bumpalo_ident: m.rust_impl_ident("Bumpalo"),
@@ -188,7 +188,7 @@ struct Field {
     has_default_value: bool,
     default_value: String,
     has_optional_bit: bool,
-    optional_bit_index: i32,
+    bitfield_index: i32,
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
     trait_label_and_type_tags: String,
@@ -208,7 +208,7 @@ struct Field {
 }
 
 impl Field {
-    fn try_new(f: &wrappers::Field, optional_bit_index: &mut i32) -> Result<Self> {
+    fn try_new(f: &wrappers::Field, bitfield_index: &mut i32) -> Result<Self> {
         let trait_maybe_field_message_trait_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_trait_path())
@@ -258,10 +258,10 @@ impl Field {
                 .transpose()?
                 .unwrap_or(Default::default()),
             has_optional_bit,
-            optional_bit_index: {
+            bitfield_index: {
                 if has_optional_bit {
-                    let i = *optional_bit_index;
-                    *optional_bit_index += 1;
+                    let i = *bitfield_index;
+                    *bitfield_index += 1;
                     i
                 } else {
                     -1
@@ -442,12 +442,12 @@ struct Oneof {
     fields: Vec<OneofField>,
     has_ld_field: bool,
     has_message_field: bool,
-    optional_bit_index: i32,
+    bitfield_index: i32,
     owner_message_trait_path: String,
 }
 
 impl Oneof {
-    fn try_new(o: &wrappers::Oneof, optional_bit_index: &mut i32) -> Result<Self> {
+    fn try_new(o: &wrappers::Oneof, bitfield_index: &mut i32) -> Result<Self> {
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
@@ -470,9 +470,9 @@ impl Oneof {
                 .fields()?
                 .into_iter()
                 .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_)))),
-            optional_bit_index: {
-                let i = *optional_bit_index;
-                *optional_bit_index += 1;
+            bitfield_index: {
+                let i = *bitfield_index;
+                *bitfield_index += 1;
                 i
             },
             owner_message_trait_path: o.message()?.rust_trait_path(),

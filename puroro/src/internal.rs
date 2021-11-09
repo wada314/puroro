@@ -22,7 +22,9 @@ pub mod variant;
 
 use crate::desc::{FieldDescriptor, MessageDescriptor};
 use crate::once_cell::sync::Lazy;
-use ::bitvec::prelude::*;
+use ::bitvec::order::BitOrder;
+use ::bitvec::slice::BitSlice;
+use ::bitvec::store::BitStore;
 
 // Limitation: BITS_LEN <= 29, the return value is always positive or 0.
 // Can express a field number index (<= 2^29-1).
@@ -91,6 +93,9 @@ pub fn init_field_descriptor(init: FieldDescriptorInitializer) -> FieldDescripto
 
 #[test]
 fn test_get_bitvec_range() {
+    use crate::bitvec::array::BitArray;
+    use crate::bitvec::order::Lsb0;
+
     let all_1: BitArray<Lsb0, [u8; 4]> = [0xffu8; 4].into();
     let bytes_33: BitArray<Lsb0, [u8; 4]> = [0x33u8; 4].into();
     let bytes_cc: BitArray<Lsb0, [u8; 4]> = [0xccu8; 4].into();
