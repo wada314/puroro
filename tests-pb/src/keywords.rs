@@ -30,32 +30,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Msg {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "type",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Msg",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Msg {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Msg {
         fn deser_field<I>(

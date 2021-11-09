@@ -37,32 +37,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test1 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "a",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test1 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test1",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test1 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test1 {
         fn deser_field<I>(
@@ -135,32 +110,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test2 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "b",
-                            number: 2,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test2 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test2",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test2 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test2 {
         fn deser_field<I>(
@@ -235,32 +185,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test3 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "c",
-                            number: 3,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test3 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test3",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test3 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test3 {
         fn deser_field<I>(
@@ -338,32 +263,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test4 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "d",
-                            number: 4,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test4 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test4",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test4 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test4 {
         fn deser_field<I>(
