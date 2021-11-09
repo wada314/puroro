@@ -191,7 +191,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         r#type: i32,
     }
 
@@ -203,6 +203,14 @@ pub mod _puroro_impls {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
+            }
+        }
+
+        pub fn type_opt<'this>(&'this self) -> Option<i32> {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.r#type))
+            } else {
+                ::std::option::Option::None
             }
         }
     }

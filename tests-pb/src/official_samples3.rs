@@ -420,7 +420,7 @@ pub mod _puroro_impls {
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         a: i32,
     }
 
@@ -433,6 +433,10 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
+        }
+
+        pub fn a_opt<'this>(&'this self) -> Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
         }
     }
 
@@ -640,7 +644,7 @@ pub mod _puroro_impls {
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
@@ -653,6 +657,12 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 b: ::puroro::bumpalo::collections::String::new_in(bump),
             }
+        }
+
+        pub fn b_opt<'this>(
+            &'this self,
+        ) -> Option<&'this ::puroro::bumpalo::collections::String<'bump>> {
+            ::std::option::Option::Some(&self.b)
         }
     }
 
@@ -900,7 +910,7 @@ pub mod _puroro_impls {
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -918,6 +928,13 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 c: ::std::option::Option::None,
             }
+        }
+
+        pub fn c_opt<'this>(
+            &'this self,
+        ) -> Option<&'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'bump>>
+        {
+            self.c.as_ref().map(|b| b.as_ref())
         }
     }
 
@@ -1194,7 +1211,7 @@ pub mod _puroro_impls {
     pub struct Test4Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
 
@@ -1207,6 +1224,9 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 d: ::puroro::bumpalo::collections::Vec::new_in(bump),
             }
+        }
+        pub fn d<'this>(&'this self) -> &'this ::puroro::bumpalo::collections::Vec<'bump, i32> {
+            &self.d
         }
     }
 

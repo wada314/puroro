@@ -1159,7 +1159,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
         group_one: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne<'bump>,
         group_two: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo<'bump>,
         group_three: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree<'bump>,
@@ -1648,7 +1648,7 @@ pub mod _puroro_impls {
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         i32_optional: i32,
     }
 
@@ -1660,6 +1660,14 @@ pub mod _puroro_impls {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
+            }
+        }
+
+        pub fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
+            } else {
+                ::std::option::Option::None
             }
         }
     }

@@ -250,7 +250,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -268,6 +268,13 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 recursive_unlabeled: ::std::option::Option::None,
             }
+        }
+
+        pub fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<&'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>>
+        {
+            self.recursive_unlabeled.as_ref().map(|b| b.as_ref())
         }
     }
 

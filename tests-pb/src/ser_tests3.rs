@@ -2081,7 +2081,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
-            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         i32_unlabeled: i32,
         i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
         float_unlabeled: f32,
@@ -2130,6 +2130,70 @@ pub mod _puroro_impls {
                 enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 very_large_field_number: ::std::default::Default::default(),
             }
+        }
+
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+        }
+        pub fn i32_repeated<'this>(
+            &'this self,
+        ) -> &'this ::puroro::bumpalo::collections::Vec<'bump, i32> {
+            &self.i32_repeated
+        }
+
+        pub fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
+        }
+        pub fn float_repeated<'this>(
+            &'this self,
+        ) -> &'this ::puroro::bumpalo::collections::Vec<'bump, f32> {
+            &self.float_repeated
+        }
+
+        pub fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<&'this ::puroro::bumpalo::collections::String<'bump>> {
+            ::std::option::Option::Some(&self.string_unlabeled)
+        }
+        pub fn string_repeated<'this>(
+            &'this self,
+        ) -> &'this ::puroro::bumpalo::collections::Vec<
+            'bump,
+            ::puroro::bumpalo::collections::String<'bump>,
+        > {
+            &self.string_repeated
+        }
+
+    pub fn submsg_unlabeled_opt<'this>(&'this self) -> Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>
+    >
+    {
+            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
+        }
+        pub fn submsg_repeated<'this>(
+            &'this self,
+        ) -> &'this ::puroro::bumpalo::collections::Vec<
+            'bump,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'bump,
+            >,
+        > {
+            &self.submsg_repeated
+        }
+
+        pub fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::ser_tests3::Enum> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
+        }
+        pub fn enum_repeated<'this>(
+            &'this self,
+        ) -> &'this ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::ser_tests3::Enum>
+        {
+            &self.enum_repeated
+        }
+
+        pub fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.very_large_field_number))
         }
     }
 
@@ -3171,7 +3235,7 @@ pub mod _puroro_nested {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 _bitfield: ::puroro::bitvec::array::BitArray<
                     ::puroro::bitvec::order::Lsb0,
-                    [u32; (0) + 31 / 32],
+                    [u32; (0 + 31) / 32],
                 >,
                 i32_unlabeled: i32,
             }
@@ -3185,6 +3249,10 @@ pub mod _puroro_nested {
                         _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
                     }
+                }
+
+                pub fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
                 }
             }
 

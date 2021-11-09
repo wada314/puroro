@@ -3,7 +3,7 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
     _bitfield: ::puroro::bitvec::array::BitArray<
         ::puroro::bitvec::order::Lsb0,
-        [u32; ({{ m.bitfield_len }}) + 31 / 32],
+        [u32; ({{ m.bitfield_len }} + 31) / 32],
     >,
 
     {%- for field in m.fields %}
@@ -53,6 +53,55 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             {%- endfor %}
         }
     }
+
+    {%- for f in m.fields %}
+    {%- if f.is_repeated %}
+    pub fn {{ f.ident }}<'this>(&'this self) -> &'this {{ f.bumpalo_field_type }} {
+        &self.{{ f.ident }}
+    }
+    {%- else %} {#- if f.is_repeated #}
+    {%- if !f.is_explicit_oneof_field %}
+
+    pub fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<
+        {%- if f.is_length_delimited %}&'this {%- endif %} {{ f.bumpalo_scalar_field_type }}
+    >
+    {
+        {%- if f.has_optional_bit %}
+
+        if ::puroro::internal::get_bitvec_bit(&self._bitfield, {{ f.bitfield_index }}) {
+        ::std::option::Option::Some(
+            {%- if f.is_length_delimited %}
+            &self.{{ f.ident }}
+            {%- else %}
+            ::std::clone::Clone::clone(&self.{{ f.ident }})
+            {%- endif %}
+        )
+        } else {
+            ::std::option::Option::None
+        }
+
+        {%- else %} {#- if f.has_optional_bit #}
+        {%- if f.is_message %}
+
+        self.{{ f.ident }}.as_ref().map(|b| b.as_ref())
+
+        {%- else %} {#- if f.is_message #}
+
+        ::std::option::Option::Some(
+            {%- if f.is_length_delimited %}
+            &self.{{ f.ident }}
+            {%- else %}
+            ::std::clone::Clone::clone(&self.{{ f.ident }})
+            {%- endif %}
+        )
+
+        {%- endif %} {#- if f.is_message #}
+        {%- endif %} {#- if f.has_optional_bit #}
+    }
+
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
+    {%- endif %} {#- if f.is_repeated #}
+    {%- endfor %} {#- for f in m.field #}
 }
 
 impl<'bump> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {}
