@@ -559,12 +559,15 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.a, data, &self._bump),
+                1 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.a, data, &self._bump)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -781,12 +784,15 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.b, data, &self._bump),
+                2 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.b, data, &self._bump)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -1338,9 +1344,11 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.d, data, &self._bump),
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.d, data, &self._bump)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }

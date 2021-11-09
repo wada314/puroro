@@ -117,9 +117,14 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
         match field_number {
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
-            {{ field.number }} => DeserFieldFromBytesIter::<
-                {{ field.bumpalo_label_and_type_tags }}
-            >::deser_field(&mut self.{{ field.ident }}, data, &self._bump),
+            {{ field.number }} => {
+                {%- if field.has_optional_bit %}
+                self._bitfield.set({{ field.bitfield_index }}, true);
+                {%- endif %}
+                DeserFieldFromBytesIter::<
+                    {{ field.bumpalo_label_and_type_tags }}
+                >::deser_field(&mut self.{{ field.ident }}, data, &self._bump)
+            }
             {%- endif %}
             {%- endfor %}
 
