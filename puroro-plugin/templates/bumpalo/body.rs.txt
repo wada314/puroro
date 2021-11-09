@@ -8,12 +8,12 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
 
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
-    pub {{ field.ident }}: {{ field.bumpalo_field_type }},
+    {{ field.ident }}: {{ field.bumpalo_field_type }},
     {%- endif %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
-    pub {{ oneof.field_ident }}: 
+    {{ oneof.field_ident }}: 
         super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }}
         {%- if oneof.has_ld_field %}
         <'bump>
@@ -53,7 +53,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             {%- endfor %} {#- for field in m.fields #}
 
             {%- for oneof in m.oneofs %}
-            {{ oneof.field_ident }}: ::std::option::Option::None,
+            {{ oneof.field_ident }}: ::std::default::Default::default(),
             {%- endfor %}
         }
     }
@@ -85,20 +85,24 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
             {%- endif %}
         >
     {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_union_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        if ::puroro::internal::get_bitvec_bit(&self._bitfield, {{ oneof.bitfield_index }}) {
-            ::std::option::Option::Some(match self.{{ oneof.field_ident }} {
-                {%- for field in oneof.fields %}
-                {% if field.is_length_delimited %}
-                E::{{ field.ident }}(v) => F::{{ field.ident }}(v.as_ref()),
-                {%- else %}
-                E::{{ field.ident }}(v) => F::{{ field.ident }}(v.clone()),
-                {%- endif %}
-                {%- endfor %}
-            })
-        } else {
-            ::std::option::Option::None
+        let oneof_index = ::puroro::internal::get_bitvec_range(
+            &self._bitfield, {{ oneof.bitfield_index }}, {{ oneof.bitfield_size }}
+        );
+        match oneof_index {
+            0 => ::std::option::Option::None,
+            {%- for field in oneof.fields %}
+            {{ field.index_1base }} => ::std::option::Option::Some(
+                F::{{ field.ident }}(unsafe { 
+                    {% if field.is_length_delimited %}
+                    &self.{{ oneof.field_ident }}.{{ field.ident }}
+                    {% else %}
+                    self.{{ oneof.field_ident }}.{{ field.ident }}.clone()
+                    {% endif %}
+                })
+            ),
+            {%- endfor %}
         }
     }
     {%- endfor %}

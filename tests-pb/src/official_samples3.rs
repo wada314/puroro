@@ -521,7 +521,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
-        pub a: i32,
+        a: i32,
     }
 
     pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
@@ -741,7 +741,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
-        pub b: ::puroro::bumpalo::collections::String<'bump>,
+        b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
     pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
@@ -1001,7 +1001,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
-        pub c: ::std::option::Option<
+        c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
                 self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'bump>,
@@ -1295,7 +1295,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
-        pub d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
 
     pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;

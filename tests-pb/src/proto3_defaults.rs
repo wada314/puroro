@@ -1052,12 +1052,12 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1) + 31 / 32]>,
-        pub i32_unlabeled: i32,
-        pub i32_optional: i32,
-        pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
-        pub f32_unlabeled: f32,
-        pub string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
-        pub submsg_unlabeled: ::std::option::Option<
+        i32_unlabeled: i32,
+        i32_optional: i32,
+        i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        f32_unlabeled: f32,
+        string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
+        submsg_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
                 self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>,
@@ -1516,7 +1516,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
-        pub i32_unlabeled: i32,
+        i32_unlabeled: i32,
     }
 
     pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;

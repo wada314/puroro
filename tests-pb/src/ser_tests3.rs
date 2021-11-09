@@ -2209,16 +2209,16 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
-        pub i32_unlabeled: i32,
-        pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
-        pub float_unlabeled: f32,
-        pub float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
-        pub string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
-        pub string_repeated: ::puroro::bumpalo::collections::Vec<
+        i32_unlabeled: i32,
+        i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        float_unlabeled: f32,
+        float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
+        string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
+        string_repeated: ::puroro::bumpalo::collections::Vec<
             'bump,
             ::puroro::bumpalo::collections::String<'bump>,
         >,
-        pub submsg_unlabeled: ::std::option::Option<
+        submsg_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
@@ -2226,16 +2226,16 @@ pub mod _puroro_impls {
                 >,
             >,
         >,
-        pub submsg_repeated: ::puroro::bumpalo::collections::Vec<
+        submsg_repeated: ::puroro::bumpalo::collections::Vec<
             'bump,
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                 'bump,
             >,
         >,
-        pub enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
-        pub enum_repeated:
+        enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
+        enum_repeated:
             ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::ser_tests3::Enum>,
-        pub very_large_field_number: i32,
+        very_large_field_number: i32,
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
@@ -3329,7 +3329,7 @@ pub mod _puroro_nested {
                     ::puroro::bitvec::order::Lsb0,
                     [u32; (0) + 31 / 32],
                 >,
-                pub i32_unlabeled: i32,
+                i32_unlabeled: i32,
             }
 
             pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;

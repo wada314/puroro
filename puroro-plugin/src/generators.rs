@@ -437,26 +437,31 @@ impl Field {
 struct Oneof {
     index: i32,
     enum_ident: String,
-    bumpalo_enum_ident: String,
+    bumpalo_union_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
     has_message_field: bool,
     bitfield_index: i32,
+    bitfield_size: i32,
     owner_message_trait_path: String,
 }
 
 impl Oneof {
     fn try_new(o: &wrappers::Oneof, bitfield_index: &mut i32) -> Result<Self> {
+        let field_num = o.fields()?.len();
+        let bitfield_size =
+            (usize::BITS - usize::leading_zeros(field_num + 1 /* +1 for None variant */)) as i32;
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
-            bumpalo_enum_ident: o.rust_enum_ident().to_string(),
+            bumpalo_union_ident: o.rust_enum_ident().to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
                 .into_iter()
-                .map(|f| OneofField::try_new(f))
+                .enumerate()
+                .map(|(index, f)| OneofField::try_new(f, (index + 1) as i32))
                 .try_collect()?,
             has_ld_field: o.fields()?.into_iter().any(|f| {
                 matches!(
@@ -472,9 +477,10 @@ impl Oneof {
                 .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_)))),
             bitfield_index: {
                 let i = *bitfield_index;
-                *bitfield_index += 1;
+                *bitfield_index += bitfield_size;
                 i
             },
+            bitfield_size,
             owner_message_trait_path: o.message()?.rust_trait_path(),
         })
     }
@@ -482,6 +488,7 @@ impl Oneof {
 
 struct OneofField {
     ident: String,
+    index_1base: i32,
     getter_ident: String,
     getter_ident_unesc: String,
     number: i32,
@@ -495,9 +502,10 @@ struct OneofField {
 }
 
 impl OneofField {
-    fn try_new(f: &wrappers::Field) -> Result<Self> {
+    fn try_new(f: &wrappers::Field, index_1base: i32) -> Result<Self> {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
+            index_1base,
             getter_ident: f.rust_ident().to_string(),
             getter_ident_unesc: f.rust_ident_unesc().to_string(),
             number: f.number(),

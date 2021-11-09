@@ -581,6 +581,12 @@ impl Field {
     pub fn is_message(&self) -> Result<bool> {
         Ok(matches!(self.field_type()?, FieldType::Message(_)))
     }
+    pub fn is_length_delimited(&self) -> Result<bool> {
+        Ok(matches!(
+            self.field_type()?,
+            FieldType::Message(_) | FieldType::String | FieldType::Bytes
+        ))
+    }
     pub fn is_optional3(&self) -> bool {
         self.proto_is_optional3
     }
@@ -725,7 +731,7 @@ impl Field {
     }
 
     pub fn bumpalo_oneof_field_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
+        let bare_type = match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::String => "::puroro::bumpalo::collections::String<'bump>".to_string(),
@@ -738,7 +744,12 @@ impl Field {
                 )
             }
             t => t.numerical_rust_type()?.to_string(),
-        })
+        };
+        if self.is_length_delimited()? {
+            Ok(format!("::std::mem::ManuallyDrop<{}>", bare_type))
+        } else {
+            Ok(bare_type)
+        }
     }
 
     pub fn simple_field_type(&self) -> Result<String> {

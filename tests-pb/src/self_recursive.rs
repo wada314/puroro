@@ -276,7 +276,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0) + 31 / 32]>,
-        pub recursive_unlabeled: ::std::option::Option<
+        recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
                 self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,

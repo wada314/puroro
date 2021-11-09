@@ -1,24 +1,23 @@
 
 {%- let maybe_gp %}
+{%- let maybe_gp_args %}
 {%- if oneof.has_ld_field %}
 {%- let maybe_gp = "<'bump>" %}
+{%- let maybe_gp_args = "'bump, " %}
 {%- else %}
 {%- let maybe_gp = "" %}
+{%- let maybe_gp_args = "" %}
 {%- endif %}
 
-#[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub enum {{ oneof.bumpalo_enum_ident }}{{ maybe_gp }} {
+pub(crate) union {{ oneof.bumpalo_union_ident }}{{ maybe_gp }} {
+    _None: (),
     {%- for field in oneof.fields %}
-    {{ field.ident }}({{ field.bumpalo_field_type }}),
+    {{ field.ident }}: {{ field.bumpalo_field_type }},
     {%- endfor %}
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ oneof.bumpalo_enum_ident }}{{ maybe_gp }} {
-    fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        match self {
-            {%- for field in oneof.fields %}
-            Self::{{ field.ident }}(x) => Self::{{field.ident}}(::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump)),
-            {%- endfor %}
-        }
+impl{{ maybe_gp }} ::std::default::Default for {{ oneof.bumpalo_union_ident }}{{ maybe_gp }} {
+    Self {
+        _None: (),
     }
 }
