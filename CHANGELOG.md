@@ -1,3 +1,6 @@
+# v 0.3.1
+- Fixed that the compile does not pass in the latest rustc nightly (1.58).
+
 # v 0.3.0
 - Changed the serializer method to use heap memory
 - Changed the builder's `append_my_i32_field()` methods for numerical types to accept `Into<i32>` types.
