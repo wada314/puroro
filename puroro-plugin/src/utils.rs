@@ -107,3 +107,59 @@ pub fn upgrade<T>(weak: &Weak<T>) -> Result<Rc<T>> {
         detail: "Failed to upgrade a Weak<> pointer.".to_string(),
     })?)
 }
+
+pub fn convert_octal_escape_to_rust_style_escape(input: &str) -> Result<String> {
+    // protoc escapes 0x7F~0xFF character as octal escape "\234".
+    // Rust does not support that style so we need to re-encode it.
+    let mut decoded = Vec::new();
+    let mut bytes = input.bytes();
+    loop {
+        if let Some(c) = bytes.next() {
+            if c == b'\\' {
+                if let Some(d) = bytes.next() {
+                    match d {
+                        b'\\' | b'\"' | b'\'' => {
+                            decoded.push(d);
+                        }
+                        b'r' => decoded.push(b'\r'),
+                        b'n' => decoded.push(b'\n'),
+                        b't' => decoded.push(b'\t'),
+                        _ => {
+                            let e_opt = bytes.next();
+                            let f_opt = bytes.next();
+                            match (d, e_opt, f_opt) {
+                                (
+                                    (b'0'..=b'9'),
+                                    Some(e @ (b'0'..=b'9')),
+                                    Some(f @ (b'0'..=b'9')),
+                                ) => {
+                                    let u8_value = u8::from_str_radix(
+                                        &format!("{}{}{}", d - b'0', e - b'0', f - b'0'),
+                                        8,
+                                    )
+                                    .map_err(|e| ErrorKind::ParseIntError { source: e })?;
+                                    decoded.push(u8_value);
+                                }
+                                _ => Err(ErrorKind::InvalidString {
+                                    string: input.to_string(),
+                                })?,
+                            }
+                        }
+                    }
+                } else {
+                    Err(ErrorKind::InvalidString {
+                        string: input.to_string(),
+                    })?
+                }
+            } else {
+                decoded.push(c);
+            }
+        } else {
+            break;
+        }
+    }
+    Ok(decoded
+        .into_iter()
+        .map(|b| format!(r"\x{:02x}", b))
+        .collect::<String>())
+}

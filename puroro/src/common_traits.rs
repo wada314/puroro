@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::desc::MessageDescriptor;
 use crate::internal::de::from_iter::deser_from_iter;
 use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::se::SerMessageToIoWrite;
@@ -22,16 +21,6 @@ use ::std::io::Write;
 
 /// A common trait for protobuf message implementation in Rust.
 pub trait Message<M> {
-    /// Returns a descriptor of message.
-    /// Though currently the descriptor has almost no items.
-    /// More details may come in future versions.
-    fn descriptor() -> &'static MessageDescriptor
-    where
-        M: MessageRepresentativeImpl,
-    {
-        M::descriptor()
-    }
-
     /// Deserialize the message from input bytes.
     /// This method does not clear the `&mut self` before deserializing.
     /// i.e. This method "merges" the input into `&mut self`.
@@ -120,9 +109,7 @@ where
 {
 }
 
-pub trait MessageRepresentativeImpl {
-    fn descriptor() -> &'static MessageDescriptor;
-}
+pub trait MessageRepresentativeImpl {}
 
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>

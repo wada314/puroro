@@ -206,7 +206,6 @@
 #![feature(type_alias_impl_trait)]
 
 mod common_traits;
-pub mod desc;
 mod error;
 pub mod internal;
 pub mod tags;
@@ -219,7 +218,6 @@ pub type Result<T> = ::std::result::Result<T, PuroroError>;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
-pub use ::once_cell;
 
 use ::std::ops::{Deref, DerefMut};
 
