@@ -12659,7 +12659,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if self._bitfield.get(0).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
             } else {
                 ::std::option::Option::None
@@ -12677,7 +12677,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            if self._bitfield.get(1).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 1) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_optional))
             } else {
                 ::std::option::Option::None
@@ -12695,7 +12695,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
         }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            if self._bitfield.get(2).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 2) {
                 ::std::option::Option::Some(self.bytes_optional.as_ref())
             } else {
                 ::std::option::Option::None
@@ -12716,7 +12716,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            if self._bitfield.get(3).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 3) {
                 ::std::option::Option::Some(self.string_optional.as_ref())
             } else {
                 ::std::option::Option::None
@@ -12741,7 +12741,7 @@ pub mod _puroro_impls {
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
-            if self._bitfield.get(4).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 4) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_optional))
             } else {
                 ::std::option::Option::None
@@ -12776,7 +12776,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
         }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
-            if self._bitfield.get(5).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 5) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_optional))
             } else {
                 ::std::option::Option::None
@@ -12794,7 +12794,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_unlabeled))
         }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
-            if self._bitfield.get(6).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 6) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_optional))
             } else {
                 ::std::option::Option::None
@@ -12812,7 +12812,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_unlabeled))
         }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
-            if self._bitfield.get(7).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 7) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_optional))
             } else {
                 ::std::option::Option::None
@@ -12830,7 +12830,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_unlabeled))
         }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if self._bitfield.get(8).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 8) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_optional))
             } else {
                 ::std::option::Option::None
@@ -12848,7 +12848,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_unlabeled))
         }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
-            if self._bitfield.get(9).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 9) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_optional))
             } else {
                 ::std::option::Option::None
@@ -12866,7 +12866,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_unlabeled))
         }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
-            if self._bitfield.get(10).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 10) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_optional))
             } else {
                 ::std::option::Option::None
@@ -12884,7 +12884,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_unlabeled))
         }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
-            if self._bitfield.get(11).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 11) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_optional))
             } else {
                 ::std::option::Option::None
@@ -12902,7 +12902,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_unlabeled))
         }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if self._bitfield.get(12).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 12) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_optional))
             } else {
                 ::std::option::Option::None
@@ -12920,7 +12920,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_unlabeled))
         }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
-            if self._bitfield.get(13).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 13) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_optional))
             } else {
                 ::std::option::Option::None
@@ -12938,7 +12938,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_unlabeled))
         }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
-            if self._bitfield.get(14).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 14) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_optional))
             } else {
                 ::std::option::Option::None

@@ -32,12 +32,12 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 {%- if !f.is_explicit_oneof_field %}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     {%- if f.has_optional_bit %}
+
     {#-
      # The field type is a bare value type, and an optional bit is available in the bitfield.
      # Maybe wrap the field with Some() depend on the bitfield's optional bit value.
      #}
-
-    if self._bitfield.get({{ f.bitfield_index }}).map_or(false, |b| *b) {
+    if ::puroro::internal::get_bitvec_bit(&self._bitfield, {{ f.bitfield_index }}) {
         ::std::option::Option::Some(
             {%- if f.is_length_delimited %}
             self.{{ f.ident }}.as_ref()

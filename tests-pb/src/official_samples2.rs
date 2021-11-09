@@ -538,7 +538,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            if self._bitfield.get(0).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
             } else {
                 ::std::option::Option::None
@@ -760,7 +760,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            if self._bitfield.get(0).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
                 ::std::option::Option::Some(self.b.as_ref())
             } else {
                 ::std::option::Option::None

@@ -1304,7 +1304,7 @@ pub mod _puroro_impls {
         > {
             use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as F;
-            if ::puroro::internal::check_bitfield(&self._bitfield, 5) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 5) {
                 ::std::option::Option::Some(match self.group_one {
                     E::G1Int32(v) => F::G1Int32(v.clone()),
 
@@ -1325,7 +1325,7 @@ pub mod _puroro_impls {
         > {
             use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as F;
-            if ::puroro::internal::check_bitfield(&self._bitfield, 6) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 6) {
                 ::std::option::Option::Some(match self.group_two {
                     E::G2F32(v) => F::G2F32(v.clone()),
 
@@ -1342,7 +1342,7 @@ pub mod _puroro_impls {
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree as E;
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as F;
-            if ::puroro::internal::check_bitfield(&self._bitfield, 7) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 7) {
                 ::std::option::Option::Some(match self.group_three {
                     E::G3Int32(v) => F::G3Int32(v.clone()),
                 })
@@ -1800,7 +1800,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if self._bitfield.get(0).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
             } else {
                 ::std::option::Option::None

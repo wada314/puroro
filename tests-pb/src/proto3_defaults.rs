@@ -1095,7 +1095,7 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if self._bitfield.get(0).map_or(false, |b| *b) {
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
             } else {
                 ::std::option::Option::None

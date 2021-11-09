@@ -87,7 +87,7 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        if ::puroro::internal::check_bitfield(&self._bitfield, {{ oneof.bitfield_index }}) {        
+        if ::puroro::internal::get_bitvec_bit(&self._bitfield, {{ oneof.bitfield_index }}) {
             ::std::option::Option::Some(match self.{{ oneof.field_ident }} {
                 {%- for field in oneof.fields %}
                 {% if field.is_length_delimited %}
