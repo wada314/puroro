@@ -26,42 +26,50 @@ use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
 use ::bitvec::store::BitStore;
 
-// Limitation: BITS_LEN <= 29, the return value is always positive or 0.
-// Can express a field number index (<= 2^29-1).
-pub fn get_bitvec_range<O, T, const START_BIT: usize, const BITS_LEN: usize>(
-    slice: &BitSlice<O, T>,
-) -> i32
+pub fn get_bitvec_bit<O, T>(slice: &BitSlice<O, T>, index: usize) -> bool
 where
     O: BitOrder,
     T: BitStore,
 {
-    assert!(BITS_LEN <= 29);
+    *slice.get(index).expect("bitvec index out of bound.")
+}
+
+// Limitation: BITS_LEN <= 29, the return value is always positive or 0.
+// Can express a field number index (<= 2^29-1).
+pub fn get_bitvec_range<O, T>(slice: &BitSlice<O, T>, start_bit: usize, bits_len: usize) -> i32
+where
+    O: BitOrder,
+    T: BitStore,
+{
+    debug_assert!(bits_len <= 29);
     let mut result = 0i32;
     // I don't want to optimize this by hand...
-    for i in 0..BITS_LEN {
-        if slice.get(START_BIT + i).map_or(false, |b| *b) {
+    for i in 0..bits_len {
+        if slice.get(start_bit + i).map_or(false, |b| *b) {
             result |= 1 << i;
         }
     }
     result
 }
-pub fn set_bitvec_range<O, T, const START_BIT: usize, const BITS_LEN: usize>(
+pub fn set_bitvec_range<O, T>(
     slice: &mut BitSlice<O, T>,
+    start_bit: usize,
+    bits_len: usize,
     val: i32,
 ) where
     O: BitOrder,
     T: BitStore,
 {
-    assert!(BITS_LEN <= 29);
-    assert!(val >= 0);
-    assert!(
-        32 >= i32::leading_zeros(val) as usize + BITS_LEN,
+    debug_assert!(bits_len <= 29);
+    debug_assert!(val >= 0);
+    debug_assert!(
+        32 >= i32::leading_zeros(val) as usize + bits_len,
         "Too short BITS_LEN({}) for the input val({})",
-        BITS_LEN,
+        bits_len,
         val
     );
-    for i in 0..BITS_LEN {
-        slice.set(START_BIT + i, (val & (1 << i)) != 0);
+    for i in 0..bits_len {
+        slice.set(start_bit + i, (val & (1 << i)) != 0);
     }
 }
 
@@ -101,49 +109,49 @@ fn test_get_bitvec_range() {
     let bytes_cc: BitArray<Lsb0, [u8; 4]> = [0xccu8; 4].into();
 
     // within 1 byte range
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 0, 1>(&all_1));
-    assert_eq!(0b_0000_0011, get_bitvec_range::<_, _, 0, 2>(&all_1));
-    assert_eq!(0b_0111_1111, get_bitvec_range::<_, _, 0, 7>(&all_1));
-    assert_eq!(0b_1111_1111, get_bitvec_range::<_, _, 0, 8>(&all_1));
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 1, 1>(&all_1));
-    assert_eq!(0b_0000_0011, get_bitvec_range::<_, _, 1, 2>(&all_1));
-    assert_eq!(0b_0011_1111, get_bitvec_range::<_, _, 1, 6>(&all_1));
-    assert_eq!(0b_0111_1111, get_bitvec_range::<_, _, 1, 7>(&all_1));
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 6, 1>(&all_1));
-    assert_eq!(0b_0000_0011, get_bitvec_range::<_, _, 6, 2>(&all_1));
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 7, 1>(&all_1));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&all_1, 0, 1));
+    assert_eq!(0b_0000_0011, get_bitvec_range(&all_1, 0, 2));
+    assert_eq!(0b_0111_1111, get_bitvec_range(&all_1, 0, 7));
+    assert_eq!(0b_1111_1111, get_bitvec_range(&all_1, 0, 8));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&all_1, 1, 1));
+    assert_eq!(0b_0000_0011, get_bitvec_range(&all_1, 1, 2));
+    assert_eq!(0b_0011_1111, get_bitvec_range(&all_1, 1, 6));
+    assert_eq!(0b_0111_1111, get_bitvec_range(&all_1, 1, 7));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&all_1, 6, 1));
+    assert_eq!(0b_0000_0011, get_bitvec_range(&all_1, 6, 2));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&all_1, 7, 1));
 
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 0, 1>(&bytes_33));
-    assert_eq!(0b_0000_0011, get_bitvec_range::<_, _, 0, 2>(&bytes_33));
-    assert_eq!(0b_0011_0011, get_bitvec_range::<_, _, 0, 7>(&bytes_33));
-    assert_eq!(0b_0011_0011, get_bitvec_range::<_, _, 0, 8>(&bytes_33));
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 1, 1>(&bytes_33));
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 1, 2>(&bytes_33));
-    assert_eq!(0b_0001_1001, get_bitvec_range::<_, _, 1, 6>(&bytes_33));
-    assert_eq!(0b_0001_1001, get_bitvec_range::<_, _, 1, 7>(&bytes_33));
-    assert_eq!(0b_0000_0000, get_bitvec_range::<_, _, 6, 1>(&bytes_33));
-    assert_eq!(0b_0000_0000, get_bitvec_range::<_, _, 6, 2>(&bytes_33));
-    assert_eq!(0b_0000_0000, get_bitvec_range::<_, _, 7, 1>(&bytes_33));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&bytes_33, 0, 1));
+    assert_eq!(0b_0000_0011, get_bitvec_range(&bytes_33, 0, 2));
+    assert_eq!(0b_0011_0011, get_bitvec_range(&bytes_33, 0, 7));
+    assert_eq!(0b_0011_0011, get_bitvec_range(&bytes_33, 0, 8));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&bytes_33, 1, 1));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&bytes_33, 1, 2));
+    assert_eq!(0b_0001_1001, get_bitvec_range(&bytes_33, 1, 6));
+    assert_eq!(0b_0001_1001, get_bitvec_range(&bytes_33, 1, 7));
+    assert_eq!(0b_0000_0000, get_bitvec_range(&bytes_33, 6, 1));
+    assert_eq!(0b_0000_0000, get_bitvec_range(&bytes_33, 6, 2));
+    assert_eq!(0b_0000_0000, get_bitvec_range(&bytes_33, 7, 1));
 
-    assert_eq!(0b_0000_0000, get_bitvec_range::<_, _, 0, 1>(&bytes_cc));
-    assert_eq!(0b_0000_0000, get_bitvec_range::<_, _, 0, 2>(&bytes_cc));
-    assert_eq!(0b_0100_1100, get_bitvec_range::<_, _, 0, 7>(&bytes_cc));
-    assert_eq!(0b_1100_1100, get_bitvec_range::<_, _, 0, 8>(&bytes_cc));
-    assert_eq!(0b_0000_0000, get_bitvec_range::<_, _, 1, 1>(&bytes_cc));
-    assert_eq!(0b_0000_0010, get_bitvec_range::<_, _, 1, 2>(&bytes_cc));
-    assert_eq!(0b_0010_0110, get_bitvec_range::<_, _, 1, 6>(&bytes_cc));
-    assert_eq!(0b_0110_0110, get_bitvec_range::<_, _, 1, 7>(&bytes_cc));
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 6, 1>(&bytes_cc));
-    assert_eq!(0b_0000_0011, get_bitvec_range::<_, _, 6, 2>(&bytes_cc));
-    assert_eq!(0b_0000_0001, get_bitvec_range::<_, _, 7, 1>(&bytes_cc));
+    assert_eq!(0b_0000_0000, get_bitvec_range(&bytes_cc, 0, 1));
+    assert_eq!(0b_0000_0000, get_bitvec_range(&bytes_cc, 0, 2));
+    assert_eq!(0b_0100_1100, get_bitvec_range(&bytes_cc, 0, 7));
+    assert_eq!(0b_1100_1100, get_bitvec_range(&bytes_cc, 0, 8));
+    assert_eq!(0b_0000_0000, get_bitvec_range(&bytes_cc, 1, 1));
+    assert_eq!(0b_0000_0010, get_bitvec_range(&bytes_cc, 1, 2));
+    assert_eq!(0b_0010_0110, get_bitvec_range(&bytes_cc, 1, 6));
+    assert_eq!(0b_0110_0110, get_bitvec_range(&bytes_cc, 1, 7));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&bytes_cc, 6, 1));
+    assert_eq!(0b_0000_0011, get_bitvec_range(&bytes_cc, 6, 2));
+    assert_eq!(0b_0000_0001, get_bitvec_range(&bytes_cc, 7, 1));
 
     // among multiple bytes
-    assert_eq!(0b_1111_1111, get_bitvec_range::<_, _, 1, 8>(&all_1));
-    assert_eq!(0b_1111_1111, get_bitvec_range::<_, _, 2, 8>(&all_1));
-    assert_eq!(0b_1111_1111, get_bitvec_range::<_, _, 6, 8>(&all_1));
-    assert_eq!(0b_1111_1111, get_bitvec_range::<_, _, 7, 8>(&all_1));
-    assert_eq!(0b_0011_1111, get_bitvec_range::<_, _, 3, 6>(&all_1));
-    assert_eq!(0b_0011_1111, get_bitvec_range::<_, _, 4, 6>(&all_1));
-    assert_eq!(0b_0011_1111, get_bitvec_range::<_, _, 6, 6>(&all_1));
-    assert_eq!(0b_0011_1111, get_bitvec_range::<_, _, 7, 6>(&all_1));
+    assert_eq!(0b_1111_1111, get_bitvec_range(&all_1, 1, 8));
+    assert_eq!(0b_1111_1111, get_bitvec_range(&all_1, 2, 8));
+    assert_eq!(0b_1111_1111, get_bitvec_range(&all_1, 6, 8));
+    assert_eq!(0b_1111_1111, get_bitvec_range(&all_1, 7, 8));
+    assert_eq!(0b_0011_1111, get_bitvec_range(&all_1, 3, 6));
+    assert_eq!(0b_0011_1111, get_bitvec_range(&all_1, 4, 6));
+    assert_eq!(0b_0011_1111, get_bitvec_range(&all_1, 6, 6));
+    assert_eq!(0b_0011_1111, get_bitvec_range(&all_1, 7, 6));
 }
