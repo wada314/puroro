@@ -316,18 +316,24 @@ impl Message {
             self.outer_messages.iter().map(|s| s.borrow()),
         )
     }
-    pub fn rust_impl_path(&self, impl_name: &str) -> String {
+    pub fn rust_impl_path(&self, impl_name: &str, gp: &[&str]) -> String {
         // "Simple" impls are separeted out to a special namespace.
         let module = if impl_name == "Simple" {
             "_puroro_simple_impl"
         } else {
             "_puroro_impls"
         };
+        let maybe_gp = if gp.is_empty() {
+            "".to_string()
+        } else {
+            format!("<{}>", gp.join(", "))
+        };
         format!(
-            "{path}::{module}::{ident}",
+            "{path}::{module}::{ident}{maybe_gp}",
             path = self.rust_module_path(),
             module = module,
             ident = self.rust_impl_ident(impl_name),
+            maybe_gp = maybe_gp,
         )
     }
 
@@ -650,11 +656,12 @@ impl Field {
     pub fn maybe_trait_scalar_getter_type_borrowed(
         &self,
         impl_name: &str,
+        gp: &[&str],
     ) -> Result<Option<String>> {
         Ok(match self.field_type() {
             Ok(FieldType::String) => Some("str".to_string()),
             Ok(FieldType::Bytes) => Some("[u8]".to_string()),
-            Ok(FieldType::Message(m)) => Some(upgrade(&m)?.rust_impl_path(impl_name)),
+            Ok(FieldType::Message(m)) => Some(upgrade(&m)?.rust_impl_path(impl_name, gp)),
             _ => None,
         })
     }
@@ -694,7 +701,7 @@ impl Field {
                 ::Choose<::std::vec::Vec<u8>, &'msg [u8]>"
                 .to_string(),
             FieldType::Message(m) => {
-                let simple_message_type = upgrade(&m)?.rust_impl_path("Simple");
+                let simple_message_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
                 let trait_getter_type = format!(
                     "<T as {trait_path}>::Field{number}MessageType<'msg>",
                     trait_path = self.message()?.rust_trait_path(),
@@ -705,6 +712,23 @@ impl Field {
                     ::Choose<::std::boxed::Box<{message_type}>, {trait_getter_type}>",
                     message_type = simple_message_type,
                     trait_getter_type = trait_getter_type,
+                )
+            }
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
+
+    pub fn bumpalo_oneof_field_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::String => "::puroro::bumpalo::collections::String<'bump>".to_string(),
+            FieldType::Bytes => "::puroro::bumpalo::collections::Vec<'bump, u8>".to_string(),
+            FieldType::Message(m) => {
+                let bumpalo_message_type = upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]);
+                format!(
+                    "::puroro::bumpalo::boxed::Box<'bump, {message_type}>",
+                    message_type = bumpalo_message_type,
                 )
             }
             t => t.numerical_rust_type()?.to_string(),
@@ -742,11 +766,51 @@ impl Field {
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {
-                let bare_msg = upgrade(&m)?.rust_impl_path("Simple");
+                let bare_msg = upgrade(&m)?.rust_impl_path("Simple", &[]);
                 if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
                     bare_msg
                 } else {
                     format!("::std::boxed::Box<{}>", bare_msg)
+                }
+            }
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
+
+    pub fn bumpalo_field_type(&self) -> Result<String> {
+        let scalar_type = self.bumpalo_scalar_field_type()?;
+        Ok(match self.field_label()? {
+            FieldLabel::OneofField => scalar_type,
+            FieldLabel::Required | FieldLabel::Optional => {
+                format!("::std::option::Option<{}>", scalar_type)
+            }
+            FieldLabel::Unlabeled => {
+                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{}>", scalar_type)
+                } else {
+                    scalar_type
+                }
+            }
+            FieldLabel::Repeated => format!(
+                "::puroro::bumpalo::collections::Vec<'bump, {}>",
+                scalar_type
+            ),
+        })
+    }
+
+    pub fn bumpalo_scalar_field_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "::puroro::bumpalo::collections::String<'bump>".to_string(),
+            FieldType::Bytes => "::puroro::bumpalo::collections::Vec<'bump, u8>".to_string(),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::Message(m) => {
+                let bare_msg = upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]);
+                if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
+                    bare_msg
+                } else {
+                    format!("::puroro::bumpalo::boxed::Box<'bump, {}>", bare_msg)
                 }
             }
             t => t.numerical_rust_type()?.to_string(),

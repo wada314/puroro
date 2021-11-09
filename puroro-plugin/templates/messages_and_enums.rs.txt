@@ -48,6 +48,16 @@ pub mod _puroro_nested {
 
             {%- for oneof in m.oneofs %}
             {{ oneof|indent(12) }}
+
+            {%- endfor %}
+        }
+        pub mod _puroro_bumpalo_oneofs {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof|print_bumpalo_oneof|indent(12) }}
             {%- endfor %}
         }
         {%- endif %}

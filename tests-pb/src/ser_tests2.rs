@@ -32,6 +32,24 @@ pub mod _puroro_simple_impl {
     }
     impl ::puroro::Message<Msg> for Msg {}
 
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                very_large_field_number: ::std::default::Default::default(),
+            }
+        }
+    }
+
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
@@ -225,16 +243,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::DeserializableMessageFromBytesIterator for Msg {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Msg {
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for Msg {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -286,7 +295,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::SerializableMessageToIoWrite for Msg
+    impl ::puroro::internal::se::SerMessageToIoWrite for Msg
     where
         Self: super::_puroro_traits::MsgTrait,
     {
@@ -392,19 +401,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::default::Default for Msg {
         fn default() -> Self {
-            Self {
-                i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::std::default::Default::default(),
-                float_optional: ::std::default::Default::default(),
-                float_repeated: ::std::default::Default::default(),
-                string_optional: ::std::default::Default::default(),
-                string_repeated: ::std::default::Default::default(),
-                submsg_optional: ::std::default::Default::default(),
-                submsg_repeated: ::std::default::Default::default(),
-                enum_optional: ::std::default::Default::default(),
-                enum_repeated: ::std::default::Default::default(),
-                very_large_field_number: ::std::default::Default::default(),
-            }
+            Self::new()
         }
     }
 }
@@ -909,7 +906,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField1<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32>
             + ::std::clone::Clone
@@ -1033,7 +1030,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField2<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<i32>
@@ -1155,7 +1152,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField3<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField3<ScalarType>
     where
         ScalarType: ::std::convert::Into<f32>
             + ::std::clone::Clone
@@ -1279,7 +1276,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField4<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<f32>
@@ -1399,7 +1396,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField5<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>
             + ::std::clone::Clone
@@ -1523,7 +1520,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField6<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::AsRef<str>
@@ -1648,7 +1645,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField7<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField7<ScalarType>
     where
         ScalarType:
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
@@ -1657,7 +1654,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
         Self: super::_puroro_traits::MsgTrait,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
-            ::puroro::internal::SerializableMessageToIoWrite,
+            ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1776,7 +1773,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
@@ -1787,7 +1784,7 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
-            ::puroro::internal::SerializableMessageToIoWrite,
+            ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1906,7 +1903,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for MsgSingleField9<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField9<ScalarType>
     where
         ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests2::Enum>
             + ::std::clone::Clone
@@ -2028,7 +2025,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType, RepeatedType> ::puroro::internal::SerializableMessageToIoWrite
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField10<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests2::Enum>
@@ -2150,8 +2147,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite
-        for MsgSingleField536870911<ScalarType>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField536870911<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32>
             + ::std::clone::Clone
@@ -2185,6 +2181,382 @@ pub mod _puroro_impls {
         fn from(value: ScalarType) -> Self {
             Self {
                 very_large_field_number: value,
+            }
+        }
+    }
+    #[derive(::std::fmt::Debug)]
+    pub struct MsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        pub i32_optional: ::std::option::Option<i32>,
+        pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        pub float_optional: ::std::option::Option<f32>,
+        pub float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
+        pub string_optional: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+        pub string_repeated: ::puroro::bumpalo::collections::Vec<
+            'bump,
+            ::puroro::bumpalo::collections::String<'bump>,
+        >,
+        pub submsg_optional: ::std::option::Option<
+            ::puroro::bumpalo::boxed::Box<
+                'bump,
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                    'bump,
+                >,
+            >,
+        >,
+        pub submsg_repeated: ::puroro::bumpalo::collections::Vec<
+            'bump,
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'bump,
+            >,
+        >,
+        pub enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
+        pub enum_repeated:
+            ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::ser_tests2::Enum>,
+        pub very_large_field_number: ::std::option::Option<i32>,
+    }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                very_large_field_number: ::std::default::Default::default(),
+            }
+        }
+    }
+
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
+    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
+        }
+        type Field2RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            self.i32_repeated.iter().cloned()
+        }
+        fn float_optional_opt<'this>(&'this self) -> Option<f32> {
+            Clone::clone(&self.float_optional)
+        }
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.float_repeated.iter().cloned()
+        }
+        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+            self.string_optional.as_ref().map(|v| v.as_ref())
+        }
+        type Field6RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
+            str,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
+        >;
+
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+        }
+        type Field7MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+            'bump,
+        >;
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
+            self.submsg_optional.as_ref().map(|v| v.as_ref())
+        }
+        type Field8MessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+            'bump,
+        >;
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::simple::BorrowedIter<
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'bump,
+            >,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                    'bump,
+                >,
+            >,
+        >;
+
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+        }
+        fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
+            Clone::clone(&self.enum_optional)
+        }
+        type Field10RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests2::Enum>>;
+
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            self.enum_repeated.iter().cloned()
+        }
+        fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.very_large_field_number)
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data, &self._bump),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_repeated, data, &self._bump),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Float
+            >::deser_field(&mut self.float_optional, data, &self._bump),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Float
+            >::deser_field(&mut self.float_repeated, data, &self._bump),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_optional, data, &self._bump),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.string_repeated, data, &self._bump),
+            7 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+            >::deser_field(&mut self.submsg_optional, data, &self._bump),
+            8 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
+            >::deser_field(&mut self.submsg_repeated, data, &self._bump),
+            9 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>
+            >::deser_field(&mut self.enum_optional, data, &self._bump),
+            10 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>
+            >::deser_field(&mut self.enum_repeated, data, &self._bump),
+            536870911 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.very_large_field_number, data, &self._bump),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
+    where
+        Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                1,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                2,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
+                3,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
+                4,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
+                5,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
+                6,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
+                7,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
+                8,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
+                9,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
+                10,
+                out,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
+                536870911,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+        fn eq(&self, rhs: &Self) -> bool {
+            ::std::ptr::eq(self._bump, rhs._bump)
+                && self.i32_optional == rhs.i32_optional
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_optional == rhs.float_optional
+                && self.float_repeated == rhs.float_repeated
+                && self.string_optional == rhs.string_optional
+                && self.string_repeated == rhs.string_repeated
+                && self.submsg_optional == rhs.submsg_optional
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.enum_optional == rhs.enum_optional
+                && self.enum_repeated == rhs.enum_repeated
+                && self.very_large_field_number == rhs.very_large_field_number
+                && true
+        }
+    }
+
+    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
+        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self {
+                _bump: bump,
+                i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_optional,
+                    bump,
+                ),
+                i32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.i32_repeated,
+                    bump,
+                ),
+                float_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.float_optional,
+                    bump,
+                ),
+                float_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.float_repeated,
+                    bump,
+                ),
+                string_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_optional,
+                    bump,
+                ),
+                string_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.string_repeated,
+                    bump,
+                ),
+                submsg_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_optional,
+                    bump,
+                ),
+                submsg_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_repeated,
+                    bump,
+                ),
+                enum_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_optional,
+                    bump,
+                ),
+                enum_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.enum_repeated,
+                    bump,
+                ),
+                very_large_field_number: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.very_large_field_number,
+                    bump,
+                ),
             }
         }
     }
@@ -2615,6 +2987,20 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
+    impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
+
+    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
+    where
+        T: MsgTrait,
+    {
+        msg_delegate!(T);
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -2651,6 +3037,18 @@ impl ::std::default::Default for Enum {
         Enum::Zeroth
     }
 }
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Enum {
+    fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::default::Default::default()
+    }
+}
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Enum {
+    fn clone_in(&self, _: &'bump ::puroro::bumpalo::Bump) -> Self {
+        ::std::clone::Clone::clone(self)
+    }
+}
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     pub mod msg {
@@ -2668,6 +3066,14 @@ pub mod _puroro_nested {
                 pub i32_optional: ::std::option::Option<i32>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
+
+            impl Submsg {
+                pub fn new() -> Self {
+                    Self {
+                        i32_optional: ::std::default::Default::default(),
+                    }
+                }
+            }
 
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
@@ -2706,16 +3112,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::DeserializableMessageFromBytesIterator for Submsg {
-                fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-                where
-                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-                {
-                    ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-                }
-            }
-
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for Submsg {
+            impl ::puroro::internal::de::DeserMessageFromBytesIter for Submsg {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -2738,7 +3135,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::SerializableMessageToIoWrite for Submsg
+            impl ::puroro::internal::se::SerMessageToIoWrite for Submsg
             where
                 Self: super::_puroro_traits::SubmsgTrait,
             {
@@ -2760,9 +3157,7 @@ pub mod _puroro_nested {
 
             impl ::std::default::Default for Submsg {
                 fn default() -> Self {
-                    Self {
-                        i32_optional: ::std::default::Default::default(),
-                    }
+                    Self::new()
                 }
             }
         }
@@ -2839,7 +3234,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<ScalarType> ::puroro::internal::SerializableMessageToIoWrite for SubmsgSingleField1<ScalarType>
+            impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField1<ScalarType>
             where
                 ScalarType: ::std::convert::Into<i32>
                     + ::std::clone::Clone
@@ -2873,6 +3268,101 @@ pub mod _puroro_nested {
                 fn from(value: ScalarType) -> Self {
                     Self {
                         i32_optional: value,
+                    }
+                }
+            }
+            #[derive(::std::fmt::Debug)]
+            pub struct SubmsgBumpalo<'bump> {
+                _bump: &'bump ::puroro::bumpalo::Bump,
+                pub i32_optional: ::std::option::Option<i32>,
+            }
+
+            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+
+            impl<'bump> SubmsgBumpalo<'bump> {
+                pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self {
+                        _bump: bump,
+                        i32_optional: ::std::default::Default::default(),
+                    }
+                }
+            }
+
+            impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+                fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self::new_in(bump)
+                }
+            }
+
+            impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
+                fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+                    Clone::clone(&self.i32_optional)
+                }
+            }
+
+            impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
+                fn deser_field<I>(
+                    &mut self,
+                    field_number: i32,
+                    data: ::puroro::internal::types::FieldData<
+                        &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+                    >,
+                ) -> ::puroro::Result<()>
+                where
+                    I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+                {
+                    use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+                    match field_number {
+                        1 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Optional,
+                            ::puroro::tags::Int32,
+                        >::deser_field(
+                            &mut self.i32_optional, data, &self._bump
+                        ),
+
+                        _ => unimplemented!("TODO: This case should be handled properly..."),
+                    }
+                }
+            }
+
+            impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
+            where
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                        1,
+                        out,
+                    )?;
+                    ::std::result::Result::Ok(())
+                }
+            }
+
+            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+                fn eq(&self, rhs: &Self) -> bool {
+                    ::std::ptr::eq(self._bump, rhs._bump)
+                        && self.i32_optional == rhs.i32_optional
+                        && true
+                }
+            }
+
+            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for SubmsgBumpalo<'bump> {
+                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self {
+                        _bump: bump,
+                        i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                            &self.i32_optional,
+                            bump,
+                        ),
                     }
                 }
             }
@@ -2953,6 +3443,20 @@ pub mod _puroro_nested {
             }
 
             impl<T> SubmsgTrait for ::std::boxed::Box<T>
+            where
+                T: SubmsgTrait,
+            {
+                submsg_delegate!(T);
+            }
+
+            impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
+            where
+                T: SubmsgTrait,
+            {
+                submsg_delegate!(T);
+            }
+
+            impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
             where
                 T: SubmsgTrait,
             {
