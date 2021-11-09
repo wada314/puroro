@@ -1119,7 +1119,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            ::std::option::Option::Some(self.submsg_unlabeled.as_ref())
+            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
         }
     }
 

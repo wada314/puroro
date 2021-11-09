@@ -2311,7 +2311,7 @@ pub mod _puroro_impls {
             'bump,
         >;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            ::std::option::Option::Some(self.submsg_unlabeled.as_ref())
+            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
         }
         type Field8MessageType<'this>
         where

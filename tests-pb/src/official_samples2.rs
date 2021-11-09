@@ -1028,7 +1028,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            ::std::option::Option::Some(self.c.as_ref())
+            self.c.as_ref().map(|b| b.as_ref())
         }
     }
 

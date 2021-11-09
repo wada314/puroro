@@ -309,7 +309,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            ::std::option::Option::Some(self.recursive_unlabeled.as_ref())
+            self.recursive_unlabeled.as_ref().map(|b| b.as_ref())
         }
     }
 

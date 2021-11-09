@@ -12714,11 +12714,11 @@ pub mod _puroro_impls {
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
-            ::std::option::Option::Some(self.submsg_required.as_ref())
+            self.submsg_required.as_ref().map(|b| b.as_ref())
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
-            ::std::option::Option::Some(self.submsg_optional.as_ref())
+            self.submsg_optional.as_ref().map(|b| b.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
         type Field53RepeatedType<'this> where Self: 'this =
