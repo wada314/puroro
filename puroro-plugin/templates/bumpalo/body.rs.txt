@@ -14,11 +14,7 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
 
     {%- for oneof in m.oneofs %}
     {{ oneof.field_ident }}: 
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }}
-        {%- if oneof.has_ld_field %}
-        <'bump>
-        {%- endif %}
-        ,
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }}<'bump>,
     {%- endfor %}
 }
 
@@ -85,22 +81,17 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
             {%- endif %}
         >
     {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_union_ident }} as E;
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        let oneof_index = ::puroro::internal::get_bitvec_range(
-            &self._bitfield, {{ oneof.bitfield_index }}, {{ oneof.bitfield_size }}
-        );
-        match oneof_index {
-            0 => ::std::option::Option::None,
+        match &self.{{ oneof.field_ident }} {
+            E::_None(_) => ::std::option::Option::None,
             {%- for field in oneof.fields %}
-            {{ field.index_1base }} => ::std::option::Option::Some(
-                F::{{ field.ident }}(unsafe { 
-                    {% if field.is_length_delimited %}
-                    &self.{{ oneof.field_ident }}.{{ field.ident }}
-                    {% else %}
-                    self.{{ oneof.field_ident }}.{{ field.ident }}.clone()
-                    {% endif %}
-                })
+            E::{{ field.ident }}(val) => ::std::option::Option::Some(
+                {% if field.is_length_delimited %}
+                F::{{ field.ident }}(val.as_ref())
+                {% else %}
+                F::{{ field.ident }}(val.clone())
+                {% endif %}
             ),
             {%- endfor %}
         }

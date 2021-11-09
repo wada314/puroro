@@ -90,7 +90,7 @@ impl Message {
             .oneofs()
             .into_iter()
             .filter(|o| matches!(o.is_synthetic(), Ok(false)))
-            .map(|o| Oneof::try_new(o, &mut bitfield_index))
+            .map(|o| Oneof::try_new(o))
             .try_collect()?;
         let nested_messages = m
             .nested_messages()
@@ -437,31 +437,25 @@ impl Field {
 struct Oneof {
     index: i32,
     enum_ident: String,
-    bumpalo_union_ident: String,
+    bumpalo_enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
     has_message_field: bool,
-    bitfield_index: i32,
-    bitfield_size: i32,
     owner_message_trait_path: String,
 }
 
 impl Oneof {
-    fn try_new(o: &wrappers::Oneof, bitfield_index: &mut i32) -> Result<Self> {
-        let field_num = o.fields()?.len();
-        let bitfield_size =
-            (usize::BITS - usize::leading_zeros(field_num + 1 /* +1 for None variant */)) as i32;
+    fn try_new(o: &wrappers::Oneof) -> Result<Self> {
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
-            bumpalo_union_ident: o.rust_enum_ident().to_string(),
+            bumpalo_enum_ident: o.rust_enum_ident().to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
                 .into_iter()
-                .enumerate()
-                .map(|(index, f)| OneofField::try_new(f, (index + 1) as i32))
+                .map(|f| OneofField::try_new(f))
                 .try_collect()?,
             has_ld_field: o.fields()?.into_iter().any(|f| {
                 matches!(
@@ -475,12 +469,6 @@ impl Oneof {
                 .fields()?
                 .into_iter()
                 .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_)))),
-            bitfield_index: {
-                let i = *bitfield_index;
-                *bitfield_index += bitfield_size;
-                i
-            },
-            bitfield_size,
             owner_message_trait_path: o.message()?.rust_trait_path(),
         })
     }
@@ -488,7 +476,6 @@ impl Oneof {
 
 struct OneofField {
     ident: String,
-    index_1base: i32,
     getter_ident: String,
     getter_ident_unesc: String,
     number: i32,
@@ -502,10 +489,9 @@ struct OneofField {
 }
 
 impl OneofField {
-    fn try_new(f: &wrappers::Field, index_1base: i32) -> Result<Self> {
+    fn try_new(f: &wrappers::Field) -> Result<Self> {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
-            index_1base,
             getter_ident: f.rust_ident().to_string(),
             getter_ident_unesc: f.rust_ident_unesc().to_string(),
             number: f.number(),
