@@ -10,12 +10,12 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
-    pub {{ oneof.field_ident }}: ::std::option::Option<
+    pub {{ oneof.field_ident }}: 
         super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }}
         {%- if oneof.has_ld_field %}
         <'bump>
         {%- endif %}
-    >,
+        ,
     {%- endfor %}
 }
 
@@ -31,15 +31,19 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             {%- if field.is_repeated %}
             {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
             {%- else %}
-            {%- if field.is_unlabeled && field.is_string  %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump),
-            {%- else %}
-            {%- if field.is_unlabeled && field.is_bytes %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
-            {%- else %}
+            {%- if field.is_length_delimited %}
+            {%- if field.is_message %}
             {{ field.ident }}: ::std::default::Default::default(),
-            {%- endif %} {#- if field.is_unlabeled && field.is_string #}
-            {%- endif %} {#- if field.is_unlabeled && field.is_bytes #}
+            {%- endif %} {#- if field.is_message #}
+            {%- if field.is_string %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump),
+            {%- endif %} {#- if field.is_string #}
+            {%- if field.is_bytes %}
+            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            {%- endif %} {#- if field.is_bytes #}
+            {%- else %} {#- if field.is_length_delimited #}
+            {{ field.ident }}: ::std::default::Default::default(),
+            {%- endif %} {#- if field.is_length_delimited #}
             {%- endif %} {#- if field.is_repeated #}
             {%- endif %} {#- if !field.is_explicit_oneof_field #}
             {%- endfor %} {#- for field in m.fields #}
@@ -79,15 +83,19 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
-            {%- for field in oneof.fields %}
-            {% if field.is_length_delimited %}
-            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.as_ref()),
-            {%- else %}
-            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.clone()),
-            {%- endif %}
-            {%- endfor %}
-        })
+        if ::puroro::internal::check_optional_bit(&self._optional_bits, {{ oneof.optional_bit_index }}) {        
+            ::std::option::Option::Some(match self.{{ oneof.field_ident }} {
+                {%- for field in oneof.fields %}
+                {% if field.is_length_delimited %}
+                E::{{ field.ident }}(v) => F::{{ field.ident }}(v.as_ref()),
+                {%- else %}
+                E::{{ field.ident }}(v) => F::{{ field.ident }}(v.clone()),
+                {%- endif %}
+                {%- endfor %}
+            })
+        } else {
+            ::std::option::Option::None
+        }
     }
     {%- endfor %}
 }

@@ -545,11 +545,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            if self.a == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.a.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
         }
     }
 
@@ -766,11 +762,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            if self.b.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.b.as_ref())
-            }
+            ::std::option::Option::Some(self.b.as_ref())
         }
     }
 
@@ -1001,7 +993,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (1 + 7) / 8],
+        _optional_bits: [u8; (0 + 7) / 8],
         pub c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -1036,7 +1028,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'bump>;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            ::std::option::Option::Some(self.c.as_ref())
         }
     }
 

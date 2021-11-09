@@ -1050,9 +1050,9 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (2 + 7) / 8],
+        _optional_bits: [u8; (1 + 7) / 8],
         pub i32_unlabeled: i32,
-        pub i32_optional: ::std::option::Option<i32>,
+        pub i32_optional: i32,
         pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
         pub f32_unlabeled: f32,
         pub string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
@@ -1091,14 +1091,14 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field3RepeatedType<'this>
         where
@@ -1109,25 +1109,17 @@ pub mod _puroro_impls {
             self.i32_repeated.iter().cloned()
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-            if self.f32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.f32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_unlabeled))
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.string_unlabeled.as_ref())
-            }
+            ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+            ::std::option::Option::Some(self.submsg_unlabeled.as_ref())
         }
     }
 
@@ -1534,11 +1526,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
     }
 

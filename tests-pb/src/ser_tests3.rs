@@ -2207,7 +2207,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (1 + 7) / 8],
+        _optional_bits: [u8; (0 + 7) / 8],
         pub i32_unlabeled: i32,
         pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
         pub float_unlabeled: f32,
@@ -2269,11 +2269,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
         type Field2RepeatedType<'this>
         where
@@ -2284,11 +2280,7 @@ pub mod _puroro_impls {
             self.i32_repeated.iter().cloned()
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-            if self.float_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.float_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
         }
         type Field4RepeatedType<'this>
         where
@@ -2299,11 +2291,7 @@ pub mod _puroro_impls {
             self.float_repeated.iter().cloned()
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.string_unlabeled.as_ref())
-            }
+            ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
         type Field6RepeatedType<'this>
         where
@@ -2323,7 +2311,7 @@ pub mod _puroro_impls {
             'bump,
         >;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+            ::std::option::Option::Some(self.submsg_unlabeled.as_ref())
         }
         type Field8MessageType<'this>
         where
@@ -2350,11 +2338,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
-            if self.enum_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.enum_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
         }
         type Field10RepeatedType<'this>
         where
@@ -2365,11 +2349,7 @@ pub mod _puroro_impls {
             self.enum_repeated.iter().cloned()
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
-            if self.very_large_field_number == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.very_large_field_number.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.very_large_field_number))
         }
     }
 
@@ -3348,11 +3328,7 @@ pub mod _puroro_nested {
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-                    if self.i32_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
-                    } else {
-                        ::std::option::Option::Some(self.i32_unlabeled.clone())
-                    }
+                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
                 }
             }
 

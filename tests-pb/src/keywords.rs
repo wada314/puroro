@@ -216,7 +216,7 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _optional_bits: [u8; (1 + 7) / 8],
-        pub r#type: ::std::option::Option<i32>,
+        pub r#type: i32,
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
@@ -241,7 +241,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn type_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.r#type)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.r#type))
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 

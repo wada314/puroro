@@ -23,6 +23,17 @@ pub mod variant;
 use crate::desc::{FieldDescriptor, MessageDescriptor};
 use crate::once_cell::sync::Lazy;
 
+pub fn check_optional_bit(array: &[u8], index: i32) -> bool {
+    array[(index / 8) as usize] & (1 << (index % 8)) == (1 << (index % 8))
+}
+pub fn set_optional_bit(array: &mut [u8], index: i32, value: bool) {
+    if value {
+        array[(index / 8) as usize] |= 1u8 << (index % 8);
+    } else {
+        array[(index / 8) as usize] &= !(1u8 << (index % 8));
+    }
+}
+
 pub struct MessageDescriptorInitializer {
     pub name: &'static str,
     pub lazy_fields: Lazy<&'static [FieldDescriptor]>,

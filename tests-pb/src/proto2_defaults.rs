@@ -6884,68 +6884,68 @@ pub mod _puroro_impls {
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _optional_bits: [u8; (62 + 7) / 8],
-        pub i32_default: ::std::option::Option<i32>,
-        pub i32_0: ::std::option::Option<i32>,
-        pub i32_42: ::std::option::Option<i32>,
-        pub i32_m42: ::std::option::Option<i32>,
-        pub i32_2147483647: ::std::option::Option<i32>,
-        pub i32_m2147483648: ::std::option::Option<i32>,
-        pub i32_0123: ::std::option::Option<i32>,
-        pub i32_0x123: ::std::option::Option<i32>,
-        pub u32_default: ::std::option::Option<u32>,
-        pub u32_0: ::std::option::Option<u32>,
-        pub u32_42: ::std::option::Option<u32>,
-        pub u32_4294967295: ::std::option::Option<u32>,
-        pub u32_0123: ::std::option::Option<u32>,
-        pub u32_0x123: ::std::option::Option<u32>,
-        pub i64_default: ::std::option::Option<i64>,
-        pub i64_0: ::std::option::Option<i64>,
-        pub i64_42: ::std::option::Option<i64>,
-        pub i64_m42: ::std::option::Option<i64>,
-        pub i64_9223372036854775807: ::std::option::Option<i64>,
-        pub i64_m9223372036854775808: ::std::option::Option<i64>,
-        pub i64_0123: ::std::option::Option<i64>,
-        pub i64_0x123: ::std::option::Option<i64>,
-        pub u64_default: ::std::option::Option<u64>,
-        pub u64_0: ::std::option::Option<u64>,
-        pub u64_42: ::std::option::Option<u64>,
-        pub u64_18446744073709551615: ::std::option::Option<u64>,
-        pub u64_0123: ::std::option::Option<u64>,
-        pub u64_0x123: ::std::option::Option<u64>,
-        pub f32_default: ::std::option::Option<f32>,
-        pub f32_0: ::std::option::Option<f32>,
-        pub f32_m0: ::std::option::Option<f32>,
-        pub f32_0p: ::std::option::Option<f32>,
-        pub f32_p0: ::std::option::Option<f32>,
-        pub f32_0p0: ::std::option::Option<f32>,
-        pub f32_42: ::std::option::Option<f32>,
-        pub f32_m42: ::std::option::Option<f32>,
-        pub f32_0p25: ::std::option::Option<f32>,
-        pub f32_1p5e2: ::std::option::Option<f32>,
-        pub f32_inf: ::std::option::Option<f32>,
-        pub f32_minf: ::std::option::Option<f32>,
-        pub f32_nan: ::std::option::Option<f32>,
-        pub f32_mnan: ::std::option::Option<f32>,
-        pub bool_default: ::std::option::Option<bool>,
-        pub bool_true: ::std::option::Option<bool>,
-        pub bool_false: ::std::option::Option<bool>,
-        pub string_default: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-        pub string_empty: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-        pub string_abc: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-        pub string_aiu: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-        pub string_backslash: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-        pub string_tab: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-        pub string_crlf: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-        pub bytes_default: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-        pub bytes_empty: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-        pub bytes_abc: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-        pub bytes_aiu: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-        pub bytes_backslash: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-        pub bytes_tab: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-        pub bytes_crlf: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-        pub enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
-        pub enum_one: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
-        pub enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        pub i32_default: i32,
+        pub i32_0: i32,
+        pub i32_42: i32,
+        pub i32_m42: i32,
+        pub i32_2147483647: i32,
+        pub i32_m2147483648: i32,
+        pub i32_0123: i32,
+        pub i32_0x123: i32,
+        pub u32_default: u32,
+        pub u32_0: u32,
+        pub u32_42: u32,
+        pub u32_4294967295: u32,
+        pub u32_0123: u32,
+        pub u32_0x123: u32,
+        pub i64_default: i64,
+        pub i64_0: i64,
+        pub i64_42: i64,
+        pub i64_m42: i64,
+        pub i64_9223372036854775807: i64,
+        pub i64_m9223372036854775808: i64,
+        pub i64_0123: i64,
+        pub i64_0x123: i64,
+        pub u64_default: u64,
+        pub u64_0: u64,
+        pub u64_42: u64,
+        pub u64_18446744073709551615: u64,
+        pub u64_0123: u64,
+        pub u64_0x123: u64,
+        pub f32_default: f32,
+        pub f32_0: f32,
+        pub f32_m0: f32,
+        pub f32_0p: f32,
+        pub f32_p0: f32,
+        pub f32_0p0: f32,
+        pub f32_42: f32,
+        pub f32_m42: f32,
+        pub f32_0p25: f32,
+        pub f32_1p5e2: f32,
+        pub f32_inf: f32,
+        pub f32_minf: f32,
+        pub f32_nan: f32,
+        pub f32_mnan: f32,
+        pub bool_default: bool,
+        pub bool_true: bool,
+        pub bool_false: bool,
+        pub string_default: ::puroro::bumpalo::collections::String<'bump>,
+        pub string_empty: ::puroro::bumpalo::collections::String<'bump>,
+        pub string_abc: ::puroro::bumpalo::collections::String<'bump>,
+        pub string_aiu: ::puroro::bumpalo::collections::String<'bump>,
+        pub string_backslash: ::puroro::bumpalo::collections::String<'bump>,
+        pub string_tab: ::puroro::bumpalo::collections::String<'bump>,
+        pub string_crlf: ::puroro::bumpalo::collections::String<'bump>,
+        pub bytes_default: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        pub bytes_empty: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        pub bytes_abc: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        pub bytes_aiu: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        pub bytes_backslash: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        pub bytes_tab: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        pub bytes_crlf: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        pub enum_default: self::_puroro_root::proto2_defaults::MyEnum,
+        pub enum_one: self::_puroro_root::proto2_defaults::MyEnum,
+        pub enum_fourty_two: self::_puroro_root::proto2_defaults::MyEnum,
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
@@ -7000,20 +7000,20 @@ pub mod _puroro_impls {
                 bool_default: ::std::default::Default::default(),
                 bool_true: ::std::default::Default::default(),
                 bool_false: ::std::default::Default::default(),
-                string_default: ::std::default::Default::default(),
-                string_empty: ::std::default::Default::default(),
-                string_abc: ::std::default::Default::default(),
-                string_aiu: ::std::default::Default::default(),
-                string_backslash: ::std::default::Default::default(),
-                string_tab: ::std::default::Default::default(),
-                string_crlf: ::std::default::Default::default(),
-                bytes_default: ::std::default::Default::default(),
-                bytes_empty: ::std::default::Default::default(),
-                bytes_abc: ::std::default::Default::default(),
-                bytes_aiu: ::std::default::Default::default(),
-                bytes_backslash: ::std::default::Default::default(),
-                bytes_tab: ::std::default::Default::default(),
-                bytes_crlf: ::std::default::Default::default(),
+                string_default: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_empty: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_abc: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_aiu: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_backslash: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_tab: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_crlf: ::puroro::bumpalo::collections::String::new_in(bump),
+                bytes_default: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_empty: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_abc: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_aiu: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_backslash: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_tab: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                bytes_crlf: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 enum_default: ::std::default::Default::default(),
                 enum_one: ::std::default::Default::default(),
                 enum_fourty_two: ::std::default::Default::default(),
@@ -7031,194 +7031,448 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_default_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_default)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_default))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i32_0_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 1) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i32_42_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 2) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i32_m42_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_m42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 3) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_m42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i32_2147483647_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_2147483647)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 4) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_2147483647))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i32_m2147483648_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_m2147483648)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 5) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_m2147483648))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i32_0123_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 6) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_0123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i32_0x123_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0x123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 7) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_0x123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u32_default_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_default)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 8) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_default))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u32_0_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 9) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u32_42_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 10) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u32_4294967295_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_4294967295)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 11) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_4294967295))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u32_0123_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 12) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_0123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u32_0x123_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0x123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 13) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_0x123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_default_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_default)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 14) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_default))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_0_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 15) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_42_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 16) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_m42_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_m42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 17) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_m42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_9223372036854775807_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_9223372036854775807)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 18) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(
+                    &self.i64_9223372036854775807,
+                ))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_m9223372036854775808_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_m9223372036854775808)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 19) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(
+                    &self.i64_m9223372036854775808,
+                ))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_0123_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 20) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_0123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn i64_0x123_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0x123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 21) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_0x123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u64_default_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_default)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 22) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_default))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u64_0_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 23) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u64_42_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 24) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u64_18446744073709551615_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_18446744073709551615)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 25) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(
+                    &self.u64_18446744073709551615,
+                ))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u64_0123_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 26) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_0123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn u64_0x123_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0x123)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 27) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_0x123))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_default_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_default)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 28) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_default))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 29) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_m0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_m0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 30) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_m0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_0p_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 31) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_0p))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_p0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_p0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 32) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_p0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_0p0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p0)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 33) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_0p0))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_42_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 34) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_m42_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_m42)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 35) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_m42))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_0p25_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p25)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 36) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_0p25))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_1p5e2_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_1p5e2)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 37) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_1p5e2))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_inf_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_inf)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 38) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_inf))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_minf_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_minf)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 39) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_minf))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_nan_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_nan)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 40) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_nan))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn f32_mnan_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_mnan)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 41) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_mnan))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bool_default_opt<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.bool_default)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 42) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.bool_default))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bool_true_opt<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.bool_true)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 43) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.bool_true))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bool_false_opt<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.bool_false)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 44) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.bool_false))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_default.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 45) {
+                ::std::option::Option::Some(self.string_default.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_empty.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 46) {
+                ::std::option::Option::Some(self.string_empty.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_abc.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 47) {
+                ::std::option::Option::Some(self.string_abc.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_aiu.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 48) {
+                ::std::option::Option::Some(self.string_aiu.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_backslash.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 49) {
+                ::std::option::Option::Some(self.string_backslash.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_tab.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 50) {
+                ::std::option::Option::Some(self.string_tab.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_crlf.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 51) {
+                ::std::option::Option::Some(self.string_crlf.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_default.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 52) {
+                ::std::option::Option::Some(self.bytes_default.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_empty.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 53) {
+                ::std::option::Option::Some(self.bytes_empty.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_abc.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 54) {
+                ::std::option::Option::Some(self.bytes_abc.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_aiu.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 55) {
+                ::std::option::Option::Some(self.bytes_aiu.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_backslash.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 56) {
+                ::std::option::Option::Some(self.bytes_backslash.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_tab.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 57) {
+                ::std::option::Option::Some(self.bytes_tab.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_crlf.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 58) {
+                ::std::option::Option::Some(self.bytes_crlf.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn enum_default_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            Clone::clone(&self.enum_default)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 59) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_default))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn enum_one_opt<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            Clone::clone(&self.enum_one)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 60) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_one))
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn enum_fourty_two_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            Clone::clone(&self.enum_fourty_two)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 61) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_fourty_two))
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 

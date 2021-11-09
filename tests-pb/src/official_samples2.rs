@@ -512,7 +512,7 @@ pub mod _puroro_impls {
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _optional_bits: [u8; (1 + 7) / 8],
-        pub a: ::std::option::Option<i32>,
+        pub a: i32,
     }
 
     pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
@@ -537,7 +537,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.a)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 
@@ -729,7 +733,7 @@ pub mod _puroro_impls {
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _optional_bits: [u8; (1 + 7) / 8],
-        pub b: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+        pub b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
     pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
@@ -739,7 +743,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _optional_bits: ::std::default::Default::default(),
-                b: ::std::default::Default::default(),
+                b: ::puroro::bumpalo::collections::String::new_in(bump),
             }
         }
     }
@@ -754,7 +758,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            self.b.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                ::std::option::Option::Some(self.b.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 
@@ -985,7 +993,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (1 + 7) / 8],
+        _optional_bits: [u8; (0 + 7) / 8],
         pub c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -1020,7 +1028,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            ::std::option::Option::Some(self.c.as_ref())
         }
     }
 

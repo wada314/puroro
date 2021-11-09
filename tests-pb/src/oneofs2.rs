@@ -1260,15 +1260,10 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (9 + 7) / 8],
-        pub group_one: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne<'bump>,
-        >,
-        pub group_two: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo<'bump>,
-        >,
-        pub group_three:
-            ::std::option::Option<super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree>,
+        _optional_bits: [u8; (8 + 7) / 8],
+        pub group_one: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne<'bump>,
+        pub group_two: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo<'bump>,
+        pub group_three: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree,
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
@@ -1308,11 +1303,15 @@ pub mod _puroro_impls {
         > {
             use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as F;
-            self.group_one.as_ref().map(|oneof| match oneof {
-                E::G1Int32(v) => F::G1Int32(v.clone()),
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 5) {
+                ::std::option::Option::Some(match self.group_one {
+                    E::G1Int32(v) => F::G1Int32(v.clone()),
 
-                E::G1String(v) => F::G1String(v.as_ref()),
-            })
+                    E::G1String(v) => F::G1String(v.as_ref()),
+                })
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn group_two<'this>(
             &'this self,
@@ -1325,22 +1324,30 @@ pub mod _puroro_impls {
         > {
             use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as F;
-            self.group_two.as_ref().map(|oneof| match oneof {
-                E::G2F32(v) => F::G2F32(v.clone()),
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 6) {
+                ::std::option::Option::Some(match self.group_two {
+                    E::G2F32(v) => F::G2F32(v.clone()),
 
-                E::G2String(v) => F::G2String(v.as_ref()),
+                    E::G2String(v) => F::G2String(v.as_ref()),
 
-                E::G2Submsg(v) => F::G2Submsg(v.as_ref()),
-            })
+                    E::G2Submsg(v) => F::G2Submsg(v.as_ref()),
+                })
+            } else {
+                ::std::option::Option::None
+            }
         }
         fn group_three<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree as E;
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as F;
-            self.group_three.as_ref().map(|oneof| match oneof {
-                E::G3Int32(v) => F::G3Int32(v.clone()),
-            })
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 7) {
+                ::std::option::Option::Some(match self.group_three {
+                    E::G3Int32(v) => F::G3Int32(v.clone()),
+                })
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 
@@ -1766,7 +1773,7 @@ pub mod _puroro_impls {
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _optional_bits: [u8; (1 + 7) / 8],
-        pub i32_optional: ::std::option::Option<i32>,
+        pub i32_optional: i32,
     }
 
     pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
@@ -1791,7 +1798,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 

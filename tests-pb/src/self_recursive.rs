@@ -274,7 +274,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (1 + 7) / 8],
+        _optional_bits: [u8; (0 + 7) / 8],
         pub recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
@@ -309,7 +309,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+            ::std::option::Option::Some(self.recursive_unlabeled.as_ref())
         }
     }
 

@@ -31,39 +31,26 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 
 {%- if !f.is_explicit_oneof_field %}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
-    {%- if f.is_unlabeled %}
-
-    {%- if f.is_length_delimited %}
-    {%- if f.is_message %}
-    {#- Message, the field type is Option<T> #}
-    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
-    {%- else %}
-    {#- String / Bytes, the field type is T #}
-    if self.{{ f.ident }}.is_empty() {
-        ::std::option::Option::None
+    {%- if f.has_optional_bit %}
+    if ::puroro::internal::check_optional_bit(&self._optional_bits, {{ f.optional_bit_index }}) {
+        ::std::option::Option::Some(
+            {%- if f.is_length_delimited %}
+            self.{{ f.ident }}.as_ref()
+            {%- else %}
+            ::std::clone::Clone::clone(&self.{{ f.ident }})
+            {%- endif %}
+        )
     } else {
-        ::std::option::Option::Some(self.{{ f.ident }}.as_ref())
-    }
-    {%- endif %}
-    {%- else %}
-    {#- Numerical types, the field type is T #}
-    if self.{{ f.ident }} == ::std::default::Default::default() {
         ::std::option::Option::None
-    } else {
-        ::std::option::Option::Some(self.{{ f.ident }}.clone())
     }
-    {%- endif %}
-
-    {%- else %} {#- if f.is_unlabeled #}
-
-    {#- The field type is Option<T> #}
-    {%- if f.is_length_delimited %}
-    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
-    {%- else %}
-    Clone::clone(&self.{{ f.ident }})
-    {%- endif %}
-
-    {%- endif %} {#- if f.is_unlabeled #}
+    {%- else %} {#- if f.has_optional_bit #}
+    ::std::option::Option::Some(
+        {%- if f.is_length_delimited %}
+        self.{{ f.ident }}.as_ref()
+        {%- else %}
+        ::std::clone::Clone::clone(&self.{{ f.ident }})
+        {%- endif %})
+    {%- endif %} {#- if f.has_optional_bit #}
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 

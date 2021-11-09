@@ -230,8 +230,8 @@ impl Field {
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
         let is_repeated = matches!(f.field_label()?, wrappers::FieldLabel::Repeated);
         let is_unlabeled = matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled);
-        // i.e. any non-repeated message types, or any (optional || required) types
-        let has_optional_bit = !is_repeated && (is_message || !is_unlabeled);
+        // i.e. any Option<> types except messages
+        let has_optional_bit = !is_repeated && !is_unlabeled && !is_message;
 
         Ok(Field {
             ident: f.rust_ident().to_string(),

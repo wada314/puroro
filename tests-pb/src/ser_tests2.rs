@@ -2187,12 +2187,12 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        _optional_bits: [u8; (6 + 7) / 8],
-        pub i32_optional: ::std::option::Option<i32>,
+        _optional_bits: [u8; (5 + 7) / 8],
+        pub i32_optional: i32,
         pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
-        pub float_optional: ::std::option::Option<f32>,
+        pub float_optional: f32,
         pub float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
-        pub string_optional: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+        pub string_optional: ::puroro::bumpalo::collections::String<'bump>,
         pub string_repeated: ::puroro::bumpalo::collections::Vec<
             'bump,
             ::puroro::bumpalo::collections::String<'bump>,
@@ -2211,10 +2211,10 @@ pub mod _puroro_impls {
                 'bump,
             >,
         >,
-        pub enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
+        pub enum_optional: self::_puroro_root::ser_tests2::Enum,
         pub enum_repeated:
             ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::ser_tests2::Enum>,
-        pub very_large_field_number: ::std::option::Option<i32>,
+        pub very_large_field_number: i32,
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
@@ -2228,7 +2228,7 @@ pub mod _puroro_impls {
                 i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 float_optional: ::std::default::Default::default(),
                 float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                string_optional: ::std::default::Default::default(),
+                string_optional: ::puroro::bumpalo::collections::String::new_in(bump),
                 string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 submsg_optional: ::std::default::Default::default(),
                 submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
@@ -2249,7 +2249,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field2RepeatedType<'this>
         where
@@ -2260,7 +2264,11 @@ pub mod _puroro_impls {
             self.i32_repeated.iter().cloned()
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.float_optional)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 1) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field4RepeatedType<'this>
         where
@@ -2271,7 +2279,11 @@ pub mod _puroro_impls {
             self.float_repeated.iter().cloned()
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 2) {
+                ::std::option::Option::Some(self.string_optional.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field6RepeatedType<'this>
         where
@@ -2291,7 +2303,7 @@ pub mod _puroro_impls {
             'bump,
         >;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            ::std::option::Option::Some(self.submsg_optional.as_ref())
         }
         type Field8MessageType<'this>
         where
@@ -2318,7 +2330,11 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
-            Clone::clone(&self.enum_optional)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 3) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field10RepeatedType<'this>
         where
@@ -2329,7 +2345,13 @@ pub mod _puroro_impls {
             self.enum_repeated.iter().cloned()
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.very_large_field_number)
+            if ::puroro::internal::check_optional_bit(&self._optional_bits, 4) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(
+                    &self.very_large_field_number,
+                ))
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 
@@ -3278,7 +3300,7 @@ pub mod _puroro_nested {
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 _optional_bits: [u8; (1 + 7) / 8],
-                pub i32_optional: ::std::option::Option<i32>,
+                pub i32_optional: i32,
             }
 
             pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
@@ -3303,7 +3325,11 @@ pub mod _puroro_nested {
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-                    Clone::clone(&self.i32_optional)
+                    if ::puroro::internal::check_optional_bit(&self._optional_bits, 0) {
+                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
+                    } else {
+                        ::std::option::Option::None
+                    }
                 }
             }
 
