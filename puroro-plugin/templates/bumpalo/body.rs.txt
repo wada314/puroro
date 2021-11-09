@@ -129,16 +129,18 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
                 if !matches!(
                     &self.{{ oneof.field_ident }},
-                    Some(E::{{ field.ident }}(_)))
+                    E::{{ field.ident }}(_))
                 {
-                    self.{{ oneof.field_ident }} = Some(
-                        E::{{ field.ident }}(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
-                        )
+                    self.{{ oneof.field_ident }} = E::{{ field.ident }}(
+                        {%- if field.is_length_delimited %}
+                        ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
+                        {%- else %}
+                        ::std::default::Default::default()
+                        {%- endif %}
                     );
                 }
                 let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
-                    Some(E::{{ field.ident }}(v)) => v,
+                    E::{{ field.ident }}(v) => v,
                     _ => unreachable!(),
                 };
                 DeserFieldFromBytesIter::<

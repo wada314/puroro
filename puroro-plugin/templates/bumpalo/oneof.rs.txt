@@ -14,7 +14,7 @@ impl<'bump> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<'bump> {
 }
 
 impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ oneof.bumpalo_enum_ident }}<'bump> {
-    fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         match self {
             Self::_None(_) => Self::_None(::std::marker::PhantomData),
 

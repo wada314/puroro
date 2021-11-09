@@ -1355,15 +1355,11 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
-                    if !matches!(&self.group_one, Some(E::G1Int32(_))) {
-                        self.group_one = Some(E::G1Int32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        ));
+                    if !matches!(&self.group_one, E::G1Int32(_)) {
+                        self.group_one = E::G1Int32(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_one {
-                        Some(E::G1Int32(v)) => v,
+                        E::G1Int32(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -1372,15 +1368,15 @@ pub mod _puroro_impls {
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
-                    if !matches!(&self.group_one, Some(E::G1String(_))) {
-                        self.group_one = Some(E::G1String(
+                    if !matches!(&self.group_one, E::G1String(_)) {
+                        self.group_one = E::G1String(
                             ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
                                 &self._bump,
                             ),
-                        ));
+                        );
                     }
                     let field_value_mut_ref = match &mut self.group_one {
-                        Some(E::G1String(v)) => v,
+                        E::G1String(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -1389,15 +1385,11 @@ pub mod _puroro_impls {
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
-                    if !matches!(&self.group_two, Some(E::G2F32(_))) {
-                        self.group_two = Some(E::G2F32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        ));
+                    if !matches!(&self.group_two, E::G2F32(_)) {
+                        self.group_two = E::G2F32(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_two {
-                        Some(E::G2F32(v)) => v,
+                        E::G2F32(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -1406,15 +1398,15 @@ pub mod _puroro_impls {
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
-                    if !matches!(&self.group_two, Some(E::G2String(_))) {
-                        self.group_two = Some(E::G2String(
+                    if !matches!(&self.group_two, E::G2String(_)) {
+                        self.group_two = E::G2String(
                             ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
                                 &self._bump,
                             ),
-                        ));
+                        );
                     }
                     let field_value_mut_ref = match &mut self.group_two {
-                        Some(E::G2String(v)) => v,
+                        E::G2String(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -1423,15 +1415,15 @@ pub mod _puroro_impls {
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
-                    if !matches!(&self.group_two, Some(E::G2Submsg(_))) {
-                        self.group_two = Some(E::G2Submsg(
+                    if !matches!(&self.group_two, E::G2Submsg(_)) {
+                        self.group_two = E::G2Submsg(
                             ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
                                 &self._bump,
                             ),
-                        ));
+                        );
                     }
                     let field_value_mut_ref = match &mut self.group_two {
-                        Some(E::G2Submsg(v)) => v,
+                        E::G2Submsg(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -1446,15 +1438,11 @@ pub mod _puroro_impls {
                 }
                 6 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree as E;
-                    if !matches!(&self.group_three, Some(E::G3Int32(_))) {
-                        self.group_three = Some(E::G3Int32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        ));
+                    if !matches!(&self.group_three, E::G3Int32(_)) {
+                        self.group_three = E::G3Int32(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_three {
-                        Some(E::G3Int32(v)) => v,
+                        E::G3Int32(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -2377,7 +2365,7 @@ pub mod _puroro_nested {
             }
 
             impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupOne<'bump> {
-                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     match self {
                         Self::_None(_) => Self::_None(::std::marker::PhantomData),
                         Self::G1Int32(x) => Self::G1Int32(x.clone()),
@@ -2408,7 +2396,7 @@ pub mod _puroro_nested {
             }
 
             impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupTwo<'bump> {
-                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     match self {
                         Self::_None(_) => Self::_None(::std::marker::PhantomData),
                         Self::G2F32(x) => Self::G2F32(x.clone()),
@@ -2435,7 +2423,7 @@ pub mod _puroro_nested {
             }
 
             impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupThree<'bump> {
-                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     match self {
                         Self::_None(_) => Self::_None(::std::marker::PhantomData),
                         Self::G3Int32(x) => Self::G3Int32(x.clone()),
