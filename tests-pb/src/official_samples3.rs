@@ -316,36 +316,6 @@ pub mod _puroro_impls {
         pub use super::super::_puroro_root::*;
     }
     use super::_puroro_traits::*;
-    impl Test1Trait for () {}
-    impl<T, U> Test1Trait for (T, U)
-    where
-        T: Test1Trait,
-        U: Test1Trait,
-    {
-        fn a_opt<'this>(&'this self) -> Option<i32> {
-            <U as Test1Trait>::a_opt(&self.1).or_else(|| <T as Test1Trait>::a_opt(&self.0))
-        }
-    }
-    impl<T, U> Test1Trait for ::puroro::Either<T, U>
-    where
-        T: Test1Trait,
-        U: Test1Trait,
-    {
-        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as Test1Trait>::a_opt(t),
-                |u| <U as Test1Trait>::a_opt(u),
-            )
-        }
-    }
-    impl<T> Test1Trait for ::std::option::Option<T>
-    where
-        T: Test1Trait,
-    {
-        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.a_opt())
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -538,36 +508,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    impl Test2Trait for () {}
-    impl<T, U> Test2Trait for (T, U)
-    where
-        T: Test2Trait,
-        U: Test2Trait,
-    {
-        fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as Test2Trait>::b_opt(&self.1).or_else(|| <T as Test2Trait>::b_opt(&self.0))
-        }
-    }
-    impl<T, U> Test2Trait for ::puroro::Either<T, U>
-    where
-        T: Test2Trait,
-        U: Test2Trait,
-    {
-        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as Test2Trait>::b_opt(t),
-                |u| <U as Test2Trait>::b_opt(u),
-            )
-        }
-    }
-    impl<T> Test2Trait for ::std::option::Option<T>
-    where
-        T: Test2Trait,
-    {
-        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.b_opt())
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -756,67 +696,6 @@ pub mod _puroro_impls {
     impl Test2Builder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    impl Test3Trait for () {
-        type Field3MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-    }
-    impl<T, U> Test3Trait for (T, U)
-    where
-        T: Test3Trait,
-        U: Test3Trait,
-    {
-        type Field3MessageType<'this>
-        where
-            Self: 'this,
-        = (
-            ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
-            ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
-        );
-        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            match (
-                <T as Test3Trait>::c_opt(&self.0),
-                <U as Test3Trait>::c_opt(&self.1),
-            ) {
-                (None, None) => None,
-                (Some(t), None) => Some((Some(t), None)),
-                (None, Some(u)) => Some((None, Some(u))),
-                (Some(t), Some(u)) => Some((Some(t), Some(u))),
-            }
-        }
-    }
-    impl<T, U> Test3Trait for ::puroro::Either<T, U>
-    where
-        T: Test3Trait,
-        U: Test3Trait,
-    {
-        type Field3MessageType<'this>
-        where
-            Self: 'this,
-        = ::puroro::Either<
-            <T as Test3Trait>::Field3MessageType<'this>,
-            <U as Test3Trait>::Field3MessageType<'this>,
-        >;
-        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            self.as_ref().either(
-                |t| <T as Test3Trait>::c_opt(t).map(|t| ::puroro::Either::Left(t)),
-                |u| <U as Test3Trait>::c_opt(u).map(|u| ::puroro::Either::Right(u)),
-            )
-        }
-    }
-    impl<T> Test3Trait for ::std::option::Option<T>
-    where
-        T: Test3Trait,
-    {
-        type Field3MessageType<'this>
-        where
-            Self: 'this,
-        = T::Field3MessageType<'this>;
-        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            self.as_ref().and_then(|msg| msg.c_opt())
         }
     }
 
@@ -1035,75 +914,6 @@ pub mod _puroro_impls {
     impl Test3Builder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    impl Test4Trait for () {
-        type Field4RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-    }
-    impl<T, U> Test4Trait for (T, U)
-    where
-        T: Test4Trait,
-        U: Test4Trait,
-    {
-        type Field4RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as Test4Trait>::Field4RepeatedType<'this>,
-            <U as Test4Trait>::Field4RepeatedType<'this>,
-        >;
-
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as Test4Trait>::d(&self.0),
-                <U as Test4Trait>::d(&self.1),
-            )
-        }
-    }
-    impl<T, U> Test4Trait for ::puroro::Either<T, U>
-    where
-        T: Test4Trait,
-        U: Test4Trait,
-    {
-        type Field4RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as Test4Trait>::Field4RepeatedType<'this>,
-            <U as Test4Trait>::Field4RepeatedType<'this>,
-        >;
-
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::either::EitherRepeatedField::new(
-                self.as_ref()
-                    .map_left(|t| <T as Test4Trait>::d(t))
-                    .map_right(|u| <U as Test4Trait>::d(u)),
-            )
-        }
-    }
-    impl<T> Test4Trait for ::std::option::Option<T>
-    where
-        T: Test4Trait,
-    {
-        type Field4RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.d().into_iter())
-                .into_iter()
-                .flatten()
         }
     }
 
@@ -1376,6 +1186,36 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
+    impl Test1Trait for () {}
+    impl<T, U> Test1Trait for (T, U)
+    where
+        T: Test1Trait,
+        U: Test1Trait,
+    {
+        fn a_opt<'this>(&'this self) -> Option<i32> {
+            <U as Test1Trait>::a_opt(&self.1).or_else(|| <T as Test1Trait>::a_opt(&self.0))
+        }
+    }
+    impl<T, U> Test1Trait for ::puroro::Either<T, U>
+    where
+        T: Test1Trait,
+        U: Test1Trait,
+    {
+        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as Test1Trait>::a_opt(t),
+                |u| <U as Test1Trait>::a_opt(u),
+            )
+        }
+    }
+    impl<T> Test1Trait for ::std::option::Option<T>
+    where
+        T: Test1Trait,
+    {
+        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.a_opt())
+        }
+    }
 
     pub trait Test2Trait {
         fn b<'this>(&'this self) -> &'this str {
@@ -1431,6 +1271,36 @@ pub mod _puroro_traits {
         T: Test2Trait,
     {
         test2_delegate!(T);
+    }
+    impl Test2Trait for () {}
+    impl<T, U> Test2Trait for (T, U)
+    where
+        T: Test2Trait,
+        U: Test2Trait,
+    {
+        fn b_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as Test2Trait>::b_opt(&self.1).or_else(|| <T as Test2Trait>::b_opt(&self.0))
+        }
+    }
+    impl<T, U> Test2Trait for ::puroro::Either<T, U>
+    where
+        T: Test2Trait,
+        U: Test2Trait,
+    {
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as Test2Trait>::b_opt(t),
+                |u| <U as Test2Trait>::b_opt(u),
+            )
+        }
+    }
+    impl<T> Test2Trait for ::std::option::Option<T>
+    where
+        T: Test2Trait,
+    {
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.b_opt())
+        }
     }
 
     pub trait Test3Trait {
@@ -1494,6 +1364,67 @@ pub mod _puroro_traits {
     {
         test3_delegate!(T);
     }
+    impl Test3Trait for () {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
+    impl<T, U> Test3Trait for (T, U)
+    where
+        T: Test3Trait,
+        U: Test3Trait,
+    {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = (
+            ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
+            ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
+        );
+        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            match (
+                <T as Test3Trait>::c_opt(&self.0),
+                <U as Test3Trait>::c_opt(&self.1),
+            ) {
+                (None, None) => None,
+                (Some(t), None) => Some((Some(t), None)),
+                (None, Some(u)) => Some((None, Some(u))),
+                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+            }
+        }
+    }
+    impl<T, U> Test3Trait for ::puroro::Either<T, U>
+    where
+        T: Test3Trait,
+        U: Test3Trait,
+    {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as Test3Trait>::Field3MessageType<'this>,
+            <U as Test3Trait>::Field3MessageType<'this>,
+        >;
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            self.as_ref().either(
+                |t| <T as Test3Trait>::c_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as Test3Trait>::c_opt(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
+    }
+    impl<T> Test3Trait for ::std::option::Option<T>
+    where
+        T: Test3Trait,
+    {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = T::Field3MessageType<'this>;
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            self.as_ref().and_then(|msg| msg.c_opt())
+        }
+    }
 
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -1548,6 +1479,75 @@ pub mod _puroro_traits {
         T: Test4Trait,
     {
         test4_delegate!(T);
+    }
+    impl Test4Trait for () {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+    impl<T, U> Test4Trait for (T, U)
+    where
+        T: Test4Trait,
+        U: Test4Trait,
+    {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as Test4Trait>::Field4RepeatedType<'this>,
+            <U as Test4Trait>::Field4RepeatedType<'this>,
+        >;
+
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as Test4Trait>::d(&self.0),
+                <U as Test4Trait>::d(&self.1),
+            )
+        }
+    }
+    impl<T, U> Test4Trait for ::puroro::Either<T, U>
+    where
+        T: Test4Trait,
+        U: Test4Trait,
+    {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as Test4Trait>::Field4RepeatedType<'this>,
+            <U as Test4Trait>::Field4RepeatedType<'this>,
+        >;
+
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as Test4Trait>::d(t))
+                    .map_right(|u| <U as Test4Trait>::d(u)),
+            )
+        }
+    }
+    impl<T> Test4Trait for ::std::option::Option<T>
+    where
+        T: Test4Trait,
+    {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.as_ref()
+                .map(|msg| msg.d().into_iter())
+                .into_iter()
+                .flatten()
+        }
     }
 }
 pub use _puroro_nested::*;
