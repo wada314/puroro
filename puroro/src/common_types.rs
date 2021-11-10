@@ -16,7 +16,7 @@ use ::std::fmt::Debug;
 use ::std::ops::{Deref, DerefMut};
 
 #[derive(PartialEq, Debug)]
-pub struct Merged<T, U>(pub T, pub U);
+pub struct Merged<T, U>(pub(crate) T, pub(crate) U);
 pub fn merge<T, U>(t: T, u: U) -> Merged<T, U> {
     Merged(t, u)
 }
