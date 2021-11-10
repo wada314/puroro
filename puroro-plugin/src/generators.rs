@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::utils::{get_keyword_safe_ident, to_camel_case, upgrade};
+use crate::utils::{
+    convert_octal_escape_to_rust_style_escape, get_keyword_safe_ident, to_camel_case, upgrade,
+};
 use crate::wrappers::{self, FieldType};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
@@ -61,15 +63,14 @@ impl MessagesAndEnums {
 
 struct Message {
     ident: String,
-    proto_name: String,
     trait_ident: String,
     trait_delegate_macro_ident: String,
     mut_trait_ident: String,
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
-    fields_len: usize,
     oneofs: Vec<Oneof>,
+    bitfield_len: i32,
     simple_ident: String,
     single_field_ident: String,
     bumpalo_ident: String,
@@ -79,12 +80,12 @@ struct Message {
 
 impl Message {
     fn try_new(m: &wrappers::Message) -> Result<Self> {
+        let mut bitfield_index = 0;
         let fields: Vec<Field> = m
             .fields()
             .into_iter()
-            .map(|f| Field::try_new(f))
+            .map(|f| Field::try_new(f, &mut bitfield_index))
             .try_collect()?;
-        let fields_len = fields.len();
         let oneofs = m
             .oneofs()
             .into_iter()
@@ -103,7 +104,6 @@ impl Message {
             .try_collect()?;
         Ok(Self {
             ident: m.rust_ident().to_string(),
-            proto_name: m.proto_name().to_string(),
             trait_ident: m.rust_trait_ident().to_string(),
             trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
             mut_trait_ident: m.rust_mut_trait_ident().to_string(),
@@ -113,8 +113,8 @@ impl Message {
                 enums: nested_enums,
             },
             fields,
-            fields_len,
             oneofs,
+            bitfield_len: bitfield_index,
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
             bumpalo_ident: m.rust_impl_ident("Bumpalo"),
@@ -174,7 +174,6 @@ impl EnumValue {
 struct Field {
     ident: String,
     ident_unesc: String,
-    proto_name: String,
     number: i32,
     oneof_index: i32,
     is_message: bool,
@@ -186,6 +185,8 @@ struct Field {
     is_unlabeled: bool,
     has_default_value: bool,
     default_value: String,
+    has_optional_bit: bool,
+    bitfield_index: i32,
     trait_scalar_getter_type: String,
     trait_scalar_mutable_target_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
@@ -206,7 +207,7 @@ struct Field {
 }
 
 impl Field {
-    fn try_new(f: &wrappers::Field) -> Result<Self> {
+    fn try_new(f: &wrappers::Field, bitfield_index: &mut i32) -> Result<Self> {
         let trait_maybe_field_message_trait_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_trait_path())
@@ -225,14 +226,18 @@ impl Field {
             } else {
                 None
             };
+        let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
+        let is_repeated = matches!(f.field_label()?, wrappers::FieldLabel::Repeated);
+        let is_unlabeled = matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled);
+        // i.e. any Option<> types except messages
+        let has_optional_bit = !is_repeated && !is_unlabeled && !is_message;
 
         Ok(Field {
             ident: f.rust_ident().to_string(),
             ident_unesc: f.rust_ident_unesc().to_string(),
-            proto_name: f.proto_name().to_string(),
             number: f.number(),
             oneof_index: f.oneof_index().unwrap_or(-1),
-            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_message,
             is_string: matches!(f.field_type()?, wrappers::FieldType::String),
             is_bytes: matches!(f.field_type()?, wrappers::FieldType::Bytes),
             is_length_delimited: matches!(
@@ -242,14 +247,24 @@ impl Field {
                     | wrappers::FieldType::Message(_)
             ),
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
-            is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
-            is_unlabeled: matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled),
+            is_repeated,
+            is_unlabeled,
             has_default_value: f.default_value().is_some(),
             default_value: f
                 .default_value()
                 .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
                 .transpose()?
                 .unwrap_or(Default::default()),
+            has_optional_bit,
+            bitfield_index: {
+                if has_optional_bit {
+                    let i = *bitfield_index;
+                    *bitfield_index += 1;
+                    i
+                } else {
+                    -1
+                }
+            },
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_scalar_mutable_target_type: f.trait_scalar_mutable_target_type()?,
             trait_maybe_field_message_trait_path,
@@ -340,67 +355,8 @@ impl Field {
                 format!(r###""{}""###, input.escape_default().collect::<String>())
             }
             FieldType::Bytes => {
-                // protoc escapes 0x7F~0xFF character as octal escape "\234".
-                // Rust does not support that style so we need to re-encode it.
-                let mut decoded = Vec::new();
-                let mut bytes = input.bytes();
-                loop {
-                    if let Some(c) = bytes.next() {
-                        if c == b'\\' {
-                            if let Some(d) = bytes.next() {
-                                match d {
-                                    b'\\' | b'\"' | b'\'' => {
-                                        decoded.push(d);
-                                    }
-                                    b'r' => decoded.push(b'\r'),
-                                    b'n' => decoded.push(b'\n'),
-                                    b't' => decoded.push(b'\t'),
-                                    _ => {
-                                        let e_opt = bytes.next();
-                                        let f_opt = bytes.next();
-                                        match (d, e_opt, f_opt) {
-                                            (
-                                                (b'0'..=b'9'),
-                                                Some(e @ (b'0'..=b'9')),
-                                                Some(f @ (b'0'..=b'9')),
-                                            ) => {
-                                                let u8_value = u8::from_str_radix(
-                                                    &format!(
-                                                        "{}{}{}",
-                                                        d - b'0',
-                                                        e - b'0',
-                                                        f - b'0'
-                                                    ),
-                                                    8,
-                                                )
-                                                .map_err(|e| ErrorKind::ParseIntError {
-                                                    source: e,
-                                                })?;
-                                                decoded.push(u8_value);
-                                            }
-                                            _ => Err(ErrorKind::InvalidString {
-                                                string: input.to_string(),
-                                            })?,
-                                        }
-                                    }
-                                }
-                            } else {
-                                Err(ErrorKind::InvalidString {
-                                    string: input.to_string(),
-                                })?
-                            }
-                        } else {
-                            decoded.push(c);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                let reencoded = decoded
-                    .into_iter()
-                    .map(|b| format!(r"\x{:02x}", b))
-                    .collect::<String>();
-                format!(r#"b"{}""#, reencoded)
+                let rust_style_bytes = convert_octal_escape_to_rust_style_escape(input)?;
+                format!(r#"b"{}""#, rust_style_bytes)
             }
             FieldType::Enum2(e) | FieldType::Enum3(e) => {
                 format!(

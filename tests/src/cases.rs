@@ -14,7 +14,6 @@
 
 mod builder;
 mod bumpalo;
-mod descriptors;
 mod either;
 mod empty;
 mod merged;

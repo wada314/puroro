@@ -33,32 +33,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test1 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "a",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test1 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test1",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test1 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test1 {
         fn deser_field<I>(
@@ -127,32 +102,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test2 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "b",
-                            number: 2,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test2 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test2",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test2 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test2 {
         fn deser_field<I>(
@@ -227,32 +177,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test3 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "c",
-                            number: 3,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test3 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test3",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test3 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test3 {
         fn deser_field<I>(
@@ -330,32 +255,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for Test4 {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "d",
-                            number: 4,
-                            lazy_containing_type: Lazy::new(|| {
-                                <Test4 as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Test4",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
+    impl ::puroro::MessageRepresentativeImpl for Test4 {}
 
     impl ::puroro::internal::de::DeserMessageFromBytesIter for Test4 {
         fn deser_field<I>(
@@ -511,7 +411,9 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        pub a: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        a: i32,
     }
 
     pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
@@ -520,6 +422,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
         }
@@ -535,7 +438,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.a)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 
@@ -552,12 +459,15 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.a, data, &self._bump),
+                1 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.a, data, &self._bump)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -591,6 +501,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: self._bitfield,
                 a: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.a, bump),
             }
         }
@@ -725,7 +636,9 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        pub b: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
     pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
@@ -734,7 +647,8 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                b: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
+                b: ::puroro::bumpalo::collections::String::new_in(bump),
             }
         }
     }
@@ -749,7 +663,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            self.b.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
+                ::std::option::Option::Some(self.b.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
     }
 
@@ -766,12 +684,15 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.b, data, &self._bump),
+                2 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.b, data, &self._bump)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -805,6 +726,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: self._bitfield,
                 b: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.b, bump),
             }
         }
@@ -979,7 +901,9 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        pub c: ::std::option::Option<
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
                 self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>,
@@ -993,7 +917,8 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                c: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
+                c: ::std::option::Option::None,
             }
         }
     }
@@ -1012,7 +937,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            self.c.as_ref().map(|b| b.as_ref())
         }
     }
 
@@ -1080,6 +1005,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: self._bitfield,
                 c: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.c, bump),
             }
         }
@@ -1269,7 +1195,9 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test4Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        pub d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
 
     pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
@@ -1278,6 +1206,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: ::std::default::Default::default(),
                 d: ::puroro::bumpalo::collections::Vec::new_in(bump),
             }
         }
@@ -1315,9 +1244,11 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.d, data, &self._bump),
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.d, data, &self._bump)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -1350,6 +1281,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: self._bitfield,
                 d: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.d, bump),
             }
         }

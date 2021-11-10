@@ -82,33 +82,7 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
     {%- endfor %}
 }
 
-impl ::puroro::MessageRepresentativeImpl for {{ m.simple_ident }} {
-    fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-        use ::puroro::once_cell::sync::Lazy;
-        static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; {{ m.fields_len }}]> = Lazy::new(|| {
-            [
-                {%- for field in m.fields %}
-                {
-                    let init = ::puroro::internal::FieldDescriptorInitializer {
-                        name: "{{ field.proto_name }}",
-                        number: {{ field.number }},
-                        lazy_containing_type: Lazy::new(|| <{{ m.simple_ident }} as ::puroro::MessageRepresentativeImpl>::descriptor()),
-                    };
-                    ::puroro::internal::init_field_descriptor(init)
-                },
-                {%- endfor %}
-            ]
-        });
-        static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-            let init = ::puroro::internal::MessageDescriptorInitializer {
-                name: "{{ m.proto_name }}",
-                lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-            };
-            ::puroro::internal::init_message_descriptor(init)
-        });
-        Lazy::force(&LAZY_DESCRIPTOR)
-    }
-}
+impl ::puroro::MessageRepresentativeImpl for {{ m.simple_ident }} {}
 
 impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} {
     fn deser_field<I>(

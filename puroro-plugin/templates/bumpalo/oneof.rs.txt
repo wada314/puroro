@@ -1,23 +1,31 @@
 
-{%- let maybe_gp %}
-{%- if oneof.has_ld_field %}
-{%- let maybe_gp = "<'bump>" %}
-{%- else %}
-{%- let maybe_gp = "" %}
-{%- endif %}
-
 #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub enum {{ oneof.bumpalo_enum_ident }}{{ maybe_gp }} {
+pub(crate) enum {{ oneof.bumpalo_enum_ident }}<'bump> {
+    _None(::std::marker::PhantomData<&'bump ()>),
     {%- for field in oneof.fields %}
     {{ field.ident }}({{ field.bumpalo_field_type }}),
     {%- endfor %}
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ oneof.bumpalo_enum_ident }}{{ maybe_gp }} {
-    fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+impl<'bump> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<'bump> {
+    fn default() -> Self {
+        Self::_None(::std::marker::PhantomData)
+    }
+}
+
+impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ oneof.bumpalo_enum_ident }}<'bump> {
+    fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         match self {
+            Self::_None(_) => Self::_None(::std::marker::PhantomData),
+
             {%- for field in oneof.fields %}
-            Self::{{ field.ident }}(x) => Self::{{field.ident}}(::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump)),
+            Self::{{ field.ident }}(x) => Self::{{ field.ident }}(
+                {%- if field.is_length_delimited %}
+                ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump)
+                {%- else %}
+                x.clone()
+                {%- endif %}
+            ),
             {%- endfor %}
         }
     }
