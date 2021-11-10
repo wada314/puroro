@@ -9789,578 +9789,143 @@ pub mod _puroro_mut_traits {
     }
 
     pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
-        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_default_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
-        fn set_i32_default(&mut self, value: i32) {
-            *self.i32_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_default(&mut self) {
-            *self.i32_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_default(&mut self);
 
-        type Field2RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_0_opt_mut<'this>(&'this mut self) -> Self::Field2RefOptMutType<'this>;
-        fn set_i32_0(&mut self, value: i32) {
-            *self.i32_0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_0(&mut self) {
-            *self.i32_0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_0(&mut self);
 
-        type Field3RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_42_opt_mut<'this>(&'this mut self) -> Self::Field3RefOptMutType<'this>;
-        fn set_i32_42(&mut self, value: i32) {
-            *self.i32_42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_42(&mut self) {
-            *self.i32_42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_42(&mut self);
 
-        type Field4RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_m42_opt_mut<'this>(&'this mut self) -> Self::Field4RefOptMutType<'this>;
-        fn set_i32_m42(&mut self, value: i32) {
-            *self.i32_m42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_m42(&mut self) {
-            *self.i32_m42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_m42(&mut self);
 
-        type Field5RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_2147483647_opt_mut<'this>(&'this mut self) -> Self::Field5RefOptMutType<'this>;
-        fn set_i32_2147483647(&mut self, value: i32) {
-            *self.i32_2147483647_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_2147483647(&mut self) {
-            *self.i32_2147483647_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_2147483647(&mut self);
 
-        type Field6RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_m2147483648_opt_mut<'this>(&'this mut self) -> Self::Field6RefOptMutType<'this>;
-        fn set_i32_m2147483648(&mut self, value: i32) {
-            *self.i32_m2147483648_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_m2147483648(&mut self) {
-            *self.i32_m2147483648_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_m2147483648(&mut self);
 
-        type Field7RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_0123_opt_mut<'this>(&'this mut self) -> Self::Field7RefOptMutType<'this>;
-        fn set_i32_0123(&mut self, value: i32) {
-            *self.i32_0123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_0123(&mut self) {
-            *self.i32_0123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_0123(&mut self);
 
-        type Field8RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn i32_0x123_opt_mut<'this>(&'this mut self) -> Self::Field8RefOptMutType<'this>;
-        fn set_i32_0x123(&mut self, value: i32) {
-            *self.i32_0x123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i32_0x123(&mut self) {
-            *self.i32_0x123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i32_0x123(&mut self);
 
-        type Field11RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
-        fn u32_default_opt_mut<'this>(&'this mut self) -> Self::Field11RefOptMutType<'this>;
-        fn set_u32_default(&mut self, value: u32) {
-            *self.u32_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u32_default(&mut self) {
-            *self.u32_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u32_default(&mut self);
 
-        type Field12RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
-        fn u32_0_opt_mut<'this>(&'this mut self) -> Self::Field12RefOptMutType<'this>;
-        fn set_u32_0(&mut self, value: u32) {
-            *self.u32_0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u32_0(&mut self) {
-            *self.u32_0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u32_0(&mut self);
 
-        type Field13RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
-        fn u32_42_opt_mut<'this>(&'this mut self) -> Self::Field13RefOptMutType<'this>;
-        fn set_u32_42(&mut self, value: u32) {
-            *self.u32_42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u32_42(&mut self) {
-            *self.u32_42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u32_42(&mut self);
 
-        type Field15RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
-        fn u32_4294967295_opt_mut<'this>(&'this mut self) -> Self::Field15RefOptMutType<'this>;
-        fn set_u32_4294967295(&mut self, value: u32) {
-            *self.u32_4294967295_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u32_4294967295(&mut self) {
-            *self.u32_4294967295_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u32_4294967295(&mut self);
 
-        type Field17RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
-        fn u32_0123_opt_mut<'this>(&'this mut self) -> Self::Field17RefOptMutType<'this>;
-        fn set_u32_0123(&mut self, value: u32) {
-            *self.u32_0123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u32_0123(&mut self) {
-            *self.u32_0123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u32_0123(&mut self);
 
-        type Field18RefOptMutType<'this>: ::puroro::RefOptMut<'this, u32>;
-        fn u32_0x123_opt_mut<'this>(&'this mut self) -> Self::Field18RefOptMutType<'this>;
-        fn set_u32_0x123(&mut self, value: u32) {
-            *self.u32_0x123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u32_0x123(&mut self) {
-            *self.u32_0x123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u32_0x123(&mut self);
 
-        type Field21RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_default_opt_mut<'this>(&'this mut self) -> Self::Field21RefOptMutType<'this>;
-        fn set_i64_default(&mut self, value: i64) {
-            *self.i64_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_default(&mut self) {
-            *self.i64_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_default(&mut self);
 
-        type Field22RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_0_opt_mut<'this>(&'this mut self) -> Self::Field22RefOptMutType<'this>;
-        fn set_i64_0(&mut self, value: i64) {
-            *self.i64_0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_0(&mut self) {
-            *self.i64_0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_0(&mut self);
 
-        type Field23RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_42_opt_mut<'this>(&'this mut self) -> Self::Field23RefOptMutType<'this>;
-        fn set_i64_42(&mut self, value: i64) {
-            *self.i64_42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_42(&mut self) {
-            *self.i64_42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_42(&mut self);
 
-        type Field24RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_m42_opt_mut<'this>(&'this mut self) -> Self::Field24RefOptMutType<'this>;
-        fn set_i64_m42(&mut self, value: i64) {
-            *self.i64_m42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_m42(&mut self) {
-            *self.i64_m42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_m42(&mut self);
 
-        type Field25RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_9223372036854775807_opt_mut<'this>(
-            &'this mut self,
-        ) -> Self::Field25RefOptMutType<'this>;
-        fn set_i64_9223372036854775807(&mut self, value: i64) {
-            *self.i64_9223372036854775807_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_9223372036854775807(&mut self) {
-            *self.i64_9223372036854775807_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_9223372036854775807(&mut self);
 
-        type Field26RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_m9223372036854775808_opt_mut<'this>(
-            &'this mut self,
-        ) -> Self::Field26RefOptMutType<'this>;
-        fn set_i64_m9223372036854775808(&mut self, value: i64) {
-            *self.i64_m9223372036854775808_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_m9223372036854775808(&mut self) {
-            *self.i64_m9223372036854775808_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_m9223372036854775808(&mut self);
 
-        type Field27RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_0123_opt_mut<'this>(&'this mut self) -> Self::Field27RefOptMutType<'this>;
-        fn set_i64_0123(&mut self, value: i64) {
-            *self.i64_0123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_0123(&mut self) {
-            *self.i64_0123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_0123(&mut self);
 
-        type Field28RefOptMutType<'this>: ::puroro::RefOptMut<'this, i64>;
-        fn i64_0x123_opt_mut<'this>(&'this mut self) -> Self::Field28RefOptMutType<'this>;
-        fn set_i64_0x123(&mut self, value: i64) {
-            *self.i64_0x123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_i64_0x123(&mut self) {
-            *self.i64_0x123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_i64_0x123(&mut self);
 
-        type Field31RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
-        fn u64_default_opt_mut<'this>(&'this mut self) -> Self::Field31RefOptMutType<'this>;
-        fn set_u64_default(&mut self, value: u64) {
-            *self.u64_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u64_default(&mut self) {
-            *self.u64_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u64_default(&mut self);
 
-        type Field32RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
-        fn u64_0_opt_mut<'this>(&'this mut self) -> Self::Field32RefOptMutType<'this>;
-        fn set_u64_0(&mut self, value: u64) {
-            *self.u64_0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u64_0(&mut self) {
-            *self.u64_0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u64_0(&mut self);
 
-        type Field33RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
-        fn u64_42_opt_mut<'this>(&'this mut self) -> Self::Field33RefOptMutType<'this>;
-        fn set_u64_42(&mut self, value: u64) {
-            *self.u64_42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u64_42(&mut self) {
-            *self.u64_42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u64_42(&mut self);
 
-        type Field35RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
-        fn u64_18446744073709551615_opt_mut<'this>(
-            &'this mut self,
-        ) -> Self::Field35RefOptMutType<'this>;
-        fn set_u64_18446744073709551615(&mut self, value: u64) {
-            *self.u64_18446744073709551615_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u64_18446744073709551615(&mut self) {
-            *self.u64_18446744073709551615_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u64_18446744073709551615(&mut self);
 
-        type Field37RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
-        fn u64_0123_opt_mut<'this>(&'this mut self) -> Self::Field37RefOptMutType<'this>;
-        fn set_u64_0123(&mut self, value: u64) {
-            *self.u64_0123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u64_0123(&mut self) {
-            *self.u64_0123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u64_0123(&mut self);
 
-        type Field38RefOptMutType<'this>: ::puroro::RefOptMut<'this, u64>;
-        fn u64_0x123_opt_mut<'this>(&'this mut self) -> Self::Field38RefOptMutType<'this>;
-        fn set_u64_0x123(&mut self, value: u64) {
-            *self.u64_0x123_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_u64_0x123(&mut self) {
-            *self.u64_0x123_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_u64_0x123(&mut self);
 
-        type Field41RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_default_opt_mut<'this>(&'this mut self) -> Self::Field41RefOptMutType<'this>;
-        fn set_f32_default(&mut self, value: f32) {
-            *self.f32_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_default(&mut self) {
-            *self.f32_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_default(&mut self);
 
-        type Field42RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_0_opt_mut<'this>(&'this mut self) -> Self::Field42RefOptMutType<'this>;
-        fn set_f32_0(&mut self, value: f32) {
-            *self.f32_0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_0(&mut self) {
-            *self.f32_0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_0(&mut self);
 
-        type Field43RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_m0_opt_mut<'this>(&'this mut self) -> Self::Field43RefOptMutType<'this>;
-        fn set_f32_m0(&mut self, value: f32) {
-            *self.f32_m0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_m0(&mut self) {
-            *self.f32_m0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_m0(&mut self);
 
-        type Field44RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_0p_opt_mut<'this>(&'this mut self) -> Self::Field44RefOptMutType<'this>;
-        fn set_f32_0p(&mut self, value: f32) {
-            *self.f32_0p_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_0p(&mut self) {
-            *self.f32_0p_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_0p(&mut self);
 
-        type Field45RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_p0_opt_mut<'this>(&'this mut self) -> Self::Field45RefOptMutType<'this>;
-        fn set_f32_p0(&mut self, value: f32) {
-            *self.f32_p0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_p0(&mut self) {
-            *self.f32_p0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_p0(&mut self);
 
-        type Field46RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_0p0_opt_mut<'this>(&'this mut self) -> Self::Field46RefOptMutType<'this>;
-        fn set_f32_0p0(&mut self, value: f32) {
-            *self.f32_0p0_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_0p0(&mut self) {
-            *self.f32_0p0_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_0p0(&mut self);
 
-        type Field47RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_42_opt_mut<'this>(&'this mut self) -> Self::Field47RefOptMutType<'this>;
-        fn set_f32_42(&mut self, value: f32) {
-            *self.f32_42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_42(&mut self) {
-            *self.f32_42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_42(&mut self);
 
-        type Field48RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_m42_opt_mut<'this>(&'this mut self) -> Self::Field48RefOptMutType<'this>;
-        fn set_f32_m42(&mut self, value: f32) {
-            *self.f32_m42_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_m42(&mut self) {
-            *self.f32_m42_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_m42(&mut self);
 
-        type Field49RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_0p25_opt_mut<'this>(&'this mut self) -> Self::Field49RefOptMutType<'this>;
-        fn set_f32_0p25(&mut self, value: f32) {
-            *self.f32_0p25_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_0p25(&mut self) {
-            *self.f32_0p25_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_0p25(&mut self);
 
-        type Field50RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_1p5e2_opt_mut<'this>(&'this mut self) -> Self::Field50RefOptMutType<'this>;
-        fn set_f32_1p5e2(&mut self, value: f32) {
-            *self.f32_1p5e2_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_1p5e2(&mut self) {
-            *self.f32_1p5e2_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_1p5e2(&mut self);
 
-        type Field51RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_inf_opt_mut<'this>(&'this mut self) -> Self::Field51RefOptMutType<'this>;
-        fn set_f32_inf(&mut self, value: f32) {
-            *self.f32_inf_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_inf(&mut self) {
-            *self.f32_inf_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_inf(&mut self);
 
-        type Field52RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_minf_opt_mut<'this>(&'this mut self) -> Self::Field52RefOptMutType<'this>;
-        fn set_f32_minf(&mut self, value: f32) {
-            *self.f32_minf_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_minf(&mut self) {
-            *self.f32_minf_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_minf(&mut self);
 
-        type Field53RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_nan_opt_mut<'this>(&'this mut self) -> Self::Field53RefOptMutType<'this>;
-        fn set_f32_nan(&mut self, value: f32) {
-            *self.f32_nan_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_nan(&mut self) {
-            *self.f32_nan_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_nan(&mut self);
 
-        type Field54RefOptMutType<'this>: ::puroro::RefOptMut<'this, f32>;
-        fn f32_mnan_opt_mut<'this>(&'this mut self) -> Self::Field54RefOptMutType<'this>;
-        fn set_f32_mnan(&mut self, value: f32) {
-            *self.f32_mnan_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_f32_mnan(&mut self) {
-            *self.f32_mnan_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_f32_mnan(&mut self);
 
-        type Field61RefOptMutType<'this>: ::puroro::RefOptMut<'this, bool>;
-        fn bool_default_opt_mut<'this>(&'this mut self) -> Self::Field61RefOptMutType<'this>;
-        fn set_bool_default(&mut self, value: bool) {
-            *self.bool_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bool_default(&mut self) {
-            *self.bool_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bool_default(&mut self);
 
-        type Field62RefOptMutType<'this>: ::puroro::RefOptMut<'this, bool>;
-        fn bool_true_opt_mut<'this>(&'this mut self) -> Self::Field62RefOptMutType<'this>;
-        fn set_bool_true(&mut self, value: bool) {
-            *self.bool_true_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bool_true(&mut self) {
-            *self.bool_true_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bool_true(&mut self);
 
-        type Field63RefOptMutType<'this>: ::puroro::RefOptMut<'this, bool>;
-        fn bool_false_opt_mut<'this>(&'this mut self) -> Self::Field63RefOptMutType<'this>;
-        fn set_bool_false(&mut self, value: bool) {
-            *self.bool_false_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bool_false(&mut self) {
-            *self.bool_false_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bool_false(&mut self);
+        type Field71StringMutType;
 
-        type Field71RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn string_default_opt_mut<'this>(&'this mut self) -> Self::Field71RefOptMutType<'this>;
-        fn set_string_default(&mut self, value: &str) {
-            *self.string_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_string_default(&mut self) {
-            *self.string_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_string_default(&mut self);
+        type Field72StringMutType;
 
-        type Field72RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn string_empty_opt_mut<'this>(&'this mut self) -> Self::Field72RefOptMutType<'this>;
-        fn set_string_empty(&mut self, value: &str) {
-            *self.string_empty_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_string_empty(&mut self) {
-            *self.string_empty_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_string_empty(&mut self);
+        type Field73StringMutType;
 
-        type Field73RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn string_abc_opt_mut<'this>(&'this mut self) -> Self::Field73RefOptMutType<'this>;
-        fn set_string_abc(&mut self, value: &str) {
-            *self.string_abc_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_string_abc(&mut self) {
-            *self.string_abc_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_string_abc(&mut self);
+        type Field74StringMutType;
 
-        type Field74RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn string_aiu_opt_mut<'this>(&'this mut self) -> Self::Field74RefOptMutType<'this>;
-        fn set_string_aiu(&mut self, value: &str) {
-            *self.string_aiu_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_string_aiu(&mut self) {
-            *self.string_aiu_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_string_aiu(&mut self);
+        type Field75StringMutType;
 
-        type Field75RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn string_backslash_opt_mut<'this>(&'this mut self) -> Self::Field75RefOptMutType<'this>;
-        fn set_string_backslash(&mut self, value: &str) {
-            *self.string_backslash_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_string_backslash(&mut self) {
-            *self.string_backslash_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_string_backslash(&mut self);
+        type Field76StringMutType;
 
-        type Field76RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn string_tab_opt_mut<'this>(&'this mut self) -> Self::Field76RefOptMutType<'this>;
-        fn set_string_tab(&mut self, value: &str) {
-            *self.string_tab_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_string_tab(&mut self) {
-            *self.string_tab_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_string_tab(&mut self);
+        type Field77StringMutType;
 
-        type Field77RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn string_crlf_opt_mut<'this>(&'this mut self) -> Self::Field77RefOptMutType<'this>;
-        fn set_string_crlf(&mut self, value: &str) {
-            *self.string_crlf_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_string_crlf(&mut self) {
-            *self.string_crlf_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_string_crlf(&mut self);
+        type Field81BytesMutType;
 
-        type Field81RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
-        fn bytes_default_opt_mut<'this>(&'this mut self) -> Self::Field81RefOptMutType<'this>;
-        fn set_bytes_default(&mut self, value: &[u8]) {
-            *self.bytes_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bytes_default(&mut self) {
-            *self.bytes_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bytes_default(&mut self);
+        type Field82BytesMutType;
 
-        type Field82RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
-        fn bytes_empty_opt_mut<'this>(&'this mut self) -> Self::Field82RefOptMutType<'this>;
-        fn set_bytes_empty(&mut self, value: &[u8]) {
-            *self.bytes_empty_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bytes_empty(&mut self) {
-            *self.bytes_empty_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bytes_empty(&mut self);
+        type Field83BytesMutType;
 
-        type Field83RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
-        fn bytes_abc_opt_mut<'this>(&'this mut self) -> Self::Field83RefOptMutType<'this>;
-        fn set_bytes_abc(&mut self, value: &[u8]) {
-            *self.bytes_abc_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bytes_abc(&mut self) {
-            *self.bytes_abc_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bytes_abc(&mut self);
+        type Field84BytesMutType;
 
-        type Field84RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
-        fn bytes_aiu_opt_mut<'this>(&'this mut self) -> Self::Field84RefOptMutType<'this>;
-        fn set_bytes_aiu(&mut self, value: &[u8]) {
-            *self.bytes_aiu_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bytes_aiu(&mut self) {
-            *self.bytes_aiu_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bytes_aiu(&mut self);
+        type Field85BytesMutType;
 
-        type Field85RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
-        fn bytes_backslash_opt_mut<'this>(&'this mut self) -> Self::Field85RefOptMutType<'this>;
-        fn set_bytes_backslash(&mut self, value: &[u8]) {
-            *self.bytes_backslash_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bytes_backslash(&mut self) {
-            *self.bytes_backslash_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bytes_backslash(&mut self);
+        type Field86BytesMutType;
 
-        type Field86RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
-        fn bytes_tab_opt_mut<'this>(&'this mut self) -> Self::Field86RefOptMutType<'this>;
-        fn set_bytes_tab(&mut self, value: &[u8]) {
-            *self.bytes_tab_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bytes_tab(&mut self) {
-            *self.bytes_tab_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bytes_tab(&mut self);
+        type Field87BytesMutType;
 
-        type Field87RefOptMutType<'this>: ::puroro::RefOptMut<'this, &[u8]>;
-        fn bytes_crlf_opt_mut<'this>(&'this mut self) -> Self::Field87RefOptMutType<'this>;
-        fn set_bytes_crlf(&mut self, value: &[u8]) {
-            *self.bytes_crlf_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_bytes_crlf(&mut self) {
-            *self.bytes_crlf_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_bytes_crlf(&mut self);
 
-        type Field91RefOptMutType<'this>: ::puroro::RefOptMut<
-            'this,
-            self::_puroro_root::proto2_defaults::MyEnum,
-        >;
-        fn enum_default_opt_mut<'this>(&'this mut self) -> Self::Field91RefOptMutType<'this>;
-        fn set_enum_default(&mut self, value: self::_puroro_root::proto2_defaults::MyEnum) {
-            *self.enum_default_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_enum_default(&mut self) {
-            *self.enum_default_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_enum_default(&mut self);
 
-        type Field92RefOptMutType<'this>: ::puroro::RefOptMut<
-            'this,
-            self::_puroro_root::proto2_defaults::MyEnum,
-        >;
-        fn enum_one_opt_mut<'this>(&'this mut self) -> Self::Field92RefOptMutType<'this>;
-        fn set_enum_one(&mut self, value: self::_puroro_root::proto2_defaults::MyEnum) {
-            *self.enum_one_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_enum_one(&mut self) {
-            *self.enum_one_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_enum_one(&mut self);
 
-        type Field93RefOptMutType<'this>: ::puroro::RefOptMut<
-            'this,
-            self::_puroro_root::proto2_defaults::MyEnum,
-        >;
-        fn enum_fourty_two_opt_mut<'this>(&'this mut self) -> Self::Field93RefOptMutType<'this>;
-        fn set_enum_fourty_two(&mut self, value: self::_puroro_root::proto2_defaults::MyEnum) {
-            *self.enum_fourty_two_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_enum_fourty_two(&mut self) {
-            *self.enum_fourty_two_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_enum_fourty_two(&mut self);
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]

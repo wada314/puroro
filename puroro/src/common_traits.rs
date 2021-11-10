@@ -18,7 +18,6 @@ use crate::internal::se::SerMessageToIoWrite;
 use crate::Result;
 use ::std::convert::TryFrom;
 use ::std::io::Write;
-use ::std::ops::{Deref, DerefMut};
 
 /// A common trait for protobuf message implementation in Rust.
 pub trait Message<M> {
@@ -123,8 +122,3 @@ pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {
 /// Currently this trait is just an analogous of [`std::iter::IntoIterator`].
 pub trait RepeatedField<'msg>: IntoIterator {}
 impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
-
-pub trait RefOptMut<'msg, T>: DerefMut + Deref<Target = Option<T>> {
-    type Unwrapped: RefMut<'msg, T>;
-}
-pub trait RefMut<'msg, T>: DerefMut + Deref<Target = T> {}

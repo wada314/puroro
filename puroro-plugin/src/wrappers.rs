@@ -651,16 +651,6 @@ impl Field {
             t => t.numerical_rust_type()?.to_string(),
         })
     }
-    pub fn trait_scalar_mutable_target_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => "&str".to_string(),
-            FieldType::Bytes => "&[u8]".to_string(),
-            FieldType::Message(_) => "T".to_string(),
-            t => t.numerical_rust_type()?.to_string(),
-        })
-    }
     pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,

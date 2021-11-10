@@ -387,14 +387,7 @@ pub mod _puroro_mut_traits {
     }
 
     pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
-        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn type_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
-        fn set_type(&mut self, value: i32) {
-            *self.type_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_type(&mut self) {
-            *self.type_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_type(&mut self);
     }
 }
 pub use _puroro_nested::*;

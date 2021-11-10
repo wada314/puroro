@@ -1554,36 +1554,21 @@ pub mod _puroro_mut_traits {
     }
 
     pub trait Test1MutTrait: super::_puroro_traits::Test1Trait {
-        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, i32>;
-        fn a_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
-        fn set_a(&mut self, value: i32) {
-            *self.a_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_a(&mut self) {
-            *self.a_opt_mut() = ::std::option::Option::None;
-        }
+        fn clear_a(&mut self);
     }
     pub trait Test2MutTrait: super::_puroro_traits::Test2Trait {
-        type Field2RefOptMutType<'this>: ::puroro::RefOptMut<'this, &str>;
-        fn b_opt_mut<'this>(&'this mut self) -> Self::Field2RefOptMutType<'this>;
-        fn set_b(&mut self, value: &str) {
-            *self.b_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_b(&mut self) {
-            *self.b_opt_mut() = ::std::option::Option::None;
-        }
+        type Field2StringMutType;
+
+        fn clear_b(&mut self);
     }
     pub trait Test3MutTrait: super::_puroro_traits::Test3Trait {
-        type Field3RefOptMutType<'this>: ::puroro::RefOptMut<'this, T>;
-        fn c_opt_mut<'this>(&'this mut self) -> Self::Field3RefOptMutType<'this>;
-        fn set_c(&mut self, value: T) {
-            *self.c_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_c(&mut self) {
-            *self.c_opt_mut() = ::std::option::Option::None;
-        }
+        type Field3MessageMutType;
+
+        fn clear_c(&mut self);
     }
-    pub trait Test4MutTrait: super::_puroro_traits::Test4Trait {}
+    pub trait Test4MutTrait: super::_puroro_traits::Test4Trait {
+        type Field4RepeatedMutType;
+    }
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {

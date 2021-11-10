@@ -482,14 +482,9 @@ pub mod _puroro_mut_traits {
     }
 
     pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
-        type Field1RefOptMutType<'this>: ::puroro::RefOptMut<'this, T>;
-        fn recursive_unlabeled_opt_mut<'this>(&'this mut self) -> Self::Field1RefOptMutType<'this>;
-        fn set_recursive_unlabeled(&mut self, value: T) {
-            *self.recursive_unlabeled_opt_mut() = ::std::option::Option::Some(value);
-        }
-        fn clear_recursive_unlabeled(&mut self) {
-            *self.recursive_unlabeled_opt_mut() = ::std::option::Option::None;
-        }
+        type Field1MessageMutType;
+
+        fn clear_recursive_unlabeled(&mut self);
     }
 }
 pub use _puroro_nested::*;
