@@ -1561,18 +1561,21 @@ pub mod _puroro_mut_traits {
     pub trait Test1MutTrait: super::_puroro_traits::Test1Trait {
         fn clear_a(&mut self);
     }
+
     pub trait Test2MutTrait: super::_puroro_traits::Test2Trait {
-        type Field2StringMutType;
+        type Field2StringMutType<'this>;
 
         fn clear_b(&mut self);
     }
+
     pub trait Test3MutTrait: super::_puroro_traits::Test3Trait {
-        type Field3MessageMutType;
+        type Field3MessageMutType<'this>;
 
         fn clear_c(&mut self);
     }
+
     pub trait Test4MutTrait: super::_puroro_traits::Test4Trait {
-        type Field4RepeatedMutType;
+        type Field4RepeatedMutType<'this>;
     }
 }
 pub use _puroro_nested::*;

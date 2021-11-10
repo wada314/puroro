@@ -482,7 +482,7 @@ pub mod _puroro_mut_traits {
     }
 
     pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
-        type Field1MessageMutType;
+        type Field1MessageMutType<'this>;
 
         fn clear_recursive_unlabeled(&mut self);
     }

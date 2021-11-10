@@ -2067,20 +2067,21 @@ pub mod _puroro_mut_traits {
 
     pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
         fn clear_g1_int32(&mut self);
-        type Field2StringMutType;
+        type Field2StringMutType<'this>;
 
         fn clear_g1_string(&mut self);
 
         fn clear_g2_f32(&mut self);
-        type Field4StringMutType;
+        type Field4StringMutType<'this>;
 
         fn clear_g2_string(&mut self);
-        type Field5MessageMutType;
+        type Field5MessageMutType<'this>;
 
         fn clear_g2_submsg(&mut self);
 
         fn clear_g3_int32(&mut self);
     }
+
     pub trait SubmsgMutTrait: super::_puroro_traits::SubmsgTrait {
         fn clear_i32_unlabeled(&mut self);
     }

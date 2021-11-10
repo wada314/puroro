@@ -487,9 +487,9 @@ struct BumpaloOneof<'a> {
 }
 
 #[derive(Template)]
-#[template(path = "mut_traits.rs.txt")]
-struct MutTraits<'a> {
-    messages: &'a [Message],
+#[template(path = "mut_trait.rs.txt")]
+struct MutTrait<'a> {
+    m: &'a Message,
 }
 
 mod filters {
@@ -503,7 +503,7 @@ mod filters {
     pub(super) fn print_bumpalo_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
         Ok(BumpaloOneof { oneof })
     }
-    pub(super) fn print_mut_traits(messages: &[Message]) -> ::askama::Result<MutTraits> {
-        Ok(MutTraits { messages })
+    pub(super) fn print_mut_trait(message: &Message) -> ::askama::Result<MutTrait> {
+        Ok(MutTrait { m: message })
     }
 }

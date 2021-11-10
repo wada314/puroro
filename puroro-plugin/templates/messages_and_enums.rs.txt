@@ -14,14 +14,16 @@ pub mod _puroro_traits {
     }
     {%- for message in messages %}
     {{ message|print_trait|indent(4) }}
-    {%- endfor %} {#- for m in messages #}
+    {%- endfor %} {#- for message in messages #}
 }
 pub use _puroro_mut_traits::*;
 pub mod _puroro_mut_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    {{ messages|print_mut_traits|indent(4) }}
+    {%- for message in messages %}
+    {{ message|print_mut_trait|indent(4) }}
+    {%- endfor %} {#- for message in messages #}
 }
 {%- endif %}
 

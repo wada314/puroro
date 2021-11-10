@@ -2930,27 +2930,27 @@ pub mod _puroro_mut_traits {
     pub trait MsgMutTrait: super::_puroro_traits::MsgTrait {
         fn clear_i32_unlabeled(&mut self);
 
-        type Field2RepeatedMutType;
+        type Field2RepeatedMutType<'this>;
 
         fn clear_float_unlabeled(&mut self);
 
-        type Field4RepeatedMutType;
-        type Field5StringMutType;
+        type Field4RepeatedMutType<'this>;
+        type Field5StringMutType<'this>;
 
         fn clear_string_unlabeled(&mut self);
-        type Field6StringMutType;
+        type Field6StringMutType<'this>;
 
-        type Field6RepeatedMutType;
-        type Field7MessageMutType;
+        type Field6RepeatedMutType<'this>;
+        type Field7MessageMutType<'this>;
 
         fn clear_submsg_unlabeled(&mut self);
-        type Field8MessageMutType;
+        type Field8MessageMutType<'this>;
 
-        type Field8RepeatedMutType;
+        type Field8RepeatedMutType<'this>;
 
         fn clear_enum_unlabeled(&mut self);
 
-        type Field10RepeatedMutType;
+        type Field10RepeatedMutType<'this>;
 
         fn clear_very_large_field_number(&mut self);
     }

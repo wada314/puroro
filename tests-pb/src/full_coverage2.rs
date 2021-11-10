@@ -15032,106 +15032,106 @@ pub mod _puroro_mut_traits {
 
         fn clear_i32_optional(&mut self);
 
-        type Field3RepeatedMutType;
+        type Field3RepeatedMutType<'this>;
 
         fn clear_float_required(&mut self);
 
         fn clear_float_optional(&mut self);
 
-        type Field13RepeatedMutType;
-        type Field21BytesMutType;
+        type Field13RepeatedMutType<'this>;
+        type Field21BytesMutType<'this>;
 
         fn clear_bytes_required(&mut self);
-        type Field22BytesMutType;
+        type Field22BytesMutType<'this>;
 
         fn clear_bytes_optional(&mut self);
-        type Field23BytesMutType;
+        type Field23BytesMutType<'this>;
 
-        type Field23RepeatedMutType;
-        type Field31StringMutType;
+        type Field23RepeatedMutType<'this>;
+        type Field31StringMutType<'this>;
 
         fn clear_string_required(&mut self);
-        type Field32StringMutType;
+        type Field32StringMutType<'this>;
 
         fn clear_string_optional(&mut self);
-        type Field33StringMutType;
+        type Field33StringMutType<'this>;
 
-        type Field33RepeatedMutType;
+        type Field33RepeatedMutType<'this>;
 
         fn clear_enum_required(&mut self);
 
         fn clear_enum_optional(&mut self);
 
-        type Field43RepeatedMutType;
-        type Field51MessageMutType;
+        type Field43RepeatedMutType<'this>;
+        type Field51MessageMutType<'this>;
 
         fn clear_submsg_required(&mut self);
-        type Field52MessageMutType;
+        type Field52MessageMutType<'this>;
 
         fn clear_submsg_optional(&mut self);
-        type Field53MessageMutType;
+        type Field53MessageMutType<'this>;
 
-        type Field53RepeatedMutType;
+        type Field53RepeatedMutType<'this>;
 
         fn clear_i64_required(&mut self);
 
         fn clear_i64_optional(&mut self);
 
-        type Field103RepeatedMutType;
+        type Field103RepeatedMutType<'this>;
 
         fn clear_u32_required(&mut self);
 
         fn clear_u32_optional(&mut self);
 
-        type Field113RepeatedMutType;
+        type Field113RepeatedMutType<'this>;
 
         fn clear_u64_required(&mut self);
 
         fn clear_u64_optional(&mut self);
 
-        type Field123RepeatedMutType;
+        type Field123RepeatedMutType<'this>;
 
         fn clear_s32_required(&mut self);
 
         fn clear_s32_optional(&mut self);
 
-        type Field133RepeatedMutType;
+        type Field133RepeatedMutType<'this>;
 
         fn clear_s64_required(&mut self);
 
         fn clear_s64_optional(&mut self);
 
-        type Field143RepeatedMutType;
+        type Field143RepeatedMutType<'this>;
 
         fn clear_fixed32_required(&mut self);
 
         fn clear_fixed32_optional(&mut self);
 
-        type Field153RepeatedMutType;
+        type Field153RepeatedMutType<'this>;
 
         fn clear_fixed64_required(&mut self);
 
         fn clear_fixed64_optional(&mut self);
 
-        type Field163RepeatedMutType;
+        type Field163RepeatedMutType<'this>;
 
         fn clear_sfixed32_required(&mut self);
 
         fn clear_sfixed32_optional(&mut self);
 
-        type Field173RepeatedMutType;
+        type Field173RepeatedMutType<'this>;
 
         fn clear_sfixed64_required(&mut self);
 
         fn clear_sfixed64_optional(&mut self);
 
-        type Field183RepeatedMutType;
+        type Field183RepeatedMutType<'this>;
 
         fn clear_f64_required(&mut self);
 
         fn clear_f64_optional(&mut self);
 
-        type Field193RepeatedMutType;
+        type Field193RepeatedMutType<'this>;
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]

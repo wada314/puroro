@@ -9878,46 +9878,46 @@ pub mod _puroro_mut_traits {
         fn clear_bool_true(&mut self);
 
         fn clear_bool_false(&mut self);
-        type Field71StringMutType;
+        type Field71StringMutType<'this>;
 
         fn clear_string_default(&mut self);
-        type Field72StringMutType;
+        type Field72StringMutType<'this>;
 
         fn clear_string_empty(&mut self);
-        type Field73StringMutType;
+        type Field73StringMutType<'this>;
 
         fn clear_string_abc(&mut self);
-        type Field74StringMutType;
+        type Field74StringMutType<'this>;
 
         fn clear_string_aiu(&mut self);
-        type Field75StringMutType;
+        type Field75StringMutType<'this>;
 
         fn clear_string_backslash(&mut self);
-        type Field76StringMutType;
+        type Field76StringMutType<'this>;
 
         fn clear_string_tab(&mut self);
-        type Field77StringMutType;
+        type Field77StringMutType<'this>;
 
         fn clear_string_crlf(&mut self);
-        type Field81BytesMutType;
+        type Field81BytesMutType<'this>;
 
         fn clear_bytes_default(&mut self);
-        type Field82BytesMutType;
+        type Field82BytesMutType<'this>;
 
         fn clear_bytes_empty(&mut self);
-        type Field83BytesMutType;
+        type Field83BytesMutType<'this>;
 
         fn clear_bytes_abc(&mut self);
-        type Field84BytesMutType;
+        type Field84BytesMutType<'this>;
 
         fn clear_bytes_aiu(&mut self);
-        type Field85BytesMutType;
+        type Field85BytesMutType<'this>;
 
         fn clear_bytes_backslash(&mut self);
-        type Field86BytesMutType;
+        type Field86BytesMutType<'this>;
 
         fn clear_bytes_tab(&mut self);
-        type Field87BytesMutType;
+        type Field87BytesMutType<'this>;
 
         fn clear_bytes_crlf(&mut self);
 

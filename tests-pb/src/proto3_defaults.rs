@@ -1747,16 +1747,17 @@ pub mod _puroro_mut_traits {
 
         fn clear_i32_optional(&mut self);
 
-        type Field3RepeatedMutType;
+        type Field3RepeatedMutType<'this>;
 
         fn clear_f32_unlabeled(&mut self);
-        type Field5StringMutType;
+        type Field5StringMutType<'this>;
 
         fn clear_string_unlabeled(&mut self);
-        type Field6MessageMutType;
+        type Field6MessageMutType<'this>;
 
         fn clear_submsg_unlabeled(&mut self);
     }
+
     pub trait SubmsgMutTrait: super::_puroro_traits::SubmsgTrait {
         fn clear_i32_unlabeled(&mut self);
     }

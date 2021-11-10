@@ -1,20 +1,20 @@
-{%- for m in messages %}
+
 pub trait {{ m.mut_trait_ident }}: super::_puroro_traits::{{ m.trait_ident }} {
     {%- for f in m.fields %}
 
     {%- if f.is_string %}
-    type Field{{ f.number }}StringMutType;
+    type Field{{ f.number }}StringMutType<'this>;
     {%- endif %} {#- if f.is_string #}
     {%- if f.is_bytes %}
-    type Field{{ f.number }}BytesMutType;
+    type Field{{ f.number }}BytesMutType<'this>;
     {%- endif %} {#- if f.is_bytes #}
     {%- if f.is_message %}
-    type Field{{ f.number }}MessageMutType;
+    type Field{{ f.number }}MessageMutType<'this>;
     {%- endif %} {#- if f.is_message #}
 
     {%- if f.is_repeated %}
 
-    type Field{{ f.number }}RepeatedMutType;
+    type Field{{ f.number }}RepeatedMutType<'this>;
 
     {%- else %} {#- if f.is_repeated #}
 
@@ -24,4 +24,3 @@ pub trait {{ m.mut_trait_ident }}: super::_puroro_traits::{{ m.trait_ident }} {
 
     {%- endfor %} {#- for f in m.fs #}
 }
-{%- endfor %} {#- for m in messages #}
