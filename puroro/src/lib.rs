@@ -142,7 +142,7 @@
 //! impl<'a, T: MyMessageTrait> MyMessageTrait for &'a mut T { /* ... */ }
 //! impl<T: MyMessageTrait> MyMessageTrait for Box<T> { /* ... */ }
 //! impl<T: MyMessageTrait> MyMessageTrait for Option<T> { /* ... */ }
-//! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for (T, U) { /* ... */ }
+//! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for puroro::Merged<T, U> { /* ... */ }
 //! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for puroro::Either<T, U> { /* ... */ }
 //! ```
 //!
@@ -156,6 +156,7 @@
 //!  
 //! ```rust
 //! # use ::std::ops::Deref;
+//! # use puroro::Merged;
 //! # trait MyMessageTrait {}
 //! pub struct MyMessageBuilder<T>(T);
 //! impl MyMessageBuilder<()> {
@@ -166,12 +167,12 @@
 //! }
 //! impl<T: MyMessageTrait> MyMessageBuilder<T> {
 //!     pub fn append_my_number(self, value: i32)
-//!     -> MyMessageBuilder<(T, MyMessageSingleField1)> {
+//!     -> MyMessageBuilder<Merged<T, MyMessageSingleField1>> {
 //! #       todo!()
 //!         /* ... */
 //!     }
 //!     pub fn append_my_name<U, V>(self, value: U)
-//!     -> MyMessageBuilder<(T, MyMessageSingleField2<U, V>)>
+//!     -> MyMessageBuilder<Merged<T, MyMessageSingleField2<U, V>>>
 //!     where
 //!         for<'a> &'a U: IntoIterator<Item=&'a V>,
 //!         V: AsRef<str>,
@@ -180,7 +181,7 @@
 //!         /* ... */
 //!     }
 //!     pub fn append_my_child<U: MyMessageTrait>(self, value: U)
-//!     -> MyMessageBuilder<(T, MyMessageSingleField3<U>)> {
+//!     -> MyMessageBuilder<Merged<T, MyMessageSingleField3<U>>> {
 //! #       todo!()
 //!         /* ... */
 //!     }
@@ -219,6 +220,17 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
+
+#[derive(PartialEq, Debug)]
+pub struct Merged<T, U>(pub T, pub U);
+pub fn merge<T, U>(t: T, u: U) -> Merged<T, U> {
+    Merged(t, u)
+}
+impl<T: Clone, U: Clone> Clone for Merged<T, U> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone(), self.1.clone())
+    }
+}
 
 use ::std::ops::{Deref, DerefMut};
 

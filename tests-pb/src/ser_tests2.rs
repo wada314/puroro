@@ -2081,14 +2081,14 @@ pub mod _puroro_impls {
         pub fn append_i32_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField1<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField1 {
                     i32_optional: value,
@@ -2099,7 +2099,7 @@ pub mod _puroro_impls {
         pub fn append_i32_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField2<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField2<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
@@ -2107,7 +2107,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField2 {
                     i32_repeated: value,
@@ -2118,14 +2118,14 @@ pub mod _puroro_impls {
         pub fn append_float_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField3<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField3<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField3 {
                     float_optional: value,
@@ -2136,7 +2136,7 @@ pub mod _puroro_impls {
         pub fn append_float_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField4<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField4<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
@@ -2144,7 +2144,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField4 {
                     float_repeated: value,
@@ -2155,14 +2155,14 @@ pub mod _puroro_impls {
         pub fn append_string_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField5<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField5 {
                     string_optional: value,
@@ -2173,7 +2173,7 @@ pub mod _puroro_impls {
         pub fn append_string_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField6<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField6<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
@@ -2181,7 +2181,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField6 {
                     string_repeated: value,
@@ -2192,7 +2192,7 @@ pub mod _puroro_impls {
         pub fn append_submsg_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField7<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField7<ScalarType>>>
         where
             ScalarType:
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
@@ -2200,7 +2200,7 @@ pub mod _puroro_impls {
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField7 {
                     submsg_optional: value,
@@ -2211,7 +2211,7 @@ pub mod _puroro_impls {
         pub fn append_submsg_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField8<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField8<ScalarType, RepeatedType>>>
         where
             ScalarType:
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
@@ -2220,7 +2220,7 @@ pub mod _puroro_impls {
                     + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField8 {
                     submsg_repeated: value,
@@ -2231,14 +2231,14 @@ pub mod _puroro_impls {
         pub fn append_enum_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField9<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField9<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests2::Enum>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField9 {
                     enum_optional: value,
@@ -2249,7 +2249,7 @@ pub mod _puroro_impls {
         pub fn append_enum_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField10<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField10<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests2::Enum>
                 + ::std::clone::Clone
@@ -2257,7 +2257,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField10 {
                     enum_repeated: value,
@@ -2268,14 +2268,14 @@ pub mod _puroro_impls {
         pub fn append_very_large_field_number<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField536870911<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField536870911<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField536870911 {
                     very_large_field_number: value,
@@ -2560,7 +2560,7 @@ pub mod _puroro_traits {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
-    impl<T, U> MsgTrait for (T, U)
+    impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
         U: MsgTrait,
@@ -2622,19 +2622,19 @@ pub mod _puroro_traits {
         type Field7MessageType<'this>
         where
             Self: 'this,
-        = (
+        = ::puroro::Merged<
             ::std::option::Option<<T as MsgTrait>::Field7MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field7MessageType<'this>>,
-        );
+        >;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             match (
                 <T as MsgTrait>::submsg_optional_opt(&self.0),
                 <U as MsgTrait>::submsg_optional_opt(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some((Some(t), None)),
-                (None, Some(u)) => Some((None, Some(u))),
-                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+                (Some(t), None) => Some(::puroro::merge(Some(t), None)),
+                (None, Some(u)) => Some(::puroro::merge(None, Some(u))),
+                (Some(t), Some(u)) => Some(::puroro::merge(Some(t), Some(u))),
             }
         }
         type Field8MessageType<'this>
@@ -3251,14 +3251,14 @@ pub mod _puroro_nested {
                 pub fn append_i32_optional<ScalarType>(
                     self,
                     value: ScalarType,
-                ) -> SubmsgBuilder<(T, SubmsgSingleField1<ScalarType>)>
+                ) -> SubmsgBuilder<::puroro::Merged<T, SubmsgSingleField1<ScalarType>>>
                 where
                     ScalarType: ::std::convert::Into<i32>
                         + ::std::clone::Clone
                         + ::std::cmp::PartialEq
                         + ::std::fmt::Debug,
                 {
-                    SubmsgBuilder((
+                    SubmsgBuilder(::puroro::merge(
                         self.0,
                         SubmsgSingleField1 {
                             i32_optional: value,
@@ -3339,7 +3339,7 @@ pub mod _puroro_nested {
                 submsg_delegate!(T);
             }
             impl SubmsgTrait for () {}
-            impl<T, U> SubmsgTrait for (T, U)
+            impl<T, U> SubmsgTrait for ::puroro::Merged<T, U>
             where
                 T: SubmsgTrait,
                 U: SubmsgTrait,

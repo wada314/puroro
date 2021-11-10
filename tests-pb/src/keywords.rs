@@ -267,14 +267,14 @@ pub mod _puroro_impls {
         pub fn append_type<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField1<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField1 { r#type: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField1 { r#type: value }))
         }
 
         pub fn build(self) -> T {
@@ -350,7 +350,7 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {}
-    impl<T, U> MsgTrait for (T, U)
+    impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
         U: MsgTrait,

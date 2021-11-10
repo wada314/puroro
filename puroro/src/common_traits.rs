@@ -71,7 +71,7 @@ where
     M: MessageRepresentativeImpl,
 {
 }
-impl<M, T, U> Message<M> for (T, U)
+impl<M, T, U> Message<M> for crate::Merged<T, U>
 where
     T: Message<M>,
     U: Message<M>,
@@ -110,6 +110,20 @@ where
 }
 
 pub trait MessageRepresentativeImpl {}
+
+pub trait EmptyMessage {}
+impl EmptyMessage for () {}
+impl<'a, T> EmptyMessage for &'a T where T: EmptyMessage {}
+impl<'a, T> EmptyMessage for &'a mut T where T: EmptyMessage {}
+impl<T> EmptyMessage for Box<T> where T: EmptyMessage {}
+impl<'bump, T> EmptyMessage for crate::bumpalo::boxed::Box<'bump, T> where T: EmptyMessage {}
+impl<T> EmptyMessage for Option<T> where T: EmptyMessage {}
+impl<T, U> EmptyMessage for crate::Merged<T, U>
+where
+    T: EmptyMessage,
+    U: EmptyMessage,
+{
+}
 
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>

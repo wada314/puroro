@@ -140,7 +140,7 @@
 //! ### `puroro::Either<T, U>`
 //! Behaves as either `T` or `U`.
 //!
-//! ### `(T, U)`
+//! ### `puroro::Merged<T, U>`
 //! Behaves as a merged message of `T` and `U`.
 //! - Non-repeated, non-message field: Prioritize `U`'s value.
 //! - Non-repeated, message field: Merges `T`'s and `U`'s values.

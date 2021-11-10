@@ -307,14 +307,14 @@ pub mod _puroro_impls {
         pub fn append_recursive_unlabeled<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField1<ScalarType>>>
         where
             ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField1 {
                     recursive_unlabeled: value,
@@ -415,7 +415,7 @@ pub mod _puroro_traits {
             Self: 'this,
         = ();
     }
-    impl<T, U> MsgTrait for (T, U)
+    impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
         U: MsgTrait,
@@ -423,19 +423,19 @@ pub mod _puroro_traits {
         type Field1MessageType<'this>
         where
             Self: 'this,
-        = (
+        = ::puroro::Merged<
             ::std::option::Option<<T as MsgTrait>::Field1MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field1MessageType<'this>>,
-        );
+        >;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             match (
                 <T as MsgTrait>::recursive_unlabeled_opt(&self.0),
                 <U as MsgTrait>::recursive_unlabeled_opt(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some((Some(t), None)),
-                (None, Some(u)) => Some((None, Some(u))),
-                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+                (Some(t), None) => Some(::puroro::merge(Some(t), None)),
+                (None, Some(u)) => Some(::puroro::merge(None, Some(u))),
+                (Some(t), Some(u)) => Some(::puroro::merge(Some(t), Some(u))),
             }
         }
     }

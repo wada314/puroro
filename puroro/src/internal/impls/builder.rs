@@ -31,6 +31,7 @@
 //! ```rust
 //! # use ::std::ops::Deref;
 //! # trait MyMessageTrait {}
+//! # struct Merged<T, U>(T, U)
 //! pub struct MyMessageBuilder<T>(T);
 //! impl MyMessageBuilder<()> {
 //!     pub fn new() -> Self {
@@ -45,12 +46,12 @@
 //!     }
 //!
 //!     pub fn append_my_number(self, value: i32)
-//!     -> MyMessageBuilder<(T, MyMessageSingleField1)> {
+//!     -> MyMessageBuilder<Merged<T, MyMessageSingleField1>> {
 //! #       todo!()
 //!         /* ... */
 //!     }
 //!     pub fn append_my_name<U, V>(self, value: U)
-//!     -> MyMessageBuilder<(T, MyMessageSingleField2<U, V>)>
+//!     -> MyMessageBuilder<Merged<T, MyMessageSingleField2<U, V>>>
 //!     where
 //!         for<'a> &'a U: IntoIterator<Item=&'a V>,
 //!         V: AsRef<str>,
@@ -59,7 +60,7 @@
 //!         /* ... */
 //!     }
 //!     pub fn append_my_child<U: MyMessageTrait>(self, value: U)
-//!     -> MyMessageBuilder<(T, MyMessageSingleField3<U>)> {
+//!     -> MyMessageBuilder<Merged<T, MyMessageSingleField3<U>>> {
 //! #       todo!()
 //!         /* ... */
 //!     }
@@ -70,7 +71,7 @@
 //! }
 //! pub struct MyMessageSingleField2<T, U> {
 //!     /* ... */
-//! #     dummy: (T, U),
+//! #     dummy: Merged<T, U>,
 //! }
 //! pub struct MyMessageSingleField3<T> {
 //!     /* ... */

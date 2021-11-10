@@ -488,14 +488,14 @@ pub mod _puroro_impls {
         pub fn append_a<ScalarType>(
             self,
             value: ScalarType,
-        ) -> Test1Builder<(T, Test1SingleField1<ScalarType>)>
+        ) -> Test1Builder<::puroro::Merged<T, Test1SingleField1<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            Test1Builder((self.0, Test1SingleField1 { a: value }))
+            Test1Builder(::puroro::merge(self.0, Test1SingleField1 { a: value }))
         }
 
         pub fn build(self) -> T {
@@ -678,14 +678,14 @@ pub mod _puroro_impls {
         pub fn append_b<ScalarType>(
             self,
             value: ScalarType,
-        ) -> Test2Builder<(T, Test2SingleField2<ScalarType>)>
+        ) -> Test2Builder<::puroro::Merged<T, Test2SingleField2<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            Test2Builder((self.0, Test2SingleField2 { b: value }))
+            Test2Builder(::puroro::merge(self.0, Test2SingleField2 { b: value }))
         }
 
         pub fn build(self) -> T {
@@ -896,14 +896,14 @@ pub mod _puroro_impls {
         pub fn append_c<ScalarType>(
             self,
             value: ScalarType,
-        ) -> Test3Builder<(T, Test3SingleField3<ScalarType>)>
+        ) -> Test3Builder<::puroro::Merged<T, Test3SingleField3<ScalarType>>>
         where
             ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            Test3Builder((self.0, Test3SingleField3 { c: value }))
+            Test3Builder(::puroro::merge(self.0, Test3SingleField3 { c: value }))
         }
 
         pub fn build(self) -> T {
@@ -1103,7 +1103,7 @@ pub mod _puroro_impls {
         pub fn append_d<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> Test4Builder<(T, Test4SingleField4<ScalarType, RepeatedType>)>
+        ) -> Test4Builder<::puroro::Merged<T, Test4SingleField4<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
@@ -1111,7 +1111,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            Test4Builder((self.0, Test4SingleField4 { d: value }))
+            Test4Builder(::puroro::merge(self.0, Test4SingleField4 { d: value }))
         }
 
         pub fn build(self) -> T {
@@ -1187,7 +1187,7 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
     impl Test1Trait for () {}
-    impl<T, U> Test1Trait for (T, U)
+    impl<T, U> Test1Trait for ::puroro::Merged<T, U>
     where
         T: Test1Trait,
         U: Test1Trait,
@@ -1273,7 +1273,7 @@ pub mod _puroro_traits {
         test2_delegate!(T);
     }
     impl Test2Trait for () {}
-    impl<T, U> Test2Trait for (T, U)
+    impl<T, U> Test2Trait for ::puroro::Merged<T, U>
     where
         T: Test2Trait,
         U: Test2Trait,
@@ -1370,7 +1370,7 @@ pub mod _puroro_traits {
             Self: 'this,
         = ();
     }
-    impl<T, U> Test3Trait for (T, U)
+    impl<T, U> Test3Trait for ::puroro::Merged<T, U>
     where
         T: Test3Trait,
         U: Test3Trait,
@@ -1378,19 +1378,19 @@ pub mod _puroro_traits {
         type Field3MessageType<'this>
         where
             Self: 'this,
-        = (
+        = ::puroro::Merged<
             ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
-        );
+        >;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             match (
                 <T as Test3Trait>::c_opt(&self.0),
                 <U as Test3Trait>::c_opt(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some((Some(t), None)),
-                (None, Some(u)) => Some((None, Some(u))),
-                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+                (Some(t), None) => Some(::puroro::merge(Some(t), None)),
+                (None, Some(u)) => Some(::puroro::merge(None, Some(u))),
+                (Some(t), Some(u)) => Some(::puroro::merge(Some(t), Some(u))),
             }
         }
     }
@@ -1489,7 +1489,7 @@ pub mod _puroro_traits {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
-    impl<T, U> Test4Trait for (T, U)
+    impl<T, U> Test4Trait for ::puroro::Merged<T, U>
     where
         T: Test4Trait,
         U: Test4Trait,

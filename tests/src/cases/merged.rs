@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use ::itertools::Itertools;
+use ::puroro::{merge, Merged};
 use ::std::borrow::Cow;
 use ::std::ops::Deref;
 use ::tests_pb::full_coverage3::msg::{Submsg, SubmsgTrait as _};
@@ -32,10 +33,10 @@ fn test_get_i32_optional_field() {
         i32_optional: Some(7),
         ..Default::default()
     };
-    assert!(!(&none, &none).has_i32_optional());
-    assert_eq!(3, (&none, &some_3).i32_optional());
-    assert_eq!(3, (&some_3, &none).i32_optional());
-    assert_eq!(7, (&some_3, &some_7).i32_optional());
+    assert!(!merge(&none, &none).has_i32_optional());
+    assert_eq!(3, merge(&none, &some_3).i32_optional());
+    assert_eq!(3, merge(&some_3, &none).i32_optional());
+    assert_eq!(7, merge(&some_3, &some_7).i32_optional());
 }
 
 #[test]
@@ -52,10 +53,10 @@ fn test_get_i32_unlabeled_field() {
         i32_unlabeled: 7,
         ..Default::default()
     };
-    assert!(!(&msg_0, &msg_0).has_i32_unlabeled());
-    assert_eq!(3, (&msg_0, &msg_3).i32_unlabeled());
-    assert_eq!(3, (&msg_3, &msg_0).i32_unlabeled());
-    assert_eq!(7, (&msg_3, &msg_7).i32_unlabeled());
+    assert!(!merge(&msg_0, &msg_0).has_i32_unlabeled());
+    assert_eq!(3, merge(&msg_0, &msg_3).i32_unlabeled());
+    assert_eq!(3, merge(&msg_3, &msg_0).i32_unlabeled());
+    assert_eq!(7, merge(&msg_3, &msg_7).i32_unlabeled());
 }
 
 #[test]
@@ -74,19 +75,31 @@ fn test_get_i32_repeated_field() {
     };
     assert_eq!(
         vec![] as Vec<i32>,
-        (&empty, &empty).i32_repeated().into_iter().collect_vec()
+        merge(&empty, &empty)
+            .i32_repeated()
+            .into_iter()
+            .collect_vec()
     );
     assert_eq!(
         vec![1],
-        (&empty, &msg_1).i32_repeated().into_iter().collect_vec()
+        merge(&empty, &msg_1)
+            .i32_repeated()
+            .into_iter()
+            .collect_vec()
     );
     assert_eq!(
         vec![1],
-        (&msg_1, &empty).i32_repeated().into_iter().collect_vec()
+        merge(&msg_1, &empty)
+            .i32_repeated()
+            .into_iter()
+            .collect_vec()
     );
     assert_eq!(
         vec![1, 3, 5],
-        (&msg_1, &msg_3_5).i32_repeated().into_iter().collect_vec()
+        merge(&msg_1, &msg_3_5)
+            .i32_repeated()
+            .into_iter()
+            .collect_vec()
     );
 }
 
@@ -112,10 +125,10 @@ fn test_get_msg_optional_field() {
         submsg_optional: Some(Box::new(submsg_7.clone())),
         ..Default::default()
     };
-    assert!(!(&none, &none).has_submsg_optional());
-    assert_eq!(3, (&msg_3, &none).submsg_optional().i32_unlabeled());
-    assert_eq!(3, (&none, &msg_3).submsg_optional().i32_unlabeled());
-    assert_eq!(7, (&msg_3, &msg_7).submsg_optional().i32_unlabeled());
+    assert!(!merge(&none, &none).has_submsg_optional());
+    assert_eq!(3, merge(&msg_3, &none).submsg_optional().i32_unlabeled());
+    assert_eq!(3, merge(&none, &msg_3).submsg_optional().i32_unlabeled());
+    assert_eq!(7, merge(&msg_3, &msg_7).submsg_optional().i32_unlabeled());
 }
 
 #[test]
@@ -140,10 +153,13 @@ fn test_get_msg_repeated_field() {
         submsg_repeated: vec![submsg_7.clone(), submsg_7.clone()],
         ..Default::default()
     };
-    assert_eq!(0, (&empty, &empty).submsg_repeated().into_iter().count());
+    assert_eq!(
+        0,
+        merge(&empty, &empty).submsg_repeated().into_iter().count()
+    );
     assert_eq!(
         vec![3],
-        (&empty, &msg_3)
+        merge(&empty, &msg_3)
             .submsg_repeated()
             .into_iter()
             .map(|submsg| submsg.i32_unlabeled)
@@ -151,7 +167,7 @@ fn test_get_msg_repeated_field() {
     );
     assert_eq!(
         vec![3],
-        (&msg_3, &empty)
+        merge(&msg_3, &empty)
             .submsg_repeated()
             .into_iter()
             .map(|submsg| submsg.i32_unlabeled)
@@ -159,7 +175,7 @@ fn test_get_msg_repeated_field() {
     );
     assert_eq!(
         vec![3, 7, 7],
-        (&msg_3, &msg_7_7)
+        merge(&msg_3, &msg_7_7)
             .submsg_repeated()
             .into_iter()
             .map(|submsg| submsg.i32_unlabeled)
@@ -206,34 +222,38 @@ fn test_get_oneof_field() {
         ..Default::default()
     };
     // None x None
-    assert_eq!(None, (&none, &none).group_two());
+    assert_eq!(None, merge(&none, &none).group_two());
 
     // None x Some
     assert_eq!(
         Some(3.0),
-        (&msg_3, &none).group_two().and_then(|o| o.g2_f32())
+        merge(&msg_3, &none).group_two().and_then(|o| o.g2_f32())
     );
     assert_eq!(
         Some(3.0),
-        (&none, &msg_3).group_two().and_then(|o| o.g2_f32())
+        merge(&none, &msg_3).group_two().and_then(|o| o.g2_f32())
     );
     assert_eq!(
         Some("Test"),
-        (&msg_test, &none).group_two().and_then(|o| o.g2_string())
+        merge(&msg_test, &none)
+            .group_two()
+            .and_then(|o| o.g2_string())
     );
     assert_eq!(
         Some("Test"),
-        (&none, &msg_test).group_two().and_then(|o| o.g2_string())
+        merge(&none, &msg_test)
+            .group_two()
+            .and_then(|o| o.g2_string())
     );
     assert_eq!(
         Some(3),
-        (&msg_submsg_3, &none)
+        merge(&msg_submsg_3, &none)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
     assert_eq!(
         Some(3),
-        (&none, &msg_submsg_3)
+        merge(&none, &msg_submsg_3)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
@@ -241,23 +261,23 @@ fn test_get_oneof_field() {
     // Some x Some, same types
     assert_eq!(
         Some(7.0),
-        (&msg_3, &msg_7).group_two().and_then(|o| o.g2_f32())
+        merge(&msg_3, &msg_7).group_two().and_then(|o| o.g2_f32())
     );
     assert_eq!(
         Some("Test2"),
-        (&msg_test, &msg_test2)
+        merge(&msg_test, &msg_test2)
             .group_two()
             .and_then(|o| o.g2_string())
     );
     assert_eq!(
         Some(3),
-        (&msg_submsg_0, &msg_submsg_3)
+        merge(&msg_submsg_0, &msg_submsg_3)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
     assert_eq!(
         Some(3),
-        (&msg_submsg_3, &msg_submsg_0)
+        merge(&msg_submsg_3, &msg_submsg_0)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
@@ -265,31 +285,37 @@ fn test_get_oneof_field() {
     // Some x Some, different types
     assert_eq!(
         Some("Test"),
-        (&msg_3, &msg_test).group_two().and_then(|o| o.g2_string())
+        merge(&msg_3, &msg_test)
+            .group_two()
+            .and_then(|o| o.g2_string())
     );
     assert_eq!(
         Some(0),
-        (&msg_3, &msg_submsg_0)
+        merge(&msg_3, &msg_submsg_0)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
     assert_eq!(
         Some(3.0),
-        (&msg_test, &msg_3).group_two().and_then(|o| o.g2_f32())
+        merge(&msg_test, &msg_3)
+            .group_two()
+            .and_then(|o| o.g2_f32())
     );
     assert_eq!(
         Some(0),
-        (&msg_test, &msg_submsg_0)
+        merge(&msg_test, &msg_submsg_0)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
     assert_eq!(
         Some(7.0),
-        (&msg_submsg_3, &msg_7).group_two().and_then(|o| o.g2_f32())
+        merge(&msg_submsg_3, &msg_7)
+            .group_two()
+            .and_then(|o| o.g2_f32())
     );
     assert_eq!(
         Some("Test"),
-        (&msg_submsg_3, &msg_test)
+        merge(&msg_submsg_3, &msg_test)
             .group_two()
             .and_then(|o| o.g2_string())
     );

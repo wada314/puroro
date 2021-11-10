@@ -12065,14 +12065,14 @@ pub mod _puroro_impls {
         pub fn append_i32_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField1<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField1 {
                     i32_required: value,
@@ -12083,14 +12083,14 @@ pub mod _puroro_impls {
         pub fn append_i32_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField2<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField2<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField2 {
                     i32_optional: value,
@@ -12101,7 +12101,7 @@ pub mod _puroro_impls {
         pub fn append_i32_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField3<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField3<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
@@ -12109,7 +12109,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField3 {
                     i32_repeated: value,
@@ -12120,14 +12120,14 @@ pub mod _puroro_impls {
         pub fn append_float_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField11<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField11<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField11 {
                     float_required: value,
@@ -12138,14 +12138,14 @@ pub mod _puroro_impls {
         pub fn append_float_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField12<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField12<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField12 {
                     float_optional: value,
@@ -12156,7 +12156,7 @@ pub mod _puroro_impls {
         pub fn append_float_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField13<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField13<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
@@ -12164,7 +12164,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField13 {
                     float_repeated: value,
@@ -12175,14 +12175,14 @@ pub mod _puroro_impls {
         pub fn append_bytes_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField21<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField21<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField21 {
                     bytes_required: value,
@@ -12193,14 +12193,14 @@ pub mod _puroro_impls {
         pub fn append_bytes_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField22<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField22<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField22 {
                     bytes_optional: value,
@@ -12211,7 +12211,7 @@ pub mod _puroro_impls {
         pub fn append_bytes_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField23<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField23<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
@@ -12219,7 +12219,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField23 {
                     bytes_repeated: value,
@@ -12230,14 +12230,14 @@ pub mod _puroro_impls {
         pub fn append_string_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField31<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField31<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField31 {
                     string_required: value,
@@ -12248,14 +12248,14 @@ pub mod _puroro_impls {
         pub fn append_string_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField32<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField32<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField32 {
                     string_optional: value,
@@ -12266,7 +12266,7 @@ pub mod _puroro_impls {
         pub fn append_string_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField33<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField33<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
@@ -12274,7 +12274,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField33 {
                     string_repeated: value,
@@ -12285,14 +12285,14 @@ pub mod _puroro_impls {
         pub fn append_enum_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField41<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField41<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::full_coverage2::Enum>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField41 {
                     enum_required: value,
@@ -12303,14 +12303,14 @@ pub mod _puroro_impls {
         pub fn append_enum_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField42<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField42<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::full_coverage2::Enum>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField42 {
                     enum_optional: value,
@@ -12321,7 +12321,7 @@ pub mod _puroro_impls {
         pub fn append_enum_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField43<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField43<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::full_coverage2::Enum>
                 + ::std::clone::Clone
@@ -12329,7 +12329,7 @@ pub mod _puroro_impls {
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField43 {
                     enum_repeated: value,
@@ -12338,11 +12338,14 @@ pub mod _puroro_impls {
         }
 
     pub fn append_submsg_required<ScalarType>(self, value: ScalarType)
-        -> MsgBuilder<(T, MsgSingleField51<ScalarType>)>
+        -> MsgBuilder<::puroro::Merged<
+            T,
+            MsgSingleField51<ScalarType>
+        >>
 where
 ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField51 {
                     submsg_required: value,
@@ -12351,11 +12354,14 @@ ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_tra
         }
 
     pub fn append_submsg_optional<ScalarType>(self, value: ScalarType)
-        -> MsgBuilder<(T, MsgSingleField52<ScalarType>)>
+        -> MsgBuilder<::puroro::Merged<
+            T,
+            MsgSingleField52<ScalarType>
+        >>
 where
 ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField52 {
                     submsg_optional: value,
@@ -12364,14 +12370,17 @@ ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_tra
         }
 
     pub fn append_submsg_repeated<ScalarType, RepeatedType>(self, value: RepeatedType)
-        -> MsgBuilder<(T, MsgSingleField53<ScalarType, RepeatedType>)>
+        -> MsgBuilder<::puroro::Merged<
+            T,
+            MsgSingleField53<ScalarType, RepeatedType>
+        >>
 where
 ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
     Item = &'a ScalarType
 >,
     {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField53 {
                     submsg_repeated: value,
@@ -12382,14 +12391,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_i64_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField101<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField101<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField101 {
                     i64_required: value,
@@ -12400,14 +12409,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_i64_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField102<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField102<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField102 {
                     i64_optional: value,
@@ -12418,7 +12427,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_i64_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField103<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField103<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
@@ -12426,7 +12435,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField103 {
                     i64_repeated: value,
@@ -12437,14 +12446,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_u32_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField111<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField111<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField111 {
                     u32_required: value,
@@ -12455,14 +12464,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_u32_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField112<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField112<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField112 {
                     u32_optional: value,
@@ -12473,7 +12482,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_u32_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField113<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField113<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
@@ -12481,7 +12490,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField113 {
                     u32_repeated: value,
@@ -12492,14 +12501,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_u64_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField121<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField121<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField121 {
                     u64_required: value,
@@ -12510,14 +12519,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_u64_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField122<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField122<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField122 {
                     u64_optional: value,
@@ -12528,7 +12537,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_u64_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField123<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField123<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
@@ -12536,7 +12545,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField123 {
                     u64_repeated: value,
@@ -12547,14 +12556,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_s32_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField131<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField131<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField131 {
                     s32_required: value,
@@ -12565,14 +12574,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_s32_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField132<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField132<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField132 {
                     s32_optional: value,
@@ -12583,7 +12592,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_s32_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField133<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField133<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
@@ -12591,7 +12600,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField133 {
                     s32_repeated: value,
@@ -12602,14 +12611,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_s64_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField141<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField141<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField141 {
                     s64_required: value,
@@ -12620,14 +12629,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_s64_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField142<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField142<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField142 {
                     s64_optional: value,
@@ -12638,7 +12647,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_s64_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField143<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField143<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
@@ -12646,7 +12655,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField143 {
                     s64_repeated: value,
@@ -12657,14 +12666,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_fixed32_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField151<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField151<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField151 {
                     fixed32_required: value,
@@ -12675,14 +12684,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_fixed32_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField152<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField152<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField152 {
                     fixed32_optional: value,
@@ -12693,7 +12702,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_fixed32_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField153<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField153<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
@@ -12701,7 +12710,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField153 {
                     fixed32_repeated: value,
@@ -12712,14 +12721,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_fixed64_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField161<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField161<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField161 {
                     fixed64_required: value,
@@ -12730,14 +12739,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_fixed64_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField162<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField162<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField162 {
                     fixed64_optional: value,
@@ -12748,7 +12757,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_fixed64_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField163<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField163<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
@@ -12756,7 +12765,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField163 {
                     fixed64_repeated: value,
@@ -12767,14 +12776,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_sfixed32_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField171<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField171<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField171 {
                     sfixed32_required: value,
@@ -12785,14 +12794,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_sfixed32_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField172<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField172<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField172 {
                     sfixed32_optional: value,
@@ -12803,7 +12812,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_sfixed32_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField173<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField173<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
@@ -12811,7 +12820,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField173 {
                     sfixed32_repeated: value,
@@ -12822,14 +12831,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_sfixed64_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField181<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField181<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField181 {
                     sfixed64_required: value,
@@ -12840,14 +12849,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_sfixed64_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField182<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField182<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField182 {
                     sfixed64_optional: value,
@@ -12858,7 +12867,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_sfixed64_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField183<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField183<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
@@ -12866,7 +12875,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField183 {
                     sfixed64_repeated: value,
@@ -12877,14 +12886,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_f64_required<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField191<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField191<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField191 {
                     f64_required: value,
@@ -12895,14 +12904,14 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_f64_optional<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField192<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField192<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField192 {
                     f64_optional: value,
@@ -12913,7 +12922,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
         pub fn append_f64_repeated<ScalarType, RepeatedType>(
             self,
             value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField193<ScalarType, RepeatedType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField193<ScalarType, RepeatedType>>>
         where
             ScalarType: ::std::convert::Into<f64>
                 + ::std::clone::Clone
@@ -12921,7 +12930,7 @@ for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
                 + ::std::fmt::Debug,
             for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField193 {
                     f64_repeated: value,
@@ -13795,7 +13804,7 @@ pub mod _puroro_traits {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
-    impl<T, U> MsgTrait for (T, U)
+    impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
         U: MsgTrait,
@@ -13917,37 +13926,37 @@ pub mod _puroro_traits {
         type Field51MessageType<'this>
         where
             Self: 'this,
-        = (
+        = ::puroro::Merged<
             ::std::option::Option<<T as MsgTrait>::Field51MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field51MessageType<'this>>,
-        );
+        >;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             match (
                 <T as MsgTrait>::submsg_required_opt(&self.0),
                 <U as MsgTrait>::submsg_required_opt(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some((Some(t), None)),
-                (None, Some(u)) => Some((None, Some(u))),
-                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+                (Some(t), None) => Some(::puroro::merge(Some(t), None)),
+                (None, Some(u)) => Some(::puroro::merge(None, Some(u))),
+                (Some(t), Some(u)) => Some(::puroro::merge(Some(t), Some(u))),
             }
         }
         type Field52MessageType<'this>
         where
             Self: 'this,
-        = (
+        = ::puroro::Merged<
             ::std::option::Option<<T as MsgTrait>::Field52MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field52MessageType<'this>>,
-        );
+        >;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             match (
                 <T as MsgTrait>::submsg_optional_opt(&self.0),
                 <U as MsgTrait>::submsg_optional_opt(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some((Some(t), None)),
-                (None, Some(u)) => Some((None, Some(u))),
-                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+                (Some(t), None) => Some(::puroro::merge(Some(t), None)),
+                (None, Some(u)) => Some(::puroro::merge(None, Some(u))),
+                (Some(t), Some(u)) => Some(::puroro::merge(Some(t), Some(u))),
             }
         }
         type Field53MessageType<'this>
@@ -15461,14 +15470,14 @@ pub mod _puroro_nested {
                 pub fn append_i32_required<ScalarType>(
                     self,
                     value: ScalarType,
-                ) -> SubmsgBuilder<(T, SubmsgSingleField1<ScalarType>)>
+                ) -> SubmsgBuilder<::puroro::Merged<T, SubmsgSingleField1<ScalarType>>>
                 where
                     ScalarType: ::std::convert::Into<i32>
                         + ::std::clone::Clone
                         + ::std::cmp::PartialEq
                         + ::std::fmt::Debug,
                 {
-                    SubmsgBuilder((
+                    SubmsgBuilder(::puroro::merge(
                         self.0,
                         SubmsgSingleField1 {
                             i32_required: value,
@@ -15479,14 +15488,14 @@ pub mod _puroro_nested {
                 pub fn append_i64_required<ScalarType>(
                     self,
                     value: ScalarType,
-                ) -> SubmsgBuilder<(T, SubmsgSingleField101<ScalarType>)>
+                ) -> SubmsgBuilder<::puroro::Merged<T, SubmsgSingleField101<ScalarType>>>
                 where
                     ScalarType: ::std::convert::Into<i64>
                         + ::std::clone::Clone
                         + ::std::cmp::PartialEq
                         + ::std::fmt::Debug,
                 {
-                    SubmsgBuilder((
+                    SubmsgBuilder(::puroro::merge(
                         self.0,
                         SubmsgSingleField101 {
                             i64_required: value,
@@ -15580,7 +15589,7 @@ pub mod _puroro_nested {
                 submsg_delegate!(T);
             }
             impl SubmsgTrait for () {}
-            impl<T, U> SubmsgTrait for (T, U)
+            impl<T, U> SubmsgTrait for ::puroro::Merged<T, U>
             where
                 T: SubmsgTrait,
                 U: SubmsgTrait,

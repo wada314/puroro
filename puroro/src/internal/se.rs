@@ -31,7 +31,7 @@ impl SerMessageToIoWrite for () {
         Ok(())
     }
 }
-impl<T, U> SerMessageToIoWrite for (T, U)
+impl<T, U> SerMessageToIoWrite for crate::Merged<T, U>
 where
     T: SerMessageToIoWrite,
     U: SerMessageToIoWrite,

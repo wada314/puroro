@@ -1,4 +1,4 @@
-impl<T, U> {{ m.trait_ident }} for (T, U)
+impl<T, U> {{ m.trait_ident }} for ::puroro::Merged<T, U>
 where
     T: {{ m.trait_ident }},
     U: {{ m.trait_ident }},
@@ -30,7 +30,7 @@ where
                 Some(E::{{ field.ident }}(right))
             ) => {
                 {%- if field.is_message %}
-                E::{{ field.ident }}((Some(left), Some(right)))
+                E::{{ field.ident }}(::puroro::merge(Some(left), Some(right)))
                 {%- else %}
                 E::{{ field.ident }}(right)
                 {%- endif %}
@@ -40,7 +40,7 @@ where
             {%- for field in oneof.fields %}
             (_, Some(E::{{ field.ident }}(right))) => {
                 {%- if field.is_message %}
-                E::{{ field.ident }}((None, Some(right)))
+                E::{{ field.ident }}(::puroro::merge(None, Some(right)))
                 {%- else %}
                 E::{{ field.ident }}(right)
                 {%- endif %}
@@ -50,7 +50,7 @@ where
             {%- for field in oneof.fields %}
             (Some(E::{{ field.ident }}(left)), None) => {
                 {%- if field.is_message %}
-                E::{{ field.ident }}((Some(left), None))
+                E::{{ field.ident }}(::puroro::merge(Some(left), None))
                 {%- else %}
                 E::{{ field.ident }}(left)
                 {%- endif %}

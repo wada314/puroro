@@ -7254,66 +7254,69 @@ pub mod _puroro_impls {
         pub fn append_i32_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField1<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField1 { i32_default: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField1 { i32_default: value },
+            ))
         }
 
         pub fn append_i32_0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField2<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField2<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField2 { i32_0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField2 { i32_0: value }))
         }
 
         pub fn append_i32_42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField3<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField3<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField3 { i32_42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField3 { i32_42: value }))
         }
 
         pub fn append_i32_m42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField4<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField4<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField4 { i32_m42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField4 { i32_m42: value }))
         }
 
         pub fn append_i32_2147483647<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField5<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField5 {
                     i32_2147483647: value,
@@ -7324,14 +7327,14 @@ pub mod _puroro_impls {
         pub fn append_i32_m2147483648<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField6<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField6<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField6 {
                     i32_m2147483648: value,
@@ -7342,79 +7345,85 @@ pub mod _puroro_impls {
         pub fn append_i32_0123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField7<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField7<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField7 { i32_0123: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField7 { i32_0123: value }))
         }
 
         pub fn append_i32_0x123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField8<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField8<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField8 { i32_0x123: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField8 { i32_0x123: value },
+            ))
         }
 
         pub fn append_u32_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField11<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField11<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField11 { u32_default: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField11 { u32_default: value },
+            ))
         }
 
         pub fn append_u32_0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField12<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField12<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField12 { u32_0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField12 { u32_0: value }))
         }
 
         pub fn append_u32_42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField13<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField13<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField13 { u32_42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField13 { u32_42: value }))
         }
 
         pub fn append_u32_4294967295<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField15<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField15<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField15 {
                     u32_4294967295: value,
@@ -7425,92 +7434,101 @@ pub mod _puroro_impls {
         pub fn append_u32_0123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField17<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField17<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField17 { u32_0123: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField17 { u32_0123: value },
+            ))
         }
 
         pub fn append_u32_0x123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField18<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField18<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField18 { u32_0x123: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField18 { u32_0x123: value },
+            ))
         }
 
         pub fn append_i64_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField21<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField21<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField21 { i64_default: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField21 { i64_default: value },
+            ))
         }
 
         pub fn append_i64_0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField22<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField22<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField22 { i64_0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField22 { i64_0: value }))
         }
 
         pub fn append_i64_42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField23<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField23<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField23 { i64_42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField23 { i64_42: value }))
         }
 
         pub fn append_i64_m42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField24<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField24<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField24 { i64_m42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField24 { i64_m42: value }))
         }
 
         pub fn append_i64_9223372036854775807<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField25<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField25<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField25 {
                     i64_9223372036854775807: value,
@@ -7521,14 +7539,14 @@ pub mod _puroro_impls {
         pub fn append_i64_m9223372036854775808<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField26<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField26<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField26 {
                     i64_m9223372036854775808: value,
@@ -7539,79 +7557,88 @@ pub mod _puroro_impls {
         pub fn append_i64_0123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField27<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField27<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField27 { i64_0123: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField27 { i64_0123: value },
+            ))
         }
 
         pub fn append_i64_0x123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField28<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField28<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField28 { i64_0x123: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField28 { i64_0x123: value },
+            ))
         }
 
         pub fn append_u64_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField31<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField31<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField31 { u64_default: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField31 { u64_default: value },
+            ))
         }
 
         pub fn append_u64_0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField32<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField32<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField32 { u64_0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField32 { u64_0: value }))
         }
 
         pub fn append_u64_42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField33<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField33<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField33 { u64_42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField33 { u64_42: value }))
         }
 
         pub fn append_u64_18446744073709551615<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField35<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField35<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField35 {
                     u64_18446744073709551615: value,
@@ -7622,222 +7649,243 @@ pub mod _puroro_impls {
         pub fn append_u64_0123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField37<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField37<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField37 { u64_0123: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField37 { u64_0123: value },
+            ))
         }
 
         pub fn append_u64_0x123<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField38<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField38<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<u64>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField38 { u64_0x123: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField38 { u64_0x123: value },
+            ))
         }
 
         pub fn append_f32_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField41<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField41<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField41 { f32_default: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField41 { f32_default: value },
+            ))
         }
 
         pub fn append_f32_0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField42<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField42<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField42 { f32_0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField42 { f32_0: value }))
         }
 
         pub fn append_f32_m0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField43<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField43<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField43 { f32_m0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField43 { f32_m0: value }))
         }
 
         pub fn append_f32_0p<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField44<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField44<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField44 { f32_0p: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField44 { f32_0p: value }))
         }
 
         pub fn append_f32_p0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField45<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField45<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField45 { f32_p0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField45 { f32_p0: value }))
         }
 
         pub fn append_f32_0p0<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField46<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField46<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField46 { f32_0p0: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField46 { f32_0p0: value }))
         }
 
         pub fn append_f32_42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField47<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField47<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField47 { f32_42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField47 { f32_42: value }))
         }
 
         pub fn append_f32_m42<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField48<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField48<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField48 { f32_m42: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField48 { f32_m42: value }))
         }
 
         pub fn append_f32_0p25<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField49<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField49<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField49 { f32_0p25: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField49 { f32_0p25: value },
+            ))
         }
 
         pub fn append_f32_1p5e2<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField50<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField50<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField50 { f32_1p5e2: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField50 { f32_1p5e2: value },
+            ))
         }
 
         pub fn append_f32_inf<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField51<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField51<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField51 { f32_inf: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField51 { f32_inf: value }))
         }
 
         pub fn append_f32_minf<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField52<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField52<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField52 { f32_minf: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField52 { f32_minf: value },
+            ))
         }
 
         pub fn append_f32_nan<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField53<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField53<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField53 { f32_nan: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField53 { f32_nan: value }))
         }
 
         pub fn append_f32_mnan<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField54<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField54<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField54 { f32_mnan: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField54 { f32_mnan: value },
+            ))
         }
 
         pub fn append_bool_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField61<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField61<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<bool>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField61 {
                     bool_default: value,
@@ -7848,40 +7896,46 @@ pub mod _puroro_impls {
         pub fn append_bool_true<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField62<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField62<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<bool>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField62 { bool_true: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField62 { bool_true: value },
+            ))
         }
 
         pub fn append_bool_false<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField63<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField63<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<bool>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField63 { bool_false: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField63 { bool_false: value },
+            ))
         }
 
         pub fn append_string_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField71<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField71<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField71 {
                     string_default: value,
@@ -7892,14 +7946,14 @@ pub mod _puroro_impls {
         pub fn append_string_empty<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField72<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField72<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField72 {
                     string_empty: value,
@@ -7910,40 +7964,46 @@ pub mod _puroro_impls {
         pub fn append_string_abc<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField73<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField73<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField73 { string_abc: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField73 { string_abc: value },
+            ))
         }
 
         pub fn append_string_aiu<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField74<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField74<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField74 { string_aiu: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField74 { string_aiu: value },
+            ))
         }
 
         pub fn append_string_backslash<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField75<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField75<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField75 {
                     string_backslash: value,
@@ -7954,40 +8014,46 @@ pub mod _puroro_impls {
         pub fn append_string_tab<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField76<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField76<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField76 { string_tab: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField76 { string_tab: value },
+            ))
         }
 
         pub fn append_string_crlf<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField77<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField77<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField77 { string_crlf: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField77 { string_crlf: value },
+            ))
         }
 
         pub fn append_bytes_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField81<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField81<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField81 {
                     bytes_default: value,
@@ -7998,53 +8064,62 @@ pub mod _puroro_impls {
         pub fn append_bytes_empty<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField82<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField82<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField82 { bytes_empty: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField82 { bytes_empty: value },
+            ))
         }
 
         pub fn append_bytes_abc<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField83<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField83<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField83 { bytes_abc: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField83 { bytes_abc: value },
+            ))
         }
 
         pub fn append_bytes_aiu<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField84<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField84<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField84 { bytes_aiu: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField84 { bytes_aiu: value },
+            ))
         }
 
         pub fn append_bytes_backslash<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField85<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField85<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField85 {
                     bytes_backslash: value,
@@ -8055,40 +8130,46 @@ pub mod _puroro_impls {
         pub fn append_bytes_tab<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField86<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField86<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField86 { bytes_tab: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField86 { bytes_tab: value },
+            ))
         }
 
         pub fn append_bytes_crlf<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField87<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField87<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<[u8]>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField87 { bytes_crlf: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField87 { bytes_crlf: value },
+            ))
         }
 
         pub fn append_enum_default<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField91<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField91<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::proto2_defaults::MyEnum>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField91 {
                     enum_default: value,
@@ -8099,27 +8180,30 @@ pub mod _puroro_impls {
         pub fn append_enum_one<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField92<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField92<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::proto2_defaults::MyEnum>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField92 { enum_one: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField92 { enum_one: value },
+            ))
         }
 
         pub fn append_enum_fourty_two<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField93<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField93<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<self::_puroro_root::proto2_defaults::MyEnum>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((
+            MsgBuilder(::puroro::merge(
                 self.0,
                 MsgSingleField93 {
                     enum_fourty_two: value,
@@ -8958,7 +9042,7 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {}
-    impl<T, U> MsgTrait for (T, U)
+    impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
         U: MsgTrait,

@@ -1228,79 +1228,88 @@ pub mod _puroro_impls {
         pub fn append_g1_int32<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField1<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField1 { g1_int32: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField1 { g1_int32: value }))
         }
 
         pub fn append_g1_string<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField2<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField2<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField2 { g1_string: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField2 { g1_string: value },
+            ))
         }
 
         pub fn append_g2_f32<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField3<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField3<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<f32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField3 { g2_f32: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField3 { g2_f32: value }))
         }
 
         pub fn append_g2_string<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField4<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField4<ScalarType>>>
         where
             ScalarType: ::std::convert::AsRef<str>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField4 { g2_string: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField4 { g2_string: value },
+            ))
         }
 
         pub fn append_g2_submsg<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField5<ScalarType>>>
         where
             ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField5 { g2_submsg: value }))
+            MsgBuilder(::puroro::merge(
+                self.0,
+                MsgSingleField5 { g2_submsg: value },
+            ))
         }
 
         pub fn append_g3_int32<ScalarType>(
             self,
             value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField6<ScalarType>)>
+        ) -> MsgBuilder<::puroro::Merged<T, MsgSingleField6<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            MsgBuilder((self.0, MsgSingleField6 { g3_int32: value }))
+            MsgBuilder(::puroro::merge(self.0, MsgSingleField6 { g3_int32: value }))
         }
 
         pub fn build(self) -> T {
@@ -1490,14 +1499,14 @@ pub mod _puroro_impls {
         pub fn append_i32_unlabeled<ScalarType>(
             self,
             value: ScalarType,
-        ) -> SubmsgBuilder<(T, SubmsgSingleField1<ScalarType>)>
+        ) -> SubmsgBuilder<::puroro::Merged<T, SubmsgSingleField1<ScalarType>>>
         where
             ScalarType: ::std::convert::Into<i32>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
         {
-            SubmsgBuilder((
+            SubmsgBuilder(::puroro::merge(
                 self.0,
                 SubmsgSingleField1 {
                     i32_unlabeled: value,
@@ -1771,7 +1780,7 @@ pub mod _puroro_traits {
             None
         }
     }
-    impl<T, U> MsgTrait for (T, U)
+    impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
         U: MsgTrait,
@@ -1779,10 +1788,10 @@ pub mod _puroro_traits {
         type Field5MessageType<'this>
         where
             Self: 'this,
-        = (
+        = ::puroro::Merged<
             ::std::option::Option<<T as MsgTrait>::Field5MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field5MessageType<'this>>,
-        );
+        >;
         fn group_one<'this>(
             &'this self,
         ) -> Option<
@@ -1821,14 +1830,14 @@ pub mod _puroro_traits {
                 (Some(E::G2F32(_)), Some(E::G2F32(right))) => E::G2F32(right),
                 (Some(E::G2String(_)), Some(E::G2String(right))) => E::G2String(right),
                 (Some(E::G2Submsg(left)), Some(E::G2Submsg(right))) => {
-                    E::G2Submsg((Some(left), Some(right)))
+                    E::G2Submsg(::puroro::merge(Some(left), Some(right)))
                 }
                 (_, Some(E::G2F32(right))) => E::G2F32(right),
                 (_, Some(E::G2String(right))) => E::G2String(right),
-                (_, Some(E::G2Submsg(right))) => E::G2Submsg((None, Some(right))),
+                (_, Some(E::G2Submsg(right))) => E::G2Submsg(::puroro::merge(None, Some(right))),
                 (Some(E::G2F32(left)), None) => E::G2F32(left),
                 (Some(E::G2String(left)), None) => E::G2String(left),
-                (Some(E::G2Submsg(left)), None) => E::G2Submsg((Some(left), None)),
+                (Some(E::G2Submsg(left)), None) => E::G2Submsg(::puroro::merge(Some(left), None)),
             })
         }
         fn group_three<'this>(
@@ -2028,7 +2037,7 @@ pub mod _puroro_traits {
         submsg_delegate!(T);
     }
     impl SubmsgTrait for () {}
-    impl<T, U> SubmsgTrait for (T, U)
+    impl<T, U> SubmsgTrait for ::puroro::Merged<T, U>
     where
         T: SubmsgTrait,
         U: SubmsgTrait,
