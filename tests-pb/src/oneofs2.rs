@@ -1781,6 +1781,39 @@ pub mod _puroro_traits {
             None
         }
     }
+
+    impl<T> MsgTrait for ::puroro::EmptyMessageWrapper<T> {
+        type Field5MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        fn group_one<'this>(
+            &'this self,
+        ) -> Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
+                'this,
+                ::puroro::internal::bool::False,
+            >,
+        > {
+            None
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
+                'this,
+                ::puroro::internal::bool::False,
+                Self,
+            >,
+        > {
+            None
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            None
+        }
+    }
     impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
@@ -2038,6 +2071,8 @@ pub mod _puroro_traits {
         submsg_delegate!(T);
     }
     impl SubmsgTrait for () {}
+
+    impl<T> SubmsgTrait for ::puroro::EmptyMessageWrapper<T> {}
     impl<T, U> SubmsgTrait for ::puroro::Merged<T, U>
     where
         T: SubmsgTrait,

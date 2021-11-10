@@ -207,11 +207,13 @@
 #![feature(type_alias_impl_trait)]
 
 mod common_traits;
+mod common_types;
 mod error;
 pub mod internal;
 pub mod tags;
 
 pub use self::common_traits::*;
+pub use self::common_types::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
@@ -220,67 +222,3 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
-
-#[derive(PartialEq, Debug)]
-pub struct Merged<T, U>(pub T, pub U);
-pub fn merge<T, U>(t: T, u: U) -> Merged<T, U> {
-    Merged(t, u)
-}
-impl<T: Clone, U: Clone> Clone for Merged<T, U> {
-    fn clone(&self) -> Self {
-        Self(self.0.clone(), self.1.clone())
-    }
-}
-
-use ::std::ops::{Deref, DerefMut};
-
-// Bumpalo wrapper
-pub struct BumpaloOwned<T> {
-    // The field order matters, `Drop` drops the field in decl order.
-    t: T,
-    bump: Box<crate::bumpalo::Bump>,
-}
-impl<T> BumpaloOwned<T> {
-    pub fn bump(this: &BumpaloOwned<T>) -> &crate::bumpalo::Bump {
-        &this.bump
-    }
-    pub fn inner(this: &BumpaloOwned<T>) -> &T {
-        &this.t
-    }
-    pub fn inner_mut(this: &mut BumpaloOwned<T>) -> &mut T {
-        &mut this.t
-    }
-}
-impl<T> BumpaloOwned<T>
-where
-    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
-{
-    pub fn new() -> Self {
-        let bump = Box::new(crate::bumpalo::Bump::new());
-        let t = crate::internal::impls::bumpalo::BumpaloDefault::default_in(unsafe {
-            ::std::mem::transmute(bump.as_ref())
-        });
-        Self { t, bump }
-    }
-}
-impl<T> Default for BumpaloOwned<T>
-where
-    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
-{
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl<T> Deref for BumpaloOwned<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.t
-    }
-}
-impl<T> DerefMut for BumpaloOwned<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.t
-    }
-}
-
-impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}

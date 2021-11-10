@@ -1493,6 +1493,20 @@ pub mod _puroro_traits {
             Self: 'this,
         = ();
     }
+
+    impl<T> MsgTrait for ::puroro::EmptyMessageWrapper<T> {
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
     impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
@@ -1705,6 +1719,8 @@ pub mod _puroro_traits {
         submsg_delegate!(T);
     }
     impl SubmsgTrait for () {}
+
+    impl<T> SubmsgTrait for ::puroro::EmptyMessageWrapper<T> {}
     impl<T, U> SubmsgTrait for ::puroro::Merged<T, U>
     where
         T: SubmsgTrait,

@@ -1187,6 +1187,8 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
     impl Test1Trait for () {}
+
+    impl<T> Test1Trait for ::puroro::EmptyMessageWrapper<T> {}
     impl<T, U> Test1Trait for ::puroro::Merged<T, U>
     where
         T: Test1Trait,
@@ -1273,6 +1275,8 @@ pub mod _puroro_traits {
         test2_delegate!(T);
     }
     impl Test2Trait for () {}
+
+    impl<T> Test2Trait for ::puroro::EmptyMessageWrapper<T> {}
     impl<T, U> Test2Trait for ::puroro::Merged<T, U>
     where
         T: Test2Trait,
@@ -1365,6 +1369,13 @@ pub mod _puroro_traits {
         test3_delegate!(T);
     }
     impl Test3Trait for () {
+        type Field3MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
+
+    impl<T> Test3Trait for ::puroro::EmptyMessageWrapper<T> {
         type Field3MessageType<'this>
         where
             Self: 'this,
@@ -1481,6 +1492,16 @@ pub mod _puroro_traits {
         test4_delegate!(T);
     }
     impl Test4Trait for () {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl<T> Test4Trait for ::puroro::EmptyMessageWrapper<T> {
         type Field4RepeatedType<'this>
         where
             Self: 'this,

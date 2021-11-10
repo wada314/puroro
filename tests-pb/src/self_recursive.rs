@@ -415,6 +415,13 @@ pub mod _puroro_traits {
             Self: 'this,
         = ();
     }
+
+    impl<T> MsgTrait for ::puroro::EmptyMessageWrapper<T> {
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
     impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,

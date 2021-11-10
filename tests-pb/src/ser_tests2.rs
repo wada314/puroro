@@ -2560,6 +2560,54 @@ pub mod _puroro_traits {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
+
+    impl<T> MsgTrait for ::puroro::EmptyMessageWrapper<T> {
+        type Field2RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field6RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field7MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field8MessageType<'this>
+        where
+            Self: 'this,
+        = ();
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field10RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            self::_puroro_root::ser_tests2::Enum,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
     impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
@@ -3339,6 +3387,8 @@ pub mod _puroro_nested {
                 submsg_delegate!(T);
             }
             impl SubmsgTrait for () {}
+
+            impl<T> SubmsgTrait for ::puroro::EmptyMessageWrapper<T> {}
             impl<T, U> SubmsgTrait for ::puroro::Merged<T, U>
             where
                 T: SubmsgTrait,

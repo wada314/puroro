@@ -31,6 +31,14 @@ impl SerMessageToIoWrite for () {
         Ok(())
     }
 }
+impl<T> SerMessageToIoWrite for crate::EmptyMessageWrapper<T> {
+    fn ser<W>(&self, _: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        Ok(())
+    }
+}
 impl<T, U> SerMessageToIoWrite for crate::Merged<T, U>
 where
     T: SerMessageToIoWrite,

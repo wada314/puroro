@@ -15,7 +15,7 @@
 use crate::internal::de::from_iter::deser_from_iter;
 use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::se::SerMessageToIoWrite;
-use crate::Result;
+use crate::{EmptyMessageWrapper, Result};
 use ::std::convert::TryFrom;
 use ::std::io::Write;
 
@@ -64,6 +64,7 @@ pub trait Message<M> {
     }
 }
 impl<M> Message<M> for () where M: MessageRepresentativeImpl {}
+impl<M, T> Message<M> for crate::EmptyMessageWrapper<T> where M: MessageRepresentativeImpl {}
 impl<M, T, U> Message<M> for crate::Either<T, U>
 where
     T: Message<M>,
@@ -113,6 +114,7 @@ pub trait MessageRepresentativeImpl {}
 
 pub trait EmptyMessage {}
 impl EmptyMessage for () {}
+impl<T> EmptyMessage for EmptyMessageWrapper<T> {}
 impl<'a, T> EmptyMessage for &'a T where T: EmptyMessage {}
 impl<'a, T> EmptyMessage for &'a mut T where T: EmptyMessage {}
 impl<T> EmptyMessage for Box<T> where T: EmptyMessage {}

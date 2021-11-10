@@ -350,6 +350,8 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {}
+
+    impl<T> MsgTrait for ::puroro::EmptyMessageWrapper<T> {}
     impl<T, U> MsgTrait for ::puroro::Merged<T, U>
     where
         T: MsgTrait,
