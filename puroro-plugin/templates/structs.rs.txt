@@ -26,10 +26,6 @@ pub mod _puroro_impls {
     use super::_puroro_traits::*;
 
     {%- for m in messages %}
-    {%- include "empty/body.rs.txt" %}
-    {%- include "merged/body.rs.txt" %}
-    {%- include "either/body.rs.txt" %}
-    {%- include "option/body.rs.txt" %}
     {%- include "single_field/body.rs.txt" %}
     {%- include "bumpalo/body.rs.txt" %}
     {%- include "builder.rs.txt" %}
@@ -42,28 +38,16 @@ pub mod _puroro_impls {
 {%- include "simple/trait_impl_field.rs.txt" %}
 {%- endmacro -%}
 
-{%- macro empty_trait_impl_field(f) -%}
-{%- include "empty/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro either_trait_impl_field(f) -%}
-{%- include "either/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro merged_trait_impl_field(f) -%}
-{%- include "merged/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro option_trait_impl_field(f) -%}
-{%- include "option/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
 {%- macro single_field_bound(f) -%}
 {%- include "single_field/bound.rs.txt" %}
 {%- endmacro -%}
 
 {%- macro single_field_trait_impl_field(f) -%}
 {%- include "single_field/trait_impl_field.rs.txt" %}
+{%- endmacro -%}
+
+{%- macro empty_trait_impl_field(f) -%}
+{%- include "empty/trait_impl_field.rs.txt" %}
 {%- endmacro -%}
 
 {%- macro bumpalo_trait_impl_field(f) -%}

@@ -12,7 +12,9 @@ pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    {{ messages|print_traits|indent(4) }}
+    {%- for message in messages %}
+    {{ message|print_trait|indent(4) }}
+    {%- endfor %} {#- for m in messages #}
 }
 {%- endif %}
 
@@ -65,4 +67,3 @@ pub mod _puroro_nested {
     {%- endfor %}
 }
 {%- endif %}
-

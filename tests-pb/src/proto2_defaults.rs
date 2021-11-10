@@ -1073,830 +1073,6 @@ pub mod _puroro_impls {
         pub use super::super::_puroro_root::*;
     }
     use super::_puroro_traits::*;
-    impl MsgTrait for () {}
-    impl<T, U> MsgTrait for (T, U)
-    where
-        T: MsgTrait,
-        U: MsgTrait,
-    {
-        fn i32_default_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_default_opt(&self.0))
-        }
-        fn i32_0_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_0_opt(&self.1).or_else(|| <T as MsgTrait>::i32_0_opt(&self.0))
-        }
-        fn i32_42_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_42_opt(&self.1).or_else(|| <T as MsgTrait>::i32_42_opt(&self.0))
-        }
-        fn i32_m42_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_m42_opt(&self.1).or_else(|| <T as MsgTrait>::i32_m42_opt(&self.0))
-        }
-        fn i32_2147483647_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_2147483647_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_2147483647_opt(&self.0))
-        }
-        fn i32_m2147483648_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_m2147483648_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_m2147483648_opt(&self.0))
-        }
-        fn i32_0123_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_0123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_0123_opt(&self.0))
-        }
-        fn i32_0x123_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_0x123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_0x123_opt(&self.0))
-        }
-        fn u32_default_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_default_opt(&self.0))
-        }
-        fn u32_0_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_0_opt(&self.1).or_else(|| <T as MsgTrait>::u32_0_opt(&self.0))
-        }
-        fn u32_42_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_42_opt(&self.1).or_else(|| <T as MsgTrait>::u32_42_opt(&self.0))
-        }
-        fn u32_4294967295_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_4294967295_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_4294967295_opt(&self.0))
-        }
-        fn u32_0123_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_0123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_0123_opt(&self.0))
-        }
-        fn u32_0x123_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_0x123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_0x123_opt(&self.0))
-        }
-        fn i64_default_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_default_opt(&self.0))
-        }
-        fn i64_0_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_0_opt(&self.1).or_else(|| <T as MsgTrait>::i64_0_opt(&self.0))
-        }
-        fn i64_42_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_42_opt(&self.1).or_else(|| <T as MsgTrait>::i64_42_opt(&self.0))
-        }
-        fn i64_m42_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_m42_opt(&self.1).or_else(|| <T as MsgTrait>::i64_m42_opt(&self.0))
-        }
-        fn i64_9223372036854775807_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_9223372036854775807_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_9223372036854775807_opt(&self.0))
-        }
-        fn i64_m9223372036854775808_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_m9223372036854775808_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_m9223372036854775808_opt(&self.0))
-        }
-        fn i64_0123_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_0123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_0123_opt(&self.0))
-        }
-        fn i64_0x123_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_0x123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_0x123_opt(&self.0))
-        }
-        fn u64_default_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_default_opt(&self.0))
-        }
-        fn u64_0_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_0_opt(&self.1).or_else(|| <T as MsgTrait>::u64_0_opt(&self.0))
-        }
-        fn u64_42_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_42_opt(&self.1).or_else(|| <T as MsgTrait>::u64_42_opt(&self.0))
-        }
-        fn u64_18446744073709551615_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_18446744073709551615_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_18446744073709551615_opt(&self.0))
-        }
-        fn u64_0123_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_0123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_0123_opt(&self.0))
-        }
-        fn u64_0x123_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_0x123_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_0x123_opt(&self.0))
-        }
-        fn f32_default_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::f32_default_opt(&self.0))
-        }
-        fn f32_0_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0_opt(&self.0))
-        }
-        fn f32_m0_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_m0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_m0_opt(&self.0))
-        }
-        fn f32_0p_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0p_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0p_opt(&self.0))
-        }
-        fn f32_p0_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_p0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_p0_opt(&self.0))
-        }
-        fn f32_0p0_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0p0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0p0_opt(&self.0))
-        }
-        fn f32_42_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_42_opt(&self.1).or_else(|| <T as MsgTrait>::f32_42_opt(&self.0))
-        }
-        fn f32_m42_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_m42_opt(&self.1).or_else(|| <T as MsgTrait>::f32_m42_opt(&self.0))
-        }
-        fn f32_0p25_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_0p25_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::f32_0p25_opt(&self.0))
-        }
-        fn f32_1p5e2_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_1p5e2_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::f32_1p5e2_opt(&self.0))
-        }
-        fn f32_inf_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_inf_opt(&self.1).or_else(|| <T as MsgTrait>::f32_inf_opt(&self.0))
-        }
-        fn f32_minf_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_minf_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::f32_minf_opt(&self.0))
-        }
-        fn f32_nan_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_nan_opt(&self.1).or_else(|| <T as MsgTrait>::f32_nan_opt(&self.0))
-        }
-        fn f32_mnan_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::f32_mnan_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::f32_mnan_opt(&self.0))
-        }
-        fn bool_default_opt<'this>(&'this self) -> Option<bool> {
-            <U as MsgTrait>::bool_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bool_default_opt(&self.0))
-        }
-        fn bool_true_opt<'this>(&'this self) -> Option<bool> {
-            <U as MsgTrait>::bool_true_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bool_true_opt(&self.0))
-        }
-        fn bool_false_opt<'this>(&'this self) -> Option<bool> {
-            <U as MsgTrait>::bool_false_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bool_false_opt(&self.0))
-        }
-        fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_default_opt(&self.0))
-        }
-        fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_empty_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_empty_opt(&self.0))
-        }
-        fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_abc_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_abc_opt(&self.0))
-        }
-        fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_aiu_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_aiu_opt(&self.0))
-        }
-        fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_backslash_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_backslash_opt(&self.0))
-        }
-        fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_tab_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_tab_opt(&self.0))
-        }
-        fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_crlf_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_crlf_opt(&self.0))
-        }
-        fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_default_opt(&self.0))
-        }
-        fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_empty_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_empty_opt(&self.0))
-        }
-        fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_abc_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_abc_opt(&self.0))
-        }
-        fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_aiu_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_aiu_opt(&self.0))
-        }
-        fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_backslash_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_backslash_opt(&self.0))
-        }
-        fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_tab_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_tab_opt(&self.0))
-        }
-        fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_crlf_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_crlf_opt(&self.0))
-        }
-        fn enum_default_opt<'this>(
-            &'this self,
-        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            <U as MsgTrait>::enum_default_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_default_opt(&self.0))
-        }
-        fn enum_one_opt<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            <U as MsgTrait>::enum_one_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_one_opt(&self.0))
-        }
-        fn enum_fourty_two_opt<'this>(
-            &'this self,
-        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            <U as MsgTrait>::enum_fourty_two_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_fourty_two_opt(&self.0))
-        }
-    }
-    impl<T, U> MsgTrait for ::puroro::Either<T, U>
-    where
-        T: MsgTrait,
-        U: MsgTrait,
-    {
-        fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_default_opt(t),
-                |u| <U as MsgTrait>::i32_default_opt(u),
-            )
-        }
-        fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_0_opt(t),
-                |u| <U as MsgTrait>::i32_0_opt(u),
-            )
-        }
-        fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_42_opt(t),
-                |u| <U as MsgTrait>::i32_42_opt(u),
-            )
-        }
-        fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_m42_opt(t),
-                |u| <U as MsgTrait>::i32_m42_opt(u),
-            )
-        }
-        fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_2147483647_opt(t),
-                |u| <U as MsgTrait>::i32_2147483647_opt(u),
-            )
-        }
-        fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_m2147483648_opt(t),
-                |u| <U as MsgTrait>::i32_m2147483648_opt(u),
-            )
-        }
-        fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_0123_opt(t),
-                |u| <U as MsgTrait>::i32_0123_opt(u),
-            )
-        }
-        fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i32_0x123_opt(t),
-                |u| <U as MsgTrait>::i32_0x123_opt(u),
-            )
-        }
-        fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u32_default_opt(t),
-                |u| <U as MsgTrait>::u32_default_opt(u),
-            )
-        }
-        fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u32_0_opt(t),
-                |u| <U as MsgTrait>::u32_0_opt(u),
-            )
-        }
-        fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u32_42_opt(t),
-                |u| <U as MsgTrait>::u32_42_opt(u),
-            )
-        }
-        fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u32_4294967295_opt(t),
-                |u| <U as MsgTrait>::u32_4294967295_opt(u),
-            )
-        }
-        fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u32_0123_opt(t),
-                |u| <U as MsgTrait>::u32_0123_opt(u),
-            )
-        }
-        fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u32_0x123_opt(t),
-                |u| <U as MsgTrait>::u32_0x123_opt(u),
-            )
-        }
-        fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_default_opt(t),
-                |u| <U as MsgTrait>::i64_default_opt(u),
-            )
-        }
-        fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_0_opt(t),
-                |u| <U as MsgTrait>::i64_0_opt(u),
-            )
-        }
-        fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_42_opt(t),
-                |u| <U as MsgTrait>::i64_42_opt(u),
-            )
-        }
-        fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_m42_opt(t),
-                |u| <U as MsgTrait>::i64_m42_opt(u),
-            )
-        }
-        fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_9223372036854775807_opt(t),
-                |u| <U as MsgTrait>::i64_9223372036854775807_opt(u),
-            )
-        }
-        fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_m9223372036854775808_opt(t),
-                |u| <U as MsgTrait>::i64_m9223372036854775808_opt(u),
-            )
-        }
-        fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_0123_opt(t),
-                |u| <U as MsgTrait>::i64_0123_opt(u),
-            )
-        }
-        fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::i64_0x123_opt(t),
-                |u| <U as MsgTrait>::i64_0x123_opt(u),
-            )
-        }
-        fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u64_default_opt(t),
-                |u| <U as MsgTrait>::u64_default_opt(u),
-            )
-        }
-        fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u64_0_opt(t),
-                |u| <U as MsgTrait>::u64_0_opt(u),
-            )
-        }
-        fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u64_42_opt(t),
-                |u| <U as MsgTrait>::u64_42_opt(u),
-            )
-        }
-        fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u64_18446744073709551615_opt(t),
-                |u| <U as MsgTrait>::u64_18446744073709551615_opt(u),
-            )
-        }
-        fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u64_0123_opt(t),
-                |u| <U as MsgTrait>::u64_0123_opt(u),
-            )
-        }
-        fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::u64_0x123_opt(t),
-                |u| <U as MsgTrait>::u64_0x123_opt(u),
-            )
-        }
-        fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_default_opt(t),
-                |u| <U as MsgTrait>::f32_default_opt(u),
-            )
-        }
-        fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_0_opt(t),
-                |u| <U as MsgTrait>::f32_0_opt(u),
-            )
-        }
-        fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_m0_opt(t),
-                |u| <U as MsgTrait>::f32_m0_opt(u),
-            )
-        }
-        fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_0p_opt(t),
-                |u| <U as MsgTrait>::f32_0p_opt(u),
-            )
-        }
-        fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_p0_opt(t),
-                |u| <U as MsgTrait>::f32_p0_opt(u),
-            )
-        }
-        fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_0p0_opt(t),
-                |u| <U as MsgTrait>::f32_0p0_opt(u),
-            )
-        }
-        fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_42_opt(t),
-                |u| <U as MsgTrait>::f32_42_opt(u),
-            )
-        }
-        fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_m42_opt(t),
-                |u| <U as MsgTrait>::f32_m42_opt(u),
-            )
-        }
-        fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_0p25_opt(t),
-                |u| <U as MsgTrait>::f32_0p25_opt(u),
-            )
-        }
-        fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_1p5e2_opt(t),
-                |u| <U as MsgTrait>::f32_1p5e2_opt(u),
-            )
-        }
-        fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_inf_opt(t),
-                |u| <U as MsgTrait>::f32_inf_opt(u),
-            )
-        }
-        fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_minf_opt(t),
-                |u| <U as MsgTrait>::f32_minf_opt(u),
-            )
-        }
-        fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_nan_opt(t),
-                |u| <U as MsgTrait>::f32_nan_opt(u),
-            )
-        }
-        fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::f32_mnan_opt(t),
-                |u| <U as MsgTrait>::f32_mnan_opt(u),
-            )
-        }
-        fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bool_default_opt(t),
-                |u| <U as MsgTrait>::bool_default_opt(u),
-            )
-        }
-        fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bool_true_opt(t),
-                |u| <U as MsgTrait>::bool_true_opt(u),
-            )
-        }
-        fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bool_false_opt(t),
-                |u| <U as MsgTrait>::bool_false_opt(u),
-            )
-        }
-        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::string_default_opt(t),
-                |u| <U as MsgTrait>::string_default_opt(u),
-            )
-        }
-        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::string_empty_opt(t),
-                |u| <U as MsgTrait>::string_empty_opt(u),
-            )
-        }
-        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::string_abc_opt(t),
-                |u| <U as MsgTrait>::string_abc_opt(u),
-            )
-        }
-        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::string_aiu_opt(t),
-                |u| <U as MsgTrait>::string_aiu_opt(u),
-            )
-        }
-        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::string_backslash_opt(t),
-                |u| <U as MsgTrait>::string_backslash_opt(u),
-            )
-        }
-        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::string_tab_opt(t),
-                |u| <U as MsgTrait>::string_tab_opt(u),
-            )
-        }
-        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::string_crlf_opt(t),
-                |u| <U as MsgTrait>::string_crlf_opt(u),
-            )
-        }
-        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_default_opt(t),
-                |u| <U as MsgTrait>::bytes_default_opt(u),
-            )
-        }
-        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_empty_opt(t),
-                |u| <U as MsgTrait>::bytes_empty_opt(u),
-            )
-        }
-        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_abc_opt(t),
-                |u| <U as MsgTrait>::bytes_abc_opt(u),
-            )
-        }
-        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_aiu_opt(t),
-                |u| <U as MsgTrait>::bytes_aiu_opt(u),
-            )
-        }
-        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_backslash_opt(t),
-                |u| <U as MsgTrait>::bytes_backslash_opt(u),
-            )
-        }
-        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_tab_opt(t),
-                |u| <U as MsgTrait>::bytes_tab_opt(u),
-            )
-        }
-        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_crlf_opt(t),
-                |u| <U as MsgTrait>::bytes_crlf_opt(u),
-            )
-        }
-        fn enum_default_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::enum_default_opt(t),
-                |u| <U as MsgTrait>::enum_default_opt(u),
-            )
-        }
-        fn enum_one_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::enum_one_opt(t),
-                |u| <U as MsgTrait>::enum_one_opt(u),
-            )
-        }
-        fn enum_fourty_two_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::enum_fourty_two_opt(t),
-                |u| <U as MsgTrait>::enum_fourty_two_opt(u),
-            )
-        }
-    }
-    impl<T> MsgTrait for ::std::option::Option<T>
-    where
-        T: MsgTrait,
-    {
-        fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_default_opt())
-        }
-        fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_0_opt())
-        }
-        fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_42_opt())
-        }
-        fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_m42_opt())
-        }
-        fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_2147483647_opt())
-        }
-        fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_m2147483648_opt())
-        }
-        fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_0123_opt())
-        }
-        fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.i32_0x123_opt())
-        }
-        fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.u32_default_opt())
-        }
-        fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.u32_0_opt())
-        }
-        fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.u32_42_opt())
-        }
-        fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.u32_4294967295_opt())
-        }
-        fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.u32_0123_opt())
-        }
-        fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            self.as_ref().and_then(|msg| msg.u32_0x123_opt())
-        }
-        fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.i64_default_opt())
-        }
-        fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.i64_0_opt())
-        }
-        fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.i64_42_opt())
-        }
-        fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.i64_m42_opt())
-        }
-        fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref()
-                .and_then(|msg| msg.i64_9223372036854775807_opt())
-        }
-        fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref()
-                .and_then(|msg| msg.i64_m9223372036854775808_opt())
-        }
-        fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.i64_0123_opt())
-        }
-        fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            self.as_ref().and_then(|msg| msg.i64_0x123_opt())
-        }
-        fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().and_then(|msg| msg.u64_default_opt())
-        }
-        fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().and_then(|msg| msg.u64_0_opt())
-        }
-        fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().and_then(|msg| msg.u64_42_opt())
-        }
-        fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref()
-                .and_then(|msg| msg.u64_18446744073709551615_opt())
-        }
-        fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().and_then(|msg| msg.u64_0123_opt())
-        }
-        fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            self.as_ref().and_then(|msg| msg.u64_0x123_opt())
-        }
-        fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_default_opt())
-        }
-        fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_0_opt())
-        }
-        fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_m0_opt())
-        }
-        fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_0p_opt())
-        }
-        fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_p0_opt())
-        }
-        fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_0p0_opt())
-        }
-        fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_42_opt())
-        }
-        fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_m42_opt())
-        }
-        fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_0p25_opt())
-        }
-        fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_1p5e2_opt())
-        }
-        fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_inf_opt())
-        }
-        fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_minf_opt())
-        }
-        fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_nan_opt())
-        }
-        fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            self.as_ref().and_then(|msg| msg.f32_mnan_opt())
-        }
-        fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            self.as_ref().and_then(|msg| msg.bool_default_opt())
-        }
-        fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            self.as_ref().and_then(|msg| msg.bool_true_opt())
-        }
-        fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            self.as_ref().and_then(|msg| msg.bool_false_opt())
-        }
-        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_default_opt())
-        }
-        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_empty_opt())
-        }
-        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_abc_opt())
-        }
-        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_aiu_opt())
-        }
-        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_backslash_opt())
-        }
-        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_tab_opt())
-        }
-        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            self.as_ref().and_then(|msg| msg.string_crlf_opt())
-        }
-        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_default_opt())
-        }
-        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_empty_opt())
-        }
-        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_abc_opt())
-        }
-        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_aiu_opt())
-        }
-        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_backslash_opt())
-        }
-        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_tab_opt())
-        }
-        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            self.as_ref().and_then(|msg| msg.bytes_crlf_opt())
-        }
-        fn enum_default_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.as_ref().and_then(|msg| msg.enum_default_opt())
-        }
-        fn enum_one_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.as_ref().and_then(|msg| msg.enum_one_opt())
-        }
-        fn enum_fourty_two_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.as_ref().and_then(|msg| msg.enum_fourty_two_opt())
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -9780,6 +8956,830 @@ pub mod _puroro_traits {
         T: MsgTrait,
     {
         msg_delegate!(T);
+    }
+    impl MsgTrait for () {}
+    impl<T, U> MsgTrait for (T, U)
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        fn i32_default_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_default_opt(&self.0))
+        }
+        fn i32_0_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_0_opt(&self.1).or_else(|| <T as MsgTrait>::i32_0_opt(&self.0))
+        }
+        fn i32_42_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_42_opt(&self.1).or_else(|| <T as MsgTrait>::i32_42_opt(&self.0))
+        }
+        fn i32_m42_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_m42_opt(&self.1).or_else(|| <T as MsgTrait>::i32_m42_opt(&self.0))
+        }
+        fn i32_2147483647_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_2147483647_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_2147483647_opt(&self.0))
+        }
+        fn i32_m2147483648_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_m2147483648_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_m2147483648_opt(&self.0))
+        }
+        fn i32_0123_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_0123_opt(&self.0))
+        }
+        fn i32_0x123_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_0x123_opt(&self.0))
+        }
+        fn u32_default_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_default_opt(&self.0))
+        }
+        fn u32_0_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_0_opt(&self.1).or_else(|| <T as MsgTrait>::u32_0_opt(&self.0))
+        }
+        fn u32_42_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_42_opt(&self.1).or_else(|| <T as MsgTrait>::u32_42_opt(&self.0))
+        }
+        fn u32_4294967295_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_4294967295_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_4294967295_opt(&self.0))
+        }
+        fn u32_0123_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_0123_opt(&self.0))
+        }
+        fn u32_0x123_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_0x123_opt(&self.0))
+        }
+        fn i64_default_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_default_opt(&self.0))
+        }
+        fn i64_0_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_0_opt(&self.1).or_else(|| <T as MsgTrait>::i64_0_opt(&self.0))
+        }
+        fn i64_42_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_42_opt(&self.1).or_else(|| <T as MsgTrait>::i64_42_opt(&self.0))
+        }
+        fn i64_m42_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_m42_opt(&self.1).or_else(|| <T as MsgTrait>::i64_m42_opt(&self.0))
+        }
+        fn i64_9223372036854775807_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_9223372036854775807_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_9223372036854775807_opt(&self.0))
+        }
+        fn i64_m9223372036854775808_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_m9223372036854775808_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_m9223372036854775808_opt(&self.0))
+        }
+        fn i64_0123_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_0123_opt(&self.0))
+        }
+        fn i64_0x123_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_0x123_opt(&self.0))
+        }
+        fn u64_default_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_default_opt(&self.0))
+        }
+        fn u64_0_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_0_opt(&self.1).or_else(|| <T as MsgTrait>::u64_0_opt(&self.0))
+        }
+        fn u64_42_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_42_opt(&self.1).or_else(|| <T as MsgTrait>::u64_42_opt(&self.0))
+        }
+        fn u64_18446744073709551615_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_18446744073709551615_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_18446744073709551615_opt(&self.0))
+        }
+        fn u64_0123_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_0123_opt(&self.0))
+        }
+        fn u64_0x123_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_0x123_opt(&self.0))
+        }
+        fn f32_default_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_default_opt(&self.0))
+        }
+        fn f32_0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0_opt(&self.0))
+        }
+        fn f32_m0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_m0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_m0_opt(&self.0))
+        }
+        fn f32_0p_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0p_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0p_opt(&self.0))
+        }
+        fn f32_p0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_p0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_p0_opt(&self.0))
+        }
+        fn f32_0p0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0p0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0p0_opt(&self.0))
+        }
+        fn f32_42_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_42_opt(&self.1).or_else(|| <T as MsgTrait>::f32_42_opt(&self.0))
+        }
+        fn f32_m42_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_m42_opt(&self.1).or_else(|| <T as MsgTrait>::f32_m42_opt(&self.0))
+        }
+        fn f32_0p25_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0p25_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_0p25_opt(&self.0))
+        }
+        fn f32_1p5e2_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_1p5e2_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_1p5e2_opt(&self.0))
+        }
+        fn f32_inf_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_inf_opt(&self.1).or_else(|| <T as MsgTrait>::f32_inf_opt(&self.0))
+        }
+        fn f32_minf_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_minf_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_minf_opt(&self.0))
+        }
+        fn f32_nan_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_nan_opt(&self.1).or_else(|| <T as MsgTrait>::f32_nan_opt(&self.0))
+        }
+        fn f32_mnan_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_mnan_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_mnan_opt(&self.0))
+        }
+        fn bool_default_opt<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bool_default_opt(&self.0))
+        }
+        fn bool_true_opt<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_true_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bool_true_opt(&self.0))
+        }
+        fn bool_false_opt<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_false_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bool_false_opt(&self.0))
+        }
+        fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_default_opt(&self.0))
+        }
+        fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_empty_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_empty_opt(&self.0))
+        }
+        fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_abc_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_abc_opt(&self.0))
+        }
+        fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_aiu_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_aiu_opt(&self.0))
+        }
+        fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_backslash_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_backslash_opt(&self.0))
+        }
+        fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_tab_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_tab_opt(&self.0))
+        }
+        fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
+            <U as MsgTrait>::string_crlf_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::string_crlf_opt(&self.0))
+        }
+        fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_default_opt(&self.0))
+        }
+        fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_empty_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_empty_opt(&self.0))
+        }
+        fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_abc_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_abc_opt(&self.0))
+        }
+        fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_aiu_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_aiu_opt(&self.0))
+        }
+        fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_backslash_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_backslash_opt(&self.0))
+        }
+        fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_tab_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_tab_opt(&self.0))
+        }
+        fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <U as MsgTrait>::bytes_crlf_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bytes_crlf_opt(&self.0))
+        }
+        fn enum_default_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_default_opt(&self.0))
+        }
+        fn enum_one_opt<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_one_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_one_opt(&self.0))
+        }
+        fn enum_fourty_two_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_fourty_two_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_fourty_two_opt(&self.0))
+        }
+    }
+    impl<T, U> MsgTrait for ::puroro::Either<T, U>
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_default_opt(t),
+                |u| <U as MsgTrait>::i32_default_opt(u),
+            )
+        }
+        fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_0_opt(t),
+                |u| <U as MsgTrait>::i32_0_opt(u),
+            )
+        }
+        fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_42_opt(t),
+                |u| <U as MsgTrait>::i32_42_opt(u),
+            )
+        }
+        fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_m42_opt(t),
+                |u| <U as MsgTrait>::i32_m42_opt(u),
+            )
+        }
+        fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_2147483647_opt(t),
+                |u| <U as MsgTrait>::i32_2147483647_opt(u),
+            )
+        }
+        fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_m2147483648_opt(t),
+                |u| <U as MsgTrait>::i32_m2147483648_opt(u),
+            )
+        }
+        fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_0123_opt(t),
+                |u| <U as MsgTrait>::i32_0123_opt(u),
+            )
+        }
+        fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_0x123_opt(t),
+                |u| <U as MsgTrait>::i32_0x123_opt(u),
+            )
+        }
+        fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_default_opt(t),
+                |u| <U as MsgTrait>::u32_default_opt(u),
+            )
+        }
+        fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_0_opt(t),
+                |u| <U as MsgTrait>::u32_0_opt(u),
+            )
+        }
+        fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_42_opt(t),
+                |u| <U as MsgTrait>::u32_42_opt(u),
+            )
+        }
+        fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_4294967295_opt(t),
+                |u| <U as MsgTrait>::u32_4294967295_opt(u),
+            )
+        }
+        fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_0123_opt(t),
+                |u| <U as MsgTrait>::u32_0123_opt(u),
+            )
+        }
+        fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_0x123_opt(t),
+                |u| <U as MsgTrait>::u32_0x123_opt(u),
+            )
+        }
+        fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_default_opt(t),
+                |u| <U as MsgTrait>::i64_default_opt(u),
+            )
+        }
+        fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_0_opt(t),
+                |u| <U as MsgTrait>::i64_0_opt(u),
+            )
+        }
+        fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_42_opt(t),
+                |u| <U as MsgTrait>::i64_42_opt(u),
+            )
+        }
+        fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_m42_opt(t),
+                |u| <U as MsgTrait>::i64_m42_opt(u),
+            )
+        }
+        fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_9223372036854775807_opt(t),
+                |u| <U as MsgTrait>::i64_9223372036854775807_opt(u),
+            )
+        }
+        fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_m9223372036854775808_opt(t),
+                |u| <U as MsgTrait>::i64_m9223372036854775808_opt(u),
+            )
+        }
+        fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_0123_opt(t),
+                |u| <U as MsgTrait>::i64_0123_opt(u),
+            )
+        }
+        fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_0x123_opt(t),
+                |u| <U as MsgTrait>::i64_0x123_opt(u),
+            )
+        }
+        fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_default_opt(t),
+                |u| <U as MsgTrait>::u64_default_opt(u),
+            )
+        }
+        fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_0_opt(t),
+                |u| <U as MsgTrait>::u64_0_opt(u),
+            )
+        }
+        fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_42_opt(t),
+                |u| <U as MsgTrait>::u64_42_opt(u),
+            )
+        }
+        fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_18446744073709551615_opt(t),
+                |u| <U as MsgTrait>::u64_18446744073709551615_opt(u),
+            )
+        }
+        fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_0123_opt(t),
+                |u| <U as MsgTrait>::u64_0123_opt(u),
+            )
+        }
+        fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_0x123_opt(t),
+                |u| <U as MsgTrait>::u64_0x123_opt(u),
+            )
+        }
+        fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_default_opt(t),
+                |u| <U as MsgTrait>::f32_default_opt(u),
+            )
+        }
+        fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0_opt(t),
+                |u| <U as MsgTrait>::f32_0_opt(u),
+            )
+        }
+        fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_m0_opt(t),
+                |u| <U as MsgTrait>::f32_m0_opt(u),
+            )
+        }
+        fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0p_opt(t),
+                |u| <U as MsgTrait>::f32_0p_opt(u),
+            )
+        }
+        fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_p0_opt(t),
+                |u| <U as MsgTrait>::f32_p0_opt(u),
+            )
+        }
+        fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0p0_opt(t),
+                |u| <U as MsgTrait>::f32_0p0_opt(u),
+            )
+        }
+        fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_42_opt(t),
+                |u| <U as MsgTrait>::f32_42_opt(u),
+            )
+        }
+        fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_m42_opt(t),
+                |u| <U as MsgTrait>::f32_m42_opt(u),
+            )
+        }
+        fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0p25_opt(t),
+                |u| <U as MsgTrait>::f32_0p25_opt(u),
+            )
+        }
+        fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_1p5e2_opt(t),
+                |u| <U as MsgTrait>::f32_1p5e2_opt(u),
+            )
+        }
+        fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_inf_opt(t),
+                |u| <U as MsgTrait>::f32_inf_opt(u),
+            )
+        }
+        fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_minf_opt(t),
+                |u| <U as MsgTrait>::f32_minf_opt(u),
+            )
+        }
+        fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_nan_opt(t),
+                |u| <U as MsgTrait>::f32_nan_opt(u),
+            )
+        }
+        fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_mnan_opt(t),
+                |u| <U as MsgTrait>::f32_mnan_opt(u),
+            )
+        }
+        fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_default_opt(t),
+                |u| <U as MsgTrait>::bool_default_opt(u),
+            )
+        }
+        fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_true_opt(t),
+                |u| <U as MsgTrait>::bool_true_opt(u),
+            )
+        }
+        fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_false_opt(t),
+                |u| <U as MsgTrait>::bool_false_opt(u),
+            )
+        }
+        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_default_opt(t),
+                |u| <U as MsgTrait>::string_default_opt(u),
+            )
+        }
+        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_empty_opt(t),
+                |u| <U as MsgTrait>::string_empty_opt(u),
+            )
+        }
+        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_abc_opt(t),
+                |u| <U as MsgTrait>::string_abc_opt(u),
+            )
+        }
+        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_aiu_opt(t),
+                |u| <U as MsgTrait>::string_aiu_opt(u),
+            )
+        }
+        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_backslash_opt(t),
+                |u| <U as MsgTrait>::string_backslash_opt(u),
+            )
+        }
+        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_tab_opt(t),
+                |u| <U as MsgTrait>::string_tab_opt(u),
+            )
+        }
+        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_crlf_opt(t),
+                |u| <U as MsgTrait>::string_crlf_opt(u),
+            )
+        }
+        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_default_opt(t),
+                |u| <U as MsgTrait>::bytes_default_opt(u),
+            )
+        }
+        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_empty_opt(t),
+                |u| <U as MsgTrait>::bytes_empty_opt(u),
+            )
+        }
+        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_abc_opt(t),
+                |u| <U as MsgTrait>::bytes_abc_opt(u),
+            )
+        }
+        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_aiu_opt(t),
+                |u| <U as MsgTrait>::bytes_aiu_opt(u),
+            )
+        }
+        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_backslash_opt(t),
+                |u| <U as MsgTrait>::bytes_backslash_opt(u),
+            )
+        }
+        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_tab_opt(t),
+                |u| <U as MsgTrait>::bytes_tab_opt(u),
+            )
+        }
+        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_crlf_opt(t),
+                |u| <U as MsgTrait>::bytes_crlf_opt(u),
+            )
+        }
+        fn enum_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_default_opt(t),
+                |u| <U as MsgTrait>::enum_default_opt(u),
+            )
+        }
+        fn enum_one_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_one_opt(t),
+                |u| <U as MsgTrait>::enum_one_opt(u),
+            )
+        }
+        fn enum_fourty_two_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_fourty_two_opt(t),
+                |u| <U as MsgTrait>::enum_fourty_two_opt(u),
+            )
+        }
+    }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_default_opt())
+        }
+        fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_0_opt())
+        }
+        fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_42_opt())
+        }
+        fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_m42_opt())
+        }
+        fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_2147483647_opt())
+        }
+        fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_m2147483648_opt())
+        }
+        fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_0123_opt())
+        }
+        fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_0x123_opt())
+        }
+        fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_default_opt())
+        }
+        fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_0_opt())
+        }
+        fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_42_opt())
+        }
+        fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_4294967295_opt())
+        }
+        fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_0123_opt())
+        }
+        fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_0x123_opt())
+        }
+        fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_default_opt())
+        }
+        fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_0_opt())
+        }
+        fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_42_opt())
+        }
+        fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_m42_opt())
+        }
+        fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref()
+                .and_then(|msg| msg.i64_9223372036854775807_opt())
+        }
+        fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref()
+                .and_then(|msg| msg.i64_m9223372036854775808_opt())
+        }
+        fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_0123_opt())
+        }
+        fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_0x123_opt())
+        }
+        fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_default_opt())
+        }
+        fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_0_opt())
+        }
+        fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_42_opt())
+        }
+        fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref()
+                .and_then(|msg| msg.u64_18446744073709551615_opt())
+        }
+        fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_0123_opt())
+        }
+        fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_0x123_opt())
+        }
+        fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_default_opt())
+        }
+        fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0_opt())
+        }
+        fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_m0_opt())
+        }
+        fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0p_opt())
+        }
+        fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_p0_opt())
+        }
+        fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0p0_opt())
+        }
+        fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_42_opt())
+        }
+        fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_m42_opt())
+        }
+        fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0p25_opt())
+        }
+        fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_1p5e2_opt())
+        }
+        fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_inf_opt())
+        }
+        fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_minf_opt())
+        }
+        fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_nan_opt())
+        }
+        fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_mnan_opt())
+        }
+        fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_default_opt())
+        }
+        fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_true_opt())
+        }
+        fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_false_opt())
+        }
+        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_default_opt())
+        }
+        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_empty_opt())
+        }
+        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_abc_opt())
+        }
+        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_aiu_opt())
+        }
+        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_backslash_opt())
+        }
+        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_tab_opt())
+        }
+        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            self.as_ref().and_then(|msg| msg.string_crlf_opt())
+        }
+        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_default_opt())
+        }
+        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_empty_opt())
+        }
+        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_abc_opt())
+        }
+        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_aiu_opt())
+        }
+        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_backslash_opt())
+        }
+        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_tab_opt())
+        }
+        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            self.as_ref().and_then(|msg| msg.bytes_crlf_opt())
+        }
+        fn enum_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_default_opt())
+        }
+        fn enum_one_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_one_opt())
+        }
+        fn enum_fourty_two_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_fourty_two_opt())
+        }
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
