@@ -249,7 +249,9 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
-        pub recursive_unlabeled: ::std::option::Option<
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'bump,
                 self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
@@ -263,7 +265,8 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
-                recursive_unlabeled: ::std::default::Default::default(),
+                _bitfield: ::std::default::Default::default(),
+                recursive_unlabeled: ::std::option::Option::None,
             }
         }
     }
@@ -282,7 +285,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+            self.recursive_unlabeled.as_ref().map(|b| b.as_ref())
         }
     }
 
@@ -352,6 +355,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: self._bitfield,
                 recursive_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                     &self.recursive_unlabeled,
                     bump,

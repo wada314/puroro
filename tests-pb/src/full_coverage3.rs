@@ -12036,54 +12036,58 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
-    pub i32_unlabeled: i32,
-    pub i32_optional: ::std::option::Option<i32>,
-    pub i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
-    pub float_unlabeled: f32,
-    pub float_optional: ::std::option::Option<f32>,
-    pub float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
-    pub bytes_unlabeled: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-    pub bytes_optional: ::std::option::Option<::puroro::bumpalo::collections::Vec<'bump, u8>>,
-    pub bytes_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::Vec<'bump, u8>>,
-    pub string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
-    pub string_optional: ::std::option::Option<::puroro::bumpalo::collections::String<'bump>>,
-    pub string_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::String<'bump>>,
-    pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
-    pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
-    pub enum_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage3::Enum>,
-    pub submsg_unlabeled: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
-    pub submsg_optional: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
-    pub submsg_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>,
-    pub i64_unlabeled: i64,
-    pub i64_optional: ::std::option::Option<i64>,
-    pub i64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
-    pub u32_unlabeled: u32,
-    pub u32_optional: ::std::option::Option<u32>,
-    pub u32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
-    pub u64_unlabeled: u64,
-    pub u64_optional: ::std::option::Option<u64>,
-    pub u64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
-    pub s32_unlabeled: i32,
-    pub s32_optional: ::std::option::Option<i32>,
-    pub s32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
-    pub s64_unlabeled: i64,
-    pub s64_optional: ::std::option::Option<i64>,
-    pub s64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
-    pub fixed32_unlabeled: u32,
-    pub fixed32_optional: ::std::option::Option<u32>,
-    pub fixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
-    pub fixed64_unlabeled: u64,
-    pub fixed64_optional: ::std::option::Option<u64>,
-    pub fixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
-    pub sfixed32_unlabeled: i32,
-    pub sfixed32_optional: ::std::option::Option<i32>,
-    pub sfixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
-    pub sfixed64_unlabeled: i64,
-    pub sfixed64_optional: ::std::option::Option<i64>,
-    pub sfixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
-    pub f64_unlabeled: f64,
-    pub f64_optional: ::std::option::Option<f64>,
-    pub f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
+    _bitfield: ::puroro::bitvec::array::BitArray<
+        ::puroro::bitvec::order::Lsb0,
+        [u32; (15 + 31) / 32],
+    >,
+    i32_unlabeled: i32,
+    i32_optional: i32,
+    i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    float_unlabeled: f32,
+    float_optional: f32,
+    float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
+    bytes_unlabeled: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+    bytes_optional: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+    bytes_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::Vec<'bump, u8>>,
+    string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
+    string_optional: ::puroro::bumpalo::collections::String<'bump>,
+    string_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::String<'bump>>,
+    enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
+    enum_optional: self::_puroro_root::full_coverage3::Enum,
+    enum_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage3::Enum>,
+    submsg_unlabeled: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
+    submsg_optional: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
+    submsg_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>,
+    i64_unlabeled: i64,
+    i64_optional: i64,
+    i64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    u32_unlabeled: u32,
+    u32_optional: u32,
+    u32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
+    u64_unlabeled: u64,
+    u64_optional: u64,
+    u64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
+    s32_unlabeled: i32,
+    s32_optional: i32,
+    s32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    s64_unlabeled: i64,
+    s64_optional: i64,
+    s64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    fixed32_unlabeled: u32,
+    fixed32_optional: u32,
+    fixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
+    fixed64_unlabeled: u64,
+    fixed64_optional: u64,
+    fixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
+    sfixed32_unlabeled: i32,
+    sfixed32_optional: i32,
+    sfixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    sfixed64_unlabeled: i64,
+    sfixed64_optional: i64,
+    sfixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    f64_unlabeled: f64,
+    f64_optional: f64,
+    f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
 }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
@@ -12092,6 +12096,7 @@ pub mod _puroro_impls {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
                 i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
@@ -12099,16 +12104,16 @@ pub mod _puroro_impls {
                 float_optional: ::std::default::Default::default(),
                 float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 bytes_unlabeled: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_optional: ::std::default::Default::default(),
+                bytes_optional: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 bytes_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_optional: ::std::default::Default::default(),
+                string_optional: ::puroro::bumpalo::collections::String::new_in(bump),
                 string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 enum_unlabeled: ::std::default::Default::default(),
                 enum_optional: ::std::default::Default::default(),
                 enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                submsg_unlabeled: ::std::default::Default::default(),
-                submsg_optional: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::option::Option::None,
+                submsg_optional: ::std::option::Option::None,
                 submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
                 i64_unlabeled: ::std::default::Default::default(),
                 i64_optional: ::std::default::Default::default(),
@@ -12154,14 +12159,14 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field3RepeatedType<'this>
         where
@@ -12172,14 +12177,14 @@ pub mod _puroro_impls {
             self.i32_repeated.iter().cloned()
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-            if self.float_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.float_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.float_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 1) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field13RepeatedType<'this>
         where
@@ -12190,14 +12195,14 @@ pub mod _puroro_impls {
             self.float_repeated.iter().cloned()
         }
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            if self.bytes_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
-            }
+            ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
         }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_optional.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 2) {
+                ::std::option::Option::Some(self.bytes_optional.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field23RepeatedType<'this>
         where
@@ -12211,14 +12216,14 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.string_unlabeled.as_ref())
-            }
+            ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 3) {
+                ::std::option::Option::Some(self.string_optional.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field33RepeatedType<'this>
         where
@@ -12234,16 +12239,16 @@ pub mod _puroro_impls {
         fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
-            if self.enum_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.enum_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
         }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
-            Clone::clone(&self.enum_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 4) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field43RepeatedType<'this>
         where
@@ -12255,11 +12260,11 @@ pub mod _puroro_impls {
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            self.submsg_optional.as_ref().map(|b| b.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
         type Field53RepeatedType<'this> where Self: 'this =
@@ -12271,14 +12276,14 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-            if self.i64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i64_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
         }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 5) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field103RepeatedType<'this>
         where
@@ -12289,14 +12294,14 @@ pub mod _puroro_impls {
             self.i64_repeated.iter().cloned()
         }
         fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
-            if self.u32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.u32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_unlabeled))
         }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 6) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field113RepeatedType<'this>
         where
@@ -12307,14 +12312,14 @@ pub mod _puroro_impls {
             self.u32_repeated.iter().cloned()
         }
         fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
-            if self.u64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.u64_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_unlabeled))
         }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 7) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field123RepeatedType<'this>
         where
@@ -12325,14 +12330,14 @@ pub mod _puroro_impls {
             self.u64_repeated.iter().cloned()
         }
         fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.s32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.s32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_unlabeled))
         }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.s32_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 8) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field133RepeatedType<'this>
         where
@@ -12343,14 +12348,14 @@ pub mod _puroro_impls {
             self.s32_repeated.iter().cloned()
         }
         fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-            if self.s64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.s64_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_unlabeled))
         }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.s64_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 9) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field143RepeatedType<'this>
         where
@@ -12361,14 +12366,14 @@ pub mod _puroro_impls {
             self.s64_repeated.iter().cloned()
         }
         fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
-            if self.fixed32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.fixed32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_unlabeled))
         }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.fixed32_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 10) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field153RepeatedType<'this>
         where
@@ -12379,14 +12384,14 @@ pub mod _puroro_impls {
             self.fixed32_repeated.iter().cloned()
         }
         fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
-            if self.fixed64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.fixed64_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_unlabeled))
         }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.fixed64_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 11) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field163RepeatedType<'this>
         where
@@ -12397,14 +12402,14 @@ pub mod _puroro_impls {
             self.fixed64_repeated.iter().cloned()
         }
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.sfixed32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.sfixed32_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_unlabeled))
         }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.sfixed32_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 12) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field173RepeatedType<'this>
         where
@@ -12415,14 +12420,14 @@ pub mod _puroro_impls {
             self.sfixed32_repeated.iter().cloned()
         }
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-            if self.sfixed64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.sfixed64_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_unlabeled))
         }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.sfixed64_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 13) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field183RepeatedType<'this>
         where
@@ -12433,14 +12438,14 @@ pub mod _puroro_impls {
             self.sfixed64_repeated.iter().cloned()
         }
         fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
-            if self.f64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.f64_unlabeled.clone())
-            }
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_unlabeled))
         }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
-            Clone::clone(&self.f64_optional)
+            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 14) {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_optional))
+            } else {
+                ::std::option::Option::None
+            }
         }
         type Field193RepeatedType<'this>
         where
@@ -12465,150 +12470,261 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_unlabeled, data, &self._bump),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_optional, data, &self._bump),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_repeated, data, &self._bump),
-            11 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Float
-            >::deser_field(&mut self.float_unlabeled, data, &self._bump),
-            12 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.float_optional, data, &self._bump),
-            13 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Float
-            >::deser_field(&mut self.float_repeated, data, &self._bump),
-            21 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_unlabeled, data, &self._bump),
-            22 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_optional, data, &self._bump),
-            23 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_repeated, data, &self._bump),
-            31 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::String
-            >::deser_field(&mut self.string_unlabeled, data, &self._bump),
-            32 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_optional, data, &self._bump),
-            33 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::String
-            >::deser_field(&mut self.string_repeated, data, &self._bump),
-            41 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
-            >::deser_field(&mut self.enum_unlabeled, data, &self._bump),
-            42 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
-            >::deser_field(&mut self.enum_optional, data, &self._bump),
-            43 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
-            >::deser_field(&mut self.enum_repeated, data, &self._bump),
-            51 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
-            >::deser_field(&mut self.submsg_unlabeled, data, &self._bump),
-            52 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
-            >::deser_field(&mut self.submsg_optional, data, &self._bump),
-            53 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
-            >::deser_field(&mut self.submsg_repeated, data, &self._bump),
-            101 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_unlabeled, data, &self._bump),
-            102 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_optional, data, &self._bump),
-            103 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_repeated, data, &self._bump),
-            111 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_unlabeled, data, &self._bump),
-            112 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_optional, data, &self._bump),
-            113 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_repeated, data, &self._bump),
-            121 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_unlabeled, data, &self._bump),
-            122 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_optional, data, &self._bump),
-            123 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_repeated, data, &self._bump),
-            131 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SInt32
-            >::deser_field(&mut self.s32_unlabeled, data, &self._bump),
-            132 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SInt32
-            >::deser_field(&mut self.s32_optional, data, &self._bump),
-            133 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SInt32
-            >::deser_field(&mut self.s32_repeated, data, &self._bump),
-            141 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SInt64
-            >::deser_field(&mut self.s64_unlabeled, data, &self._bump),
-            142 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SInt64
-            >::deser_field(&mut self.s64_optional, data, &self._bump),
-            143 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SInt64
-            >::deser_field(&mut self.s64_repeated, data, &self._bump),
-            151 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Fixed32
-            >::deser_field(&mut self.fixed32_unlabeled, data, &self._bump),
-            152 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Fixed32
-            >::deser_field(&mut self.fixed32_optional, data, &self._bump),
-            153 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Fixed32
-            >::deser_field(&mut self.fixed32_repeated, data, &self._bump),
-            161 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Fixed64
-            >::deser_field(&mut self.fixed64_unlabeled, data, &self._bump),
-            162 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Fixed64
-            >::deser_field(&mut self.fixed64_optional, data, &self._bump),
-            163 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Fixed64
-            >::deser_field(&mut self.fixed64_repeated, data, &self._bump),
-            171 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SFixed32
-            >::deser_field(&mut self.sfixed32_unlabeled, data, &self._bump),
-            172 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SFixed32
-            >::deser_field(&mut self.sfixed32_optional, data, &self._bump),
-            173 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SFixed32
-            >::deser_field(&mut self.sfixed32_repeated, data, &self._bump),
-            181 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SFixed64
-            >::deser_field(&mut self.sfixed64_unlabeled, data, &self._bump),
-            182 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SFixed64
-            >::deser_field(&mut self.sfixed64_optional, data, &self._bump),
-            183 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SFixed64
-            >::deser_field(&mut self.sfixed64_repeated, data, &self._bump),
-            191 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Double
-            >::deser_field(&mut self.f64_unlabeled, data, &self._bump),
-            192 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Double
-            >::deser_field(&mut self.f64_optional, data, &self._bump),
-            193 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Double
-            >::deser_field(&mut self.f64_repeated, data, &self._bump),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data, &self._bump)
+            }
+            2 => {
+                self._bitfield.set(0, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_optional, data, &self._bump)
+            }
+            3 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_repeated, data, &self._bump)
+            }
+            11 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                >::deser_field(&mut self.float_unlabeled, data, &self._bump)
+            }
+            12 => {
+                self._bitfield.set(1, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.float_optional, data, &self._bump)
+            }
+            13 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Float
+                >::deser_field(&mut self.float_repeated, data, &self._bump)
+            }
+            21 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_unlabeled, data, &self._bump)
+            }
+            22 => {
+                self._bitfield.set(2, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_optional, data, &self._bump)
+            }
+            23 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_repeated, data, &self._bump)
+            }
+            31 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.string_unlabeled, data, &self._bump)
+            }
+            32 => {
+                self._bitfield.set(3, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_optional, data, &self._bump)
+            }
+            33 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::String
+                >::deser_field(&mut self.string_repeated, data, &self._bump)
+            }
+            41 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_unlabeled, data, &self._bump)
+            }
+            42 => {
+                self._bitfield.set(4, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_optional, data, &self._bump)
+            }
+            43 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_repeated, data, &self._bump)
+            }
+            51 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                >::deser_field(&mut self.submsg_unlabeled, data, &self._bump)
+            }
+            52 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                >::deser_field(&mut self.submsg_optional, data, &self._bump)
+            }
+            53 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
+                >::deser_field(&mut self.submsg_repeated, data, &self._bump)
+            }
+            101 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_unlabeled, data, &self._bump)
+            }
+            102 => {
+                self._bitfield.set(5, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_optional, data, &self._bump)
+            }
+            103 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_repeated, data, &self._bump)
+            }
+            111 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_unlabeled, data, &self._bump)
+            }
+            112 => {
+                self._bitfield.set(6, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_optional, data, &self._bump)
+            }
+            113 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_repeated, data, &self._bump)
+            }
+            121 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_unlabeled, data, &self._bump)
+            }
+            122 => {
+                self._bitfield.set(7, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_optional, data, &self._bump)
+            }
+            123 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_repeated, data, &self._bump)
+            }
+            131 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_unlabeled, data, &self._bump)
+            }
+            132 => {
+                self._bitfield.set(8, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_optional, data, &self._bump)
+            }
+            133 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_repeated, data, &self._bump)
+            }
+            141 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_unlabeled, data, &self._bump)
+            }
+            142 => {
+                self._bitfield.set(9, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_optional, data, &self._bump)
+            }
+            143 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_repeated, data, &self._bump)
+            }
+            151 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_unlabeled, data, &self._bump)
+            }
+            152 => {
+                self._bitfield.set(10, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_optional, data, &self._bump)
+            }
+            153 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_repeated, data, &self._bump)
+            }
+            161 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_unlabeled, data, &self._bump)
+            }
+            162 => {
+                self._bitfield.set(11, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_optional, data, &self._bump)
+            }
+            163 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_repeated, data, &self._bump)
+            }
+            171 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_unlabeled, data, &self._bump)
+            }
+            172 => {
+                self._bitfield.set(12, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_optional, data, &self._bump)
+            }
+            173 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_repeated, data, &self._bump)
+            }
+            181 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_unlabeled, data, &self._bump)
+            }
+            182 => {
+                self._bitfield.set(13, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_optional, data, &self._bump)
+            }
+            183 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_repeated, data, &self._bump)
+            }
+            191 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_unlabeled, data, &self._bump)
+            }
+            192 => {
+                self._bitfield.set(14, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_optional, data, &self._bump)
+            }
+            193 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_repeated, data, &self._bump)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -13082,6 +13198,7 @@ pub mod _puroro_impls {
         fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self {
                 _bump: bump,
+                _bitfield: self._bitfield,
                 i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                     &self.i32_unlabeled,
                     bump,
@@ -15243,8 +15360,12 @@ pub mod _puroro_nested {
             #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
-                pub i32_unlabeled: i32,
-                pub i64_unlabeled: i64,
+                _bitfield: ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (0 + 31) / 32],
+                >,
+                i32_unlabeled: i32,
+                i64_unlabeled: i64,
             }
 
             pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
@@ -15253,6 +15374,7 @@ pub mod _puroro_nested {
                 pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
+                        _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
                     }
@@ -15269,18 +15391,10 @@ pub mod _puroro_nested {
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-                    if self.i32_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
-                    } else {
-                        ::std::option::Option::Some(self.i32_unlabeled.clone())
-                    }
+                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
                 }
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-                    if self.i64_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
-                    } else {
-                        ::std::option::Option::Some(self.i64_unlabeled.clone())
-                    }
+                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
                 }
             }
 
@@ -15356,6 +15470,7 @@ pub mod _puroro_nested {
                 fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self {
                         _bump: bump,
+                        _bitfield: self._bitfield,
                         i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
                             &self.i32_unlabeled,
                             bump,

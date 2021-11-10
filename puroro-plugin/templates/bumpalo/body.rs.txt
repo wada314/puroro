@@ -1,20 +1,20 @@
 #[derive(::std::fmt::Debug)]
 pub struct {{ m.bumpalo_ident }}<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
+    _bitfield: ::puroro::bitvec::array::BitArray<
+        ::puroro::bitvec::order::Lsb0,
+        [u32; ({{ m.bitfield_len }} + 31) / 32],
+    >,
 
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
-    pub {{ field.ident }}: {{ field.bumpalo_field_type }},
+    {{ field.ident }}: {{ field.bumpalo_field_type }},
     {%- endif %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
-    pub {{ oneof.field_ident }}: ::std::option::Option<
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }}
-        {%- if oneof.has_ld_field %}
-        <'bump>
-        {%- endif %}
-    >,
+    {{ oneof.field_ident }}: 
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }}<'bump>,
     {%- endfor %}
 }
 
@@ -24,26 +24,32 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         Self {
             _bump: bump,
+            _bitfield: ::std::default::Default::default(),
+
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             {%- if field.is_repeated %}
             {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
             {%- else %}
-            {%- if field.is_unlabeled && field.is_string  %}
+            {%- if field.is_length_delimited %}
+            {%- if field.is_message %}
+            {{ field.ident }}: ::std::option::Option::None,
+            {%- endif %} {#- if field.is_message #}
+            {%- if field.is_string %}
             {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump),
-            {%- else %}
-            {%- if field.is_unlabeled && field.is_bytes %}
+            {%- endif %} {#- if field.is_string #}
+            {%- if field.is_bytes %}
             {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
-            {%- else %}
+            {%- endif %} {#- if field.is_bytes #}
+            {%- else %} {#- if field.is_length_delimited #}
             {{ field.ident }}: ::std::default::Default::default(),
-            {%- endif %} {#- if field.is_unlabeled && field.is_string #}
-            {%- endif %} {#- if field.is_unlabeled && field.is_bytes #}
+            {%- endif %} {#- if field.is_length_delimited #}
             {%- endif %} {#- if field.is_repeated #}
             {%- endif %} {#- if !field.is_explicit_oneof_field #}
             {%- endfor %} {#- for field in m.fields #}
 
             {%- for oneof in m.oneofs %}
-            {{ oneof.field_ident }}: ::std::option::Option::None,
+            {{ oneof.field_ident }}: ::std::default::Default::default(),
             {%- endfor %}
         }
     }
@@ -75,17 +81,20 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
             {%- endif %}
         >
     {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
+        match &self.{{ oneof.field_ident }} {
+            E::_None(_) => ::std::option::Option::None,
             {%- for field in oneof.fields %}
-            {% if field.is_length_delimited %}
-            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.as_ref()),
-            {%- else %}
-            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.clone()),
-            {%- endif %}
+            E::{{ field.ident }}(val) => ::std::option::Option::Some(
+                {% if field.is_length_delimited %}
+                F::{{ field.ident }}(val.as_ref())
+                {% else %}
+                F::{{ field.ident }}(val.clone())
+                {% endif %}
+            ),
             {%- endfor %}
-        })
+        }
     }
     {%- endfor %}
 }
@@ -103,9 +112,14 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
         match field_number {
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
-            {{ field.number }} => DeserFieldFromBytesIter::<
-                {{ field.bumpalo_label_and_type_tags }}
-            >::deser_field(&mut self.{{ field.ident }}, data, &self._bump),
+            {{ field.number }} => {
+                {%- if field.has_optional_bit %}
+                self._bitfield.set({{ field.bitfield_index }}, true);
+                {%- endif %}
+                DeserFieldFromBytesIter::<
+                    {{ field.bumpalo_label_and_type_tags }}
+                >::deser_field(&mut self.{{ field.ident }}, data, &self._bump)
+            }
             {%- endif %}
             {%- endfor %}
 
@@ -115,16 +129,18 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
                 if !matches!(
                     &self.{{ oneof.field_ident }},
-                    Some(E::{{ field.ident }}(_)))
+                    E::{{ field.ident }}(_))
                 {
-                    self.{{ oneof.field_ident }} = Some(
-                        E::{{ field.ident }}(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
-                        )
+                    self.{{ oneof.field_ident }} = E::{{ field.ident }}(
+                        {%- if field.is_length_delimited %}
+                        ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
+                        {%- else %}
+                        ::std::default::Default::default()
+                        {%- endif %}
                     );
                 }
                 let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
-                    Some(E::{{ field.ident }}(v)) => v,
+                    E::{{ field.ident }}(v) => v,
                     _ => unreachable!(),
                 };
                 DeserFieldFromBytesIter::<
@@ -189,6 +205,7 @@ impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ m.bum
     fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         Self { 
             _bump: bump,
+            _bitfield: self._bitfield,
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             {{ field.ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ field.ident }}, bump),

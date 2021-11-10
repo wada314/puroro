@@ -19,3 +19,15 @@ pub mod impls;
 pub mod se;
 pub mod types;
 pub mod variant;
+
+use ::bitvec::order::BitOrder;
+use ::bitvec::slice::BitSlice;
+use ::bitvec::store::BitStore;
+
+pub fn get_bitvec_bit<O, T>(slice: &BitSlice<O, T>, index: usize) -> bool
+where
+    O: BitOrder,
+    T: BitStore,
+{
+    *slice.get(index).expect("bitvec index out of bound.")
+}

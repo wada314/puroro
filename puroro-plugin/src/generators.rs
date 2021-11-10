@@ -69,6 +69,7 @@ struct Message {
     nested: MessagesAndEnums,
     fields: Vec<Field>,
     oneofs: Vec<Oneof>,
+    bitfield_len: i32,
     simple_ident: String,
     single_field_ident: String,
     bumpalo_ident: String,
@@ -78,10 +79,11 @@ struct Message {
 
 impl Message {
     fn try_new(m: &wrappers::Message) -> Result<Self> {
+        let mut bitfield_index = 0;
         let fields: Vec<Field> = m
             .fields()
             .into_iter()
-            .map(|f| Field::try_new(f))
+            .map(|f| Field::try_new(f, &mut bitfield_index))
             .try_collect()?;
         let oneofs = m
             .oneofs()
@@ -110,6 +112,7 @@ impl Message {
             },
             fields,
             oneofs,
+            bitfield_len: bitfield_index,
             simple_ident: m.rust_impl_ident(""),
             single_field_ident: m.rust_impl_ident("SingleField"),
             bumpalo_ident: m.rust_impl_ident("Bumpalo"),
@@ -180,6 +183,8 @@ struct Field {
     is_unlabeled: bool,
     has_default_value: bool,
     default_value: String,
+    has_optional_bit: bool,
+    bitfield_index: i32,
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
     trait_label_and_type_tags: String,
@@ -199,7 +204,7 @@ struct Field {
 }
 
 impl Field {
-    fn try_new(f: &wrappers::Field) -> Result<Self> {
+    fn try_new(f: &wrappers::Field, bitfield_index: &mut i32) -> Result<Self> {
         let trait_maybe_field_message_trait_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_trait_path())
@@ -218,13 +223,18 @@ impl Field {
             } else {
                 None
             };
+        let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
+        let is_repeated = matches!(f.field_label()?, wrappers::FieldLabel::Repeated);
+        let is_unlabeled = matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled);
+        // i.e. any Option<> types except messages
+        let has_optional_bit = !is_repeated && !is_unlabeled && !is_message;
 
         Ok(Field {
             ident: f.rust_ident().to_string(),
             ident_unesc: f.rust_ident_unesc().to_string(),
             number: f.number(),
             oneof_index: f.oneof_index().unwrap_or(-1),
-            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_message,
             is_string: matches!(f.field_type()?, wrappers::FieldType::String),
             is_bytes: matches!(f.field_type()?, wrappers::FieldType::Bytes),
             is_length_delimited: matches!(
@@ -234,14 +244,24 @@ impl Field {
                     | wrappers::FieldType::Message(_)
             ),
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
-            is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
-            is_unlabeled: matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled),
+            is_repeated,
+            is_unlabeled,
             has_default_value: f.default_value().is_some(),
             default_value: f
                 .default_value()
                 .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
                 .transpose()?
                 .unwrap_or(Default::default()),
+            has_optional_bit,
+            bitfield_index: {
+                if has_optional_bit {
+                    let i = *bitfield_index;
+                    *bitfield_index += 1;
+                    i
+                } else {
+                    -1
+                }
+            },
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
