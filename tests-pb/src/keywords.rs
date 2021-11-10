@@ -205,14 +205,6 @@ pub mod _puroro_impls {
                 r#type: ::std::default::Default::default(),
             }
         }
-
-        pub fn type_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.r#type))
-            } else {
-                ::std::option::Option::None
-            }
-        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}

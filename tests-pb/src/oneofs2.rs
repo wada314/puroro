@@ -1662,14 +1662,6 @@ pub mod _puroro_impls {
                 i32_optional: ::std::default::Default::default(),
             }
         }
-
-        pub fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
-            } else {
-                ::std::option::Option::None
-            }
-        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}

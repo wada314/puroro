@@ -269,13 +269,6 @@ pub mod _puroro_impls {
                 recursive_unlabeled: ::std::option::Option::None,
             }
         }
-
-        pub fn recursive_unlabeled_opt<'this>(
-            &'this self,
-        ) -> Option<&'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>>
-        {
-            self.recursive_unlabeled.as_ref().map(|b| b.as_ref())
-        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}

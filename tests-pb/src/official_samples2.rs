@@ -426,14 +426,6 @@ pub mod _puroro_impls {
                 a: ::std::default::Default::default(),
             }
         }
-
-        pub fn a_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
-            } else {
-                ::std::option::Option::None
-            }
-        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
@@ -657,16 +649,6 @@ pub mod _puroro_impls {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 b: ::puroro::bumpalo::collections::String::new_in(bump),
-            }
-        }
-
-        pub fn b_opt<'this>(
-            &'this self,
-        ) -> Option<&'this ::puroro::bumpalo::collections::String<'bump>> {
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(&self.b)
-            } else {
-                ::std::option::Option::None
             }
         }
     }
@@ -938,13 +920,6 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 c: ::std::option::Option::None,
             }
-        }
-
-        pub fn c_opt<'this>(
-            &'this self,
-        ) -> Option<&'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>>
-        {
-            self.c.as_ref().map(|b| b.as_ref())
         }
     }
 
@@ -1234,9 +1209,6 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 d: ::puroro::bumpalo::collections::Vec::new_in(bump),
             }
-        }
-        pub fn d<'this>(&'this self) -> &'this ::puroro::bumpalo::collections::Vec<'bump, i32> {
-            &self.d
         }
     }
 

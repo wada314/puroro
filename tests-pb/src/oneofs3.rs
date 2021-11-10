@@ -1666,10 +1666,6 @@ pub mod _puroro_impls {
                 i32_unlabeled: ::std::default::Default::default(),
             }
         }
-
-        pub fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
-        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
