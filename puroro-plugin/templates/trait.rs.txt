@@ -1,4 +1,4 @@
-{%- for m in messages %}
+
 pub trait {{ m.trait_ident }} {
     {%- for field in m.fields %}
 
@@ -166,4 +166,3 @@ where
     {{ m.trait_delegate_macro_ident }}!(T);
 }
 
-{%- endfor %} {#- for m in messages #}

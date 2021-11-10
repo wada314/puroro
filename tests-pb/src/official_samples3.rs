@@ -1376,6 +1376,7 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
+
     pub trait Test2Trait {
         fn b<'this>(&'this self) -> &'this str {
             self.b_opt()
@@ -1431,6 +1432,7 @@ pub mod _puroro_traits {
     {
         test2_delegate!(T);
     }
+
     pub trait Test3Trait {
         type Field3MessageType<'this>:
             self::_puroro_root::official_samples3::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
@@ -1492,6 +1494,7 @@ pub mod _puroro_traits {
     {
         test3_delegate!(T);
     }
+
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>

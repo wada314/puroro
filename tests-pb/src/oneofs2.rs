@@ -2003,6 +2003,7 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+
     pub trait SubmsgTrait {
         fn i32_optional<'this>(&'this self) -> i32 {
             self.i32_optional_opt()
