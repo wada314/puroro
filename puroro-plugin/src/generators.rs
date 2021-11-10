@@ -475,9 +475,9 @@ struct Structs<'a> {
 }
 
 #[derive(Template)]
-#[template(path = "traits.rs.txt")]
-struct Traits<'a> {
-    messages: &'a [Message],
+#[template(path = "trait.rs.txt")]
+struct Trait<'a> {
+    m: &'a Message,
 }
 
 #[derive(Template)]
@@ -497,8 +497,8 @@ mod filters {
     pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
         Ok(Structs { messages })
     }
-    pub(super) fn print_traits(messages: &[Message]) -> ::askama::Result<Traits> {
-        Ok(Traits { messages })
+    pub(super) fn print_trait(message: &Message) -> ::askama::Result<Trait> {
+        Ok(Trait { m: message })
     }
     pub(super) fn print_bumpalo_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
         Ok(BumpaloOneof { oneof })
