@@ -21,7 +21,7 @@ where
         >
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
-        Some(match (self.0.{{ oneof.field_ident }}(), self.1.{{ oneof.field_ident }}()) {
+        Some(match (self.first().{{ oneof.field_ident }}(), self.last().{{ oneof.field_ident }}()) {
             (None, None) => { return None; },
 
             {%- for field in oneof.fields %}

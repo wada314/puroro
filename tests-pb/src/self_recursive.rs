@@ -194,7 +194,10 @@ pub mod _puroro_impls {
         >,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    pub type MsgBumpaloOwned = ::puroro::Merged<
+        MsgBumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> MsgBumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -402,13 +405,6 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-
-    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
-    where
-        T: MsgTrait,
-    {
-        msg_delegate!(T);
-    }
     impl MsgTrait for () {
         type Field1MessageType<'this>
         where
@@ -436,8 +432,8 @@ pub mod _puroro_traits {
         >;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             match (
-                <T as MsgTrait>::recursive_unlabeled_opt(&self.0),
-                <U as MsgTrait>::recursive_unlabeled_opt(&self.1),
+                <T as MsgTrait>::recursive_unlabeled_opt(self.first()),
+                <U as MsgTrait>::recursive_unlabeled_opt(self.last()),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some(::puroro::merge(Some(t), None)),

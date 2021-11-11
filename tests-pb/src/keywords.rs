@@ -165,7 +165,10 @@ pub mod _puroro_impls {
         r#type: i32,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    pub type MsgBumpaloOwned = ::puroro::Merged<
+        MsgBumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> MsgBumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -342,13 +345,6 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-
-    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
-    where
-        T: MsgTrait,
-    {
-        msg_delegate!(T);
-    }
     impl MsgTrait for () {}
 
     impl<T> MsgTrait for ::puroro::EmptyMessageWrapper<T> {}
@@ -358,7 +354,8 @@ pub mod _puroro_traits {
         U: MsgTrait,
     {
         fn type_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::type_opt(&self.1).or_else(|| <T as MsgTrait>::type_opt(&self.0))
+            <U as MsgTrait>::type_opt(self.last())
+                .or_else(|| <T as MsgTrait>::type_opt(self.first()))
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>

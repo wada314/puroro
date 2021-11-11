@@ -386,7 +386,10 @@ pub mod _puroro_impls {
         a: i32,
     }
 
-    pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
+    pub type Test1BumpaloOwned = ::puroro::Merged<
+        Test1Bumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> Test1Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -581,7 +584,10 @@ pub mod _puroro_impls {
         b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
-    pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
+    pub type Test2BumpaloOwned = ::puroro::Merged<
+        Test2Bumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> Test2Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -790,7 +796,10 @@ pub mod _puroro_impls {
         >,
     }
 
-    pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<'static>>;
+    pub type Test3BumpaloOwned = ::puroro::Merged<
+        Test3Bumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> Test3Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -1010,7 +1019,10 @@ pub mod _puroro_impls {
         d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
 
-    pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
+    pub type Test4BumpaloOwned = ::puroro::Merged<
+        Test4Bumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> Test4Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -1181,13 +1193,6 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
-
-    impl<T> Test1Trait for ::puroro::BumpaloOwned<T>
-    where
-        T: Test1Trait,
-    {
-        test1_delegate!(T);
-    }
     impl Test1Trait for () {}
 
     impl<T> Test1Trait for ::puroro::EmptyMessageWrapper<T> {}
@@ -1197,7 +1202,7 @@ pub mod _puroro_traits {
         U: Test1Trait,
     {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            <U as Test1Trait>::a_opt(&self.1).or_else(|| <T as Test1Trait>::a_opt(&self.0))
+            <U as Test1Trait>::a_opt(self.last()).or_else(|| <T as Test1Trait>::a_opt(self.first()))
         }
     }
     impl<T, U> Test1Trait for ::puroro::Either<T, U>
@@ -1269,13 +1274,6 @@ pub mod _puroro_traits {
     {
         test2_delegate!(T);
     }
-
-    impl<T> Test2Trait for ::puroro::BumpaloOwned<T>
-    where
-        T: Test2Trait,
-    {
-        test2_delegate!(T);
-    }
     impl Test2Trait for () {}
 
     impl<T> Test2Trait for ::puroro::EmptyMessageWrapper<T> {}
@@ -1285,7 +1283,7 @@ pub mod _puroro_traits {
         U: Test2Trait,
     {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as Test2Trait>::b_opt(&self.1).or_else(|| <T as Test2Trait>::b_opt(&self.0))
+            <U as Test2Trait>::b_opt(self.last()).or_else(|| <T as Test2Trait>::b_opt(self.first()))
         }
     }
     impl<T, U> Test2Trait for ::puroro::Either<T, U>
@@ -1363,13 +1361,6 @@ pub mod _puroro_traits {
     {
         test3_delegate!(T);
     }
-
-    impl<T> Test3Trait for ::puroro::BumpaloOwned<T>
-    where
-        T: Test3Trait,
-    {
-        test3_delegate!(T);
-    }
     impl Test3Trait for () {
         type Field3MessageType<'this>
         where
@@ -1397,8 +1388,8 @@ pub mod _puroro_traits {
         >;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             match (
-                <T as Test3Trait>::c_opt(&self.0),
-                <U as Test3Trait>::c_opt(&self.1),
+                <T as Test3Trait>::c_opt(self.first()),
+                <U as Test3Trait>::c_opt(self.last()),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some(::puroro::merge(Some(t), None)),
@@ -1486,13 +1477,6 @@ pub mod _puroro_traits {
     {
         test4_delegate!(T);
     }
-
-    impl<T> Test4Trait for ::puroro::BumpaloOwned<T>
-    where
-        T: Test4Trait,
-    {
-        test4_delegate!(T);
-    }
     impl Test4Trait for () {
         type Field4RepeatedType<'this>
         where
@@ -1527,8 +1511,8 @@ pub mod _puroro_traits {
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as Test4Trait>::d(&self.0),
-                <U as Test4Trait>::d(&self.1),
+                <T as Test4Trait>::d(self.first()),
+                <U as Test4Trait>::d(self.last()),
             )
         }
     }

@@ -27,12 +27,26 @@ impl<T: Clone, U: Clone> Clone for Merged<T, U> {
         Self(self.0.clone(), self.1.clone())
     }
 }
-impl<T> Merged<T, Box<Bump>>
+impl<T, U> Merged<T, U> {
+    pub fn first(&self) -> &T {
+        &self.0
+    }
+    pub fn last(&self) -> &U {
+        &self.1
+    }
+    pub fn first_mut(&mut self) -> &mut T {
+        &mut self.0
+    }
+    pub fn last_mut(&mut self) -> &mut U {
+        &mut self.1
+    }
+}
+impl<T> Merged<T, EmptyMessageWrapper<Box<Bump>>>
 where
     T: BumpaloDefault<'static>,
 {
     pub fn new() -> Self {
-        let boxed_bump = Box::new(Bump::new());
+        let boxed_bump = EmptyMessageWrapper::new(Box::new(Bump::new()));
         merge(
             T::default_in(unsafe { ::std::mem::transmute(boxed_bump.as_ref()) }),
             boxed_bump,
@@ -41,6 +55,11 @@ where
 }
 
 pub struct EmptyMessageWrapper<T>(T);
+impl<T> EmptyMessageWrapper<T> {
+    pub fn new(t: T) -> Self {
+        Self(t)
+    }
+}
 impl<T: Clone> Clone for EmptyMessageWrapper<T> {
     fn clone(&self) -> Self {
         Self(self.0.clone())

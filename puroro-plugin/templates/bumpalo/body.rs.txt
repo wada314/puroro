@@ -18,7 +18,10 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     {%- endfor %}
 }
 
-pub type {{ m.bumpalo_owned_ident }} = ::puroro::BumpaloOwned<{{ m.bumpalo_ident }}<'static>>;
+pub type {{ m.bumpalo_owned_ident }} = ::puroro::Merged<
+    {{ m.bumpalo_ident }}<'static>,
+    ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+>;
 
 impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {

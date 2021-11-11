@@ -1677,7 +1677,10 @@ pub mod _puroro_impls {
         very_large_field_number: i32,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    pub type MsgBumpaloOwned = ::puroro::Merged<
+        MsgBumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> MsgBumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -2506,13 +2509,6 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-
-    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
-    where
-        T: MsgTrait,
-    {
-        msg_delegate!(T);
-    }
     impl MsgTrait for () {
         type Field2RepeatedType<'this>
         where
@@ -2614,8 +2610,8 @@ pub mod _puroro_traits {
         U: MsgTrait,
     {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
+            <U as MsgTrait>::i32_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::i32_optional_opt(self.first()))
         }
         type Field2RepeatedType<'this>
         where
@@ -2627,13 +2623,13 @@ pub mod _puroro_traits {
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::i32_repeated(&self.0),
-                <U as MsgTrait>::i32_repeated(&self.1),
+                <T as MsgTrait>::i32_repeated(self.first()),
+                <U as MsgTrait>::i32_repeated(self.last()),
             )
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::float_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::float_optional_opt(&self.0))
+            <U as MsgTrait>::float_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::float_optional_opt(self.first()))
         }
         type Field4RepeatedType<'this>
         where
@@ -2645,13 +2641,13 @@ pub mod _puroro_traits {
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::float_repeated(&self.0),
-                <U as MsgTrait>::float_repeated(&self.1),
+                <T as MsgTrait>::float_repeated(self.first()),
+                <U as MsgTrait>::float_repeated(self.last()),
             )
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_optional_opt(&self.0))
+            <U as MsgTrait>::string_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::string_optional_opt(self.first()))
         }
         type Field6RepeatedType<'this>
         where
@@ -2663,8 +2659,8 @@ pub mod _puroro_traits {
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::string_repeated(&self.0),
-                <U as MsgTrait>::string_repeated(&self.1),
+                <T as MsgTrait>::string_repeated(self.first()),
+                <U as MsgTrait>::string_repeated(self.last()),
             )
         }
         type Field7MessageType<'this>
@@ -2676,8 +2672,8 @@ pub mod _puroro_traits {
         >;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             match (
-                <T as MsgTrait>::submsg_optional_opt(&self.0),
-                <U as MsgTrait>::submsg_optional_opt(&self.1),
+                <T as MsgTrait>::submsg_optional_opt(self.first()),
+                <U as MsgTrait>::submsg_optional_opt(self.last()),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some(::puroro::merge(Some(t), None)),
@@ -2702,13 +2698,13 @@ pub mod _puroro_traits {
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
-                <T as MsgTrait>::submsg_repeated(&self.0),
-                <U as MsgTrait>::submsg_repeated(&self.1),
+                <T as MsgTrait>::submsg_repeated(self.first()),
+                <U as MsgTrait>::submsg_repeated(self.last()),
             )
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
-            <U as MsgTrait>::enum_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_optional_opt(&self.0))
+            <U as MsgTrait>::enum_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::enum_optional_opt(self.first()))
         }
         type Field10RepeatedType<'this>
         where
@@ -2720,13 +2716,13 @@ pub mod _puroro_traits {
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::enum_repeated(&self.0),
-                <U as MsgTrait>::enum_repeated(&self.1),
+                <T as MsgTrait>::enum_repeated(self.first()),
+                <U as MsgTrait>::enum_repeated(self.last()),
             )
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::very_large_field_number_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::very_large_field_number_opt(&self.0))
+            <U as MsgTrait>::very_large_field_number_opt(self.last())
+                .or_else(|| <T as MsgTrait>::very_large_field_number_opt(self.first()))
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -3195,7 +3191,10 @@ pub mod _puroro_nested {
                 i32_optional: i32,
             }
 
-            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+            pub type SubmsgBumpaloOwned = ::puroro::Merged<
+                SubmsgBumpalo<'static>,
+                ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+            >;
 
             impl<'bump> SubmsgBumpalo<'bump> {
                 pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -3379,13 +3378,6 @@ pub mod _puroro_nested {
             {
                 submsg_delegate!(T);
             }
-
-            impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
-            where
-                T: SubmsgTrait,
-            {
-                submsg_delegate!(T);
-            }
             impl SubmsgTrait for () {}
 
             impl<T> SubmsgTrait for ::puroro::EmptyMessageWrapper<T> {}
@@ -3395,8 +3387,8 @@ pub mod _puroro_nested {
                 U: SubmsgTrait,
             {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-                    <U as SubmsgTrait>::i32_optional_opt(&self.1)
-                        .or_else(|| <T as SubmsgTrait>::i32_optional_opt(&self.0))
+                    <U as SubmsgTrait>::i32_optional_opt(self.last())
+                        .or_else(|| <T as SubmsgTrait>::i32_optional_opt(self.first()))
                 }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>

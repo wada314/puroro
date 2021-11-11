@@ -10677,7 +10677,10 @@ pub mod _puroro_impls {
     f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
 }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    pub type MsgBumpaloOwned = ::puroro::Merged<
+        MsgBumpalo<'static>,
+        ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+    >;
 
     impl<'bump> MsgBumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -13669,13 +13672,6 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-
-    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
-    where
-        T: MsgTrait,
-    {
-        msg_delegate!(T);
-    }
     impl MsgTrait for () {
         type Field3RepeatedType<'this>
         where
@@ -13939,12 +13935,12 @@ pub mod _puroro_traits {
         U: MsgTrait,
     {
         fn i32_required_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_required_opt(&self.0))
+            <U as MsgTrait>::i32_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::i32_required_opt(self.first()))
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::i32_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
+            <U as MsgTrait>::i32_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::i32_optional_opt(self.first()))
         }
         type Field3RepeatedType<'this>
         where
@@ -13956,17 +13952,17 @@ pub mod _puroro_traits {
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::i32_repeated(&self.0),
-                <U as MsgTrait>::i32_repeated(&self.1),
+                <T as MsgTrait>::i32_repeated(self.first()),
+                <U as MsgTrait>::i32_repeated(self.last()),
             )
         }
         fn float_required_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::float_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::float_required_opt(&self.0))
+            <U as MsgTrait>::float_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::float_required_opt(self.first()))
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            <U as MsgTrait>::float_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::float_optional_opt(&self.0))
+            <U as MsgTrait>::float_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::float_optional_opt(self.first()))
         }
         type Field13RepeatedType<'this>
         where
@@ -13978,17 +13974,17 @@ pub mod _puroro_traits {
 
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::float_repeated(&self.0),
-                <U as MsgTrait>::float_repeated(&self.1),
+                <T as MsgTrait>::float_repeated(self.first()),
+                <U as MsgTrait>::float_repeated(self.last()),
             )
         }
         fn bytes_required_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_required_opt(&self.0))
+            <U as MsgTrait>::bytes_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::bytes_required_opt(self.first()))
         }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            <U as MsgTrait>::bytes_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::bytes_optional_opt(&self.0))
+            <U as MsgTrait>::bytes_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::bytes_optional_opt(self.first()))
         }
         type Field23RepeatedType<'this>
         where
@@ -14000,17 +13996,17 @@ pub mod _puroro_traits {
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::bytes_repeated(&self.0),
-                <U as MsgTrait>::bytes_repeated(&self.1),
+                <T as MsgTrait>::bytes_repeated(self.first()),
+                <U as MsgTrait>::bytes_repeated(self.last()),
             )
         }
         fn string_required_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_required_opt(&self.0))
+            <U as MsgTrait>::string_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::string_required_opt(self.first()))
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            <U as MsgTrait>::string_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::string_optional_opt(&self.0))
+            <U as MsgTrait>::string_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::string_optional_opt(self.first()))
         }
         type Field33RepeatedType<'this>
         where
@@ -14022,21 +14018,21 @@ pub mod _puroro_traits {
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::string_repeated(&self.0),
-                <U as MsgTrait>::string_repeated(&self.1),
+                <T as MsgTrait>::string_repeated(self.first()),
+                <U as MsgTrait>::string_repeated(self.last()),
             )
         }
         fn enum_required_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
-            <U as MsgTrait>::enum_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_required_opt(&self.0))
+            <U as MsgTrait>::enum_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::enum_required_opt(self.first()))
         }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
-            <U as MsgTrait>::enum_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::enum_optional_opt(&self.0))
+            <U as MsgTrait>::enum_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::enum_optional_opt(self.first()))
         }
         type Field43RepeatedType<'this>
         where
@@ -14048,8 +14044,8 @@ pub mod _puroro_traits {
 
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::enum_repeated(&self.0),
-                <U as MsgTrait>::enum_repeated(&self.1),
+                <T as MsgTrait>::enum_repeated(self.first()),
+                <U as MsgTrait>::enum_repeated(self.last()),
             )
         }
         type Field51MessageType<'this>
@@ -14061,8 +14057,8 @@ pub mod _puroro_traits {
         >;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             match (
-                <T as MsgTrait>::submsg_required_opt(&self.0),
-                <U as MsgTrait>::submsg_required_opt(&self.1),
+                <T as MsgTrait>::submsg_required_opt(self.first()),
+                <U as MsgTrait>::submsg_required_opt(self.last()),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some(::puroro::merge(Some(t), None)),
@@ -14079,8 +14075,8 @@ pub mod _puroro_traits {
         >;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             match (
-                <T as MsgTrait>::submsg_optional_opt(&self.0),
-                <U as MsgTrait>::submsg_optional_opt(&self.1),
+                <T as MsgTrait>::submsg_optional_opt(self.first()),
+                <U as MsgTrait>::submsg_optional_opt(self.last()),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some(::puroro::merge(Some(t), None)),
@@ -14105,17 +14101,17 @@ pub mod _puroro_traits {
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
-                <T as MsgTrait>::submsg_repeated(&self.0),
-                <U as MsgTrait>::submsg_repeated(&self.1),
+                <T as MsgTrait>::submsg_repeated(self.first()),
+                <U as MsgTrait>::submsg_repeated(self.last()),
             )
         }
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_required_opt(&self.0))
+            <U as MsgTrait>::i64_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::i64_required_opt(self.first()))
         }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::i64_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::i64_optional_opt(&self.0))
+            <U as MsgTrait>::i64_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::i64_optional_opt(self.first()))
         }
         type Field103RepeatedType<'this>
         where
@@ -14127,17 +14123,17 @@ pub mod _puroro_traits {
 
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::i64_repeated(&self.0),
-                <U as MsgTrait>::i64_repeated(&self.1),
+                <T as MsgTrait>::i64_repeated(self.first()),
+                <U as MsgTrait>::i64_repeated(self.last()),
             )
         }
         fn u32_required_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_required_opt(&self.0))
+            <U as MsgTrait>::u32_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::u32_required_opt(self.first()))
         }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::u32_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u32_optional_opt(&self.0))
+            <U as MsgTrait>::u32_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::u32_optional_opt(self.first()))
         }
         type Field113RepeatedType<'this>
         where
@@ -14149,17 +14145,17 @@ pub mod _puroro_traits {
 
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::u32_repeated(&self.0),
-                <U as MsgTrait>::u32_repeated(&self.1),
+                <T as MsgTrait>::u32_repeated(self.first()),
+                <U as MsgTrait>::u32_repeated(self.last()),
             )
         }
         fn u64_required_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_required_opt(&self.0))
+            <U as MsgTrait>::u64_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::u64_required_opt(self.first()))
         }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::u64_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::u64_optional_opt(&self.0))
+            <U as MsgTrait>::u64_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::u64_optional_opt(self.first()))
         }
         type Field123RepeatedType<'this>
         where
@@ -14171,17 +14167,17 @@ pub mod _puroro_traits {
 
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::u64_repeated(&self.0),
-                <U as MsgTrait>::u64_repeated(&self.1),
+                <T as MsgTrait>::u64_repeated(self.first()),
+                <U as MsgTrait>::u64_repeated(self.last()),
             )
         }
         fn s32_required_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::s32_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::s32_required_opt(&self.0))
+            <U as MsgTrait>::s32_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::s32_required_opt(self.first()))
         }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::s32_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::s32_optional_opt(&self.0))
+            <U as MsgTrait>::s32_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::s32_optional_opt(self.first()))
         }
         type Field133RepeatedType<'this>
         where
@@ -14193,17 +14189,17 @@ pub mod _puroro_traits {
 
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::s32_repeated(&self.0),
-                <U as MsgTrait>::s32_repeated(&self.1),
+                <T as MsgTrait>::s32_repeated(self.first()),
+                <U as MsgTrait>::s32_repeated(self.last()),
             )
         }
         fn s64_required_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::s64_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::s64_required_opt(&self.0))
+            <U as MsgTrait>::s64_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::s64_required_opt(self.first()))
         }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::s64_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::s64_optional_opt(&self.0))
+            <U as MsgTrait>::s64_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::s64_optional_opt(self.first()))
         }
         type Field143RepeatedType<'this>
         where
@@ -14215,17 +14211,17 @@ pub mod _puroro_traits {
 
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::s64_repeated(&self.0),
-                <U as MsgTrait>::s64_repeated(&self.1),
+                <T as MsgTrait>::s64_repeated(self.first()),
+                <U as MsgTrait>::s64_repeated(self.last()),
             )
         }
         fn fixed32_required_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::fixed32_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed32_required_opt(&self.0))
+            <U as MsgTrait>::fixed32_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::fixed32_required_opt(self.first()))
         }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
-            <U as MsgTrait>::fixed32_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed32_optional_opt(&self.0))
+            <U as MsgTrait>::fixed32_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::fixed32_optional_opt(self.first()))
         }
         type Field153RepeatedType<'this>
         where
@@ -14237,17 +14233,17 @@ pub mod _puroro_traits {
 
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::fixed32_repeated(&self.0),
-                <U as MsgTrait>::fixed32_repeated(&self.1),
+                <T as MsgTrait>::fixed32_repeated(self.first()),
+                <U as MsgTrait>::fixed32_repeated(self.last()),
             )
         }
         fn fixed64_required_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::fixed64_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed64_required_opt(&self.0))
+            <U as MsgTrait>::fixed64_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::fixed64_required_opt(self.first()))
         }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
-            <U as MsgTrait>::fixed64_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::fixed64_optional_opt(&self.0))
+            <U as MsgTrait>::fixed64_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::fixed64_optional_opt(self.first()))
         }
         type Field163RepeatedType<'this>
         where
@@ -14259,17 +14255,17 @@ pub mod _puroro_traits {
 
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::fixed64_repeated(&self.0),
-                <U as MsgTrait>::fixed64_repeated(&self.1),
+                <T as MsgTrait>::fixed64_repeated(self.first()),
+                <U as MsgTrait>::fixed64_repeated(self.last()),
             )
         }
         fn sfixed32_required_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::sfixed32_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed32_required_opt(&self.0))
+            <U as MsgTrait>::sfixed32_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::sfixed32_required_opt(self.first()))
         }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::sfixed32_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed32_optional_opt(&self.0))
+            <U as MsgTrait>::sfixed32_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::sfixed32_optional_opt(self.first()))
         }
         type Field173RepeatedType<'this>
         where
@@ -14281,17 +14277,17 @@ pub mod _puroro_traits {
 
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::sfixed32_repeated(&self.0),
-                <U as MsgTrait>::sfixed32_repeated(&self.1),
+                <T as MsgTrait>::sfixed32_repeated(self.first()),
+                <U as MsgTrait>::sfixed32_repeated(self.last()),
             )
         }
         fn sfixed64_required_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::sfixed64_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed64_required_opt(&self.0))
+            <U as MsgTrait>::sfixed64_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::sfixed64_required_opt(self.first()))
         }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
-            <U as MsgTrait>::sfixed64_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::sfixed64_optional_opt(&self.0))
+            <U as MsgTrait>::sfixed64_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::sfixed64_optional_opt(self.first()))
         }
         type Field183RepeatedType<'this>
         where
@@ -14303,17 +14299,17 @@ pub mod _puroro_traits {
 
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::sfixed64_repeated(&self.0),
-                <U as MsgTrait>::sfixed64_repeated(&self.1),
+                <T as MsgTrait>::sfixed64_repeated(self.first()),
+                <U as MsgTrait>::sfixed64_repeated(self.last()),
             )
         }
         fn f64_required_opt<'this>(&'this self) -> Option<f64> {
-            <U as MsgTrait>::f64_required_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::f64_required_opt(&self.0))
+            <U as MsgTrait>::f64_required_opt(self.last())
+                .or_else(|| <T as MsgTrait>::f64_required_opt(self.first()))
         }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
-            <U as MsgTrait>::f64_optional_opt(&self.1)
-                .or_else(|| <T as MsgTrait>::f64_optional_opt(&self.0))
+            <U as MsgTrait>::f64_optional_opt(self.last())
+                .or_else(|| <T as MsgTrait>::f64_optional_opt(self.first()))
         }
         type Field193RepeatedType<'this>
         where
@@ -14325,8 +14321,8 @@ pub mod _puroro_traits {
 
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
-                <T as MsgTrait>::f64_repeated(&self.0),
-                <U as MsgTrait>::f64_repeated(&self.1),
+                <T as MsgTrait>::f64_repeated(self.first()),
+                <U as MsgTrait>::f64_repeated(self.last()),
             )
         }
     }
@@ -15468,7 +15464,10 @@ pub mod _puroro_nested {
                 i64_required: i64,
             }
 
-            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+            pub type SubmsgBumpaloOwned = ::puroro::Merged<
+                SubmsgBumpalo<'static>,
+                ::puroro::EmptyMessageWrapper<::std::boxed::Box<::puroro::bumpalo::Bump>>,
+            >;
 
             impl<'bump> SubmsgBumpalo<'bump> {
                 pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
@@ -15710,13 +15709,6 @@ pub mod _puroro_nested {
             {
                 submsg_delegate!(T);
             }
-
-            impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
-            where
-                T: SubmsgTrait,
-            {
-                submsg_delegate!(T);
-            }
             impl SubmsgTrait for () {}
 
             impl<T> SubmsgTrait for ::puroro::EmptyMessageWrapper<T> {}
@@ -15726,12 +15718,12 @@ pub mod _puroro_nested {
                 U: SubmsgTrait,
             {
                 fn i32_required_opt<'this>(&'this self) -> Option<i32> {
-                    <U as SubmsgTrait>::i32_required_opt(&self.1)
-                        .or_else(|| <T as SubmsgTrait>::i32_required_opt(&self.0))
+                    <U as SubmsgTrait>::i32_required_opt(self.last())
+                        .or_else(|| <T as SubmsgTrait>::i32_required_opt(self.first()))
                 }
                 fn i64_required_opt<'this>(&'this self) -> Option<i64> {
-                    <U as SubmsgTrait>::i64_required_opt(&self.1)
-                        .or_else(|| <T as SubmsgTrait>::i64_required_opt(&self.0))
+                    <U as SubmsgTrait>::i64_required_opt(self.last())
+                        .or_else(|| <T as SubmsgTrait>::i64_required_opt(self.first()))
                 }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
