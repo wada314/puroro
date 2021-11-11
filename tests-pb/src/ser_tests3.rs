@@ -2068,6 +2068,32 @@ pub mod _puroro_impls {
             }
         }
     }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_unlabeled: ::std::clone::Clone::clone(&self.float_unlabeled),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                submsg_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_unlabeled,
+                    &self._bump,
+                ),
+                submsg_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.submsg_repeated,
+                    &self._bump,
+                ),
+                enum_unlabeled: ::std::clone::Clone::clone(&self.enum_unlabeled),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                very_large_field_number: ::std::clone::Clone::clone(&self.very_large_field_number),
+            }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -3280,6 +3306,16 @@ pub mod _puroro_nested {
                             &self.i32_unlabeled,
                             bump,
                         ),
+                    }
+                }
+            }
+
+            impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
+                fn clone(&self) -> Self {
+                    Self {
+                        _bump: self._bump,
+                        _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                        i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                     }
                 }
             }

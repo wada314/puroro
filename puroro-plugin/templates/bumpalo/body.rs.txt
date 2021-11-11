@@ -220,3 +220,25 @@ impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ m.bum
         }
     }
 }
+
+impl<'bump> ::std::clone::Clone for {{ m.bumpalo_ident }}<'bump> {
+    fn clone(&self) -> Self {
+        Self {
+            _bump: self._bump,
+            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {%- if field.is_message %}
+            {{ field.ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ field.ident }}, &self._bump),
+            {%- else %} {#- if field.is_message #}
+            {{ field.ident }}: ::std::clone::Clone::clone(&self.{{ field.ident }}),
+            {%- endif %} {#- if field.is_message #}
+            {%- endif %} {#- if !field.is_explicit_oneof_field #}
+            {%- endfor %} {#- for field in m.fields #}
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ oneof.field_ident }}, &self._bump),
+            {%- endfor %} {#- for oneof in m.oneofs #}
+        }
+    }
+}

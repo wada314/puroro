@@ -1218,6 +1218,27 @@ pub mod _puroro_impls {
             }
         }
     }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                group_one: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.group_one,
+                    &self._bump,
+                ),
+                group_two: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.group_two,
+                    &self._bump,
+                ),
+                group_three: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.group_three,
+                    &self._bump,
+                ),
+            }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -1494,6 +1515,16 @@ pub mod _puroro_impls {
                     &self.i32_optional,
                     bump,
                 ),
+            }
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for SubmsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
             }
         }
     }

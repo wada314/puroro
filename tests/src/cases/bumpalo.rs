@@ -31,7 +31,7 @@ fn test_owned() {
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
-    let t31 = t3.c().unwrap().first().unwrap();
+    let t31 = t3.c().unwrap().first().unwrap().clone();
 
     assert!(is_test1_trait(&t1));
 }

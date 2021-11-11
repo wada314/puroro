@@ -301,6 +301,19 @@ pub mod _puroro_impls {
             }
         }
     }
+
+    impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                recursive_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
+                    &self.recursive_unlabeled,
+                    &self._bump,
+                ),
+            }
+        }
+    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>

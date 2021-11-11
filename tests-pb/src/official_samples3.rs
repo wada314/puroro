@@ -482,6 +482,16 @@ pub mod _puroro_impls {
             }
         }
     }
+
+    impl<'bump> ::std::clone::Clone for Test1Bumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                a: ::std::clone::Clone::clone(&self.a),
+            }
+        }
+    }
     pub struct Test1Builder<T>(T);
 
     impl<T> Test1Builder<T>
@@ -672,6 +682,16 @@ pub mod _puroro_impls {
                 _bump: bump,
                 _bitfield: self._bitfield,
                 b: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.b, bump),
+            }
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for Test2Bumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                b: ::std::clone::Clone::clone(&self.b),
             }
         }
     }
@@ -896,6 +916,16 @@ pub mod _puroro_impls {
             }
         }
     }
+
+    impl<'bump> ::std::clone::Clone for Test3Bumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                c: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.c, &self._bump),
+            }
+        }
+    }
     pub struct Test3Builder<T>(T);
 
     impl<T> Test3Builder<T>
@@ -1103,6 +1133,16 @@ pub mod _puroro_impls {
                 _bump: bump,
                 _bitfield: self._bitfield,
                 d: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.d, bump),
+            }
+        }
+    }
+
+    impl<'bump> ::std::clone::Clone for Test4Bumpalo<'bump> {
+        fn clone(&self) -> Self {
+            Self {
+                _bump: self._bump,
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                d: ::std::clone::Clone::clone(&self.d),
             }
         }
     }
