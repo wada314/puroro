@@ -216,6 +216,5 @@ pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
 pub use ::bitvec;
-#[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
