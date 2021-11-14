@@ -154,6 +154,16 @@ where
     }
 }
 
+/// A trait decides how the bumpalo message struct hold the
+/// pointer to the `Bump` instance.
+///
+/// Basically, 2 types are defined in this trait:
+///
+/// - A type that THIS message struct should use to point the `Bump`
+/// instance. e.g. `Rc<Bump>`, `&Bump`
+/// - Same trait bound `BumpType` for the child message structs,
+/// which decides the child struct's bump ptr type and grandchild's
+/// `BumpType`, recursively.
 pub trait BumpTypes {
     type BumpRef<'bump>: Sized + Deref<Target = Bump> + Debug;
     unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
@@ -166,6 +176,7 @@ pub trait BumpTypes {
     ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump>;
 }
 
+/// Use `Rc<Bump>` to point the `Bump`. Same for the children.
 #[derive(PartialEq, Debug)]
 pub struct BumpRc;
 impl BumpTypes for BumpRc {
@@ -183,6 +194,9 @@ impl BumpTypes for BumpRc {
     }
 }
 
+/// Use `&Bump` to point the `Bump`. Same for the children.
+/// Note you'll need to keep the instance of `Bump` at somewhere
+/// else if you use this ptr type.
 #[derive(PartialEq, Debug)]
 pub struct BumpRef;
 impl BumpTypes for BumpRef {
@@ -200,6 +214,9 @@ impl BumpTypes for BumpRef {
     }
 }
 
+/// Use `Box<Bump>` to point the `Bump`. The children will use
+/// `&Bump` instead of the box because the box is not allowed to
+/// be shared.
 #[derive(PartialEq, Debug)]
 pub struct BumpBox;
 impl BumpTypes for BumpBox {
