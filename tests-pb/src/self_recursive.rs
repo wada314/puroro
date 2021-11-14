@@ -191,7 +191,7 @@ pub mod _puroro_impls {
         recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'static,
-                self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT>,
+                self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT::ChildsBumpTypes>,
             >,
         >,
 
@@ -239,7 +239,7 @@ pub mod _puroro_impls {
         type Field1MessageType<'this>
         where
             Self: 'this,
-        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT>;
+        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT::ChildsBumpTypes>;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|b| b.as_ref())
         }
@@ -267,7 +267,9 @@ pub mod _puroro_impls {
                     ::puroro::tags::Message<
                         ::puroro::bumpalo::boxed::Box<
                             'static,
-                            self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT>,
+                            self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<
+                                BT::ChildsBumpTypes,
+                            >,
                         >,
                     >,
                     BT,

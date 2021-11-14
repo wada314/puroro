@@ -1683,13 +1683,15 @@ pub mod _puroro_impls {
             ::puroro::bumpalo::boxed::Box<
                 'static,
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    BT,
+                    BT::ChildsBumpTypes,
                 >,
             >,
         >,
         submsg_repeated: ::puroro::bumpalo::collections::Vec<
             'static,
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                BT::ChildsBumpTypes,
+            >,
         >,
         enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
         enum_repeated:
@@ -1787,7 +1789,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-            BT,
+            BT::ChildsBumpTypes,
         >;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
@@ -1796,17 +1798,19 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-            BT,
+            BT::ChildsBumpTypes,
         >;
         type Field8RepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::simple::BorrowedIter<
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                BT::ChildsBumpTypes,
+            >,
             ::std::slice::Iter<
                 'this,
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    BT,
+                    BT::ChildsBumpTypes,
                 >,
             >,
         >;
@@ -1879,12 +1883,12 @@ pub mod _puroro_impls {
             }
             7 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>, BT
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>>, BT
                 >::deser_field(&mut self.submsg_unlabeled, data, bump)
             }
             8 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>, BT
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>, BT
                 >::deser_field(&mut self.submsg_repeated, data, bump)
             }
             9 => {

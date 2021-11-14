@@ -147,6 +147,11 @@ pub trait BumpTypes {
     unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
         input: Self::BumpRef<'short>,
     ) -> Self::BumpRef<'long>;
+
+    type ChildsBumpTypes: BumpTypes + Clone + Debug + PartialEq;
+    fn make_bump_for_child<'bump>(
+        bump_parent: &Self::BumpRef<'bump>,
+    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump>;
 }
 
 #[derive(Clone, PartialEq, Debug)]
@@ -158,15 +163,27 @@ impl BumpTypes for BumpRc {
     ) -> Self::BumpRef<'long> {
         input // as-is
     }
+    type ChildsBumpTypes = Self;
+    fn make_bump_for_child<'bump>(
+        bump_parent: &Self::BumpRef<'bump>,
+    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+        bump_parent.clone()
+    }
 }
 
 #[derive(Clone, PartialEq, Debug)]
-pub struct BumpRef();
+pub struct BumpRef;
 impl BumpTypes for BumpRef {
     type BumpRef<'bump> = &'bump Bump;
     unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
         input: Self::BumpRef<'short>,
     ) -> Self::BumpRef<'long> {
         ::std::mem::transmute(input) // `&'short T` => `&'long T`, which is dangerous
+    }
+    type ChildsBumpTypes = BumpRef;
+    fn make_bump_for_child<'bump>(
+        bump_parent: &Self::BumpRef<'bump>,
+    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+        *bump_parent
     }
 }

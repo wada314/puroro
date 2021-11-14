@@ -197,7 +197,7 @@ where
     where
         FieldType: VecOrOptionOrBare<M>,
         I: Iterator<Item = ::std::io::Result<u8>>,
-        M: BumpaloMessage<'bump, BumpTypes = BT>,
+        M: BumpaloMessage<'bump, BumpTypes = BT::ChildsBumpTypes>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
             let msg = field.get_or_insert_with(|| BumpaloMessage::new_with_parents_bump(bump));

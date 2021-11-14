@@ -980,7 +980,7 @@ pub mod _puroro_impls {
         type Field5MessageType<'this>
         where
             Self: 'this,
-        = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<BT>;
+        = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>;
         fn group_one<'this>(
             &'this self,
         ) -> Option<
@@ -1119,7 +1119,9 @@ pub mod _puroro_impls {
                         ::puroro::tags::Message<
                             ::puroro::bumpalo::boxed::Box<
                                 'static,
-                                self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<BT>,
+                                self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
+                                    BT::ChildsBumpTypes,
+                                >,
                             >,
                         >,
                         BT,
@@ -2282,7 +2284,9 @@ pub mod _puroro_nested {
                 G2Submsg(
                     ::puroro::bumpalo::boxed::Box<
                         'static,
-                        self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<BT>,
+                        self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
+                            BT::ChildsBumpTypes,
+                        >,
                     >,
                 ),
             }

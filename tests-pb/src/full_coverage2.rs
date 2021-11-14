@@ -10644,9 +10644,9 @@ where
     enum_required: self::_puroro_root::full_coverage2::Enum,
     enum_optional: self::_puroro_root::full_coverage2::Enum,
     enum_repeated: ::puroro::bumpalo::collections::Vec<'static, self::_puroro_root::full_coverage2::Enum>,
-    submsg_required: ::std::option::Option<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>,
-    submsg_optional: ::std::option::Option<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>,
-    submsg_repeated: ::puroro::bumpalo::collections::Vec<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>,
+    submsg_required: ::std::option::Option<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>>,
+    submsg_optional: ::std::option::Option<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>>,
+    submsg_repeated: ::puroro::bumpalo::collections::Vec<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>,
     i64_required: i64,
     i64_optional: i64,
     i64_repeated: ::puroro::bumpalo::collections::Vec<'static, i64>,
@@ -10886,19 +10886,19 @@ where
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             self.enum_repeated.iter().cloned()
         }
-        type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>;
+        type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_required.as_ref().map(|b| b.as_ref())
         }
-        type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>;
+        type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|b| b.as_ref())
         }
-        type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>;
+        type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>;
         type Field53RepeatedType<'this> where Self: 'this =
     ::puroro::internal::impls::simple::BorrowedIter<
-        self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>,
-        ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>;
+        self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>,
+        ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
@@ -11229,17 +11229,17 @@ where
             }
             51 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>, BT
+                    ::puroro::tags::Required, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>>, BT
                 >::deser_field(&mut self.submsg_required, data, bump)
             }
             52 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>, BT
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>>, BT
                 >::deser_field(&mut self.submsg_optional, data, bump)
             }
             53 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>, BT
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes>>, BT
                 >::deser_field(&mut self.submsg_repeated, data, bump)
             }
             101 => {

@@ -833,7 +833,9 @@ pub mod _puroro_impls {
         c: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
                 'static,
-                self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<BT>,
+                self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+                    BT::ChildsBumpTypes,
+                >,
             >,
         >,
 
@@ -881,7 +883,9 @@ pub mod _puroro_impls {
         type Field3MessageType<'this>
         where
             Self: 'this,
-        = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<BT>;
+        = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+            BT::ChildsBumpTypes,
+        >;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|b| b.as_ref())
         }
@@ -909,7 +913,9 @@ pub mod _puroro_impls {
                     ::puroro::tags::Message<
                         ::puroro::bumpalo::boxed::Box<
                             'static,
-                            self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<BT>,
+                            self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+                                BT::ChildsBumpTypes,
+                            >,
                         >,
                     >,
                     BT,

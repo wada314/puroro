@@ -219,7 +219,7 @@ impl Field {
             };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["BT"]))
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"]))
             } else {
                 None
             };
@@ -294,15 +294,15 @@ impl Field {
             bumpalo_static_scalar_field_type: f.bumpalo_scalar_field_type("'static")?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["BT"])?,
+                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["BT::ChildsBumpTypes"])?,
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["BT"])
+                        msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
                     } else {
                         format!(
                             "::puroro::bumpalo::boxed::Box<'static, {}>",
-                            msg.rust_impl_path("Bumpalo", &["BT"])
+                            msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
                         )
                     },
                 )
@@ -457,11 +457,11 @@ impl OneofField {
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["BT"])
+                        msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
                     } else {
                         format!(
                             "::puroro::bumpalo::boxed::Box<'static, {}>",
-                            msg.rust_impl_path("Bumpalo", &["BT"])
+                            msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
                         )
                     },
                 )
