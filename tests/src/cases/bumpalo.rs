@@ -53,6 +53,22 @@ fn test_rc() {
     assert!(is_test1_trait(&t1));
 }
 
+#[test]
+fn test_box() {
+    let bump_box = Box::new(Bump::new());
+    let mut t1 = Test1Bumpalo::<BumpBox>::new_in(bump_box);
+    t1.merge_from_bytes([0x08, 0x01].bytes());
+    assert_eq!(1, t1.a());
+
+    let bump_box = Box::new(Bump::new());
+    let mut t3 = Test3Bumpalo::<BumpBox>::new_in(bump_box);
+    t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
+    assert_eq!(1, t3.c().a());
+    let t1: &Test1Bumpalo<BumpRef> = t3.c().unwrap();
+
+    assert!(is_test1_trait(&t1));
+}
+
 /// ```compile_fail
 /// let bump_boxed = Box::new(Bump::new());
 /// let t1 = {
