@@ -10621,8 +10621,11 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct MsgBumpalo<'bump> {
-    _bump: &'bump ::puroro::bumpalo::Bump,
+    pub struct MsgBumpalo<'bump, BT>
+where
+    BT: ::puroro::BumpTypes,
+{
+    _bump: BT::BumpRef,
     _bitfield: ::puroro::bitvec::array::BitArray<
         ::puroro::bitvec::order::Lsb0,
         [u32; (30 + 31) / 32],
@@ -10677,10 +10680,10 @@ pub mod _puroro_impls {
     f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
 }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static, ::puroro::BumpRc>>;
 
-    impl<'bump> MsgBumpalo<'bump> {
-        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump, BT> MsgBumpalo<'bump, BT> {
+        pub fn new_in(bump: BT::BumpRef) -> Self {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
@@ -10736,9 +10739,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump, BT> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump, BT> {
         fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -15119,8 +15122,11 @@ pub mod _puroro_nested {
                 }
             }
             #[derive(::std::fmt::Debug)]
-            pub struct SubmsgBumpalo<'bump> {
-                _bump: &'bump ::puroro::bumpalo::Bump,
+            pub struct SubmsgBumpalo<'bump, BT>
+            where
+                BT: ::puroro::BumpTypes,
+            {
+                _bump: BT::BumpRef,
                 _bitfield: ::puroro::bitvec::array::BitArray<
                     ::puroro::bitvec::order::Lsb0,
                     [u32; (2 + 31) / 32],
@@ -15129,10 +15135,11 @@ pub mod _puroro_nested {
                 i64_required: i64,
             }
 
-            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+            pub type SubmsgBumpaloOwned =
+                ::puroro::BumpaloOwned<SubmsgBumpalo<'static, ::puroro::BumpRc>>;
 
-            impl<'bump> SubmsgBumpalo<'bump> {
-                pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            impl<'bump, BT> SubmsgBumpalo<'bump, BT> {
+                pub fn new_in(bump: BT::BumpRef) -> Self {
                     Self {
                         _bump: bump,
                         _bitfield: ::std::default::Default::default(),
@@ -15142,9 +15149,9 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+            impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump, BT> {}
 
-            impl<'bump> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump> {
+            impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump, BT> {
                 fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self::new_in(bump)
                 }

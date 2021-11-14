@@ -379,17 +379,20 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct Test1Bumpalo<'bump> {
-        _bump: &'bump ::puroro::bumpalo::Bump,
+    pub struct Test1Bumpalo<'bump, BT>
+    where
+        BT: ::puroro::BumpTypes,
+    {
+        _bump: BT::BumpRef,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         a: i32,
     }
 
-    pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
+    pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static, ::puroro::BumpRc>>;
 
-    impl<'bump> Test1Bumpalo<'bump> {
-        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump, BT> Test1Bumpalo<'bump, BT> {
+        pub fn new_in(bump: BT::BumpRef) -> Self {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
@@ -398,9 +401,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
+    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump, BT> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test1Bumpalo<'bump> {
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for Test1Bumpalo<'bump, BT> {
         fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -570,17 +573,20 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct Test2Bumpalo<'bump> {
-        _bump: &'bump ::puroro::bumpalo::Bump,
+    pub struct Test2Bumpalo<'bump, BT>
+    where
+        BT: ::puroro::BumpTypes,
+    {
+        _bump: BT::BumpRef,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         b: ::puroro::bumpalo::collections::String<'bump>,
     }
 
-    pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
+    pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static, ::puroro::BumpRc>>;
 
-    impl<'bump> Test2Bumpalo<'bump> {
-        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump, BT> Test2Bumpalo<'bump, BT> {
+        pub fn new_in(bump: BT::BumpRef) -> Self {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
@@ -589,9 +595,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
+    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump, BT> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test2Bumpalo<'bump> {
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for Test2Bumpalo<'bump, BT> {
         fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -770,8 +776,11 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct Test3Bumpalo<'bump> {
-        _bump: &'bump ::puroro::bumpalo::Bump,
+    pub struct Test3Bumpalo<'bump, BT>
+    where
+        BT: ::puroro::BumpTypes,
+    {
+        _bump: BT::BumpRef,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         c: ::std::option::Option<
@@ -782,10 +791,10 @@ pub mod _puroro_impls {
         >,
     }
 
-    pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<'static>>;
+    pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<'static, ::puroro::BumpRc>>;
 
-    impl<'bump> Test3Bumpalo<'bump> {
-        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump, BT> Test3Bumpalo<'bump, BT> {
+        pub fn new_in(bump: BT::BumpRef) -> Self {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
@@ -794,9 +803,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}
+    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump, BT> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test3Bumpalo<'bump> {
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for Test3Bumpalo<'bump, BT> {
         fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -991,17 +1000,20 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct Test4Bumpalo<'bump> {
-        _bump: &'bump ::puroro::bumpalo::Bump,
+    pub struct Test4Bumpalo<'bump, BT>
+    where
+        BT: ::puroro::BumpTypes,
+    {
+        _bump: BT::BumpRef,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
     }
 
-    pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
+    pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static, ::puroro::BumpRc>>;
 
-    impl<'bump> Test4Bumpalo<'bump> {
-        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+    impl<'bump, BT> Test4Bumpalo<'bump, BT> {
+        pub fn new_in(bump: BT::BumpRef) -> Self {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
@@ -1010,9 +1022,9 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
+    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump, BT> {}
 
-    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test4Bumpalo<'bump> {
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for Test4Bumpalo<'bump, BT> {
         fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
