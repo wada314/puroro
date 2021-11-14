@@ -928,51 +928,65 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct MsgBumpalo<'bump, BT>
+    pub struct MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
-        _bump: BT::BumpRef,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
-        group_one: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne<'bump>,
-        group_two: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo<'bump>,
-        group_three: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree<'bump>,
+        group_one: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne<BT>,
+        group_two: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo<BT>,
+        group_three: super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree<BT>,
+
+        _bump: BT::BumpRef,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static, ::puroro::BumpRc>>;
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<::puroro::BumpRc>>;
 
-    impl<'bump, BT> MsgBumpalo<'bump, BT> {
-        pub fn new_in(bump: BT::BumpRef) -> Self {
+    impl<BT> MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+            let bump_ref = unsafe {
+                ::std::mem::transmute(
+                    <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump),
+                )
+            };
             Self {
-                _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 group_one: ::std::default::Default::default(),
                 group_two: ::std::default::Default::default(),
                 group_three: ::std::default::Default::default(),
+
+                _bump: bump,
             }
         }
     }
 
-    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump, BT> {}
+    impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug
+    {
+    }
 
-    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump, BT> {
-        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        type BumpTypes = BT;
+        fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+            Self::new_in(bump.clone())
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
-        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
-        }
-    }
-
-    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+    impl<BT> super::_puroro_traits::MsgTrait for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         type Field5MessageType<'this>
         where
             Self: 'this,
-        = &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>;
+        = &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<BT>;
         fn group_one<'this>(
             &'this self,
         ) -> Option<
@@ -1019,7 +1033,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+    impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -1113,8 +1130,8 @@ pub mod _puroro_impls {
                         ::puroro::tags::OneofField,
                         ::puroro::tags::Message<
                             ::puroro::bumpalo::boxed::Box<
-                                'bump,
-                                self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
+                                'static,
+                                self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<BT>,
                             >,
                         >,
                     >::deser_field(field_value_mut_ref, data, &self._bump)
@@ -1142,9 +1159,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
+    impl<BT> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<BT>
     where
         Self: super::_puroro_traits::MsgTrait,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
@@ -1206,7 +1224,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+    impl<BT> ::std::cmp::PartialEq for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump)
                 && self.group_one == rhs.group_one
@@ -1382,49 +1403,66 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct SubmsgBumpalo<'bump, BT>
+    pub struct SubmsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
-        _bump: BT::BumpRef,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         i32_unlabeled: i32,
+
+        _bump: BT::BumpRef,
     }
 
-    pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static, ::puroro::BumpRc>>;
+    pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<::puroro::BumpRc>>;
 
-    impl<'bump, BT> SubmsgBumpalo<'bump, BT> {
-        pub fn new_in(bump: BT::BumpRef) -> Self {
+    impl<BT> SubmsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+            let bump_ref = unsafe {
+                ::std::mem::transmute(
+                    <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump),
+                )
+            };
             Self {
-                _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
+
+                _bump: bump,
             }
         }
     }
 
-    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump, BT> {}
+    impl<BT> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<BT> where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug
+    {
+    }
 
-    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump, BT> {
-        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        type BumpTypes = BT;
+        fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+            Self::new_in(bump.clone())
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
-        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
-        }
-    }
-
-    impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
+    impl<BT> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
     }
 
-    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
+    impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -1448,9 +1486,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
+    impl<BT> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<BT>
     where
         Self: super::_puroro_traits::SubmsgTrait,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -1468,7 +1507,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+    impl<BT> ::std::cmp::PartialEq for SubmsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.i32_unlabeled == rhs.i32_unlabeled && true
         }
@@ -2242,44 +2284,62 @@ pub mod _puroro_nested {
             }
 
             #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub(crate) enum GroupOne<'bump> {
-                _None(::std::marker::PhantomData<&'bump ()>),
+            pub(crate) enum GroupOne<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
+                _None(::std::marker::PhantomData<BT>),
                 G1Int32(i32),
-                G1String(::puroro::bumpalo::collections::String<'bump>),
+                G1String(::puroro::bumpalo::collections::String<'static>),
             }
 
-            impl<'bump> ::std::default::Default for GroupOne<'bump> {
+            impl<BT> ::std::default::Default for GroupOne<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
                 }
             }
 
             #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub(crate) enum GroupTwo<'bump> {
-                _None(::std::marker::PhantomData<&'bump ()>),
+            pub(crate) enum GroupTwo<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
+                _None(::std::marker::PhantomData<BT>),
                 G2F32(f32),
-                G2String(::puroro::bumpalo::collections::String<'bump>),
+                G2String(::puroro::bumpalo::collections::String<'static>),
                 G2Submsg(
                     ::puroro::bumpalo::boxed::Box<
-                        'bump,
-                        self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
+                        'static,
+                        self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<BT>,
                     >,
                 ),
             }
 
-            impl<'bump> ::std::default::Default for GroupTwo<'bump> {
+            impl<BT> ::std::default::Default for GroupTwo<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
                 }
             }
 
             #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
-            pub(crate) enum GroupThree<'bump> {
-                _None(::std::marker::PhantomData<&'bump ()>),
+            pub(crate) enum GroupThree<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
+                _None(::std::marker::PhantomData<BT>),
                 G3Int32(i32),
             }
 
-            impl<'bump> ::std::default::Default for GroupThree<'bump> {
+            impl<BT> ::std::default::Default for GroupThree<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
                 }

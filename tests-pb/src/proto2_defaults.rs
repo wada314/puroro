@@ -5420,11 +5420,10 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct MsgBumpalo<'bump, BT>
+    pub struct MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
-        _bump: BT::BumpRef,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (62 + 31) / 32]>,
         i32_default: i32,
@@ -5472,31 +5471,40 @@ pub mod _puroro_impls {
         bool_default: bool,
         bool_true: bool,
         bool_false: bool,
-        string_default: ::puroro::bumpalo::collections::String<'bump>,
-        string_empty: ::puroro::bumpalo::collections::String<'bump>,
-        string_abc: ::puroro::bumpalo::collections::String<'bump>,
-        string_aiu: ::puroro::bumpalo::collections::String<'bump>,
-        string_backslash: ::puroro::bumpalo::collections::String<'bump>,
-        string_tab: ::puroro::bumpalo::collections::String<'bump>,
-        string_crlf: ::puroro::bumpalo::collections::String<'bump>,
-        bytes_default: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-        bytes_empty: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-        bytes_abc: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-        bytes_aiu: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-        bytes_backslash: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-        bytes_tab: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-        bytes_crlf: ::puroro::bumpalo::collections::Vec<'bump, u8>,
+        string_default: ::puroro::bumpalo::collections::String<'static>,
+        string_empty: ::puroro::bumpalo::collections::String<'static>,
+        string_abc: ::puroro::bumpalo::collections::String<'static>,
+        string_aiu: ::puroro::bumpalo::collections::String<'static>,
+        string_backslash: ::puroro::bumpalo::collections::String<'static>,
+        string_tab: ::puroro::bumpalo::collections::String<'static>,
+        string_crlf: ::puroro::bumpalo::collections::String<'static>,
+        bytes_default: ::puroro::bumpalo::collections::Vec<'static, u8>,
+        bytes_empty: ::puroro::bumpalo::collections::Vec<'static, u8>,
+        bytes_abc: ::puroro::bumpalo::collections::Vec<'static, u8>,
+        bytes_aiu: ::puroro::bumpalo::collections::Vec<'static, u8>,
+        bytes_backslash: ::puroro::bumpalo::collections::Vec<'static, u8>,
+        bytes_tab: ::puroro::bumpalo::collections::Vec<'static, u8>,
+        bytes_crlf: ::puroro::bumpalo::collections::Vec<'static, u8>,
         enum_default: self::_puroro_root::proto2_defaults::MyEnum,
         enum_one: self::_puroro_root::proto2_defaults::MyEnum,
         enum_fourty_two: self::_puroro_root::proto2_defaults::MyEnum,
+
+        _bump: BT::BumpRef,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static, ::puroro::BumpRc>>;
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<::puroro::BumpRc>>;
 
-    impl<'bump, BT> MsgBumpalo<'bump, BT> {
-        pub fn new_in(bump: BT::BumpRef) -> Self {
+    impl<BT> MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+            let bump_ref = unsafe {
+                ::std::mem::transmute(
+                    <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump),
+                )
+            };
             Self {
-                _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 i32_default: ::std::default::Default::default(),
                 i32_0: ::std::default::Default::default(),
@@ -5543,42 +5551,48 @@ pub mod _puroro_impls {
                 bool_default: ::std::default::Default::default(),
                 bool_true: ::std::default::Default::default(),
                 bool_false: ::std::default::Default::default(),
-                string_default: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_empty: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_abc: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_aiu: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_backslash: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_tab: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_crlf: ::puroro::bumpalo::collections::String::new_in(bump),
-                bytes_default: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_empty: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_abc: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_aiu: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_backslash: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_tab: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_crlf: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                string_default: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_empty: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_abc: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_aiu: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_backslash: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_tab: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_crlf: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                bytes_default: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_empty: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_abc: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_aiu: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_backslash: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_tab: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_crlf: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 enum_default: ::std::default::Default::default(),
                 enum_one: ::std::default::Default::default(),
                 enum_fourty_two: ::std::default::Default::default(),
+
+                _bump: bump,
             }
         }
     }
 
-    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump, BT> {}
+    impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug
+    {
+    }
 
-    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump, BT> {
-        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        type BumpTypes = BT;
+        fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+            Self::new_in(bump.clone())
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
-        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
-        }
-    }
-
-    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+    impl<BT> super::_puroro_traits::MsgTrait for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn i32_default_opt<'this>(&'this self) -> Option<i32> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
                 ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_default))
@@ -6025,7 +6039,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+    impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -6419,9 +6436,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
+    impl<BT> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<BT>
     where
         Self: super::_puroro_traits::MsgTrait,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -6927,7 +6945,10 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+    impl<BT> ::std::cmp::PartialEq for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump)
                 && self.i32_default == rhs.i32_default

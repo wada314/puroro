@@ -10681,139 +10681,153 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct MsgBumpalo<'bump, BT>
+    pub struct MsgBumpalo<BT>
 where
-    BT: ::puroro::BumpTypes,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
 {
-    _bump: BT::BumpRef,
     _bitfield: ::puroro::bitvec::array::BitArray<
         ::puroro::bitvec::order::Lsb0,
         [u32; (15 + 31) / 32],
     >,
     i32_unlabeled: i32,
     i32_optional: i32,
-    i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    i32_repeated: ::puroro::bumpalo::collections::Vec<'static, i32>,
     float_unlabeled: f32,
     float_optional: f32,
-    float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
-    bytes_unlabeled: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-    bytes_optional: ::puroro::bumpalo::collections::Vec<'bump, u8>,
-    bytes_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::Vec<'bump, u8>>,
-    string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
-    string_optional: ::puroro::bumpalo::collections::String<'bump>,
-    string_repeated: ::puroro::bumpalo::collections::Vec<'bump, ::puroro::bumpalo::collections::String<'bump>>,
+    float_repeated: ::puroro::bumpalo::collections::Vec<'static, f32>,
+    bytes_unlabeled: ::puroro::bumpalo::collections::Vec<'static, u8>,
+    bytes_optional: ::puroro::bumpalo::collections::Vec<'static, u8>,
+    bytes_repeated: ::puroro::bumpalo::collections::Vec<'static, ::puroro::bumpalo::collections::Vec<'static, u8>>,
+    string_unlabeled: ::puroro::bumpalo::collections::String<'static>,
+    string_optional: ::puroro::bumpalo::collections::String<'static>,
+    string_repeated: ::puroro::bumpalo::collections::Vec<'static, ::puroro::bumpalo::collections::String<'static>>,
     enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
     enum_optional: self::_puroro_root::full_coverage3::Enum,
-    enum_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage3::Enum>,
-    submsg_unlabeled: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
-    submsg_optional: ::std::option::Option<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
-    submsg_repeated: ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>,
+    enum_repeated: ::puroro::bumpalo::collections::Vec<'static, self::_puroro_root::full_coverage3::Enum>,
+    submsg_unlabeled: ::std::option::Option<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>,
+    submsg_optional: ::std::option::Option<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>,
+    submsg_repeated: ::puroro::bumpalo::collections::Vec<'static, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>,
     i64_unlabeled: i64,
     i64_optional: i64,
-    i64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    i64_repeated: ::puroro::bumpalo::collections::Vec<'static, i64>,
     u32_unlabeled: u32,
     u32_optional: u32,
-    u32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
+    u32_repeated: ::puroro::bumpalo::collections::Vec<'static, u32>,
     u64_unlabeled: u64,
     u64_optional: u64,
-    u64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
+    u64_repeated: ::puroro::bumpalo::collections::Vec<'static, u64>,
     s32_unlabeled: i32,
     s32_optional: i32,
-    s32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    s32_repeated: ::puroro::bumpalo::collections::Vec<'static, i32>,
     s64_unlabeled: i64,
     s64_optional: i64,
-    s64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    s64_repeated: ::puroro::bumpalo::collections::Vec<'static, i64>,
     fixed32_unlabeled: u32,
     fixed32_optional: u32,
-    fixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, u32>,
+    fixed32_repeated: ::puroro::bumpalo::collections::Vec<'static, u32>,
     fixed64_unlabeled: u64,
     fixed64_optional: u64,
-    fixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, u64>,
+    fixed64_repeated: ::puroro::bumpalo::collections::Vec<'static, u64>,
     sfixed32_unlabeled: i32,
     sfixed32_optional: i32,
-    sfixed32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+    sfixed32_repeated: ::puroro::bumpalo::collections::Vec<'static, i32>,
     sfixed64_unlabeled: i64,
     sfixed64_optional: i64,
-    sfixed64_repeated: ::puroro::bumpalo::collections::Vec<'bump, i64>,
+    sfixed64_repeated: ::puroro::bumpalo::collections::Vec<'static, i64>,
     f64_unlabeled: f64,
     f64_optional: f64,
-    f64_repeated: ::puroro::bumpalo::collections::Vec<'bump, f64>,
+    f64_repeated: ::puroro::bumpalo::collections::Vec<'static, f64>,
+    
+    _bump: BT::BumpRef,
 }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static, ::puroro::BumpRc>>;
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<::puroro::BumpRc>>;
 
-    impl<'bump, BT> MsgBumpalo<'bump, BT> {
-        pub fn new_in(bump: BT::BumpRef) -> Self {
+    impl<BT> MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+            let bump_ref = unsafe {
+                ::std::mem::transmute(
+                    <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump),
+                )
+            };
             Self {
-                _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 float_unlabeled: ::std::default::Default::default(),
                 float_optional: ::std::default::Default::default(),
-                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_unlabeled: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_optional: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_optional: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_unlabeled: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_optional: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_optional: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 enum_unlabeled: ::std::default::Default::default(),
                 enum_optional: ::std::default::Default::default(),
-                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 submsg_unlabeled: ::std::option::Option::None,
                 submsg_optional: ::std::option::Option::None,
-                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 i64_unlabeled: ::std::default::Default::default(),
                 i64_optional: ::std::default::Default::default(),
-                i64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 u32_unlabeled: ::std::default::Default::default(),
                 u32_optional: ::std::default::Default::default(),
-                u32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 u64_unlabeled: ::std::default::Default::default(),
                 u64_optional: ::std::default::Default::default(),
-                u64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 s32_unlabeled: ::std::default::Default::default(),
                 s32_optional: ::std::default::Default::default(),
-                s32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 s64_unlabeled: ::std::default::Default::default(),
                 s64_optional: ::std::default::Default::default(),
-                s64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 fixed32_unlabeled: ::std::default::Default::default(),
                 fixed32_optional: ::std::default::Default::default(),
-                fixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 fixed64_unlabeled: ::std::default::Default::default(),
                 fixed64_optional: ::std::default::Default::default(),
-                fixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 sfixed32_unlabeled: ::std::default::Default::default(),
                 sfixed32_optional: ::std::default::Default::default(),
-                sfixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 sfixed64_unlabeled: ::std::default::Default::default(),
                 sfixed64_optional: ::std::default::Default::default(),
-                sfixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 f64_unlabeled: ::std::default::Default::default(),
                 f64_optional: ::std::default::Default::default(),
-                f64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                f64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+
+                _bump: bump,
             }
         }
     }
 
-    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump, BT> {}
+    impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug
+    {
+    }
 
-    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump, BT> {
-        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
+    impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
+        type BumpTypes = BT;
+        fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+            Self::new_in(bump.clone())
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
-        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self::new_in(bump)
-        }
-    }
-
-    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+    impl<BT> super::_puroro_traits::MsgTrait for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
@@ -10865,7 +10879,7 @@ where
             Self: 'this,
         = ::puroro::internal::impls::simple::BorrowedIter<
             [u8],
-            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::Vec<'bump, u8>>,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::Vec<'static, u8>>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
@@ -10886,7 +10900,7 @@ where
             Self: 'this,
         = ::puroro::internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'static>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
@@ -10914,19 +10928,19 @@ where
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             self.enum_repeated.iter().cloned()
         }
-        type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
+        type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
         }
-        type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
+        type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|b| b.as_ref())
         }
-        type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
+        type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>;
         type Field53RepeatedType<'this> where Self: 'this =
     ::puroro::internal::impls::simple::BorrowedIter<
-        self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>,
-        ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>;
+        self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>,
+        ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
@@ -11113,7 +11127,10 @@ where
         }
     }
 
-    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+    impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -11208,17 +11225,17 @@ where
             }
             51 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>
                 >::deser_field(&mut self.submsg_unlabeled, data, &self._bump)
             }
             52 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>
                 >::deser_field(&mut self.submsg_optional, data, &self._bump)
             }
             53 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>
                 >::deser_field(&mut self.submsg_repeated, data, &self._bump)
             }
             101 => {
@@ -11387,9 +11404,10 @@ where
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
+    impl<BT> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<BT>
     where
         Self: super::_puroro_traits::MsgTrait,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'a>:
@@ -11795,7 +11813,10 @@ where
         }
     }
 
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
+    impl<BT> ::std::cmp::PartialEq for MsgBumpalo<BT>
+    where
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump)
                 && self.i32_unlabeled == rhs.i32_unlabeled
@@ -15116,48 +15137,63 @@ pub mod _puroro_nested {
                 }
             }
             #[derive(::std::fmt::Debug)]
-            pub struct SubmsgBumpalo<'bump, BT>
+            pub struct SubmsgBumpalo<BT>
             where
-                BT: ::puroro::BumpTypes,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
             {
-                _bump: BT::BumpRef,
                 _bitfield: ::puroro::bitvec::array::BitArray<
                     ::puroro::bitvec::order::Lsb0,
                     [u32; (0 + 31) / 32],
                 >,
                 i32_unlabeled: i32,
                 i64_unlabeled: i64,
+
+                _bump: BT::BumpRef,
             }
 
-            pub type SubmsgBumpaloOwned =
-                ::puroro::BumpaloOwned<SubmsgBumpalo<'static, ::puroro::BumpRc>>;
+            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<::puroro::BumpRc>>;
 
-            impl<'bump, BT> SubmsgBumpalo<'bump, BT> {
-                pub fn new_in(bump: BT::BumpRef) -> Self {
+            impl<BT> SubmsgBumpalo<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
+                pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+                    let bump_ref = unsafe {
+                        ::std::mem::transmute(
+                            <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(
+                                &bump,
+                            ),
+                        )
+                    };
                     Self {
-                        _bump: bump,
                         _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
+
+                        _bump: bump,
                     }
                 }
             }
 
-            impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump, BT> {}
+            impl<BT> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<BT> where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug
+            {
+            }
 
-            impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump, BT> {
-                fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-                    Self::new_in(bump)
+            impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
+                type BumpTypes = BT;
+                fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+                    Self::new_in(bump.clone())
                 }
             }
 
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
-                fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-                    Self::new_in(bump)
-                }
-            }
-
-            impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
+            impl<BT> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
                     ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
                 }
@@ -15166,7 +15202,10 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
+            impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -15197,9 +15236,10 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
+            impl<BT> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<BT>
             where
                 Self: super::_puroro_traits::SubmsgTrait,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
@@ -15225,7 +15265,10 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
+            impl<BT> ::std::cmp::PartialEq for SubmsgBumpalo<BT>
+            where
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+            {
                 fn eq(&self, rhs: &Self) -> bool {
                     ::std::ptr::eq(self._bump, rhs._bump)
                         && self.i32_unlabeled == rhs.i32_unlabeled

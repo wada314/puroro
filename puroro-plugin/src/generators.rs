@@ -219,7 +219,7 @@ impl Field {
             };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]))
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["BT"]))
             } else {
                 None
             };
@@ -292,15 +292,15 @@ impl Field {
             bumpalo_scalar_field_type: f.bumpalo_scalar_field_type()?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'bump"])?,
+                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["BT"])?,
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["'bump"])
+                        msg.rust_impl_path("Bumpalo", &["BT"])
                     } else {
                         format!(
-                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
-                            msg.rust_impl_path("Bumpalo", &["'bump"])
+                            "::puroro::bumpalo::boxed::Box<'static, {}>",
+                            msg.rust_impl_path("Bumpalo", &["BT"])
                         )
                     },
                 )
@@ -453,11 +453,11 @@ impl OneofField {
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["'bump"])
+                        msg.rust_impl_path("Bumpalo", &["BT"])
                     } else {
                         format!(
-                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
-                            msg.rust_impl_path("Bumpalo", &["'bump"])
+                            "::puroro::bumpalo::boxed::Box<'static, {}>",
+                            msg.rust_impl_path("Bumpalo", &["BT"])
                         )
                     },
                 )

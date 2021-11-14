@@ -1,13 +1,19 @@
 
 #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub(crate) enum {{ oneof.bumpalo_enum_ident }}<'bump> {
-    _None(::std::marker::PhantomData<&'bump ()>),
+pub(crate) enum {{ oneof.bumpalo_enum_ident }}<BT>
+where
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+{
+    _None(::std::marker::PhantomData<BT>),
     {%- for field in oneof.fields %}
     {{ field.ident }}({{ field.bumpalo_field_type }}),
     {%- endfor %}
 }
 
-impl<'bump> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<'bump> {
+impl<BT> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<BT>
+where
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+{
     fn default() -> Self {
         Self::_None(::std::marker::PhantomData)
     }
