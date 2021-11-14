@@ -15,6 +15,7 @@ thiserror = "1.0.24"
 either = "1.6.1"
 bumpalo = { version = "3.8.0", optional = true, features = ["collections", "boxed"] }
 bitvec = "0.22.3"
+stable_deref_trait = "1.2.0"
 
 [features]
 default = ["puroro-bumpalo"]

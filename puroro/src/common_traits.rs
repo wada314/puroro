@@ -17,6 +17,7 @@ use crate::internal::de::from_iter::deser_from_iter;
 use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::se::SerMessageToIoWrite;
 use crate::Result;
+use ::stable_deref_trait::StableDeref;
 use ::std::convert::TryFrom;
 use ::std::fmt::Debug;
 use ::std::io::Write;
@@ -165,7 +166,7 @@ where
 /// which decides the child struct's bump ptr type and grandchild's
 /// `BumpType`, recursively.
 pub trait BumpTypes {
-    type BumpRef<'bump>: Sized + Deref<Target = Bump> + Debug;
+    type BumpRef<'bump>: Sized + StableDeref + Deref<Target = Bump> + Debug;
     unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
         input: Self::BumpRef<'short>,
     ) -> Self::BumpRef<'long>;
