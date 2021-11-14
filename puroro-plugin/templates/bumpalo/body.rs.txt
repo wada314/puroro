@@ -57,6 +57,12 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 
 impl<'bump> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {}
 
+impl<'bump> ::puroro::BumpaloMessage<'bump> for {{ m.bumpalo_ident }}<'bump> {
+    fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
+
 impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for {{ m.bumpalo_ident }}<'bump> {
     fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         Self::new_in(bump)
@@ -132,11 +138,11 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                     E::{{ field.ident }}(_))
                 {
                     self.{{ oneof.field_ident }} = E::{{ field.ident }}(
-                        {%- if field.is_length_delimited %}
+                        {%- if field.is_message %}
+                        ::puroro::BumpaloMessage::new_in(&self._bump)
+                        {%- else %} {#- if field.is_message #}
                         ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
-                        {%- else %}
-                        ::std::default::Default::default()
-                        {%- endif %}
+                        {%- endif %} {#- if field.is_message #}
                     );
                 }
                 let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {

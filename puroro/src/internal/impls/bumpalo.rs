@@ -126,14 +126,6 @@ impl<'bump, T> BumpaloDefault<'bump> for Vec<'bump, T> {
         Vec::new_in(bump)
     }
 }
-impl<'bump, T> BumpaloDefault<'bump> for Box<'bump, T>
-where
-    T: BumpaloDefault<'bump>,
-{
-    fn default_in(bump: &'bump Bump) -> Self {
-        Box::new_in(BumpaloDefault::default_in(bump), bump)
-    }
-}
 impl<'bump, T> BumpaloDefault<'bump> for Option<T> {
     fn default_in(_: &'bump Bump) -> Self {
         ::std::default::Default::default()
