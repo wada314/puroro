@@ -48,5 +48,6 @@ fn test_rc() {
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
+    assert_eq!(3, Rc::strong_count(&bump_rc));
     assert!(is_test1_trait(&t1));
 }
