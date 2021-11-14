@@ -1774,7 +1774,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = ::puroro::internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'static>>,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'this>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
@@ -1803,7 +1803,7 @@ pub mod _puroro_impls {
             ::std::slice::Iter<
                 'this,
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    BT::AsStatic,
+                    BT,
                 >,
             >,
         >;

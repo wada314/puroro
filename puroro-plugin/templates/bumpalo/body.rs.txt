@@ -10,7 +10,7 @@ where
 
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
-    {{ field.ident }}: {{ field.bumpalo_field_type }},
+    {{ field.ident }}: {{ field.bumpalo_static_field_type }},
     {%- endif %}
     {%- endfor %}
 

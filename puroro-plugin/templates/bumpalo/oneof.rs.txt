@@ -6,7 +6,7 @@ where
 {
     _None(::std::marker::PhantomData<BT>),
     {%- for field in oneof.fields %}
-    {{ field.ident }}({{ field.bumpalo_field_type }}),
+    {{ field.ident }}({{ field.bumpalo_static_field_type }}),
     {%- endfor %}
 }
 

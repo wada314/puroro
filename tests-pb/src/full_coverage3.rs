@@ -10880,7 +10880,7 @@ where
             Self: 'this,
         = ::puroro::internal::impls::simple::BorrowedIter<
             [u8],
-            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::Vec<'static, u8>>,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::Vec<'this, u8>>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
@@ -10901,7 +10901,7 @@ where
             Self: 'this,
         = ::puroro::internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'static>>,
+            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'this>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
@@ -10941,7 +10941,7 @@ where
         type Field53RepeatedType<'this> where Self: 'this =
     ::puroro::internal::impls::simple::BorrowedIter<
         self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>,
-        ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::AsStatic>>>;
+        ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
