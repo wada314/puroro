@@ -77,7 +77,7 @@ where
     BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     type BumpTypes = BT;
-    fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+    fn new_with_parents_bump(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
         Self::new_in(bump.clone())
     }
 }
@@ -161,7 +161,7 @@ where
                 {
                     self.{{ oneof.field_ident }} = E::{{ field.ident }}(
                         {%- if field.is_message %}
-                        ::puroro::BumpaloMessage::new_in(bump)
+                        ::puroro::BumpaloMessage::new_with_parents_bump(bump)
                         {%- else %} {#- if field.is_message #}
                         ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump)
                         {%- endif %} {#- if field.is_message #}

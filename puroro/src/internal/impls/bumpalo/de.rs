@@ -201,7 +201,7 @@ where
         M: BumpaloMessage<'bump, BumpTypes = BT>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
-            let msg = field.get_or_insert_with(|| BumpaloMessage::new_in(bump));
+            let msg = field.get_or_insert_with(|| BumpaloMessage::new_with_parents_bump(bump));
             deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;

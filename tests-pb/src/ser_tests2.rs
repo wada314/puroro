@@ -1719,7 +1719,9 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+        fn new_with_parents_bump(
+            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef,
+        ) -> Self {
             Self::new_in(bump.clone())
         }
     }
@@ -3145,7 +3147,9 @@ pub mod _puroro_nested {
                 BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
                 type BumpTypes = BT;
-                fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
+                fn new_with_parents_bump(
+                    bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef,
+                ) -> Self {
                     Self::new_in(bump.clone())
                 }
             }

@@ -130,15 +130,15 @@ impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
 /// Bumpalo message, initialized from bump ptr instance.
 pub trait BumpaloMessage<'bump> {
     type BumpTypes: BumpTypes;
-    fn new_in(bump: &'bump <Self::BumpTypes as BumpTypes>::BumpRef) -> Self;
+    fn new_with_parents_bump(bump: &'bump <Self::BumpTypes as BumpTypes>::BumpRef) -> Self;
 }
 impl<'bump, T> BumpaloMessage<'bump> for crate::bumpalo::boxed::Box<'bump, T>
 where
     T: BumpaloMessage<'bump>,
 {
     type BumpTypes = T::BumpTypes;
-    fn new_in(bump: &'bump <T::BumpTypes as BumpTypes>::BumpRef) -> Self {
-        crate::bumpalo::boxed::Box::new_in(BumpaloMessage::new_in(bump), bump)
+    fn new_with_parents_bump(bump: &'bump <T::BumpTypes as BumpTypes>::BumpRef) -> Self {
+        crate::bumpalo::boxed::Box::new_in(BumpaloMessage::new_with_parents_bump(bump), bump)
     }
 }
 
