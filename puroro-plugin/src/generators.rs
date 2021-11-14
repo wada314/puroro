@@ -194,10 +194,8 @@ struct Field {
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
-    bumpalo_field_type: String,
     bumpalo_scalar_field_type: String,
     bumpalo_static_field_type: String,
-    bumpalo_static_scalar_field_type: String,
     bumpalo_maybe_field_message_path: Option<String>,
     bumpalo_maybe_borrowed_field_type: Option<String>,
     bumpalo_label_and_type_tags: String,
@@ -288,10 +286,8 @@ impl Field {
             })?,
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
-            bumpalo_field_type: f.bumpalo_field_type("'this")?,
             bumpalo_scalar_field_type: f.bumpalo_scalar_field_type("'this")?,
             bumpalo_static_field_type: f.bumpalo_field_type("'static")?,
-            bumpalo_static_scalar_field_type: f.bumpalo_scalar_field_type("'static")?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["BT::ChildsBumpTypes"])?,
@@ -422,7 +418,6 @@ struct OneofField {
     field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
-    bumpalo_field_type: String,
     bumpalo_static_field_type: String,
     bumpalo_field_type_tag: String,
 }
@@ -452,7 +447,6 @@ impl OneofField {
                     },
                 )
             })?,
-            bumpalo_field_type: f.bumpalo_oneof_field_type("'msg")?,
             bumpalo_static_field_type: f.bumpalo_oneof_field_type("'static")?,
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
