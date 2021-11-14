@@ -246,7 +246,10 @@ pub mod _puroro_impls {
                         >,
                     >,
                 >::deser_field(
-                    &mut self.recursive_unlabeled, data, &self._bump
+                    &mut self.recursive_unlabeled,
+                    data,
+                    &self._bump,
+                    ChildsBumpStrategy::new_child_bump,
                 ),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

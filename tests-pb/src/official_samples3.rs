@@ -436,7 +436,7 @@ pub mod _puroro_impls {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-                >::deser_field(&mut self.a, data, &self._bump)
+                >::deser_field(&mut self.a, data, &self._bump, ChildsBumpStrategy::new_child_bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -626,7 +626,7 @@ pub mod _puroro_impls {
             2 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::String
-                >::deser_field(&mut self.b, data, &self._bump)
+                >::deser_field(&mut self.b, data, &self._bump, ChildsBumpStrategy::new_child_bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -841,7 +841,12 @@ pub mod _puroro_impls {
                             >,
                         >,
                     >,
-                >::deser_field(&mut self.c, data, &self._bump),
+                >::deser_field(
+                    &mut self.c,
+                    data,
+                    &self._bump,
+                    ChildsBumpStrategy::new_child_bump,
+                ),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1055,7 +1060,7 @@ pub mod _puroro_impls {
             4 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::deser_field(&mut self.d, data, &self._bump)
+                >::deser_field(&mut self.d, data, &self._bump, ChildsBumpStrategy::new_child_bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),

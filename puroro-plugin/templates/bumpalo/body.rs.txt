@@ -118,7 +118,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 {%- endif %}
                 DeserFieldFromBytesIter::<
                     {{ field.bumpalo_label_and_type_tags }}
-                >::deser_field(&mut self.{{ field.ident }}, data, &self._bump)
+                >::deser_field(&mut self.{{ field.ident }}, data, &self._bump, ChildsBumpStrategy::new_child_bump)
             }
             {%- endif %}
             {%- endfor %}
@@ -145,7 +145,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 };
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump, ChildsBumpStrategy::new_child_bump)
             }
             {%- endfor %}
             {%- endfor %}

@@ -1030,7 +1030,7 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::Int32
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump, ChildsBumpStrategy::new_child_bump)
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupOne as E;
@@ -1047,7 +1047,7 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::String
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump, ChildsBumpStrategy::new_child_bump)
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
@@ -1060,7 +1060,7 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::Float
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump, ChildsBumpStrategy::new_child_bump)
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
@@ -1077,7 +1077,7 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::String
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump, ChildsBumpStrategy::new_child_bump)
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
@@ -1100,7 +1100,12 @@ pub mod _puroro_impls {
                                 self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'bump>,
                             >,
                         >,
-                    >::deser_field(field_value_mut_ref, data, &self._bump)
+                    >::deser_field(
+                        field_value_mut_ref,
+                        data,
+                        &self._bump,
+                        ChildsBumpStrategy::new_child_bump,
+                    )
                 }
                 6 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupThree as E;
@@ -1113,7 +1118,7 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::Int32
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump, ChildsBumpStrategy::new_child_bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1436,7 +1441,7 @@ pub mod _puroro_impls {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::deser_field(&mut self.i32_optional, data, &self._bump)
+                >::deser_field(&mut self.i32_optional, data, &self._bump, ChildsBumpStrategy::new_child_bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
