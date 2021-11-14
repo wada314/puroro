@@ -143,7 +143,7 @@ where
                 self._bitfield.set({{ field.bitfield_index }}, true);
                 {%- endif %}
                 DeserFieldFromBytesIter::<
-                    {{ field.bumpalo_label_and_type_tags }}
+                    {{ field.bumpalo_label_and_type_tags }}, BT
                 >::deser_field(&mut self.{{ field.ident }}, data, &self._bump)
             }
             {%- endif %}
@@ -170,7 +170,7 @@ where
                     _ => unreachable!(),
                 };
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}
+                    ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}, BT
                 >::deser_field(field_value_mut_ref, data, &self._bump)
             }
             {%- endfor %}
@@ -218,7 +218,10 @@ where
     BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
 {
     fn eq(&self, rhs: &Self) -> bool {
-        ::std::ptr::eq(self._bump, rhs._bump) &&
+        ::std::ptr::eq(
+            <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+            <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+        ) &&
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             self.{{ field.ident }} == rhs.{{ field.ident }} &&

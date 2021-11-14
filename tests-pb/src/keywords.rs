@@ -237,7 +237,7 @@ pub mod _puroro_impls {
                 1 => {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.r#type, data, &self._bump)
                 }
 
@@ -272,7 +272,11 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.r#type == rhs.r#type && true
+            ::std::ptr::eq(
+                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+            ) && self.r#type == rhs.r#type
+                && true
         }
     }
     pub struct MsgBuilder<T>(T);

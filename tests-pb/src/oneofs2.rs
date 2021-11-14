@@ -1059,7 +1059,7 @@ pub mod _puroro_impls {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::Int32
+                    ::puroro::tags::OneofField, ::puroro::tags::Int32, BT
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 2 => {
@@ -1076,7 +1076,7 @@ pub mod _puroro_impls {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::String
+                    ::puroro::tags::OneofField, ::puroro::tags::String, BT
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 3 => {
@@ -1093,7 +1093,7 @@ pub mod _puroro_impls {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::Float
+                    ::puroro::tags::OneofField, ::puroro::tags::Float, BT
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 4 => {
@@ -1110,7 +1110,7 @@ pub mod _puroro_impls {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::String
+                    ::puroro::tags::OneofField, ::puroro::tags::String, BT
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 5 => {
@@ -1130,6 +1130,7 @@ pub mod _puroro_impls {
                                 self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<BT>,
                             >,
                         >,
+                        BT,
                     >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 6 => {
@@ -1146,7 +1147,7 @@ pub mod _puroro_impls {
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::Int32
+                    ::puroro::tags::OneofField, ::puroro::tags::Int32, BT
                 >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
 
@@ -1225,8 +1226,10 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.group_one == rhs.group_one
+            ::std::ptr::eq(
+                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+            ) && self.group_one == rhs.group_one
                 && self.group_two == rhs.group_two
                 && self.group_three == rhs.group_three
                 && true
@@ -1478,7 +1481,7 @@ pub mod _puroro_impls {
                 1 => {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.i32_optional, data, &self._bump)
                 }
 
@@ -1513,7 +1516,11 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.i32_optional == rhs.i32_optional && true
+            ::std::ptr::eq(
+                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+            ) && self.i32_optional == rhs.i32_optional
+                && true
         }
     }
     pub struct SubmsgBuilder<T>(T);

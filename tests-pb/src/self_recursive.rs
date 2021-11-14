@@ -271,6 +271,7 @@ pub mod _puroro_impls {
                             self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT>,
                         >,
                     >,
+                    BT,
                 >::deser_field(
                     &mut self.recursive_unlabeled, data, &self._bump
                 ),
@@ -310,8 +311,10 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.recursive_unlabeled == rhs.recursive_unlabeled
+            ::std::ptr::eq(
+                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+            ) && self.recursive_unlabeled == rhs.recursive_unlabeled
                 && true
         }
     }

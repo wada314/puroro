@@ -1850,57 +1850,57 @@ pub mod _puroro_impls {
             match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.i32_unlabeled, data, &self._bump)
             }
             2 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.i32_repeated, data, &self._bump)
             }
             3 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float, BT
                 >::deser_field(&mut self.float_unlabeled, data, &self._bump)
             }
             4 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Float
+                    ::puroro::tags::Repeated, ::puroro::tags::Float, BT
                 >::deser_field(&mut self.float_repeated, data, &self._bump)
             }
             5 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String, BT
                 >::deser_field(&mut self.string_unlabeled, data, &self._bump)
             }
             6 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::String
+                    ::puroro::tags::Repeated, ::puroro::tags::String, BT
                 >::deser_field(&mut self.string_repeated, data, &self._bump)
             }
             7 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>, BT
                 >::deser_field(&mut self.submsg_unlabeled, data, &self._bump)
             }
             8 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>, BT
                 >::deser_field(&mut self.submsg_repeated, data, &self._bump)
             }
             9 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>, BT
                 >::deser_field(&mut self.enum_unlabeled, data, &self._bump)
             }
             10 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>, BT
                 >::deser_field(&mut self.enum_repeated, data, &self._bump)
             }
             536870911 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.very_large_field_number, data, &self._bump)
             }
 
@@ -2023,8 +2023,10 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.i32_unlabeled == rhs.i32_unlabeled
+            ::std::ptr::eq(
+                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+            ) && self.i32_unlabeled == rhs.i32_unlabeled
                 && self.i32_repeated == rhs.i32_repeated
                 && self.float_unlabeled == rhs.float_unlabeled
                 && self.float_repeated == rhs.float_repeated
@@ -3182,6 +3184,7 @@ pub mod _puroro_nested {
                         1 => DeserFieldFromBytesIter::<
                             ::puroro::tags::Unlabeled,
                             ::puroro::tags::Int32,
+                            BT,
                         >::deser_field(
                             &mut self.i32_unlabeled, data, &self._bump
                         ),
@@ -3217,8 +3220,10 @@ pub mod _puroro_nested {
                 BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
             {
                 fn eq(&self, rhs: &Self) -> bool {
-                    ::std::ptr::eq(self._bump, rhs._bump)
-                        && self.i32_unlabeled == rhs.i32_unlabeled
+                    ::std::ptr::eq(
+                        <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                        <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+                    ) && self.i32_unlabeled == rhs.i32_unlabeled
                         && true
                 }
             }

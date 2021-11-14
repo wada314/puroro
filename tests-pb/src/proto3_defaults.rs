@@ -895,33 +895,33 @@ pub mod _puroro_impls {
             match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.i32_unlabeled, data, &self._bump)
             }
             2 => {
                 self._bitfield.set(0, true);
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.i32_optional, data, &self._bump)
             }
             3 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.i32_repeated, data, &self._bump)
             }
             4 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float, BT
                 >::deser_field(&mut self.f32_unlabeled, data, &self._bump)
             }
             5 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String, BT
                 >::deser_field(&mut self.string_unlabeled, data, &self._bump)
             }
             6 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<BT>>>
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<BT>>>, BT
                 >::deser_field(&mut self.submsg_unlabeled, data, &self._bump)
             }
 
@@ -1000,8 +1000,10 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.i32_unlabeled == rhs.i32_unlabeled
+            ::std::ptr::eq(
+                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+            ) && self.i32_unlabeled == rhs.i32_unlabeled
                 && self.i32_optional == rhs.i32_optional
                 && self.i32_repeated == rhs.i32_repeated
                 && self.f32_unlabeled == rhs.f32_unlabeled
@@ -1282,7 +1284,7 @@ pub mod _puroro_impls {
             match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
                 >::deser_field(&mut self.i32_unlabeled, data, &self._bump)
             }
 
@@ -1317,7 +1319,11 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.i32_unlabeled == rhs.i32_unlabeled && true
+            ::std::ptr::eq(
+                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
+                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+            ) && self.i32_unlabeled == rhs.i32_unlabeled
+                && true
         }
     }
     pub struct SubmsgBuilder<T>(T);
