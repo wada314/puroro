@@ -155,18 +155,18 @@ where
 }
 
 pub trait BumpTypes {
-    type BumpRef<'bump>: Sized + Deref<Target = Bump> + Debug + Clone;
+    type BumpRef<'bump>: Sized + Deref<Target = Bump> + Debug;
     unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
         input: Self::BumpRef<'short>,
     ) -> Self::BumpRef<'long>;
 
-    type ChildsBumpTypes: BumpTypes + Clone + Debug + PartialEq;
+    type ChildsBumpTypes: BumpTypes + Debug + PartialEq;
     fn make_bump_for_child<'bump>(
-        bump_parent: &Self::BumpRef<'bump>,
+        bump_parent: &'bump Self::BumpRef<'bump>,
     ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump>;
 }
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(PartialEq, Debug)]
 pub struct BumpRc;
 impl BumpTypes for BumpRc {
     type BumpRef<'bump> = Rc<Bump>;
@@ -177,13 +177,13 @@ impl BumpTypes for BumpRc {
     }
     type ChildsBumpTypes = Self;
     fn make_bump_for_child<'bump>(
-        bump_parent: &Self::BumpRef<'bump>,
+        bump_parent: &'bump Self::BumpRef<'bump>,
     ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
         bump_parent.clone()
     }
 }
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(PartialEq, Debug)]
 pub struct BumpRef;
 impl BumpTypes for BumpRef {
     type BumpRef<'bump> = &'bump Bump;
@@ -194,8 +194,25 @@ impl BumpTypes for BumpRef {
     }
     type ChildsBumpTypes = BumpRef;
     fn make_bump_for_child<'bump>(
-        bump_parent: &Self::BumpRef<'bump>,
+        bump_parent: &'bump Self::BumpRef<'bump>,
     ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
         *bump_parent
+    }
+}
+
+#[derive(PartialEq, Debug)]
+pub struct BumpBox;
+impl BumpTypes for BumpBox {
+    type BumpRef<'bump> = Box<Bump>;
+    unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
+        input: Self::BumpRef<'short>,
+    ) -> Self::BumpRef<'long> {
+        input // as-is
+    }
+    type ChildsBumpTypes = BumpRef;
+    fn make_bump_for_child<'bump>(
+        bump_parent: &'bump Self::BumpRef<'bump>,
+    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+        bump_parent.as_ref()
     }
 }

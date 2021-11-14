@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use ::puroro::bumpalo::Bump;
-use ::puroro::{BumpRc, BumpRef, Message};
+use ::puroro::{BumpBox, BumpRc, BumpRef, Message};
 use ::std::io::Read;
 use ::std::rc::Rc;
 use ::tests_pb::official_samples3::*;
@@ -52,3 +52,16 @@ fn test_rc() {
     assert_eq!(4, Rc::strong_count(&bump_rc));
     assert!(is_test1_trait(&t1));
 }
+
+/// ```compile_fail
+/// let bump_boxed = Box::new(Bump::new());
+/// let t1 = {
+///     let mut t3 = Test3Bumpalo::<BumpBox>::new_in(bump_boxed);
+///     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
+///     assert_eq!(1, t3.c().a());
+///     t3.c()
+/// }; // <- t1 cannot leave here because the owner t3 gets dropped!
+/// assert!(is_test1_trait(&t1));
+/// ```
+#[cfg(doctest)]
+fn doctest_box_fails() {}
