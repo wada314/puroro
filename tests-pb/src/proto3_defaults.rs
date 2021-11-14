@@ -806,7 +806,7 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
-            let bump_ref = unsafe {
+            let bump_ref: &'static ::puroro::bumpalo::Bump = unsafe {
                 ::std::mem::transmute(
                     <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump),
                 )
@@ -1228,7 +1228,7 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
     {
         pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
-            let bump_ref = unsafe {
+            let bump_ref: &'static ::puroro::bumpalo::Bump = unsafe {
                 ::std::mem::transmute(
                     <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump),
                 )

@@ -29,8 +29,8 @@ where
     BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
 {
     pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
-        let bump_ref = unsafe 
-            {::std::mem::transmute(
+        let bump_ref: &'static ::puroro::bumpalo::Bump = unsafe {
+            ::std::mem::transmute(
                 <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump)
             )
         };
