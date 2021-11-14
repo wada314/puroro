@@ -21,7 +21,6 @@ use crate::internal::types::FieldData;
 use crate::internal::variant::VariantTypeTag;
 use crate::{tags, BumpTypes, BumpaloMessage, ErrorKind, Result};
 use ::std::marker::PhantomData;
-use ::std::ops::Deref;
 
 // deser from iter methods
 
@@ -36,7 +35,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &<BT as BumpTypes>::BumpRef,
+        _: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
@@ -74,7 +73,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &<BT as BumpTypes>::BumpRef,
+        _: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
@@ -101,7 +100,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &<BT as BumpTypes>::BumpRef,
+        _: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
@@ -127,14 +126,14 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef,
+        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<String<'bump>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
-            let mut bytes = Vec::new_in(<<BT as BumpTypes>::BumpRef as Deref>::deref(bump));
+            let mut bytes = Vec::new_in(bump);
             if let Some(expected_size) = iter.size_hint().1 {
                 bytes.reserve_exact(expected_size);
             }
@@ -160,7 +159,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef,
+        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<Vec<'bump, u8>>,
@@ -193,7 +192,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef,
+        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<M>,

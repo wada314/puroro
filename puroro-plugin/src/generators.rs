@@ -302,7 +302,7 @@ impl Field {
                     } else {
                         format!(
                             "::puroro::bumpalo::boxed::Box<'static, {}>",
-                            msg.rust_impl_path("Bumpalo", &["BT::AsStatic"])
+                            msg.rust_impl_path("Bumpalo", &["BT"])
                         )
                     },
                 )

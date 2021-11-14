@@ -731,18 +731,13 @@ impl Field {
     }
 
     pub fn bumpalo_oneof_field_type(&self, bump_lt: &str) -> Result<String> {
-        let bt_type = if bump_lt == "'static" {
-            "BT::AsStatic"
-        } else {
-            "BT"
-        };
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::String => format!("::puroro::bumpalo::collections::String<{}>", bump_lt),
             FieldType::Bytes => format!("::puroro::bumpalo::collections::Vec<{}, u8>", bump_lt),
             FieldType::Message(m) => {
-                let bumpalo_message_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[bt_type]);
+                let bumpalo_message_type = upgrade(&m)?.rust_impl_path("Bumpalo", &["BT"]);
                 format!(
                     "::puroro::bumpalo::boxed::Box<{lt}, {ty}>",
                     lt = bump_lt,
@@ -815,18 +810,13 @@ impl Field {
     }
 
     pub fn bumpalo_scalar_field_type(&self, bump_lt: &str) -> Result<String> {
-        let bt_type = if bump_lt == "'static" {
-            "BT::AsStatic"
-        } else {
-            "BT"
-        };
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => format!("::puroro::bumpalo::collections::String<{}>", bump_lt),
             FieldType::Bytes => format!("::puroro::bumpalo::collections::Vec<{}, u8>", bump_lt),
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::Message(m) => upgrade(&m)?.rust_impl_path("Bumpalo", &[bt_type]),
+            FieldType::Message(m) => upgrade(&m)?.rust_impl_path("Bumpalo", &["BT"]),
             t => t.numerical_rust_type()?.to_string(),
         })
     }

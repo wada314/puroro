@@ -1646,7 +1646,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
@@ -1663,66 +1663,61 @@ pub mod _puroro_impls {
             ::puroro::bumpalo::boxed::Box<
                 'static,
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    BT::AsStatic,
+                    BT,
                 >,
             >,
         >,
         submsg_repeated: ::puroro::bumpalo::collections::Vec<
             'static,
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                BT::AsStatic,
-            >,
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>,
         >,
         enum_optional: self::_puroro_root::ser_tests2::Enum,
         enum_repeated:
             ::puroro::bumpalo::collections::Vec<'static, self::_puroro_root::ser_tests2::Enum>,
         very_large_field_number: i32,
 
-        _bump: BT::BumpRef,
+        _bump: BT::BumpRef<'static>,
     }
 
     impl<BT> MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
-        pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+        pub fn new_in<'bump>(bump: <BT as ::puroro::BumpTypes>::BumpRef<'bump>) -> Self {
             #[allow(unused)]
-            let bump_ref: &'static ::puroro::bumpalo::Bump = unsafe {
-                ::std::mem::transmute(
-                    <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump),
-                )
-            };
+            let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
                 float_optional: ::std::default::Default::default(),
-                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
-                string_optional: ::puroro::bumpalo::collections::String::new_in(bump_ref),
-                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+                string_optional: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
                 submsg_optional: ::std::option::Option::None,
-                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
                 enum_optional: ::std::default::Default::default(),
-                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
                 very_large_field_number: ::std::default::Default::default(),
 
-                _bump: bump,
+                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
             }
         }
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq
     {
     }
 
     impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
         fn new_with_parents_bump(
-            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef,
+            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
         ) -> Self {
             Self::new_in(bump.clone())
         }
@@ -1730,7 +1725,7 @@ pub mod _puroro_impls {
 
     impl<BT> super::_puroro_traits::MsgTrait for MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
@@ -1839,7 +1834,7 @@ pub mod _puroro_impls {
 
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         fn deser_field<I>(
             &mut self,
@@ -1852,7 +1847,7 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpRef = unsafe { ::std::mem::transmute(&self._bump) };
+            let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
             1 => {
                 self._bitfield.set(0, true);
@@ -1889,7 +1884,7 @@ pub mod _puroro_impls {
             }
             7 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::AsStatic>>>, BT
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'static, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT>>>, BT
                 >::deser_field(&mut self.submsg_optional, data, bump)
             }
             8 => {
@@ -1923,7 +1918,7 @@ pub mod _puroro_impls {
     impl<BT> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<BT>
     where
         Self: super::_puroro_traits::MsgTrait,
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
@@ -2031,12 +2026,12 @@ pub mod _puroro_impls {
 
     impl<BT> ::std::cmp::PartialEq for MsgBumpalo<BT>
     where
-        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(
-                <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
-                <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+                ::std::ops::Deref::deref(&self._bump),
+                ::std::ops::Deref::deref(&rhs._bump),
             ) && self.i32_optional == rhs.i32_optional
                 && self.i32_repeated == rhs.i32_repeated
                 && self.float_optional == rhs.float_optional
@@ -3106,7 +3101,7 @@ pub mod _puroro_nested {
             #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<BT>
             where
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
                 _bitfield: ::puroro::bitvec::array::BitArray<
                     ::puroro::bitvec::order::Lsb0,
@@ -3114,43 +3109,38 @@ pub mod _puroro_nested {
                 >,
                 i32_optional: i32,
 
-                _bump: BT::BumpRef,
+                _bump: BT::BumpRef<'static>,
             }
 
             impl<BT> SubmsgBumpalo<BT>
             where
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
-                pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+                pub fn new_in<'bump>(bump: <BT as ::puroro::BumpTypes>::BumpRef<'bump>) -> Self {
                     #[allow(unused)]
-                    let bump_ref: &'static ::puroro::bumpalo::Bump = unsafe {
-                        ::std::mem::transmute(
-                            <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(
-                                &bump,
-                            ),
-                        )
-                    };
+                    let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+                        unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
                     Self {
                         _bitfield: ::std::default::Default::default(),
                         i32_optional: ::std::default::Default::default(),
 
-                        _bump: bump,
+                        _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
                     }
                 }
             }
 
             impl<BT> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<BT> where
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq
             {
             }
 
             impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<BT>
             where
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
                 type BumpTypes = BT;
                 fn new_with_parents_bump(
-                    bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef,
+                    bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
                 ) -> Self {
                     Self::new_in(bump.clone())
                 }
@@ -3158,7 +3148,7 @@ pub mod _puroro_nested {
 
             impl<BT> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<BT>
             where
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
                     if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
@@ -3171,7 +3161,7 @@ pub mod _puroro_nested {
 
             impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<BT>
             where
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
                 fn deser_field<I>(
                     &mut self,
@@ -3184,7 +3174,7 @@ pub mod _puroro_nested {
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 {
                     use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-                    let bump: &'_ BT::BumpRef = unsafe { ::std::mem::transmute(&self._bump) };
+                    let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
                     match field_number {
                         1 => {
                             self._bitfield.set(0, true);
@@ -3205,7 +3195,7 @@ pub mod _puroro_nested {
             impl<BT> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<BT>
             where
                 Self: super::_puroro_traits::SubmsgTrait,
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
@@ -3225,12 +3215,12 @@ pub mod _puroro_nested {
 
             impl<BT> ::std::cmp::PartialEq for SubmsgBumpalo<BT>
             where
-                BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+                BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
             {
                 fn eq(&self, rhs: &Self) -> bool {
                     ::std::ptr::eq(
-                        <BT::BumpRef as ::std::ops::Deref>::deref(&self._bump),
-                        <BT::BumpRef as ::std::ops::Deref>::deref(&rhs._bump),
+                        ::std::ops::Deref::deref(&self._bump),
+                        ::std::ops::Deref::deref(&rhs._bump),
                     ) && self.i32_optional == rhs.i32_optional
                         && true
                 }
