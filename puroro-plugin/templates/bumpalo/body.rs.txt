@@ -1,7 +1,7 @@
 #[derive(::std::fmt::Debug)]
 pub struct {{ m.bumpalo_ident }}<BT>
 where
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     _bitfield: ::puroro::bitvec::array::BitArray<
         ::puroro::bitvec::order::Lsb0,
@@ -26,9 +26,10 @@ pub type {{ m.bumpalo_owned_ident }} = ::puroro::BumpaloOwned<{{ m.bumpalo_ident
 
 impl<BT> {{ m.bumpalo_ident }}<BT> 
 where
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
+        #[allow(unused)]
         let bump_ref: &'static ::puroro::bumpalo::Bump = unsafe {
             ::std::mem::transmute(
                 <<BT as ::puroro::BumpTypes>::BumpRef as ::std::ops::Deref>::deref(&bump)
@@ -70,12 +71,12 @@ where
 
 impl<BT> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<BT> 
 where
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {}
 
 impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for {{ m.bumpalo_ident }}<BT> 
 where
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     type BumpTypes = BT;
     fn new_in(bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef) -> Self {
@@ -85,7 +86,7 @@ where
 
 impl<BT> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}<BT> 
 where
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     {%- for field in m.fields %}
     {%- call bumpalo_trait_impl_field(field) %}
@@ -124,7 +125,7 @@ where
 
 impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_ident }}<BT> 
 where
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     fn deser_field<I>(
         &mut self,
@@ -162,7 +163,7 @@ where
                 {
                     self.{{ oneof.field_ident }} = E::{{ field.ident }}(
                         {%- if field.is_message %}
-                        ::puroro::BumpaloMessage::new_in(&self._bump)
+                        ::puroro::BumpaloMessage::new_in(bump)
                         {%- else %} {#- if field.is_message #}
                         ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump)
                         {%- endif %} {#- if field.is_message #}
@@ -187,7 +188,7 @@ where
 impl<BT> ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}<BT>
 where
     Self: super::_puroro_traits::{{ m.ident }}Trait,
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {%- for field in m.fields %}
 {%- if field.is_message %}
     for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'a> :
@@ -218,7 +219,7 @@ where
 
 impl<BT> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<BT> 
 where
-    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug,
+    BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     fn eq(&self, rhs: &Self) -> bool {
         ::std::ptr::eq(
