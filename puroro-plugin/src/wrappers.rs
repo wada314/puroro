@@ -737,7 +737,8 @@ impl Field {
             FieldType::String => "::puroro::bumpalo::collections::String<'static>".to_string(),
             FieldType::Bytes => "::puroro::bumpalo::collections::Vec<'static, u8>".to_string(),
             FieldType::Message(m) => {
-                let bumpalo_message_type = upgrade(&m)?.rust_impl_path("Bumpalo", &["BT"]);
+                let bumpalo_message_type =
+                    upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::AsStatic"]);
                 format!(
                     "::puroro::bumpalo::boxed::Box<'static, {message_type}>",
                     message_type = bumpalo_message_type,
@@ -813,7 +814,7 @@ impl Field {
             FieldType::Bytes => "::puroro::bumpalo::collections::Vec<'static, u8>".to_string(),
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::Message(m) => upgrade(&m)?.rust_impl_path("Bumpalo", &["BT"]),
+            FieldType::Message(m) => upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::AsStatic"]),
             t => t.numerical_rust_type()?.to_string(),
         })
     }

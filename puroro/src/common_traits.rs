@@ -145,16 +145,19 @@ where
 
 pub trait BumpTypes {
     type BumpRef: Deref<Target = Bump> + Debug + Clone;
+    type AsStatic: 'static + BumpTypes + Clone + PartialEq + Debug;
 }
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct BumpRc;
 impl BumpTypes for BumpRc {
     type BumpRef = Rc<Bump>;
+    type AsStatic = Self;
 }
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct BumpRef<'bump>(PhantomData<&'bump ()>);
 impl<'bump> BumpTypes for BumpRef<'bump> {
     type BumpRef = &'bump Bump;
+    type AsStatic = BumpRef<'static>;
 }

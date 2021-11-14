@@ -160,7 +160,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<BT>
     where
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
@@ -171,7 +171,7 @@ pub mod _puroro_impls {
 
     impl<BT> MsgBumpalo<BT>
     where
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         pub fn new_in(bump: <BT as ::puroro::BumpTypes>::BumpRef) -> Self {
             #[allow(unused)]
@@ -190,13 +190,13 @@ pub mod _puroro_impls {
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq
     {
     }
 
     impl<'bump, BT> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<BT>
     where
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
         fn new_with_parents_bump(
@@ -208,7 +208,7 @@ pub mod _puroro_impls {
 
     impl<BT> super::_puroro_traits::MsgTrait for MsgBumpalo<BT>
     where
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
@@ -221,7 +221,7 @@ pub mod _puroro_impls {
 
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
     where
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         fn deser_field<I>(
             &mut self,
@@ -251,7 +251,7 @@ pub mod _puroro_impls {
     impl<BT> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<BT>
     where
         Self: super::_puroro_traits::MsgTrait,
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
@@ -271,7 +271,7 @@ pub mod _puroro_impls {
 
     impl<BT> ::std::cmp::PartialEq for MsgBumpalo<BT>
     where
-        BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
+        BT: ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(
