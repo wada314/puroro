@@ -425,10 +425,13 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump(
-            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
-        ) -> Self {
-            Self::new_in(bump.clone())
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'bump <ParentsBT as ::puroro::BumpTypes>::BumpRef<'bump>,
+        ) -> Self
+        where
+            ParentsBT: ::puroro::BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+        {
+            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
         }
     }
 
@@ -638,10 +641,13 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump(
-            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
-        ) -> Self {
-            Self::new_in(bump.clone())
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'bump <ParentsBT as ::puroro::BumpTypes>::BumpRef<'bump>,
+        ) -> Self
+        where
+            ParentsBT: ::puroro::BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+        {
+            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
         }
     }
 
@@ -867,10 +873,13 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump(
-            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
-        ) -> Self {
-            Self::new_in(bump.clone())
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'bump <ParentsBT as ::puroro::BumpTypes>::BumpRef<'bump>,
+        ) -> Self
+        where
+            ParentsBT: ::puroro::BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+        {
+            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
         }
     }
 
@@ -1113,10 +1122,13 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump(
-            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
-        ) -> Self {
-            Self::new_in(bump.clone())
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'bump <ParentsBT as ::puroro::BumpTypes>::BumpRef<'bump>,
+        ) -> Self
+        where
+            ParentsBT: ::puroro::BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+        {
+            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
         }
     }
 

@@ -130,15 +130,27 @@ impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
 /// Bumpalo message, initialized from bump ptr instance.
 pub trait BumpaloMessage<'bump> {
     type BumpTypes: BumpTypes;
-    fn new_with_parents_bump(bump: &'bump <Self::BumpTypes as BumpTypes>::BumpRef<'bump>) -> Self;
+    fn new_with_parents_bump<ParentsBT>(
+        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef<'bump>,
+    ) -> Self
+    where
+        ParentsBT: BumpTypes<ChildsBumpTypes = Self::BumpTypes>;
 }
 impl<'bump, T> BumpaloMessage<'bump> for crate::bumpalo::boxed::Box<'bump, T>
 where
     T: BumpaloMessage<'bump>,
 {
     type BumpTypes = T::BumpTypes;
-    fn new_with_parents_bump(bump: &'bump <T::BumpTypes as BumpTypes>::BumpRef<'bump>) -> Self {
-        crate::bumpalo::boxed::Box::new_in(BumpaloMessage::new_with_parents_bump(bump), bump)
+    fn new_with_parents_bump<ParentsBT>(
+        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef<'bump>,
+    ) -> Self
+    where
+        ParentsBT: BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+    {
+        crate::bumpalo::boxed::Box::new_in(
+            BumpaloMessage::new_with_parents_bump::<ParentsBT>(parents_bump),
+            parents_bump, // Use the parent's bump to alloc the `Box`'s field.
+        )
     }
 }
 

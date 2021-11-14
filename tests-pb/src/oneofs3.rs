@@ -970,10 +970,13 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump(
-            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
-        ) -> Self {
-            Self::new_in(bump.clone())
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'bump <ParentsBT as ::puroro::BumpTypes>::BumpRef<'bump>,
+        ) -> Self
+        where
+            ParentsBT: ::puroro::BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+        {
+            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
         }
     }
 
@@ -1111,8 +1114,9 @@ pub mod _puroro_impls {
                 5 => {
                     use super::_puroro_nested::msg::_puroro_bumpalo_oneofs::GroupTwo as E;
                     if !matches!(&self.group_two, E::G2Submsg(_)) {
-                        self.group_two =
-                            E::G2Submsg(::puroro::BumpaloMessage::new_with_parents_bump(bump));
+                        self.group_two = E::G2Submsg(
+                            ::puroro::BumpaloMessage::new_with_parents_bump::<BT>(bump),
+                        );
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         E::G2Submsg(v) => v,
@@ -1436,10 +1440,13 @@ pub mod _puroro_impls {
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump(
-            bump: &'bump <Self::BumpTypes as ::puroro::BumpTypes>::BumpRef<'bump>,
-        ) -> Self {
-            Self::new_in(bump.clone())
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'bump <ParentsBT as ::puroro::BumpTypes>::BumpRef<'bump>,
+        ) -> Self
+        where
+            ParentsBT: ::puroro::BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+        {
+            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
         }
     }
 

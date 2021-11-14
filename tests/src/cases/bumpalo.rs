@@ -40,14 +40,15 @@ fn test_ref() {
 #[test]
 fn test_rc() {
     let bump_rc = Rc::new(Bump::new());
-    let mut t1 = Test1Bumpalo::<BumpRc>::new_with_parents_bump(&bump_rc);
+    let mut t1 = Test1Bumpalo::<BumpRc>::new_in(bump_rc.clone());
     t1.merge_from_bytes([0x08, 0x01].bytes());
     assert_eq!(1, t1.a());
 
-    let mut t3 = Test3Bumpalo::<BumpRc>::new_with_parents_bump(&bump_rc);
+    let mut t3 = Test3Bumpalo::<BumpRc>::new_in(bump_rc.clone());
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
-    assert_eq!(3, Rc::strong_count(&bump_rc));
+    // [local var, t1._bump, t3._bump, t3.c._bump]
+    assert_eq!(4, Rc::strong_count(&bump_rc));
     assert!(is_test1_trait(&t1));
 }
