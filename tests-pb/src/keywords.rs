@@ -179,6 +179,12 @@ pub mod _puroro_impls {
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
@@ -212,7 +218,7 @@ pub mod _puroro_impls {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::deser_field(&mut self.r#type, data, &self._bump, ChildsBumpStrategy::new_child_bump)
+                >::deser_field(&mut self.r#type, data, &self._bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

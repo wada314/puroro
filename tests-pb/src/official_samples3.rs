@@ -408,6 +408,12 @@ pub mod _puroro_impls {
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
 
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test1Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test1Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
@@ -436,7 +442,7 @@ pub mod _puroro_impls {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-                >::deser_field(&mut self.a, data, &self._bump, ChildsBumpStrategy::new_child_bump)
+                >::deser_field(&mut self.a, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -598,6 +604,12 @@ pub mod _puroro_impls {
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
 
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test2Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test2Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
@@ -626,7 +638,7 @@ pub mod _puroro_impls {
             2 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::String
-                >::deser_field(&mut self.b, data, &self._bump, ChildsBumpStrategy::new_child_bump)
+                >::deser_field(&mut self.b, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -802,6 +814,12 @@ pub mod _puroro_impls {
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}
 
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test3Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test3Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
@@ -841,12 +859,7 @@ pub mod _puroro_impls {
                             >,
                         >,
                     >,
-                >::deser_field(
-                    &mut self.c,
-                    data,
-                    &self._bump,
-                    ChildsBumpStrategy::new_child_bump,
-                ),
+                >::deser_field(&mut self.c, data, &self._bump),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1027,6 +1040,12 @@ pub mod _puroro_impls {
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
 
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test4Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+    }
+
     impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test4Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
@@ -1060,7 +1079,7 @@ pub mod _puroro_impls {
             4 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::deser_field(&mut self.d, data, &self._bump, ChildsBumpStrategy::new_child_bump)
+                >::deser_field(&mut self.d, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
