@@ -135,6 +135,9 @@ where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+        let bump: &'_ BT::BumpRef = unsafe { 
+            ::std::mem::transmute(&self._bump)
+        };
         match field_number {
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
@@ -144,7 +147,7 @@ where
                 {%- endif %}
                 DeserFieldFromBytesIter::<
                     {{ field.bumpalo_label_and_type_tags }}, BT
-                >::deser_field(&mut self.{{ field.ident }}, data, &self._bump)
+                >::deser_field(&mut self.{{ field.ident }}, data, bump)
             }
             {%- endif %}
             {%- endfor %}
@@ -161,7 +164,7 @@ where
                         {%- if field.is_message %}
                         ::puroro::BumpaloMessage::new_in(&self._bump)
                         {%- else %} {#- if field.is_message #}
-                        ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
+                        ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump)
                         {%- endif %} {#- if field.is_message #}
                     );
                 }
@@ -171,7 +174,7 @@ where
                 };
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}, BT
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, bump)
             }
             {%- endfor %}
             {%- endfor %}

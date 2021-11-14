@@ -233,12 +233,13 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            let bump: &'_ BT::BumpRef = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.r#type, data, &self._bump)
+                >::deser_field(&mut self.r#type, data, bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

@@ -454,12 +454,13 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            let bump: &'_ BT::BumpRef = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.a, data, &self._bump)
+                >::deser_field(&mut self.a, data, bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -673,12 +674,13 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            let bump: &'_ BT::BumpRef = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
                 2 => {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(&mut self.b, data, &self._bump)
+                >::deser_field(&mut self.b, data, bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -906,6 +908,7 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            let bump: &'_ BT::BumpRef = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
                 3 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional,
@@ -916,7 +919,7 @@ pub mod _puroro_impls {
                         >,
                     >,
                     BT,
-                >::deser_field(&mut self.c, data, &self._bump),
+                >::deser_field(&mut self.c, data, bump),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1150,11 +1153,12 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            let bump: &'_ BT::BumpRef = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
             4 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.d, data, &self._bump)
+                >::deser_field(&mut self.d, data, bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
