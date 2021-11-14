@@ -13,21 +13,24 @@
 // limitations under the License.
 
 use ::puroro::bumpalo::Bump;
-use ::puroro::Message;
+use ::puroro::{BumpRc, BumpRef, Message};
 use ::std::io::Read;
+use ::std::rc::Rc;
 use ::tests_pb::official_samples3::*;
+use puroro::BumpaloMessage;
 
 fn is_test1_trait<T: Test1Trait>(t: &T) -> bool {
     true
 }
 
 #[test]
-fn test_owned() {
-    let mut t1 = Test1BumpaloOwned::new();
+fn test_ref() {
+    let bump = Bump::new();
+    let mut t1 = Test1Bumpalo::<BumpRef>::new_in(&bump);
     t1.merge_from_bytes([0x08, 0x01].bytes());
     assert_eq!(1, t1.a());
 
-    let mut t3 = Test3BumpaloOwned::new();
+    let mut t3 = Test3Bumpalo::<BumpRef>::new_in(&bump);
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
@@ -35,13 +38,13 @@ fn test_owned() {
 }
 
 #[test]
-fn test_ref() {
-    let bump = Bump::new();
-    let mut t1 = Test1Bumpalo::new_in(&bump);
+fn test_rc() {
+    let bump_rc = Rc::new(Bump::new());
+    let mut t1 = Test1Bumpalo::<BumpRc>::new_with_parents_bump(&bump_rc);
     t1.merge_from_bytes([0x08, 0x01].bytes());
     assert_eq!(1, t1.a());
 
-    let mut t3 = Test3Bumpalo::new_in(&bump);
+    let mut t3 = Test3Bumpalo::<BumpRc>::new_with_parents_bump(&bump_rc);
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 

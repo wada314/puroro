@@ -22,6 +22,7 @@ use ::std::fmt::Debug;
 use ::std::io::Write;
 use ::std::ops::Deref;
 use ::std::rc::Rc;
+use std::marker::PhantomData;
 
 /// A common trait for protobuf message implementation in Rust.
 pub trait Message<M> {
@@ -145,7 +146,15 @@ where
 pub trait BumpTypes {
     type BumpRef: Deref<Target = Bump> + Debug + Clone;
 }
+
+#[derive(Clone, PartialEq, Debug)]
 pub struct BumpRc;
 impl BumpTypes for BumpRc {
     type BumpRef = Rc<Bump>;
+}
+
+#[derive(Clone, PartialEq, Debug)]
+pub struct BumpRef<'bump>(PhantomData<&'bump ()>);
+impl<'bump> BumpTypes for BumpRef<'bump> {
+    type BumpRef = &'bump Bump;
 }
