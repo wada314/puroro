@@ -198,8 +198,6 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<::puroro::BumpRc>>;
-
     impl<BT> MsgBumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -417,13 +415,6 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
-    where
-        T: MsgTrait,
-    {
-        msg_delegate!(T);
-    }
-
-    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
     where
         T: MsgTrait,
     {

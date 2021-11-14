@@ -17,7 +17,6 @@ pub mod from_iter;
 use self::from_iter::ScopedIter;
 use crate::internal::types::FieldData;
 use crate::Result;
-use ::std::ops::DerefMut;
 
 pub trait DeserMessageFromBytesIter {
     fn deser_field<I>(
@@ -87,20 +86,5 @@ where
     {
         self.get_or_insert_with(Default::default)
             .deser_field(field_number, data)
-    }
-}
-impl<T> DeserMessageFromBytesIter for crate::BumpaloOwned<T>
-where
-    T: DeserMessageFromBytesIter,
-{
-    fn deser_field<I>(
-        &mut self,
-        field_number: i32,
-        data: FieldData<&mut ScopedIter<I>>,
-    ) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-    {
-        self.deref_mut().deser_field(field_number, data)
     }
 }

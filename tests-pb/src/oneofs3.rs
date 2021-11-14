@@ -941,8 +941,6 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<::puroro::BumpRc>>;
-
     impl<BT> MsgBumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -1409,8 +1407,6 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef,
     }
 
-    pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<::puroro::BumpRc>>;
-
     impl<BT> SubmsgBumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -1767,13 +1763,6 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-
-    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
-    where
-        T: MsgTrait,
-    {
-        msg_delegate!(T);
-    }
     impl MsgTrait for () {
         type Field5MessageType<'this>
         where
@@ -2055,13 +2044,6 @@ pub mod _puroro_traits {
     {
         submsg_delegate!(T);
     }
-
-    impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
-    where
-        T: SubmsgTrait,
-    {
-        submsg_delegate!(T);
-    }
     impl SubmsgTrait for () {}
     impl<T, U> SubmsgTrait for (T, U)
     where
@@ -2237,20 +2219,6 @@ pub mod _puroro_nested {
             }
             impl<'msg, 'bump, IsOwned, T> ::std::convert::From<GroupTwo<'msg, IsOwned, T>>
                 for GroupTwo<'msg, IsOwned, ::puroro::bumpalo::boxed::Box<'bump, T>>
-            where
-                IsOwned: ::puroro::internal::bool::BoolType,
-                T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
-            {
-                fn from(value: GroupTwo<'msg, IsOwned, T>) -> Self {
-                    match value {
-                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
-                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
-                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
-                    }
-                }
-            }
-            impl<'msg, 'bump, IsOwned, T> ::std::convert::From<GroupTwo<'msg, IsOwned, T>>
-                for GroupTwo<'msg, IsOwned, ::puroro::BumpaloOwned<T>>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
                 T: 'msg + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,

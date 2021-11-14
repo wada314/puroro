@@ -390,8 +390,6 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef,
     }
 
-    pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<::puroro::BumpRc>>;
-
     impl<BT> Test1Bumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -610,8 +608,6 @@ pub mod _puroro_impls {
 
         _bump: BT::BumpRef,
     }
-
-    pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<::puroro::BumpRc>>;
 
     impl<BT> Test2Bumpalo<BT>
     where
@@ -845,8 +841,6 @@ pub mod _puroro_impls {
 
         _bump: BT::BumpRef,
     }
-
-    pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<::puroro::BumpRc>>;
 
     impl<BT> Test3Bumpalo<BT>
     where
@@ -1091,8 +1085,6 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef,
     }
 
-    pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<::puroro::BumpRc>>;
-
     impl<BT> Test4Bumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -1284,13 +1276,6 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
-
-    impl<T> Test1Trait for ::puroro::BumpaloOwned<T>
-    where
-        T: Test1Trait,
-    {
-        test1_delegate!(T);
-    }
     impl Test1Trait for () {}
     impl<T, U> Test1Trait for (T, U)
     where
@@ -1365,13 +1350,6 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> Test2Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
-    where
-        T: Test2Trait,
-    {
-        test2_delegate!(T);
-    }
-
-    impl<T> Test2Trait for ::puroro::BumpaloOwned<T>
     where
         T: Test2Trait,
     {
@@ -1457,13 +1435,6 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> Test3Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
-    where
-        T: Test3Trait,
-    {
-        test3_delegate!(T);
-    }
-
-    impl<T> Test3Trait for ::puroro::BumpaloOwned<T>
     where
         T: Test3Trait,
     {
@@ -1573,13 +1544,6 @@ pub mod _puroro_traits {
     }
 
     impl<'bump, T> Test4Trait for ::puroro::bumpalo::boxed::Box<'bump, T>
-    where
-        T: Test4Trait,
-    {
-        test4_delegate!(T);
-    }
-
-    impl<T> Test4Trait for ::puroro::BumpaloOwned<T>
     where
         T: Test4Trait,
     {

@@ -22,8 +22,6 @@ where
     _bump: BT::BumpRef,
 }
 
-pub type {{ m.bumpalo_owned_ident }} = ::puroro::BumpaloOwned<{{ m.bumpalo_ident }}<::puroro::BumpRc>>;
-
 impl<BT> {{ m.bumpalo_ident }}<BT> 
 where
     BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,

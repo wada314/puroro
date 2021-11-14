@@ -1679,8 +1679,6 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef,
     }
 
-    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<::puroro::BumpRc>>;
-
     impl<BT> MsgBumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -2483,13 +2481,6 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-
-    impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
-    where
-        T: MsgTrait,
-    {
-        msg_delegate!(T);
-    }
     impl MsgTrait for () {
         type Field2RepeatedType<'this>
         where
@@ -3122,8 +3113,6 @@ pub mod _puroro_nested {
                 _bump: BT::BumpRef,
             }
 
-            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<::puroro::BumpRc>>;
-
             impl<BT> SubmsgBumpalo<BT>
             where
                 BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -3324,13 +3313,6 @@ pub mod _puroro_nested {
             }
 
             impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
-            where
-                T: SubmsgTrait,
-            {
-                submsg_delegate!(T);
-            }
-
-            impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
             where
                 T: SubmsgTrait,
             {
