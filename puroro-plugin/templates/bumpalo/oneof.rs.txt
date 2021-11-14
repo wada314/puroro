@@ -12,21 +12,3 @@ impl<'bump> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<'bump> {
         Self::_None(::std::marker::PhantomData)
     }
 }
-
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ oneof.bumpalo_enum_ident }}<'bump> {
-    fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        match self {
-            Self::_None(_) => Self::_None(::std::marker::PhantomData),
-
-            {%- for field in oneof.fields %}
-            Self::{{ field.ident }}(x) => Self::{{ field.ident }}(
-                {%- if field.is_length_delimited %}
-                ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump)
-                {%- else %}
-                x.clone()
-                {%- endif %}
-            ),
-            {%- endfor %}
-        }
-    }
-}

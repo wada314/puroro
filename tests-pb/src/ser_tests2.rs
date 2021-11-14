@@ -2025,59 +2025,6 @@ pub mod _puroro_impls {
                 && true
         }
     }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.i32_optional,
-                    bump,
-                ),
-                i32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.i32_repeated,
-                    bump,
-                ),
-                float_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.float_optional,
-                    bump,
-                ),
-                float_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.float_repeated,
-                    bump,
-                ),
-                string_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.string_optional,
-                    bump,
-                ),
-                string_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.string_repeated,
-                    bump,
-                ),
-                submsg_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.submsg_optional,
-                    bump,
-                ),
-                submsg_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.submsg_repeated,
-                    bump,
-                ),
-                enum_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.enum_optional,
-                    bump,
-                ),
-                enum_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.enum_repeated,
-                    bump,
-                ),
-                very_large_field_number: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.very_large_field_number,
-                    bump,
-                ),
-            }
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -2975,12 +2922,6 @@ impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Enum {
         ::std::default::Default::default()
     }
 }
-
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Enum {
-    fn clone_in(&self, _: &'bump ::puroro::bumpalo::Bump) -> Self {
-        ::std::clone::Clone::clone(self)
-    }
-}
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     pub mod msg {
@@ -3239,19 +3180,6 @@ pub mod _puroro_nested {
                     ::std::ptr::eq(self._bump, rhs._bump)
                         && self.i32_optional == rhs.i32_optional
                         && true
-                }
-            }
-
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for SubmsgBumpalo<'bump> {
-                fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-                    Self {
-                        _bump: bump,
-                        _bitfield: self._bitfield,
-                        i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                            &self.i32_optional,
-                            bump,
-                        ),
-                    }
                 }
             }
             pub struct SubmsgBuilder<T>(T);

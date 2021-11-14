@@ -291,19 +291,6 @@ pub mod _puroro_impls {
                 && true
         }
     }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                recursive_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.recursive_unlabeled,
-                    bump,
-                ),
-            }
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>

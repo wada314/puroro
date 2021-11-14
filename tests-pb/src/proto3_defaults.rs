@@ -986,39 +986,6 @@ pub mod _puroro_impls {
                 && true
         }
     }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.i32_unlabeled,
-                    bump,
-                ),
-                i32_optional: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.i32_optional,
-                    bump,
-                ),
-                i32_repeated: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.i32_repeated,
-                    bump,
-                ),
-                f32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.f32_unlabeled,
-                    bump,
-                ),
-                string_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.string_unlabeled,
-                    bump,
-                ),
-                submsg_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.submsg_unlabeled,
-                    bump,
-                ),
-            }
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -1303,19 +1270,6 @@ pub mod _puroro_impls {
     impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.i32_unlabeled == rhs.i32_unlabeled && true
-        }
-    }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for SubmsgBumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.i32_unlabeled,
-                    bump,
-                ),
-            }
         }
     }
     pub struct SubmsgBuilder<T>(T);

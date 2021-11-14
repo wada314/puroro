@@ -206,20 +206,3 @@ impl<'bump> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<'bump> {
             true
     }
 }
-
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for {{ m.bumpalo_ident }}<'bump> {
-    fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        Self { 
-            _bump: bump,
-            _bitfield: self._bitfield,
-            {%- for field in m.fields %}
-            {%- if !field.is_explicit_oneof_field %}
-            {{ field.ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ field.ident }}, bump),
-            {%- endif %}
-            {%- endfor %} {#- for field in m.fields #}
-            {%- for oneof in m.oneofs %}
-            {{ oneof.field_ident }}: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.{{ oneof.field_ident }}, bump),
-            {%- endfor %}
-        }
-    }
-}
