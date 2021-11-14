@@ -251,19 +251,6 @@ pub mod _puroro_impls {
             ::std::ptr::eq(self._bump, rhs._bump) && self.r#type == rhs.r#type && true
         }
     }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                r#type: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.r#type,
-                    bump,
-                ),
-            }
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>

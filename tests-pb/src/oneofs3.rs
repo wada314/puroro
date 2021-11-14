@@ -1212,27 +1212,6 @@ pub mod _puroro_impls {
                 && true
         }
     }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for MsgBumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                group_one: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.group_one,
-                    bump,
-                ),
-                group_two: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.group_two,
-                    bump,
-                ),
-                group_three: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.group_three,
-                    bump,
-                ),
-            }
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -1486,19 +1465,6 @@ pub mod _puroro_impls {
     impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.i32_unlabeled == rhs.i32_unlabeled && true
-        }
-    }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for SubmsgBumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                i32_unlabeled: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(
-                    &self.i32_unlabeled,
-                    bump,
-                ),
-            }
         }
     }
     pub struct SubmsgBuilder<T>(T);
@@ -2282,18 +2248,6 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupOne<'bump> {
-                fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-                    match self {
-                        Self::_None(_) => Self::_None(::std::marker::PhantomData),
-                        Self::G1Int32(x) => Self::G1Int32(x.clone()),
-                        Self::G1String(x) => Self::G1String(
-                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
-                        ),
-                    }
-                }
-            }
-
             #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub(crate) enum GroupTwo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
@@ -2313,21 +2267,6 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupTwo<'bump> {
-                fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-                    match self {
-                        Self::_None(_) => Self::_None(::std::marker::PhantomData),
-                        Self::G2F32(x) => Self::G2F32(x.clone()),
-                        Self::G2String(x) => Self::G2String(
-                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
-                        ),
-                        Self::G2Submsg(x) => Self::G2Submsg(
-                            ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(x, bump),
-                        ),
-                    }
-                }
-            }
-
             #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub(crate) enum GroupThree<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
@@ -2337,15 +2276,6 @@ pub mod _puroro_nested {
             impl<'bump> ::std::default::Default for GroupThree<'bump> {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
-                }
-            }
-
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for GroupThree<'bump> {
-                fn clone_in(&self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-                    match self {
-                        Self::_None(_) => Self::_None(::std::marker::PhantomData),
-                        Self::G3Int32(x) => Self::G3Int32(x.clone()),
-                    }
                 }
             }
         }

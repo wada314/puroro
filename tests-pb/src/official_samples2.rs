@@ -472,16 +472,6 @@ pub mod _puroro_impls {
             ::std::ptr::eq(self._bump, rhs._bump) && self.a == rhs.a && true
         }
     }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test1Bumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                a: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.a, bump),
-            }
-        }
-    }
     pub struct Test1Builder<T>(T);
 
     impl<T> Test1Builder<T>
@@ -671,16 +661,6 @@ pub mod _puroro_impls {
     impl<'bump> ::std::cmp::PartialEq for Test2Bumpalo<'bump> {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.b == rhs.b && true
-        }
-    }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test2Bumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                b: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.b, bump),
-            }
         }
     }
     pub struct Test2Builder<T>(T);
@@ -897,16 +877,6 @@ pub mod _puroro_impls {
             ::std::ptr::eq(self._bump, rhs._bump) && self.c == rhs.c && true
         }
     }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test3Bumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                c: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.c, bump),
-            }
-        }
-    }
     pub struct Test3Builder<T>(T);
 
     impl<T> Test3Builder<T>
@@ -1108,16 +1078,6 @@ pub mod _puroro_impls {
     impl<'bump> ::std::cmp::PartialEq for Test4Bumpalo<'bump> {
         fn eq(&self, rhs: &Self) -> bool {
             ::std::ptr::eq(self._bump, rhs._bump) && self.d == rhs.d && true
-        }
-    }
-
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloClone<'bump> for Test4Bumpalo<'bump> {
-        fn clone_in(&self, bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-            Self {
-                _bump: bump,
-                _bitfield: self._bitfield,
-                d: ::puroro::internal::impls::bumpalo::BumpaloClone::clone_in(&self.d, bump),
-            }
         }
     }
     pub struct Test4Builder<T>(T);
