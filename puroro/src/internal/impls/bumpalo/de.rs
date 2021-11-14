@@ -127,7 +127,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &<BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<String<'bump>>,
@@ -160,7 +160,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &<BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<Vec<'bump, u8>>,
@@ -193,7 +193,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &<BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<M>,
@@ -201,7 +201,7 @@ where
         M: BumpaloMessage<'bump, BumpTypes = BT>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
-            let msg = field.get_or_insert_with(|| BumpaloMessage::new_in(bump.clone()));
+            let msg = field.get_or_insert_with(|| BumpaloMessage::new_in(bump));
             deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
