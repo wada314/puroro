@@ -13,11 +13,10 @@
 // limitations under the License.
 
 use ::puroro::bumpalo::Bump;
-use ::puroro::{BumpBox, BumpRc, BumpRef, Message};
+use ::puroro::Message as _;
 use ::std::io::Read;
 use ::std::rc::Rc;
 use ::tests_pb::official_samples3::*;
-use puroro::BumpaloMessage;
 
 fn is_test1_trait<T: Test1Trait>(t: &T) -> bool {
     true
