@@ -26,11 +26,11 @@ fn is_test1_trait<T: Test1Trait>(t: &T) -> bool {
 #[test]
 fn test_ref() {
     let bump = Bump::new();
-    let mut t1 = Test1Bumpalo::<BumpRef>::new_in(&bump);
+    let mut t1 = Test1BumpaloRef::new_in(&bump);
     t1.merge_from_bytes([0x08, 0x01].bytes());
     assert_eq!(1, t1.a());
 
-    let mut t3 = Test3Bumpalo::<BumpRef>::new_in(&bump);
+    let mut t3 = Test3BumpaloRef::new_in(&bump);
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
@@ -40,11 +40,11 @@ fn test_ref() {
 #[test]
 fn test_rc() {
     let bump_rc = Rc::new(Bump::new());
-    let mut t1 = Test1Bumpalo::<BumpRc>::new_in(bump_rc.clone());
+    let mut t1 = Test1BumpaloRc::new_in(bump_rc.clone());
     t1.merge_from_bytes([0x08, 0x01].bytes());
     assert_eq!(1, t1.a());
 
-    let mut t3 = Test3Bumpalo::<BumpRc>::new_in(bump_rc.clone());
+    let mut t3 = Test3BumpaloRc::new_in(bump_rc.clone());
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
@@ -56,15 +56,15 @@ fn test_rc() {
 #[test]
 fn test_box() {
     let bump_box = Box::new(Bump::new());
-    let mut t1 = Test1Bumpalo::<BumpBox>::new_in(bump_box);
+    let mut t1 = Test1BumpaloBox::new_in(bump_box);
     t1.merge_from_bytes([0x08, 0x01].bytes());
     assert_eq!(1, t1.a());
 
     let bump_box = Box::new(Bump::new());
-    let mut t3 = Test3Bumpalo::<BumpBox>::new_in(bump_box);
+    let mut t3 = Test3BumpaloBox::new_in(bump_box);
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
-    let t1: &Test1Bumpalo<BumpRef> = t3.c().unwrap();
+    let t1: &Test1BumpaloRef = t3.c().unwrap();
 
     assert!(is_test1_trait(&t1));
 }
@@ -72,7 +72,7 @@ fn test_box() {
 /// ```compile_fail
 /// let bump_boxed = Box::new(Bump::new());
 /// let t1 = {
-///     let mut t3 = Test3Bumpalo::<BumpBox>::new_in(bump_boxed);
+///     let mut t3 = Test3BumpaloBox::new_in(bump_boxed);
 ///     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
 ///     assert_eq!(1, t3.c().a());
 ///     t3.c()

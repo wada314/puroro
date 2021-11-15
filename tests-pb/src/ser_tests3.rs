@@ -1701,6 +1701,11 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef<'static>,
     }
 
+    pub type MsgBumpaloRef = MsgBumpalo<::puroro::BumpRef>;
+    pub type MsgBumpaloRc = MsgBumpalo<::puroro::BumpRc>;
+    pub type MsgBumpaloArc = MsgBumpalo<::puroro::BumpArc>;
+    pub type MsgBumpaloBox = MsgBumpalo<::puroro::BumpBox>;
+
     impl<BT> MsgBumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -3116,6 +3121,11 @@ pub mod _puroro_nested {
 
                 _bump: BT::BumpRef<'static>,
             }
+
+            pub type SubmsgBumpaloRef = SubmsgBumpalo<::puroro::BumpRef>;
+            pub type SubmsgBumpaloRc = SubmsgBumpalo<::puroro::BumpRc>;
+            pub type SubmsgBumpaloArc = SubmsgBumpalo<::puroro::BumpArc>;
+            pub type SubmsgBumpaloBox = SubmsgBumpalo<::puroro::BumpBox>;
 
             impl<BT> SubmsgBumpalo<BT>
             where

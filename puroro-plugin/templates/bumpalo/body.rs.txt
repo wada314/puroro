@@ -22,6 +22,11 @@ where
     _bump: BT::BumpRef<'static>,
 }
 
+pub type {{ m.bumpalo_ident }}Ref = {{ m.bumpalo_ident }}<::puroro::BumpRef>;
+pub type {{ m.bumpalo_ident }}Rc = {{ m.bumpalo_ident }}<::puroro::BumpRc>;
+pub type {{ m.bumpalo_ident }}Arc = {{ m.bumpalo_ident }}<::puroro::BumpArc>;
+pub type {{ m.bumpalo_ident }}Box = {{ m.bumpalo_ident }}<::puroro::BumpBox>;
+
 impl<BT> {{ m.bumpalo_ident }}<BT> 
 where
     BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,

@@ -390,6 +390,11 @@ pub mod _puroro_impls {
         _bump: BT::BumpRef<'static>,
     }
 
+    pub type Test1BumpaloRef = Test1Bumpalo<::puroro::BumpRef>;
+    pub type Test1BumpaloRc = Test1Bumpalo<::puroro::BumpRc>;
+    pub type Test1BumpaloArc = Test1Bumpalo<::puroro::BumpArc>;
+    pub type Test1BumpaloBox = Test1Bumpalo<::puroro::BumpBox>;
+
     impl<BT> Test1Bumpalo<BT>
     where
         BT: 'static + ::puroro::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -610,6 +615,11 @@ pub mod _puroro_impls {
 
         _bump: BT::BumpRef<'static>,
     }
+
+    pub type Test2BumpaloRef = Test2Bumpalo<::puroro::BumpRef>;
+    pub type Test2BumpaloRc = Test2Bumpalo<::puroro::BumpRc>;
+    pub type Test2BumpaloArc = Test2Bumpalo<::puroro::BumpArc>;
+    pub type Test2BumpaloBox = Test2Bumpalo<::puroro::BumpBox>;
 
     impl<BT> Test2Bumpalo<BT>
     where
@@ -847,6 +857,11 @@ pub mod _puroro_impls {
 
         _bump: BT::BumpRef<'static>,
     }
+
+    pub type Test3BumpaloRef = Test3Bumpalo<::puroro::BumpRef>;
+    pub type Test3BumpaloRc = Test3Bumpalo<::puroro::BumpRc>;
+    pub type Test3BumpaloArc = Test3Bumpalo<::puroro::BumpArc>;
+    pub type Test3BumpaloBox = Test3Bumpalo<::puroro::BumpBox>;
 
     impl<BT> Test3Bumpalo<BT>
     where
@@ -1096,6 +1111,11 @@ pub mod _puroro_impls {
 
         _bump: BT::BumpRef<'static>,
     }
+
+    pub type Test4BumpaloRef = Test4Bumpalo<::puroro::BumpRef>;
+    pub type Test4BumpaloRc = Test4Bumpalo<::puroro::BumpRc>;
+    pub type Test4BumpaloArc = Test4Bumpalo<::puroro::BumpArc>;
+    pub type Test4BumpaloBox = Test4Bumpalo<::puroro::BumpBox>;
 
     impl<BT> Test4Bumpalo<BT>
     where

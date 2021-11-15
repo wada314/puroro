@@ -23,6 +23,7 @@ use ::std::fmt::Debug;
 use ::std::io::Write;
 use ::std::ops::Deref;
 use ::std::rc::Rc;
+use ::std::sync::Arc;
 
 /// A common trait for protobuf message implementation in Rust.
 pub trait Message<M> {
@@ -182,6 +183,24 @@ pub trait BumpTypes {
 pub struct BumpRc;
 impl BumpTypes for BumpRc {
     type BumpRef<'bump> = Rc<Bump>;
+    unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
+        input: Self::BumpRef<'short>,
+    ) -> Self::BumpRef<'long> {
+        input // as-is
+    }
+    type ChildsBumpTypes = Self;
+    fn make_bump_for_child<'bump>(
+        bump_parent: &'bump Self::BumpRef<'bump>,
+    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+        bump_parent.clone()
+    }
+}
+
+/// Use `Arc<Bump>` to point the `Bump`. Same for the children.
+#[derive(PartialEq, Debug)]
+pub struct BumpArc;
+impl BumpTypes for BumpArc {
+    type BumpRef<'bump> = Arc<Bump>;
     unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
         input: Self::BumpRef<'short>,
     ) -> Self::BumpRef<'long> {
