@@ -33,6 +33,12 @@ fn test_ref() {
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
+    // Bad case...
+    let t1 = {
+        let bump = Bump::new();
+        Test1BumpaloRef::new_in(&bump)
+    };
+
     assert!(is_test1_trait(&t1));
 }
 
