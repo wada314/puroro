@@ -381,7 +381,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test1Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -401,7 +401,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> Test1Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -422,7 +422,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump, BT> where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
@@ -432,7 +432,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump>
         for Test1Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -451,7 +451,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -467,7 +467,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::puroro::internal::de::DeserMessageFromBytesIter for Test1Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -500,7 +500,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::se::SerMessageToIoWrite for Test1Bumpalo<'bump, BT>
     where
         Self: super::_puroro_traits::Test1Trait,
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -523,7 +523,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::std::cmp::PartialEq for Test1Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -636,7 +636,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test2Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -656,7 +656,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> Test2Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -677,7 +677,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump, BT> where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
@@ -687,7 +687,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump>
         for Test2Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -706,7 +706,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -722,7 +722,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::puroro::internal::de::DeserMessageFromBytesIter for Test2Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -755,7 +755,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::se::SerMessageToIoWrite for Test2Bumpalo<'bump, BT>
     where
         Self: super::_puroro_traits::Test2Trait,
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -778,7 +778,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::std::cmp::PartialEq for Test2Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -900,7 +900,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -928,7 +928,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> Test3Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -949,7 +949,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump, BT> where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
@@ -959,7 +959,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump>
         for Test3Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -978,7 +978,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> super::_puroro_traits::Test3Trait for Test3Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -997,7 +997,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::puroro::internal::de::DeserMessageFromBytesIter for Test3Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1037,7 +1037,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::se::SerMessageToIoWrite for Test3Bumpalo<'bump, BT>
     where
         Self: super::_puroro_traits::Test3Trait,
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1064,7 +1064,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::std::cmp::PartialEq for Test3Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1193,7 +1193,7 @@ pub mod _puroro_impls {
     #[derive(::std::fmt::Debug)]
     pub struct Test4Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1213,7 +1213,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> Test4Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1234,7 +1234,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump, BT> where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
@@ -1244,7 +1244,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump>
         for Test4Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1263,7 +1263,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> super::_puroro_traits::Test4Trait for Test4Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1280,7 +1280,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::puroro::internal::de::DeserMessageFromBytesIter for Test4Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1312,7 +1312,7 @@ pub mod _puroro_impls {
     impl<'bump, BT> ::puroro::internal::se::SerMessageToIoWrite for Test4Bumpalo<'bump, BT>
     where
         Self: super::_puroro_traits::Test4Trait,
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
@@ -1331,7 +1331,7 @@ pub mod _puroro_impls {
 
     impl<'bump, BT> ::std::cmp::PartialEq for Test4Bumpalo<'bump, BT>
     where
-        BT: 'static
+        BT: 'bump
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
