@@ -738,7 +738,7 @@ impl Field {
             FieldType::Bytes => format!("::puroro::bumpalo::collections::Vec<{}, u8>", bump_lt),
             FieldType::Message(m) => {
                 let bumpalo_message_type =
-                    upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"]);
+                    upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"]);
                 format!(
                     "::puroro::bumpalo::boxed::Box<{lt}, {ty}>",
                     lt = bump_lt,
@@ -818,7 +818,7 @@ impl Field {
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {
-                upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
+                upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
             }
             t => t.numerical_rust_type()?.to_string(),
         })

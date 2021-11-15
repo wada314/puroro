@@ -217,7 +217,7 @@ impl Field {
             };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"]))
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"]))
             } else {
                 None
             };
@@ -287,18 +287,20 @@ impl Field {
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
             bumpalo_scalar_field_type: f.bumpalo_scalar_field_type("'this")?,
-            bumpalo_static_field_type: f.bumpalo_field_type("'static")?,
+            bumpalo_static_field_type: f.bumpalo_field_type("'bump")?,
             bumpalo_maybe_field_message_path,
-            bumpalo_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["BT::ChildsBumpTypes"])?,
+            bumpalo_maybe_borrowed_field_type: f.maybe_trait_scalar_getter_type_borrowed(
+                "Bumpalo",
+                &["'bump", "BT::ChildsBumpTypes"],
+            )?,
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
+                        msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                     } else {
                         format!(
-                            "::puroro::bumpalo::boxed::Box<'static, {}>",
-                            msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
+                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                         )
                     },
                 )
@@ -447,15 +449,15 @@ impl OneofField {
                     },
                 )
             })?,
-            bumpalo_static_field_type: f.bumpalo_oneof_field_type("'static")?,
+            bumpalo_static_field_type: f.bumpalo_oneof_field_type("'bump")?,
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
+                        msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                     } else {
                         format!(
-                            "::puroro::bumpalo::boxed::Box<'static, {}>",
-                            msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes"])
+                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                         )
                     },
                 )

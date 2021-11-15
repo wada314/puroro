@@ -182,7 +182,7 @@ pub mod _puroro_impls {
         }
     }
     #[derive(::std::fmt::Debug)]
-    pub struct MsgBumpalo<BT>
+    pub struct MsgBumpalo<'bump, BT>
     where
         BT: 'static
             + ::puroro::internal::impls::bumpalo::BumpTypes
@@ -193,27 +193,30 @@ pub mod _puroro_impls {
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         recursive_unlabeled: ::std::option::Option<
             ::puroro::bumpalo::boxed::Box<
-                'static,
-                self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT::ChildsBumpTypes>,
+                'bump,
+                self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<
+                    'bump,
+                    BT::ChildsBumpTypes,
+                >,
             >,
         >,
 
-        _bump: BT::BumpRef<'static>,
+        _bump: BT::BumpRef<'bump>,
     }
 
-    pub type MsgBumpaloRef = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRef>;
-    pub type MsgBumpaloRc = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRc>;
-    pub type MsgBumpaloArc = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpArc>;
-    pub type MsgBumpaloBox = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpBox>;
+    pub type MsgBumpaloRef<'bump> = MsgBumpalo<'bump, ::puroro::internal::impls::bumpalo::BumpRef>;
+    pub type MsgBumpaloRc = MsgBumpalo<'static, ::puroro::internal::impls::bumpalo::BumpRc>;
+    pub type MsgBumpaloArc = MsgBumpalo<'static, ::puroro::internal::impls::bumpalo::BumpArc>;
+    pub type MsgBumpaloBox = MsgBumpalo<'static, ::puroro::internal::impls::bumpalo::BumpBox>;
 
-    impl<BT> MsgBumpalo<BT>
+    impl<'bump, BT> MsgBumpalo<'bump, BT>
     where
         BT: 'static
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        pub fn new_in<'bump>(
+        pub fn new_in(
             bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>,
         ) -> Self {
             #[allow(unused)]
@@ -228,7 +231,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
+    impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump, BT> where
         BT: 'static
             + ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
@@ -236,7 +239,7 @@ pub mod _puroro_impls {
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for MsgBumpalo<BT>
+    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for MsgBumpalo<'bump, BT>
     where
         BT: 'static
             + ::puroro::internal::impls::bumpalo::BumpTypes
@@ -255,7 +258,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<BT> super::_puroro_traits::MsgTrait for MsgBumpalo<BT>
+    impl<'bump, BT> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump, BT>
     where
         BT: 'static
             + ::puroro::internal::impls::bumpalo::BumpTypes
@@ -265,13 +268,16 @@ pub mod _puroro_impls {
         type Field1MessageType<'this>
         where
             Self: 'this,
-        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<BT::ChildsBumpTypes>;
+        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<
+            'bump,
+            BT::ChildsBumpTypes,
+        >;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|b| b.as_ref())
         }
     }
 
-    impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
+    impl<'bump, BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump, BT>
     where
         BT: 'static
             + ::puroro::internal::impls::bumpalo::BumpTypes
@@ -295,8 +301,9 @@ pub mod _puroro_impls {
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
                         ::puroro::bumpalo::boxed::Box<
-                            'static,
+                            'bump,
                             self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<
+                                'bump,
                                 BT::ChildsBumpTypes,
                             >,
                         >,
@@ -309,7 +316,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<BT> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<BT>
+    impl<'bump, BT> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump, BT>
     where
         Self: super::_puroro_traits::MsgTrait,
         BT: 'static
@@ -337,7 +344,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<BT> ::std::cmp::PartialEq for MsgBumpalo<BT>
+    impl<'bump, BT> ::std::cmp::PartialEq for MsgBumpalo<'bump, BT>
     where
         BT: 'static
             + ::puroro::internal::impls::bumpalo::BumpTypes

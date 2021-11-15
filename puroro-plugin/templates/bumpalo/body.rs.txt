@@ -1,5 +1,5 @@
 #[derive(::std::fmt::Debug)]
-pub struct {{ m.bumpalo_ident }}<BT>
+pub struct {{ m.bumpalo_ident }}<'bump, BT>
 where
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
@@ -16,22 +16,22 @@ where
 
     {%- for oneof in m.oneofs %}
     {{ oneof.field_ident }}: 
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }}<BT>,
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }}<'bump, BT>,
     {%- endfor %}
-    
-    _bump: BT::BumpRef<'static>,
+
+    _bump: BT::BumpRef<'bump>,
 }
 
-pub type {{ m.bumpalo_ident }}Ref = {{ m.bumpalo_ident }}<::puroro::internal::impls::bumpalo::BumpRef>;
-pub type {{ m.bumpalo_ident }}Rc = {{ m.bumpalo_ident }}<::puroro::internal::impls::bumpalo::BumpRc>;
-pub type {{ m.bumpalo_ident }}Arc = {{ m.bumpalo_ident }}<::puroro::internal::impls::bumpalo::BumpArc>;
-pub type {{ m.bumpalo_ident }}Box = {{ m.bumpalo_ident }}<::puroro::internal::impls::bumpalo::BumpBox>;
+pub type {{ m.bumpalo_ident }}Ref<'bump> = {{ m.bumpalo_ident }}<'bump, ::puroro::internal::impls::bumpalo::BumpRef>;
+pub type {{ m.bumpalo_ident }}Rc = {{ m.bumpalo_ident }}<'static, ::puroro::internal::impls::bumpalo::BumpRc>;
+pub type {{ m.bumpalo_ident }}Arc = {{ m.bumpalo_ident }}<'static, ::puroro::internal::impls::bumpalo::BumpArc>;
+pub type {{ m.bumpalo_ident }}Box = {{ m.bumpalo_ident }}<'static, ::puroro::internal::impls::bumpalo::BumpBox>;
 
-impl<BT> {{ m.bumpalo_ident }}<BT> 
+impl<'bump, BT> {{ m.bumpalo_ident }}<'bump, BT> 
 where
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
-    pub fn new_in<'bump>(bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>) -> Self {
+    pub fn new_in(bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>) -> Self {
         #[allow(unused)]
         let bump_static_ref: &'static ::puroro::bumpalo::Bump = unsafe {
             ::std::mem::transmute(
@@ -72,12 +72,12 @@ where
     }
 }
 
-impl<BT> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<BT> 
+impl<'bump, BT> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump, BT> 
 where
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {}
 
-impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for {{ m.bumpalo_ident }}<BT> 
+impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for {{ m.bumpalo_ident }}<'bump, BT> 
 where
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
@@ -92,7 +92,7 @@ where
     }
 }
 
-impl<BT> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}<BT> 
+impl<'bump, BT> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}<'bump, BT> 
 where
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
@@ -131,7 +131,7 @@ where
     {%- endfor %}
 }
 
-impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_ident }}<BT> 
+impl<'bump, BT> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_ident }}<'bump, BT> 
 where
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
@@ -193,7 +193,7 @@ where
     }
 }
 
-impl<BT> ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}<BT>
+impl<'bump, BT> ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}<'bump, BT>
 where
     Self: super::_puroro_traits::{{ m.ident }}Trait,
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
@@ -225,7 +225,7 @@ where
     }
 }
 
-impl<BT> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<BT> 
+impl<'bump, BT> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<'bump, BT> 
 where
     BT: 'static + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
