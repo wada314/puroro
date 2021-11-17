@@ -15,23 +15,14 @@
 use ::itertools::Itertools;
 use ::std::borrow::Cow;
 use ::std::ops::Deref;
-use ::tests_pb::full_coverage3::msg::{Submsg, SubmsgTrait as _};
-use ::tests_pb::full_coverage3::{Msg, MsgTrait as _};
+use ::tests_pb::full_coverage3::msg::{Submsg, SubmsgBuilder, SubmsgTrait as _};
+use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait as _};
 
 #[test]
 fn test_get_i32_optional_field() {
-    let none = Msg {
-        i32_optional: None,
-        ..Default::default()
-    };
-    let some_3 = Msg {
-        i32_optional: Some(3),
-        ..Default::default()
-    };
-    let some_7 = Msg {
-        i32_optional: Some(7),
-        ..Default::default()
-    };
+    let none = Msg::default();
+    let some_3 = MsgBuilder::new().append_i32_optional(3).build();
+    let some_7 = MsgBuilder::new().append_i32_optional(7).build();
     assert!(!(&none, &none).has_i32_optional());
     assert_eq!(3, (&none, &some_3).i32_optional());
     assert_eq!(3, (&some_3, &none).i32_optional());
@@ -40,18 +31,9 @@ fn test_get_i32_optional_field() {
 
 #[test]
 fn test_get_i32_unlabeled_field() {
-    let msg_0 = Msg {
-        i32_unlabeled: 0,
-        ..Default::default()
-    };
-    let msg_3 = Msg {
-        i32_unlabeled: 3,
-        ..Default::default()
-    };
-    let msg_7 = Msg {
-        i32_unlabeled: 7,
-        ..Default::default()
-    };
+    let msg_0 = Msg::default();
+    let msg_3 = MsgBuilder::new().append_i32_unlabeled(3).build();
+    let msg_7 = MsgBuilder::new().append_i32_unlabeled(7).build();
     assert!(!(&msg_0, &msg_0).has_i32_unlabeled());
     assert_eq!(3, (&msg_0, &msg_3).i32_unlabeled());
     assert_eq!(3, (&msg_3, &msg_0).i32_unlabeled());
@@ -60,18 +42,9 @@ fn test_get_i32_unlabeled_field() {
 
 #[test]
 fn test_get_i32_repeated_field() {
-    let empty = Msg {
-        i32_repeated: vec![],
-        ..Default::default()
-    };
-    let msg_1 = Msg {
-        i32_repeated: vec![1],
-        ..Default::default()
-    };
-    let msg_3_5 = Msg {
-        i32_repeated: vec![3, 5],
-        ..Default::default()
-    };
+    let empty = Msg::default();
+    let msg_1 = MsgBuilder::new().append_i32_repeated(vec![1]).build();
+    let msg_3_5 = MsgBuilder::new().append_i32_repeated(vec![3, 5]).build();
     assert_eq!(
         vec![] as Vec<i32>,
         (&empty, &empty).i32_repeated().into_iter().collect_vec()
@@ -92,26 +65,15 @@ fn test_get_i32_repeated_field() {
 
 #[test]
 fn test_get_msg_optional_field() {
-    let submsg_3 = Submsg {
-        i32_unlabeled: 3,
-        ..Default::default()
-    };
-    let submsg_7 = Submsg {
-        i32_unlabeled: 7,
-        ..Default::default()
-    };
-    let none = Msg {
-        submsg_optional: None,
-        ..Default::default()
-    };
-    let msg_3 = Msg {
-        submsg_optional: Some(Box::new(submsg_3.clone())),
-        ..Default::default()
-    };
-    let msg_7 = Msg {
-        submsg_optional: Some(Box::new(submsg_7.clone())),
-        ..Default::default()
-    };
+    let submsg_3 = SubmsgBuilder::new().append_i32_unlabeled(3).build();
+    let submsg_7 = SubmsgBuilder::new().append_i32_unlabeled(7).build();
+    let none = Msg::default();
+    let msg_3 = MsgBuilder::new()
+        .append_submsg_optional(submsg_3.clone())
+        .build();
+    let msg_7 = MsgBuilder::new()
+        .append_submsg_optional(submsg_7.clone())
+        .build();
     assert!(!(&none, &none).has_submsg_optional());
     assert_eq!(3, (&msg_3, &none).submsg_optional().i32_unlabeled());
     assert_eq!(3, (&none, &msg_3).submsg_optional().i32_unlabeled());
@@ -120,26 +82,15 @@ fn test_get_msg_optional_field() {
 
 #[test]
 fn test_get_msg_repeated_field() {
-    let submsg_3 = Submsg {
-        i32_unlabeled: 3,
-        ..Default::default()
-    };
-    let submsg_7 = Submsg {
-        i32_unlabeled: 7,
-        ..Default::default()
-    };
-    let empty = Msg {
-        submsg_repeated: vec![],
-        ..Default::default()
-    };
-    let msg_3 = Msg {
-        submsg_repeated: vec![submsg_3.clone()],
-        ..Default::default()
-    };
-    let msg_7_7 = Msg {
-        submsg_repeated: vec![submsg_7.clone(), submsg_7.clone()],
-        ..Default::default()
-    };
+    let submsg_3 = SubmsgBuilder::new().append_i32_unlabeled(3).build();
+    let submsg_7 = SubmsgBuilder::new().append_i32_unlabeled(7).build();
+    let empty = Msg::default();
+    let msg_3 = MsgBuilder::new()
+        .append_submsg_repeated(vec![submsg_3.clone()])
+        .build();
+    let msg_7_7 = MsgBuilder::new()
+        .append_submsg_repeated(vec![submsg_7.clone(), submsg_7.clone()])
+        .build();
     assert_eq!(0, (&empty, &empty).submsg_repeated().into_iter().count());
     assert_eq!(
         vec![3],
