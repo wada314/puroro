@@ -27,6 +27,7 @@ use ::stable_deref_trait::StableDeref;
 use ::std::fmt::Debug;
 use ::std::ops::Deref;
 use ::std::rc::Rc;
+use ::std::sync::Arc;
 
 pub trait BumpaloDefault<'bump> {
     fn default_in(bump: &'bump Bump) -> Self;
