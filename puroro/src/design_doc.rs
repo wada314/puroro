@@ -45,10 +45,11 @@ For now let's think for a simple public-field struct, because the interfacing is
 
 ```rust
 use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
-struct Person<'bump> {
-    name: String<'bump>,
-    partner: Option<Box<'bump, Person<'bump>>>,
-    children: Vec<'bump, Person<'bump>>,
+
+pub struct Person<'bump> {
+    pub name: String<'bump>,
+    pub partner: Option<Box<'bump, Person<'bump>>>,
+    pub children: Vec<'bump, Person<'bump>>,
     _bump: &'bump Bump,
 }
 ```
@@ -75,5 +76,32 @@ instances are dropped.
 all refer to the root allocator instance.
 
 We already see no.1 (no one owns) example above, so let's try implement the others.
+Let's write an implementation which accepts 1 and 2:
+
+```rust
+use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
+use std::ops::Deref;
+use std::rc::Rc;
+
+pub struct Person<'bump, B: Deref<Target=Bump>> {
+    pub name: String<'bump>,
+    pub partner: Option<Box<'bump, Person<'bump, B>>>,
+    pub children: Vec<'bump, Person<'bump, B>>,
+    _bump: B,
+}
+type PersonRef<'bump> = Person<'bump, &'bump Bump>;
+type PersonRc = Person<'static, Rc<Bump>>;
+
+impl<'bump, B: Deref<Target=Bump>> Person<'bump, B> {
+    pub fn new_in(bump: B) -> Self {
+        Self {
+            name: String::new_in(&bump),
+            partner: None,
+            children: Vec::new_in(&bump),
+            _bump: bump,
+        }
+    }
+}
+```
 
  */
