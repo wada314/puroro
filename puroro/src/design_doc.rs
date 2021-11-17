@@ -83,24 +83,51 @@ use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
 use std::ops::Deref;
 use std::rc::Rc;
 
-pub struct Person<'bump, B: Deref<Target=Bump>> {
+pub struct Person<'bump, B> {
     pub name: String<'bump>,
     pub partner: Option<Box<'bump, Person<'bump, B>>>,
     pub children: Vec<'bump, Person<'bump, B>>,
     _bump: B,
 }
+// Straightforward
 type PersonRef<'bump> = Person<'bump, &'bump Bump>;
+// No lifetime param we can use here except 'static, but it's cheaty
 type PersonRc = Person<'static, Rc<Bump>>;
 
 impl<'bump, B: Deref<Target=Bump>> Person<'bump, B> {
     pub fn new_in(bump: B) -> Self {
+        let bump_ref: &Bump = unsafe {
+            std::mem::transmute(bump.deref())
+        };
         Self {
-            name: String::new_in(&bump),
+            name: String::new_in(bump_ref),
             partner: None,
-            children: Vec::new_in(&bump),
+            children: Vec::new_in(bump_ref),
             _bump: bump,
         }
     }
+}
+
+pub fn main() {
+    // This is okay
+    let person_rc = {
+        let bump = Rc::new(Bump::new());
+        PersonRc::new_in(bump)
+    };
+
+    // This is not, bump dies earlier than the person.
+    // let person_ref = {
+    //     let bump = Bump::new();
+    //     PersonRef::new_in(&bump)
+    // };
+
+    // Another bad case, dangling pointer
+    // This happens because we lie the lifetime as 'static
+    let name = {
+        let bump = Rc::new(Bump::new());
+        let person_rc = PersonRc::new_in(bump);
+        person_rc.name
+    };
 }
 ```
 
