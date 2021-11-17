@@ -1,4 +1,3 @@
-Design related notes and documents. No code here.
 
 # Bumpalo message
 
