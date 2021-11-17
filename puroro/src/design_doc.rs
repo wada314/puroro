@@ -223,9 +223,9 @@ happen when dropping it...
 
 Returning to the struct implementation. In the 3rd strategy the `Bump` pointer type
 might be different between a message struct and its child message structs,
-so the struct needs 4 type info: the struct itself's `Bump` ptr,
-the child message struct's `Bump` ptr, the converter from the former to the latter,
-and the recursive set of 4 types in child message.
+so the struct needs 4 type info: the struct itself's `Bump` ptr type,
+the child message struct's `Bump` ptr type, a converter from the former to the latter,
+and the recursive set of 4 type params for the child message.
 
 ```ignore
 use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
