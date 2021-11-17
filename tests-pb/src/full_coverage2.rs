@@ -300,13 +300,13 @@ pub mod _puroro_simple_impl {
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             self.bytes_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field23RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field23RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
             [u8],
             ::std::slice::Iter<'this, ::std::vec::Vec<u8>>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.bytes_repeated.iter())
         }
         fn string_required_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_required.as_ref().map(|v| v.as_ref())
@@ -314,13 +314,13 @@ pub mod _puroro_simple_impl {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field33RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field33RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::std::string::String>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
         }
         fn enum_required_opt<'this>(
             &'this self,
@@ -348,12 +348,12 @@ pub mod _puroro_simple_impl {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        type Field53RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field53RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
     self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
     ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_required)
@@ -11329,13 +11329,13 @@ where
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::simple::BorrowedIter<
+        = ::puroro::internal::utils::BorrowedIter<
             [u8],
             ::std::slice::Iter<'this, ::puroro::bumpalo::collections::Vec<'this, u8>>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.bytes_repeated.iter())
         }
         fn string_required_opt<'this>(&'this self) -> Option<&'this str> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 6) {
@@ -11354,13 +11354,13 @@ where
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::simple::BorrowedIter<
+        = ::puroro::internal::utils::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'this>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
         }
         fn enum_required_opt<'this>(
             &'this self,
@@ -11398,12 +11398,12 @@ where
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump, BT::ChildsBumpTypes>;
         type Field53RepeatedType<'this> where Self: 'this =
-    ::puroro::internal::impls::simple::BorrowedIter<
+    ::puroro::internal::utils::BorrowedIter<
         self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump, BT::ChildsBumpTypes>,
         ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump, BT::ChildsBumpTypes>>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 10) {

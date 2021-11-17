@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::VecOrOptionOrBare;
 use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
 use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::FieldData;
+use crate::internal::utils::VecOrOptionOrBare;
 use crate::internal::variant::VariantTypeTag;
 use crate::ErrorKind;
 use crate::{tags, Result};

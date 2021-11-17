@@ -18,6 +18,7 @@ pub mod fixed_bits;
 pub mod impls;
 pub mod se;
 pub mod types;
+pub mod utils;
 pub mod variant;
 
 use ::bitvec::order::BitOrder;
