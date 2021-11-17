@@ -1,4 +1,4 @@
-#[derive(::std::fmt::Debug)]
+
 pub struct {{ m.bumpalo_ident }}<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
     _bitfield: ::puroro::bitvec::array::BitArray<
@@ -189,20 +189,5 @@ where
         )?;
         {%- endfor %} {#- for field in m.fields #}
         ::std::result::Result::Ok(())
-    }
-}
-
-impl<'bump> ::std::cmp::PartialEq for {{ m.bumpalo_ident }}<'bump> {
-    fn eq(&self, rhs: &Self) -> bool {
-        ::std::ptr::eq(self._bump, rhs._bump) &&
-            {%- for field in m.fields %}
-            {%- if !field.is_explicit_oneof_field %}
-            self.{{ field.ident }} == rhs.{{ field.ident }} &&
-            {%- endif %}
-            {%- endfor %} {#- for field in m.fields #}
-            {%- for oneof in m.oneofs %}
-            self.{{ oneof.field_ident }} == rhs.{{ oneof.field_ident }} &&
-            {%- endfor %}
-            true
     }
 }

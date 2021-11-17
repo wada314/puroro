@@ -11,7 +11,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub group_one: ::std::option::Option<
             super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
@@ -260,7 +259,6 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Submsg {
         pub i32_optional: ::std::option::Option<i32>,
     }
@@ -923,7 +921,6 @@ pub mod _puroro_impls {
             Self { g3_int32: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -1198,16 +1195,6 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.group_one == rhs.group_one
-                && self.group_two == rhs.group_two
-                && self.group_three == rhs.group_three
-                && true
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -1374,7 +1361,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -1462,12 +1448,6 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-
-    impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.i32_optional == rhs.i32_optional && true
-        }
-    }
     pub struct SubmsgBuilder<T>(T);
 
     impl<T> SubmsgBuilder<T>
@@ -1539,9 +1519,6 @@ pub mod _puroro_traits {
             self.g2_string_opt().is_some()
         }
         type Field5MessageType<'this>: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
         where
             Self: 'this;
         fn g2_submsg<'this>(&'this self) -> ::std::option::Option<Self::Field5MessageType<'this>> {
@@ -2059,7 +2036,6 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupOne<'msg, IsOwned>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
@@ -2100,7 +2076,6 @@ pub mod _puroro_nested {
                 }
             }
 
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupTwo<'msg, IsOwned, T>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
@@ -2216,7 +2191,6 @@ pub mod _puroro_nested {
                 }
             }
 
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupThree {
                 G3Int32(i32),
             }
@@ -2236,7 +2210,6 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub(crate) enum GroupOne<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G1Int32(i32),
@@ -2249,7 +2222,6 @@ pub mod _puroro_nested {
                 }
             }
 
-            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub(crate) enum GroupTwo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G2F32(f32),
@@ -2268,7 +2240,6 @@ pub mod _puroro_nested {
                 }
             }
 
-            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub(crate) enum GroupThree<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G3Int32(i32),

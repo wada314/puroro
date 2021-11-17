@@ -11,7 +11,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_unlabeled: i32,
         pub i32_optional: ::std::option::Option<i32>,
@@ -182,7 +181,6 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -777,7 +775,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -971,19 +968,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.i32_unlabeled == rhs.i32_unlabeled
-                && self.i32_optional == rhs.i32_optional
-                && self.i32_repeated == rhs.i32_repeated
-                && self.f32_unlabeled == rhs.f32_unlabeled
-                && self.string_unlabeled == rhs.string_unlabeled
-                && self.submsg_unlabeled == rhs.submsg_unlabeled
-                && true
         }
     }
     pub struct MsgBuilder<T>(T);
@@ -1183,7 +1167,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct SubmsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -1264,12 +1247,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.i32_unlabeled == rhs.i32_unlabeled && true
         }
     }
     pub struct SubmsgBuilder<T>(T);
@@ -1360,8 +1337,7 @@ pub mod _puroro_traits {
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
-        type Field6MessageType<'this>:
-            self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field6MessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
             where Self: 'this;
         fn submsg_unlabeled<'this>(
             &'this self,

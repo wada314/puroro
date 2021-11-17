@@ -10,7 +10,6 @@
 {%- let maybe_gp = "" %}
 {%- endif %}
 
-#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub enum {{ enum_ident }}{{ maybe_gp }}
 {%- if has_ld_field %}
 where

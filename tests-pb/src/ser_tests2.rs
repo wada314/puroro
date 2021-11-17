@@ -10,7 +10,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_optional: ::std::option::Option<i32>,
         pub i32_repeated: ::std::vec::Vec<i32>,
@@ -1643,7 +1642,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -2007,24 +2005,6 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.i32_optional == rhs.i32_optional
-                && self.i32_repeated == rhs.i32_repeated
-                && self.float_optional == rhs.float_optional
-                && self.float_repeated == rhs.float_repeated
-                && self.string_optional == rhs.string_optional
-                && self.string_repeated == rhs.string_repeated
-                && self.submsg_optional == rhs.submsg_optional
-                && self.submsg_repeated == rhs.submsg_repeated
-                && self.enum_optional == rhs.enum_optional
-                && self.enum_repeated == rhs.enum_repeated
-                && self.very_large_field_number == rhs.very_large_field_number
-                && true
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -2302,8 +2282,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
-        type Field7MessageType<'this>:
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field7MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
         fn submsg_optional<'this>(
             &'this self,
@@ -2318,8 +2297,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field8MessageType<'this>:
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field8MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -2934,7 +2912,6 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Submsg {
                 pub i32_optional: ::std::option::Option<i32>,
             }
@@ -3084,7 +3061,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 _bitfield: ::puroro::bitvec::array::BitArray<
@@ -3172,14 +3148,6 @@ pub mod _puroro_nested {
                         out,
                     )?;
                     ::std::result::Result::Ok(())
-                }
-            }
-
-            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
-                fn eq(&self, rhs: &Self) -> bool {
-                    ::std::ptr::eq(self._bump, rhs._bump)
-                        && self.i32_optional == rhs.i32_optional
-                        && true
                 }
             }
             pub struct SubmsgBuilder<T>(T);

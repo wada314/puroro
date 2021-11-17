@@ -10,7 +10,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub r#type: ::std::option::Option<i32>,
     }
@@ -157,7 +156,6 @@ pub mod _puroro_impls {
             Self { r#type: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -243,12 +241,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.r#type == rhs.r#type && true
         }
     }
     pub struct MsgBuilder<T>(T);

@@ -13,7 +13,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test1 {
         pub a: i32,
     }
@@ -86,7 +85,6 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test2 {
         pub b: ::std::string::String,
     }
@@ -159,7 +157,6 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test3 {
         pub c: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>,
@@ -241,7 +238,6 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test4 {
         pub d: ::std::vec::Vec<i32>,
     }
@@ -386,7 +382,6 @@ pub mod _puroro_impls {
             Self { a: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test1Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -467,12 +462,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for Test1Bumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.a == rhs.a && true
         }
     }
     pub struct Test1Builder<T>(T);
@@ -572,7 +561,6 @@ pub mod _puroro_impls {
             Self { b: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test2Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -653,12 +641,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for Test2Bumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.b == rhs.b && true
         }
     }
     pub struct Test2Builder<T>(T);
@@ -767,7 +749,6 @@ pub mod _puroro_impls {
             Self { c: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -867,12 +848,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for Test3Bumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.c == rhs.c && true
         }
     }
     pub struct Test3Builder<T>(T);
@@ -988,7 +963,6 @@ pub mod _puroro_impls {
             Self { d: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test4Bumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -1070,12 +1044,6 @@ pub mod _puroro_impls {
                 ::puroro::tags::Int32,
             >::ser_field(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for Test4Bumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.d == rhs.d && true
         }
     }
     pub struct Test4Builder<T>(T);
@@ -1288,8 +1256,7 @@ pub mod _puroro_traits {
     }
 
     pub trait Test3Trait {
-        type Field3MessageType<'this>:
-            self::_puroro_root::official_samples3::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field3MessageType<'this>: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
             where Self: 'this;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.c_opt()

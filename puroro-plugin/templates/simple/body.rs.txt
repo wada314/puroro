@@ -1,4 +1,4 @@
-#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
