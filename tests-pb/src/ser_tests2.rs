@@ -116,13 +116,13 @@ pub mod _puroro_simple_impl {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field6RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field6RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::std::string::String>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
         }
         type Field7MessageType<'this>
         where
@@ -135,7 +135,7 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        type Field8RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
+        type Field8RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
             ::std::slice::Iter<
                 'this,
@@ -144,7 +144,7 @@ pub mod _puroro_simple_impl {
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             Clone::clone(&self.enum_optional)
@@ -1893,13 +1893,13 @@ pub mod _puroro_impls {
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::simple::BorrowedIter<
+        = ::puroro::internal::utils::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'bump>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
         }
         type Field7MessageType<'this>
         where
@@ -1919,7 +1919,7 @@ pub mod _puroro_impls {
         type Field8RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::simple::BorrowedIter<
+        = ::puroro::internal::utils::BorrowedIter<
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                 'bump,
             >,
@@ -1932,7 +1932,7 @@ pub mod _puroro_impls {
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+            ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 3) {
