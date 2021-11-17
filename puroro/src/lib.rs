@@ -30,26 +30,26 @@
 //!
 //! A struct & trait like this is output:
 //! ```rust
+//! #![feature(generic_associated_types)]
 //! pub struct MyMessage { /* ... */ }
 //!
 //! // A readonly trait for message `MyMessage`
-//! # #![feature(generic_associated_types)]
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
 //!     fn my_number_opt(&self) -> Option<i32>;
 //!     fn has_my_number(&self) -> bool;
 //!
-//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str>;
+//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str> where Self: 'this;
 //!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
 //!
-//!     type Field3MessageType<'this>: MyMessageTrait;
+//!     type Field3MessageType<'this>: MyMessageTrait where Self: 'this;
 //!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
 //!     fn my_child_opt(&self) -> Option<Self::Field3MessageType<'_>>;
 //!     fn has_my_child(&self) -> bool;
 //! }
 //!
-//! impl MyMesasgeTrait for MyMessage {
+//! impl MyMessageTrait for MyMessage {
 //!     /* ... */
 //! #     fn my_number(&self) -> i32 { todo!() }
 //! #     fn my_number_opt(&self) -> Option<i32> { todo!() }
@@ -67,65 +67,20 @@
 //!
 //! You can deserialize a struct from `Iterator<std::io::Result<u8>>`
 //! (which is a return type of `std::io::Read::bytes()` method):
-//! ```rust
-//! # #[derive(Default)]
-//! # pub struct MyMessage {
-//! #     pub my_number: i32,
-//! # }
-//! # use ::puroro::*;
-//! # impl Message<MyMessage> for MyMessage {}
-//! # impl internal::de::DeserMessageFromBytesIter for MyMessage {
-//! #     fn deser<I>(&mut self, iter: I) -> Result<()>
-//! #     where
-//! #         I: Iterator<Item = ::std::io::Result<u8>>
-//! #     {
-//! #         internal::de::from_iter::deser_from_iter(self, iter)
-//! #     }
-//! # }
-//! # impl internal::de::DeserFieldsFromBytesIter for MyMessage {
-//! #     fn deser_field<I>(
-//! #         &mut self,
-//! #         field_number: i32,
-//! #         data: internal::types::FieldData<&mut internal::de::from_iter::ScopedIter<I>>,
-//! #     ) -> Result<()>
-//! #     where
-//! #         I: Iterator<Item = ::std::io::Result<u8>>,
-//! #     {
-//! #         use internal::impls::simple::de::DeserFieldFromBytesIter;
-//! #         match field_number {
-//! #             1 => DeserFieldFromBytesIter::<
-//! #                 tags::Unlabeled, tags::Int32
-//! #             >::deser_field(&mut self.my_number, data),
-//! #             _ => panic!(),
-//! #         }
-//! #     }
-//! # }
+//! ```ignore
 //! use puroro::Message; // For from_bytes() method
 //! use std::io::Read; // For bytes() method
 //! let input = vec![0x08, 0x0a];
 //! let msg = MyMessage::from_bytes(input.bytes()).unwrap();
-//! assert_eq!(10, msg.my_number);
+//! assert_eq!(10, msg.my_number());
 //! ```
 //!
 //! And serialize it to `std::io::Write`:
-//! ```rust
-//! # #[derive(Default)]
-//! # pub struct MyMessage {
-//! #     pub my_number: i32,
-//! # }
-//! # use ::puroro::{internal, Result, tags};
-//! # impl Message<MyMessage> for MyMessage {}
-//! # impl ::puroro::internal::SerializableMessageToIoWrite for MyMessage {
-//! #     fn ser<W>(&self, out: &mut W) -> Result<()> where W: std::io::Write {
-//! #         internal::impls::simple::se::SerFieldToIoWrite::<tags::Unlabeled, tags::Int32>::ser_field(
-//! #             &self.my_number, 1, out
-//! #         )
-//! #     }
-//! # }
+//! ```ignore
 //! use puroro::Message; // For ser() method
 //! let mut output = vec![];
 //! let mut msg = MyMessage::default();
-//! msg.my_number = 10;
+//! *msg.mut_my_number() = 10;
 //! msg.ser(&mut output).unwrap();
 //! assert_eq!(vec![0x08, 0x0a], output);
 //! ```
@@ -198,7 +153,7 @@
 //!
 //! Usage:
 //!
-//! ```ignored
+//! ```ignore
 //! let my_message = MyMessageBuilder::new()
 //!     .append_my_number(10)
 //!     .append_my_name(vec!["foo", "bar"])
@@ -212,6 +167,7 @@
 #![feature(type_alias_impl_trait)]
 
 mod common_traits;
+pub mod design_doc;
 mod error;
 pub mod internal;
 pub mod tags;
