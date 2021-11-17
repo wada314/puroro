@@ -227,7 +227,7 @@ so the struct needs 4 type info: the struct itself's `Bump` ptr,
 the child message struct's `Bump` ptr, the converter from the former to the latter,
 and the recursive set of 4 types in child message.
 
-```rust
+```ignore
 use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
 use std::ops::Deref;
 use std::rc::Rc;
@@ -269,5 +269,7 @@ pub type PersonRef<'bump> = Person<'bump, CloningBumpType<&'bump Bump>>;
 pub type PersonRc = Person<'static, CloningBumpType<Rc<Bump>>>;
 pub type PersonBox = Person<'static, BoxBumpType>;
 ```
+
+First of all, COMPILING THIS CODE MAKES COMPILER HANG FOREVER SO DO NOT COMPILE IT.
 
  */
