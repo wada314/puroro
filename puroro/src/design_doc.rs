@@ -282,4 +282,12 @@ pub struct Person<'bump, BT: BumpTypes> {
 }
 ```
 
+[The issue](https://github.com/rust-lang/rust/issues/89195)
+
+Somehow today's rust (nightly 1.58) hangs if you give a recursive type definition
+which takes both lifetime and a type parameter's associated type as generic parameters.
+In my code, `struct Person` is taking the lifetime `'bump` and the associated type
+`BT::ChildBumpTypes<'bump>` so hitting this issue.
+I'm really not sure if this is intended behavior or not...
+
  */
