@@ -931,15 +931,15 @@ pub mod _puroro_impls {
             bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>,
         ) -> Self {
             #[allow(unused)]
-            let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+            let bump_ref: &'bump ::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 f32_unlabeled: ::std::default::Default::default(),
-                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
+                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump_ref),
                 submsg_unlabeled: ::std::option::Option::None,
 
                 _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
@@ -1390,7 +1390,7 @@ pub mod _puroro_impls {
             bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>,
         ) -> Self {
             #[allow(unused)]
-            let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+            let bump_ref: &'bump ::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),

@@ -10,7 +10,7 @@ where
 
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
-    {{ field.ident }}: {{ field.bumpalo_static_field_type }},
+    {{ field.ident }}: {{ field.bumpalo_field_type }},
     {%- endif %}
     {%- endfor %}
 
@@ -33,7 +33,7 @@ where
 {
     pub fn new_in(bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>) -> Self {
         #[allow(unused)]
-        let bump_static_ref: &'static ::puroro::bumpalo::Bump = unsafe {
+        let bump_ref: &'bump ::puroro::bumpalo::Bump = unsafe {
             ::std::mem::transmute(
                 ::std::ops::Deref::deref(&bump)
             )
@@ -44,17 +44,17 @@ where
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             {%- if field.is_repeated %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
             {%- else %}
             {%- if field.is_length_delimited %}
             {%- if field.is_message %}
             {{ field.ident }}: ::std::option::Option::None,
             {%- endif %} {#- if field.is_message #}
             {%- if field.is_string %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
+            {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump_ref),
             {%- endif %} {#- if field.is_string #}
             {%- if field.is_bytes %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
             {%- endif %} {#- if field.is_bytes #}
             {%- else %} {#- if field.is_length_delimited #}
             {{ field.ident }}: ::std::default::Default::default(),

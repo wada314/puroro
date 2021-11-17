@@ -1859,20 +1859,20 @@ pub mod _puroro_impls {
             bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>,
         ) -> Self {
             #[allow(unused)]
-            let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+            let bump_ref: &'bump ::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 float_unlabeled: ::std::default::Default::default(),
-                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
-                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 submsg_unlabeled: ::std::option::Option::None,
-                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 enum_unlabeled: ::std::default::Default::default(),
-                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 very_large_field_number: ::std::default::Default::default(),
 
                 _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
@@ -3342,7 +3342,7 @@ pub mod _puroro_nested {
                     bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>,
                 ) -> Self {
                     #[allow(unused)]
-                    let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+                    let bump_ref: &'bump ::puroro::bumpalo::Bump =
                         unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
                     Self {
                         _bitfield: ::std::default::Default::default(),

@@ -6102,7 +6102,7 @@ pub mod _puroro_impls {
             bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>,
         ) -> Self {
             #[allow(unused)]
-            let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+            let bump_ref: &'bump ::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),
@@ -6151,20 +6151,20 @@ pub mod _puroro_impls {
                 bool_default: ::std::default::Default::default(),
                 bool_true: ::std::default::Default::default(),
                 bool_false: ::std::default::Default::default(),
-                string_default: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                string_empty: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                string_abc: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                string_aiu: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                string_backslash: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                string_tab: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                string_crlf: ::puroro::bumpalo::collections::String::new_in(bump_static_ref),
-                bytes_default: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
-                bytes_empty: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
-                bytes_abc: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
-                bytes_aiu: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
-                bytes_backslash: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
-                bytes_tab: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
-                bytes_crlf: ::puroro::bumpalo::collections::Vec::new_in(bump_static_ref),
+                string_default: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_empty: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_abc: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_aiu: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_backslash: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_tab: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                string_crlf: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                bytes_default: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_empty: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_abc: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_aiu: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_backslash: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_tab: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                bytes_crlf: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 enum_default: ::std::default::Default::default(),
                 enum_one: ::std::default::Default::default(),
                 enum_fourty_two: ::std::default::Default::default(),

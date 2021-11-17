@@ -217,7 +217,7 @@ pub mod _puroro_impls {
             bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>,
         ) -> Self {
             #[allow(unused)]
-            let bump_static_ref: &'static ::puroro::bumpalo::Bump =
+            let bump_ref: &'bump ::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),
