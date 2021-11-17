@@ -14,7 +14,9 @@
 
 //! Yet another Rust implementation of [Google Protocol Buffer](https://developers.google.com/protocol-buffers).
 //!
-//! # Generated structs
+//! __Warning! The interface is still experimental and it will change very frequently!!__
+//!
+//! # Generated structs & traits
 //!
 //! For an input .proto file like this:
 //! ```protobuf
@@ -26,14 +28,42 @@
 //! }
 //! ```
 //!
-//! A struct like this is output ([detailed doc](internal::impls::simple)):
+//! A struct & trait like this is output:
 //! ```rust
-//! pub struct MyMessage {
-//!     pub my_number: i32,
-//!     pub my_name: Vec<String>,
-//!     pub my_child: Option<Box<MyMessage>>,
+//! pub struct MyMessage { /* ... */ }
+//!
+//! // A readonly trait for message `MyMessage`
+//! # #![feature(generic_associated_types)]
+//! # use ::std::ops::Deref;
+//! pub trait MyMessageTrait {
+//!     fn my_number(&self) -> i32;
+//!     fn my_number_opt(&self) -> Option<i32>;
+//!     fn has_my_number(&self) -> bool;
+//!
+//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str>;
+//!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
+//!
+//!     type Field3MessageType<'this>: MyMessageTrait;
+//!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
+//!     fn my_child_opt(&self) -> Option<Self::Field3MessageType<'_>>;
+//!     fn has_my_child(&self) -> bool;
+//! }
+//!
+//! impl MyMesasgeTrait for MyMessage {
+//!     /* ... */
+//! #     fn my_number(&self) -> i32 { todo!() }
+//! #     fn my_number_opt(&self) -> Option<i32> { todo!() }
+//! #     fn has_my_number(&self) -> bool { todo!() }
+//! #     type Field2RepeatedType<'this> = Vec<&'this str>;
+//! #     fn my_name(&self) -> Self::Field2RepeatedType<'_> { todo!() }
+//! #     type Field3MessageType<'this> = MyMessage;
+//! #     fn my_child(&self) -> Option<Self::Field3MessageType<'_>> { todo!() }
+//! #     fn my_child_opt(&self) -> Option<Self::Field3MessageType<'_>> { todo!() }
+//! #     fn has_my_child(&self) -> bool { todo!() }
 //! }
 //! ```
+//!
+//! (Omitting some trait bounds for explanation. Please check the [traits](internal::impls::traits) page for detail):
 //!
 //! You can deserialize a struct from `Iterator<std::io::Result<u8>>`
 //! (which is a return type of `std::io::Read::bytes()` method):
@@ -100,40 +130,11 @@
 //! assert_eq!(vec![0x08, 0x0a], output);
 //! ```
 //!
-//! # Generated traits
+//! # Trait impls
 //! ([Detailed doc](internal::impls::traits))
 //!
-//! For the same input as above:
-//! ```protobuf
-//! syntax = "proto3";
-//! message MyMessage {
-//!     int32 my_number = 1;
-//!     repeated string my_name = 2;
-//!     MyMessage my_child = 3;
-//! }
-//! ```
-//!
-//! Trait like this is generated
-//! (Omitting some bounds for explanation. Please check the [traits](internal::impls::traits) page for detail):
-//!
-//! ```rust
-//! // A readonly trait for message `MyMessage`
-//! # #![feature(generic_associated_types)]
-//! # use ::std::ops::Deref;
-//! pub trait MyMessageTrait {
-//!     fn my_number(&self) -> i32;
-//!     fn my_number_opt(&self) -> Option<i32>;
-//!     fn has_my_number(&self) -> bool;
-//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str>;
-//!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
-//!     type Field3MessageType<'this>: MyMessageTrait;
-//!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
-//!     fn my_child_opt(&self) -> Option<Self::Field3MessageType<'_>>;
-//!     fn has_my_child(&self) -> bool;
-//! }
-//! ```
-//!
-//! The trait is implemented for the struct `MyMessage` and few other items:
+//! The trait `MyMessageTrait` is not only implemented for the struct `MyMessage`,
+//! but for few other items:
 //!
 //! ```rust
 //! # trait MyMessageTrait {}
@@ -145,6 +146,8 @@
 //! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for (T, U) { /* ... */ }
 //! impl<T: MyMessageTrait, U: MyMessageTrait> MyMessageTrait for puroro::Either<T, U> { /* ... */ }
 //! ```
+//!
+//! Notably, `(T, U)` works as a merged message.
 //!
 //! # Builder struct
 //! ([Detailed doc](internal::impls::builder))
@@ -165,8 +168,11 @@
 //!     }
 //! }
 //! impl<T: MyMessageTrait> MyMessageBuilder<T> {
-//!     pub fn append_my_number(self, value: i32)
-//!     -> MyMessageBuilder<(T, MyMessageSingleField1)> {
+//!     pub fn append_my_number<U>(self, value: U)
+//!     -> MyMessageBuilder<(T, MyMessageSingleField1<U>)>
+//!     where
+//!         U: Into<i32>,
+//!     {
 //! #       todo!()
 //!         /* ... */
 //!     }
@@ -185,7 +191,7 @@
 //!         /* ... */
 //!     }
 //! }
-//! # pub struct MyMessageSingleField1();
+//! # pub struct MyMessageSingleField1<T>(T);
 //! # pub struct MyMessageSingleField2<T, U>(T, U);
 //! # pub struct MyMessageSingleField3<T>(T);
 //! ```

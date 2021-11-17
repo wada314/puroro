@@ -173,38 +173,6 @@
 //! assert_eq!(false, ().has_my_number());
 //! ```
 //!
-//! Warning: The default struct implementation of message (e.g. `struct MyMessage`)
-//! has an exceptional behavior when initializing it.
-//!
-//! ```rust
-//! # pub struct MyMessage {
-//! #     pub my_number: Option<i32>,
-//! # }
-//! # impl Default for MyMessage {
-//! #     fn default() -> Self {
-//! #         Self { my_number: Some(42) }
-//! #     }
-//! # }
-//! # trait MyMessageTrait {
-//! #     fn my_number(&self) -> i32;
-//! #     fn has_my_number(&self) -> bool;
-//! # }
-//! # impl MyMessageTrait for () {
-//! #     fn my_number(&self) -> i32 { 42 }
-//! #     fn has_my_number(&self) -> bool { false }
-//! # }
-//! # impl MyMessageTrait for MyMessage {
-//! #     fn my_number(&self) -> i32 { self.my_number.unwrap_or(0) }
-//! #     fn has_my_number(&self) -> bool { self.my_number.is_some() }
-//! # }
-//! // The getters return the same values,
-//! assert_eq!(42, MyMessage::default().my_number());
-//! assert_eq!(42, ().my_number());
-//! // But the struct version actually "sets" the value, where others not.
-//! assert_eq!(true, MyMessage::default().has_my_number());
-//! assert_eq!(false, ().has_my_number());
-//! ```
-//!
 //! ## proto3
 //!
 //! In proto3 unlabeled fields, 0 value (or empty string / bytes) fields
