@@ -183,13 +183,13 @@ fn test_get_oneof_field() {
     );
     assert_eq!(
         Some(3),
-        (&msg_submsg_3, &msg_submsg_3)
+        (&msg_submsg_0, &msg_submsg_3)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
     assert_eq!(
         Some(3),
-        (&msg_submsg_3, &msg_submsg_3)
+        (&msg_submsg_3, &msg_submsg_0)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
@@ -201,7 +201,7 @@ fn test_get_oneof_field() {
     );
     assert_eq!(
         Some(0),
-        (&msg_3, &msg_submsg_3)
+        (&msg_3, &msg_submsg_0)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
@@ -211,7 +211,7 @@ fn test_get_oneof_field() {
     );
     assert_eq!(
         Some(0),
-        (&msg_test, &msg_submsg_3)
+        (&msg_test, &msg_submsg_0)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
