@@ -21,6 +21,9 @@ pub mod _puroro_simple_impl {
                 r#type: ::std::default::Default::default(),
             }
         }
+        pub fn type_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.r#type
+        }
     }
 
     impl super::_puroro_traits::MsgTrait for Msg {

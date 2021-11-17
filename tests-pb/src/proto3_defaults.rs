@@ -34,6 +34,28 @@ pub mod _puroro_simple_impl {
                 submsg_unlabeled: ::std::default::Default::default(),
             }
         }
+        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+            &mut self.i32_unlabeled
+        }
+        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_optional
+        }
+        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.i32_repeated
+        }
+        pub fn f32_unlabeled_mut(&mut self) -> &mut f32 {
+            &mut self.f32_unlabeled
+        }
+        pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+            &mut self.string_unlabeled
+        }
+        pub fn submsg_unlabeled_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
+        > {
+            &mut self.submsg_unlabeled
+        }
     }
 
     impl super::_puroro_traits::MsgTrait for Msg {
@@ -251,6 +273,9 @@ pub mod _puroro_simple_impl {
             Self {
                 i32_unlabeled: ::std::default::Default::default(),
             }
+        }
+        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+            &mut self.i32_unlabeled
         }
     }
 

@@ -149,6 +149,200 @@ pub mod _puroro_simple_impl {
                 ),
             }
         }
+        pub fn i32_default_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_default
+        }
+        pub fn i32_0_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_0
+        }
+        pub fn i32_42_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_42
+        }
+        pub fn i32_m42_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_m42
+        }
+        pub fn i32_2147483647_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_2147483647
+        }
+        pub fn i32_m2147483648_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_m2147483648
+        }
+        pub fn i32_0123_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_0123
+        }
+        pub fn i32_0x123_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_0x123
+        }
+        pub fn u32_default_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_default
+        }
+        pub fn u32_0_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_0
+        }
+        pub fn u32_42_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_42
+        }
+        pub fn u32_4294967295_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_4294967295
+        }
+        pub fn u32_0123_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_0123
+        }
+        pub fn u32_0x123_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_0x123
+        }
+        pub fn i64_default_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_default
+        }
+        pub fn i64_0_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_0
+        }
+        pub fn i64_42_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_42
+        }
+        pub fn i64_m42_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_m42
+        }
+        pub fn i64_9223372036854775807_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_9223372036854775807
+        }
+        pub fn i64_m9223372036854775808_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_m9223372036854775808
+        }
+        pub fn i64_0123_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_0123
+        }
+        pub fn i64_0x123_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_0x123
+        }
+        pub fn u64_default_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_default
+        }
+        pub fn u64_0_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_0
+        }
+        pub fn u64_42_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_42
+        }
+        pub fn u64_18446744073709551615_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_18446744073709551615
+        }
+        pub fn u64_0123_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_0123
+        }
+        pub fn u64_0x123_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_0x123
+        }
+        pub fn f32_default_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_default
+        }
+        pub fn f32_0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0
+        }
+        pub fn f32_m0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_m0
+        }
+        pub fn f32_0p_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0p
+        }
+        pub fn f32_p0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_p0
+        }
+        pub fn f32_0p0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0p0
+        }
+        pub fn f32_42_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_42
+        }
+        pub fn f32_m42_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_m42
+        }
+        pub fn f32_0p25_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0p25
+        }
+        pub fn f32_1p5e2_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_1p5e2
+        }
+        pub fn f32_inf_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_inf
+        }
+        pub fn f32_minf_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_minf
+        }
+        pub fn f32_nan_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_nan
+        }
+        pub fn f32_mnan_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_mnan
+        }
+        pub fn bool_default_mut(&mut self) -> &mut ::std::option::Option<bool> {
+            &mut self.bool_default
+        }
+        pub fn bool_true_mut(&mut self) -> &mut ::std::option::Option<bool> {
+            &mut self.bool_true
+        }
+        pub fn bool_false_mut(&mut self) -> &mut ::std::option::Option<bool> {
+            &mut self.bool_false
+        }
+        pub fn string_default_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_default
+        }
+        pub fn string_empty_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_empty
+        }
+        pub fn string_abc_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_abc
+        }
+        pub fn string_aiu_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_aiu
+        }
+        pub fn string_backslash_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_backslash
+        }
+        pub fn string_tab_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_tab
+        }
+        pub fn string_crlf_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_crlf
+        }
+        pub fn bytes_default_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_default
+        }
+        pub fn bytes_empty_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_empty
+        }
+        pub fn bytes_abc_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_abc
+        }
+        pub fn bytes_aiu_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_aiu
+        }
+        pub fn bytes_backslash_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_backslash
+        }
+        pub fn bytes_tab_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_tab
+        }
+        pub fn bytes_crlf_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_crlf
+        }
+        pub fn enum_default_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            &mut self.enum_default
+        }
+        pub fn enum_one_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            &mut self.enum_one
+        }
+        pub fn enum_fourty_two_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            &mut self.enum_fourty_two
+        }
     }
 
     impl super::_puroro_traits::MsgTrait for Msg {

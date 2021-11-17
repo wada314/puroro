@@ -24,6 +24,9 @@ pub mod _puroro_simple_impl {
                 a: ::std::default::Default::default(),
             }
         }
+        pub fn a_mut(&mut self) -> &mut i32 {
+            &mut self.a
+        }
     }
 
     impl super::_puroro_traits::Test1Trait for Test1 {
@@ -120,6 +123,9 @@ pub mod _puroro_simple_impl {
             Self {
                 b: ::std::default::Default::default(),
             }
+        }
+        pub fn b_mut(&mut self) -> &mut ::std::string::String {
+            &mut self.b
         }
     }
 
@@ -219,6 +225,13 @@ pub mod _puroro_simple_impl {
             Self {
                 c: ::std::default::Default::default(),
             }
+        }
+        pub fn c_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>,
+        > {
+            &mut self.c
         }
     }
 
@@ -323,6 +336,9 @@ pub mod _puroro_simple_impl {
             Self {
                 d: ::std::default::Default::default(),
             }
+        }
+        pub fn d_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.d
         }
     }
 

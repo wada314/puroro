@@ -115,6 +115,158 @@ pub mod _puroro_simple_impl {
                 f64_repeated: ::std::default::Default::default(),
             }
         }
+        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+            &mut self.i32_unlabeled
+        }
+        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_optional
+        }
+        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.i32_repeated
+        }
+        pub fn float_unlabeled_mut(&mut self) -> &mut f32 {
+            &mut self.float_unlabeled
+        }
+        pub fn float_optional_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.float_optional
+        }
+        pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
+            &mut self.float_repeated
+        }
+        pub fn bytes_unlabeled_mut(&mut self) -> &mut ::std::vec::Vec<u8> {
+            &mut self.bytes_unlabeled
+        }
+        pub fn bytes_optional_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_optional
+        }
+        pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::vec::Vec<u8>> {
+            &mut self.bytes_repeated
+        }
+        pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+            &mut self.string_unlabeled
+        }
+        pub fn string_optional_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_optional
+        }
+        pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
+            &mut self.string_repeated
+        }
+        pub fn enum_unlabeled_mut(&mut self) -> &mut self::_puroro_root::full_coverage3::Enum {
+            &mut self.enum_unlabeled
+        }
+        pub fn enum_optional_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            &mut self.enum_optional
+        }
+        pub fn enum_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum> {
+            &mut self.enum_repeated
+        }
+        pub fn submsg_unlabeled_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
+            &mut self.submsg_unlabeled
+        }
+        pub fn submsg_optional_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
+            &mut self.submsg_optional
+        }
+        pub fn submsg_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+        > {
+            &mut self.submsg_repeated
+        }
+        pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
+            &mut self.i64_unlabeled
+        }
+        pub fn i64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_optional
+        }
+        pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            &mut self.i64_repeated
+        }
+        pub fn u32_unlabeled_mut(&mut self) -> &mut u32 {
+            &mut self.u32_unlabeled
+        }
+        pub fn u32_optional_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_optional
+        }
+        pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
+            &mut self.u32_repeated
+        }
+        pub fn u64_unlabeled_mut(&mut self) -> &mut u64 {
+            &mut self.u64_unlabeled
+        }
+        pub fn u64_optional_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_optional
+        }
+        pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
+            &mut self.u64_repeated
+        }
+        pub fn s32_unlabeled_mut(&mut self) -> &mut i32 {
+            &mut self.s32_unlabeled
+        }
+        pub fn s32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.s32_optional
+        }
+        pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.s32_repeated
+        }
+        pub fn s64_unlabeled_mut(&mut self) -> &mut i64 {
+            &mut self.s64_unlabeled
+        }
+        pub fn s64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.s64_optional
+        }
+        pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            &mut self.s64_repeated
+        }
+        pub fn fixed32_unlabeled_mut(&mut self) -> &mut u32 {
+            &mut self.fixed32_unlabeled
+        }
+        pub fn fixed32_optional_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.fixed32_optional
+        }
+        pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
+            &mut self.fixed32_repeated
+        }
+        pub fn fixed64_unlabeled_mut(&mut self) -> &mut u64 {
+            &mut self.fixed64_unlabeled
+        }
+        pub fn fixed64_optional_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.fixed64_optional
+        }
+        pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
+            &mut self.fixed64_repeated
+        }
+        pub fn sfixed32_unlabeled_mut(&mut self) -> &mut i32 {
+            &mut self.sfixed32_unlabeled
+        }
+        pub fn sfixed32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.sfixed32_optional
+        }
+        pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.sfixed32_repeated
+        }
+        pub fn sfixed64_unlabeled_mut(&mut self) -> &mut i64 {
+            &mut self.sfixed64_unlabeled
+        }
+        pub fn sfixed64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.sfixed64_optional
+        }
+        pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            &mut self.sfixed64_repeated
+        }
+        pub fn f64_unlabeled_mut(&mut self) -> &mut f64 {
+            &mut self.f64_unlabeled
+        }
+        pub fn f64_optional_mut(&mut self) -> &mut ::std::option::Option<f64> {
+            &mut self.f64_optional
+        }
+        pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f64> {
+            &mut self.f64_repeated
+        }
     }
 
     impl super::_puroro_traits::MsgTrait for Msg {
@@ -15144,6 +15296,12 @@ pub mod _puroro_nested {
                         i32_unlabeled: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
                     }
+                }
+                pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+                    &mut self.i32_unlabeled
+                }
+                pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
+                    &mut self.i64_unlabeled
                 }
             }
 

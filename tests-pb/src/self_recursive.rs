@@ -23,6 +23,13 @@ pub mod _puroro_simple_impl {
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }
+        pub fn recursive_unlabeled_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
+        > {
+            &mut self.recursive_unlabeled
+        }
     }
 
     impl super::_puroro_traits::MsgTrait for Msg {

@@ -41,6 +41,37 @@ impl {{ m.simple_ident }} {
             {%- endfor %}
         }
     }
+
+    {#- Tentative mutable interfaces. #}
+    {%- for field in m.fields %}
+    {%- if !field.is_explicit_oneof_field %}
+    pub fn {{ field.ident_unesc }}_mut(&mut self) -> &mut {{ field.simple_field_type }} {
+        &mut self.{{ field.ident }}
+    }
+    {%- endif %} {#- if !field.is_explicit_oneof_field #}
+    {%- endfor %} {#- for field in m.fields #}
+    {%- for oneof in m.oneofs %}
+    {%- for field in oneof.fields %}
+    pub fn {{ field.getter_ident_unesc }}_mut(&mut self) -> &mut {{ field.simple_field_type }}
+    {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
+        if !matches!(
+            &self.{{ oneof.field_ident }},
+            Some(E::{{ field.ident }}(_)))
+        {
+            self.{{ oneof.field_ident }} = Some(
+                E::{{ field.ident }}(
+                    ::std::default::Default::default()
+                )
+            );
+        }
+        match &mut self.{{ oneof.field_ident }} {
+            Some(E::{{ field.ident }}(v)) => v,
+            _ => unreachable!(),
+        }
+    }
+    {%- endfor %} {#- for field in oneof.fields #}
+    {%- endfor %} {#- for oneof in m.oneofs #}
 }
 
 impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
