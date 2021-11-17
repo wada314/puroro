@@ -20,11 +20,12 @@ Though `Box` does not keep `&'bump Bump` after the initialization is done becaus
 The lifetime `'bump` of `Box<'bump, t>` indicates:
 "This Box cannot outlive the source Bump instance which was given when I was allocated."
 
-- `String<'bump>, Vec<'bump, T>` Almost the same as `Box<'bump, T>`, analogus to the
+- `String<'bump>, Vec<'bump, T>` Similar to the `Box<'bump, T>`, analogus to the
 standard library's `String` and `Vec`. Just one difference with the `Box` is that
 these classes need to use the allocator instance even after the class is initialized,
 (e.g. when the vector size is extended) so they keep own `&'bump Bump` reference inside it.
-
+This is actually redundant in our case because our message also keeps own the pointer to `Bump`,
+but let's ignore it for now...
 
 ## First attempt
 So what will happen if I say "Use bumpalo in my protobuf implementation"?
@@ -75,6 +76,8 @@ instances are dropped.
 3. Only root owns. The root message owns the allocator, and the children messages
 all refer to the root allocator instance.
 
+## Second attempt, give `<B: Deref<Target=Bump>>`
+
 We already see no.1 (no one owns) example above, so let's try implement the others.
 Let's write an implementation which accepts 1 and 2:
 
@@ -89,11 +92,20 @@ pub struct Person<'bump, B> {
     pub children: Vec<'bump, Person<'bump, B>>,
     _bump: B,
 }
-// Straightforward
-type PersonRef<'bump> = Person<'bump, &'bump Bump>;
-// No lifetime param we can use here except 'static, but it's cheaty
-type PersonRc = Person<'static, Rc<Bump>>;
 
+// Straightforward.
+type PersonRef<'bump> = Person<'bump, &'bump Bump>;
+
+// No lifetime param we can use here except 'static,
+// but it's cheaty and later it actually makes some problems...
+type PersonRc = Person<'static, Rc<Bump>>;
+```
+
+This looks pretty straightforward except we are using `'static`.
+But one of the problem in this code comes up when you write an
+initializer function:
+
+```ignore
 impl<'bump, B: Deref<Target=Bump>> Person<'bump, B> {
     pub fn new_in(bump: B) -> Self {
         let bump_ref: &Bump = unsafe {
@@ -107,7 +119,16 @@ impl<'bump, B: Deref<Target=Bump>> Person<'bump, B> {
         }
     }
 }
+```
 
+We needed to introduce an `unsafe` block to make the compile pass here.
+Unless using the `unsafe` block, we cannot initialize the `Person::_bump` field
+because the local variable `bump` is already borrowed in previous fields initializations
+so it cannot be moved.
+Instead, we are manually cutting off the borrow checker using `std::mem::transmute`
+function so that the borrow checker thinks the variable `bump` is "free" for moving.
+
+```ignore
 pub fn main() {
     // This is okay
     let person_rc = {
@@ -115,20 +136,64 @@ pub fn main() {
         PersonRc::new_in(bump)
     };
 
-    // This is not, bump dies earlier than the person.
+    // This results expected compile error. bump dies earlier than the person.
+    // Good catch lifetime!.
     // let person_ref = {
     //     let bump = Bump::new();
     //     PersonRef::new_in(&bump)
     // };
 
-    // Another bad case, dangling pointer
-    // This happens because we lie the lifetime as 'static
+    // Bad case, dangling pointer
+    // This happens because we lied the lifetime as 'static
     let name = {
         let bump = Rc::new(Bump::new());
         let person_rc = PersonRc::new_in(bump);
         person_rc.name
     };
+    println!("{}", name); // bad pointer!
 }
 ```
+
+The problem here is the last block of the code.
+Because we lied the lifetime passed to `String` as `'static`,
+compiler thinks it's actually movable out from the `PersonRc` struct.
+Of course this is not correct, the code above is making a dangling pointer.
+Because of this, the struct fields cannot be public anymore --
+the user need to access the fields via getter methods which converts type into safe one:
+
+```ignore
+impl<'bump, B> Person<'bump, B> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn name_mut(&mut self) -> &mut String<'_> {
+        unsafe { std::mem::transmute(&mut self.name) }
+    }
+}
+
+fn main() {
+    // Because we hide the raw struct fields, this code compiles error correctly!
+    // let name = {
+    //     let bump = Rc::new(Bump::new());
+    //     let mut person_rc = PersonRc::new_in(bump);
+    //     person_rc.name_mut()
+    // };
+
+    // But this code also become compile error, which was okay in public fields...
+    // let bump = Bump::new();
+    // let name = {
+    //     let mut person_ref = PersonRef::new_in(&bump);
+    //     person_ref.name_mut().clone()
+    // };
+
+    // The okay version of the above, using the public field
+    let bump = Bump::new();
+    let name = {
+        let mut person_ref = PersonRef::new_in(&bump);
+        person_ref.name
+    };
+}
+```
+
 
  */
