@@ -223,7 +223,7 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }

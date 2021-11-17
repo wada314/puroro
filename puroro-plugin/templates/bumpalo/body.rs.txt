@@ -32,6 +32,9 @@ where
     BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
     pub fn new_in(bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef<'bump>) -> Self {
+        {#- We need to make this `bump_ref` to cut off the borrow from the param `bump`
+         #  so that we can move the `bump` into our struct.
+         #}
         #[allow(unused)]
         let bump_ref: &'bump ::puroro::bumpalo::Bump = unsafe {
             ::std::mem::transmute(
@@ -67,7 +70,7 @@ where
             {{ oneof.field_ident }}: ::std::default::Default::default(),
             {%- endfor %}
 
-            _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+            _bump: bump,
         }
     }
 }

@@ -1050,7 +1050,7 @@ pub mod _puroro_impls {
                 group_two: ::std::default::Default::default(),
                 group_three: ::std::default::Default::default(),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }
@@ -1545,7 +1545,7 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }

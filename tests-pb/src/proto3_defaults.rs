@@ -942,7 +942,7 @@ pub mod _puroro_impls {
                 string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump_ref),
                 submsg_unlabeled: ::std::option::Option::None,
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }
@@ -1396,7 +1396,7 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }

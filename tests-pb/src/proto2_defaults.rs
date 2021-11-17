@@ -6169,7 +6169,7 @@ pub mod _puroro_impls {
                 enum_one: ::std::default::Default::default(),
                 enum_fourty_two: ::std::default::Default::default(),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }

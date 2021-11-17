@@ -1875,7 +1875,7 @@ pub mod _puroro_impls {
                 enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
                 very_large_field_number: ::std::default::Default::default(),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }
@@ -3348,7 +3348,7 @@ pub mod _puroro_nested {
                         _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
 
-                        _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                        _bump: bump,
                     }
                 }
             }

@@ -537,7 +537,7 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }
@@ -791,7 +791,7 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 b: ::puroro::bumpalo::collections::String::new_in(bump_ref),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }
@@ -1062,7 +1062,7 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 c: ::std::option::Option::None,
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }
@@ -1346,7 +1346,7 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 d: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }

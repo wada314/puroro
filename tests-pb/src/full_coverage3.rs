@@ -11287,7 +11287,7 @@ where
                 f64_optional: ::std::default::Default::default(),
                 f64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
 
-                _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                _bump: bump,
             }
         }
     }
@@ -15720,7 +15720,7 @@ pub mod _puroro_nested {
                         i32_unlabeled: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
 
-                        _bump: unsafe { BT::cast_ref_lt_unsafe(bump) },
+                        _bump: bump,
                     }
                 }
             }
