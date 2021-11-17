@@ -45,6 +45,29 @@ where
     {%- endfor %}
 }
 
+impl{{ maybe_gp }} ::std::clone::Clone for {{ enum_ident }}{{ maybe_gp }}
+where
+    {%- for field in fields %}
+    {{ field.field_type }}: ::std::clone::Clone,
+    {%- endfor %} {#- for field in fields #}
+    {%- if has_ld_field %}
+    IsOwned: ::puroro::internal::bool::BoolType,
+    {%- if has_message_field %}
+    T: 'msg + ?Sized + {{ owner_message_trait_path }},
+    {%- endif %}
+    {%- endif %}
+{
+    fn clone(&self) -> Self {
+        match self {
+            {%- for field in fields %}
+            Self::{{ field.ident }}(v) => Self::{{ field.ident }}(
+                ::std::clone::Clone::clone(&v)
+            ),
+            {%- endfor %} {#- for field in fields #}
+        }
+    }
+}
+
 {%- if has_message_field %}
 impl{{ maybe_gp }} ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
 for {{ enum_ident }}<'msg, IsOwned, &'_ T>

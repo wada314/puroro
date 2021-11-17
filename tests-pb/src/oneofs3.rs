@@ -293,6 +293,16 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                group_one: ::std::clone::Clone::clone(&self.group_one),
+                group_two: ::std::clone::Clone::clone(&self.group_two),
+                group_three: ::std::clone::Clone::clone(&self.group_three),
+            }
+        }
+    }
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -377,6 +387,14 @@ pub mod _puroro_simple_impl {
                     &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
                 )
                 .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Submsg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+            }
         }
     }
 }
@@ -2123,6 +2141,23 @@ pub mod _puroro_nested {
                 }
             }
 
+            impl<'msg, IsOwned> ::std::clone::Clone for GroupOne<'msg, IsOwned>
+            where
+                i32: ::std::clone::Clone,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::clone::Clone,
+                IsOwned: ::puroro::internal::bool::BoolType,
+            {
+                fn clone(&self) -> Self {
+                    match self {
+                        Self::G1Int32(v) => Self::G1Int32(::std::clone::Clone::clone(&v)),
+                        Self::G1String(v) => Self::G1String(::std::clone::Clone::clone(&v)),
+                    }
+                }
+            }
+
             pub enum GroupTwo<'msg, IsOwned, T>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
@@ -2164,6 +2199,31 @@ pub mod _puroro_nested {
                         Self::G2Submsg(v) => ::std::option::Option::Some(v),
                         #[allow(unreachable_patterns)]
                         _ => None,
+                    }
+                }
+            }
+
+            impl<'msg, IsOwned, T> ::std::clone::Clone for GroupTwo<'msg, IsOwned, T>
+            where
+                f32: ::std::clone::Clone,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::clone::Clone,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>,
+                    <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+                        'msg,
+                    >,
+                >: ::std::clone::Clone,
+                IsOwned: ::puroro::internal::bool::BoolType,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            {
+                fn clone(&self) -> Self {
+                    match self {
+                        Self::G2F32(v) => Self::G2F32(::std::clone::Clone::clone(&v)),
+                        Self::G2String(v) => Self::G2String(::std::clone::Clone::clone(&v)),
+                        Self::G2Submsg(v) => Self::G2Submsg(::std::clone::Clone::clone(&v)),
                     }
                 }
             }
@@ -2248,6 +2308,17 @@ pub mod _puroro_nested {
                         Self::G3Int32(v) => ::std::option::Option::Some(v),
                         #[allow(unreachable_patterns)]
                         _ => None,
+                    }
+                }
+            }
+
+            impl ::std::clone::Clone for GroupThree
+            where
+                i32: ::std::clone::Clone,
+            {
+                fn clone(&self) -> Self {
+                    match self {
+                        Self::G3Int32(v) => Self::G3Int32(::std::clone::Clone::clone(&v)),
                     }
                 }
             }

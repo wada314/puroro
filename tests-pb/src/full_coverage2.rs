@@ -1103,6 +1103,61 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_required: ::std::clone::Clone::clone(&self.i32_required),
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_required: ::std::clone::Clone::clone(&self.float_required),
+                float_optional: ::std::clone::Clone::clone(&self.float_optional),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                bytes_required: ::std::clone::Clone::clone(&self.bytes_required),
+                bytes_optional: ::std::clone::Clone::clone(&self.bytes_optional),
+                bytes_repeated: ::std::clone::Clone::clone(&self.bytes_repeated),
+                string_required: ::std::clone::Clone::clone(&self.string_required),
+                string_optional: ::std::clone::Clone::clone(&self.string_optional),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                enum_required: ::std::clone::Clone::clone(&self.enum_required),
+                enum_optional: ::std::clone::Clone::clone(&self.enum_optional),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                submsg_required: ::std::clone::Clone::clone(&self.submsg_required),
+                submsg_optional: ::std::clone::Clone::clone(&self.submsg_optional),
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+                i64_required: ::std::clone::Clone::clone(&self.i64_required),
+                i64_optional: ::std::clone::Clone::clone(&self.i64_optional),
+                i64_repeated: ::std::clone::Clone::clone(&self.i64_repeated),
+                u32_required: ::std::clone::Clone::clone(&self.u32_required),
+                u32_optional: ::std::clone::Clone::clone(&self.u32_optional),
+                u32_repeated: ::std::clone::Clone::clone(&self.u32_repeated),
+                u64_required: ::std::clone::Clone::clone(&self.u64_required),
+                u64_optional: ::std::clone::Clone::clone(&self.u64_optional),
+                u64_repeated: ::std::clone::Clone::clone(&self.u64_repeated),
+                s32_required: ::std::clone::Clone::clone(&self.s32_required),
+                s32_optional: ::std::clone::Clone::clone(&self.s32_optional),
+                s32_repeated: ::std::clone::Clone::clone(&self.s32_repeated),
+                s64_required: ::std::clone::Clone::clone(&self.s64_required),
+                s64_optional: ::std::clone::Clone::clone(&self.s64_optional),
+                s64_repeated: ::std::clone::Clone::clone(&self.s64_repeated),
+                fixed32_required: ::std::clone::Clone::clone(&self.fixed32_required),
+                fixed32_optional: ::std::clone::Clone::clone(&self.fixed32_optional),
+                fixed32_repeated: ::std::clone::Clone::clone(&self.fixed32_repeated),
+                fixed64_required: ::std::clone::Clone::clone(&self.fixed64_required),
+                fixed64_optional: ::std::clone::Clone::clone(&self.fixed64_optional),
+                fixed64_repeated: ::std::clone::Clone::clone(&self.fixed64_repeated),
+                sfixed32_required: ::std::clone::Clone::clone(&self.sfixed32_required),
+                sfixed32_optional: ::std::clone::Clone::clone(&self.sfixed32_optional),
+                sfixed32_repeated: ::std::clone::Clone::clone(&self.sfixed32_repeated),
+                sfixed64_required: ::std::clone::Clone::clone(&self.sfixed64_required),
+                sfixed64_optional: ::std::clone::Clone::clone(&self.sfixed64_optional),
+                sfixed64_repeated: ::std::clone::Clone::clone(&self.sfixed64_repeated),
+                f64_required: ::std::clone::Clone::clone(&self.f64_required),
+                f64_optional: ::std::clone::Clone::clone(&self.f64_optional),
+                f64_repeated: ::std::clone::Clone::clone(&self.f64_repeated),
+            }
+        }
+    }
 }
 
 pub use _puroro_impls::*;
@@ -15139,6 +15194,15 @@ pub mod _puroro_nested {
                             &<Self as super::_puroro_traits::SubmsgTrait>::i64_required_opt(self),
                         )
                         .finish()
+                }
+            }
+
+            impl ::std::clone::Clone for Submsg {
+                fn clone(&self) -> Self {
+                    Self {
+                        i32_required: ::std::clone::Clone::clone(&self.i32_required),
+                        i64_required: ::std::clone::Clone::clone(&self.i64_required),
+                    }
                 }
             }
         }

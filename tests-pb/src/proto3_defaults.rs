@@ -216,6 +216,19 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                f32_unlabeled: ::std::clone::Clone::clone(&self.f32_unlabeled),
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+                submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
+            }
+        }
+    }
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -300,6 +313,14 @@ pub mod _puroro_simple_impl {
                     &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
                 )
                 .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Submsg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+            }
         }
     }
 }

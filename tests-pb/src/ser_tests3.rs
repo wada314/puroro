@@ -355,6 +355,24 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_unlabeled: ::std::clone::Clone::clone(&self.float_unlabeled),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+                enum_unlabeled: ::std::clone::Clone::clone(&self.enum_unlabeled),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                very_large_field_number: ::std::clone::Clone::clone(&self.very_large_field_number),
+            }
+        }
+    }
 }
 
 pub use _puroro_impls::*;
@@ -3050,6 +3068,14 @@ pub mod _puroro_nested {
                             &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
                         )
                         .finish()
+                }
+            }
+
+            impl ::std::clone::Clone for Submsg {
+                fn clone(&self) -> Self {
+                    Self {
+                        i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                    }
                 }
             }
         }

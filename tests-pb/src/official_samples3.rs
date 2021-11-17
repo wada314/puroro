@@ -96,6 +96,14 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Test1 {
+        fn clone(&self) -> Self {
+            Self {
+                a: ::std::clone::Clone::clone(&self.a),
+            }
+        }
+    }
     pub struct Test2 {
         pub b: ::std::string::String,
     }
@@ -177,6 +185,14 @@ pub mod _puroro_simple_impl {
             f.debug_struct("Test2")
                 .field("b", &<Self as super::_puroro_traits::Test2Trait>::b(self))
                 .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Test2 {
+        fn clone(&self) -> Self {
+            Self {
+                b: ::std::clone::Clone::clone(&self.b),
+            }
         }
     }
     pub struct Test3 {
@@ -271,6 +287,14 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Test3 {
+        fn clone(&self) -> Self {
+            Self {
+                c: ::std::clone::Clone::clone(&self.c),
+            }
+        }
+    }
     pub struct Test4 {
         pub d: ::std::vec::Vec<i32>,
     }
@@ -350,6 +374,14 @@ pub mod _puroro_simple_impl {
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Test4 {
+        fn clone(&self) -> Self {
+            Self {
+                d: ::std::clone::Clone::clone(&self.d),
+            }
         }
     }
 }

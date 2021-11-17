@@ -92,6 +92,14 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                r#type: ::std::clone::Clone::clone(&self.r#type),
+            }
+        }
+    }
 }
 
 pub use _puroro_impls::*;

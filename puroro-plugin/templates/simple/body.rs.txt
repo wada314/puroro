@@ -185,3 +185,19 @@ where
             .finish()
     }
 }
+
+impl ::std::clone::Clone for {{ m.simple_ident }} {
+    fn clone(&self) -> Self {
+        Self {
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {{ field.ident }}: ::std::clone::Clone::clone(&self.{{ field.ident }}),
+            {%- endif %} {#- if !field.is_explicit_oneof_field #}
+            {%- endfor %} {#- for field in m.fields #}
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::std::clone::Clone::clone(&self.{{ oneof.field_ident }}),
+            {%- endfor %} {#- for oneof in m.oneofs #}
+        }
+    }
+}
+

@@ -105,6 +105,14 @@ pub mod _puroro_simple_impl {
                 .finish()
         }
     }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                recursive_unlabeled: ::std::clone::Clone::clone(&self.recursive_unlabeled),
+            }
+        }
+    }
 }
 
 pub use _puroro_impls::*;
