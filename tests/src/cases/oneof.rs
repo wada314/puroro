@@ -122,10 +122,10 @@ fn test_oneof_simple3() {
     assert!(!msg.has_g2_f32());
     assert!(!msg.has_g2_submsg());
     *msg.g2_submsg_mut() = Box::new(Submsg3::default());
-    *msg.g2_submsg_mut().i32_optional_mut() = Some(100);
+    *msg.g2_submsg_mut().i32_unlabeled_mut() = 100;
     assert!(matches!(msg.group_two(), Some(GroupTwo3::G2Submsg(_))));
     assert!(msg.g2_submsg().is_some());
-    assert_eq!(msg.g2_submsg().unwrap().i32_optional(), 100);
+    assert_eq!(msg.g2_submsg().unwrap().i32_unlabeled(), 100);
     assert!(!msg.has_g2_f32());
     assert!(!msg.has_g2_string());
     msg.clear_group_two();
