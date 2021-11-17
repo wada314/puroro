@@ -17,8 +17,6 @@ It has an initializer method `::new_in(t: T, bump: &'bump Bump)`,
 which takes the reference to the `Bump` allocator with lifetime `'bump`.
 Though `Box` does not keep `&'bump Bump` after the initialization is done because
 `Box<'bump, T>` has no chance to reallocate the buffer.
-The lifetime `'bump` of `Box<'bump, t>` indicates:
-"This Box cannot outlive the source Bump instance which was given when I was allocated."
 
 - `String<'bump>, Vec<'bump, T>` Similar to the `Box<'bump, T>`, analogus to the
 standard library's `String` and `Vec`. Just one difference with the `Box` is that
@@ -191,9 +189,22 @@ fn main() {
     let name = {
         let mut person_ref = PersonRef::new_in(&bump);
         person_ref.name
-    };
+    }; // because `bump` is still alive here, so the `name` is also alive.
 }
 ```
 
+Again, we are using `std::mem::transmute` in the mutable getter method.
+We need this because the field type is `String<'bump>`, but the return type is `String<'_>`
+(where the lifetime `'_` is the lifetime of the `Person` struct itself),
+and the compiler doesn't know the relation between those 2 lifetimes.
+You can make the code compile by adding `'_: 'bump` (actually you need to name the lifetime instead of `'_`) bound,
+but remind that we are giving `'static` as a lifetime parameter for `PersonRc` struct.
+If we add the bound above, the method become only callable for static variable!
+
+As a side effect of introducing the `unsafe` conversion, the 2nd example in above code
+become uncompilable. In this case the lifetime `'bump` actually outlives the lifetime
+of the `PersonRef` struct, but because `PersonRc` struct lied about the `'bump` parameter
+so our getter methods decided to not trust the `'bump` param and instead use the
+struct's lifetime itself (`'_`). 
 
  */

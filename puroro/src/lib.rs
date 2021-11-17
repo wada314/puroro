@@ -180,3 +180,29 @@ pub type Result<T> = ::std::result::Result<T, PuroroError>;
 pub use ::bitvec;
 pub use ::bumpalo;
 pub use ::either::Either;
+
+use bumpalo::{
+    boxed::Box,
+    collections::{String, Vec},
+    Bump,
+};
+use std::ops::Deref;
+use std::rc::Rc;
+
+pub struct Person<'bump, B> {
+    pub name: String<'bump>,
+    pub partner: Option<Box<'bump, Person<'bump, B>>>,
+    pub children: Vec<'bump, Person<'bump, B>>,
+    _bump: B,
+}
+impl<'bump, B> Person<'bump, B> {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn name_mut<'this>(&'this mut self) -> &mut String<'this>
+    where
+        'this: 'bump,
+    {
+        &mut self.name
+    }
+}
