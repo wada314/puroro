@@ -102,7 +102,7 @@ This looks pretty straightforward except we are using `'static`.
 But one of the problem in this code comes up when you write an
 initializer function:
 
-```ignore
+```
 impl<'bump, B: Deref<Target=Bump>> Person<'bump, B> {
     pub fn new_in(bump: B) -> Self {
         let bump_ref: &Bump = unsafe {
@@ -125,7 +125,7 @@ so it cannot be moved.
 Instead, we are manually cutting off the borrow checker using `std::mem::transmute`
 function so that the borrow checker thinks the variable `bump` is "free" for moving.
 
-```ignore
+```
 pub fn main() {
     // This is okay
     let person_rc = {
@@ -158,7 +158,7 @@ Of course this is not correct, the code above is making a dangling pointer.
 Because of this, the struct fields cannot be public anymore --
 the user need to access the fields via getter methods which converts type into safe one:
 
-```ignore
+```
 impl<'bump, B> Person<'bump, B> {
     pub fn name(&self) -> &str {
         &self.name
@@ -227,7 +227,7 @@ so the struct needs 4 type info: the struct itself's `Bump` ptr type,
 the child message struct's `Bump` ptr type, a converter from the former to the latter,
 and the recursive set of 4 type params for the child message.
 
-```ignore
+```
 use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
 use std::ops::Deref;
 use std::rc::Rc;
@@ -273,7 +273,7 @@ pub type PersonBox = Person<'static, BoxBumpTypes>;
 First of all, THIS CODE MAKES COMPILER HANG FOREVER SO DO NOT COMPILE IT.
 
 The reason of hanging is the recursive type definition here:
-```ignore
+```
 pub struct Person<'bump, BT: BumpTypes> {
     // ...
     pub children: Vec<'bump, Person<'bump, BT::ChildBumpTypes<'bump>>>,

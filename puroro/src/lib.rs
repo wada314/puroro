@@ -167,7 +167,6 @@
 #![feature(type_alias_impl_trait)]
 
 mod common_traits;
-pub mod design_doc;
 mod error;
 pub mod internal;
 pub mod tags;
