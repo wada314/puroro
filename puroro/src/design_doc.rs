@@ -270,6 +270,16 @@ pub type PersonRc = Person<'static, CloningBumpType<Rc<Bump>>>;
 pub type PersonBox = Person<'static, BoxBumpTypes>;
 ```
 
-First of all, COMPILING THIS CODE MAKES COMPILER HANG FOREVER SO DO NOT COMPILE IT.
+First of all, THIS CODE MAKES COMPILER HANG FOREVER SO DO NOT COMPILE IT.
+
+The reason of hanging is the recursive type definition here:
+```ignore
+pub struct Person<'bump, BT: BumpTypes> {
+    // ...
+    pub children: Vec<'bump, Person<'bump, BT::ChildBumpTypes<'bump>>>,
+    //                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ...
+}
+```
 
  */
