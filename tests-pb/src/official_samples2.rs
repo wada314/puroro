@@ -13,7 +13,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test1 {
         pub a: ::std::option::Option<i32>,
     }
@@ -82,7 +81,34 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    impl ::std::fmt::Debug for Test1
+    where
+        Self: super::_puroro_traits::Test1Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test1")
+                .field(
+                    "a",
+                    &<Self as super::_puroro_traits::Test1Trait>::a_opt(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Test1 {
+        fn clone(&self) -> Self {
+            Self {
+                a: ::std::clone::Clone::clone(&self.a),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Test1 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.a == rhs.a && true
+        }
+    }
     pub struct Test2 {
         pub b: ::std::option::Option<::std::string::String>,
     }
@@ -151,7 +177,34 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    impl ::std::fmt::Debug for Test2
+    where
+        Self: super::_puroro_traits::Test2Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test2")
+                .field(
+                    "b",
+                    &<Self as super::_puroro_traits::Test2Trait>::b_opt(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Test2 {
+        fn clone(&self) -> Self {
+            Self {
+                b: ::std::clone::Clone::clone(&self.b),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Test2 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.b == rhs.b && true
+        }
+    }
     pub struct Test3 {
         pub c: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>,
@@ -233,7 +286,31 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    impl ::std::fmt::Debug for Test3
+    where
+        Self: super::_puroro_traits::Test3Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test3")
+                .field("c", &<Self as super::_puroro_traits::Test3Trait>::c(self))
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Test3 {
+        fn clone(&self) -> Self {
+            Self {
+                c: ::std::clone::Clone::clone(&self.c),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Test3 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.c == rhs.c && true
+        }
+    }
     pub struct Test4 {
         pub d: ::std::vec::Vec<i32>,
     }
@@ -298,6 +375,35 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Test4 {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Test4
+    where
+        Self: super::_puroro_traits::Test4Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test4")
+                .field(
+                    "d",
+                    &<Self as super::_puroro_traits::Test4Trait>::d(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Test4 {
+        fn clone(&self) -> Self {
+            Self {
+                d: ::std::clone::Clone::clone(&self.d),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Test4 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.d == rhs.d && true
         }
     }
 }
@@ -378,7 +484,6 @@ pub mod _puroro_impls {
             Self { a: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test1Bumpalo<'bump, BT>
     where
         BT: 'bump
@@ -633,7 +738,6 @@ pub mod _puroro_impls {
             Self { b: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test2Bumpalo<'bump, BT>
     where
         BT: 'bump
@@ -897,7 +1001,6 @@ pub mod _puroro_impls {
             Self { c: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test3Bumpalo<'bump, BT>
     where
         BT: 'bump
@@ -1190,7 +1293,6 @@ pub mod _puroro_impls {
             Self { d: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct Test4Bumpalo<'bump, BT>
     where
         BT: 'bump
@@ -1540,8 +1642,7 @@ pub mod _puroro_traits {
     }
 
     pub trait Test3Trait {
-        type Field3MessageType<'this>:
-            self::_puroro_root::official_samples2::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field3MessageType<'this>: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             where Self: 'this;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.c_opt()

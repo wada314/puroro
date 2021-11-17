@@ -10,7 +10,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_optional: ::std::option::Option<i32>,
         pub i32_repeated: ::std::vec::Vec<i32>,
@@ -275,6 +274,100 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Msg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "i32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                )
+                .field(
+                    "i32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "float_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
+                )
+                .field(
+                    "float_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "string_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
+                )
+                .field(
+                    "string_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "submsg_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_optional(self),
+                )
+                .field(
+                    "submsg_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "enum_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
+                )
+                .field(
+                    "enum_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "very_large_field_number",
+                    &<Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_optional: ::std::clone::Clone::clone(&self.float_optional),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                string_optional: ::std::clone::Clone::clone(&self.string_optional),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                submsg_optional: ::std::clone::Clone::clone(&self.submsg_optional),
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+                enum_optional: ::std::clone::Clone::clone(&self.enum_optional),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                very_large_field_number: ::std::clone::Clone::clone(&self.very_large_field_number),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_optional == rhs.i32_optional
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_optional == rhs.float_optional
+                && self.float_repeated == rhs.float_repeated
+                && self.string_optional == rhs.string_optional
+                && self.string_repeated == rhs.string_repeated
+                && self.submsg_optional == rhs.submsg_optional
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.enum_optional == rhs.enum_optional
+                && self.enum_repeated == rhs.enum_repeated
+                && self.very_large_field_number == rhs.very_large_field_number
+                && true
         }
     }
 }
@@ -1643,7 +1736,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump, BT>
     where
         BT: 'bump
@@ -2368,8 +2460,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
-        type Field7MessageType<'this>:
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field7MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
         fn submsg_optional<'this>(
             &'this self,
@@ -2384,8 +2475,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field8MessageType<'this>:
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field8MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -2993,7 +3083,6 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Submsg {
                 pub i32_optional: ::std::option::Option<i32>,
             }
@@ -3061,6 +3150,34 @@ pub mod _puroro_nested {
             impl ::std::default::Default for Submsg {
                 fn default() -> Self {
                     Self::new()
+                }
+            }
+
+            impl ::std::fmt::Debug for Submsg
+            where
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                    f.debug_struct("Submsg")
+                        .field(
+                            "i32_optional",
+                            &<Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                        )
+                        .finish()
+                }
+            }
+
+            impl ::std::clone::Clone for Submsg {
+                fn clone(&self) -> Self {
+                    Self {
+                        i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                    }
+                }
+            }
+
+            impl ::std::cmp::PartialEq for Submsg {
+                fn eq(&self, rhs: &Self) -> bool {
+                    self.i32_optional == rhs.i32_optional && true
                 }
             }
         }
@@ -3143,7 +3260,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump, BT>
             where
                 BT: 'bump

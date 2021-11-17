@@ -11,7 +11,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub group_one: ::std::option::Option<
             super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
@@ -260,7 +259,59 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "g1_int32",
+                    &<Self as super::_puroro_traits::MsgTrait>::g1_int32_opt(self),
+                )
+                .field(
+                    "g1_string",
+                    &<Self as super::_puroro_traits::MsgTrait>::g1_string_opt(self),
+                )
+                .field(
+                    "g2_f32",
+                    &<Self as super::_puroro_traits::MsgTrait>::g2_f32_opt(self),
+                )
+                .field(
+                    "g2_string",
+                    &<Self as super::_puroro_traits::MsgTrait>::g2_string_opt(self),
+                )
+                .field(
+                    "g2_submsg",
+                    &<Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
+                )
+                .field(
+                    "g3_int32",
+                    &<Self as super::_puroro_traits::MsgTrait>::g3_int32_opt(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                group_one: ::std::clone::Clone::clone(&self.group_one),
+                group_two: ::std::clone::Clone::clone(&self.group_two),
+                group_three: ::std::clone::Clone::clone(&self.group_three),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.group_one == rhs.group_one
+                && self.group_two == rhs.group_two
+                && self.group_three == rhs.group_three
+                && true
+        }
+    }
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -331,6 +382,34 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Submsg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Submsg
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Submsg")
+                .field(
+                    "i32_unlabeled",
+                    &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Submsg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Submsg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_unlabeled == rhs.i32_unlabeled && true
         }
     }
 }
@@ -927,7 +1006,6 @@ pub mod _puroro_impls {
             Self { g3_int32: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump, BT>
     where
         BT: 'bump
@@ -1437,7 +1515,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct SubmsgBumpalo<'bump, BT>
     where
         BT: 'bump
@@ -1661,9 +1738,6 @@ pub mod _puroro_traits {
             self.g2_string_opt().is_some()
         }
         type Field5MessageType<'this>: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
         where
             Self: 'this;
         fn g2_submsg<'this>(&'this self) -> ::std::option::Option<Self::Field5MessageType<'this>> {
@@ -2167,7 +2241,6 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupOne<'msg, IsOwned>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
@@ -2208,7 +2281,59 @@ pub mod _puroro_nested {
                 }
             }
 
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+            impl<'msg, IsOwned> ::std::fmt::Debug for GroupOne<'msg, IsOwned>
+            where
+                i32: ::std::fmt::Debug,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::fmt::Debug,
+                IsOwned: ::puroro::internal::bool::BoolType,
+            {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                    match self {
+                        Self::G1Int32(v) => f.debug_tuple("GroupOne::G1Int32").field(&v).finish(),
+                        Self::G1String(v) => f.debug_tuple("GroupOne::G1String").field(&v).finish(),
+                    }
+                }
+            }
+
+            impl<'msg, IsOwned> ::std::clone::Clone for GroupOne<'msg, IsOwned>
+            where
+                i32: ::std::clone::Clone,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::clone::Clone,
+                IsOwned: ::puroro::internal::bool::BoolType,
+            {
+                fn clone(&self) -> Self {
+                    match self {
+                        Self::G1Int32(v) => Self::G1Int32(::std::clone::Clone::clone(&v)),
+                        Self::G1String(v) => Self::G1String(::std::clone::Clone::clone(&v)),
+                    }
+                }
+            }
+
+            impl<'msg, IsOwned> ::std::cmp::PartialEq for GroupOne<'msg, IsOwned>
+            where
+                i32: ::std::cmp::PartialEq,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::cmp::PartialEq,
+                IsOwned: ::puroro::internal::bool::BoolType,
+            {
+                fn eq(&self, rhs: &Self) -> bool {
+                    match (self, rhs) {
+                        (Self::G1Int32(left), Self::G1Int32(right)) => left == right,
+                        (Self::G1String(left), Self::G1String(right)) => left == right,
+                        #[allow(unreachable_patterns)]
+                        _ => false,
+                    }
+                }
+            }
+
             pub enum GroupTwo<'msg, IsOwned, T>
             where
                 IsOwned: ::puroro::internal::bool::BoolType,
@@ -2250,6 +2375,83 @@ pub mod _puroro_nested {
                         Self::G2Submsg(v) => ::std::option::Option::Some(v),
                         #[allow(unreachable_patterns)]
                         _ => None,
+                    }
+                }
+            }
+
+            impl<'msg, IsOwned, T> ::std::fmt::Debug for GroupTwo<'msg, IsOwned, T>
+            where
+                f32: ::std::fmt::Debug,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::fmt::Debug,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>,
+                    <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+                        'msg,
+                    >,
+                >: ::std::fmt::Debug,
+                IsOwned: ::puroro::internal::bool::BoolType,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                    match self {
+                        Self::G2F32(v) => f.debug_tuple("GroupTwo::G2F32").field(&v).finish(),
+                        Self::G2String(v) => f.debug_tuple("GroupTwo::G2String").field(&v).finish(),
+                        Self::G2Submsg(v) => f.debug_tuple("GroupTwo::G2Submsg").field(&v).finish(),
+                    }
+                }
+            }
+
+            impl<'msg, IsOwned, T> ::std::clone::Clone for GroupTwo<'msg, IsOwned, T>
+            where
+                f32: ::std::clone::Clone,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::clone::Clone,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>,
+                    <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+                        'msg,
+                    >,
+                >: ::std::clone::Clone,
+                IsOwned: ::puroro::internal::bool::BoolType,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            {
+                fn clone(&self) -> Self {
+                    match self {
+                        Self::G2F32(v) => Self::G2F32(::std::clone::Clone::clone(&v)),
+                        Self::G2String(v) => Self::G2String(::std::clone::Clone::clone(&v)),
+                        Self::G2Submsg(v) => Self::G2Submsg(::std::clone::Clone::clone(&v)),
+                    }
+                }
+            }
+
+            impl<'msg, IsOwned, T> ::std::cmp::PartialEq for GroupTwo<'msg, IsOwned, T>
+            where
+                f32: ::std::cmp::PartialEq,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::string::String,
+                    &'msg str,
+                >: ::std::cmp::PartialEq,
+                <IsOwned as ::puroro::internal::bool::BoolType>::Choose<
+                    ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>,
+                    <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+                        'msg,
+                    >,
+                >: ::std::cmp::PartialEq,
+                IsOwned: ::puroro::internal::bool::BoolType,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            {
+                fn eq(&self, rhs: &Self) -> bool {
+                    match (self, rhs) {
+                        (Self::G2F32(left), Self::G2F32(right)) => left == right,
+                        (Self::G2String(left), Self::G2String(right)) => left == right,
+                        (Self::G2Submsg(left), Self::G2Submsg(right)) => left == right,
+                        #[allow(unreachable_patterns)]
+                        _ => false,
                     }
                 }
             }
@@ -2310,7 +2512,6 @@ pub mod _puroro_nested {
                 }
             }
 
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupThree {
                 G3Int32(i32),
             }
@@ -2324,19 +2525,50 @@ pub mod _puroro_nested {
                     }
                 }
             }
+
+            impl ::std::fmt::Debug for GroupThree
+            where
+                i32: ::std::fmt::Debug,
+            {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                    match self {
+                        Self::G3Int32(v) => f.debug_tuple("GroupThree::G3Int32").field(&v).finish(),
+                    }
+                }
+            }
+
+            impl ::std::clone::Clone for GroupThree
+            where
+                i32: ::std::clone::Clone,
+            {
+                fn clone(&self) -> Self {
+                    match self {
+                        Self::G3Int32(v) => Self::G3Int32(::std::clone::Clone::clone(&v)),
+                    }
+                }
+            }
+
+            impl ::std::cmp::PartialEq for GroupThree
+            where
+                i32: ::std::cmp::PartialEq,
+            {
+                fn eq(&self, rhs: &Self) -> bool {
+                    match (self, rhs) {
+                        (Self::G3Int32(left), Self::G3Int32(right)) => left == right,
+                        #[allow(unreachable_patterns)]
+                        _ => false,
+                    }
+                }
+            }
         }
         pub mod _puroro_bumpalo_oneofs {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
 
-            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub(crate) enum GroupOne<'bump, BT>
             where
-                BT: 'bump
-                    + ::puroro::internal::impls::bumpalo::BumpTypes
-                    + ::std::fmt::Debug
-                    + ::std::cmp::PartialEq,
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
             {
                 _None(::std::marker::PhantomData<&'bump BT>),
                 G1Int32(i32),
@@ -2345,23 +2577,31 @@ pub mod _puroro_nested {
 
             impl<'bump, BT> ::std::default::Default for GroupOne<'bump, BT>
             where
-                BT: 'bump
-                    + ::puroro::internal::impls::bumpalo::BumpTypes
-                    + ::std::fmt::Debug
-                    + ::std::cmp::PartialEq,
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
             {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
                 }
             }
 
-            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
+            impl<'bump, BT> ::std::cmp::PartialEq for GroupOne<'bump, BT>
+            where
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
+            {
+                fn eq(&self, rhs: &Self) -> bool {
+                    match (self, rhs) {
+                        (Self::_None(_), Self::_None(_)) => true,
+                        (Self::G1Int32(left), Self::G1Int32(right)) => left == right,
+                        (Self::G1String(left), Self::G1String(right)) => left == right,
+                        #[allow(unreachable_patterns)]
+                        _ => false,
+                    }
+                }
+            }
+
             pub(crate) enum GroupTwo<'bump, BT>
             where
-                BT: 'bump
-                    + ::puroro::internal::impls::bumpalo::BumpTypes
-                    + ::std::fmt::Debug
-                    + ::std::cmp::PartialEq,
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
             {
                 _None(::std::marker::PhantomData<&'bump BT>),
                 G2F32(f32),
@@ -2379,23 +2619,32 @@ pub mod _puroro_nested {
 
             impl<'bump, BT> ::std::default::Default for GroupTwo<'bump, BT>
             where
-                BT: 'bump
-                    + ::puroro::internal::impls::bumpalo::BumpTypes
-                    + ::std::fmt::Debug
-                    + ::std::cmp::PartialEq,
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
             {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
                 }
             }
 
-            #[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
+            impl<'bump, BT> ::std::cmp::PartialEq for GroupTwo<'bump, BT>
+            where
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
+            {
+                fn eq(&self, rhs: &Self) -> bool {
+                    match (self, rhs) {
+                        (Self::_None(_), Self::_None(_)) => true,
+                        (Self::G2F32(left), Self::G2F32(right)) => left == right,
+                        (Self::G2String(left), Self::G2String(right)) => left == right,
+                        (Self::G2Submsg(left), Self::G2Submsg(right)) => left == right,
+                        #[allow(unreachable_patterns)]
+                        _ => false,
+                    }
+                }
+            }
+
             pub(crate) enum GroupThree<'bump, BT>
             where
-                BT: 'bump
-                    + ::puroro::internal::impls::bumpalo::BumpTypes
-                    + ::std::fmt::Debug
-                    + ::std::cmp::PartialEq,
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
             {
                 _None(::std::marker::PhantomData<&'bump BT>),
                 G3Int32(i32),
@@ -2403,13 +2652,24 @@ pub mod _puroro_nested {
 
             impl<'bump, BT> ::std::default::Default for GroupThree<'bump, BT>
             where
-                BT: 'bump
-                    + ::puroro::internal::impls::bumpalo::BumpTypes
-                    + ::std::fmt::Debug
-                    + ::std::cmp::PartialEq,
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
             {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
+                }
+            }
+
+            impl<'bump, BT> ::std::cmp::PartialEq for GroupThree<'bump, BT>
+            where
+                BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
+            {
+                fn eq(&self, rhs: &Self) -> bool {
+                    match (self, rhs) {
+                        (Self::_None(_), Self::_None(_)) => true,
+                        (Self::G3Int32(left), Self::G3Int32(right)) => left == right,
+                        #[allow(unreachable_patterns)]
+                        _ => false,
+                    }
                 }
             }
         }

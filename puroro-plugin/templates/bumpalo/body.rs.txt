@@ -1,4 +1,4 @@
-#[derive(::std::fmt::Debug)]
+
 pub struct {{ m.bumpalo_ident }}<'bump, BT>
 where
     BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,

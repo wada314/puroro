@@ -4,8 +4,7 @@ pub trait {{ m.trait_ident }} {
 
     {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
-    type Field{{ field.number }}MessageType<'this>:
-        {{ field_msg_path }} + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+    type Field{{ field.number }}MessageType<'this>: {{ field_msg_path }}
         where Self: 'this;
     {%- else %}
     {%- endmatch %}
