@@ -481,8 +481,8 @@ struct Trait<'a> {
 }
 
 #[derive(Template)]
-#[template(path = "bumpalo/oneof.rs.txt")]
-struct BumpaloOneof<'a> {
+#[template(path = "private_oneof.rs.txt")]
+struct PrivateOneof<'a> {
     oneof: &'a Oneof,
 }
 
@@ -494,7 +494,7 @@ mod filters {
     pub(super) fn print_trait(message: &Message) -> ::askama::Result<Trait> {
         Ok(Trait { m: message })
     }
-    pub(super) fn print_private_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
-        Ok(BumpaloOneof { oneof })
+    pub(super) fn print_private_oneof(oneof: &Oneof) -> ::askama::Result<PrivateOneof> {
+        Ok(PrivateOneof { oneof })
     }
 }

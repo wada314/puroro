@@ -1,0 +1,3 @@
+
+{%- include "simple/oneof.rs.txt" %}
+{%- include "bumpalo/oneof.rs.txt" %}
