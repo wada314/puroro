@@ -2,20 +2,13 @@
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
-    pub {{ field.ident }}: {{ field.simple_field_type }},
+    {{ field.ident }}: {{ field.simple_field_type }},
     {%- endif %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
-    pub {{ oneof.field_ident }}: ::std::option::Option<
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-        {%- if oneof.has_ld_field %}
-        {%- if oneof.has_message_field %}
-        <'static, ::puroro::internal::bool::True, Self>
-        {%- else %}
-        <'static, ::puroro::internal::bool::True>
-        {%- endif %}
-        {%- endif %}
+    {{ oneof.field_ident }}: ::std::option::Option<
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }}
     >,
     {%- endfor %}
 }
@@ -68,13 +61,14 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
             {%- endif %}
         >
     {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
         self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
             {%- for field in oneof.fields %}
             {% if field.is_length_delimited %}
-            E::{{ field.ident }}(v) => E::{{ field.ident }}(v.as_ref()),
+            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.as_ref()),
             {%- else %}
-            E::{{ field.ident }}(v) => E::{{ field.ident }}(v.clone()),
+            E::{{ field.ident }}(v) => F::{{ field.ident }}(v.clone()),
             {%- endif %}
             {%- endfor %}
         })
@@ -106,7 +100,7 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} 
             {%- for oneof in m.oneofs %}
             {%- for field in oneof.fields %}
             {{ field.number }} => {
-                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
                 if !matches!(
                     &self.{{ oneof.field_ident }},
                     Some(E::{{ field.ident }}(_)))

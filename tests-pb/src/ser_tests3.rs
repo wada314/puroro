@@ -11,23 +11,23 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub i32_unlabeled: i32,
-        pub i32_repeated: ::std::vec::Vec<i32>,
-        pub float_unlabeled: f32,
-        pub float_repeated: ::std::vec::Vec<f32>,
-        pub string_unlabeled: ::std::string::String,
-        pub string_repeated: ::std::vec::Vec<::std::string::String>,
-        pub submsg_unlabeled: ::std::option::Option<
+        i32_unlabeled: i32,
+        i32_repeated: ::std::vec::Vec<i32>,
+        float_unlabeled: f32,
+        float_repeated: ::std::vec::Vec<f32>,
+        string_unlabeled: ::std::string::String,
+        string_repeated: ::std::vec::Vec<::std::string::String>,
+        submsg_unlabeled: ::std::option::Option<
             ::std::boxed::Box<
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
             >,
         >,
-        pub submsg_repeated: ::std::vec::Vec<
+        submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >,
-        pub enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
-        pub enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
-        pub very_large_field_number: i32,
+        enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
+        enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
+        very_large_field_number: i32,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -3001,7 +3001,7 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                pub i32_unlabeled: i32,
+                i32_unlabeled: i32,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 

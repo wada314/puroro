@@ -4,3 +4,41 @@ pub(crate) enum {{ oneof.simple_enum_ident }} {
     {{ field.ident }}({{ field.simple_field_type }}),
     {%- endfor %}
 }
+
+impl ::std::fmt::Debug for {{ oneof.simple_enum_ident }} {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match self {
+            {%- for field in oneof.fields %}
+            Self::{{ field.ident }}(v) => f
+                .debug_tuple("{{ oneof.simple_enum_ident }}::{{ field.ident }}")
+                .field(&v)
+                .finish(),
+            {%- endfor %} {#- for field in oneof.fields #}
+        }
+    }
+}
+
+impl ::std::clone::Clone for {{ oneof.simple_enum_ident }} {
+    fn clone(&self) -> Self {
+        match self {
+            {%- for field in oneof.fields %}
+            Self::{{ field.ident }}(v) => Self::{{ field.ident }}(
+                ::std::clone::Clone::clone(&v)
+            ),
+            {%- endfor %} {#- for field in oneof.fields #}
+        }
+    }
+}
+
+impl ::std::cmp::PartialEq for {{ oneof.simple_enum_ident }} {
+    fn eq(&self, rhs: &Self) -> bool {
+        match (self, rhs) {
+            {%- for field in oneof.fields %}
+            (Self::{{ field.ident }}(left), Self::{{ field.ident }}(right)) => left == right,
+            {%- endfor %} {#- for field in oneof.fields #}
+            #[allow(unreachable_patterns)]
+            _ => false,
+        }
+    }
+}
+

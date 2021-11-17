@@ -11,7 +11,7 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub r#type: ::std::option::Option<i32>,
+        r#type: ::std::option::Option<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 

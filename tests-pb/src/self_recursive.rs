@@ -11,7 +11,7 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub recursive_unlabeled: ::std::option::Option<
+        recursive_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
         >,
     }

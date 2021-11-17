@@ -11,23 +11,23 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub i32_optional: ::std::option::Option<i32>,
-        pub i32_repeated: ::std::vec::Vec<i32>,
-        pub float_optional: ::std::option::Option<f32>,
-        pub float_repeated: ::std::vec::Vec<f32>,
-        pub string_optional: ::std::option::Option<::std::string::String>,
-        pub string_repeated: ::std::vec::Vec<::std::string::String>,
-        pub submsg_optional: ::std::option::Option<
+        i32_optional: ::std::option::Option<i32>,
+        i32_repeated: ::std::vec::Vec<i32>,
+        float_optional: ::std::option::Option<f32>,
+        float_repeated: ::std::vec::Vec<f32>,
+        string_optional: ::std::option::Option<::std::string::String>,
+        string_repeated: ::std::vec::Vec<::std::string::String>,
+        submsg_optional: ::std::option::Option<
             ::std::boxed::Box<
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
             >,
         >,
-        pub submsg_repeated: ::std::vec::Vec<
+        submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >,
-        pub enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
-        pub enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
-        pub very_large_field_number: ::std::option::Option<i32>,
+        enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
+        enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
+        very_large_field_number: ::std::option::Option<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -3007,7 +3007,7 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                pub i32_optional: ::std::option::Option<i32>,
+                i32_optional: ::std::option::Option<i32>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 

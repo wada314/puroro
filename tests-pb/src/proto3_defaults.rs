@@ -12,12 +12,12 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub i32_unlabeled: i32,
-        pub i32_optional: ::std::option::Option<i32>,
-        pub i32_repeated: ::std::vec::Vec<i32>,
-        pub f32_unlabeled: f32,
-        pub string_unlabeled: ::std::string::String,
-        pub submsg_unlabeled: ::std::option::Option<
+        i32_unlabeled: i32,
+        i32_optional: ::std::option::Option<i32>,
+        i32_repeated: ::std::vec::Vec<i32>,
+        f32_unlabeled: f32,
+        string_unlabeled: ::std::string::String,
+        submsg_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
         >,
     }
@@ -242,7 +242,7 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Submsg {
-        pub i32_unlabeled: i32,
+        i32_unlabeled: i32,
     }
     impl ::puroro::Message<Submsg> for Submsg {}
 

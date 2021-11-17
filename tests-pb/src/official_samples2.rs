@@ -14,7 +14,7 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Test1 {
-        pub a: ::std::option::Option<i32>,
+        a: ::std::option::Option<i32>,
     }
     impl ::puroro::Message<Test1> for Test1 {}
 
@@ -110,7 +110,7 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Test2 {
-        pub b: ::std::option::Option<::std::string::String>,
+        b: ::std::option::Option<::std::string::String>,
     }
     impl ::puroro::Message<Test2> for Test2 {}
 
@@ -206,7 +206,7 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Test3 {
-        pub c: ::std::option::Option<
+        c: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>,
         >,
     }
@@ -312,7 +312,7 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Test4 {
-        pub d: ::std::vec::Vec<i32>,
+        d: ::std::vec::Vec<i32>,
     }
     impl ::puroro::Message<Test4> for Test4 {}
 
