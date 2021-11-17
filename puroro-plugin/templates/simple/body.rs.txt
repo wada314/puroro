@@ -201,3 +201,16 @@ impl ::std::clone::Clone for {{ m.simple_ident }} {
     }
 }
 
+impl ::std::cmp::PartialEq for {{ m.simple_ident }} {
+    fn eq(&self, rhs: &Self) -> bool {
+        {%- for field in m.fields %}
+        {%- if !field.is_explicit_oneof_field %}
+        self.{{ field.ident }} == rhs.{{ field.ident }} &&
+        {%- endif %} {#- if !field.is_explicit_oneof_field #}
+        {%- endfor %} {#- for field in m.fields #}
+        {%- for oneof in m.oneofs %}
+        self.{{ oneof.field_ident }} == rhs.{{ oneof.field_ident }} &&
+        {%- endfor %} {#- for oneof in m.oneofs #}
+        true
+    }
+}

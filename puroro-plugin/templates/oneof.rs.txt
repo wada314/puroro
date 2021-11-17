@@ -45,6 +45,31 @@ where
     {%- endfor %}
 }
 
+
+impl{{ maybe_gp }} ::std::fmt::Debug for {{ enum_ident }}{{ maybe_gp }}
+where
+    {%- for field in fields %}
+    {{ field.field_type }}: ::std::fmt::Debug,
+    {%- endfor %} {#- for field in fields #}
+    {%- if has_ld_field %}
+    IsOwned: ::puroro::internal::bool::BoolType,
+    {%- if has_message_field %}
+    T: 'msg + ?Sized + {{ owner_message_trait_path }},
+    {%- endif %}
+    {%- endif %}
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match self {
+            {%- for field in fields %}
+            Self::{{ field.ident }}(v) => f
+                .debug_tuple("{{ enum_ident }}::{{ field.ident }}")
+                .field(&v)
+                .finish(),
+            {%- endfor %} {#- for field in fields #}
+        }
+    }
+}
+
 impl{{ maybe_gp }} ::std::clone::Clone for {{ enum_ident }}{{ maybe_gp }}
 where
     {%- for field in fields %}
@@ -64,6 +89,29 @@ where
                 ::std::clone::Clone::clone(&v)
             ),
             {%- endfor %} {#- for field in fields #}
+        }
+    }
+}
+
+impl{{ maybe_gp }} ::std::cmp::PartialEq for {{ enum_ident }}{{ maybe_gp }}
+where
+    {%- for field in fields %}
+    {{ field.field_type }}: ::std::cmp::PartialEq,
+    {%- endfor %} {#- for field in fields #}
+    {%- if has_ld_field %}
+    IsOwned: ::puroro::internal::bool::BoolType,
+    {%- if has_message_field %}
+    T: 'msg + ?Sized + {{ owner_message_trait_path }},
+    {%- endif %}
+    {%- endif %}
+{
+    fn eq(&self, rhs: &Self) -> bool {
+        match (self, rhs) {
+            {%- for field in fields %}
+            (Self::{{ field.ident }}(left), Self::{{ field.ident }}(right)) => left == right,
+            {%- endfor %} {#- for field in fields #}
+            #[allow(unreachable_patterns)]
+            _ => false,
         }
     }
 }

@@ -229,6 +229,18 @@ pub mod _puroro_simple_impl {
             }
         }
     }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_unlabeled == rhs.i32_unlabeled
+                && self.i32_optional == rhs.i32_optional
+                && self.i32_repeated == rhs.i32_repeated
+                && self.f32_unlabeled == rhs.f32_unlabeled
+                && self.string_unlabeled == rhs.string_unlabeled
+                && self.submsg_unlabeled == rhs.submsg_unlabeled
+                && true
+        }
+    }
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -321,6 +333,12 @@ pub mod _puroro_simple_impl {
             Self {
                 i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
             }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Submsg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_unlabeled == rhs.i32_unlabeled && true
         }
     }
 }

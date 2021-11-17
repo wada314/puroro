@@ -373,6 +373,23 @@ pub mod _puroro_simple_impl {
             }
         }
     }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_unlabeled == rhs.i32_unlabeled
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_unlabeled == rhs.float_unlabeled
+                && self.float_repeated == rhs.float_repeated
+                && self.string_unlabeled == rhs.string_unlabeled
+                && self.string_repeated == rhs.string_repeated
+                && self.submsg_unlabeled == rhs.submsg_unlabeled
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.enum_unlabeled == rhs.enum_unlabeled
+                && self.enum_repeated == rhs.enum_repeated
+                && self.very_large_field_number == rhs.very_large_field_number
+                && true
+        }
+    }
 }
 
 pub use _puroro_impls::*;
@@ -3076,6 +3093,12 @@ pub mod _puroro_nested {
                     Self {
                         i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                     }
+                }
+            }
+
+            impl ::std::cmp::PartialEq for Submsg {
+                fn eq(&self, rhs: &Self) -> bool {
+                    self.i32_unlabeled == rhs.i32_unlabeled && true
                 }
             }
         }

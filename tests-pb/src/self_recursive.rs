@@ -113,6 +113,12 @@ pub mod _puroro_simple_impl {
             }
         }
     }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.recursive_unlabeled == rhs.recursive_unlabeled && true
+        }
+    }
 }
 
 pub use _puroro_impls::*;

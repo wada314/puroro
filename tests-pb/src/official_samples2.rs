@@ -103,6 +103,12 @@ pub mod _puroro_simple_impl {
             }
         }
     }
+
+    impl ::std::cmp::PartialEq for Test1 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.a == rhs.a && true
+        }
+    }
     pub struct Test2 {
         pub b: ::std::option::Option<::std::string::String>,
     }
@@ -191,6 +197,12 @@ pub mod _puroro_simple_impl {
             Self {
                 b: ::std::clone::Clone::clone(&self.b),
             }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Test2 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.b == rhs.b && true
         }
     }
     pub struct Test3 {
@@ -293,6 +305,12 @@ pub mod _puroro_simple_impl {
             }
         }
     }
+
+    impl ::std::cmp::PartialEq for Test3 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.c == rhs.c && true
+        }
+    }
     pub struct Test4 {
         pub d: ::std::vec::Vec<i32>,
     }
@@ -380,6 +398,12 @@ pub mod _puroro_simple_impl {
             Self {
                 d: ::std::clone::Clone::clone(&self.d),
             }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Test4 {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.d == rhs.d && true
         }
     }
 }
