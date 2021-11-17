@@ -248,8 +248,8 @@ impl<B: Deref<Target = Bump> + Clone> BumpTypes for CloningBumpType {
     }
     type ChildBumpTypes<'parent> = Self;
 }
-struct BoxBumpType;
-impl BumpTypes for BoxBumpType {
+struct BoxBumpTypes;
+impl BumpTypes for BoxBumpTypes {
     type BumpPtr = std::boxed::Box<Bump>;
     type ChildsBumpPtr<'parent> = &'parent Bump;
     fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
@@ -267,7 +267,7 @@ pub struct Person<'bump, BT: BumpTypes> {
 
 pub type PersonRef<'bump> = Person<'bump, CloningBumpType<&'bump Bump>>;
 pub type PersonRc = Person<'static, CloningBumpType<Rc<Bump>>>;
-pub type PersonBox = Person<'static, BoxBumpType>;
+pub type PersonBox = Person<'static, BoxBumpTypes>;
 ```
 
 First of all, COMPILING THIS CODE MAKES COMPILER HANG FOREVER SO DO NOT COMPILE IT.
