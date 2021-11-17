@@ -1,5 +1,4 @@
 
-#[derive(::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub(crate) enum {{ oneof.bumpalo_enum_ident }}<'bump> {
     _None(::std::marker::PhantomData<&'bump ()>),
     {%- for field in oneof.fields %}

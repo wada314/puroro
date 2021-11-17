@@ -10,7 +10,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
     pub i32_required: ::std::option::Option<i32>,
     pub i32_optional: ::std::option::Option<i32>,
@@ -884,6 +883,333 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Msg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "i32_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_required_opt(self),
+                )
+                .field(
+                    "i32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                )
+                .field(
+                    "i32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "float_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_required_opt(self),
+                )
+                .field(
+                    "float_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
+                )
+                .field(
+                    "float_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "bytes_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_required_opt(self),
+                )
+                .field(
+                    "bytes_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_optional_opt(self),
+                )
+                .field(
+                    "bytes_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "string_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_required_opt(self),
+                )
+                .field(
+                    "string_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
+                )
+                .field(
+                    "string_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "enum_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_required_opt(self),
+                )
+                .field(
+                    "enum_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
+                )
+                .field(
+                    "enum_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "submsg_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_required(self),
+                )
+                .field(
+                    "submsg_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_optional(self),
+                )
+                .field(
+                    "submsg_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "i64_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_required_opt(self),
+                )
+                .field(
+                    "i64_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_optional_opt(self),
+                )
+                .field(
+                    "i64_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "u32_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_required_opt(self),
+                )
+                .field(
+                    "u32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_optional_opt(self),
+                )
+                .field(
+                    "u32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "u64_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_required_opt(self),
+                )
+                .field(
+                    "u64_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_optional_opt(self),
+                )
+                .field(
+                    "u64_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "s32_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::s32_required_opt(self),
+                )
+                .field(
+                    "s32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::s32_optional_opt(self),
+                )
+                .field(
+                    "s32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::s32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "s64_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::s64_required_opt(self),
+                )
+                .field(
+                    "s64_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::s64_optional_opt(self),
+                )
+                .field(
+                    "s64_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::s64_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "fixed32_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::fixed32_required_opt(self),
+                )
+                .field(
+                    "fixed32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::fixed32_optional_opt(self),
+                )
+                .field(
+                    "fixed32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::fixed32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "fixed64_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::fixed64_required_opt(self),
+                )
+                .field(
+                    "fixed64_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::fixed64_optional_opt(self),
+                )
+                .field(
+                    "fixed64_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::fixed64_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "sfixed32_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::sfixed32_required_opt(self),
+                )
+                .field(
+                    "sfixed32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::sfixed32_optional_opt(self),
+                )
+                .field(
+                    "sfixed32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::sfixed32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "sfixed64_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::sfixed64_required_opt(self),
+                )
+                .field(
+                    "sfixed64_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::sfixed64_optional_opt(self),
+                )
+                .field(
+                    "sfixed64_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::sfixed64_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "f64_required",
+                    &<Self as super::_puroro_traits::MsgTrait>::f64_required_opt(self),
+                )
+                .field(
+                    "f64_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::f64_optional_opt(self),
+                )
+                .field(
+                    "f64_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::f64_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_required: ::std::clone::Clone::clone(&self.i32_required),
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_required: ::std::clone::Clone::clone(&self.float_required),
+                float_optional: ::std::clone::Clone::clone(&self.float_optional),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                bytes_required: ::std::clone::Clone::clone(&self.bytes_required),
+                bytes_optional: ::std::clone::Clone::clone(&self.bytes_optional),
+                bytes_repeated: ::std::clone::Clone::clone(&self.bytes_repeated),
+                string_required: ::std::clone::Clone::clone(&self.string_required),
+                string_optional: ::std::clone::Clone::clone(&self.string_optional),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                enum_required: ::std::clone::Clone::clone(&self.enum_required),
+                enum_optional: ::std::clone::Clone::clone(&self.enum_optional),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                submsg_required: ::std::clone::Clone::clone(&self.submsg_required),
+                submsg_optional: ::std::clone::Clone::clone(&self.submsg_optional),
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+                i64_required: ::std::clone::Clone::clone(&self.i64_required),
+                i64_optional: ::std::clone::Clone::clone(&self.i64_optional),
+                i64_repeated: ::std::clone::Clone::clone(&self.i64_repeated),
+                u32_required: ::std::clone::Clone::clone(&self.u32_required),
+                u32_optional: ::std::clone::Clone::clone(&self.u32_optional),
+                u32_repeated: ::std::clone::Clone::clone(&self.u32_repeated),
+                u64_required: ::std::clone::Clone::clone(&self.u64_required),
+                u64_optional: ::std::clone::Clone::clone(&self.u64_optional),
+                u64_repeated: ::std::clone::Clone::clone(&self.u64_repeated),
+                s32_required: ::std::clone::Clone::clone(&self.s32_required),
+                s32_optional: ::std::clone::Clone::clone(&self.s32_optional),
+                s32_repeated: ::std::clone::Clone::clone(&self.s32_repeated),
+                s64_required: ::std::clone::Clone::clone(&self.s64_required),
+                s64_optional: ::std::clone::Clone::clone(&self.s64_optional),
+                s64_repeated: ::std::clone::Clone::clone(&self.s64_repeated),
+                fixed32_required: ::std::clone::Clone::clone(&self.fixed32_required),
+                fixed32_optional: ::std::clone::Clone::clone(&self.fixed32_optional),
+                fixed32_repeated: ::std::clone::Clone::clone(&self.fixed32_repeated),
+                fixed64_required: ::std::clone::Clone::clone(&self.fixed64_required),
+                fixed64_optional: ::std::clone::Clone::clone(&self.fixed64_optional),
+                fixed64_repeated: ::std::clone::Clone::clone(&self.fixed64_repeated),
+                sfixed32_required: ::std::clone::Clone::clone(&self.sfixed32_required),
+                sfixed32_optional: ::std::clone::Clone::clone(&self.sfixed32_optional),
+                sfixed32_repeated: ::std::clone::Clone::clone(&self.sfixed32_repeated),
+                sfixed64_required: ::std::clone::Clone::clone(&self.sfixed64_required),
+                sfixed64_optional: ::std::clone::Clone::clone(&self.sfixed64_optional),
+                sfixed64_repeated: ::std::clone::Clone::clone(&self.sfixed64_repeated),
+                f64_required: ::std::clone::Clone::clone(&self.f64_required),
+                f64_optional: ::std::clone::Clone::clone(&self.f64_optional),
+                f64_repeated: ::std::clone::Clone::clone(&self.f64_repeated),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_required == rhs.i32_required
+                && self.i32_optional == rhs.i32_optional
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_required == rhs.float_required
+                && self.float_optional == rhs.float_optional
+                && self.float_repeated == rhs.float_repeated
+                && self.bytes_required == rhs.bytes_required
+                && self.bytes_optional == rhs.bytes_optional
+                && self.bytes_repeated == rhs.bytes_repeated
+                && self.string_required == rhs.string_required
+                && self.string_optional == rhs.string_optional
+                && self.string_repeated == rhs.string_repeated
+                && self.enum_required == rhs.enum_required
+                && self.enum_optional == rhs.enum_optional
+                && self.enum_repeated == rhs.enum_repeated
+                && self.submsg_required == rhs.submsg_required
+                && self.submsg_optional == rhs.submsg_optional
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.i64_required == rhs.i64_required
+                && self.i64_optional == rhs.i64_optional
+                && self.i64_repeated == rhs.i64_repeated
+                && self.u32_required == rhs.u32_required
+                && self.u32_optional == rhs.u32_optional
+                && self.u32_repeated == rhs.u32_repeated
+                && self.u64_required == rhs.u64_required
+                && self.u64_optional == rhs.u64_optional
+                && self.u64_repeated == rhs.u64_repeated
+                && self.s32_required == rhs.s32_required
+                && self.s32_optional == rhs.s32_optional
+                && self.s32_repeated == rhs.s32_repeated
+                && self.s64_required == rhs.s64_required
+                && self.s64_optional == rhs.s64_optional
+                && self.s64_repeated == rhs.s64_repeated
+                && self.fixed32_required == rhs.fixed32_required
+                && self.fixed32_optional == rhs.fixed32_optional
+                && self.fixed32_repeated == rhs.fixed32_repeated
+                && self.fixed64_required == rhs.fixed64_required
+                && self.fixed64_optional == rhs.fixed64_optional
+                && self.fixed64_repeated == rhs.fixed64_repeated
+                && self.sfixed32_required == rhs.sfixed32_required
+                && self.sfixed32_optional == rhs.sfixed32_optional
+                && self.sfixed32_repeated == rhs.sfixed32_repeated
+                && self.sfixed64_required == rhs.sfixed64_required
+                && self.sfixed64_optional == rhs.sfixed64_optional
+                && self.sfixed64_repeated == rhs.sfixed64_repeated
+                && self.f64_required == rhs.f64_required
+                && self.f64_optional == rhs.f64_optional
+                && self.f64_repeated == rhs.f64_repeated
+                && true
         }
     }
 }
@@ -10620,7 +10946,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
     _bitfield: ::puroro::bitvec::array::BitArray<
@@ -11806,61 +12131,6 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.i32_required == rhs.i32_required
-                && self.i32_optional == rhs.i32_optional
-                && self.i32_repeated == rhs.i32_repeated
-                && self.float_required == rhs.float_required
-                && self.float_optional == rhs.float_optional
-                && self.float_repeated == rhs.float_repeated
-                && self.bytes_required == rhs.bytes_required
-                && self.bytes_optional == rhs.bytes_optional
-                && self.bytes_repeated == rhs.bytes_repeated
-                && self.string_required == rhs.string_required
-                && self.string_optional == rhs.string_optional
-                && self.string_repeated == rhs.string_repeated
-                && self.enum_required == rhs.enum_required
-                && self.enum_optional == rhs.enum_optional
-                && self.enum_repeated == rhs.enum_repeated
-                && self.submsg_required == rhs.submsg_required
-                && self.submsg_optional == rhs.submsg_optional
-                && self.submsg_repeated == rhs.submsg_repeated
-                && self.i64_required == rhs.i64_required
-                && self.i64_optional == rhs.i64_optional
-                && self.i64_repeated == rhs.i64_repeated
-                && self.u32_required == rhs.u32_required
-                && self.u32_optional == rhs.u32_optional
-                && self.u32_repeated == rhs.u32_repeated
-                && self.u64_required == rhs.u64_required
-                && self.u64_optional == rhs.u64_optional
-                && self.u64_repeated == rhs.u64_repeated
-                && self.s32_required == rhs.s32_required
-                && self.s32_optional == rhs.s32_optional
-                && self.s32_repeated == rhs.s32_repeated
-                && self.s64_required == rhs.s64_required
-                && self.s64_optional == rhs.s64_optional
-                && self.s64_repeated == rhs.s64_repeated
-                && self.fixed32_required == rhs.fixed32_required
-                && self.fixed32_optional == rhs.fixed32_optional
-                && self.fixed32_repeated == rhs.fixed32_repeated
-                && self.fixed64_required == rhs.fixed64_required
-                && self.fixed64_optional == rhs.fixed64_optional
-                && self.fixed64_repeated == rhs.fixed64_repeated
-                && self.sfixed32_required == rhs.sfixed32_required
-                && self.sfixed32_optional == rhs.sfixed32_optional
-                && self.sfixed32_repeated == rhs.sfixed32_repeated
-                && self.sfixed64_required == rhs.sfixed64_required
-                && self.sfixed64_optional == rhs.sfixed64_optional
-                && self.sfixed64_repeated == rhs.sfixed64_repeated
-                && self.f64_required == rhs.f64_required
-                && self.f64_optional == rhs.f64_optional
-                && self.f64_repeated == rhs.f64_repeated
-                && true
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -12886,8 +13156,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this>;
-        type Field51MessageType<'this>:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field51MessageType<'this>: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
         fn submsg_required<'this>(
             &'this self,
@@ -12902,8 +13171,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field52MessageType<'this>:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field52MessageType<'this>: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
         fn submsg_optional<'this>(
             &'this self,
@@ -12918,8 +13186,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field53MessageType<'this>:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field53MessageType<'this>: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         type Field53RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -14879,7 +15146,6 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Submsg {
                 pub i32_required: ::std::option::Option<i32>,
                 pub i64_required: ::std::option::Option<i64>,
@@ -14964,6 +15230,41 @@ pub mod _puroro_nested {
             impl ::std::default::Default for Submsg {
                 fn default() -> Self {
                     Self::new()
+                }
+            }
+
+            impl ::std::fmt::Debug for Submsg
+            where
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                    f.debug_struct("Submsg")
+                        .field(
+                            "i32_required",
+                            &<Self as super::_puroro_traits::SubmsgTrait>::i32_required_opt(self),
+                        )
+                        .field(
+                            "i64_required",
+                            &<Self as super::_puroro_traits::SubmsgTrait>::i64_required_opt(self),
+                        )
+                        .finish()
+                }
+            }
+
+            impl ::std::clone::Clone for Submsg {
+                fn clone(&self) -> Self {
+                    Self {
+                        i32_required: ::std::clone::Clone::clone(&self.i32_required),
+                        i64_required: ::std::clone::Clone::clone(&self.i64_required),
+                    }
+                }
+            }
+
+            impl ::std::cmp::PartialEq for Submsg {
+                fn eq(&self, rhs: &Self) -> bool {
+                    self.i32_required == rhs.i32_required
+                        && self.i64_required == rhs.i64_required
+                        && true
                 }
             }
         }
@@ -15118,7 +15419,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 _bitfield: ::puroro::bitvec::array::BitArray<
@@ -15229,15 +15529,6 @@ pub mod _puroro_nested {
                         out,
                     )?;
                     ::std::result::Result::Ok(())
-                }
-            }
-
-            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
-                fn eq(&self, rhs: &Self) -> bool {
-                    ::std::ptr::eq(self._bump, rhs._bump)
-                        && self.i32_required == rhs.i32_required
-                        && self.i64_required == rhs.i64_required
-                        && true
                 }
             }
             pub struct SubmsgBuilder<T>(T);

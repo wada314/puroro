@@ -10,7 +10,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_unlabeled: i32,
         pub i32_repeated: ::std::vec::Vec<i32>,
@@ -295,6 +294,100 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Msg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "i32_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_unlabeled(self),
+                )
+                .field(
+                    "i32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "float_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_unlabeled(self),
+                )
+                .field(
+                    "float_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "string_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_unlabeled(self),
+                )
+                .field(
+                    "string_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "submsg_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self),
+                )
+                .field(
+                    "submsg_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "enum_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_unlabeled(self),
+                )
+                .field(
+                    "enum_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "very_large_field_number",
+                    &<Self as super::_puroro_traits::MsgTrait>::very_large_field_number(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                float_unlabeled: ::std::clone::Clone::clone(&self.float_unlabeled),
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+                submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+                enum_unlabeled: ::std::clone::Clone::clone(&self.enum_unlabeled),
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+                very_large_field_number: ::std::clone::Clone::clone(&self.very_large_field_number),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_unlabeled == rhs.i32_unlabeled
+                && self.i32_repeated == rhs.i32_repeated
+                && self.float_unlabeled == rhs.float_unlabeled
+                && self.float_repeated == rhs.float_repeated
+                && self.string_unlabeled == rhs.string_unlabeled
+                && self.string_repeated == rhs.string_repeated
+                && self.submsg_unlabeled == rhs.submsg_unlabeled
+                && self.submsg_repeated == rhs.submsg_repeated
+                && self.enum_unlabeled == rhs.enum_unlabeled
+                && self.enum_repeated == rhs.enum_repeated
+                && self.very_large_field_number == rhs.very_large_field_number
+                && true
         }
     }
 }
@@ -1663,7 +1756,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -2000,24 +2092,6 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.i32_unlabeled == rhs.i32_unlabeled
-                && self.i32_repeated == rhs.i32_repeated
-                && self.float_unlabeled == rhs.float_unlabeled
-                && self.float_repeated == rhs.float_repeated
-                && self.string_unlabeled == rhs.string_unlabeled
-                && self.string_repeated == rhs.string_repeated
-                && self.submsg_unlabeled == rhs.submsg_unlabeled
-                && self.submsg_repeated == rhs.submsg_repeated
-                && self.enum_unlabeled == rhs.enum_unlabeled
-                && self.enum_repeated == rhs.enum_repeated
-                && self.very_large_field_number == rhs.very_large_field_number
-                && true
-        }
-    }
     pub struct MsgBuilder<T>(T);
 
     impl<T> MsgBuilder<T>
@@ -2295,8 +2369,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
-        type Field7MessageType<'this>:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field7MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
         fn submsg_unlabeled<'this>(
             &'this self,
@@ -2311,8 +2384,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field8MessageType<'this>:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug
+        type Field8MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -2928,7 +3000,6 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub struct Submsg {
                 pub i32_unlabeled: i32,
             }
@@ -3000,6 +3071,34 @@ pub mod _puroro_nested {
             impl ::std::default::Default for Submsg {
                 fn default() -> Self {
                     Self::new()
+                }
+            }
+
+            impl ::std::fmt::Debug for Submsg
+            where
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                    f.debug_struct("Submsg")
+                        .field(
+                            "i32_unlabeled",
+                            &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
+                        )
+                        .finish()
+                }
+            }
+
+            impl ::std::clone::Clone for Submsg {
+                fn clone(&self) -> Self {
+                    Self {
+                        i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                    }
+                }
+            }
+
+            impl ::std::cmp::PartialEq for Submsg {
+                fn eq(&self, rhs: &Self) -> bool {
+                    self.i32_unlabeled == rhs.i32_unlabeled && true
                 }
             }
         }
@@ -3082,7 +3181,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::fmt::Debug)]
             pub struct SubmsgBumpalo<'bump> {
                 _bump: &'bump ::puroro::bumpalo::Bump,
                 _bitfield: ::puroro::bitvec::array::BitArray<
@@ -3166,14 +3264,6 @@ pub mod _puroro_nested {
                         out,
                     )?;
                     ::std::result::Result::Ok(())
-                }
-            }
-
-            impl<'bump> ::std::cmp::PartialEq for SubmsgBumpalo<'bump> {
-                fn eq(&self, rhs: &Self) -> bool {
-                    ::std::ptr::eq(self._bump, rhs._bump)
-                        && self.i32_unlabeled == rhs.i32_unlabeled
-                        && true
                 }
             }
             pub struct SubmsgBuilder<T>(T);

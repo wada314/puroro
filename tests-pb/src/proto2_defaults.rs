@@ -10,7 +10,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub i32_default: ::std::option::Option<i32>,
         pub i32_0: ::std::option::Option<i32>,
@@ -1063,6 +1062,405 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Msg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "i32_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_default_opt(self),
+                )
+                .field(
+                    "i32_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_0_opt(self),
+                )
+                .field(
+                    "i32_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_42_opt(self),
+                )
+                .field(
+                    "i32_m42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_m42_opt(self),
+                )
+                .field(
+                    "i32_2147483647",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_2147483647_opt(self),
+                )
+                .field(
+                    "i32_m2147483648",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_m2147483648_opt(self),
+                )
+                .field(
+                    "i32_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_0123_opt(self),
+                )
+                .field(
+                    "i32_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_0x123_opt(self),
+                )
+                .field(
+                    "u32_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_default_opt(self),
+                )
+                .field(
+                    "u32_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_0_opt(self),
+                )
+                .field(
+                    "u32_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_42_opt(self),
+                )
+                .field(
+                    "u32_4294967295",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_4294967295_opt(self),
+                )
+                .field(
+                    "u32_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_0123_opt(self),
+                )
+                .field(
+                    "u32_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_0x123_opt(self),
+                )
+                .field(
+                    "i64_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_default_opt(self),
+                )
+                .field(
+                    "i64_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_0_opt(self),
+                )
+                .field(
+                    "i64_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_42_opt(self),
+                )
+                .field(
+                    "i64_m42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_m42_opt(self),
+                )
+                .field(
+                    "i64_9223372036854775807",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807_opt(self),
+                )
+                .field(
+                    "i64_m9223372036854775808",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808_opt(self),
+                )
+                .field(
+                    "i64_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_0123_opt(self),
+                )
+                .field(
+                    "i64_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_0x123_opt(self),
+                )
+                .field(
+                    "u64_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_default_opt(self),
+                )
+                .field(
+                    "u64_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_0_opt(self),
+                )
+                .field(
+                    "u64_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_42_opt(self),
+                )
+                .field(
+                    "u64_18446744073709551615",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615_opt(self),
+                )
+                .field(
+                    "u64_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_0123_opt(self),
+                )
+                .field(
+                    "u64_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_0x123_opt(self),
+                )
+                .field(
+                    "f32_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_default_opt(self),
+                )
+                .field(
+                    "f32_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0_opt(self),
+                )
+                .field(
+                    "f32_m0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_m0_opt(self),
+                )
+                .field(
+                    "f32_0p",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p_opt(self),
+                )
+                .field(
+                    "f32_p0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_p0_opt(self),
+                )
+                .field(
+                    "f32_0p0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p0_opt(self),
+                )
+                .field(
+                    "f32_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_42_opt(self),
+                )
+                .field(
+                    "f32_m42",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_m42_opt(self),
+                )
+                .field(
+                    "f32_0p25",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p25_opt(self),
+                )
+                .field(
+                    "f32_1p5e2",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_1p5e2_opt(self),
+                )
+                .field(
+                    "f32_inf",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_inf_opt(self),
+                )
+                .field(
+                    "f32_minf",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_minf_opt(self),
+                )
+                .field(
+                    "f32_nan",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_nan_opt(self),
+                )
+                .field(
+                    "f32_mnan",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_mnan_opt(self),
+                )
+                .field(
+                    "bool_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::bool_default_opt(self),
+                )
+                .field(
+                    "bool_true",
+                    &<Self as super::_puroro_traits::MsgTrait>::bool_true_opt(self),
+                )
+                .field(
+                    "bool_false",
+                    &<Self as super::_puroro_traits::MsgTrait>::bool_false_opt(self),
+                )
+                .field(
+                    "string_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_default_opt(self),
+                )
+                .field(
+                    "string_empty",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_empty_opt(self),
+                )
+                .field(
+                    "string_abc",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_abc_opt(self),
+                )
+                .field(
+                    "string_aiu",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_aiu_opt(self),
+                )
+                .field(
+                    "string_backslash",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_backslash_opt(self),
+                )
+                .field(
+                    "string_tab",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_tab_opt(self),
+                )
+                .field(
+                    "string_crlf",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_crlf_opt(self),
+                )
+                .field(
+                    "bytes_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_default_opt(self),
+                )
+                .field(
+                    "bytes_empty",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_empty_opt(self),
+                )
+                .field(
+                    "bytes_abc",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_abc_opt(self),
+                )
+                .field(
+                    "bytes_aiu",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_aiu_opt(self),
+                )
+                .field(
+                    "bytes_backslash",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_backslash_opt(self),
+                )
+                .field(
+                    "bytes_tab",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_tab_opt(self),
+                )
+                .field(
+                    "bytes_crlf",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_crlf_opt(self),
+                )
+                .field(
+                    "enum_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_default_opt(self),
+                )
+                .field(
+                    "enum_one",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_one_opt(self),
+                )
+                .field(
+                    "enum_fourty_two",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_fourty_two_opt(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                i32_default: ::std::clone::Clone::clone(&self.i32_default),
+                i32_0: ::std::clone::Clone::clone(&self.i32_0),
+                i32_42: ::std::clone::Clone::clone(&self.i32_42),
+                i32_m42: ::std::clone::Clone::clone(&self.i32_m42),
+                i32_2147483647: ::std::clone::Clone::clone(&self.i32_2147483647),
+                i32_m2147483648: ::std::clone::Clone::clone(&self.i32_m2147483648),
+                i32_0123: ::std::clone::Clone::clone(&self.i32_0123),
+                i32_0x123: ::std::clone::Clone::clone(&self.i32_0x123),
+                u32_default: ::std::clone::Clone::clone(&self.u32_default),
+                u32_0: ::std::clone::Clone::clone(&self.u32_0),
+                u32_42: ::std::clone::Clone::clone(&self.u32_42),
+                u32_4294967295: ::std::clone::Clone::clone(&self.u32_4294967295),
+                u32_0123: ::std::clone::Clone::clone(&self.u32_0123),
+                u32_0x123: ::std::clone::Clone::clone(&self.u32_0x123),
+                i64_default: ::std::clone::Clone::clone(&self.i64_default),
+                i64_0: ::std::clone::Clone::clone(&self.i64_0),
+                i64_42: ::std::clone::Clone::clone(&self.i64_42),
+                i64_m42: ::std::clone::Clone::clone(&self.i64_m42),
+                i64_9223372036854775807: ::std::clone::Clone::clone(&self.i64_9223372036854775807),
+                i64_m9223372036854775808: ::std::clone::Clone::clone(
+                    &self.i64_m9223372036854775808,
+                ),
+                i64_0123: ::std::clone::Clone::clone(&self.i64_0123),
+                i64_0x123: ::std::clone::Clone::clone(&self.i64_0x123),
+                u64_default: ::std::clone::Clone::clone(&self.u64_default),
+                u64_0: ::std::clone::Clone::clone(&self.u64_0),
+                u64_42: ::std::clone::Clone::clone(&self.u64_42),
+                u64_18446744073709551615: ::std::clone::Clone::clone(
+                    &self.u64_18446744073709551615,
+                ),
+                u64_0123: ::std::clone::Clone::clone(&self.u64_0123),
+                u64_0x123: ::std::clone::Clone::clone(&self.u64_0x123),
+                f32_default: ::std::clone::Clone::clone(&self.f32_default),
+                f32_0: ::std::clone::Clone::clone(&self.f32_0),
+                f32_m0: ::std::clone::Clone::clone(&self.f32_m0),
+                f32_0p: ::std::clone::Clone::clone(&self.f32_0p),
+                f32_p0: ::std::clone::Clone::clone(&self.f32_p0),
+                f32_0p0: ::std::clone::Clone::clone(&self.f32_0p0),
+                f32_42: ::std::clone::Clone::clone(&self.f32_42),
+                f32_m42: ::std::clone::Clone::clone(&self.f32_m42),
+                f32_0p25: ::std::clone::Clone::clone(&self.f32_0p25),
+                f32_1p5e2: ::std::clone::Clone::clone(&self.f32_1p5e2),
+                f32_inf: ::std::clone::Clone::clone(&self.f32_inf),
+                f32_minf: ::std::clone::Clone::clone(&self.f32_minf),
+                f32_nan: ::std::clone::Clone::clone(&self.f32_nan),
+                f32_mnan: ::std::clone::Clone::clone(&self.f32_mnan),
+                bool_default: ::std::clone::Clone::clone(&self.bool_default),
+                bool_true: ::std::clone::Clone::clone(&self.bool_true),
+                bool_false: ::std::clone::Clone::clone(&self.bool_false),
+                string_default: ::std::clone::Clone::clone(&self.string_default),
+                string_empty: ::std::clone::Clone::clone(&self.string_empty),
+                string_abc: ::std::clone::Clone::clone(&self.string_abc),
+                string_aiu: ::std::clone::Clone::clone(&self.string_aiu),
+                string_backslash: ::std::clone::Clone::clone(&self.string_backslash),
+                string_tab: ::std::clone::Clone::clone(&self.string_tab),
+                string_crlf: ::std::clone::Clone::clone(&self.string_crlf),
+                bytes_default: ::std::clone::Clone::clone(&self.bytes_default),
+                bytes_empty: ::std::clone::Clone::clone(&self.bytes_empty),
+                bytes_abc: ::std::clone::Clone::clone(&self.bytes_abc),
+                bytes_aiu: ::std::clone::Clone::clone(&self.bytes_aiu),
+                bytes_backslash: ::std::clone::Clone::clone(&self.bytes_backslash),
+                bytes_tab: ::std::clone::Clone::clone(&self.bytes_tab),
+                bytes_crlf: ::std::clone::Clone::clone(&self.bytes_crlf),
+                enum_default: ::std::clone::Clone::clone(&self.enum_default),
+                enum_one: ::std::clone::Clone::clone(&self.enum_one),
+                enum_fourty_two: ::std::clone::Clone::clone(&self.enum_fourty_two),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.i32_default == rhs.i32_default
+                && self.i32_0 == rhs.i32_0
+                && self.i32_42 == rhs.i32_42
+                && self.i32_m42 == rhs.i32_m42
+                && self.i32_2147483647 == rhs.i32_2147483647
+                && self.i32_m2147483648 == rhs.i32_m2147483648
+                && self.i32_0123 == rhs.i32_0123
+                && self.i32_0x123 == rhs.i32_0x123
+                && self.u32_default == rhs.u32_default
+                && self.u32_0 == rhs.u32_0
+                && self.u32_42 == rhs.u32_42
+                && self.u32_4294967295 == rhs.u32_4294967295
+                && self.u32_0123 == rhs.u32_0123
+                && self.u32_0x123 == rhs.u32_0x123
+                && self.i64_default == rhs.i64_default
+                && self.i64_0 == rhs.i64_0
+                && self.i64_42 == rhs.i64_42
+                && self.i64_m42 == rhs.i64_m42
+                && self.i64_9223372036854775807 == rhs.i64_9223372036854775807
+                && self.i64_m9223372036854775808 == rhs.i64_m9223372036854775808
+                && self.i64_0123 == rhs.i64_0123
+                && self.i64_0x123 == rhs.i64_0x123
+                && self.u64_default == rhs.u64_default
+                && self.u64_0 == rhs.u64_0
+                && self.u64_42 == rhs.u64_42
+                && self.u64_18446744073709551615 == rhs.u64_18446744073709551615
+                && self.u64_0123 == rhs.u64_0123
+                && self.u64_0x123 == rhs.u64_0x123
+                && self.f32_default == rhs.f32_default
+                && self.f32_0 == rhs.f32_0
+                && self.f32_m0 == rhs.f32_m0
+                && self.f32_0p == rhs.f32_0p
+                && self.f32_p0 == rhs.f32_p0
+                && self.f32_0p0 == rhs.f32_0p0
+                && self.f32_42 == rhs.f32_42
+                && self.f32_m42 == rhs.f32_m42
+                && self.f32_0p25 == rhs.f32_0p25
+                && self.f32_1p5e2 == rhs.f32_1p5e2
+                && self.f32_inf == rhs.f32_inf
+                && self.f32_minf == rhs.f32_minf
+                && self.f32_nan == rhs.f32_nan
+                && self.f32_mnan == rhs.f32_mnan
+                && self.bool_default == rhs.bool_default
+                && self.bool_true == rhs.bool_true
+                && self.bool_false == rhs.bool_false
+                && self.string_default == rhs.string_default
+                && self.string_empty == rhs.string_empty
+                && self.string_abc == rhs.string_abc
+                && self.string_aiu == rhs.string_aiu
+                && self.string_backslash == rhs.string_backslash
+                && self.string_tab == rhs.string_tab
+                && self.string_crlf == rhs.string_crlf
+                && self.bytes_default == rhs.bytes_default
+                && self.bytes_empty == rhs.bytes_empty
+                && self.bytes_abc == rhs.bytes_abc
+                && self.bytes_aiu == rhs.bytes_aiu
+                && self.bytes_backslash == rhs.bytes_backslash
+                && self.bytes_tab == rhs.bytes_tab
+                && self.bytes_crlf == rhs.bytes_crlf
+                && self.enum_default == rhs.enum_default
+                && self.enum_one == rhs.enum_one
+                && self.enum_fourty_two == rhs.enum_fourty_two
+                && true
         }
     }
 }
@@ -5419,7 +5817,6 @@ pub mod _puroro_impls {
             }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -6921,75 +7318,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump)
-                && self.i32_default == rhs.i32_default
-                && self.i32_0 == rhs.i32_0
-                && self.i32_42 == rhs.i32_42
-                && self.i32_m42 == rhs.i32_m42
-                && self.i32_2147483647 == rhs.i32_2147483647
-                && self.i32_m2147483648 == rhs.i32_m2147483648
-                && self.i32_0123 == rhs.i32_0123
-                && self.i32_0x123 == rhs.i32_0x123
-                && self.u32_default == rhs.u32_default
-                && self.u32_0 == rhs.u32_0
-                && self.u32_42 == rhs.u32_42
-                && self.u32_4294967295 == rhs.u32_4294967295
-                && self.u32_0123 == rhs.u32_0123
-                && self.u32_0x123 == rhs.u32_0x123
-                && self.i64_default == rhs.i64_default
-                && self.i64_0 == rhs.i64_0
-                && self.i64_42 == rhs.i64_42
-                && self.i64_m42 == rhs.i64_m42
-                && self.i64_9223372036854775807 == rhs.i64_9223372036854775807
-                && self.i64_m9223372036854775808 == rhs.i64_m9223372036854775808
-                && self.i64_0123 == rhs.i64_0123
-                && self.i64_0x123 == rhs.i64_0x123
-                && self.u64_default == rhs.u64_default
-                && self.u64_0 == rhs.u64_0
-                && self.u64_42 == rhs.u64_42
-                && self.u64_18446744073709551615 == rhs.u64_18446744073709551615
-                && self.u64_0123 == rhs.u64_0123
-                && self.u64_0x123 == rhs.u64_0x123
-                && self.f32_default == rhs.f32_default
-                && self.f32_0 == rhs.f32_0
-                && self.f32_m0 == rhs.f32_m0
-                && self.f32_0p == rhs.f32_0p
-                && self.f32_p0 == rhs.f32_p0
-                && self.f32_0p0 == rhs.f32_0p0
-                && self.f32_42 == rhs.f32_42
-                && self.f32_m42 == rhs.f32_m42
-                && self.f32_0p25 == rhs.f32_0p25
-                && self.f32_1p5e2 == rhs.f32_1p5e2
-                && self.f32_inf == rhs.f32_inf
-                && self.f32_minf == rhs.f32_minf
-                && self.f32_nan == rhs.f32_nan
-                && self.f32_mnan == rhs.f32_mnan
-                && self.bool_default == rhs.bool_default
-                && self.bool_true == rhs.bool_true
-                && self.bool_false == rhs.bool_false
-                && self.string_default == rhs.string_default
-                && self.string_empty == rhs.string_empty
-                && self.string_abc == rhs.string_abc
-                && self.string_aiu == rhs.string_aiu
-                && self.string_backslash == rhs.string_backslash
-                && self.string_tab == rhs.string_tab
-                && self.string_crlf == rhs.string_crlf
-                && self.bytes_default == rhs.bytes_default
-                && self.bytes_empty == rhs.bytes_empty
-                && self.bytes_abc == rhs.bytes_abc
-                && self.bytes_aiu == rhs.bytes_aiu
-                && self.bytes_backslash == rhs.bytes_backslash
-                && self.bytes_tab == rhs.bytes_tab
-                && self.bytes_crlf == rhs.bytes_crlf
-                && self.enum_default == rhs.enum_default
-                && self.enum_one == rhs.enum_one
-                && self.enum_fourty_two == rhs.enum_fourty_two
-                && true
         }
     }
     pub struct MsgBuilder<T>(T);

@@ -10,7 +10,6 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Msg {
         pub r#type: ::std::option::Option<i32>,
     }
@@ -77,6 +76,34 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Msg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "r#type",
+                    &<Self as super::_puroro_traits::MsgTrait>::type_opt(self),
+                )
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                r#type: ::std::clone::Clone::clone(&self.r#type),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self.r#type == rhs.r#type && true
         }
     }
 }
@@ -157,7 +184,6 @@ pub mod _puroro_impls {
             Self { r#type: value }
         }
     }
-    #[derive(::std::fmt::Debug)]
     pub struct MsgBumpalo<'bump> {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
@@ -243,12 +269,6 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<'bump> ::std::cmp::PartialEq for MsgBumpalo<'bump> {
-        fn eq(&self, rhs: &Self) -> bool {
-            ::std::ptr::eq(self._bump, rhs._bump) && self.r#type == rhs.r#type && true
         }
     }
     pub struct MsgBuilder<T>(T);

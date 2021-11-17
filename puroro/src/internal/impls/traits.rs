@@ -32,7 +32,6 @@
 //! ```rust
 //! // A readonly trait for message `MyMessage`
 //! # #![feature(generic_associated_types)]
-//! # use ::std::fmt::Debug;
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;
@@ -43,7 +42,7 @@
 //!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
 //!     fn has_my_name(&self) -> bool;
 //!
-//!     type Field3MessageType<'this>: MyMessageTrait + Clone + PartialEq + Debug where Self: 'this;
+//!     type Field3MessageType<'this>: MyMessageTrait where Self: 'this;
 //!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
 //!     fn my_name_opt(&self) -> Option<Self::Field3MessageType<'_>>;
 //!     fn has_my_child(&self) -> bool;

@@ -1,4 +1,4 @@
-#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
@@ -161,5 +161,56 @@ where
 impl ::std::default::Default for {{ m.simple_ident }} {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::fmt::Debug for {{ m.simple_ident }} 
+where
+    Self: super::_puroro_traits::{{ m.trait_ident }}
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("{{ m.simple_ident }}")
+            {%- for field in m.fields %}
+            {%- if field.is_repeated %}
+            .field("{{ field.ident }}", &<Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self)
+                .collect::<::std::vec::Vec<_>>())
+            {%- else %} {#- if field.is_repeated #}
+            {%- if field.has_optional_bit || field.is_explicit_oneof_field %}
+            .field("{{ field.ident }}", &<Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_opt(self))
+            {%- else %} {#- if field.has_optional_bit || field.is_explicit_oneof_field #}
+            .field("{{ field.ident }}", &<Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self))
+            {%- endif %} {#- if field.has_optional_bit || field.is_explicit_oneof_field #}
+            {%- endif %} {#- if field.is_repeated #}
+            {%- endfor %} {#- for field in m.fields #}
+            .finish()
+    }
+}
+
+impl ::std::clone::Clone for {{ m.simple_ident }} {
+    fn clone(&self) -> Self {
+        Self {
+            {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
+            {{ field.ident }}: ::std::clone::Clone::clone(&self.{{ field.ident }}),
+            {%- endif %} {#- if !field.is_explicit_oneof_field #}
+            {%- endfor %} {#- for field in m.fields #}
+            {%- for oneof in m.oneofs %}
+            {{ oneof.field_ident }}: ::std::clone::Clone::clone(&self.{{ oneof.field_ident }}),
+            {%- endfor %} {#- for oneof in m.oneofs #}
+        }
+    }
+}
+
+impl ::std::cmp::PartialEq for {{ m.simple_ident }} {
+    fn eq(&self, rhs: &Self) -> bool {
+        {%- for field in m.fields %}
+        {%- if !field.is_explicit_oneof_field %}
+        self.{{ field.ident }} == rhs.{{ field.ident }} &&
+        {%- endif %} {#- if !field.is_explicit_oneof_field #}
+        {%- endfor %} {#- for field in m.fields #}
+        {%- for oneof in m.oneofs %}
+        self.{{ oneof.field_ident }} == rhs.{{ oneof.field_ident }} &&
+        {%- endfor %} {#- for oneof in m.oneofs #}
+        true
     }
 }
