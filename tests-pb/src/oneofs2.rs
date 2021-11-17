@@ -2456,6 +2456,10 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
+            pub(crate) enum GroupOneSimple {
+                G1Int32(i32),
+                G1String(::std::string::String),
+            }
             pub(crate) enum GroupOneBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G1Int32(i32),
@@ -2468,6 +2472,13 @@ pub mod _puroro_nested {
                 }
             }
 
+            pub(crate) enum GroupTwoSimple {
+                G2F32(f32),
+                G2String(::std::string::String),
+                G2Submsg(
+                    ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>,
+                ),
+            }
             pub(crate) enum GroupTwoBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G2F32(f32),
@@ -2486,6 +2497,9 @@ pub mod _puroro_nested {
                 }
             }
 
+            pub(crate) enum GroupThreeSimple {
+                G3Int32(i32),
+            }
             pub(crate) enum GroupThreeBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G3Int32(i32),

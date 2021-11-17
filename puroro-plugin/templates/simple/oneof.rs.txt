@@ -1,0 +1,6 @@
+
+pub(crate) enum {{ oneof.simple_enum_ident }} {
+    {%- for field in oneof.fields %}
+    {{ field.ident }}({{ field.simple_field_type }}),
+    {%- endfor %}
+}

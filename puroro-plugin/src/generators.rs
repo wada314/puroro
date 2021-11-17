@@ -420,6 +420,7 @@ struct OneofField {
     is_length_delimited: bool,
     is_message: bool,
     field_type: String,
+    simple_field_type: String,
     bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
@@ -441,6 +442,7 @@ impl OneofField {
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             field_type: f.oneof_field_type()?,
+            simple_field_type: f.simple_oneof_field_type()?,
             bumpalo_field_type: f.bumpalo_oneof_field_type()?,
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag(|msg| {
