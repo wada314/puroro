@@ -78,6 +78,20 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "r#type",
+                    &<Self as super::_puroro_traits::MsgTrait>::type_opt(self),
+                )
+                .finish()
+        }
+    }
 }
 
 pub use _puroro_impls::*;

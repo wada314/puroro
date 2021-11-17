@@ -276,6 +276,65 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "i32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                )
+                .field(
+                    "i32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "float_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
+                )
+                .field(
+                    "float_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "string_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
+                )
+                .field(
+                    "string_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "submsg_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_optional(self),
+                )
+                .field(
+                    "submsg_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "enum_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
+                )
+                .field(
+                    "enum_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "very_large_field_number",
+                    &<Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
+                )
+                .finish()
+        }
+    }
 }
 
 pub use _puroro_impls::*;
@@ -2979,6 +3038,20 @@ pub mod _puroro_nested {
             impl ::std::default::Default for Submsg {
                 fn default() -> Self {
                     Self::new()
+                }
+            }
+
+            impl ::std::fmt::Debug for Submsg
+            where
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                    f.debug_struct("Submsg")
+                        .field(
+                            "i32_optional",
+                            &<Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                        )
+                        .finish()
                 }
             }
         }

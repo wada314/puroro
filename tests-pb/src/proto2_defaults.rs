@@ -1064,6 +1064,264 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "i32_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_default_opt(self),
+                )
+                .field(
+                    "i32_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_0_opt(self),
+                )
+                .field(
+                    "i32_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_42_opt(self),
+                )
+                .field(
+                    "i32_m42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_m42_opt(self),
+                )
+                .field(
+                    "i32_2147483647",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_2147483647_opt(self),
+                )
+                .field(
+                    "i32_m2147483648",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_m2147483648_opt(self),
+                )
+                .field(
+                    "i32_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_0123_opt(self),
+                )
+                .field(
+                    "i32_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_0x123_opt(self),
+                )
+                .field(
+                    "u32_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_default_opt(self),
+                )
+                .field(
+                    "u32_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_0_opt(self),
+                )
+                .field(
+                    "u32_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_42_opt(self),
+                )
+                .field(
+                    "u32_4294967295",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_4294967295_opt(self),
+                )
+                .field(
+                    "u32_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_0123_opt(self),
+                )
+                .field(
+                    "u32_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u32_0x123_opt(self),
+                )
+                .field(
+                    "i64_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_default_opt(self),
+                )
+                .field(
+                    "i64_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_0_opt(self),
+                )
+                .field(
+                    "i64_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_42_opt(self),
+                )
+                .field(
+                    "i64_m42",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_m42_opt(self),
+                )
+                .field(
+                    "i64_9223372036854775807",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807_opt(self),
+                )
+                .field(
+                    "i64_m9223372036854775808",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808_opt(self),
+                )
+                .field(
+                    "i64_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_0123_opt(self),
+                )
+                .field(
+                    "i64_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::i64_0x123_opt(self),
+                )
+                .field(
+                    "u64_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_default_opt(self),
+                )
+                .field(
+                    "u64_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_0_opt(self),
+                )
+                .field(
+                    "u64_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_42_opt(self),
+                )
+                .field(
+                    "u64_18446744073709551615",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615_opt(self),
+                )
+                .field(
+                    "u64_0123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_0123_opt(self),
+                )
+                .field(
+                    "u64_0x123",
+                    &<Self as super::_puroro_traits::MsgTrait>::u64_0x123_opt(self),
+                )
+                .field(
+                    "f32_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_default_opt(self),
+                )
+                .field(
+                    "f32_0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0_opt(self),
+                )
+                .field(
+                    "f32_m0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_m0_opt(self),
+                )
+                .field(
+                    "f32_0p",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p_opt(self),
+                )
+                .field(
+                    "f32_p0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_p0_opt(self),
+                )
+                .field(
+                    "f32_0p0",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p0_opt(self),
+                )
+                .field(
+                    "f32_42",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_42_opt(self),
+                )
+                .field(
+                    "f32_m42",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_m42_opt(self),
+                )
+                .field(
+                    "f32_0p25",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p25_opt(self),
+                )
+                .field(
+                    "f32_1p5e2",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_1p5e2_opt(self),
+                )
+                .field(
+                    "f32_inf",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_inf_opt(self),
+                )
+                .field(
+                    "f32_minf",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_minf_opt(self),
+                )
+                .field(
+                    "f32_nan",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_nan_opt(self),
+                )
+                .field(
+                    "f32_mnan",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_mnan_opt(self),
+                )
+                .field(
+                    "bool_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::bool_default_opt(self),
+                )
+                .field(
+                    "bool_true",
+                    &<Self as super::_puroro_traits::MsgTrait>::bool_true_opt(self),
+                )
+                .field(
+                    "bool_false",
+                    &<Self as super::_puroro_traits::MsgTrait>::bool_false_opt(self),
+                )
+                .field(
+                    "string_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_default_opt(self),
+                )
+                .field(
+                    "string_empty",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_empty_opt(self),
+                )
+                .field(
+                    "string_abc",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_abc_opt(self),
+                )
+                .field(
+                    "string_aiu",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_aiu_opt(self),
+                )
+                .field(
+                    "string_backslash",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_backslash_opt(self),
+                )
+                .field(
+                    "string_tab",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_tab_opt(self),
+                )
+                .field(
+                    "string_crlf",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_crlf_opt(self),
+                )
+                .field(
+                    "bytes_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_default_opt(self),
+                )
+                .field(
+                    "bytes_empty",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_empty_opt(self),
+                )
+                .field(
+                    "bytes_abc",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_abc_opt(self),
+                )
+                .field(
+                    "bytes_aiu",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_aiu_opt(self),
+                )
+                .field(
+                    "bytes_backslash",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_backslash_opt(self),
+                )
+                .field(
+                    "bytes_tab",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_tab_opt(self),
+                )
+                .field(
+                    "bytes_crlf",
+                    &<Self as super::_puroro_traits::MsgTrait>::bytes_crlf_opt(self),
+                )
+                .field(
+                    "enum_default",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_default_opt(self),
+                )
+                .field(
+                    "enum_one",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_one_opt(self),
+                )
+                .field(
+                    "enum_fourty_two",
+                    &<Self as super::_puroro_traits::MsgTrait>::enum_fourty_two_opt(self),
+                )
+                .finish()
+        }
+    }
 }
 
 pub use _puroro_impls::*;

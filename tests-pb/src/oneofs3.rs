@@ -259,6 +259,40 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "g1_int32",
+                    &<Self as super::_puroro_traits::MsgTrait>::g1_int32_opt(self),
+                )
+                .field(
+                    "g1_string",
+                    &<Self as super::_puroro_traits::MsgTrait>::g1_string_opt(self),
+                )
+                .field(
+                    "g2_f32",
+                    &<Self as super::_puroro_traits::MsgTrait>::g2_f32_opt(self),
+                )
+                .field(
+                    "g2_string",
+                    &<Self as super::_puroro_traits::MsgTrait>::g2_string_opt(self),
+                )
+                .field(
+                    "g2_submsg",
+                    &<Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
+                )
+                .field(
+                    "g3_int32",
+                    &<Self as super::_puroro_traits::MsgTrait>::g3_int32_opt(self),
+                )
+                .finish()
+        }
+    }
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -329,6 +363,20 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Submsg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Submsg
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Submsg")
+                .field(
+                    "i32_unlabeled",
+                    &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
+                )
+                .finish()
         }
     }
 }

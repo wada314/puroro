@@ -181,6 +181,41 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "i32_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_unlabeled(self),
+                )
+                .field(
+                    "i32_optional",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                )
+                .field(
+                    "i32_repeated",
+                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .field(
+                    "f32_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::f32_unlabeled(self),
+                )
+                .field(
+                    "string_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::string_unlabeled(self),
+                )
+                .field(
+                    "submsg_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self),
+                )
+                .finish()
+        }
+    }
     pub struct Submsg {
         pub i32_unlabeled: i32,
     }
@@ -251,6 +286,20 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Submsg {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Submsg
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Submsg")
+                .field(
+                    "i32_unlabeled",
+                    &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
+                )
+                .finish()
         }
     }
 }

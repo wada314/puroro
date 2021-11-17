@@ -163,3 +163,25 @@ impl ::std::default::Default for {{ m.simple_ident }} {
         Self::new()
     }
 }
+
+impl ::std::fmt::Debug for {{ m.simple_ident }} 
+where
+    Self: super::_puroro_traits::{{ m.trait_ident }}
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("{{ m.simple_ident }}")
+            {%- for field in m.fields %}
+            {%- if field.is_repeated %}
+            .field("{{ field.ident }}", &<Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self)
+                .collect::<::std::vec::Vec<_>>())
+            {%- else %} {#- if field.is_repeated #}
+            {%- if field.has_optional_bit || field.is_explicit_oneof_field %}
+            .field("{{ field.ident }}", &<Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_opt(self))
+            {%- else %} {#- if field.has_optional_bit || field.is_explicit_oneof_field #}
+            .field("{{ field.ident }}", &<Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self))
+            {%- endif %} {#- if field.has_optional_bit || field.is_explicit_oneof_field #}
+            {%- endif %} {#- if field.is_repeated #}
+            {%- endfor %} {#- for field in m.fields #}
+            .finish()
+    }
+}

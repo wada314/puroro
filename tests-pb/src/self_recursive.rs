@@ -91,6 +91,20 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field(
+                    "recursive_unlabeled",
+                    &<Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled(self),
+                )
+                .finish()
+        }
+    }
 }
 
 pub use _puroro_impls::*;

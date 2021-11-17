@@ -81,6 +81,20 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Test1
+    where
+        Self: super::_puroro_traits::Test1Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test1")
+                .field(
+                    "a",
+                    &<Self as super::_puroro_traits::Test1Trait>::a_opt(self),
+                )
+                .finish()
+        }
+    }
     pub struct Test2 {
         pub b: ::std::option::Option<::std::string::String>,
     }
@@ -147,6 +161,20 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Test2 {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Test2
+    where
+        Self: super::_puroro_traits::Test2Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test2")
+                .field(
+                    "b",
+                    &<Self as super::_puroro_traits::Test2Trait>::b_opt(self),
+                )
+                .finish()
         }
     }
     pub struct Test3 {
@@ -230,6 +258,17 @@ pub mod _puroro_simple_impl {
             Self::new()
         }
     }
+
+    impl ::std::fmt::Debug for Test3
+    where
+        Self: super::_puroro_traits::Test3Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test3")
+                .field("c", &<Self as super::_puroro_traits::Test3Trait>::c(self))
+                .finish()
+        }
+    }
     pub struct Test4 {
         pub d: ::std::vec::Vec<i32>,
     }
@@ -294,6 +333,21 @@ pub mod _puroro_simple_impl {
     impl ::std::default::Default for Test4 {
         fn default() -> Self {
             Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Test4
+    where
+        Self: super::_puroro_traits::Test4Trait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Test4")
+                .field(
+                    "d",
+                    &<Self as super::_puroro_traits::Test4Trait>::d(self)
+                        .collect::<::std::vec::Vec<_>>(),
+                )
+                .finish()
         }
     }
 }
