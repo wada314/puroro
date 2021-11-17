@@ -11,68 +11,68 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub i32_default: ::std::option::Option<i32>,
-        pub i32_0: ::std::option::Option<i32>,
-        pub i32_42: ::std::option::Option<i32>,
-        pub i32_m42: ::std::option::Option<i32>,
-        pub i32_2147483647: ::std::option::Option<i32>,
-        pub i32_m2147483648: ::std::option::Option<i32>,
-        pub i32_0123: ::std::option::Option<i32>,
-        pub i32_0x123: ::std::option::Option<i32>,
-        pub u32_default: ::std::option::Option<u32>,
-        pub u32_0: ::std::option::Option<u32>,
-        pub u32_42: ::std::option::Option<u32>,
-        pub u32_4294967295: ::std::option::Option<u32>,
-        pub u32_0123: ::std::option::Option<u32>,
-        pub u32_0x123: ::std::option::Option<u32>,
-        pub i64_default: ::std::option::Option<i64>,
-        pub i64_0: ::std::option::Option<i64>,
-        pub i64_42: ::std::option::Option<i64>,
-        pub i64_m42: ::std::option::Option<i64>,
-        pub i64_9223372036854775807: ::std::option::Option<i64>,
-        pub i64_m9223372036854775808: ::std::option::Option<i64>,
-        pub i64_0123: ::std::option::Option<i64>,
-        pub i64_0x123: ::std::option::Option<i64>,
-        pub u64_default: ::std::option::Option<u64>,
-        pub u64_0: ::std::option::Option<u64>,
-        pub u64_42: ::std::option::Option<u64>,
-        pub u64_18446744073709551615: ::std::option::Option<u64>,
-        pub u64_0123: ::std::option::Option<u64>,
-        pub u64_0x123: ::std::option::Option<u64>,
-        pub f32_default: ::std::option::Option<f32>,
-        pub f32_0: ::std::option::Option<f32>,
-        pub f32_m0: ::std::option::Option<f32>,
-        pub f32_0p: ::std::option::Option<f32>,
-        pub f32_p0: ::std::option::Option<f32>,
-        pub f32_0p0: ::std::option::Option<f32>,
-        pub f32_42: ::std::option::Option<f32>,
-        pub f32_m42: ::std::option::Option<f32>,
-        pub f32_0p25: ::std::option::Option<f32>,
-        pub f32_1p5e2: ::std::option::Option<f32>,
-        pub f32_inf: ::std::option::Option<f32>,
-        pub f32_minf: ::std::option::Option<f32>,
-        pub f32_nan: ::std::option::Option<f32>,
-        pub f32_mnan: ::std::option::Option<f32>,
-        pub bool_default: ::std::option::Option<bool>,
-        pub bool_true: ::std::option::Option<bool>,
-        pub bool_false: ::std::option::Option<bool>,
-        pub string_default: ::std::option::Option<::std::string::String>,
-        pub string_empty: ::std::option::Option<::std::string::String>,
-        pub string_abc: ::std::option::Option<::std::string::String>,
-        pub string_aiu: ::std::option::Option<::std::string::String>,
-        pub string_backslash: ::std::option::Option<::std::string::String>,
-        pub string_tab: ::std::option::Option<::std::string::String>,
-        pub string_crlf: ::std::option::Option<::std::string::String>,
-        pub bytes_default: ::std::option::Option<::std::vec::Vec<u8>>,
-        pub bytes_empty: ::std::option::Option<::std::vec::Vec<u8>>,
-        pub bytes_abc: ::std::option::Option<::std::vec::Vec<u8>>,
-        pub bytes_aiu: ::std::option::Option<::std::vec::Vec<u8>>,
-        pub bytes_backslash: ::std::option::Option<::std::vec::Vec<u8>>,
-        pub bytes_tab: ::std::option::Option<::std::vec::Vec<u8>>,
-        pub bytes_crlf: ::std::option::Option<::std::vec::Vec<u8>>,
-        pub enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
-        pub enum_one: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
-        pub enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        i32_default: ::std::option::Option<i32>,
+        i32_0: ::std::option::Option<i32>,
+        i32_42: ::std::option::Option<i32>,
+        i32_m42: ::std::option::Option<i32>,
+        i32_2147483647: ::std::option::Option<i32>,
+        i32_m2147483648: ::std::option::Option<i32>,
+        i32_0123: ::std::option::Option<i32>,
+        i32_0x123: ::std::option::Option<i32>,
+        u32_default: ::std::option::Option<u32>,
+        u32_0: ::std::option::Option<u32>,
+        u32_42: ::std::option::Option<u32>,
+        u32_4294967295: ::std::option::Option<u32>,
+        u32_0123: ::std::option::Option<u32>,
+        u32_0x123: ::std::option::Option<u32>,
+        i64_default: ::std::option::Option<i64>,
+        i64_0: ::std::option::Option<i64>,
+        i64_42: ::std::option::Option<i64>,
+        i64_m42: ::std::option::Option<i64>,
+        i64_9223372036854775807: ::std::option::Option<i64>,
+        i64_m9223372036854775808: ::std::option::Option<i64>,
+        i64_0123: ::std::option::Option<i64>,
+        i64_0x123: ::std::option::Option<i64>,
+        u64_default: ::std::option::Option<u64>,
+        u64_0: ::std::option::Option<u64>,
+        u64_42: ::std::option::Option<u64>,
+        u64_18446744073709551615: ::std::option::Option<u64>,
+        u64_0123: ::std::option::Option<u64>,
+        u64_0x123: ::std::option::Option<u64>,
+        f32_default: ::std::option::Option<f32>,
+        f32_0: ::std::option::Option<f32>,
+        f32_m0: ::std::option::Option<f32>,
+        f32_0p: ::std::option::Option<f32>,
+        f32_p0: ::std::option::Option<f32>,
+        f32_0p0: ::std::option::Option<f32>,
+        f32_42: ::std::option::Option<f32>,
+        f32_m42: ::std::option::Option<f32>,
+        f32_0p25: ::std::option::Option<f32>,
+        f32_1p5e2: ::std::option::Option<f32>,
+        f32_inf: ::std::option::Option<f32>,
+        f32_minf: ::std::option::Option<f32>,
+        f32_nan: ::std::option::Option<f32>,
+        f32_mnan: ::std::option::Option<f32>,
+        bool_default: ::std::option::Option<bool>,
+        bool_true: ::std::option::Option<bool>,
+        bool_false: ::std::option::Option<bool>,
+        string_default: ::std::option::Option<::std::string::String>,
+        string_empty: ::std::option::Option<::std::string::String>,
+        string_abc: ::std::option::Option<::std::string::String>,
+        string_aiu: ::std::option::Option<::std::string::String>,
+        string_backslash: ::std::option::Option<::std::string::String>,
+        string_tab: ::std::option::Option<::std::string::String>,
+        string_crlf: ::std::option::Option<::std::string::String>,
+        bytes_default: ::std::option::Option<::std::vec::Vec<u8>>,
+        bytes_empty: ::std::option::Option<::std::vec::Vec<u8>>,
+        bytes_abc: ::std::option::Option<::std::vec::Vec<u8>>,
+        bytes_aiu: ::std::option::Option<::std::vec::Vec<u8>>,
+        bytes_backslash: ::std::option::Option<::std::vec::Vec<u8>>,
+        bytes_tab: ::std::option::Option<::std::vec::Vec<u8>>,
+        bytes_crlf: ::std::option::Option<::std::vec::Vec<u8>>,
+        enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        enum_one: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -148,6 +148,200 @@ pub mod _puroro_simple_impl {
                     self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo,
                 ),
             }
+        }
+        pub fn i32_default_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_default
+        }
+        pub fn i32_0_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_0
+        }
+        pub fn i32_42_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_42
+        }
+        pub fn i32_m42_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_m42
+        }
+        pub fn i32_2147483647_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_2147483647
+        }
+        pub fn i32_m2147483648_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_m2147483648
+        }
+        pub fn i32_0123_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_0123
+        }
+        pub fn i32_0x123_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_0x123
+        }
+        pub fn u32_default_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_default
+        }
+        pub fn u32_0_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_0
+        }
+        pub fn u32_42_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_42
+        }
+        pub fn u32_4294967295_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_4294967295
+        }
+        pub fn u32_0123_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_0123
+        }
+        pub fn u32_0x123_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_0x123
+        }
+        pub fn i64_default_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_default
+        }
+        pub fn i64_0_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_0
+        }
+        pub fn i64_42_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_42
+        }
+        pub fn i64_m42_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_m42
+        }
+        pub fn i64_9223372036854775807_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_9223372036854775807
+        }
+        pub fn i64_m9223372036854775808_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_m9223372036854775808
+        }
+        pub fn i64_0123_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_0123
+        }
+        pub fn i64_0x123_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_0x123
+        }
+        pub fn u64_default_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_default
+        }
+        pub fn u64_0_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_0
+        }
+        pub fn u64_42_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_42
+        }
+        pub fn u64_18446744073709551615_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_18446744073709551615
+        }
+        pub fn u64_0123_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_0123
+        }
+        pub fn u64_0x123_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_0x123
+        }
+        pub fn f32_default_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_default
+        }
+        pub fn f32_0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0
+        }
+        pub fn f32_m0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_m0
+        }
+        pub fn f32_0p_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0p
+        }
+        pub fn f32_p0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_p0
+        }
+        pub fn f32_0p0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0p0
+        }
+        pub fn f32_42_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_42
+        }
+        pub fn f32_m42_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_m42
+        }
+        pub fn f32_0p25_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_0p25
+        }
+        pub fn f32_1p5e2_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_1p5e2
+        }
+        pub fn f32_inf_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_inf
+        }
+        pub fn f32_minf_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_minf
+        }
+        pub fn f32_nan_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_nan
+        }
+        pub fn f32_mnan_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.f32_mnan
+        }
+        pub fn bool_default_mut(&mut self) -> &mut ::std::option::Option<bool> {
+            &mut self.bool_default
+        }
+        pub fn bool_true_mut(&mut self) -> &mut ::std::option::Option<bool> {
+            &mut self.bool_true
+        }
+        pub fn bool_false_mut(&mut self) -> &mut ::std::option::Option<bool> {
+            &mut self.bool_false
+        }
+        pub fn string_default_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_default
+        }
+        pub fn string_empty_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_empty
+        }
+        pub fn string_abc_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_abc
+        }
+        pub fn string_aiu_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_aiu
+        }
+        pub fn string_backslash_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_backslash
+        }
+        pub fn string_tab_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_tab
+        }
+        pub fn string_crlf_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_crlf
+        }
+        pub fn bytes_default_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_default
+        }
+        pub fn bytes_empty_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_empty
+        }
+        pub fn bytes_abc_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_abc
+        }
+        pub fn bytes_aiu_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_aiu
+        }
+        pub fn bytes_backslash_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_backslash
+        }
+        pub fn bytes_tab_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_tab
+        }
+        pub fn bytes_crlf_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_crlf
+        }
+        pub fn enum_default_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            &mut self.enum_default
+        }
+        pub fn enum_one_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            &mut self.enum_one
+        }
+        pub fn enum_fourty_two_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            &mut self.enum_fourty_two
         }
     }
 

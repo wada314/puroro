@@ -373,6 +373,7 @@ impl Field {
 struct Oneof {
     index: i32,
     enum_ident: String,
+    simple_enum_ident: String,
     bumpalo_enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
@@ -386,7 +387,8 @@ impl Oneof {
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
-            bumpalo_enum_ident: o.rust_enum_ident().to_string(),
+            simple_enum_ident: format!("{}Simple", o.rust_enum_ident().to_string()),
+            bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident().to_string()),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
@@ -418,6 +420,7 @@ struct OneofField {
     is_length_delimited: bool,
     is_message: bool,
     field_type: String,
+    simple_field_type: String,
     bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
@@ -438,7 +441,8 @@ impl OneofField {
                     | wrappers::FieldType::Message(_)
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
-            field_type: f.oneof_field_type()?,
+            field_type: f.trait_oneof_field_type("'msg", "T")?,
+            simple_field_type: f.simple_oneof_field_type()?,
             bumpalo_field_type: f.bumpalo_oneof_field_type()?,
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag(|msg| {
@@ -479,8 +483,8 @@ struct Trait<'a> {
 }
 
 #[derive(Template)]
-#[template(path = "bumpalo/oneof.rs.txt")]
-struct BumpaloOneof<'a> {
+#[template(path = "private_oneof.rs.txt")]
+struct PrivateOneof<'a> {
     oneof: &'a Oneof,
 }
 
@@ -492,7 +496,7 @@ mod filters {
     pub(super) fn print_trait(message: &Message) -> ::askama::Result<Trait> {
         Ok(Trait { m: message })
     }
-    pub(super) fn print_bumpalo_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
-        Ok(BumpaloOneof { oneof })
+    pub(super) fn print_private_oneof(oneof: &Oneof) -> ::askama::Result<PrivateOneof> {
+        Ok(PrivateOneof { oneof })
     }
 }

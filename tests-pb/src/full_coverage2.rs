@@ -11,54 +11,54 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-    pub i32_required: ::std::option::Option<i32>,
-    pub i32_optional: ::std::option::Option<i32>,
-    pub i32_repeated: ::std::vec::Vec<i32>,
-    pub float_required: ::std::option::Option<f32>,
-    pub float_optional: ::std::option::Option<f32>,
-    pub float_repeated: ::std::vec::Vec<f32>,
-    pub bytes_required: ::std::option::Option<::std::vec::Vec<u8>>,
-    pub bytes_optional: ::std::option::Option<::std::vec::Vec<u8>>,
-    pub bytes_repeated: ::std::vec::Vec<::std::vec::Vec<u8>>,
-    pub string_required: ::std::option::Option<::std::string::String>,
-    pub string_optional: ::std::option::Option<::std::string::String>,
-    pub string_repeated: ::std::vec::Vec<::std::string::String>,
-    pub enum_required: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
-    pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
-    pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage2::Enum>,
-    pub submsg_required: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
-    pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
-    pub submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>,
-    pub i64_required: ::std::option::Option<i64>,
-    pub i64_optional: ::std::option::Option<i64>,
-    pub i64_repeated: ::std::vec::Vec<i64>,
-    pub u32_required: ::std::option::Option<u32>,
-    pub u32_optional: ::std::option::Option<u32>,
-    pub u32_repeated: ::std::vec::Vec<u32>,
-    pub u64_required: ::std::option::Option<u64>,
-    pub u64_optional: ::std::option::Option<u64>,
-    pub u64_repeated: ::std::vec::Vec<u64>,
-    pub s32_required: ::std::option::Option<i32>,
-    pub s32_optional: ::std::option::Option<i32>,
-    pub s32_repeated: ::std::vec::Vec<i32>,
-    pub s64_required: ::std::option::Option<i64>,
-    pub s64_optional: ::std::option::Option<i64>,
-    pub s64_repeated: ::std::vec::Vec<i64>,
-    pub fixed32_required: ::std::option::Option<u32>,
-    pub fixed32_optional: ::std::option::Option<u32>,
-    pub fixed32_repeated: ::std::vec::Vec<u32>,
-    pub fixed64_required: ::std::option::Option<u64>,
-    pub fixed64_optional: ::std::option::Option<u64>,
-    pub fixed64_repeated: ::std::vec::Vec<u64>,
-    pub sfixed32_required: ::std::option::Option<i32>,
-    pub sfixed32_optional: ::std::option::Option<i32>,
-    pub sfixed32_repeated: ::std::vec::Vec<i32>,
-    pub sfixed64_required: ::std::option::Option<i64>,
-    pub sfixed64_optional: ::std::option::Option<i64>,
-    pub sfixed64_repeated: ::std::vec::Vec<i64>,
-    pub f64_required: ::std::option::Option<f64>,
-    pub f64_optional: ::std::option::Option<f64>,
-    pub f64_repeated: ::std::vec::Vec<f64>,
+    i32_required: ::std::option::Option<i32>,
+    i32_optional: ::std::option::Option<i32>,
+    i32_repeated: ::std::vec::Vec<i32>,
+    float_required: ::std::option::Option<f32>,
+    float_optional: ::std::option::Option<f32>,
+    float_repeated: ::std::vec::Vec<f32>,
+    bytes_required: ::std::option::Option<::std::vec::Vec<u8>>,
+    bytes_optional: ::std::option::Option<::std::vec::Vec<u8>>,
+    bytes_repeated: ::std::vec::Vec<::std::vec::Vec<u8>>,
+    string_required: ::std::option::Option<::std::string::String>,
+    string_optional: ::std::option::Option<::std::string::String>,
+    string_repeated: ::std::vec::Vec<::std::string::String>,
+    enum_required: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
+    enum_optional: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
+    enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage2::Enum>,
+    submsg_required: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
+    submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
+    submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>,
+    i64_required: ::std::option::Option<i64>,
+    i64_optional: ::std::option::Option<i64>,
+    i64_repeated: ::std::vec::Vec<i64>,
+    u32_required: ::std::option::Option<u32>,
+    u32_optional: ::std::option::Option<u32>,
+    u32_repeated: ::std::vec::Vec<u32>,
+    u64_required: ::std::option::Option<u64>,
+    u64_optional: ::std::option::Option<u64>,
+    u64_repeated: ::std::vec::Vec<u64>,
+    s32_required: ::std::option::Option<i32>,
+    s32_optional: ::std::option::Option<i32>,
+    s32_repeated: ::std::vec::Vec<i32>,
+    s64_required: ::std::option::Option<i64>,
+    s64_optional: ::std::option::Option<i64>,
+    s64_repeated: ::std::vec::Vec<i64>,
+    fixed32_required: ::std::option::Option<u32>,
+    fixed32_optional: ::std::option::Option<u32>,
+    fixed32_repeated: ::std::vec::Vec<u32>,
+    fixed64_required: ::std::option::Option<u64>,
+    fixed64_optional: ::std::option::Option<u64>,
+    fixed64_repeated: ::std::vec::Vec<u64>,
+    sfixed32_required: ::std::option::Option<i32>,
+    sfixed32_optional: ::std::option::Option<i32>,
+    sfixed32_repeated: ::std::vec::Vec<i32>,
+    sfixed64_required: ::std::option::Option<i64>,
+    sfixed64_optional: ::std::option::Option<i64>,
+    sfixed64_repeated: ::std::vec::Vec<i64>,
+    f64_required: ::std::option::Option<f64>,
+    f64_optional: ::std::option::Option<f64>,
+    f64_repeated: ::std::vec::Vec<f64>,
 }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -114,6 +114,160 @@ pub mod _puroro_simple_impl {
                 f64_optional: ::std::default::Default::default(),
                 f64_repeated: ::std::default::Default::default(),
             }
+        }
+        pub fn i32_required_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_required
+        }
+        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_optional
+        }
+        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.i32_repeated
+        }
+        pub fn float_required_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.float_required
+        }
+        pub fn float_optional_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.float_optional
+        }
+        pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
+            &mut self.float_repeated
+        }
+        pub fn bytes_required_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_required
+        }
+        pub fn bytes_optional_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+            &mut self.bytes_optional
+        }
+        pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::vec::Vec<u8>> {
+            &mut self.bytes_repeated
+        }
+        pub fn string_required_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_required
+        }
+        pub fn string_optional_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_optional
+        }
+        pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
+            &mut self.string_repeated
+        }
+        pub fn enum_required_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
+            &mut self.enum_required
+        }
+        pub fn enum_optional_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
+            &mut self.enum_optional
+        }
+        pub fn enum_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<self::_puroro_root::full_coverage2::Enum> {
+            &mut self.enum_repeated
+        }
+        pub fn submsg_required_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
+            &mut self.submsg_required
+        }
+        pub fn submsg_optional_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
+            &mut self.submsg_optional
+        }
+        pub fn submsg_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<
+            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+        > {
+            &mut self.submsg_repeated
+        }
+        pub fn i64_required_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_required
+        }
+        pub fn i64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.i64_optional
+        }
+        pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            &mut self.i64_repeated
+        }
+        pub fn u32_required_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_required
+        }
+        pub fn u32_optional_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.u32_optional
+        }
+        pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
+            &mut self.u32_repeated
+        }
+        pub fn u64_required_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_required
+        }
+        pub fn u64_optional_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.u64_optional
+        }
+        pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
+            &mut self.u64_repeated
+        }
+        pub fn s32_required_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.s32_required
+        }
+        pub fn s32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.s32_optional
+        }
+        pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.s32_repeated
+        }
+        pub fn s64_required_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.s64_required
+        }
+        pub fn s64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.s64_optional
+        }
+        pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            &mut self.s64_repeated
+        }
+        pub fn fixed32_required_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.fixed32_required
+        }
+        pub fn fixed32_optional_mut(&mut self) -> &mut ::std::option::Option<u32> {
+            &mut self.fixed32_optional
+        }
+        pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
+            &mut self.fixed32_repeated
+        }
+        pub fn fixed64_required_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.fixed64_required
+        }
+        pub fn fixed64_optional_mut(&mut self) -> &mut ::std::option::Option<u64> {
+            &mut self.fixed64_optional
+        }
+        pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
+            &mut self.fixed64_repeated
+        }
+        pub fn sfixed32_required_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.sfixed32_required
+        }
+        pub fn sfixed32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.sfixed32_optional
+        }
+        pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.sfixed32_repeated
+        }
+        pub fn sfixed64_required_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.sfixed64_required
+        }
+        pub fn sfixed64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+            &mut self.sfixed64_optional
+        }
+        pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            &mut self.sfixed64_repeated
+        }
+        pub fn f64_required_mut(&mut self) -> &mut ::std::option::Option<f64> {
+            &mut self.f64_required
+        }
+        pub fn f64_optional_mut(&mut self) -> &mut ::std::option::Option<f64> {
+            &mut self.f64_optional
+        }
+        pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f64> {
+            &mut self.f64_repeated
         }
     }
 
@@ -15147,8 +15301,8 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                pub i32_required: ::std::option::Option<i32>,
-                pub i64_required: ::std::option::Option<i64>,
+                i32_required: ::std::option::Option<i32>,
+                i64_required: ::std::option::Option<i64>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
@@ -15158,6 +15312,12 @@ pub mod _puroro_nested {
                         i32_required: ::std::default::Default::default(),
                         i64_required: ::std::default::Default::default(),
                     }
+                }
+                pub fn i32_required_mut(&mut self) -> &mut ::std::option::Option<i32> {
+                    &mut self.i32_required
+                }
+                pub fn i64_required_mut(&mut self) -> &mut ::std::option::Option<i64> {
+                    &mut self.i64_required
                 }
             }
 

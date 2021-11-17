@@ -9,9 +9,9 @@ impl {{ m.ident }}Trait for () {
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_ld_field %}
             {%- if oneof.has_message_field %}
-            <'this, ::puroro::internal::bool::False, Self>
+            <'this, Self>
             {%- else %}
-            <'this, ::puroro::internal::bool::False>
+            <'this>
             {%- endif %}
             {%- endif %}
         >

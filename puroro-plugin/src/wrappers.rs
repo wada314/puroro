@@ -702,34 +702,6 @@ impl Field {
         Ok(matches!(self.field_label(), Ok(FieldLabel::Repeated)))
     }
 
-    pub fn oneof_field_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => "<IsOwned as ::puroro::internal::bool::BoolType>\
-                ::Choose<::std::string::String, &'msg str>"
-                .to_string(),
-            FieldType::Bytes => "<IsOwned as ::puroro::internal::bool::BoolType>\
-                ::Choose<::std::vec::Vec<u8>, &'msg [u8]>"
-                .to_string(),
-            FieldType::Message(m) => {
-                let simple_message_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
-                let trait_getter_type = format!(
-                    "<T as {trait_path}>::Field{number}MessageType<'msg>",
-                    trait_path = self.message()?.rust_trait_path(),
-                    number = self.number(),
-                );
-                format!(
-                    "<IsOwned as ::puroro::internal::bool::BoolType>\
-                    ::Choose<::std::boxed::Box<{message_type}>, {trait_getter_type}>",
-                    message_type = simple_message_type,
-                    trait_getter_type = trait_getter_type,
-                )
-            }
-            t => t.numerical_rust_type()?.to_string(),
-        })
-    }
-
     pub fn bumpalo_oneof_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,

@@ -11,23 +11,23 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub i32_optional: ::std::option::Option<i32>,
-        pub i32_repeated: ::std::vec::Vec<i32>,
-        pub float_optional: ::std::option::Option<f32>,
-        pub float_repeated: ::std::vec::Vec<f32>,
-        pub string_optional: ::std::option::Option<::std::string::String>,
-        pub string_repeated: ::std::vec::Vec<::std::string::String>,
-        pub submsg_optional: ::std::option::Option<
+        i32_optional: ::std::option::Option<i32>,
+        i32_repeated: ::std::vec::Vec<i32>,
+        float_optional: ::std::option::Option<f32>,
+        float_repeated: ::std::vec::Vec<f32>,
+        string_optional: ::std::option::Option<::std::string::String>,
+        string_repeated: ::std::vec::Vec<::std::string::String>,
+        submsg_optional: ::std::option::Option<
             ::std::boxed::Box<
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
             >,
         >,
-        pub submsg_repeated: ::std::vec::Vec<
+        submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >,
-        pub enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
-        pub enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
-        pub very_large_field_number: ::std::option::Option<i32>,
+        enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
+        enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
+        very_large_field_number: ::std::option::Option<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -46,6 +46,53 @@ pub mod _puroro_simple_impl {
                 enum_repeated: ::std::default::Default::default(),
                 very_large_field_number: ::std::default::Default::default(),
             }
+        }
+        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.i32_optional
+        }
+        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.i32_repeated
+        }
+        pub fn float_optional_mut(&mut self) -> &mut ::std::option::Option<f32> {
+            &mut self.float_optional
+        }
+        pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
+            &mut self.float_repeated
+        }
+        pub fn string_optional_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+            &mut self.string_optional
+        }
+        pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
+            &mut self.string_repeated
+        }
+        pub fn submsg_optional_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+            >,
+        > {
+            &mut self.submsg_optional
+        }
+        pub fn submsg_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+        > {
+            &mut self.submsg_repeated
+        }
+        pub fn enum_optional_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
+            &mut self.enum_optional
+        }
+        pub fn enum_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum> {
+            &mut self.enum_repeated
+        }
+        pub fn very_large_field_number_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.very_large_field_number
         }
     }
 
@@ -3007,7 +3054,7 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                pub i32_optional: ::std::option::Option<i32>,
+                i32_optional: ::std::option::Option<i32>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
@@ -3016,6 +3063,9 @@ pub mod _puroro_nested {
                     Self {
                         i32_optional: ::std::default::Default::default(),
                     }
+                }
+                pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+                    &mut self.i32_optional
                 }
             }
 

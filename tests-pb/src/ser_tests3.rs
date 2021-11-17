@@ -11,23 +11,23 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub i32_unlabeled: i32,
-        pub i32_repeated: ::std::vec::Vec<i32>,
-        pub float_unlabeled: f32,
-        pub float_repeated: ::std::vec::Vec<f32>,
-        pub string_unlabeled: ::std::string::String,
-        pub string_repeated: ::std::vec::Vec<::std::string::String>,
-        pub submsg_unlabeled: ::std::option::Option<
+        i32_unlabeled: i32,
+        i32_repeated: ::std::vec::Vec<i32>,
+        float_unlabeled: f32,
+        float_repeated: ::std::vec::Vec<f32>,
+        string_unlabeled: ::std::string::String,
+        string_repeated: ::std::vec::Vec<::std::string::String>,
+        submsg_unlabeled: ::std::option::Option<
             ::std::boxed::Box<
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
             >,
         >,
-        pub submsg_repeated: ::std::vec::Vec<
+        submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >,
-        pub enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
-        pub enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
-        pub very_large_field_number: i32,
+        enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
+        enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
+        very_large_field_number: i32,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -46,6 +46,51 @@ pub mod _puroro_simple_impl {
                 enum_repeated: ::std::default::Default::default(),
                 very_large_field_number: ::std::default::Default::default(),
             }
+        }
+        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+            &mut self.i32_unlabeled
+        }
+        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            &mut self.i32_repeated
+        }
+        pub fn float_unlabeled_mut(&mut self) -> &mut f32 {
+            &mut self.float_unlabeled
+        }
+        pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
+            &mut self.float_repeated
+        }
+        pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+            &mut self.string_unlabeled
+        }
+        pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
+            &mut self.string_repeated
+        }
+        pub fn submsg_unlabeled_mut(
+            &mut self,
+        ) -> &mut ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+            >,
+        > {
+            &mut self.submsg_unlabeled
+        }
+        pub fn submsg_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+        > {
+            &mut self.submsg_repeated
+        }
+        pub fn enum_unlabeled_mut(&mut self) -> &mut self::_puroro_root::ser_tests3::Enum {
+            &mut self.enum_unlabeled
+        }
+        pub fn enum_repeated_mut(
+            &mut self,
+        ) -> &mut ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum> {
+            &mut self.enum_repeated
+        }
+        pub fn very_large_field_number_mut(&mut self) -> &mut i32 {
+            &mut self.very_large_field_number
         }
     }
 
@@ -3001,7 +3046,7 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                pub i32_unlabeled: i32,
+                i32_unlabeled: i32,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
@@ -3010,6 +3055,9 @@ pub mod _puroro_nested {
                     Self {
                         i32_unlabeled: ::std::default::Default::default(),
                     }
+                }
+                pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+                    &mut self.i32_unlabeled
                 }
             }
 

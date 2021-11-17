@@ -53,13 +53,13 @@ pub mod _puroro_nested {
 
             {%- endfor %}
         }
-        pub mod _puroro_bumpalo_oneofs {
+        pub mod _puroro_private_oneofs {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
 
             {%- for oneof in m.oneofs %}
-            {{ oneof|print_bumpalo_oneof|indent(12) }}
+            {{ oneof|print_private_oneof|indent(12) }}
             {%- endfor %}
         }
         {%- endif %}

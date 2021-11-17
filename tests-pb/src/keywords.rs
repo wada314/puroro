@@ -11,7 +11,7 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        pub r#type: ::std::option::Option<i32>,
+        r#type: ::std::option::Option<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
@@ -20,6 +20,9 @@ pub mod _puroro_simple_impl {
             Self {
                 r#type: ::std::default::Default::default(),
             }
+        }
+        pub fn type_mut(&mut self) -> &mut ::std::option::Option<i32> {
+            &mut self.r#type
         }
     }
 
