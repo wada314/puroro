@@ -14,7 +14,7 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
 
     {%- for oneof in m.oneofs %}
     {{ oneof.field_ident }}: 
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }}<'bump>,
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }}<'bump>,
     {%- endfor %}
 }
 
@@ -87,7 +87,7 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
             {%- endif %}
         >
     {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
         match &self.{{ oneof.field_ident }} {
             E::_None(_) => ::std::option::Option::None,
@@ -132,7 +132,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
             {%- for oneof in m.oneofs %}
             {%- for field in oneof.fields %}
             {{ field.number }} => {
-                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_bumpalo_oneofs::{{ oneof.enum_ident }} as E;
+                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
                 if !matches!(
                     &self.{{ oneof.field_ident }},
                     E::{{ field.ident }}(_))

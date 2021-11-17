@@ -373,6 +373,7 @@ impl Field {
 struct Oneof {
     index: i32,
     enum_ident: String,
+    simple_enum_ident: String,
     bumpalo_enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
@@ -386,7 +387,8 @@ impl Oneof {
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
-            bumpalo_enum_ident: o.rust_enum_ident().to_string(),
+            simple_enum_ident: format!("{}Simple", o.rust_enum_ident().to_string()),
+            bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident().to_string()),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
@@ -492,7 +494,7 @@ mod filters {
     pub(super) fn print_trait(message: &Message) -> ::askama::Result<Trait> {
         Ok(Trait { m: message })
     }
-    pub(super) fn print_bumpalo_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
+    pub(super) fn print_private_oneof(oneof: &Oneof) -> ::askama::Result<BumpaloOneof> {
         Ok(BumpaloOneof { oneof })
     }
 }
