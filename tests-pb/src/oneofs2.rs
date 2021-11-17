@@ -32,6 +32,9 @@ pub mod _puroro_simple_impl {
                 group_three: ::std::default::Default::default(),
             }
         }
+        pub fn clear_group_one(&mut self) {
+            self.group_one = ::std::option::Option::None;
+        }
         pub fn g1_int32_mut(&mut self) -> &mut i32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
             if !matches!(&self.group_one, Some(E::G1Int32(_))) {
@@ -51,6 +54,9 @@ pub mod _puroro_simple_impl {
                 Some(E::G1String(v)) => v,
                 _ => unreachable!(),
             }
+        }
+        pub fn clear_group_two(&mut self) {
+            self.group_two = ::std::option::Option::None;
         }
         pub fn g2_f32_mut(&mut self) -> &mut f32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
@@ -84,6 +90,9 @@ pub mod _puroro_simple_impl {
                 Some(E::G2Submsg(v)) => v,
                 _ => unreachable!(),
             }
+        }
+        pub fn clear_group_three(&mut self) {
+            self.group_three = ::std::option::Option::None;
         }
         pub fn g3_int32_mut(&mut self) -> &mut i32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;

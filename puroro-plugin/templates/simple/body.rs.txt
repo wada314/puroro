@@ -51,6 +51,10 @@ impl {{ m.simple_ident }} {
     {%- endif %} {#- if !field.is_explicit_oneof_field #}
     {%- endfor %} {#- for field in m.fields #}
     {%- for oneof in m.oneofs %}
+    pub fn clear_{{ oneof.field_ident }}(&mut self) {
+        self.{{ oneof.field_ident }} = ::std::option::Option::None;
+    }
+
     {%- for field in oneof.fields %}
     pub fn {{ field.getter_ident_unesc }}_mut(&mut self) -> &mut {{ field.simple_field_type }}
     {

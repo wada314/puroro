@@ -146,7 +146,7 @@ fn test_get_msg_repeated_field() {
         (&empty, &msg_3)
             .submsg_repeated()
             .into_iter()
-            .map(|submsg| submsg.i32_unlabeled)
+            .map(|submsg| submsg.i32_unlabeled())
             .collect_vec()
     );
     assert_eq!(
@@ -154,7 +154,7 @@ fn test_get_msg_repeated_field() {
         (&msg_3, &empty)
             .submsg_repeated()
             .into_iter()
-            .map(|submsg| submsg.i32_unlabeled)
+            .map(|submsg| submsg.i32_unlabeled())
             .collect_vec()
     );
     assert_eq!(
@@ -162,7 +162,7 @@ fn test_get_msg_repeated_field() {
         (&msg_3, &msg_7_7)
             .submsg_repeated()
             .into_iter()
-            .map(|submsg| submsg.i32_unlabeled)
+            .map(|submsg| submsg.i32_unlabeled())
             .collect_vec()
     );
 }
@@ -171,40 +171,21 @@ fn test_get_msg_repeated_field() {
 fn test_get_oneof_field() {
     use ::tests_pb::oneofs3::msg::GroupTwo;
     use ::tests_pb::oneofs3::{Msg, MsgTrait as _, Submsg, SubmsgTrait as _};
-    let none = Msg {
-        group_two: None,
-        ..Default::default()
-    };
-    let msg_3 = Msg {
-        group_two: Some(GroupTwo::G2F32(3.0)),
-        ..Default::default()
-    };
-    let msg_7 = Msg {
-        group_two: Some(GroupTwo::G2F32(7.0)),
-        ..Default::default()
-    };
-    let msg_test = Msg {
-        group_two: Some(GroupTwo::G2String("Test".to_string())),
-        ..Default::default()
-    };
-    let msg_test2 = Msg {
-        group_two: Some(GroupTwo::G2String("Test2".to_string())),
-        ..Default::default()
-    };
-    let msg_submsg_0 = Msg {
-        group_two: Some(GroupTwo::G2Submsg(Box::new(Submsg {
-            i32_unlabeled: 0,
-            ..Default::default()
-        }))),
-        ..Default::default()
-    };
-    let msg_submsg_3 = Msg {
-        group_two: Some(GroupTwo::G2Submsg(Box::new(Submsg {
-            i32_unlabeled: 3,
-            ..Default::default()
-        }))),
-        ..Default::default()
-    };
+    let mut none = Msg::default();
+    let mut msg_3 = Msg::default();
+    *msg_3.g2_f32_mut() = 3.0;
+    let mut msg_7 = Msg::default();
+    *msg_7.g2_f32_mut() = 7.0;
+    let mut msg_test = Msg::default();
+    *msg_test.g2_string_mut() = "Test".to_string();
+    let mut msg_test2 = Msg::default();
+    *msg_test2.g2_string_mut() = "Test2".to_string();
+    let mut msg_submsg_0 = Msg::default();
+    *msg_submsg_0.g2_submsg_mut() = Box::new(Submsg::default());
+    *msg_submsg_0.g2_submsg_mut().i32_unlabeled_mut() = 0;
+    let mut msg_submsg_3 = Msg::default();
+    *msg_submsg_3.g2_submsg_mut() = Box::new(Submsg::default());
+    *msg_submsg_3.g2_submsg_mut().i32_unlabeled_mut() = 3;
     // None x None
     assert_eq!(None, (&none, &none).group_two());
 
@@ -251,13 +232,13 @@ fn test_get_oneof_field() {
     );
     assert_eq!(
         Some(3),
-        (&msg_submsg_0, &msg_submsg_3)
+        (&msg_submsg_3, &msg_submsg_3)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
     assert_eq!(
         Some(3),
-        (&msg_submsg_3, &msg_submsg_0)
+        (&msg_submsg_3, &msg_submsg_3)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
@@ -269,7 +250,7 @@ fn test_get_oneof_field() {
     );
     assert_eq!(
         Some(0),
-        (&msg_3, &msg_submsg_0)
+        (&msg_3, &msg_submsg_3)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
@@ -279,7 +260,7 @@ fn test_get_oneof_field() {
     );
     assert_eq!(
         Some(0),
-        (&msg_test, &msg_submsg_0)
+        (&msg_test, &msg_submsg_3)
             .group_two()
             .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
     );
