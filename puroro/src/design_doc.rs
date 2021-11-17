@@ -206,7 +206,7 @@ of the `PersonRef` struct, but because `PersonRc` struct lied about the `'bump` 
 so our getter methods decided to not trust the `'bump` param and instead use the
 struct's lifetime itself (`'_`). Sad...
 
-## Third attempt, <B, C, BToC>
+## Third attempt
 
 The last iteration is to implement the 3rd strategy I listed above,
 the root meessage owns the allocator and the children refers it.
@@ -223,8 +223,9 @@ happen when dropping it...
 
 Returning to the struct implementation. In the 3rd strategy the `Bump` pointer type
 might be different between a message struct and its child message structs,
-so the struct takes 3 generic arguments: `B` for the struct itself's `Bump` ptr,
-`C` for the child message struct's `Bump` ptr, and the converter `BToC`.
+so the struct needs 4 type info: the struct itself's `Bump` ptr,
+the child message struct's `Bump` ptr, the converter from the former to the latter,
+and the recursive set of 4 types in child message.
 
 ```rust
 use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
@@ -232,43 +233,41 @@ use std::ops::Deref;
 use std::rc::Rc;
 use std::marker::PhantomData;
 
-pub trait Converter {
-    type From;
-    type To;
-    fn conv(from: &Self::From) -> Self::To;
+pub trait BumpTypes {
+    type BumpPtr: Deref<Target = Bump>;
+    type ChildsBumpPtr<'parent>: Deref<Target = Bump>;
+    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_>;
+    type ChildBumpTypes<'parent>: BumpTypes;
 }
-pub struct CloneConv<T>(PhantomData<T>);
-impl<T: Clone> Converter for CloneConv<T> {
-    type From = T;
-    type To = T;
-    fn conv(from: &Self::From) -> Self::To {
+struct CloningBumpType<B>(PhantomData<B>);
+impl<B: Deref<Target = Bump> + Clone> BumpTypes for CloningBumpType {
+    type BumpPtr = B;
+    type ChildsBumpPtr<'parent> = B;
+    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
         from.clone()
     }
+    type ChildBumpTypes<'parent> = Self;
 }
-pub struct DerefConv<T>(PhantomData<T>);
-impl<T: Deref> Converter for DerefConv<T> {
-    type From = T;
-    type To = T;
-    fn conv(from: &Self::From) -> Self::To {
-        from.deref()
+struct BoxBumpType;
+impl BumpTypes for BoxBumpType {
+    type BumpPtr = std::boxed::Box<Bump>;
+    type ChildsBumpPtr<'parent> = &'parent Bump;
+    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
+        from.as_ref()
     }
+    type ChildBumpTypes<'parent> = CloningBumpType<&'parent Bump>;
 }
 
-pub struct Person<'bump, B, C = B, BToC = CloneConv<B>> {
+pub struct Person<'bump, BT: BumpTypes> {
     pub name: String<'bump>,
-    pub partner: Option<Box<'bump, Person<'bump, C>>>,
-    pub children: Vec<'bump, Person<'bump, C>>,
-    _bump: B,
+    pub partner: Option<Box<'bump, Person<'bump, BT::ChildBumpTypes<'bump>>>>,
+    pub children: Vec<'bump, Person<'bump, BT::ChildBumpTypes<'bump>>>,
+    _bump: BT::BumpPtr,
 }
 
-pub type PersonRef<'bump> = Person<'bump, &'bump Bump>;
-pub type PersonRc = Person<'static, Rc<Bump>>;
-pub type PersonBox = Person<
-    'static,
-    std::boxed::Box<Bump>,
-    &'bump Bump,
-    DerefConv<std::boxed::Box<Bump>>
->;
+pub type PersonRef<'bump> = Person<'bump, CloningBumpType<&'bump Bump>>;
+pub type PersonRc = Person<'static, CloningBumpType<Rc<Bump>>>;
+pub type PersonBox = Person<'static, BoxBumpType>;
 ```
 
  */
