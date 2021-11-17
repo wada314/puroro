@@ -26,7 +26,6 @@ This is actually redundant in our case because our message also keeps own the po
 but let's ignore it for now...
 
 ## First attempt
-So what will happen if I say "Use bumpalo in my protobuf implementation"?
 The first step is quite simple, just replace the all `Box`s, `Vec`s and `String`s into
 the bumpalo's one.
 
@@ -92,11 +91,11 @@ pub struct Person<'bump, B> {
 }
 
 // Straightforward.
-type PersonRef<'bump> = Person<'bump, &'bump Bump>;
+pub type PersonRef<'bump> = Person<'bump, &'bump Bump>;
 
 // No lifetime param we can use here except 'static,
 // but it's cheaty and later it actually makes some problems...
-type PersonRc = Person<'static, Rc<Bump>>;
+pub type PersonRc = Person<'static, Rc<Bump>>;
 ```
 
 This looks pretty straightforward except we are using `'static`.
@@ -205,6 +204,71 @@ As a side effect of introducing the `unsafe` conversion, the 2nd example in abov
 become uncompilable. In this case the lifetime `'bump` actually outlives the lifetime
 of the `PersonRef` struct, but because `PersonRc` struct lied about the `'bump` parameter
 so our getter methods decided to not trust the `'bump` param and instead use the
-struct's lifetime itself (`'_`). 
+struct's lifetime itself (`'_`). Sad...
+
+## Third attempt, <B, C, BToC>
+
+The last iteration is to implement the 3rd strategy I listed above,
+the root meessage owns the allocator and the children refers it.
+Let's say the root message owns the allocator by `::std::boxed::Box<Bump>`.
+If we let it own the allocator by raw `Bump` type instead,
+then the struct become unmovable and needed to be `Pin`ned.
+That might be another possible choice but I don't discuss about it in here.
+
+An unresolved question I have here is that if it's possible to own the allocator
+using `bumpalo::boxed::Box<'static, Bump>`, which means allocate your allocator's
+memory using the same allocator. Of course it needs to use `unsafe` code for
+initialization but that should be actually safe. Though I'm not sure what will
+happen when dropping it...
+
+Returning to the struct implementation. In the 3rd strategy the `Bump` pointer type
+might be different between a message struct and its child message structs,
+so the struct takes 3 generic arguments: `B` for the struct itself's `Bump` ptr,
+`C` for the child message struct's `Bump` ptr, and the converter `BToC`.
+
+```rust
+use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
+use std::ops::Deref;
+use std::rc::Rc;
+use std::marker::PhantomData;
+
+pub trait Converter {
+    type From;
+    type To;
+    fn conv(from: &Self::From) -> Self::To;
+}
+pub struct CloneConv<T>(PhantomData<T>);
+impl<T: Clone> Converter for CloneConv<T> {
+    type From = T;
+    type To = T;
+    fn conv(from: &Self::From) -> Self::To {
+        from.clone()
+    }
+}
+pub struct DerefConv<T>(PhantomData<T>);
+impl<T: Deref> Converter for DerefConv<T> {
+    type From = T;
+    type To = T;
+    fn conv(from: &Self::From) -> Self::To {
+        from.deref()
+    }
+}
+
+pub struct Person<'bump, B, C = B, BToC = CloneConv<B>> {
+    pub name: String<'bump>,
+    pub partner: Option<Box<'bump, Person<'bump, C>>>,
+    pub children: Vec<'bump, Person<'bump, C>>,
+    _bump: B,
+}
+
+pub type PersonRef<'bump> = Person<'bump, &'bump Bump>;
+pub type PersonRc = Person<'static, Rc<Bump>>;
+pub type PersonBox = Person<
+    'static,
+    std::boxed::Box<Bump>,
+    &'bump Bump,
+    DerefConv<std::boxed::Box<Bump>>
+>;
+```
 
  */
