@@ -441,7 +441,7 @@ impl OneofField {
                     | wrappers::FieldType::Message(_)
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
-            field_type: f.oneof_field_type()?,
+            field_type: f.trait_oneof_field_type("'msg", "T")?,
             simple_field_type: f.simple_oneof_field_type()?,
             bumpalo_field_type: f.bumpalo_oneof_field_type()?,
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
