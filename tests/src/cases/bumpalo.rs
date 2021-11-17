@@ -33,12 +33,6 @@ fn test_ref() {
     t3.merge_from_bytes([0x1a, 0x02, 0x08, 0x01].bytes());
     assert_eq!(1, t3.c().a());
 
-    // Bad case...
-    let t1 = {
-        let bump = Bump::new();
-        Test1BumpaloRef::new_in(&bump)
-    };
-
     assert!(is_test1_trait(&t1));
 }
 
@@ -73,6 +67,15 @@ fn test_box() {
 
     assert!(is_test1_trait(&t1));
 }
+
+/// ```compile_fail
+/// let t1 = {
+///    let bump = Bump::new();
+///    Test1BumpaloRef::new_in(&bump)
+/// }; // bump's lifetime ends here, so the message lifetime should also be.
+/// ```
+#[cfg(doctest)]
+fn doctest_fn_fails() {}
 
 /// ```compile_fail
 /// let bump_boxed = Box::new(Bump::new());

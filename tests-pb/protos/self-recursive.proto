@@ -15,6 +15,6 @@
 syntax = "proto3";
 package self_recursive;
 
-message Msg {
-    Msg recursive_unlabeled = 1;
-}
+//message Msg {
+//    Msg recursive_unlabeled = 1;
+//}
