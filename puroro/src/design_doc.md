@@ -316,3 +316,10 @@ LIST UP MORE PLACES THAT WE NEED TO INTRODUCE `unsafe` IN THIS PATTERN
 ## Nth attempt: Create new `OwnedPerson<T>` struct that owns both `Bump` and `Person`
 
 ## Nth attempt: Stop using provided `String`, `Vec` and `Box`
+
+Until here, we got many reasons to not use the Bumpalo's providing `String`, `Vec` and `Box`.
+
+- `String` and `Vec` are owning `&'bump Bump` ptr inside itself. This is redundant in our purpose because our message struct always have it.
+- The lifetime parameter `'bump` is making our code complex when we are abstracting the `&'bump Bump` into `B: Deref<Target=Bump>`.
+- (Is this true?) Actually, as long as the message struct fields are private and the accessor methods are well-designed, they don't need to be checked for the lifetimes. They always get dropped at the same time with the owner message struct.
+- Imagine if our message struct uses `Rc<Bump>` as a pointer to the `Bump`. If our accessor method returns a `&'_ str` or `String<'_>`, then that lifetime is limited to the message struct's lifetime. But what if we can make a new string struct that owns the both string buffer and cloned `Rc<Bump>` interface, and then return that from the message's accessor methods? We can get a full benefit of the shared reference counting smart pointer!
