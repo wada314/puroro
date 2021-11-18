@@ -73,7 +73,7 @@ all refer to the root allocator instance.
 
 ## Second attempt: Use `<B: Deref<Target=Bump>>` as a `Bump` ptr type
 
-We already see no.1 (no one owns) example above, so let's try implement the others.
+We have already seen no.1 (no one owns) example above, so let's try implement the others.
 Let's write an implementation which accepts 1 and 2:
 
 ```rust
