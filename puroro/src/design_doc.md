@@ -23,7 +23,7 @@ these classes need to use the allocator instance even after the class is initial
 This is actually redundant in our case because our message also keeps own the pointer to `Bump`,
 but let's ignore it for now...
 
-## First attempt
+## First attempt: Use `&'bump Bump` for the allocator pointer
 The first step is quite simple, just replace the all `Box`s, `Vec`s and `String`s into
 the bumpalo's one.
 
@@ -71,7 +71,7 @@ instances are dropped.
 3. Only root owns. The root message owns the allocator, and the children messages
 all refer to the root allocator instance.
 
-## Second attempt, give `<B: Deref<Target=Bump>>`
+## Second attempt: Use `<B: Deref<Target=Bump>>` as a `Bump` ptr type
 
 We already see no.1 (no one owns) example above, so let's try implement the others.
 Let's write an implementation which accepts 1 and 2:
@@ -227,7 +227,7 @@ of the `PersonRef` struct, but because `PersonRc` struct lied about the `'bump` 
 so our getter methods decided to not trust the `'bump` param and instead use the
 struct's lifetime itself (`'_`). Sad...
 
-## Third attempt
+## Third attempt: Use different `Bump` ptr for root and children
 
 The last iteration is to implement the 3rd strategy I listed above,
 the root meessage owns the allocator and the children refers it.
@@ -311,12 +311,16 @@ In my code, `struct Person` is taking the lifetime `'bump` and the associated ty
 `BT::ChildBumpTypes<'bump>` so hitting this issue.
 The issue is marked has high-priority so it might be fixed soon.
 
+LIST UP MORE PLACES THAT WE NEED TO INTRODUCE `unsafe` IN THIS PATTERN
+
+## Nth attempt: Create new `OwnedPerson<T>` struct that owns both `Bump` and `Person`
+
+## Nth attempt: Stop using provided `String`, `Vec` and `Box`
 
 
-↓stash
+manual git stash below
 
 ```rust
-
 // Re-exports
 pub use ::bitvec;
 pub use ::bumpalo;
