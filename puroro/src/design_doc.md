@@ -78,7 +78,6 @@ Let's write an implementation which accepts 1 and 2:
 
 ```rust
 use bumpalo::{Bump, boxed::Box, collections::{Vec, String}};
-use std::ops::Deref;
 use std::rc::Rc;
 
 pub struct Person<'bump, B> {
@@ -122,6 +121,31 @@ because the local variable `bump` is already borrowed in previous fields initial
 so it cannot be moved.
 Instead, we are manually cutting off the borrow checker using `std::mem::transmute`
 function so that the borrow checker thinks the variable `bump` is "free" for moving.
+This kind of pattern is known as "self-referential struct", which is difficult to
+express in normal safe rust code.
+
+```rust
+impl<'bump, B: Deref<Target=Bump>> Person<'bump, B> {
+    pub fn partner_mut(&mut self) -> &mut Person<'bump, B>
+    where
+        B: Clone,
+    {
+        let bump_unsafe_ref = unsafe { std::mem::transmute(self._bump.deref()) };
+        let bump_ref = &self._bump;
+        self.partner
+            .get_or_insert_with(|| Box::new_in(Person::new_in(B::clone(bump_ref)), bump_unsafe_ref))
+            .as_mut()
+    }
+}
+```
+
+Here's another place we need `unsafe` block.
+This `unsafe` is introduced because we modified `&'bump Bump` in the previous example
+to `B: Deref<Target=Bump>` in this example. This might look like an perfect abstraction,
+but actually it's not... The lifetime of `self._bump.deref()` return value in the method above is `'_`, which is the lifetime of the `Person` struct. We know that if `&'bump Bump` is bound to `B` then actually the reference to the `Bump` can live `'bump` lifetime, which is longer than `'_` here, but we don't have a way to tell that.
+That's why we need to make an unsafe variable `bump_unsafe_ref` above, which is deleting the lifetime information from the reference.
+
+Unchecked: The variable `bump_ref` might not be needed if we use rust 2021?
 
 ```rust
 pub fn main() {
@@ -149,7 +173,7 @@ pub fn main() {
 }
 ```
 
-The problem here is the last block of the code.
+Another problem here is the last block of the code.
 Because we lied the lifetime passed to `String` as `'static`,
 compiler thinks it's actually movable out from the `PersonRc` struct.
 Of course this is not correct, the code above is making a dangling pointer.
@@ -191,8 +215,7 @@ fn main() {
 ```
 
 Again, we are using `std::mem::transmute` in the mutable getter method.
-We need this because the field type is `String<'bump>`, but the return type is `String<'_>`
-(where the lifetime `'_` is the lifetime of the `Person` struct itself),
+We need this because the field type is `String<'bump>`, but the return type is `String<'_>`,
 and the compiler doesn't know the relation between those 2 lifetimes.
 You can make the code compile by adding `'_: 'bump` (actually you need to name the lifetime instead of `'_`) bound,
 but remind that we are giving `'static` as a lifetime parameter for `PersonRc` struct.
@@ -290,3 +313,74 @@ The issue is marked has high-priority so it might be fixed soon.
 
 
 
+↓stash
+
+```rust
+
+// Re-exports
+pub use ::bitvec;
+pub use ::bumpalo;
+pub use ::either::Either;
+
+use bumpalo::{
+    boxed::Box,
+    collections::{String, Vec},
+    Bump,
+};
+use std::marker::PhantomData;
+use std::ops::Deref;
+use std::rc::Rc;
+
+pub trait BumpTypes<'bump> {
+    type BumpPtr: 'bump + Deref<Target = Bump>;
+    type ChildsBumpPtr<'parent>: Deref<Target = Bump>;
+    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_>;
+    type ChildBumpTypes: BumpTypes<'bump>;
+}
+struct CloningBumpType<B>(PhantomData<B>);
+impl<'bump, B: 'bump + Deref<Target = Bump> + Clone> BumpTypes<'bump> for CloningBumpType<B> {
+    type BumpPtr = B;
+    type ChildsBumpPtr<'parent> = B;
+    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
+        from.clone()
+    }
+    type ChildBumpTypes = Self;
+}
+struct BoxBumpTypes;
+impl<'bump> BumpTypes<'bump> for BoxBumpTypes {
+    type BumpPtr = std::boxed::Box<Bump>;
+    type ChildsBumpPtr<'parent> = &'parent Bump;
+    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
+        from.as_ref()
+    }
+    type ChildBumpTypes = CloningBumpType<&'static Bump>;
+}
+
+pub struct Person<'bump, BT: BumpTypes<'bump>> {
+    pub name: String<'bump>,
+    pub partner: Option<Box<'bump, Person2<'bump, BT::ChildBumpTypes>>>,
+    pub children: Vec<'bump, Person2<'bump, BT::ChildBumpTypes>>,
+    _bump: BT::BumpPtr,
+}
+pub struct Person2<'bump, BT: BumpTypes<'bump>>(BT::BumpPtr, PhantomData<&'bump ()>);
+
+pub type PersonRef<'bump> = Person<'bump, CloningBumpType<&'bump Bump>>;
+pub type PersonRc = Person<'static, CloningBumpType<Rc<Bump>>>;
+pub type PersonBox = Person<'static, BoxBumpTypes>;
+
+impl<'bump, BT: BumpTypes<'bump>> Person<'bump, BT> {
+    fn new_partner<'parent>(&'parent mut self)
+    where
+        BT::BumpPtr: 'bump,
+        BT::ChildBumpTypes: BumpTypes<'bump, BumpPtr = BT::ChildsBumpPtr<'parent>>,
+    {
+        self.partner = Some(Box::new_in(
+            Person2(BT::conv(&self._bump), PhantomData),
+            &self._bump,
+        ));
+    }
+}
+
+fn hoge<'bump, BT: BumpTypes<'bump>>(p: Person<'bump, BT>) {}
+
+```

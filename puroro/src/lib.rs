@@ -171,72 +171,57 @@ mod error;
 pub mod internal;
 pub mod tags;
 
-pub use self::common_traits::*;
-pub use self::error::{ErrorKind, PuroroError};
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
-
 // Re-exports
 pub use ::bitvec;
 pub use ::bumpalo;
 pub use ::either::Either;
 
+/////////// playground
+
+pub use self::common_traits::*;
+pub use self::error::{ErrorKind, PuroroError};
+pub type Result<T> = ::std::result::Result<T, PuroroError>;
 use bumpalo::{
     boxed::Box,
     collections::{String, Vec},
     Bump,
 };
-use std::marker::PhantomData;
 use std::ops::Deref;
 use std::rc::Rc;
 
-pub trait BumpTypes {
-    type BumpPtr: Deref<Target = Bump>;
-    type ChildsBumpPtr<'parent>: Deref<Target = Bump>;
-    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_>;
-    type ChildBumpTypes: BumpTypes;
-}
-struct CloningBumpType<B>(PhantomData<B>);
-impl<B: Deref<Target = Bump> + Clone> BumpTypes for CloningBumpType<B> {
-    type BumpPtr = B;
-    type ChildsBumpPtr<'parent> = B;
-    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
-        from.clone()
-    }
-    type ChildBumpTypes = Self;
-}
-struct BoxBumpTypes;
-impl BumpTypes for BoxBumpTypes {
-    type BumpPtr = std::boxed::Box<Bump>;
-    type ChildsBumpPtr<'parent> = &'parent Bump;
-    fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
-        from.as_ref()
-    }
-    type ChildBumpTypes = CloningBumpType<&'static Bump>;
-}
-
-pub struct Person<'bump, BT: BumpTypes> {
+pub struct Person<'bump, B: 'bump> {
     pub name: String<'bump>,
-    pub partner: Option<Box<'bump, Person2<'bump, BT::ChildBumpTypes>>>,
-    pub children: Vec<'bump, Person2<'bump, BT::ChildBumpTypes>>,
-    _bump: BT::BumpPtr,
+    pub partner: Option<Box<'bump, Person<'bump, B>>>,
+    pub children: Vec<'bump, Person<'bump, B>>,
+    _bump: B,
 }
-pub struct Person2<'bump, BT: BumpTypes>(BT::BumpPtr, PhantomData<&'bump ()>);
 
-pub type PersonRef<'bump> = Person<'bump, CloningBumpType<&'bump Bump>>;
-pub type PersonRc = Person<'static, CloningBumpType<Rc<Bump>>>;
-pub type PersonBox = Person<'static, BoxBumpTypes>;
+// Straightforward.
+pub type PersonRef<'bump> = Person<'bump, &'bump Bump>;
 
-impl<'bump, BT: BumpTypes> Person<'bump, BT> {
-    fn new_partner<'parent>(&'parent mut self)
+// No lifetime param we can use here except 'static,
+// but it's cheaty and later it actually makes some problems...
+pub type PersonRc = Person<'static, Rc<Bump>>;
+
+impl<'bump, B: Deref<Target = Bump>> Person<'bump, B> {
+    pub fn new_in(bump: B) -> Self {
+        let bump_ref: &Bump = unsafe { std::mem::transmute(bump.deref()) };
+        Self {
+            name: String::new_in(bump_ref),
+            partner: None,
+            children: Vec::new_in(bump_ref),
+            _bump: bump,
+        }
+    }
+
+    pub fn partner_mut(&mut self) -> &mut Person<'bump, B>
     where
-        BT::BumpPtr: 'bump,
-        BT::ChildBumpTypes: BumpTypes<BumpPtr = BT::ChildsBumpPtr<'parent>>,
+        B: Clone,
     {
-        self.partner = Some(Box::new_in(
-            Person2(BT::conv(&self._bump), PhantomData),
-            &self._bump,
-        ));
+        let bump_unsafe_ref = unsafe { std::mem::transmute(self._bump.deref()) };
+        let bump_ref = &self._bump;
+        self.partner
+            .get_or_insert_with(|| Box::new_in(Person::new_in(B::clone(bump_ref)), bump_unsafe_ref))
+            .as_mut()
     }
 }
-
-fn hoge<'bump, BT: BumpTypes>(p: Person<'bump, BT>) {}
