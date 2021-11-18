@@ -235,16 +235,16 @@ pub trait BumpTypes {
     type BumpPtr: Deref<Target = Bump>;
     type ChildsBumpPtr<'parent>: Deref<Target = Bump>;
     fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_>;
-    type ChildBumpTypes<'parent>: BumpTypes;
+    type ChildBumpTypes: BumpTypes;
 }
 struct CloningBumpType<B>(PhantomData<B>);
-impl<B: Deref<Target = Bump> + Clone> BumpTypes for CloningBumpType {
+impl<B: Deref<Target = Bump> + Clone> BumpTypes for CloningBumpType<B> {
     type BumpPtr = B;
     type ChildsBumpPtr<'parent> = B;
     fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
         from.clone()
     }
-    type ChildBumpTypes<'parent> = Self;
+    type ChildBumpTypes = Self;
 }
 struct BoxBumpTypes;
 impl BumpTypes for BoxBumpTypes {
@@ -253,13 +253,13 @@ impl BumpTypes for BoxBumpTypes {
     fn conv(from: &Self::BumpPtr) -> Self::ChildsBumpPtr<'_> {
         from.as_ref()
     }
-    type ChildBumpTypes<'parent> = CloningBumpType<&'parent Bump>;
+    type ChildBumpTypes = CloningBumpType<&'static Bump>;
 }
 
 pub struct Person<'bump, BT: BumpTypes> {
     pub name: String<'bump>,
-    pub partner: Option<Box<'bump, Person<'bump, BT::ChildBumpTypes<'bump>>>>,
-    pub children: Vec<'bump, Person<'bump, BT::ChildBumpTypes<'bump>>>,
+    pub partner: Option<Box<'bump, Person<'bump, BT::ChildBumpTypes>>>,
+    pub children: Vec<'bump, Person<'bump, BT::ChildBumpTypes>>,
     _bump: BT::BumpPtr,
 }
 
@@ -286,5 +286,7 @@ Somehow today's rust (nightly 1.58) hangs if you give a recursive type definitio
 which takes both lifetime and a type parameter's associated type as generic parameters.
 In my code, `struct Person` is taking the lifetime `'bump` and the associated type
 `BT::ChildBumpTypes<'bump>` so hitting this issue.
-I'm really not sure if this is intended behavior or not...
+The issue is marked has high-priority so it might be fixed soon.
+
+
 
