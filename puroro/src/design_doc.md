@@ -102,13 +102,13 @@ initializer function:
 ```rust
 impl<'bump, B: Deref<Target=Bump>> Person<'bump, B> {
     pub fn new_in(bump: B) -> Self {
-        let bump_ref: &Bump = unsafe {
+        let bump_unsafe_ref: &Bump = unsafe {
             std::mem::transmute(bump.deref())
         };
         Self {
-            name: String::new_in(bump_ref),
+            name: String::new_in(bump_unsafe_ref),
             partner: None,
-            children: Vec::new_in(bump_ref),
+            children: Vec::new_in(bump_unsafe_ref),
             _bump: bump,
         }
     }
@@ -311,7 +311,7 @@ In my code, `struct Person` is taking the lifetime `'bump` and the associated ty
 `BT::ChildBumpTypes<'bump>` so hitting this issue.
 The issue is marked has high-priority so it might be fixed soon.
 
-LIST UP MORE PLACES THAT WE NEED TO INTRODUCE `unsafe` IN THIS PATTERN
+FIND OUT AND LIST UP MORE PLACES THAT WE NEED TO INTRODUCE `unsafe` IN THIS PATTERN
 
 ## Nth attempt: Create new `OwnedPerson<T>` struct that owns both `Bump` and `Person`
 
