@@ -15,4 +15,7 @@
 //! Data structures using bumpalo. Tentative name.
 //! The data body and the reference to the `Bump` object must be separatable.
 
+pub mod boxed;
 pub(crate) mod raw_vec;
+pub mod string;
+pub mod vec;
