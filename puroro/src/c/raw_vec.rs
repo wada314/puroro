@@ -16,18 +16,17 @@ use core::cmp;
 use core::intrinsics;
 use core::mem::{self, ManuallyDrop, MaybeUninit};
 use core::ops::Drop;
-use core::ptr::{self, NonNull, Unique};
+use core::ptr::{self, NonNull};
 use core::slice;
 
 #[cfg(not(no_global_oom_handling))]
-use crate::alloc::handle_alloc_error;
-use crate::alloc::{Allocator, Global, Layout};
-use crate::boxed::Box;
-use crate::collections::TryReserveError;
-use crate::collections::TryReserveErrorKind::*;
+use std::alloc::handle_alloc_error;
+use std::alloc::{Allocator, Global, Layout};
+use std::collections::TryReserveError;
+use std::collections::TryReserveErrorKind::*;
 
-#[cfg(test)]
-mod tests;
+use super::boxed::Box;
+use crate::bumpalo::Bump;
 
 #[cfg(not(no_global_oom_handling))]
 enum AllocInit {
@@ -42,14 +41,14 @@ enum AllocInit {
 /// involved. This type is excellent for building your own data structures like Vec and VecDeque.
 /// In particular:
 ///
-/// * Produces `Unique::dangling()` on zero-sized types.
-/// * Produces `Unique::dangling()` on zero-length allocations.
-/// * Avoids freeing `Unique::dangling()`.
+/// * Produces `NonNull::dangling()` on zero-sized types.
+/// * Produces `NonNull::dangling()` on zero-length allocations.
+/// * Avoids freeing `NonNull::dangling()`.
 /// * Catches all overflows in capacity computations (promotes them to "capacity overflow" panics).
 /// * Guards against 32-bit systems allocating more than isize::MAX bytes.
 /// * Guards against overflowing your length.
 /// * Calls `handle_alloc_error` for fallible allocations.
-/// * Contains a `ptr::Unique` and thus endows the user with all related benefits.
+/// * Contains a `ptr::NonNull` and thus endows the user with all related benefits.
 /// * Uses the excess returned from the allocator to use the largest available capacity.
 ///
 /// This type does not in anyway inspect the memory that it manages. When dropped it *will*
@@ -60,13 +59,12 @@ enum AllocInit {
 /// `usize::MAX`. This means that you need to be careful when round-tripping this type with a
 /// `Box<[T]>`, since `capacity()` won't yield the length.
 #[allow(missing_debug_implementations)]
-pub(crate) struct RawVec<T, A: Allocator = Global> {
-    ptr: Unique<T>,
+pub(crate) struct RawVec<T> {
+    ptr: NonNull<T>,
     cap: usize,
-    alloc: A,
 }
 
-impl<T> RawVec<T, Global> {
+impl<T> RawVec<T> {
     /// HACK(Centril): This exists because stable `const fn` can only call stable `const fn`, so
     /// they cannot call `Self::new()`.
     ///
@@ -77,43 +75,18 @@ impl<T> RawVec<T, Global> {
     /// Creates the biggest possible `RawVec` (on the system heap)
     /// without allocating. If `T` has positive size, then this makes a
     /// `RawVec` with capacity `0`. If `T` is zero-sized, then it makes a
-    /// `RawVec` with capacity `usize::MAX`. Useful for implementing
+    /// `RawVec` with capacity `usize::MAX`.
     /// delayed allocation.
     #[must_use]
     pub const fn new() -> Self {
-        Self::new_in(Global)
-    }
-
-    /// Creates a `RawVec` (on the system heap) with exactly the
-    /// capacity and alignment requirements for a `[T; capacity]`. This is
-    /// equivalent to calling `RawVec::new` when `capacity` is `0` or `T` is
-    /// zero-sized. Note that if `T` is zero-sized this means you will
-    /// *not* get a `RawVec` with the requested capacity.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the requested capacity exceeds `isize::MAX` bytes.
-    ///
-    /// # Aborts
-    ///
-    /// Aborts on OOM.
-    #[cfg(not(any(no_global_oom_handling, test)))]
-    #[must_use]
-    #[inline]
-    pub fn with_capacity(capacity: usize) -> Self {
-        Self::with_capacity_in(capacity, Global)
-    }
-
-    /// Like `with_capacity`, but guarantees the buffer is zeroed.
-    #[cfg(not(any(no_global_oom_handling, test)))]
-    #[must_use]
-    #[inline]
-    pub fn with_capacity_zeroed(capacity: usize) -> Self {
-        Self::with_capacity_zeroed_in(capacity, Global)
+        Self {
+            ptr: NonNull::dangling(),
+            cap: 0,
+        }
     }
 }
 
-impl<T, A: Allocator> RawVec<T, A> {
+impl<T> RawVec<T> {
     // Tiny Vecs are dumb. Skip to:
     // - 8 if the element size is 1, because any heap allocators is likely
     //   to round up a request of less than 8 bytes to at least 8 bytes.
@@ -127,32 +100,20 @@ impl<T, A: Allocator> RawVec<T, A> {
         1
     };
 
-    /// Like `new`, but parameterized over the choice of allocator for
-    /// the returned `RawVec`.
-    #[rustc_allow_const_fn_unstable(const_fn)]
-    pub const fn new_in(alloc: A) -> Self {
-        // `cap: 0` means "unallocated". zero-sized types are ignored.
-        Self {
-            ptr: Unique::dangling(),
-            cap: 0,
-            alloc,
-        }
-    }
-
     /// Like `with_capacity`, but parameterized over the choice of
     /// allocator for the returned `RawVec`.
     #[cfg(not(no_global_oom_handling))]
     #[inline]
-    pub fn with_capacity_in(capacity: usize, alloc: A) -> Self {
-        Self::allocate_in(capacity, AllocInit::Uninitialized, alloc)
+    pub fn with_capacity_in(capacity: usize, bump: &Bump) -> Self {
+        Self::allocate_in(capacity, AllocInit::Uninitialized, bump)
     }
 
     /// Like `with_capacity_zeroed`, but parameterized over the choice
     /// of allocator for the returned `RawVec`.
     #[cfg(not(no_global_oom_handling))]
     #[inline]
-    pub fn with_capacity_zeroed_in(capacity: usize, alloc: A) -> Self {
-        Self::allocate_in(capacity, AllocInit::Zeroed, alloc)
+    pub fn with_capacity_zeroed_in(capacity: usize, bump: &Bump) -> Self {
+        Self::allocate_in(capacity, AllocInit::Zeroed, bump)
     }
 
     /// Converts the entire buffer into `Box<[MaybeUninit<T>]>` with the specified `len`.
@@ -167,7 +128,7 @@ impl<T, A: Allocator> RawVec<T, A> {
     ///
     /// Note, that the requested capacity and `self.capacity()` could differ, as
     /// an allocator could overallocate and return a greater memory block than requested.
-    pub unsafe fn into_box(self, len: usize) -> Box<[MaybeUninit<T>], A> {
+    pub unsafe fn into_box(self, len: usize) -> Box<[MaybeUninit<T>]> {
         // Sanity-check one half of the safety requirement (we cannot check the other half).
         debug_assert!(
             len <= self.capacity(),
@@ -177,14 +138,14 @@ impl<T, A: Allocator> RawVec<T, A> {
         let me = ManuallyDrop::new(self);
         unsafe {
             let slice = slice::from_raw_parts_mut(me.ptr() as *mut MaybeUninit<T>, len);
-            Box::from_raw_in(slice, ptr::read(&me.alloc))
+            Box::from_raw_in(slice)
         }
     }
 
     #[cfg(not(no_global_oom_handling))]
-    fn allocate_in(capacity: usize, init: AllocInit, alloc: A) -> Self {
+    fn allocate_in(capacity: usize, init: AllocInit, bump: &Bump) -> Self {
         if mem::size_of::<T>() == 0 {
-            Self::new_in(alloc)
+            Self::new()
         } else {
             // We avoid `unwrap_or_else` here because it bloats the amount of
             // LLVM IR generated.
@@ -196,19 +157,20 @@ impl<T, A: Allocator> RawVec<T, A> {
                 Ok(_) => {}
                 Err(_) => capacity_overflow(),
             }
-            let result = match init {
-                AllocInit::Uninitialized => alloc.allocate(layout),
-                AllocInit::Zeroed => alloc.allocate_zeroed(layout),
-            };
+            let result = bump.try_alloc_layout(layout);
             let ptr = match result {
                 Ok(ptr) => ptr,
                 Err(_) => handle_alloc_error(layout),
             };
+            if let AllocInit::Zeroed = init {
+                unsafe {
+                    ptr::write_bytes(ptr.as_ptr(), 0, layout.size());
+                }
+            };
 
             Self {
-                ptr: unsafe { Unique::new_unchecked(ptr.cast().as_ptr()) },
-                cap: Self::capacity_from_bytes(ptr.len()),
-                alloc,
+                ptr: unsafe { NonNull::new_unchecked(ptr.as_ptr()) },
+                cap: Self::capacity_from_bytes(layout.size()),
             }
         }
     }
@@ -224,16 +186,15 @@ impl<T, A: Allocator> RawVec<T, A> {
     /// If the `ptr` and `capacity` come from a `RawVec` created via `alloc`, then this is
     /// guaranteed.
     #[inline]
-    pub unsafe fn from_raw_parts_in(ptr: *mut T, capacity: usize, alloc: A) -> Self {
+    pub unsafe fn from_raw_parts_in(ptr: *mut T, capacity: usize) -> Self {
         Self {
-            ptr: unsafe { Unique::new_unchecked(ptr) },
+            ptr: unsafe { NonNull::new_unchecked(ptr) },
             cap: capacity,
-            alloc,
         }
     }
 
     /// Gets a raw pointer to the start of the allocation. Note that this is
-    /// `Unique::dangling()` if `capacity == 0` or `T` is zero-sized. In the former case, you must
+    /// `NonNull::dangling()` if `capacity == 0` or `T` is zero-sized. In the former case, you must
     /// be careful.
     #[inline]
     pub fn ptr(&self) -> *mut T {
@@ -250,11 +211,6 @@ impl<T, A: Allocator> RawVec<T, A> {
         } else {
             self.cap
         }
-    }
-
-    /// Returns a shared reference to the allocator backing this `RawVec`.
-    pub fn allocator(&self) -> &A {
-        &self.alloc
     }
 
     fn current_memory(&self) -> Option<(NonNull<u8>, Layout)> {
@@ -293,29 +249,35 @@ impl<T, A: Allocator> RawVec<T, A> {
     /// Aborts on OOM.
     #[cfg(not(no_global_oom_handling))]
     #[inline]
-    pub fn reserve(&mut self, len: usize, additional: usize) {
+    pub fn reserve_in(&mut self, len: usize, additional: usize, bump: &Bump) {
         // Callers expect this function to be very cheap when there is already sufficient capacity.
         // Therefore, we move all the resizing and error-handling logic from grow_amortized and
         // handle_reserve behind a call, while making sure that this function is likely to be
         // inlined as just a comparison and a call if the comparison fails.
         #[cold]
-        fn do_reserve_and_handle<T, A: Allocator>(
-            slf: &mut RawVec<T, A>,
+        fn do_reserve_and_handle_in<T>(
+            slf: &mut RawVec<T>,
             len: usize,
             additional: usize,
+            bump: &Bump,
         ) {
-            handle_reserve(slf.grow_amortized(len, additional));
+            handle_reserve(slf.grow_amortized_in(len, additional, bump));
         }
 
         if self.needs_to_grow(len, additional) {
-            do_reserve_and_handle(self, len, additional);
+            do_reserve_and_handle_in(self, len, additional, bump);
         }
     }
 
     /// The same as `reserve`, but returns on errors instead of panicking or aborting.
-    pub fn try_reserve(&mut self, len: usize, additional: usize) -> Result<(), TryReserveError> {
+    pub fn try_reserve_in(
+        &mut self,
+        len: usize,
+        additional: usize,
+        bump: &Bump,
+    ) -> Result<(), TryReserveError> {
         if self.needs_to_grow(len, additional) {
-            self.grow_amortized(len, additional)
+            self.grow_amortized_in(len, additional, bump)
         } else {
             Ok(())
         }
@@ -339,18 +301,19 @@ impl<T, A: Allocator> RawVec<T, A> {
     ///
     /// Aborts on OOM.
     #[cfg(not(no_global_oom_handling))]
-    pub fn reserve_exact(&mut self, len: usize, additional: usize) {
-        handle_reserve(self.try_reserve_exact(len, additional));
+    pub fn reserve_exact_in(&mut self, len: usize, additional: usize, bump: &Bump) {
+        handle_reserve(self.try_reserve_exact_in(len, additional, bump));
     }
 
     /// The same as `reserve_exact`, but returns on errors instead of panicking or aborting.
-    pub fn try_reserve_exact(
+    pub fn try_reserve_exact_in(
         &mut self,
         len: usize,
         additional: usize,
+        bump: &Bump,
     ) -> Result<(), TryReserveError> {
         if self.needs_to_grow(len, additional) {
-            self.grow_exact(len, additional)
+            self.grow_exact_in(len, additional, bump)
         } else {
             Ok(())
         }
@@ -372,7 +335,7 @@ impl<T, A: Allocator> RawVec<T, A> {
     }
 }
 
-impl<T, A: Allocator> RawVec<T, A> {
+impl<T> RawVec<T> {
     /// Returns if the buffer needs to grow to fulfill the needed extra capacity.
     /// Mainly used to make inlining reserve-calls possible without inlining `grow`.
     fn needs_to_grow(&self, len: usize, additional: usize) -> bool {
@@ -385,7 +348,7 @@ impl<T, A: Allocator> RawVec<T, A> {
     }
 
     fn set_ptr(&mut self, ptr: NonNull<[u8]>) {
-        self.ptr = unsafe { Unique::new_unchecked(ptr.cast().as_ptr()) };
+        self.ptr = unsafe { NonNull::new_unchecked(ptr.cast().as_ptr()) };
         self.cap = Self::capacity_from_bytes(ptr.len());
     }
 
@@ -506,7 +469,7 @@ where
     })
 }
 
-unsafe impl<#[may_dangle] T, A: Allocator> Drop for RawVec<T, A> {
+unsafe impl<#[may_dangle] T> Drop for RawVec<T> {
     /// Frees the memory owned by the `RawVec` *without* trying to drop its contents.
     fn drop(&mut self) {
         if let Some((ptr, layout)) = self.current_memory() {
