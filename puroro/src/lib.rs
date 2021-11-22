@@ -211,7 +211,6 @@
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
 use std::string::String;
-pub mod c;
 mod common_traits;
 mod error;
 pub mod internal;
