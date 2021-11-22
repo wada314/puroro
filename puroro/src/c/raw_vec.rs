@@ -22,8 +22,6 @@ use core::slice;
 #[cfg(not(no_global_oom_handling))]
 use std::alloc::handle_alloc_error;
 use std::alloc::{Allocator, Global, Layout};
-use std::collections::TryReserveError;
-use std::collections::TryReserveErrorKind::*;
 
 use super::boxed::Box;
 use crate::bumpalo::Bump;
@@ -270,12 +268,7 @@ impl<T> RawVec<T> {
     }
 
     /// The same as `reserve`, but returns on errors instead of panicking or aborting.
-    pub fn try_reserve_in(
-        &mut self,
-        len: usize,
-        additional: usize,
-        bump: &Bump,
-    ) -> Result<(), TryReserveError> {
+    pub fn try_reserve_in(&mut self, len: usize, additional: usize, bump: &Bump) -> Result<(), ()> {
         if self.needs_to_grow(len, additional) {
             self.grow_amortized_in(len, additional, bump)
         } else {
@@ -311,7 +304,7 @@ impl<T> RawVec<T> {
         len: usize,
         additional: usize,
         bump: &Bump,
-    ) -> Result<(), TryReserveError> {
+    ) -> Result<(), ()> {
         if self.needs_to_grow(len, additional) {
             self.grow_exact_in(len, additional, bump)
         } else {
@@ -359,18 +352,18 @@ impl<T> RawVec<T> {
     // so that all of the code that depends on `T` is within it, while as much
     // of the code that doesn't depend on `T` as possible is in functions that
     // are non-generic over `T`.
-    fn grow_amortized(&mut self, len: usize, additional: usize) -> Result<(), TryReserveError> {
+    fn grow_amortized_in(&mut self, len: usize, additional: usize, bump: &Bump) -> Result<(), ()> {
         // This is ensured by the calling contexts.
         debug_assert!(additional > 0);
 
         if mem::size_of::<T>() == 0 {
             // Since we return a capacity of `usize::MAX` when `elem_size` is
             // 0, getting to here necessarily means the `RawVec` is overfull.
-            return Err(CapacityOverflow.into());
+            return Err(());
         }
 
         // Nothing we can really do about these checks, sadly.
-        let required_cap = len.checked_add(additional).ok_or(CapacityOverflow)?;
+        let required_cap = len.checked_add(additional).ok_or(())?;
 
         // This guarantees exponential growth. The doubling cannot overflow
         // because `cap <= isize::MAX` and the type of `cap` is `usize`.
@@ -380,7 +373,7 @@ impl<T> RawVec<T> {
         let new_layout = Layout::array::<T>(cap);
 
         // `finish_grow` is non-generic over `T`.
-        let ptr = finish_grow(new_layout, self.current_memory(), &mut self.alloc)?;
+        let ptr = finish_grow(new_layout, self.current_memory(), &bump)?;
         self.set_ptr(ptr);
         Ok(())
     }
@@ -388,45 +381,28 @@ impl<T> RawVec<T> {
     // The constraints on this method are much the same as those on
     // `grow_amortized`, but this method is usually instantiated less often so
     // it's less critical.
-    fn grow_exact(&mut self, len: usize, additional: usize) -> Result<(), TryReserveError> {
+    fn grow_exact_in(&mut self, len: usize, additional: usize, bump: &Bump) -> Result<(), ()> {
         if mem::size_of::<T>() == 0 {
             // Since we return a capacity of `usize::MAX` when the type size is
             // 0, getting to here necessarily means the `RawVec` is overfull.
-            return Err(CapacityOverflow.into());
+            return Err(());
         }
 
-        let cap = len.checked_add(additional).ok_or(CapacityOverflow)?;
+        let cap = len.checked_add(additional).ok_or(())?;
         let new_layout = Layout::array::<T>(cap);
 
         // `finish_grow` is non-generic over `T`.
-        let ptr = finish_grow(new_layout, self.current_memory(), &mut self.alloc)?;
+        let ptr = finish_grow(new_layout, self.current_memory(), bump)?;
         self.set_ptr(ptr);
         Ok(())
     }
 
-    fn shrink(&mut self, amount: usize) -> Result<(), TryReserveError> {
+    fn shrink_in(&mut self, amount: usize, _bump: &Bump) -> Result<(), ()> {
         assert!(
             amount <= self.capacity(),
             "Tried to shrink to a larger capacity"
         );
-
-        let (ptr, layout) = if let Some(mem) = self.current_memory() {
-            mem
-        } else {
-            return Ok(());
-        };
-        let new_size = amount * mem::size_of::<T>();
-
-        let ptr = unsafe {
-            let new_layout = Layout::from_size_align_unchecked(new_size, layout.align());
-            self.alloc
-                .shrink(ptr, layout, new_layout)
-                .map_err(|_| AllocError {
-                    layout: new_layout,
-                    non_exhaustive: (),
-                })?
-        };
-        self.set_ptr(ptr);
+        // Nothing to do for bumpalo...
         Ok(())
     }
 }
@@ -439,13 +415,10 @@ impl<T> RawVec<T> {
 fn finish_grow<A>(
     new_layout: Result<Layout, LayoutError>,
     current_memory: Option<(NonNull<u8>, Layout)>,
-    alloc: &mut A,
-) -> Result<NonNull<[u8]>, TryReserveError>
-where
-    A: Allocator,
-{
+    bump: &Bump,
+) -> Result<NonNull<[u8]>, ()> {
     // Check for the error here to minimize the size of `RawVec::grow_*`.
-    let new_layout = new_layout.map_err(|_| CapacityOverflow)?;
+    let new_layout = new_layout.map_err(|| ())?;
 
     alloc_guard(new_layout.size())?;
 
@@ -481,7 +454,7 @@ unsafe impl<#[may_dangle] T> Drop for RawVec<T> {
 // Central function for reserve error handling.
 #[cfg(not(no_global_oom_handling))]
 #[inline]
-fn handle_reserve(result: Result<(), TryReserveError>) {
+fn handle_reserve(result: Result<(), ()>) {
     match result.map_err(|e| e.kind()) {
         Err(CapacityOverflow) => capacity_overflow(),
         Err(AllocError { layout, .. }) => handle_alloc_error(layout),
@@ -499,7 +472,7 @@ fn handle_reserve(result: Result<(), TryReserveError>) {
 // all 4GB in user-space, e.g., PAE or x32.
 
 #[inline]
-fn alloc_guard(alloc_size: usize) -> Result<(), TryReserveError> {
+fn alloc_guard(alloc_size: usize) -> Result<(), ()> {
     if usize::BITS < 64 && alloc_size > isize::MAX as usize {
         Err(CapacityOverflow.into())
     } else {
