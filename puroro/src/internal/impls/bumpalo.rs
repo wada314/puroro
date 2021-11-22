@@ -24,7 +24,10 @@ pub mod de;
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
 use ::std::mem;
+use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
+use ::std::ptr;
+use ::std::ptr::NonNull;
 
 pub trait BumpaloDefault<'bump> {
     fn default_in(bump: &'bump Bump) -> Self;
@@ -61,6 +64,29 @@ impl_bumpalo_default!(u64);
 impl_bumpalo_default!(f64);
 impl_bumpalo_default!(bool);
 
+pub struct NoAllocBox<T>(NonNull<T>);
+impl<T> NoAllocBox<T> {
+    pub fn new_in(x: T, bump: &Bump) -> Self {
+        Self(unsafe { NonNull::new_unchecked(bump.alloc(x)) })
+    }
+}
+impl<T> Deref for NoAllocBox<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        unsafe { self.0.as_ref() }
+    }
+}
+impl<T> DerefMut for NoAllocBox<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { self.0.as_mut() }
+    }
+}
+impl<T> Drop for NoAllocBox<T> {
+    fn drop(&mut self) {
+        unsafe { ptr::drop_in_place(self.0.as_ptr()) }
+    }
+}
+
 pub struct NoAllocVec<T> {
     ptr: *mut T,
     length: usize,
@@ -68,7 +94,10 @@ pub struct NoAllocVec<T> {
 }
 impl<T> NoAllocVec<T> {
     pub fn new_in(bump: &Bump) -> Self {
-        let mut vec = Vec::new_in(bump);
+        let vec = Vec::new_in(bump);
+        unsafe { Self::from_vec(vec) }
+    }
+    pub unsafe fn from_vec<'bump>(mut vec: Vec<'bump, T>) -> Self {
         let result = Self {
             ptr: vec.as_mut_ptr(),
             length: vec.len(),
@@ -78,7 +107,7 @@ impl<T> NoAllocVec<T> {
         result
     }
 
-    /// Construct an immutable `Vec` by adding bump info.
+    /// Construct an immutable `Vec` by adding bump ptr.
     /// This function must take a same bump ref with the one given in [`new_in`] method.
     pub unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> Vec<'bump, T> {
         Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump)
@@ -88,14 +117,25 @@ impl<T> NoAllocVec<T> {
     /// This function must take a same bump ref with the one given in [`new_in`] method.
     pub unsafe fn as_vec_mut_in<'bump>(&mut self, bump: &'bump Bump) -> MutRefVec<'bump, '_, T> {
         MutRefVec {
-            temp_vec: Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump),
+            temp_vec: ManuallyDrop::new(self.as_vec_in(bump)),
             ref_vec: self,
         }
+    }
+
+    /// Drop. This type needs to know about itself's allocating bump ptr.
+    pub unsafe fn drop_in(self, bump: &Bump) {
+        // Construct a Vec and let that handle the drop functions.
+        Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump);
+    }
+}
+impl<T> Drop for NoAllocVec<T> {
+    fn drop(&mut self) {
+        unreachable!("This type must be manually dropped!! Call drop_in() instead.")
     }
 }
 
 pub struct MutRefVec<'bump, 'vec, T> {
-    temp_vec: Vec<'bump, T>,
+    temp_vec: ManuallyDrop<Vec<'bump, T>>,
     ref_vec: &'vec mut NoAllocVec<T>,
 }
 
@@ -112,8 +152,67 @@ impl<'bump, 'vec, T: 'bump> DerefMut for MutRefVec<'bump, 'vec, T> {
 }
 impl<'bump, 'vec, T> Drop for MutRefVec<'bump, 'vec, T> {
     fn drop(&mut self) {
-        self.ref_vec.ptr = self.temp_vec.as_mut_ptr();
-        self.ref_vec.length = self.temp_vec.len();
-        self.ref_vec.capacity = self.temp_vec.capacity();
+        unsafe {
+            *self.ref_vec = NoAllocVec::from_vec(ManuallyDrop::take(&mut self.temp_vec));
+        }
+    }
+}
+
+pub struct NoAllocString {
+    vec: NoAllocVec<u8>,
+}
+impl NoAllocString {
+    pub fn new_in(bump: &Bump) -> Self {
+        Self {
+            vec: NoAllocVec::new_in(bump),
+        }
+    }
+
+    /// Construct an immutable `String` by adding bump ptr.
+    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    pub unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> String<'bump> {
+        String::from_utf8_unchecked(self.vec.as_vec_in(bump))
+    }
+
+    /// Construct a mutable `String` by adding bump ptr.
+    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    pub unsafe fn as_string_mut_in<'bump, 'string>(
+        &'string mut self,
+        bump: &'bump Bump,
+    ) -> MutRefString<'bump, 'string> {
+        MutRefString {
+            temp_string: ManuallyDrop::new(self.as_string_in(bump)),
+            ref_string: self,
+        }
+    }
+
+    /// Drop. This type needs to know about itself's allocating bump ptr.
+    pub unsafe fn drop_in(self, bump: &Bump) {
+        self.vec.drop_in(bump);
+    }
+}
+
+pub struct MutRefString<'bump, 'string> {
+    temp_string: ManuallyDrop<String<'bump>>,
+    ref_string: &'string mut NoAllocString,
+}
+
+impl<'bump, 'string> Deref for MutRefString<'bump, 'string> {
+    type Target = String<'bump>;
+    fn deref(&self) -> &Self::Target {
+        &self.temp_string
+    }
+}
+impl<'bump, 'string> DerefMut for MutRefString<'bump, 'string> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.temp_string
+    }
+}
+impl<'bump, 'string> Drop for MutRefString<'bump, 'string> {
+    fn drop(&mut self) {
+        unsafe {
+            let vec = ManuallyDrop::take(&mut self.temp_string).into_bytes();
+            self.ref_string.vec = NoAllocVec::from_vec(vec);
+        }
     }
 }
