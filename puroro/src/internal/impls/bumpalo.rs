@@ -23,6 +23,8 @@ pub mod de;
 
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
+use ::std::mem;
+use ::std::ops::{Deref, DerefMut};
 
 pub trait BumpaloDefault<'bump> {
     fn default_in(bump: &'bump Bump) -> Self;
@@ -58,3 +60,60 @@ impl_bumpalo_default!(i64);
 impl_bumpalo_default!(u64);
 impl_bumpalo_default!(f64);
 impl_bumpalo_default!(bool);
+
+pub struct NoAllocVec<T> {
+    ptr: *mut T,
+    length: usize,
+    capacity: usize,
+}
+impl<T> NoAllocVec<T> {
+    pub fn new_in(bump: &Bump) -> Self {
+        let mut vec = Vec::new_in(bump);
+        let result = Self {
+            ptr: vec.as_mut_ptr(),
+            length: vec.len(),
+            capacity: vec.capacity(),
+        };
+        mem::forget(vec);
+        result
+    }
+
+    /// Construct an immutable `Vec` by adding bump info.
+    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    pub unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> Vec<'bump, T> {
+        Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump)
+    }
+
+    /// Construct a mutable `Vec` wrapped by [`MutRef`].
+    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    pub unsafe fn as_vec_mut_in<'bump>(&mut self, bump: &'bump Bump) -> MutRefVec<'bump, '_, T> {
+        MutRefVec {
+            temp_vec: Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump),
+            ref_vec: self,
+        }
+    }
+}
+
+pub struct MutRefVec<'bump, 'vec, T> {
+    temp_vec: Vec<'bump, T>,
+    ref_vec: &'vec mut NoAllocVec<T>,
+}
+
+impl<'bump, 'vec, T: 'bump> Deref for MutRefVec<'bump, 'vec, T> {
+    type Target = Vec<'bump, T>;
+    fn deref(&self) -> &Self::Target {
+        &self.temp_vec
+    }
+}
+impl<'bump, 'vec, T: 'bump> DerefMut for MutRefVec<'bump, 'vec, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.temp_vec
+    }
+}
+impl<'bump, 'vec, T> Drop for MutRefVec<'bump, 'vec, T> {
+    fn drop(&mut self) {
+        self.ref_vec.ptr = self.temp_vec.as_mut_ptr();
+        self.ref_vec.length = self.temp_vec.len();
+        self.ref_vec.capacity = self.temp_vec.capacity();
+    }
+}
