@@ -702,7 +702,7 @@ impl Field {
         Ok(matches!(self.field_label(), Ok(FieldLabel::Repeated)))
     }
 
-    pub fn bumpalo_oneof_field_type(&self, bump_lt: &str) -> Result<String> {
+    pub fn bumpalo_oneof_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
@@ -710,7 +710,7 @@ impl Field {
             FieldType::Bytes => "::puroro::internal::NoAllocBumpVec<u8>".to_string(),
             FieldType::Message(m) => {
                 let bumpalo_message_type =
-                    upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"]);
+                    upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"]);
                 format!(
                     "::puroro::internal::NoAllocBumpBox<{message_type}>",
                     message_type = bumpalo_message_type,
@@ -762,8 +762,8 @@ impl Field {
         })
     }
 
-    pub fn bumpalo_field_type(&self, bump_lt: &str) -> Result<String> {
-        let scalar_type = self.bumpalo_scalar_field_type(bump_lt)?;
+    pub fn bumpalo_field_type(&self) -> Result<String> {
+        let scalar_type = self.bumpalo_scalar_field_type()?;
         if self.is_repeated()? {
             Ok(format!(
                 "::puroro::internal::NoAllocBumpVec<{}>",
@@ -779,7 +779,7 @@ impl Field {
         }
     }
 
-    pub fn bumpalo_scalar_field_type(&self, bump_lt: &str) -> Result<String> {
+    pub fn bumpalo_scalar_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::puroro::internal::NoAllocBumpString".to_string(),
@@ -787,7 +787,7 @@ impl Field {
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {
-                upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
+                upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"])
             }
             t => t.numerical_rust_type()?.to_string(),
         })

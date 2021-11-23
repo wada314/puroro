@@ -1088,8 +1088,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
-            'bump,
-            BT::ChildsBumpTypes,
+            BT::ChildsBumpTypes<'bump>,
         >;
         fn group_one<'this>(
             &'this self,
@@ -1221,8 +1220,7 @@ pub mod _puroro_impls {
                         ::puroro::tags::Message<
                             ::puroro::internal::NoAllocBumpBox<
                                 self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
-                                    'bump,
-                                    BT::ChildsBumpTypes,
+                                    BT::ChildsBumpTypes<'bump>,
                                 >,
                             >,
                         >,
@@ -2548,8 +2546,7 @@ pub mod _puroro_nested {
                 G2Submsg(
                     ::puroro::internal::NoAllocBumpBox<
                         self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
-                            'bump,
-                            BT::ChildsBumpTypes,
+                            BT::ChildsBumpTypes<'bump>,
                         >,
                     >,
                 ),

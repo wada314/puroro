@@ -904,8 +904,7 @@ pub mod _puroro_impls {
         submsg_unlabeled: ::std::option::Option<
             ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
-                    'bump,
-                    BT::ChildsBumpTypes,
+                    BT::ChildsBumpTypes<'bump>,
                 >,
             >,
         >,
@@ -1004,8 +1003,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
-            'bump,
-            BT::ChildsBumpTypes,
+            BT::ChildsBumpTypes<'bump>,
         >;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
@@ -1059,7 +1057,7 @@ pub mod _puroro_impls {
             }
             6 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump, BT::ChildsBumpTypes>>>, BT
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>>, BT
                 >::deser_field(&mut self.submsg_unlabeled, data, bump)
             }
 

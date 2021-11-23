@@ -1004,8 +1004,7 @@ pub mod _puroro_impls {
         c: ::std::option::Option<
             ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
-                    'bump,
-                    BT::ChildsBumpTypes,
+                    BT::ChildsBumpTypes<'bump>,
                 >,
             >,
         >,
@@ -1076,8 +1075,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
-            'bump,
-            BT::ChildsBumpTypes,
+            BT::ChildsBumpTypes<'bump>,
         >;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|b| b.as_ref())
@@ -1108,8 +1106,7 @@ pub mod _puroro_impls {
                     ::puroro::tags::Message<
                         ::puroro::internal::NoAllocBumpBox<
                             self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
-                                'bump,
-                                BT::ChildsBumpTypes,
+                                BT::ChildsBumpTypes<'bump>,
                             >,
                         >,
                     >,
