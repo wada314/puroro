@@ -246,6 +246,11 @@ impl<T: PartialEq> PartialEq for NoAllocBox<T> {
         self.0 == other.0
     }
 }
+impl<T: Clone> Clone for NoAllocBox<T> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
 
 /// A vec for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
@@ -298,6 +303,12 @@ impl<T> NoAllocVec<T> {
             temp_vec: ManuallyDrop::new(self.as_vec_in(bump)),
             ref_vec: self,
         }
+    }
+}
+impl<T: Clone> NoAllocVec<T> {
+    pub unsafe fn clone_in<'bump>(&self, bump: &'bump Bump) -> Self {
+        let cloned_vec = self.as_vec_in(bump).clone();
+        Self::from_vec(cloned_vec)
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -447,6 +458,13 @@ impl AsRef<str> for NoAllocString {
 impl PartialEq for NoAllocString {
     fn eq(&self, other: &Self) -> bool {
         self.vec == other.vec
+    }
+}
+impl NoAllocString {
+    pub unsafe fn clone_in<'bump>(&self, bump: &'bump Bump) -> Self {
+        Self {
+            vec: self.vec.clone_in(bump),
+        }
     }
 }
 

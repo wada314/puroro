@@ -213,12 +213,31 @@ impl<B: Deref<Target = Bump>> Person<B> {
     where
         B: Clone,
     {
-        let bump_unsafe_ref = unsafe { std::mem::transmute(self._bump.deref()) };
         let bump_ref = &self._bump;
         self.partner
             .get_or_insert_with(|| {
-                NoAllocBumpBox::new_in(Person::new_in(B::clone(bump_ref)), bump_unsafe_ref)
+                NoAllocBumpBox::new_in(Person::new_in(B::clone(bump_ref)), bump_ref)
             })
             .as_mut()
     }
+}
+
+impl<B: Clone + Deref<Target = Bump>> Clone for Person<B> {
+    fn clone(&self) -> Self {
+        Self {
+            name: self.name.clone_in(),
+            partner: self.partner.clone(),
+            children: self.children.clone(),
+            _bump: self._bump.clone(),
+        }
+    }
+}
+
+#[test]
+fn test() {
+    let cloned = {
+        let bump = Bump::new();
+        let mut msg = PersonRef::new_in(&bump);
+        msg.partner_mut()
+    };
 }
