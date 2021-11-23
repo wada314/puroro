@@ -81,26 +81,6 @@ impl<T> VecOrOptionOrBare<T> for Vec<T> {
         <[T]>::iter(self)
     }
 }
-impl<'bump, T> VecOrOptionOrBare<T> for crate::bumpalo::collections::Vec<'bump, T> {
-    fn push(&mut self, val: T) {
-        self.push(val);
-    }
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
-    where
-        F: FnOnce() -> T,
-    {
-        <crate::bumpalo::collections::Vec<T>>::push(self, (f)());
-        self.last_mut().unwrap()
-    }
-    type Iter<'a>
-    where
-        Self: 'a,
-        T: 'a,
-    = ::std::slice::Iter<'a, T>;
-    fn iter(&self) -> <Self as VecOrOptionOrBare<T>>::Iter<'_> {
-        <[T]>::iter(self)
-    }
-}
 impl<T> VecOrOptionOrBare<T> for T {
     fn push(&mut self, val: T) {
         *self = val;

@@ -685,7 +685,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        b: ::puroro::bumpalo::collections::String<'bump>,
+        b: ::puroro::internal::NoAllocBumpString,
     }
 
     pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
@@ -874,8 +874,7 @@ pub mod _puroro_impls {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         c: ::std::option::Option<
-            ::puroro::bumpalo::boxed::Box<
-                'bump,
+            ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'bump>,
             >,
         >,
@@ -933,8 +932,7 @@ pub mod _puroro_impls {
                 3 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        ::puroro::bumpalo::boxed::Box<
-                            'bump,
+                        ::puroro::internal::NoAllocBumpBox<
                             self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
                                 'bump,
                             >,
@@ -1087,7 +1085,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        d: ::puroro::internal::NoAllocBumpVec<i32>,
     }
 
     pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::bumpalo::collections::{String, Vec};
+use crate::bumpalo::collections::Vec;
 use crate::bumpalo::Bump;
 use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
 use crate::internal::de::DeserMessageFromBytesIter;
@@ -20,6 +20,7 @@ use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::FieldData;
 use crate::internal::utils::VecOrOptionOrBare;
 use crate::internal::variant::VariantTypeTag;
+use crate::internal::{NoAllocBumpString, NoAllocBumpVec};
 use crate::BumpaloMessage;
 use crate::ErrorKind;
 use crate::{tags, Result};
@@ -128,18 +129,22 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<String<'bump>>,
+        FieldType: VecOrOptionOrBare<NoAllocBumpString>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
-            let mut bytes = Vec::new_in(bump);
-            if let Some(expected_size) = iter.size_hint().1 {
-                bytes.reserve_exact(expected_size);
+            let mut bytes = NoAllocBumpVec::new_in(bump);
+            {
+                let mut mut_bytes = unsafe { bytes.as_vec_mut_in(bump) };
+                if let Some(expected_size) = iter.size_hint().1 {
+                    mut_bytes.reserve_exact(expected_size);
+                }
+                for rbyte in iter {
+                    <Vec<u8>>::push(&mut mut_bytes, rbyte?);
+                }
             }
-            for rbyte in iter {
-                bytes.push(rbyte?);
-            }
-            let string = String::from_utf8(bytes).map_err(|_| ErrorKind::InvalidUtf8Bumpalo())?;
+            let string =
+                NoAllocBumpString::from_utf8(bytes).map_err(|_| ErrorKind::InvalidUtf8Bumpalo())?;
             if !L::DO_DEFAULT_CHECK || !string.is_empty() {
                 field.push(string);
             }
@@ -160,16 +165,20 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<Vec<'bump, u8>>,
+        FieldType: VecOrOptionOrBare<NoAllocBumpVec<u8>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
-            let mut bytes = Vec::new_in(bump);
-            if let Some(expected_size) = iter.size_hint().1 {
-                bytes.reserve_exact(expected_size);
-            }
-            for rbyte in iter {
-                bytes.push(rbyte?);
+            let mut bytes = NoAllocBumpVec::new_in(bump);
+            {
+                let mut mut_bytes = unsafe { bytes.as_vec_mut_in(bump) };
+                if let Some(expected_size) = iter.size_hint().1 {
+                    mut_bytes.reserve_exact(expected_size);
+                }
+                for rbyte in iter {
+                    <Vec<u8>>::push(&mut mut_bytes, rbyte?);
+                }
+                // drop mut_bytes
             }
             if !L::DO_DEFAULT_CHECK || !bytes.is_empty() {
                 field.push(bytes);

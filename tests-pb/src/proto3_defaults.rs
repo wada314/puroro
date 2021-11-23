@@ -894,12 +894,11 @@ pub mod _puroro_impls {
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         i32_unlabeled: i32,
         i32_optional: i32,
-        i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
         f32_unlabeled: f32,
-        string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
+        string_unlabeled: ::puroro::internal::NoAllocBumpString,
         submsg_unlabeled: ::std::option::Option<
-            ::puroro::bumpalo::boxed::Box<
-                'bump,
+            ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>,
             >,
         >,
@@ -1011,7 +1010,7 @@ pub mod _puroro_impls {
             }
             6 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>>>
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>>>
                 >::deser_field(&mut self.submsg_unlabeled, data, &self._bump)
             }
 

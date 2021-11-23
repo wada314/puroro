@@ -1183,8 +1183,7 @@ pub mod _puroro_impls {
                     DeserFieldFromBytesIter::<
                         ::puroro::tags::OneofField,
                         ::puroro::tags::Message<
-                            ::puroro::bumpalo::boxed::Box<
-                                'bump,
+                            ::puroro::internal::NoAllocBumpBox<
                                 self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
                             >,
                         >,
@@ -2368,7 +2367,7 @@ pub mod _puroro_nested {
             pub(crate) enum GroupOneBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G1Int32(i32),
-                G1String(::puroro::bumpalo::collections::String<'bump>),
+                G1String(::puroro::internal::NoAllocBumpString),
             }
 
             impl<'bump> ::std::default::Default for GroupOneBumpalo<'bump> {
@@ -2423,10 +2422,9 @@ pub mod _puroro_nested {
             pub(crate) enum GroupTwoBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G2F32(f32),
-                G2String(::puroro::bumpalo::collections::String<'bump>),
+                G2String(::puroro::internal::NoAllocBumpString),
                 G2Submsg(
-                    ::puroro::bumpalo::boxed::Box<
-                        'bump,
+                    ::puroro::internal::NoAllocBumpBox<
                         self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
                     >,
                 ),

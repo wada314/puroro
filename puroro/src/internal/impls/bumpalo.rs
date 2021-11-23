@@ -28,9 +28,20 @@ use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
 use ::std::ptr;
 use ::std::ptr::NonNull;
+use ::std::str::Utf8Error;
 
 pub trait BumpaloDefault<'bump> {
     fn default_in(bump: &'bump Bump) -> Self;
+}
+impl<'bump> BumpaloDefault<'bump> for NoAllocString {
+    fn default_in(bump: &'bump Bump) -> Self {
+        NoAllocString::new_in(bump)
+    }
+}
+impl<'bump, T> BumpaloDefault<'bump> for NoAllocVec<T> {
+    fn default_in(bump: &'bump Bump) -> Self {
+        NoAllocVec::new_in(bump)
+    }
 }
 impl<'bump> BumpaloDefault<'bump> for String<'bump> {
     fn default_in(bump: &'bump Bump) -> Self {
@@ -109,12 +120,20 @@ impl<T> NoAllocVec<T> {
 
     /// Construct an immutable `Vec` by adding bump ptr.
     /// This function must take a same bump ref with the one given in [`new_in`] method.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> Vec<'bump, T> {
         Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump)
     }
 
     /// Construct a mutable `Vec` wrapped by [`MutRef`].
     /// This function must take a same bump ref with the one given in [`new_in`] method.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_vec_mut_in<'bump>(&mut self, bump: &'bump Bump) -> MutRefVec<'bump, '_, T> {
         MutRefVec {
             temp_vec: ManuallyDrop::new(self.as_vec_in(bump)),
@@ -123,6 +142,10 @@ impl<T> NoAllocVec<T> {
     }
 
     /// Drop. This type needs to know about itself's allocating bump ptr.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn drop_in(self, bump: &Bump) {
         // Construct a Vec and let that handle the drop functions.
         Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump);
@@ -174,14 +197,34 @@ impl NoAllocString {
         }
     }
 
+    pub fn from_utf8(vec: NoAllocVec<u8>) -> ::std::result::Result<Self, Utf8Error> {
+        if let Err(error) = ::std::str::from_utf8(&vec) {
+            Err(error)
+        } else {
+            Ok(Self { vec })
+        }
+    }
+
+    pub fn from_utf8_unchecked(vec: NoAllocVec<u8>) -> Self {
+        Self { vec }
+    }
+
     /// Construct an immutable `String` by adding bump ptr.
     /// This function must take a same bump ref with the one given in [`new_in`] method.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> String<'bump> {
         String::from_utf8_unchecked(self.vec.as_vec_in(bump))
     }
 
     /// Construct a mutable `String` by adding bump ptr.
     /// This function must take a same bump ref with the one given in [`new_in`] method.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_string_mut_in<'bump, 'string>(
         &'string mut self,
         bump: &'bump Bump,
@@ -193,6 +236,10 @@ impl NoAllocString {
     }
 
     /// Drop. This type needs to know about itself's allocating bump ptr.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn drop_in(self, bump: &Bump) {
         self.vec.drop_in(bump);
     }
