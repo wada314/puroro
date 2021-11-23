@@ -128,6 +128,12 @@ impl<T> NoAllocVec<T> {
         Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump);
     }
 }
+impl<T> Deref for NoAllocVec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        unsafe { ::std::slice::from_raw_parts(self.ptr, self.length) }
+    }
+}
 impl<T> Drop for NoAllocVec<T> {
     fn drop(&mut self) {
         unreachable!("This type must be manually dropped!! Call drop_in() instead.")
@@ -189,6 +195,13 @@ impl NoAllocString {
     /// Drop. This type needs to know about itself's allocating bump ptr.
     pub unsafe fn drop_in(self, bump: &Bump) {
         self.vec.drop_in(bump);
+    }
+}
+
+impl Deref for NoAllocString {
+    type Target = str;
+    fn deref(&self) -> &Self::Target {
+        unsafe { ::std::str::from_utf8_unchecked(&self.vec) }
     }
 }
 
