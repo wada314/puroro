@@ -231,6 +231,11 @@ impl<T> AsRef<T> for NoAllocBox<T> {
         self.deref()
     }
 }
+impl<T> AsMut<T> for NoAllocBox<T> {
+    fn as_mut(&mut self) -> &mut T {
+        self.deref_mut()
+    }
+}
 impl<T> Drop for NoAllocBox<T> {
     fn drop(&mut self) {
         unsafe { ptr::drop_in_place(self.0.as_ptr()) }
@@ -314,6 +319,11 @@ impl<T> Borrow<[T]> for NoAllocVec<T> {
 impl<T> AsRef<[T]> for NoAllocVec<T> {
     fn as_ref(&self) -> &[T] {
         self.deref()
+    }
+}
+impl<T> AsMut<[T]> for NoAllocVec<T> {
+    fn as_mut(&mut self) -> &mut [T] {
+        self.deref_mut()
     }
 }
 impl<T> Drop for NoAllocVec<T> {
