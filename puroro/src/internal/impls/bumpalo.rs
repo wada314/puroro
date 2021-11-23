@@ -109,8 +109,8 @@ impl<T> NoAllocVec<T> {
         result
     }
 
-    /// Construct an immutable `Vec` by adding bump ptr.
-    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    /// Construct an immutable [`Vec`](bumpalo::collections::Vec) by adding bump ptr.
+    /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
@@ -119,8 +119,8 @@ impl<T> NoAllocVec<T> {
         Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump)
     }
 
-    /// Construct a mutable `Vec` wrapped by [`MutRef`].
-    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
+    /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
@@ -210,8 +210,8 @@ impl NoAllocString {
         Self { vec }
     }
 
-    /// Construct an immutable `String` by adding bump ptr.
-    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    /// Construct an immutable [`String`](bumpalo::collections::String) by adding bump ptr.
+    /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
@@ -220,8 +220,8 @@ impl NoAllocString {
         String::from_utf8_unchecked(self.vec.as_vec_in(bump))
     }
 
-    /// Construct a mutable `String` by adding bump ptr.
-    /// This function must take a same bump ref with the one given in [`new_in`] method.
+    /// Construct a mutable [`String`](bumpalo::collections::String) by adding bump ptr.
+    /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
