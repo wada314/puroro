@@ -43,16 +43,6 @@ impl<'bump, T> BumpDefault<'bump> for NoAllocVec<T> {
         NoAllocVec::new_in(bump)
     }
 }
-impl<'bump> BumpDefault<'bump> for String<'bump> {
-    fn default_in(bump: &'bump Bump) -> Self {
-        String::new_in(bump)
-    }
-}
-impl<'bump, T> BumpDefault<'bump> for Vec<'bump, T> {
-    fn default_in(bump: &'bump Bump) -> Self {
-        Vec::new_in(bump)
-    }
-}
 impl<'bump, T> BumpDefault<'bump> for Option<T> {
     fn default_in(_: &'bump Bump) -> Self {
         ::std::default::Default::default()
