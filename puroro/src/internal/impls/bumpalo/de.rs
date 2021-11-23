@@ -25,7 +25,7 @@ use crate::ErrorKind;
 use crate::{tags, Result};
 use ::std::marker::PhantomData;
 
-pub trait BumpVecOrOptionOrBare<T> {
+pub trait VecOrOptionOrBare<T> {
     fn push_in(&mut self, val: T, bump: &Bump);
     fn get_or_insert_with_in<F>(&mut self, f: F, bump: &Bump) -> &mut T
     where
@@ -36,7 +36,7 @@ pub trait BumpVecOrOptionOrBare<T> {
         T: 'a;
     fn iter(&self) -> Self::Iter<'_>;
 }
-impl<T> BumpVecOrOptionOrBare<T> for Option<T> {
+impl<T> VecOrOptionOrBare<T> for Option<T> {
     fn push_in(&mut self, val: T, _: &Bump) {
         *self = Some(val);
     }
@@ -54,7 +54,7 @@ impl<T> BumpVecOrOptionOrBare<T> for Option<T> {
         Option::iter(self)
     }
 }
-impl<T> BumpVecOrOptionOrBare<T> for NoAllocBumpVec<T> {
+impl<T> VecOrOptionOrBare<T> for NoAllocBumpVec<T> {
     fn push_in(&mut self, val: T, bump: &Bump) {
         let mut mut_vec = unsafe { self.as_vec_mut_in(bump) };
         mut_vec.push(val);
@@ -73,11 +73,11 @@ impl<T> BumpVecOrOptionOrBare<T> for NoAllocBumpVec<T> {
     where
         T: 'a,
     = ::std::slice::Iter<'a, T>;
-    fn iter(&self) -> <Self as BumpVecOrOptionOrBare<T>>::Iter<'_> {
+    fn iter(&self) -> <Self as VecOrOptionOrBare<T>>::Iter<'_> {
         <[T]>::iter(self)
     }
 }
-impl<T> BumpVecOrOptionOrBare<T> for T {
+impl<T> VecOrOptionOrBare<T> for T {
     fn push_in(&mut self, val: T, _: &Bump) {
         *self = val;
     }
@@ -111,7 +111,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: BumpVecOrOptionOrBare<<tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: VecOrOptionOrBare<<tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         match input {
@@ -148,7 +148,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: BumpVecOrOptionOrBare<<tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: VecOrOptionOrBare<<tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::Bits32(bytes) = input {
@@ -174,7 +174,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: BumpVecOrOptionOrBare<<tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: VecOrOptionOrBare<<tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::Bits64(bytes) = input {
@@ -199,7 +199,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: BumpVecOrOptionOrBare<NoAllocBumpString>,
+        FieldType: VecOrOptionOrBare<NoAllocBumpString>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
@@ -235,7 +235,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: BumpVecOrOptionOrBare<NoAllocBumpVec<u8>>,
+        FieldType: VecOrOptionOrBare<NoAllocBumpVec<u8>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
@@ -271,7 +271,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: BumpVecOrOptionOrBare<M>,
+        FieldType: VecOrOptionOrBare<M>,
         I: Iterator<Item = ::std::io::Result<u8>>,
         M: BumpaloMessage<'bump>,
     {
