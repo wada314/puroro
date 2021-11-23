@@ -210,6 +210,11 @@ impl<T> NoAllocBox<T> {
         Self(unsafe { NonNull::new_unchecked(bump.alloc(x)) })
     }
 }
+impl<T: Clone> NoAllocBox<T> {
+    pub fn clone_in(&self, bump: &Bump) -> Self {
+        Self(unsafe { NonNull::new_unchecked(bump.alloc(self.0.as_ref().clone())) })
+    }
+}
 impl<T> Deref for NoAllocBox<T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {
@@ -244,11 +249,6 @@ impl<T> Drop for NoAllocBox<T> {
 impl<T: PartialEq> PartialEq for NoAllocBox<T> {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
-    }
-}
-impl<T: Clone> Clone for NoAllocBox<T> {
-    fn clone(&self) -> Self {
-        Self(self.0.clone())
     }
 }
 
@@ -306,10 +306,10 @@ impl<T> NoAllocVec<T> {
     }
 }
 impl<T: Clone> NoAllocVec<T> {
-    pub unsafe fn clone_in<'bump>(&self, bump: &'bump Bump) -> Self {
+    pub fn clone_in<'bump>(&self, bump: &'bump Bump) -> Self {
         let mut cloned_vec = Vec::new_in(bump);
         cloned_vec.extend_from_slice(self.deref());
-        Self::from_vec(cloned_vec)
+        unsafe { Self::from_vec(cloned_vec) }
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -462,7 +462,7 @@ impl PartialEq for NoAllocString {
     }
 }
 impl NoAllocString {
-    pub unsafe fn clone_in<'bump>(&self, bump: &'bump Bump) -> Self {
+    pub fn clone_in<'bump>(&self, bump: &'bump Bump) -> Self {
         Self {
             vec: self.vec.clone_in(bump),
         }

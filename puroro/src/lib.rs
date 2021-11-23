@@ -224,20 +224,22 @@ impl<B: Deref<Target = Bump>> Person<B> {
 
 impl<B: Clone + Deref<Target = Bump>> Clone for Person<B> {
     fn clone(&self) -> Self {
+        let newbump = self._bump.clone();
+        let bumpref = unsafe { std::mem::transmute(newbump.deref()) };
         Self {
-            name: self.name.clone_in(),
-            partner: self.partner.clone(),
-            children: self.children.clone(),
-            _bump: self._bump.clone(),
+            name: self.name.clone_in(bumpref),
+            partner: self.partner.as_ref().map(|b| b.clone_in(bumpref)),
+            children: self.children.clone_in(bumpref),
+            _bump: newbump,
         }
     }
 }
 
 #[test]
 fn test() {
+    let bump = Bump::new();
     let cloned = {
-        let bump = Bump::new();
         let mut msg = PersonRef::new_in(&bump);
-        msg.partner_mut()
+        msg.partner_mut().clone()
     };
 }
