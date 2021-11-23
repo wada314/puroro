@@ -236,6 +236,11 @@ impl<T> Drop for NoAllocBox<T> {
         unsafe { ptr::drop_in_place(self.0.as_ptr()) }
     }
 }
+impl<T: PartialEq> PartialEq for NoAllocBox<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
 
 /// A vec for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
@@ -316,6 +321,12 @@ impl<T> Drop for NoAllocVec<T> {
         // bumpalo's Vec does not drop items so manually dropping it
         // https://github.com/fitzgen/bumpalo/issues/133
         unsafe { ptr::drop_in_place(ptr::slice_from_raw_parts_mut(self.ptr, self.length)) }
+    }
+}
+impl<T: PartialEq> PartialEq for NoAllocVec<T> {
+    fn eq(&self, other: &Self) -> bool {
+        ptr::slice_from_raw_parts(self.ptr, self.length)
+            == ptr::slice_from_raw_parts(other.ptr, other.length)
     }
 }
 
@@ -421,6 +432,11 @@ impl Borrow<str> for NoAllocString {
 impl AsRef<str> for NoAllocString {
     fn as_ref(&self) -> &str {
         self.deref()
+    }
+}
+impl PartialEq for NoAllocString {
+    fn eq(&self, other: &Self) -> bool {
+        self.vec == other.vec
     }
 }
 

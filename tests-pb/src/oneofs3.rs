@@ -1159,7 +1159,7 @@ pub mod _puroro_impls {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
                     if !matches!(&self.group_one, E::G1Int32(_)) {
                         self.group_one = E::G1Int32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_one {
@@ -1174,7 +1174,7 @@ pub mod _puroro_impls {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
                     if !matches!(&self.group_one, E::G1String(_)) {
                         self.group_one = E::G1String(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_one {
@@ -1189,7 +1189,7 @@ pub mod _puroro_impls {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2F32(_)) {
                         self.group_two = E::G2F32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_two {
@@ -1204,7 +1204,7 @@ pub mod _puroro_impls {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2String(_)) {
                         self.group_two = E::G2String(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_two {
@@ -1243,7 +1243,7 @@ pub mod _puroro_impls {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeBumpalo as E;
                     if !matches!(&self.group_three, E::G3Int32(_)) {
                         self.group_three = E::G3Int32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_three {

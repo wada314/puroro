@@ -176,7 +176,7 @@ where
                         {%- if field.is_message %}
                         ::puroro::internal::impls::bumpalo::BumpaloMessage::new_with_parents_bump::<BT>(bump)
                         {%- else %} {#- if field.is_message #}
-                        ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(bump)
+                        ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump)
                         {%- endif %} {#- if field.is_message #}
                     );
                 }
