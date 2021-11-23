@@ -23,6 +23,7 @@ pub mod de;
 
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
+use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
@@ -152,6 +153,11 @@ impl<T> DerefMut for NoAllocVec<T> {
         unsafe { ::std::slice::from_raw_parts_mut(self.ptr, self.length) }
     }
 }
+impl<T> Borrow<[T]> for NoAllocVec<T> {
+    fn borrow(&self) -> &[T] {
+        self.deref()
+    }
+}
 impl<T> Drop for NoAllocVec<T> {
     fn drop(&mut self) {
         unreachable!("This type must be manually dropped!! Call drop_in() instead.")
@@ -244,6 +250,11 @@ impl Deref for NoAllocString {
     type Target = str;
     fn deref(&self) -> &Self::Target {
         unsafe { ::std::str::from_utf8_unchecked(&self.vec) }
+    }
+}
+impl Borrow<str> for NoAllocString {
+    fn borrow(&self) -> &str {
+        self.deref()
     }
 }
 
