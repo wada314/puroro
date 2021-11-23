@@ -186,21 +186,19 @@ use internal::{NoAllocBumpBox, NoAllocBumpString, NoAllocBumpVec};
 use std::ops::Deref;
 use std::rc::Rc;
 
-pub struct Person<'bump, B: 'bump> {
+pub struct Person<B> {
     pub name: NoAllocBumpString,
-    pub partner: Option<NoAllocBumpBox<Person<'bump, B>>>,
-    pub children: NoAllocBumpVec<Person<'bump, B>>,
+    pub partner: Option<NoAllocBumpBox<Person<B>>>,
+    pub children: NoAllocBumpVec<Person<B>>,
     _bump: B,
 }
 
 // Straightforward.
-pub type PersonRef<'bump> = Person<'bump, &'bump Bump>;
+pub type PersonRef<'bump> = Person<&'bump Bump>;
 
-// No lifetime param we can use here except 'static,
-// but it's cheaty and later it actually makes some problems...
-pub type PersonRc = Person<'static, Rc<Bump>>;
+pub type PersonRc = Person<Rc<Bump>>;
 
-impl<'bump, B: Deref<Target = Bump>> Person<'bump, B> {
+impl<B: Deref<Target = Bump>> Person<B> {
     pub fn new_in(bump: B) -> Self {
         let bump_ref: &Bump = unsafe { std::mem::transmute(bump.deref()) };
         Self {
@@ -211,7 +209,7 @@ impl<'bump, B: Deref<Target = Bump>> Person<'bump, B> {
         }
     }
 
-    pub fn partner_mut(&mut self) -> &mut Person<'bump, B>
+    pub fn partner_mut(&mut self) -> &mut Person<B>
     where
         B: Clone,
     {
