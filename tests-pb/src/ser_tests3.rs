@@ -1836,15 +1836,15 @@ pub mod _puroro_impls {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 float_unlabeled: ::std::default::Default::default(),
-                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                string_unlabeled: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 submsg_unlabeled: ::std::option::Option::None,
-                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 enum_unlabeled: ::std::default::Default::default(),
-                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 very_large_field_number: ::std::default::Default::default(),
             }
         }
@@ -1858,7 +1858,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -3022,7 +3022,7 @@ impl ::std::default::Default for Enum {
     }
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Enum {
+impl<'bump> ::puroro::internal::BumpDefault<'bump> for Enum {
     fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
         ::std::default::Default::default()
     }
@@ -3252,7 +3252,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+            impl<'bump> ::puroro::internal::BumpDefault<'bump> for SubmsgBumpalo<'bump> {
                 fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self::new_in(bump)
                 }

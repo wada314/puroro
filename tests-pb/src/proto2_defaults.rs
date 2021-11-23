@@ -6131,20 +6131,20 @@ pub mod _puroro_impls {
                 bool_default: ::std::default::Default::default(),
                 bool_true: ::std::default::Default::default(),
                 bool_false: ::std::default::Default::default(),
-                string_default: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_empty: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_abc: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_aiu: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_backslash: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_tab: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_crlf: ::puroro::bumpalo::collections::String::new_in(bump),
-                bytes_default: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_empty: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_abc: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_aiu: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_backslash: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_tab: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_crlf: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                string_default: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_empty: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_abc: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_aiu: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_backslash: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_tab: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_crlf: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                bytes_default: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_empty: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_abc: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_aiu: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_backslash: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_tab: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_crlf: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 enum_default: ::std::default::Default::default(),
                 enum_one: ::std::default::Default::default(),
                 enum_fourty_two: ::std::default::Default::default(),
@@ -6160,7 +6160,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -10084,7 +10084,7 @@ impl ::std::default::Default for MyEnum {
     }
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MyEnum {
+impl<'bump> ::puroro::internal::BumpDefault<'bump> for MyEnum {
     fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
         ::std::default::Default::default()
     }

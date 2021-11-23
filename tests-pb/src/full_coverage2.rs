@@ -11165,52 +11165,52 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 i32_required: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 float_required: ::std::default::Default::default(),
                 float_optional: ::std::default::Default::default(),
-                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_required: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_optional: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                bytes_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
-                string_required: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_optional: ::puroro::bumpalo::collections::String::new_in(bump),
-                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                float_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_required: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_optional: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                bytes_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                string_required: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_optional: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                string_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 enum_required: ::std::default::Default::default(),
                 enum_optional: ::std::default::Default::default(),
-                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                enum_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 submsg_required: ::std::option::Option::None,
                 submsg_optional: ::std::option::Option::None,
-                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                submsg_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 i64_required: ::std::default::Default::default(),
                 i64_optional: ::std::default::Default::default(),
-                i64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i64_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 u32_required: ::std::default::Default::default(),
                 u32_optional: ::std::default::Default::default(),
-                u32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 u64_required: ::std::default::Default::default(),
                 u64_optional: ::std::default::Default::default(),
-                u64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                u64_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 s32_required: ::std::default::Default::default(),
                 s32_optional: ::std::default::Default::default(),
-                s32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 s64_required: ::std::default::Default::default(),
                 s64_optional: ::std::default::Default::default(),
-                s64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                s64_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 fixed32_required: ::std::default::Default::default(),
                 fixed32_optional: ::std::default::Default::default(),
-                fixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 fixed64_required: ::std::default::Default::default(),
                 fixed64_optional: ::std::default::Default::default(),
-                fixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                fixed64_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 sfixed32_required: ::std::default::Default::default(),
                 sfixed32_optional: ::std::default::Default::default(),
-                sfixed32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 sfixed64_required: ::std::default::Default::default(),
                 sfixed64_optional: ::std::default::Default::default(),
-                sfixed64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                sfixed64_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 f64_required: ::std::default::Default::default(),
                 f64_optional: ::std::default::Default::default(),
-                f64_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                f64_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             }
         }
     }
@@ -11223,7 +11223,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -15283,7 +15283,7 @@ impl ::std::default::Default for Enum {
     }
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Enum {
+impl<'bump> ::puroro::internal::BumpDefault<'bump> for Enum {
     fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
         ::std::default::Default::default()
     }
@@ -15610,7 +15610,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+            impl<'bump> ::puroro::internal::BumpDefault<'bump> for SubmsgBumpalo<'bump> {
                 fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
                     Self::new_in(bump)
                 }

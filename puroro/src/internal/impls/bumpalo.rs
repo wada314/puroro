@@ -30,37 +30,37 @@ use ::std::ptr;
 use ::std::ptr::NonNull;
 use ::std::str::Utf8Error;
 
-pub trait BumpaloDefault<'bump> {
+pub trait BumpDefault<'bump> {
     fn default_in(bump: &'bump Bump) -> Self;
 }
-impl<'bump> BumpaloDefault<'bump> for NoAllocString {
+impl<'bump> BumpDefault<'bump> for NoAllocString {
     fn default_in(bump: &'bump Bump) -> Self {
         NoAllocString::new_in(bump)
     }
 }
-impl<'bump, T> BumpaloDefault<'bump> for NoAllocVec<T> {
+impl<'bump, T> BumpDefault<'bump> for NoAllocVec<T> {
     fn default_in(bump: &'bump Bump) -> Self {
         NoAllocVec::new_in(bump)
     }
 }
-impl<'bump> BumpaloDefault<'bump> for String<'bump> {
+impl<'bump> BumpDefault<'bump> for String<'bump> {
     fn default_in(bump: &'bump Bump) -> Self {
         String::new_in(bump)
     }
 }
-impl<'bump, T> BumpaloDefault<'bump> for Vec<'bump, T> {
+impl<'bump, T> BumpDefault<'bump> for Vec<'bump, T> {
     fn default_in(bump: &'bump Bump) -> Self {
         Vec::new_in(bump)
     }
 }
-impl<'bump, T> BumpaloDefault<'bump> for Option<T> {
+impl<'bump, T> BumpDefault<'bump> for Option<T> {
     fn default_in(_: &'bump Bump) -> Self {
         ::std::default::Default::default()
     }
 }
 macro_rules! impl_bumpalo_default {
     ($ty:ty) => {
-        impl<'bump> BumpaloDefault<'bump> for $ty {
+        impl<'bump> BumpDefault<'bump> for $ty {
             fn default_in(_: &'bump Bump) -> Self {
                 Default::default()
             }

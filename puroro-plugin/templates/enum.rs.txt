@@ -60,7 +60,7 @@ impl ::std::default::Default for {{ ident }} {
     }
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for {{ ident }} {
+impl<'bump> ::puroro::internal::BumpDefault<'bump> for {{ ident }} {
     fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
         ::std::default::Default::default()
     }

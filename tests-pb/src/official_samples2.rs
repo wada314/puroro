@@ -527,7 +527,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test1Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test1Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -698,7 +698,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                b: ::puroro::bumpalo::collections::String::new_in(bump),
+                b: ::puroro::internal::NoAllocBumpString::new_in(bump),
             }
         }
     }
@@ -711,7 +711,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test2Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test2Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -908,7 +908,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test3Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test3Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -1103,7 +1103,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                d: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                d: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             }
         }
     }
@@ -1116,7 +1116,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test4Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test4Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }

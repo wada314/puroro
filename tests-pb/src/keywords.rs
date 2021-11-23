@@ -214,7 +214,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
