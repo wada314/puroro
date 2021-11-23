@@ -894,12 +894,11 @@ pub mod _puroro_impls {
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
         i32_unlabeled: i32,
         i32_optional: i32,
-        i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
         f32_unlabeled: f32,
-        string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
+        string_unlabeled: ::puroro::internal::NoAllocBumpString,
         submsg_unlabeled: ::std::option::Option<
-            ::puroro::bumpalo::boxed::Box<
-                'bump,
+            ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>,
             >,
         >,
@@ -914,9 +913,9 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                i32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
                 f32_unlabeled: ::std::default::Default::default(),
-                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump),
+                string_unlabeled: ::puroro::internal::NoAllocBumpString::new_in(bump),
                 submsg_unlabeled: ::std::option::Option::None,
             }
         }
@@ -930,7 +929,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -1011,7 +1010,7 @@ pub mod _puroro_impls {
             }
             6 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>>>
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>>>
                 >::deser_field(&mut self.submsg_unlabeled, data, &self._bump)
             }
 
@@ -1307,7 +1306,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for SubmsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }

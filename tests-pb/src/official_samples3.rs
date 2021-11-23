@@ -529,7 +529,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test1Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test1Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -685,7 +685,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        b: ::puroro::bumpalo::collections::String<'bump>,
+        b: ::puroro::internal::NoAllocBumpString,
     }
 
     pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
@@ -695,7 +695,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                b: ::puroro::bumpalo::collections::String::new_in(bump),
+                b: ::puroro::internal::NoAllocBumpString::new_in(bump),
             }
         }
     }
@@ -708,7 +708,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test2Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test2Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -874,8 +874,7 @@ pub mod _puroro_impls {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         c: ::std::option::Option<
-            ::puroro::bumpalo::boxed::Box<
-                'bump,
+            ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'bump>,
             >,
         >,
@@ -901,7 +900,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test3Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test3Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -933,8 +932,7 @@ pub mod _puroro_impls {
                 3 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        ::puroro::bumpalo::boxed::Box<
-                            'bump,
+                        ::puroro::internal::NoAllocBumpBox<
                             self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
                                 'bump,
                             >,
@@ -1087,7 +1085,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        d: ::puroro::internal::NoAllocBumpVec<i32>,
     }
 
     pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
@@ -1097,7 +1095,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                d: ::puroro::bumpalo::collections::Vec::new_in(bump),
+                d: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             }
         }
     }
@@ -1110,7 +1108,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Test4Bumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test4Bumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }

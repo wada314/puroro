@@ -16,6 +16,7 @@ use crate::bumpalo::Bump;
 use crate::internal::de::from_iter::deser_from_iter;
 use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::se::SerMessageToIoWrite;
+use crate::internal::NoAllocBumpBox;
 use crate::Result;
 use ::std::convert::TryFrom;
 use ::std::io::Write;
@@ -91,7 +92,7 @@ where
     M: MessageRepresentativeImpl,
 {
 }
-impl<'bump, M, T> Message<M> for crate::bumpalo::boxed::Box<'bump, T>
+impl<'bump, M, T> Message<M> for NoAllocBumpBox<T>
 where
     T: Message<M>,
     M: MessageRepresentativeImpl,
@@ -128,11 +129,11 @@ impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
 pub trait BumpaloMessage<'bump> {
     fn new_in(bump: &'bump Bump) -> Self;
 }
-impl<'bump, T> BumpaloMessage<'bump> for crate::bumpalo::boxed::Box<'bump, T>
+impl<'bump, T> BumpaloMessage<'bump> for NoAllocBumpBox<T>
 where
     T: BumpaloMessage<'bump>,
 {
     fn new_in(bump: &'bump Bump) -> Self {
-        crate::bumpalo::boxed::Box::new_in(BumpaloMessage::new_in(bump), bump)
+        NoAllocBumpBox::new_in(BumpaloMessage::new_in(bump), bump)
     }
 }

@@ -29,17 +29,17 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
             {%- if field.is_repeated %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            {{ field.ident }}: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             {%- else %}
             {%- if field.is_length_delimited %}
             {%- if field.is_message %}
             {{ field.ident }}: ::std::option::Option::None,
             {%- endif %} {#- if field.is_message #}
             {%- if field.is_string %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::String::new_in(bump),
+            {{ field.ident }}: ::puroro::internal::NoAllocBumpString::new_in(bump),
             {%- endif %} {#- if field.is_string #}
             {%- if field.is_bytes %}
-            {{ field.ident }}: ::puroro::bumpalo::collections::Vec::new_in(bump),
+            {{ field.ident }}: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             {%- endif %} {#- if field.is_bytes #}
             {%- else %} {#- if field.is_length_delimited #}
             {{ field.ident }}: ::std::default::Default::default(),
@@ -63,7 +63,7 @@ impl<'bump> ::puroro::BumpaloMessage<'bump> for {{ m.bumpalo_ident }}<'bump> {
     }
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for {{ m.bumpalo_ident }}<'bump> {
+impl<'bump> ::puroro::internal::BumpDefault<'bump> for {{ m.bumpalo_ident }}<'bump> {
     fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -141,7 +141,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                         {%- if field.is_message %}
                         ::puroro::BumpaloMessage::new_in(&self._bump)
                         {%- else %} {#- if field.is_message #}
-                        ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(&self._bump)
+                        ::puroro::internal::BumpDefault::default_in(&self._bump)
                         {%- endif %} {#- if field.is_message #}
                     );
                 }

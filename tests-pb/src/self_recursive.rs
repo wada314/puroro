@@ -220,8 +220,7 @@ pub mod _puroro_impls {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         recursive_unlabeled: ::std::option::Option<
-            ::puroro::bumpalo::boxed::Box<
-                'bump,
+            ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
             >,
         >,
@@ -247,7 +246,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -279,8 +278,7 @@ pub mod _puroro_impls {
                 1 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        ::puroro::bumpalo::boxed::Box<
-                            'bump,
+                        ::puroro::internal::NoAllocBumpBox<
                             self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
                         >,
                     >,

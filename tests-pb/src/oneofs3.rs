@@ -1044,7 +1044,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for MsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -1106,11 +1106,8 @@ pub mod _puroro_impls {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
                     if !matches!(&self.group_one, E::G1Int32(_)) {
-                        self.group_one = E::G1Int32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        );
+                        self.group_one =
+                            E::G1Int32(::puroro::internal::BumpDefault::default_in(&self._bump));
                     }
                     let field_value_mut_ref = match &mut self.group_one {
                         E::G1Int32(v) => v,
@@ -1123,11 +1120,8 @@ pub mod _puroro_impls {
                 2 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
                     if !matches!(&self.group_one, E::G1String(_)) {
-                        self.group_one = E::G1String(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        );
+                        self.group_one =
+                            E::G1String(::puroro::internal::BumpDefault::default_in(&self._bump));
                     }
                     let field_value_mut_ref = match &mut self.group_one {
                         E::G1String(v) => v,
@@ -1140,11 +1134,8 @@ pub mod _puroro_impls {
                 3 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2F32(_)) {
-                        self.group_two = E::G2F32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        );
+                        self.group_two =
+                            E::G2F32(::puroro::internal::BumpDefault::default_in(&self._bump));
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         E::G2F32(v) => v,
@@ -1157,11 +1148,8 @@ pub mod _puroro_impls {
                 4 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2String(_)) {
-                        self.group_two = E::G2String(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        );
+                        self.group_two =
+                            E::G2String(::puroro::internal::BumpDefault::default_in(&self._bump));
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         E::G2String(v) => v,
@@ -1183,8 +1171,7 @@ pub mod _puroro_impls {
                     DeserFieldFromBytesIter::<
                         ::puroro::tags::OneofField,
                         ::puroro::tags::Message<
-                            ::puroro::bumpalo::boxed::Box<
-                                'bump,
+                            ::puroro::internal::NoAllocBumpBox<
                                 self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
                             >,
                         >,
@@ -1193,11 +1180,8 @@ pub mod _puroro_impls {
                 6 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeBumpalo as E;
                     if !matches!(&self.group_three, E::G3Int32(_)) {
-                        self.group_three = E::G3Int32(
-                            ::puroro::internal::impls::bumpalo::BumpaloDefault::default_in(
-                                &self._bump,
-                            ),
-                        );
+                        self.group_three =
+                            E::G3Int32(::puroro::internal::BumpDefault::default_in(&self._bump));
                     }
                     let field_value_mut_ref = match &mut self.group_three {
                         E::G3Int32(v) => v,
@@ -1469,7 +1453,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for SubmsgBumpalo<'bump> {
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for SubmsgBumpalo<'bump> {
         fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
             Self::new_in(bump)
         }
@@ -2368,7 +2352,7 @@ pub mod _puroro_nested {
             pub(crate) enum GroupOneBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G1Int32(i32),
-                G1String(::puroro::bumpalo::collections::String<'bump>),
+                G1String(::puroro::internal::NoAllocBumpString),
             }
 
             impl<'bump> ::std::default::Default for GroupOneBumpalo<'bump> {
@@ -2423,10 +2407,9 @@ pub mod _puroro_nested {
             pub(crate) enum GroupTwoBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G2F32(f32),
-                G2String(::puroro::bumpalo::collections::String<'bump>),
+                G2String(::puroro::internal::NoAllocBumpString),
                 G2Submsg(
-                    ::puroro::bumpalo::boxed::Box<
-                        'bump,
+                    ::puroro::internal::NoAllocBumpBox<
                         self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
                     >,
                 ),

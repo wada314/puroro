@@ -210,7 +210,6 @@
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
-
 mod common_traits;
 mod error;
 pub mod internal;
@@ -247,11 +246,11 @@ impl<T> BumpaloOwned<T> {
 }
 impl<T> BumpaloOwned<T>
 where
-    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
+    T: crate::internal::BumpDefault<'static>,
 {
     pub fn new() -> Self {
         let bump = Box::new(crate::bumpalo::Bump::new());
-        let t = crate::internal::impls::bumpalo::BumpaloDefault::default_in(unsafe {
+        let t = crate::internal::BumpDefault::default_in(unsafe {
             ::std::mem::transmute(bump.as_ref())
         });
         Self { t, bump }
@@ -259,7 +258,7 @@ where
 }
 impl<T> Default for BumpaloOwned<T>
 where
-    T: crate::internal::impls::bumpalo::BumpaloDefault<'static>,
+    T: crate::internal::BumpDefault<'static>,
 {
     fn default() -> Self {
         Self::new()
