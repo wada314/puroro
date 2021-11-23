@@ -66,6 +66,15 @@ impl_bumpalo_default!(u64);
 impl_bumpalo_default!(f64);
 impl_bumpalo_default!(bool);
 
+/// A box for proto message internal usage.
+/// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
+///
+/// Unlike other [`NoAllocString`] and [`NoAllocVec`] types, this type is
+/// just a slightly modified version of [`bumpalo::boxed::Box`] where
+/// replaced it's internal data type from `&'bump mut T` to [`NonNull<T>`].
+/// The main purpose of this type is to make sure the `Drop` is called
+/// when the box itself is dropped, and of course as a box storing a value
+/// into heap memory.
 pub struct NoAllocBox<T>(NonNull<T>);
 impl<T> NoAllocBox<T> {
     pub fn new_in(x: T, bump: &Bump) -> Self {
@@ -99,6 +108,16 @@ impl<T> Drop for NoAllocBox<T> {
     }
 }
 
+/// A vec for proto message internal usage.
+/// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
+///
+/// This type is, essentially, [`bumpalo::collections::Vec`] minus `bump: &Bump` field.
+/// In our usage, the bumpalo pointer is always stored in the message structure,
+/// so each vec or string in the message does not need to store the pointer to bump.
+/// This will make the message struct's self-referential paradox easier in future development.
+/// Instead, we need to make sure for every mutation operation pass the correct
+/// bump pointer and construct a [`bumpalo::collections::Vec`], and when the operation
+/// is done we need to write back the modification to the [`NoAllocVec`] type.
 pub struct NoAllocVec<T> {
     ptr: *mut T,
     length: usize,
@@ -200,6 +219,16 @@ impl<'bump, 'vec, T> Drop for RefMutVec<'bump, 'vec, T> {
     }
 }
 
+/// A string for proto message internal usage.
+/// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
+///
+/// This type is, essentially, [`bumpalo::collections::String`] minus `bump: &Bump` field.
+/// In our usage, the bumpalo pointer is always stored in the message structure,
+/// so each vec or string in the message does not need to store the pointer to bump.
+/// This will make the message struct's self-referential paradox easier in future development.
+/// Instead, we need to make sure for every mutation operation pass the correct
+/// bump pointer and construct a [`bumpalo::collections::String`], and when the operation
+/// is done we need to write back the modification to the [`NoAllocString`] type.
 pub struct NoAllocString {
     vec: NoAllocVec<u8>,
 }
