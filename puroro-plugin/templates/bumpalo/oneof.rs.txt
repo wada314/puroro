@@ -1,27 +1,27 @@
 
-pub(crate) enum {{ oneof.bumpalo_enum_ident }}<'bump, BT>
+pub(crate) enum {{ oneof.bumpalo_enum_ident }}<BT>
 where
-    BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
+    BT: ::puroro::internal::impls::bumpalo::BumpTypes,
 {
-    _None(::std::marker::PhantomData<&'bump BT>),
+    _None(),
 
     {%- for field in oneof.fields %}
     {{ field.ident }}({{ field.bumpalo_field_type }}),
     {%- endfor %}
 }
 
-impl<'bump, BT> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<'bump, BT>
+impl<BT> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<BT>
 where
-    BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
+    BT: ::puroro::internal::impls::bumpalo::BumpTypes,
 {
     fn default() -> Self {
         Self::_None(::std::marker::PhantomData)
     }
 }
 
-impl<'bump, BT> ::std::cmp::PartialEq for {{ oneof.bumpalo_enum_ident }}<'bump, BT>
+impl<BT> ::std::cmp::PartialEq for {{ oneof.bumpalo_enum_ident }}<BT>
 where
-    BT: 'bump + ::puroro::internal::impls::bumpalo::BumpTypes,
+    BT: ::puroro::internal::impls::bumpalo::BumpTypes,
 {
     fn eq(&self, rhs: &Self) -> bool {
         match (self, rhs) {

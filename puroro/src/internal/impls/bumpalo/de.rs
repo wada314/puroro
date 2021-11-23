@@ -108,7 +108,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
@@ -146,7 +146,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
@@ -173,7 +173,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
@@ -199,7 +199,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<NoAllocBumpString>,
@@ -236,7 +236,7 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<NoAllocBumpVec<u8>>,
@@ -273,12 +273,12 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        bump: &'bump <BT as BumpTypes>::BumpRef<'bump>,
+        bump: &'bump <BT as BumpTypes>::BumpRef,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<M>,
         I: Iterator<Item = ::std::io::Result<u8>>,
-        M: BumpaloMessage<'bump, BumpTypes = BT::ChildsBumpTypes>,
+        M: BumpaloMessage<'bump, BumpTypes = BT::ChildsBumpTypes<'bump>>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
             let msg = field

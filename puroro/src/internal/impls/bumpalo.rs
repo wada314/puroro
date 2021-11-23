@@ -26,6 +26,7 @@ use crate::bumpalo::Bump;
 use ::stable_deref_trait::StableDeref;
 use ::std::borrow::Borrow;
 use ::std::fmt::Debug;
+use ::std::marker::PhantomData;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
@@ -81,31 +82,22 @@ impl_bumpalo_default!(bool);
 /// which decides the child struct's bump ptr type and grandchild's
 /// `BumpType`, recursively.
 pub trait BumpTypes {
-    type BumpRef<'bump>: Sized + StableDeref + Deref<Target = Bump> + Debug;
-    unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
-        input: Self::BumpRef<'short>,
-    ) -> Self::BumpRef<'long>;
-
-    type ChildsBumpTypes: BumpTypes + Debug + PartialEq;
+    type BumpRef: Sized + StableDeref + Deref<Target = Bump> + Debug;
+    type ChildsBumpTypes<'bump>: BumpTypes + Debug + PartialEq;
     fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef<'bump>,
-    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump>;
+        bump_parent: &'bump Self::BumpRef,
+    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef;
 }
 
 /// Use `Rc<Bump>` to point the `Bump`. Same for the children.
 #[derive(PartialEq, Debug)]
 pub struct BumpRc;
 impl BumpTypes for BumpRc {
-    type BumpRef<'bump> = Rc<Bump>;
-    unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
-        input: Self::BumpRef<'short>,
-    ) -> Self::BumpRef<'long> {
-        input // as-is
-    }
-    type ChildsBumpTypes = Self;
+    type BumpRef = Rc<Bump>;
+    type ChildsBumpTypes<'bump> = Self;
     fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef<'bump>,
-    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+        bump_parent: &'bump Self::BumpRef,
+    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef {
         bump_parent.clone()
     }
 }
@@ -114,16 +106,11 @@ impl BumpTypes for BumpRc {
 #[derive(PartialEq, Debug)]
 pub struct BumpArc;
 impl BumpTypes for BumpArc {
-    type BumpRef<'bump> = Arc<Bump>;
-    unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
-        input: Self::BumpRef<'short>,
-    ) -> Self::BumpRef<'long> {
-        input // as-is
-    }
-    type ChildsBumpTypes = Self;
+    type BumpRef = Arc<Bump>;
+    type ChildsBumpTypes<'bump> = Self;
     fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef<'bump>,
-    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+        bump_parent: &'bump Self::BumpRef,
+    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef {
         bump_parent.clone()
     }
 }
@@ -132,18 +119,13 @@ impl BumpTypes for BumpArc {
 /// Note you'll need to keep the instance of `Bump` at somewhere
 /// else if you use this ptr type.
 #[derive(PartialEq, Debug)]
-pub struct BumpRef;
-impl BumpTypes for BumpRef {
-    type BumpRef<'bump> = &'bump Bump;
-    unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
-        input: Self::BumpRef<'short>,
-    ) -> Self::BumpRef<'long> {
-        ::std::mem::transmute(input) // `&'short T` => `&'long T`, which is dangerous
-    }
-    type ChildsBumpTypes = BumpRef;
-    fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef<'bump>,
-    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+pub struct BumpRef<'bump>(PhantomData<&'bump ()>);
+impl<'bump> BumpTypes for BumpRef<'bump> {
+    type BumpRef = &'bump Bump;
+    type ChildsBumpTypes<'bump2> = BumpRef<'bump2>;
+    fn make_bump_for_child<'bump2>(
+        bump_parent: &'bump2 Self::BumpRef,
+    ) -> <Self::ChildsBumpTypes<'bump2> as BumpTypes>::BumpRef {
         *bump_parent
     }
 }
@@ -154,16 +136,11 @@ impl BumpTypes for BumpRef {
 #[derive(PartialEq, Debug)]
 pub struct BumpBox;
 impl BumpTypes for BumpBox {
-    type BumpRef<'bump> = Box<Bump>;
-    unsafe fn cast_ref_lt_unsafe<'short, 'long: 'short>(
-        input: Self::BumpRef<'short>,
-    ) -> Self::BumpRef<'long> {
-        input // as-is
-    }
-    type ChildsBumpTypes = BumpRef;
+    type BumpRef = Box<Bump>;
+    type ChildsBumpTypes<'bump> = BumpRef<'bump>;
     fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef<'bump>,
-    ) -> <Self::ChildsBumpTypes as BumpTypes>::BumpRef<'bump> {
+        bump_parent: &'bump Self::BumpRef,
+    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef {
         bump_parent.as_ref()
     }
 }
@@ -172,10 +149,10 @@ impl BumpTypes for BumpBox {
 pub trait BumpaloMessage<'bump> {
     type BumpTypes: BumpTypes;
     fn new_with_parents_bump<ParentsBT>(
-        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef<'bump>,
+        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef,
     ) -> Self
     where
-        ParentsBT: BumpTypes<ChildsBumpTypes = Self::BumpTypes>;
+        ParentsBT: BumpTypes<ChildsBumpTypes<'bump> = Self::BumpTypes>;
 }
 impl<'bump, T> BumpaloMessage<'bump> for NoAllocBox<T>
 where
@@ -183,10 +160,10 @@ where
 {
     type BumpTypes = T::BumpTypes;
     fn new_with_parents_bump<ParentsBT>(
-        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef<'bump>,
+        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef,
     ) -> Self
     where
-        ParentsBT: BumpTypes<ChildsBumpTypes = Self::BumpTypes>,
+        ParentsBT: BumpTypes<ChildsBumpTypes<'bump> = Self::BumpTypes>,
     {
         NoAllocBox::new_in(
             BumpaloMessage::new_with_parents_bump::<ParentsBT>(parents_bump),
