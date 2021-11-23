@@ -15,6 +15,7 @@
 use crate::internal::de::from_iter::deser_from_iter;
 use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::se::SerMessageToIoWrite;
+use crate::internal::NoAllocBumpBox;
 use crate::Result;
 use ::std::convert::TryFrom;
 use ::std::io::Write;
@@ -90,7 +91,7 @@ where
     M: MessageRepresentativeImpl,
 {
 }
-impl<'bump, M, T> Message<M> for crate::bumpalo::boxed::Box<'bump, T>
+impl<'bump, M, T> Message<M> for NoAllocBumpBox<T>
 where
     T: Message<M>,
     M: MessageRepresentativeImpl,

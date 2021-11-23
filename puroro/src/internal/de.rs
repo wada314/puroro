@@ -16,7 +16,9 @@ pub mod from_iter;
 
 use self::from_iter::ScopedIter;
 use crate::internal::types::FieldData;
+use crate::internal::NoAllocBumpBox;
 use crate::Result;
+use ::std::ops::DerefMut;
 
 pub trait DeserMessageFromBytesIter {
     fn deser_field<I>(
@@ -54,10 +56,10 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
-        Box::as_mut(self).deser_field(field_number, data)
+        self.deref_mut().deser_field(field_number, data)
     }
 }
-impl<'bump, T> DeserMessageFromBytesIter for crate::bumpalo::boxed::Box<'bump, T>
+impl<'bump, T> DeserMessageFromBytesIter for NoAllocBumpBox<T>
 where
     T: DeserMessageFromBytesIter,
 {
@@ -69,7 +71,7 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
-        crate::bumpalo::boxed::Box::as_mut(self).deser_field(field_number, data)
+        self.deref_mut().deser_field(field_number, data)
     }
 }
 impl<T> DeserMessageFromBytesIter for Option<T>

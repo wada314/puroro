@@ -706,15 +706,14 @@ impl Field {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => format!("::puroro::bumpalo::collections::String<{}>", bump_lt),
-            FieldType::Bytes => format!("::puroro::bumpalo::collections::Vec<{}, u8>", bump_lt),
+            FieldType::String => "::puroro::internal::NoAllocBumpString".to_string(),
+            FieldType::Bytes => "::puroro::internal::NoAllocBumpVec<u8>".to_string(),
             FieldType::Message(m) => {
                 let bumpalo_message_type =
                     upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"]);
                 format!(
-                    "::puroro::bumpalo::boxed::Box<{lt}, {ty}>",
-                    lt = bump_lt,
-                    ty = bumpalo_message_type,
+                    "::puroro::internal::NoAllocBumpBox<{message_type}>",
+                    message_type = bumpalo_message_type,
                 )
             }
             t => t.numerical_rust_type()?.to_string(),
@@ -767,15 +766,13 @@ impl Field {
         let scalar_type = self.bumpalo_scalar_field_type(bump_lt)?;
         if self.is_repeated()? {
             Ok(format!(
-                "::puroro::bumpalo::collections::Vec<{lt}, {ty}>",
-                lt = bump_lt,
-                ty = scalar_type,
+                "::puroro::internal::NoAllocBumpVec<{}>",
+                scalar_type
             ))
         } else if self.is_message()? {
             Ok(format!(
-                "::std::option::Option<::puroro::bumpalo::boxed::Box<{lt}, {ty}>>",
-                lt = bump_lt,
-                ty = scalar_type,
+                "::std::option::Option<::puroro::internal::NoAllocBumpBox<{}>>",
+                scalar_type
             ))
         } else {
             Ok(scalar_type)
@@ -785,8 +782,8 @@ impl Field {
     pub fn bumpalo_scalar_field_type(&self, bump_lt: &str) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => format!("::puroro::bumpalo::collections::String<{}>", bump_lt),
-            FieldType::Bytes => format!("::puroro::bumpalo::collections::Vec<{}, u8>", bump_lt),
+            FieldType::String => "::puroro::internal::NoAllocBumpString".to_string(),
+            FieldType::Bytes => "::puroro::internal::NoAllocBumpVec<u8>".to_string(),
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {

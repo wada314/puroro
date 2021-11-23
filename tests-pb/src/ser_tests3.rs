@@ -1811,33 +1811,27 @@ pub mod _puroro_impls {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         i32_unlabeled: i32,
-        i32_repeated: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
         float_unlabeled: f32,
-        float_repeated: ::puroro::bumpalo::collections::Vec<'bump, f32>,
-        string_unlabeled: ::puroro::bumpalo::collections::String<'bump>,
-        string_repeated: ::puroro::bumpalo::collections::Vec<
-            'bump,
-            ::puroro::bumpalo::collections::String<'bump>,
-        >,
+        float_repeated: ::puroro::internal::NoAllocBumpVec<f32>,
+        string_unlabeled: ::puroro::internal::NoAllocBumpString,
+        string_repeated: ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
         submsg_unlabeled: ::std::option::Option<
-            ::puroro::bumpalo::boxed::Box<
-                'bump,
+            ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                     'bump,
                     BT::ChildsBumpTypes,
                 >,
             >,
         >,
-        submsg_repeated: ::puroro::bumpalo::collections::Vec<
-            'bump,
+        submsg_repeated: ::puroro::internal::NoAllocBumpVec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                 'bump,
                 BT::ChildsBumpTypes,
             >,
         >,
         enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
-        enum_repeated:
-            ::puroro::bumpalo::collections::Vec<'bump, self::_puroro_root::ser_tests3::Enum>,
+        enum_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::ser_tests3::Enum>,
         very_large_field_number: i32,
 
         _bump: BT::BumpRef<'bump>,
@@ -1864,15 +1858,15 @@ pub mod _puroro_impls {
             Self {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
-                i32_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                i32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
                 float_unlabeled: ::std::default::Default::default(),
-                float_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
-                string_unlabeled: ::puroro::bumpalo::collections::String::new_in(bump_ref),
-                string_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                float_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
+                string_unlabeled: ::puroro::internal::NoAllocBumpString::new_in(bump_ref),
+                string_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
                 submsg_unlabeled: ::std::option::Option::None,
-                submsg_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                submsg_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
                 enum_unlabeled: ::std::default::Default::default(),
-                enum_repeated: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                enum_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
                 very_large_field_number: ::std::default::Default::default(),
 
                 _bump: bump,
@@ -1944,7 +1938,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = ::puroro::internal::utils::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::puroro::bumpalo::collections::String<'this>>,
+            ::std::slice::Iter<'this, ::puroro::internal::NoAllocBumpString>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
@@ -2055,7 +2049,7 @@ pub mod _puroro_impls {
             }
             7 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::bumpalo::boxed::Box<'bump, self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump, BT::ChildsBumpTypes>>>, BT
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump, BT::ChildsBumpTypes>>>, BT
                 >::deser_field(&mut self.submsg_unlabeled, data, bump)
             }
             8 => {
@@ -3105,7 +3099,7 @@ impl ::std::default::Default for Enum {
     }
 }
 
-impl<'bump> ::puroro::internal::impls::bumpalo::BumpaloDefault<'bump> for Enum {
+impl<'bump> ::puroro::internal::BumpDefault<'bump> for Enum {
     fn default_in(_: &'bump ::puroro::bumpalo::Bump) -> Self {
         ::std::default::Default::default()
     }

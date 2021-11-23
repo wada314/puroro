@@ -299,7 +299,7 @@ impl Field {
                         msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                     } else {
                         format!(
-                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            "::puroro::internal::NoAllocBumpBox<{}>",
                             msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                         )
                     },
@@ -460,7 +460,7 @@ impl OneofField {
                         msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                     } else {
                         format!(
-                            "::puroro::bumpalo::boxed::Box<'bump, {}>",
+                            "::puroro::internal::NoAllocBumpBox<{}>",
                             msg.rust_impl_path("Bumpalo", &["'bump", "BT::ChildsBumpTypes"])
                         )
                     },

@@ -760,7 +760,7 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        b: ::puroro::bumpalo::collections::String<'bump>,
+        b: ::puroro::internal::NoAllocBumpString,
 
         _bump: BT::BumpRef<'bump>,
     }
@@ -786,7 +786,7 @@ pub mod _puroro_impls {
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),
-                b: ::puroro::bumpalo::collections::String::new_in(bump_ref),
+                b: ::puroro::internal::NoAllocBumpString::new_in(bump_ref),
 
                 _bump: bump,
             }
@@ -1019,8 +1019,7 @@ pub mod _puroro_impls {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         c: ::std::option::Option<
-            ::puroro::bumpalo::boxed::Box<
-                'bump,
+            ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
                     'bump,
                     BT::ChildsBumpTypes,
@@ -1129,8 +1128,7 @@ pub mod _puroro_impls {
                 3 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        ::puroro::bumpalo::boxed::Box<
-                            'bump,
+                        ::puroro::internal::NoAllocBumpBox<
                             self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
                                 'bump,
                                 BT::ChildsBumpTypes,
@@ -1310,7 +1308,7 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        d: ::puroro::bumpalo::collections::Vec<'bump, i32>,
+        d: ::puroro::internal::NoAllocBumpVec<i32>,
 
         _bump: BT::BumpRef<'bump>,
     }
@@ -1336,7 +1334,7 @@ pub mod _puroro_impls {
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
             Self {
                 _bitfield: ::std::default::Default::default(),
-                d: ::puroro::bumpalo::collections::Vec::new_in(bump_ref),
+                d: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
 
                 _bump: bump,
             }
