@@ -53,11 +53,6 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             {%- endfor %}
         }
     }
-
-    unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
-        // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
-        todo!();
-    }
 }
 
 impl<'bump> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {}

@@ -1030,11 +1030,6 @@ pub mod _puroro_impls {
                 group_three: ::std::default::Default::default(),
             }
         }
-
-        unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
-            // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
-            todo!();
-        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
@@ -1443,11 +1438,6 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
             }
-        }
-
-        unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
-            // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
-            todo!();
         }
     }
 
@@ -2366,15 +2356,6 @@ pub mod _puroro_nested {
                 G1String(::puroro::internal::NoAllocBumpString),
             }
 
-            impl<'bump> GroupOneBumpalo<'bump> {
-                unsafe fn drop_in(self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) {
-                    match self {
-                        Self::G1String(val) => val.drop_in(bump),
-                        _ => (),
-                    }
-                }
-            }
-
             impl<'bump> ::std::default::Default for GroupOneBumpalo<'bump> {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
@@ -2435,15 +2416,6 @@ pub mod _puroro_nested {
                 ),
             }
 
-            impl<'bump> GroupTwoBumpalo<'bump> {
-                unsafe fn drop_in(self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) {
-                    match self {
-                        Self::G2String(val) => val.drop_in(bump),
-                        _ => (),
-                    }
-                }
-            }
-
             impl<'bump> ::std::default::Default for GroupTwoBumpalo<'bump> {
                 fn default() -> Self {
                     Self::_None(::std::marker::PhantomData)
@@ -2485,14 +2457,6 @@ pub mod _puroro_nested {
             pub(crate) enum GroupThreeBumpalo<'bump> {
                 _None(::std::marker::PhantomData<&'bump ()>),
                 G3Int32(i32),
-            }
-
-            impl<'bump> GroupThreeBumpalo<'bump> {
-                unsafe fn drop_in(self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) {
-                    match self {
-                        _ => (),
-                    }
-                }
             }
 
             impl<'bump> ::std::default::Default for GroupThreeBumpalo<'bump> {
