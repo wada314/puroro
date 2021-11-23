@@ -83,6 +83,16 @@ impl<T> DerefMut for NoAllocBox<T> {
         unsafe { self.0.as_mut() }
     }
 }
+impl<T> Borrow<T> for NoAllocBox<T> {
+    fn borrow(&self) -> &T {
+        self.deref()
+    }
+}
+impl<T> AsRef<T> for NoAllocBox<T> {
+    fn as_ref(&self) -> &T {
+        self.deref()
+    }
+}
 impl<T> Drop for NoAllocBox<T> {
     fn drop(&mut self) {
         unsafe { ptr::drop_in_place(self.0.as_ptr()) }
@@ -155,6 +165,11 @@ impl<T> DerefMut for NoAllocVec<T> {
 }
 impl<T> Borrow<[T]> for NoAllocVec<T> {
     fn borrow(&self) -> &[T] {
+        self.deref()
+    }
+}
+impl<T> AsRef<[T]> for NoAllocVec<T> {
+    fn as_ref(&self) -> &[T] {
         self.deref()
     }
 }
@@ -254,6 +269,11 @@ impl Deref for NoAllocString {
 }
 impl Borrow<str> for NoAllocString {
     fn borrow(&self) -> &str {
+        self.deref()
+    }
+}
+impl AsRef<str> for NoAllocString {
+    fn as_ref(&self) -> &str {
         self.deref()
     }
 }
