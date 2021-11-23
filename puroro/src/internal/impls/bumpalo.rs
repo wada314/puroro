@@ -152,7 +152,7 @@ impl<T> NoAllocVec<T> {
         let mut vec = Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump);
         // ...but bumpalo's Vec does not drop items so manually dropping it
         // https://github.com/fitzgen/bumpalo/issues/133
-        vec.drain(..);
+        vec.clear();
     }
 }
 impl<T> Deref for NoAllocVec<T> {
