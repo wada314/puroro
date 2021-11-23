@@ -18,13 +18,83 @@ use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variant
 use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::FieldData;
-use crate::internal::utils::VecOrOptionOrBare;
 use crate::internal::variant::VariantTypeTag;
 use crate::internal::{NoAllocBumpString, NoAllocBumpVec};
 use crate::BumpaloMessage;
 use crate::ErrorKind;
 use crate::{tags, Result};
 use ::std::marker::PhantomData;
+
+pub trait BumpVecOrOptionOrBare<T> {
+    fn push_in(&mut self, val: T, bump: &Bump);
+    fn get_or_insert_with_in<F>(&mut self, f: F, bump: &Bump) -> &mut T
+    where
+        F: FnOnce() -> T;
+    type Iter<'a>: Iterator<Item = &'a T>
+    where
+        Self: 'a,
+        T: 'a;
+    fn iter(&self) -> Self::Iter<'_>;
+}
+impl<T> BumpVecOrOptionOrBare<T> for Option<T> {
+    fn push_in(&mut self, val: T, _: &Bump) {
+        *self = Some(val);
+    }
+    fn get_or_insert_with_in<F>(&mut self, f: F, _: &Bump) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        <Option<T>>::get_or_insert_with(self, f)
+    }
+    type Iter<'a>
+    where
+        T: 'a,
+    = ::std::option::Iter<'a, T>;
+    fn iter(&self) -> Self::Iter<'_> {
+        Option::iter(self)
+    }
+}
+impl<T> BumpVecOrOptionOrBare<T> for NoAllocBumpVec<T> {
+    fn push_in(&mut self, val: T, bump: &Bump) {
+        let mut mut_vec = unsafe { self.as_vec_mut_in(bump) };
+        mut_vec.push(val);
+    }
+    fn get_or_insert_with_in<F>(&mut self, f: F, bump: &Bump) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        {
+            let mut mut_vec = unsafe { self.as_vec_mut_in(bump) };
+            mut_vec.push((f)());
+        }
+        self.last_mut().unwrap()
+    }
+    type Iter<'a>
+    where
+        T: 'a,
+    = ::std::slice::Iter<'a, T>;
+    fn iter(&self) -> <Self as BumpVecOrOptionOrBare<T>>::Iter<'_> {
+        <[T]>::iter(self)
+    }
+}
+impl<T> BumpVecOrOptionOrBare<T> for T {
+    fn push_in(&mut self, val: T, _: &Bump) {
+        *self = val;
+    }
+    fn get_or_insert_with_in<F>(&mut self, _: F, _: &Bump) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        self
+    }
+    type Iter<'a>
+    where
+        T: 'a,
+    = ::std::iter::Once<&'a T>;
+    fn iter(&self) -> Self::Iter<'_> {
+        ::std::iter::once(self)
+    }
+}
 
 // deser from iter methods
 
@@ -38,17 +108,17 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &'bump Bump,
+        bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<<tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: BumpVecOrOptionOrBare<<tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         match input {
             FieldData::Variant(v) => {
                 let native_value = v.to_native::<tags::Variant<V>>()?;
                 if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
-                    field.push(native_value);
+                    field.push_in(native_value, bump);
                 }
             }
             FieldData::LengthDelimited(iter) => {
@@ -57,7 +127,7 @@ where
                 for rvalue in values {
                     let native_value = rvalue?;
                     if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
-                        field.push(native_value);
+                        field.push_in(native_value, bump);
                     }
                 }
             }
@@ -75,16 +145,16 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &'bump Bump,
+        bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<<tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: BumpVecOrOptionOrBare<<tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::Bits32(bytes) = input {
             let native_value = tags::Bits32::<V>::from_array(bytes);
             if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
-                field.push(native_value);
+                field.push_in(native_value, bump);
             }
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
@@ -101,16 +171,16 @@ where
     pub fn deser_field<'bump, FieldType, I>(
         field: &mut FieldType,
         input: FieldData<&mut ScopedIter<I>>,
-        _: &'bump Bump,
+        bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<<tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
+        FieldType: BumpVecOrOptionOrBare<<tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::Bits64(bytes) = input {
             let native_value = tags::Bits64::<V>::from_array(bytes);
             if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
-                field.push(native_value);
+                field.push_in(native_value, bump);
             }
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
@@ -129,7 +199,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<NoAllocBumpString>,
+        FieldType: BumpVecOrOptionOrBare<NoAllocBumpString>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
@@ -146,7 +216,7 @@ where
             let string =
                 NoAllocBumpString::from_utf8(bytes).map_err(|_| ErrorKind::InvalidUtf8Bumpalo())?;
             if !L::DO_DEFAULT_CHECK || !string.is_empty() {
-                field.push(string);
+                field.push_in(string, bump);
             }
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
@@ -165,7 +235,7 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<NoAllocBumpVec<u8>>,
+        FieldType: BumpVecOrOptionOrBare<NoAllocBumpVec<u8>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
@@ -181,7 +251,7 @@ where
                 // drop mut_bytes
             }
             if !L::DO_DEFAULT_CHECK || !bytes.is_empty() {
-                field.push(bytes);
+                field.push_in(bytes, bump);
             }
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
@@ -201,12 +271,12 @@ where
         bump: &'bump Bump,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<M>,
+        FieldType: BumpVecOrOptionOrBare<M>,
         I: Iterator<Item = ::std::io::Result<u8>>,
         M: BumpaloMessage<'bump>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
-            let msg = field.get_or_insert_with(|| BumpaloMessage::new_in(bump));
+            let msg = field.get_or_insert_with_in(|| BumpaloMessage::new_in(bump), bump);
             deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;

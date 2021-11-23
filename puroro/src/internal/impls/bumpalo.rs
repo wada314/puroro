@@ -157,6 +157,11 @@ impl<T> Deref for NoAllocVec<T> {
         unsafe { ::std::slice::from_raw_parts(self.ptr, self.length) }
     }
 }
+impl<T> DerefMut for NoAllocVec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { ::std::slice::from_raw_parts_mut(self.ptr, self.length) }
+    }
+}
 impl<T> Drop for NoAllocVec<T> {
     fn drop(&mut self) {
         unreachable!("This type must be manually dropped!! Call drop_in() instead.")
