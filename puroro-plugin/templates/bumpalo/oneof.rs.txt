@@ -6,6 +6,19 @@ pub(crate) enum {{ oneof.bumpalo_enum_ident }}<'bump> {
     {%- endfor %}
 }
 
+impl<'bump> {{ oneof.bumpalo_enum_ident }}<'bump> {
+    unsafe fn drop_in(self, #[allow(unused)] bump: &'bump ::puroro::bumpalo::Bump) {
+        match self {
+            {%- for field in oneof.fields %}
+            {%- if field.is_length_delimited && !field.is_message %}
+            Self::{{ field.ident }}(val) => val.drop_in(bump),
+            {%- endif %} {#- if field.is_length_delimited && !field.is_message #}
+            {%- endfor %} {#- for field in oneof.fields #}
+            _ => (),
+        }
+    }
+}
+
 impl<'bump> ::std::default::Default for {{ oneof.bumpalo_enum_ident }}<'bump> {
     fn default() -> Self {
         Self::_None(::std::marker::PhantomData)

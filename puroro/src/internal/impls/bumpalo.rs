@@ -173,11 +173,6 @@ impl<T> AsRef<[T]> for NoAllocVec<T> {
         self.deref()
     }
 }
-impl<T> Drop for NoAllocVec<T> {
-    fn drop(&mut self) {
-        unreachable!("This type must be manually dropped!! Call drop_in() instead.")
-    }
-}
 
 pub struct MutRefVec<'bump, 'vec, T> {
     temp_vec: ManuallyDrop<Vec<'bump, T>>,
