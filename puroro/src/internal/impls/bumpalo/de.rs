@@ -56,7 +56,7 @@ impl<T> VecOrOptionOrBare<T> for Option<T> {
 }
 impl<T> VecOrOptionOrBare<T> for NoAllocBumpVec<T> {
     fn push_in(&mut self, val: T, bump: &Bump) {
-        let mut mut_vec = unsafe { self.as_vec_mut_in(bump) };
+        let mut mut_vec = unsafe { self.as_mut_vec_in(bump) };
         mut_vec.push(val);
     }
     fn get_or_insert_with_in<F>(&mut self, f: F, bump: &Bump) -> &mut T
@@ -64,7 +64,7 @@ impl<T> VecOrOptionOrBare<T> for NoAllocBumpVec<T> {
         F: FnOnce() -> T,
     {
         {
-            let mut mut_vec = unsafe { self.as_vec_mut_in(bump) };
+            let mut mut_vec = unsafe { self.as_mut_vec_in(bump) };
             mut_vec.push((f)());
         }
         self.last_mut().unwrap()
@@ -205,7 +205,7 @@ where
         if let FieldData::LengthDelimited(iter) = input {
             let mut bytes = NoAllocBumpVec::new_in(bump);
             {
-                let mut mut_bytes = unsafe { bytes.as_vec_mut_in(bump) };
+                let mut mut_bytes = unsafe { bytes.as_mut_vec_in(bump) };
                 if let Some(expected_size) = iter.size_hint().1 {
                     mut_bytes.reserve_exact(expected_size);
                 }
@@ -241,7 +241,7 @@ where
         if let FieldData::LengthDelimited(iter) = input {
             let mut bytes = NoAllocBumpVec::new_in(bump);
             {
-                let mut mut_bytes = unsafe { bytes.as_vec_mut_in(bump) };
+                let mut mut_bytes = unsafe { bytes.as_mut_vec_in(bump) };
                 if let Some(expected_size) = iter.size_hint().1 {
                     mut_bytes.reserve_exact(expected_size);
                 }

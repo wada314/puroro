@@ -135,8 +135,8 @@ impl<T> NoAllocVec<T> {
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_vec_mut_in<'bump>(&mut self, bump: &'bump Bump) -> MutRefVec<'bump, '_, T> {
-        MutRefVec {
+    pub unsafe fn as_mut_vec_in<'bump>(&mut self, bump: &'bump Bump) -> RefMutVec<'bump, '_, T> {
+        RefMutVec {
             temp_vec: ManuallyDrop::new(self.as_vec_in(bump)),
             ref_vec: self,
         }
@@ -171,23 +171,23 @@ impl<T> Drop for NoAllocVec<T> {
     }
 }
 
-pub struct MutRefVec<'bump, 'vec, T> {
+pub struct RefMutVec<'bump, 'vec, T> {
     temp_vec: ManuallyDrop<Vec<'bump, T>>,
     ref_vec: &'vec mut NoAllocVec<T>,
 }
 
-impl<'bump, 'vec, T: 'bump> Deref for MutRefVec<'bump, 'vec, T> {
+impl<'bump, 'vec, T: 'bump> Deref for RefMutVec<'bump, 'vec, T> {
     type Target = Vec<'bump, T>;
     fn deref(&self) -> &Self::Target {
         &self.temp_vec
     }
 }
-impl<'bump, 'vec, T: 'bump> DerefMut for MutRefVec<'bump, 'vec, T> {
+impl<'bump, 'vec, T: 'bump> DerefMut for RefMutVec<'bump, 'vec, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.temp_vec
     }
 }
-impl<'bump, 'vec, T> Drop for MutRefVec<'bump, 'vec, T> {
+impl<'bump, 'vec, T> Drop for RefMutVec<'bump, 'vec, T> {
     fn drop(&mut self) {
         // We can drop without a bump ptr, though we cannot get benefit of
         // bump memory reusing when the deallocated memory block is the last block
@@ -241,8 +241,8 @@ impl NoAllocString {
     pub unsafe fn as_string_mut_in<'bump, 'string>(
         &'string mut self,
         bump: &'bump Bump,
-    ) -> MutRefString<'bump, 'string> {
-        MutRefString {
+    ) -> RefMutString<'bump, 'string> {
+        RefMutString {
             temp_string: ManuallyDrop::new(self.as_string_in(bump)),
             ref_string: self,
         }
@@ -266,23 +266,23 @@ impl AsRef<str> for NoAllocString {
     }
 }
 
-pub struct MutRefString<'bump, 'string> {
+pub struct RefMutString<'bump, 'string> {
     temp_string: ManuallyDrop<String<'bump>>,
     ref_string: &'string mut NoAllocString,
 }
 
-impl<'bump, 'string> Deref for MutRefString<'bump, 'string> {
+impl<'bump, 'string> Deref for RefMutString<'bump, 'string> {
     type Target = String<'bump>;
     fn deref(&self) -> &Self::Target {
         &self.temp_string
     }
 }
-impl<'bump, 'string> DerefMut for MutRefString<'bump, 'string> {
+impl<'bump, 'string> DerefMut for RefMutString<'bump, 'string> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.temp_string
     }
 }
-impl<'bump, 'string> Drop for MutRefString<'bump, 'string> {
+impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
     fn drop(&mut self) {
         unsafe {
             let vec = ManuallyDrop::take(&mut self.temp_string).into_bytes();
