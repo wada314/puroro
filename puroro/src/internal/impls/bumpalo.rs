@@ -141,19 +141,6 @@ impl<T> NoAllocVec<T> {
             ref_vec: self,
         }
     }
-
-    /// Drop. This type needs to know about itself's allocating bump ptr.
-    ///
-    /// # Safety
-    /// This function is unsafe because there are no guarantee that the
-    /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn drop_in(self, bump: &Bump) {
-        // Construct a Vec and let that handle the drop functions.
-        let mut vec = Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump);
-        // ...but bumpalo's Vec does not drop items so manually dropping it
-        // https://github.com/fitzgen/bumpalo/issues/133
-        vec.clear();
-    }
 }
 impl<T> Deref for NoAllocVec<T> {
     type Target = [T];
@@ -176,6 +163,13 @@ impl<T> AsRef<[T]> for NoAllocVec<T> {
         self.deref()
     }
 }
+impl<T> Drop for NoAllocVec<T> {
+    fn drop(&mut self) {
+        // bumpalo's Vec does not drop items so manually dropping it
+        // https://github.com/fitzgen/bumpalo/issues/133
+        unsafe { ptr::drop_in_place(ptr::slice_from_raw_parts_mut(self.ptr, self.length)) }
+    }
+}
 
 pub struct MutRefVec<'bump, 'vec, T> {
     temp_vec: ManuallyDrop<Vec<'bump, T>>,
@@ -195,6 +189,11 @@ impl<'bump, 'vec, T: 'bump> DerefMut for MutRefVec<'bump, 'vec, T> {
 }
 impl<'bump, 'vec, T> Drop for MutRefVec<'bump, 'vec, T> {
     fn drop(&mut self) {
+        // We can drop without a bump ptr, though we cannot get benefit of
+        // bump memory reusing when the deallocated memory block is the last block
+        // allocated by the bump instance.
+        // It's not much a deal if we are creating a complex data structure like
+        // protobuf I guess though...
         unsafe {
             *self.ref_vec = NoAllocVec::from_vec(ManuallyDrop::take(&mut self.temp_vec));
         }
@@ -247,15 +246,6 @@ impl NoAllocString {
             temp_string: ManuallyDrop::new(self.as_string_in(bump)),
             ref_string: self,
         }
-    }
-
-    /// Drop. This type needs to know about itself's allocating bump ptr.
-    ///
-    /// # Safety
-    /// This function is unsafe because there are no guarantee that the
-    /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn drop_in(self, bump: &Bump) {
-        self.vec.drop_in(bump);
     }
 }
 
