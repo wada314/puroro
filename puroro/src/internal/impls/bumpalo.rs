@@ -307,7 +307,8 @@ impl<T> NoAllocVec<T> {
 }
 impl<T: Clone> NoAllocVec<T> {
     pub unsafe fn clone_in<'bump>(&self, bump: &'bump Bump) -> Self {
-        let cloned_vec = self.as_vec_in(bump).clone();
+        let mut cloned_vec = Vec::new_in(bump);
+        cloned_vec.extend_from_slice(self.deref());
         Self::from_vec(cloned_vec)
     }
 }
