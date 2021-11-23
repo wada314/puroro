@@ -149,7 +149,10 @@ impl<T> NoAllocVec<T> {
     /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn drop_in(self, bump: &Bump) {
         // Construct a Vec and let that handle the drop functions.
-        Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump);
+        let mut vec = Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump);
+        // ...but bumpalo's Vec does not drop items so manually dropping it
+        // https://github.com/fitzgen/bumpalo/issues/133
+        vec.drain(..);
     }
 }
 impl<T> Deref for NoAllocVec<T> {

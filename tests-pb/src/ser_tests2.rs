@@ -1830,6 +1830,11 @@ pub mod _puroro_impls {
                 very_large_field_number: ::std::default::Default::default(),
             }
         }
+
+        unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
+            // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
+            todo!();
+        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
@@ -3245,6 +3250,11 @@ pub mod _puroro_nested {
                         _bitfield: ::std::default::Default::default(),
                         i32_optional: ::std::default::Default::default(),
                     }
+                }
+
+                unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
+                    // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
+                    todo!();
                 }
             }
 

@@ -517,6 +517,11 @@ pub mod _puroro_impls {
                 a: ::std::default::Default::default(),
             }
         }
+
+        unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
+            // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
+            todo!();
+        }
     }
 
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
@@ -700,6 +705,11 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 b: ::puroro::internal::NoAllocBumpString::new_in(bump),
             }
+        }
+
+        unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
+            // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
+            todo!();
         }
     }
 
@@ -897,6 +907,11 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 c: ::std::option::Option::None,
             }
+        }
+
+        unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
+            // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
+            todo!();
         }
     }
 
@@ -1105,6 +1120,11 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 d: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             }
+        }
+
+        unsafe fn drop_in(self, bump: &::puroro::bumpalo::Bump) {
+            // What if the field type is NoAllocBumpVec<NoAllocBumpVec<u8>>?
+            todo!();
         }
     }
 
