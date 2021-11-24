@@ -294,14 +294,12 @@ impl Field {
                 &["BT::ChildsBumpTypes<'bump>"],
             )?,
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
+                let bare_msg_type = msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"]);
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"])
+                        bare_msg_type
                     } else {
-                        format!(
-                            "::puroro::internal::NoAllocBumpBox<{}>",
-                            msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"])
-                        )
+                        format!("::puroro::internal::NoAllocBumpBox<{}>", bare_msg_type)
                     },
                 )
             })?,
@@ -455,14 +453,13 @@ impl OneofField {
                 )
             })?,
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
+                let bare_msg_type =
+                    msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'static>"]);
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"])
+                        bare_msg_type
                     } else {
-                        format!(
-                            "::puroro::internal::NoAllocBumpBox<{}>",
-                            msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"])
-                        )
+                        format!("::puroro::internal::NoAllocBumpBox<{}>", bare_msg_type)
                     },
                 )
             })?,

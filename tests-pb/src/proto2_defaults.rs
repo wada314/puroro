@@ -6082,7 +6082,7 @@ pub mod _puroro_impls {
         enum_one: self::_puroro_root::proto2_defaults::MyEnum,
         enum_fourty_two: self::_puroro_root::proto2_defaults::MyEnum,
 
-        _bump: BT::BumpRef,
+        _bump: BT::BumpPtr,
     }
 
     pub type MsgBumpaloRef<'bump> = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
@@ -6097,7 +6097,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq,
     {
         pub fn new_in(
-            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
@@ -6187,7 +6187,7 @@ pub mod _puroro_impls {
     {
         type BumpTypes = BT;
         fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
@@ -6667,7 +6667,7 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);

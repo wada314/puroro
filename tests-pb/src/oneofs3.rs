@@ -1025,7 +1025,7 @@ pub mod _puroro_impls {
         group_two: super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo<BT>,
         group_three: super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeBumpalo<BT>,
 
-        _bump: BT::BumpRef,
+        _bump: BT::BumpPtr,
     }
 
     pub type MsgBumpaloRef<'bump> = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
@@ -1040,7 +1040,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq,
     {
         pub fn new_in(
-            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
@@ -1071,7 +1071,7 @@ pub mod _puroro_impls {
     {
         type BumpTypes = BT;
         fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
@@ -1146,7 +1146,7 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
@@ -1224,7 +1224,7 @@ pub mod _puroro_impls {
                         ::puroro::tags::Message<
                             ::puroro::internal::NoAllocBumpBox<
                                 self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
-                                    BT::ChildsBumpTypes<'bump>,
+                                    BT::ChildsBumpTypes<'static>,
                                 >,
                             >,
                         >,
@@ -1511,7 +1511,7 @@ pub mod _puroro_impls {
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         i32_unlabeled: i32,
 
-        _bump: BT::BumpRef,
+        _bump: BT::BumpPtr,
     }
 
     pub type SubmsgBumpaloRef<'bump> =
@@ -1527,7 +1527,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq,
     {
         pub fn new_in(
-            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
@@ -1556,7 +1556,7 @@ pub mod _puroro_impls {
     {
         type BumpTypes = BT;
         fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
@@ -1595,7 +1595,7 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
@@ -2545,7 +2545,7 @@ pub mod _puroro_nested {
                 G2Submsg(
                     ::puroro::internal::NoAllocBumpBox<
                         self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
-                            BT::ChildsBumpTypes<'bump>,
+                            BT::ChildsBumpTypes<'static>,
                         >,
                     >,
                 ),

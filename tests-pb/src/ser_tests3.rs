@@ -1818,20 +1818,20 @@ pub mod _puroro_impls {
         submsg_unlabeled: ::std::option::Option<
             ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    BT::ChildsBumpTypes<'bump>,
+                    BT::ChildsBumpTypes<'static>,
                 >,
             >,
         >,
         submsg_repeated: ::puroro::internal::NoAllocBumpVec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                BT::ChildsBumpTypes<'bump>,
+                BT::ChildsBumpTypes<'static>,
             >,
         >,
         enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
         enum_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::ser_tests3::Enum>,
         very_large_field_number: i32,
 
-        _bump: BT::BumpRef,
+        _bump: BT::BumpPtr,
     }
 
     pub type MsgBumpaloRef<'bump> = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
@@ -1846,7 +1846,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq,
     {
         pub fn new_in(
-            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
@@ -1885,7 +1885,7 @@ pub mod _puroro_impls {
     {
         type BumpTypes = BT;
         fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
@@ -1963,7 +1963,7 @@ pub mod _puroro_impls {
             ::std::slice::Iter<
                 'this,
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    BT::ChildsBumpTypes<'bump>,
+                    BT::ChildsBumpTypes<'static>,
                 >,
             >,
         >;
@@ -2004,7 +2004,7 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
@@ -3299,7 +3299,7 @@ pub mod _puroro_nested {
                 >,
                 i32_unlabeled: i32,
 
-                _bump: BT::BumpRef,
+                _bump: BT::BumpPtr,
             }
 
             pub type SubmsgBumpaloRef<'bump> =
@@ -3315,7 +3315,7 @@ pub mod _puroro_nested {
                     + ::std::cmp::PartialEq,
             {
                 pub fn new_in(
-                    bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+                    bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
                 ) -> Self {
                     #[allow(unused)]
                     let bump_ref: &::puroro::bumpalo::Bump =
@@ -3344,7 +3344,7 @@ pub mod _puroro_nested {
             {
                 type BumpTypes = BT;
                 fn new_with_parents_bump<'bump, ParentsBT>(
-                    parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+                    parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
                 ) -> Self
                 where
                     ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
@@ -3383,7 +3383,7 @@ pub mod _puroro_nested {
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 {
                     use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-                    let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+                    let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
                     match field_number {
                         1 => DeserFieldFromBytesIter::<
                             ::puroro::tags::Unlabeled,

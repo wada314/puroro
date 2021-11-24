@@ -11123,9 +11123,9 @@ where
     enum_required: self::_puroro_root::full_coverage2::Enum,
     enum_optional: self::_puroro_root::full_coverage2::Enum,
     enum_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::Enum>,
-    submsg_required: ::std::option::Option<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>>,
-    submsg_optional: ::std::option::Option<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>>,
-    submsg_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>,
+    submsg_required: ::std::option::Option<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'static>>>>,
+    submsg_optional: ::std::option::Option<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'static>>>>,
+    submsg_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'static>>>,
     i64_required: i64,
     i64_optional: i64,
     i64_repeated: ::puroro::internal::NoAllocBumpVec<i64>,
@@ -11157,7 +11157,7 @@ where
     f64_optional: f64,
     f64_repeated: ::puroro::internal::NoAllocBumpVec<f64>,
 
-    _bump: BT::BumpRef,
+    _bump: BT::BumpPtr,
 }
 
     pub type MsgBumpaloRef<'bump> = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
@@ -11172,7 +11172,7 @@ where
             + ::std::cmp::PartialEq,
     {
         pub fn new_in(
-            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
@@ -11248,7 +11248,7 @@ where
     {
         type BumpTypes = BT;
         fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
@@ -11397,7 +11397,7 @@ where
         type Field53RepeatedType<'this> where Self: 'this =
     ::puroro::internal::utils::BorrowedIter<
         self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>,
-        ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>>;
+        ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'static>>>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
@@ -11641,7 +11641,7 @@ where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
             match field_number {
             1 => {
                 self._bitfield.set(0, true);
@@ -15691,7 +15691,7 @@ pub mod _puroro_nested {
                 i32_required: i32,
                 i64_required: i64,
 
-                _bump: BT::BumpRef,
+                _bump: BT::BumpPtr,
             }
 
             pub type SubmsgBumpaloRef<'bump> =
@@ -15707,7 +15707,7 @@ pub mod _puroro_nested {
                     + ::std::cmp::PartialEq,
             {
                 pub fn new_in(
-                    bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+                    bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
                 ) -> Self {
                     #[allow(unused)]
                     let bump_ref: &::puroro::bumpalo::Bump =
@@ -15737,7 +15737,7 @@ pub mod _puroro_nested {
             {
                 type BumpTypes = BT;
                 fn new_with_parents_bump<'bump, ParentsBT>(
-                    parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+                    parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
                 ) -> Self
                 where
                     ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
@@ -15787,7 +15787,7 @@ pub mod _puroro_nested {
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 {
                     use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-                    let bump: &'_ BT::BumpRef<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+                    let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
                     match field_number {
                         1 => {
                             self._bitfield.set(0, true);

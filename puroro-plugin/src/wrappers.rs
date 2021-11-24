@@ -710,7 +710,7 @@ impl Field {
             FieldType::Bytes => "::puroro::internal::NoAllocBumpVec<u8>".to_string(),
             FieldType::Message(m) => {
                 let bumpalo_message_type =
-                    upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"]);
+                    upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'static>"]);
                 format!(
                     "::puroro::internal::NoAllocBumpBox<{message_type}>",
                     message_type = bumpalo_message_type,
@@ -787,7 +787,7 @@ impl Field {
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {
-                upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"])
+                upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'static>"])
             }
             t => t.numerical_rust_type()?.to_string(),
         })
