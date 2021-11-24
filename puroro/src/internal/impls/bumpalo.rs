@@ -82,22 +82,22 @@ impl_bumpalo_default!(bool);
 /// which decides the child struct's bump ptr type and grandchild's
 /// `BumpType`, recursively.
 pub trait BumpTypes {
-    type BumpRef: Sized + StableDeref + Deref<Target = Bump> + Debug;
-    type ChildsBumpTypes<'bump>: BumpTypes + Debug + PartialEq;
-    fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef,
-    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef;
+    type BumpPtr: Sized + StableDeref + Deref<Target = Bump> + Debug;
+    type ChildsBumpTypes<'parent>: BumpTypes + Debug + PartialEq;
+    fn make_bump_for_child<'parent>(
+        bump_parent: &'parent Self::BumpPtr,
+    ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr;
 }
 
 /// Use `Rc<Bump>` to point the `Bump`. Same for the children.
 #[derive(PartialEq, Debug)]
 pub struct BumpRc;
 impl BumpTypes for BumpRc {
-    type BumpRef = Rc<Bump>;
-    type ChildsBumpTypes<'bump> = Self;
-    fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef,
-    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef {
+    type BumpPtr = Rc<Bump>;
+    type ChildsBumpTypes<'parent> = Self;
+    fn make_bump_for_child<'parent>(
+        bump_parent: &'parent Self::BumpPtr,
+    ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         bump_parent.clone()
     }
 }
@@ -106,11 +106,11 @@ impl BumpTypes for BumpRc {
 #[derive(PartialEq, Debug)]
 pub struct BumpArc;
 impl BumpTypes for BumpArc {
-    type BumpRef = Arc<Bump>;
-    type ChildsBumpTypes<'bump> = Self;
-    fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef,
-    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef {
+    type BumpPtr = Arc<Bump>;
+    type ChildsBumpTypes<'parent> = Self;
+    fn make_bump_for_child<'parent>(
+        bump_parent: &'parent Self::BumpPtr,
+    ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         bump_parent.clone()
     }
 }
@@ -121,11 +121,11 @@ impl BumpTypes for BumpArc {
 #[derive(PartialEq, Debug)]
 pub struct BumpRef<'bump>(PhantomData<&'bump ()>);
 impl<'bump> BumpTypes for BumpRef<'bump> {
-    type BumpRef = &'bump Bump;
-    type ChildsBumpTypes<'bump2> = BumpRef<'bump2>;
-    fn make_bump_for_child<'bump2>(
-        bump_parent: &'bump2 Self::BumpRef,
-    ) -> <Self::ChildsBumpTypes<'bump2> as BumpTypes>::BumpRef {
+    type BumpPtr = &'bump Bump;
+    type ChildsBumpTypes<'parent> = BumpRef<'parent>;
+    fn make_bump_for_child<'parent>(
+        bump_parent: &'parent Self::BumpPtr,
+    ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         *bump_parent
     }
 }
@@ -136,34 +136,34 @@ impl<'bump> BumpTypes for BumpRef<'bump> {
 #[derive(PartialEq, Debug)]
 pub struct BumpBox;
 impl BumpTypes for BumpBox {
-    type BumpRef = Box<Bump>;
-    type ChildsBumpTypes<'bump> = BumpRef<'bump>;
-    fn make_bump_for_child<'bump>(
-        bump_parent: &'bump Self::BumpRef,
-    ) -> <Self::ChildsBumpTypes<'bump> as BumpTypes>::BumpRef {
+    type BumpPtr = Box<Bump>;
+    type ChildsBumpTypes<'parent> = BumpRef<'parent>;
+    fn make_bump_for_child<'parent>(
+        bump_parent: &'parent Self::BumpPtr,
+    ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         bump_parent.as_ref()
     }
 }
 
 /// Bumpalo message, initialized from bump ptr instance.
-pub trait BumpaloMessage<'bump> {
+pub trait BumpaloMessage<'parent> {
     type BumpTypes: BumpTypes;
     fn new_with_parents_bump<ParentsBT>(
-        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef,
+        parents_bump: &'parent <ParentsBT as BumpTypes>::BumpPtr,
     ) -> Self
     where
-        ParentsBT: BumpTypes<ChildsBumpTypes<'bump> = Self::BumpTypes>;
+        ParentsBT: BumpTypes<ChildsBumpTypes<'parent> = Self::BumpTypes>;
 }
-impl<'bump, T> BumpaloMessage<'bump> for NoAllocBox<T>
+impl<'parent, T> BumpaloMessage<'parent> for NoAllocBox<T>
 where
-    T: BumpaloMessage<'bump>,
+    T: BumpaloMessage<'parent>,
 {
     type BumpTypes = T::BumpTypes;
     fn new_with_parents_bump<ParentsBT>(
-        parents_bump: &'bump <ParentsBT as BumpTypes>::BumpRef,
+        parents_bump: &'parent <ParentsBT as BumpTypes>::BumpPtr,
     ) -> Self
     where
-        ParentsBT: BumpTypes<ChildsBumpTypes<'bump> = Self::BumpTypes>,
+        ParentsBT: BumpTypes<ChildsBumpTypes<'parent> = Self::BumpTypes>,
     {
         NoAllocBox::new_in(
             BumpaloMessage::new_with_parents_bump::<ParentsBT>(parents_bump),

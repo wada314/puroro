@@ -19,7 +19,7 @@ where
         super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }}<BT>,
     {%- endfor %}
 
-    _bump: BT::BumpRef,
+    _bump: BT::BumpPtr,
 }
 
 pub type {{ m.bumpalo_ident }}Ref<'bump> = {{ m.bumpalo_ident }}<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
@@ -31,7 +31,7 @@ impl<BT> {{ m.bumpalo_ident }}<BT>
 where
     BT: ::puroro::internal::impls::bumpalo::BumpTypes + ::std::fmt::Debug + ::std::cmp::PartialEq,
 {
-    pub fn new_in(bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef) -> Self {
+    pub fn new_in(bump: <BT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr) -> Self {
         {#- We need to make this `bump_ref` to cut off the borrow from the param `bump`
          #  so that we can move the `bump` into our struct.
          #}
@@ -86,7 +86,7 @@ where
 {
     type BumpTypes = BT;
     fn new_with_parents_bump<'bump, ParentsBT>(
-        parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpRef,
+        parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
     ) -> Self
     where
         ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<ChildsBumpTypes<'bump> = Self::BumpTypes>
@@ -147,7 +147,7 @@ where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-        let bump: &'_ BT::BumpRef<'_> = unsafe { 
+        let bump: &'_ BT::BumpPtr<'_> = unsafe { 
             ::std::mem::transmute(&self._bump)
         };
         match field_number {
