@@ -564,7 +564,7 @@ pub mod _puroro_impls {
                 ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
-            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
+            Self::new_in(ParentsBT::make_bump_ptr_for_child(parents_bump))
         }
     }
 
@@ -805,7 +805,7 @@ pub mod _puroro_impls {
                 ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
-            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
+            Self::new_in(ParentsBT::make_bump_ptr_for_child(parents_bump))
         }
     }
 
@@ -1061,7 +1061,7 @@ pub mod _puroro_impls {
                 ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
-            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
+            Self::new_in(ParentsBT::make_bump_ptr_for_child(parents_bump))
         }
     }
 
@@ -1334,7 +1334,7 @@ pub mod _puroro_impls {
                 ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
-            Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
+            Self::new_in(ParentsBT::make_bump_ptr_for_child(parents_bump))
         }
     }
 

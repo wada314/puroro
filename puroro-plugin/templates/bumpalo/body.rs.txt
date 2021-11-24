@@ -91,7 +91,7 @@ where
     where
         ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<ChildsBumpTypes<'parent> = Self::BumpTypes>
     {
-        Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
+        Self::new_in(ParentsBT::make_bump_ptr_for_child(parents_bump))
     }
 }
 

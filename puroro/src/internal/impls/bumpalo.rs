@@ -84,7 +84,7 @@ impl_bumpalo_default!(bool);
 pub trait BumpTypes {
     type BumpPtr: Sized + StableDeref + Deref<Target = Bump> + Debug;
     type ChildsBumpTypes<'parent>: BumpTypes + Debug + PartialEq;
-    fn make_bump_for_child<'parent>(
+    fn make_bump_ptr_for_child<'parent>(
         bump_parent: &'parent Self::BumpPtr,
     ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr;
 }
@@ -95,7 +95,7 @@ pub struct BumpRc;
 impl BumpTypes for BumpRc {
     type BumpPtr = Rc<Bump>;
     type ChildsBumpTypes<'parent> = Self;
-    fn make_bump_for_child<'parent>(
+    fn make_bump_ptr_for_child<'parent>(
         bump_parent: &'parent Self::BumpPtr,
     ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         bump_parent.clone()
@@ -108,7 +108,7 @@ pub struct BumpArc;
 impl BumpTypes for BumpArc {
     type BumpPtr = Arc<Bump>;
     type ChildsBumpTypes<'parent> = Self;
-    fn make_bump_for_child<'parent>(
+    fn make_bump_ptr_for_child<'parent>(
         bump_parent: &'parent Self::BumpPtr,
     ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         bump_parent.clone()
@@ -123,7 +123,7 @@ pub struct BumpRef<'bump>(PhantomData<&'bump ()>);
 impl<'bump> BumpTypes for BumpRef<'bump> {
     type BumpPtr = &'bump Bump;
     type ChildsBumpTypes<'parent> = BumpRef<'parent>;
-    fn make_bump_for_child<'parent>(
+    fn make_bump_ptr_for_child<'parent>(
         bump_parent: &'parent Self::BumpPtr,
     ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         *bump_parent
@@ -138,7 +138,7 @@ pub struct BumpBox;
 impl BumpTypes for BumpBox {
     type BumpPtr = Box<Bump>;
     type ChildsBumpTypes<'parent> = BumpRef<'parent>;
-    fn make_bump_for_child<'parent>(
+    fn make_bump_ptr_for_child<'parent>(
         bump_parent: &'parent Self::BumpPtr,
     ) -> <Self::ChildsBumpTypes<'parent> as BumpTypes>::BumpPtr {
         bump_parent.as_ref()
