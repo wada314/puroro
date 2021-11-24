@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::{BumpTypes, BumpaloMessage};
+use super::{BumpMessage, BumpTypes};
 use crate::bumpalo::collections::Vec;
 use crate::bumpalo::Bump;
 use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
@@ -278,11 +278,11 @@ where
     where
         FieldType: VecOrOptionOrBare<M>,
         I: Iterator<Item = ::std::io::Result<u8>>,
-        M: BumpaloMessage<'bump, BumpTypes = BT::ChildsBumpTypes<'bump>>,
+        M: BumpMessage<'bump, BumpTypes = BT::ChildsBumpTypes<'bump>>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
             let msg = field
-                .get_or_insert_with_in(|| BumpaloMessage::new_with_parents_bump::<BT>(bump), &bump);
+                .get_or_insert_with_in(|| BumpMessage::new_with_parents_bump::<BT>(bump), &bump);
             deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;

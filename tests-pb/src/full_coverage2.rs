@@ -11240,19 +11240,19 @@ where
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for MsgBumpalo<BT>
+    impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for MsgBumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                ChildsBumpTypes<'bump> = Self::BumpTypes,
+                ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
             Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -11385,18 +11385,18 @@ where
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             self.enum_repeated.iter().cloned()
         }
-        type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>;
+        type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_required.as_ref().map(|b| b.as_ref())
         }
-        type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>;
+        type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|b| b.as_ref())
         }
-        type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>;
+        type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>;
         type Field53RepeatedType<'this> where Self: 'this =
     ::puroro::internal::utils::BorrowedIter<
-        self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>,
+        self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>,
         ::std::slice::Iter<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'static>>>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
@@ -11630,8 +11630,8 @@ where
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -11641,277 +11641,277 @@ where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
             match field_number {
             1 => {
                 self._bitfield.set(0, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.i32_required, data, bump)
+                >::deser_field(&mut self.i32_required, data, &self._bump)
             }
             2 => {
                 self._bitfield.set(1, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.i32_optional, data, bump)
+                >::deser_field(&mut self.i32_optional, data, &self._bump)
             }
             3 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.i32_repeated, data, bump)
+                >::deser_field(&mut self.i32_repeated, data, &self._bump)
             }
             11 => {
                 self._bitfield.set(2, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Float, BT
-                >::deser_field(&mut self.float_required, data, bump)
+                >::deser_field(&mut self.float_required, data, &self._bump)
             }
             12 => {
                 self._bitfield.set(3, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(&mut self.float_optional, data, bump)
+                >::deser_field(&mut self.float_optional, data, &self._bump)
             }
             13 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Float, BT
-                >::deser_field(&mut self.float_repeated, data, bump)
+                >::deser_field(&mut self.float_repeated, data, &self._bump)
             }
             21 => {
                 self._bitfield.set(4, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Bytes, BT
-                >::deser_field(&mut self.bytes_required, data, bump)
+                >::deser_field(&mut self.bytes_required, data, &self._bump)
             }
             22 => {
                 self._bitfield.set(5, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(&mut self.bytes_optional, data, bump)
+                >::deser_field(&mut self.bytes_optional, data, &self._bump)
             }
             23 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Bytes, BT
-                >::deser_field(&mut self.bytes_repeated, data, bump)
+                >::deser_field(&mut self.bytes_repeated, data, &self._bump)
             }
             31 => {
                 self._bitfield.set(6, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::String, BT
-                >::deser_field(&mut self.string_required, data, bump)
+                >::deser_field(&mut self.string_required, data, &self._bump)
             }
             32 => {
                 self._bitfield.set(7, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(&mut self.string_optional, data, bump)
+                >::deser_field(&mut self.string_optional, data, &self._bump)
             }
             33 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::String, BT
-                >::deser_field(&mut self.string_repeated, data, bump)
+                >::deser_field(&mut self.string_repeated, data, &self._bump)
             }
             41 => {
                 self._bitfield.set(8, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>, BT
-                >::deser_field(&mut self.enum_required, data, bump)
+                >::deser_field(&mut self.enum_required, data, &self._bump)
             }
             42 => {
                 self._bitfield.set(9, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>, BT
-                >::deser_field(&mut self.enum_optional, data, bump)
+                >::deser_field(&mut self.enum_optional, data, &self._bump)
             }
             43 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>, BT
-                >::deser_field(&mut self.enum_repeated, data, bump)
+                >::deser_field(&mut self.enum_repeated, data, &self._bump)
             }
             51 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>>, BT
-                >::deser_field(&mut self.submsg_required, data, bump)
+                    ::puroro::tags::Required, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>>, BT
+                >::deser_field(&mut self.submsg_required, data, &self._bump)
             }
             52 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>>, BT
-                >::deser_field(&mut self.submsg_optional, data, bump)
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>>, BT
+                >::deser_field(&mut self.submsg_optional, data, &self._bump)
             }
             53 => {
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'bump>>>, BT
-                >::deser_field(&mut self.submsg_repeated, data, bump)
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>, BT
+                >::deser_field(&mut self.submsg_repeated, data, &self._bump)
             }
             101 => {
                 self._bitfield.set(10, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Int64, BT
-                >::deser_field(&mut self.i64_required, data, bump)
+                >::deser_field(&mut self.i64_required, data, &self._bump)
             }
             102 => {
                 self._bitfield.set(11, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(&mut self.i64_optional, data, bump)
+                >::deser_field(&mut self.i64_optional, data, &self._bump)
             }
             103 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int64, BT
-                >::deser_field(&mut self.i64_repeated, data, bump)
+                >::deser_field(&mut self.i64_repeated, data, &self._bump)
             }
             111 => {
                 self._bitfield.set(12, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::UInt32, BT
-                >::deser_field(&mut self.u32_required, data, bump)
+                >::deser_field(&mut self.u32_required, data, &self._bump)
             }
             112 => {
                 self._bitfield.set(13, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(&mut self.u32_optional, data, bump)
+                >::deser_field(&mut self.u32_optional, data, &self._bump)
             }
             113 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::UInt32, BT
-                >::deser_field(&mut self.u32_repeated, data, bump)
+                >::deser_field(&mut self.u32_repeated, data, &self._bump)
             }
             121 => {
                 self._bitfield.set(14, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::UInt64, BT
-                >::deser_field(&mut self.u64_required, data, bump)
+                >::deser_field(&mut self.u64_required, data, &self._bump)
             }
             122 => {
                 self._bitfield.set(15, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(&mut self.u64_optional, data, bump)
+                >::deser_field(&mut self.u64_optional, data, &self._bump)
             }
             123 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::UInt64, BT
-                >::deser_field(&mut self.u64_repeated, data, bump)
+                >::deser_field(&mut self.u64_repeated, data, &self._bump)
             }
             131 => {
                 self._bitfield.set(16, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::SInt32, BT
-                >::deser_field(&mut self.s32_required, data, bump)
+                >::deser_field(&mut self.s32_required, data, &self._bump)
             }
             132 => {
                 self._bitfield.set(17, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::SInt32, BT
-                >::deser_field(&mut self.s32_optional, data, bump)
+                >::deser_field(&mut self.s32_optional, data, &self._bump)
             }
             133 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::SInt32, BT
-                >::deser_field(&mut self.s32_repeated, data, bump)
+                >::deser_field(&mut self.s32_repeated, data, &self._bump)
             }
             141 => {
                 self._bitfield.set(18, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::SInt64, BT
-                >::deser_field(&mut self.s64_required, data, bump)
+                >::deser_field(&mut self.s64_required, data, &self._bump)
             }
             142 => {
                 self._bitfield.set(19, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::SInt64, BT
-                >::deser_field(&mut self.s64_optional, data, bump)
+                >::deser_field(&mut self.s64_optional, data, &self._bump)
             }
             143 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::SInt64, BT
-                >::deser_field(&mut self.s64_repeated, data, bump)
+                >::deser_field(&mut self.s64_repeated, data, &self._bump)
             }
             151 => {
                 self._bitfield.set(20, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Fixed32, BT
-                >::deser_field(&mut self.fixed32_required, data, bump)
+                >::deser_field(&mut self.fixed32_required, data, &self._bump)
             }
             152 => {
                 self._bitfield.set(21, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Fixed32, BT
-                >::deser_field(&mut self.fixed32_optional, data, bump)
+                >::deser_field(&mut self.fixed32_optional, data, &self._bump)
             }
             153 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Fixed32, BT
-                >::deser_field(&mut self.fixed32_repeated, data, bump)
+                >::deser_field(&mut self.fixed32_repeated, data, &self._bump)
             }
             161 => {
                 self._bitfield.set(22, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Fixed64, BT
-                >::deser_field(&mut self.fixed64_required, data, bump)
+                >::deser_field(&mut self.fixed64_required, data, &self._bump)
             }
             162 => {
                 self._bitfield.set(23, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Fixed64, BT
-                >::deser_field(&mut self.fixed64_optional, data, bump)
+                >::deser_field(&mut self.fixed64_optional, data, &self._bump)
             }
             163 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Fixed64, BT
-                >::deser_field(&mut self.fixed64_repeated, data, bump)
+                >::deser_field(&mut self.fixed64_repeated, data, &self._bump)
             }
             171 => {
                 self._bitfield.set(24, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::SFixed32, BT
-                >::deser_field(&mut self.sfixed32_required, data, bump)
+                >::deser_field(&mut self.sfixed32_required, data, &self._bump)
             }
             172 => {
                 self._bitfield.set(25, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::SFixed32, BT
-                >::deser_field(&mut self.sfixed32_optional, data, bump)
+                >::deser_field(&mut self.sfixed32_optional, data, &self._bump)
             }
             173 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::SFixed32, BT
-                >::deser_field(&mut self.sfixed32_repeated, data, bump)
+                >::deser_field(&mut self.sfixed32_repeated, data, &self._bump)
             }
             181 => {
                 self._bitfield.set(26, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::SFixed64, BT
-                >::deser_field(&mut self.sfixed64_required, data, bump)
+                >::deser_field(&mut self.sfixed64_required, data, &self._bump)
             }
             182 => {
                 self._bitfield.set(27, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::SFixed64, BT
-                >::deser_field(&mut self.sfixed64_optional, data, bump)
+                >::deser_field(&mut self.sfixed64_optional, data, &self._bump)
             }
             183 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::SFixed64, BT
-                >::deser_field(&mut self.sfixed64_repeated, data, bump)
+                >::deser_field(&mut self.sfixed64_repeated, data, &self._bump)
             }
             191 => {
                 self._bitfield.set(28, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Required, ::puroro::tags::Double, BT
-                >::deser_field(&mut self.f64_required, data, bump)
+                >::deser_field(&mut self.f64_required, data, &self._bump)
             }
             192 => {
                 self._bitfield.set(29, true);
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Double, BT
-                >::deser_field(&mut self.f64_optional, data, bump)
+                >::deser_field(&mut self.f64_optional, data, &self._bump)
             }
             193 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Double, BT
-                >::deser_field(&mut self.f64_repeated, data, bump)
+                >::deser_field(&mut self.f64_repeated, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -15729,19 +15729,19 @@ pub mod _puroro_nested {
             {
             }
 
-            impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for SubmsgBumpalo<BT>
+            impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for SubmsgBumpalo<BT>
             where
                 BT: ::puroro::internal::impls::bumpalo::BumpTypes
                     + ::std::fmt::Debug
                     + ::std::cmp::PartialEq,
             {
                 type BumpTypes = BT;
-                fn new_with_parents_bump<'bump, ParentsBT>(
-                    parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+                fn new_with_parents_bump<ParentsBT>(
+                    parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
                 ) -> Self
                 where
                     ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                        ChildsBumpTypes<'bump> = Self::BumpTypes,
+                        ChildsBumpTypes<'parent> = Self::BumpTypes,
                     >,
                 {
                     Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -15776,8 +15776,8 @@ pub mod _puroro_nested {
                     + ::std::fmt::Debug
                     + ::std::cmp::PartialEq,
             {
-                fn deser_field<I>(
-                    &mut self,
+                fn deser_field<'this, I>(
+                    &'this mut self,
                     field_number: i32,
                     data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -15787,7 +15787,7 @@ pub mod _puroro_nested {
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 {
                     use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-                    let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
                     match field_number {
                         1 => {
                             self._bitfield.set(0, true);
@@ -15796,7 +15796,7 @@ pub mod _puroro_nested {
                                 ::puroro::tags::Int32,
                                 BT,
                             >::deser_field(
-                                &mut self.i32_required, data, bump
+                                &mut self.i32_required, data, &self._bump
                             )
                         }
                         101 => {
@@ -15806,7 +15806,7 @@ pub mod _puroro_nested {
                                 ::puroro::tags::Int64,
                                 BT,
                             >::deser_field(
-                                &mut self.i64_required, data, bump
+                                &mut self.i64_required, data, &self._bump
                             )
                         }
 

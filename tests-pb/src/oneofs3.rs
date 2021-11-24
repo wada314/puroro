@@ -1063,19 +1063,19 @@ pub mod _puroro_impls {
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for MsgBumpalo<BT>
+    impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for MsgBumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                ChildsBumpTypes<'bump> = Self::BumpTypes,
+                ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
             Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -1092,7 +1092,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
-            BT::ChildsBumpTypes<'bump>,
+            BT::ChildsBumpTypes<'this>,
         >;
         fn group_one<'this>(
             &'this self,
@@ -1135,8 +1135,8 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -1146,13 +1146,15 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
                     if !matches!(&self.group_one, E::G1Int32(_)) {
                         self.group_one = E::G1Int32(
-                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(
+                                &self._bump,
+                            ),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_one {
@@ -1161,13 +1163,15 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::Int32, BT
-                >::deser_field(field_value_mut_ref, data, bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
                     if !matches!(&self.group_one, E::G1String(_)) {
                         self.group_one = E::G1String(
-                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(
+                                &self._bump,
+                            ),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_one {
@@ -1176,14 +1180,15 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::String, BT
-                >::deser_field(field_value_mut_ref, data, bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2F32(_)) {
-                        self.group_two = E::G2F32(
-                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
-                        );
+                        self.group_two =
+                            E::G2F32(::puroro::internal::impls::bumpalo::BumpDefault::default_in(
+                                &self._bump,
+                            ));
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         E::G2F32(v) => v,
@@ -1191,13 +1196,15 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::Float, BT
-                >::deser_field(field_value_mut_ref, data, bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2String(_)) {
                         self.group_two = E::G2String(
-                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(
+                                &self._bump,
+                            ),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_two {
@@ -1206,14 +1213,16 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::String, BT
-                >::deser_field(field_value_mut_ref, data, bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2Submsg(_)) {
                         self.group_two = E::G2Submsg(
-                        ::puroro::internal::impls::bumpalo::BumpaloMessage::new_with_parents_bump::<BT>(bump)
-                    );
+                            ::puroro::internal::impls::bumpalo::BumpMessage::new_with_parents_bump::<
+                                BT,
+                            >(&self._bump),
+                        );
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         E::G2Submsg(v) => v,
@@ -1229,13 +1238,15 @@ pub mod _puroro_impls {
                             >,
                         >,
                         BT,
-                    >::deser_field(field_value_mut_ref, data, bump)
+                    >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
                 6 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeBumpalo as E;
                     if !matches!(&self.group_three, E::G3Int32(_)) {
                         self.group_three = E::G3Int32(
-                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(bump),
+                            ::puroro::internal::impls::bumpalo::BumpDefault::default_in(
+                                &self._bump,
+                            ),
                         );
                     }
                     let field_value_mut_ref = match &mut self.group_three {
@@ -1244,7 +1255,7 @@ pub mod _puroro_impls {
                     };
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, ::puroro::tags::Int32, BT
-                >::deser_field(field_value_mut_ref, data, bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1548,19 +1559,19 @@ pub mod _puroro_impls {
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for SubmsgBumpalo<BT>
+    impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for SubmsgBumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                ChildsBumpTypes<'bump> = Self::BumpTypes,
+                ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
             Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -1584,8 +1595,8 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -1595,12 +1606,12 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
             match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.i32_unlabeled, data, bump)
+                >::deser_field(&mut self.i32_unlabeled, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -2463,7 +2474,7 @@ pub mod _puroro_nested {
             where
                 BT: ::puroro::internal::impls::bumpalo::BumpTypes,
             {
-                _None(),
+                _None(::std::marker::PhantomData<BT>),
                 G1Int32(i32),
                 G1String(::puroro::internal::NoAllocBumpString),
             }
@@ -2539,7 +2550,7 @@ pub mod _puroro_nested {
             where
                 BT: ::puroro::internal::impls::bumpalo::BumpTypes,
             {
-                _None(),
+                _None(::std::marker::PhantomData<BT>),
                 G2F32(f32),
                 G2String(::puroro::internal::NoAllocBumpString),
                 G2Submsg(
@@ -2612,7 +2623,7 @@ pub mod _puroro_nested {
             where
                 BT: ::puroro::internal::impls::bumpalo::BumpTypes,
             {
-                _None(),
+                _None(::std::marker::PhantomData<BT>),
                 G3Int32(i32),
             }
 

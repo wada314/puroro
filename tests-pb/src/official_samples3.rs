@@ -549,19 +549,19 @@ pub mod _puroro_impls {
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for Test1Bumpalo<BT>
+    impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test1Bumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                ChildsBumpTypes<'bump> = Self::BumpTypes,
+                ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
             Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -585,8 +585,8 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -596,12 +596,12 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
             match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.a, data, bump)
+                >::deser_field(&mut self.a, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -790,19 +790,19 @@ pub mod _puroro_impls {
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for Test2Bumpalo<BT>
+    impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test2Bumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                ChildsBumpTypes<'bump> = Self::BumpTypes,
+                ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
             Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -826,8 +826,8 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -837,12 +837,12 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
             match field_number {
             2 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::String, BT
-                >::deser_field(&mut self.b, data, bump)
+                >::deser_field(&mut self.b, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1046,19 +1046,19 @@ pub mod _puroro_impls {
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for Test3Bumpalo<BT>
+    impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test3Bumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                ChildsBumpTypes<'bump> = Self::BumpTypes,
+                ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
             Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -1075,7 +1075,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
-            BT::ChildsBumpTypes<'bump>,
+            BT::ChildsBumpTypes<'this>,
         >;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|b| b.as_ref())
@@ -1088,8 +1088,8 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -1099,19 +1099,19 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
             match field_number {
                 3 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
                         ::puroro::internal::NoAllocBumpBox<
                             self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
-                                BT::ChildsBumpTypes<'bump>,
+                                BT::ChildsBumpTypes<'this>,
                             >,
                         >,
                     >,
                     BT,
-                >::deser_field(&mut self.c, data, bump),
+                >::deser_field(&mut self.c, data, &self._bump),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1319,19 +1319,19 @@ pub mod _puroro_impls {
     {
     }
 
-    impl<'bump, BT> ::puroro::internal::impls::bumpalo::BumpaloMessage<'bump> for Test4Bumpalo<BT>
+    impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test4Bumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
         type BumpTypes = BT;
-        fn new_with_parents_bump<'bump, ParentsBT>(
-            parents_bump: &'bump <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
+        fn new_with_parents_bump<ParentsBT>(
+            parents_bump: &'parent <ParentsBT as ::puroro::internal::impls::bumpalo::BumpTypes>::BumpPtr,
         ) -> Self
         where
             ParentsBT: ::puroro::internal::impls::bumpalo::BumpTypes<
-                ChildsBumpTypes<'bump> = Self::BumpTypes,
+                ChildsBumpTypes<'parent> = Self::BumpTypes,
             >,
         {
             Self::new_in(ParentsBT::make_bump_for_child(parents_bump))
@@ -1360,8 +1360,8 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -1371,12 +1371,12 @@ pub mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-            let bump: &'_ BT::BumpPtr<'_> = unsafe { ::std::mem::transmute(&self._bump) };
+
             match field_number {
             4 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.d, data, bump)
+                >::deser_field(&mut self.d, data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),

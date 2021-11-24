@@ -146,7 +146,7 @@ impl BumpTypes for BumpBox {
 }
 
 /// Bumpalo message, initialized from bump ptr instance.
-pub trait BumpaloMessage<'parent> {
+pub trait BumpMessage<'parent> {
     type BumpTypes: BumpTypes;
     fn new_with_parents_bump<ParentsBT>(
         parents_bump: &'parent <ParentsBT as BumpTypes>::BumpPtr,
@@ -154,9 +154,9 @@ pub trait BumpaloMessage<'parent> {
     where
         ParentsBT: BumpTypes<ChildsBumpTypes<'parent> = Self::BumpTypes>;
 }
-impl<'parent, T> BumpaloMessage<'parent> for NoAllocBox<T>
+impl<'parent, T> BumpMessage<'parent> for NoAllocBox<T>
 where
-    T: BumpaloMessage<'parent>,
+    T: BumpMessage<'parent>,
 {
     type BumpTypes = T::BumpTypes;
     fn new_with_parents_bump<ParentsBT>(
@@ -166,7 +166,7 @@ where
         ParentsBT: BumpTypes<ChildsBumpTypes<'parent> = Self::BumpTypes>,
     {
         NoAllocBox::new_in(
-            BumpaloMessage::new_with_parents_bump::<ParentsBT>(parents_bump),
+            BumpMessage::new_with_parents_bump::<ParentsBT>(parents_bump),
             parents_bump, // Use the parent's bump to alloc the `Box`'s field.
         )
     }

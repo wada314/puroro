@@ -3,7 +3,7 @@ pub(crate) enum {{ oneof.bumpalo_enum_ident }}<BT>
 where
     BT: ::puroro::internal::impls::bumpalo::BumpTypes,
 {
-    _None(),
+    _None(::std::marker::PhantomData<BT>),
 
     {%- for field in oneof.fields %}
     {{ field.ident }}({{ field.bumpalo_field_type }}),

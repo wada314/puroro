@@ -217,7 +217,7 @@ impl Field {
             };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"]))
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'this>"]))
             } else {
                 None
             };
@@ -291,10 +291,10 @@ impl Field {
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f.maybe_trait_scalar_getter_type_borrowed(
                 "Bumpalo",
-                &["BT::ChildsBumpTypes<'bump>"],
+                &["BT::ChildsBumpTypes<'this>"],
             )?,
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
-                let bare_msg_type = msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'bump>"]);
+                let bare_msg_type = msg.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'this>"]);
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
                         bare_msg_type
