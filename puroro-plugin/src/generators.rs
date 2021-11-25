@@ -286,7 +286,7 @@ impl Field {
             })?,
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
-            bumpalo_scalar_field_type: f.bumpalo_scalar_field_type()?,
+            bumpalo_scalar_field_type: f.bumpalo_scalar_field_type("'this")?,
             bumpalo_field_type: f.bumpalo_field_type()?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f.maybe_trait_scalar_getter_type_borrowed(

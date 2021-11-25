@@ -1078,7 +1078,7 @@ pub mod _puroro_impls {
             BT::ChildsBumpTypes<'this>,
         >;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|b| b.as_ref())
+            self.c.as_ref().map(|b| ::std::mem::transmute(b.as_ref()))
         }
     }
 

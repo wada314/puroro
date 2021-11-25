@@ -1006,7 +1006,9 @@ pub mod _puroro_impls {
             BT::ChildsBumpTypes<'this>,
         >;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
+            self.submsg_unlabeled
+                .as_ref()
+                .map(|b| ::std::mem::transmute(b.as_ref()))
         }
     }
 

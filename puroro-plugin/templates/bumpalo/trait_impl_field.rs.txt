@@ -54,7 +54,7 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
     {#- 
      # The field is Option<NoAllocBox<M>> type. Return by as_ref()-ing the internal Box. 
      # We also need to convert the lifetime parameter -- When declaring the struct fields
-     # we are lieing the `'parent` lifetime parameter for the child message because
+     # we are lieing the `'parent` lifetime parameter for the child message as `'static` because
      # we cannot get the parent struct's lifetime at the declaration timing.
      #}
     self.{{ f.ident }}.as_ref().map(|b| b.as_ref())

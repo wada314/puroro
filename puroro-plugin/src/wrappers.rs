@@ -763,7 +763,7 @@ impl Field {
     }
 
     pub fn bumpalo_field_type(&self) -> Result<String> {
-        let scalar_type = self.bumpalo_scalar_field_type()?;
+        let scalar_type = self.bumpalo_scalar_field_type("'static")?;
         if self.is_repeated()? {
             Ok(format!(
                 "::puroro::internal::NoAllocBumpVec<{}>",
@@ -779,7 +779,7 @@ impl Field {
         }
     }
 
-    pub fn bumpalo_scalar_field_type(&self) -> Result<String> {
+    pub fn bumpalo_scalar_field_type(&self, lt: &str) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::puroro::internal::NoAllocBumpString".to_string(),
@@ -787,7 +787,7 @@ impl Field {
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {
-                upgrade(&m)?.rust_impl_path("Bumpalo", &["BT::ChildsBumpTypes<'static>"])
+                upgrade(&m)?.rust_impl_path("Bumpalo", &[&format!("BT::ChildsBumpTypes<{}>", lt)])
             }
             t => t.numerical_rust_type()?.to_string(),
         })

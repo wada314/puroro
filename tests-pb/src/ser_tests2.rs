@@ -1939,7 +1939,9 @@ pub mod _puroro_impls {
             BT::ChildsBumpTypes<'this>,
         >;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            self.submsg_optional.as_ref().map(|b| b.as_ref())
+            self.submsg_optional
+                .as_ref()
+                .map(|b| ::std::mem::transmute(b.as_ref()))
         }
         type Field8MessageType<'this>
         where
@@ -1957,7 +1959,7 @@ pub mod _puroro_impls {
             ::std::slice::Iter<
                 'this,
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    BT::ChildsBumpTypes<'static>,
+                    BT::ChildsBumpTypes<'this>,
                 >,
             >,
         >;
