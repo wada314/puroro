@@ -57,7 +57,7 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
      # we are lieing the `'parent` lifetime parameter for the child message as `'static` because
      # we cannot get the parent struct's lifetime at the declaration timing.
      #}
-    self.{{ f.ident }}.as_ref().map(|b| b.as_ref())
+    self.{{ f.ident }}.as_ref().map(|b| unsafe { ::std::mem::transmute(b.as_ref()) })
 
     {%- else %} {#- if f.is_message #}
 

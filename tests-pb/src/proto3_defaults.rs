@@ -1008,7 +1008,7 @@ pub mod _puroro_impls {
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
             self.submsg_unlabeled
                 .as_ref()
-                .map(|b| ::std::mem::transmute(b.as_ref()))
+                .map(|b| unsafe { ::std::mem::transmute(b.as_ref()) })
         }
     }
 

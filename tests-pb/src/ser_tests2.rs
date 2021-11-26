@@ -1941,7 +1941,7 @@ pub mod _puroro_impls {
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             self.submsg_optional
                 .as_ref()
-                .map(|b| ::std::mem::transmute(b.as_ref()))
+                .map(|b| unsafe { ::std::mem::transmute(b.as_ref()) })
         }
         type Field8MessageType<'this>
         where

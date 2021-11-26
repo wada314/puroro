@@ -11427,13 +11427,13 @@ where
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_unlabeled
                 .as_ref()
-                .map(|b| ::std::mem::transmute(b.as_ref()))
+                .map(|b| unsafe { ::std::mem::transmute(b.as_ref()) })
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional
                 .as_ref()
-                .map(|b| ::std::mem::transmute(b.as_ref()))
+                .map(|b| unsafe { ::std::mem::transmute(b.as_ref()) })
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>;
         type Field53RepeatedType<'this> where Self: 'this =
