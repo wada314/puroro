@@ -83,6 +83,7 @@ where
 
     {#- ######## getter ######## #}
     {%- for field in m.fields %}
+    {%- if !field.is_explicit_oneof_field %}
     {%- if field.is_repeated %}
     {%- else %} {#- if field.is_repeated #}
 
@@ -96,12 +97,13 @@ where
         {%- else %} {#- if field.is_message #}
         {%- if field.has_optional_bit %}
         {#- Non-repeated, non-message, optional field. Optional bit is stored in the bitfield. #}
-        if self._bitfield.get_unchecked({{ field.bitfield_index }}) {
+        if *self._bitfield.get_unchecked({{ field.bitfield_index }}) {
             ::std::option::Option::Some(
                 {%- if field.is_length_delimited %}
-                {%- else %} {#- if field.is_length_delimited #}
-                {%- endif %} {#- if field.is_length_delimited #}
                 &self.{{ field.ident }}
+                {%- else %} {#- if field.is_length_delimited #}
+                self.{{ field.ident }}
+                {%- endif %} {#- if field.is_length_delimited #}
             )
         } else {
             ::std::option::Option::None
@@ -109,7 +111,13 @@ where
         {%- else %} {#- if field.has_optional_bit #}
         {#- Non-repeated, non-message, unlabeled field. Treat as unexisting when it's default value. #}
         if self.{{ field.ident }} != ::std::default::Default::default() {
-            ::std::option::Option::Some(&self.{{ field.ident }})
+            ::std::option::Option::Some(
+                {%- if field.is_length_delimited %}
+                &self.{{ field.ident }}
+                {%- else %} {#- if field.is_length_delimited #}
+                self.{{ field.ident }}
+                {%- endif %} {#- if field.is_length_delimited #}
+            )
         } else {
             ::std::option::Option::None
         }
@@ -118,6 +126,7 @@ where
     }
 
     {%- endif %} {#- if field.is_repeated #}
+    {%- endif %} {#- if !field.is_explicit_oneof_field #}
     {%- endfor %} {#- for field in m.fields #}
 
     {#- ######## mut getter ######## #}

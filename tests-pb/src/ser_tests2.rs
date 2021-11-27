@@ -1851,21 +1851,21 @@ pub mod _puroro_impls {
             }
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self._bitfield.get_unchecked(0) {
-                ::std::option::Option::Some(&self.i32_optional)
+            if *self._bitfield.get_unchecked(0) {
+                ::std::option::Option::Some(self.i32_optional)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            if self._bitfield.get_unchecked(1) {
-                ::std::option::Option::Some(&self.float_optional)
+            if *self._bitfield.get_unchecked(1) {
+                ::std::option::Option::Some(self.float_optional)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if self._bitfield.get_unchecked(2) {
+            if *self._bitfield.get_unchecked(2) {
                 ::std::option::Option::Some(&self.string_optional)
             } else {
                 ::std::option::Option::None
@@ -1879,15 +1879,15 @@ pub mod _puroro_impls {
         pub fn enum_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
-            if self._bitfield.get_unchecked(3) {
-                ::std::option::Option::Some(&self.enum_optional)
+            if *self._bitfield.get_unchecked(3) {
+                ::std::option::Option::Some(self.enum_optional)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self._bitfield.get_unchecked(4) {
-                ::std::option::Option::Some(&self.very_large_field_number)
+            if *self._bitfield.get_unchecked(4) {
+                ::std::option::Option::Some(self.very_large_field_number)
             } else {
                 ::std::option::Option::None
             }
@@ -3400,8 +3400,8 @@ pub mod _puroro_nested {
                     }
                 }
                 pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    if self._bitfield.get_unchecked(0) {
-                        ::std::option::Option::Some(&self.i32_optional)
+                    if *self._bitfield.get_unchecked(0) {
+                        ::std::option::Option::Some(self.i32_optional)
                     } else {
                         ::std::option::Option::None
                     }

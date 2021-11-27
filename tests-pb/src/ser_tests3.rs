@@ -1870,14 +1870,14 @@ pub mod _puroro_impls {
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self.i32_unlabeled != ::std::default::Default::default() {
-                ::std::option::Option::Some(&self.i32_unlabeled)
+                ::std::option::Option::Some(self.i32_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self.float_unlabeled != ::std::default::Default::default() {
-                ::std::option::Option::Some(&self.float_unlabeled)
+                ::std::option::Option::Some(self.float_unlabeled)
             } else {
                 ::std::option::Option::None
             }
@@ -1898,14 +1898,14 @@ pub mod _puroro_impls {
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
             if self.enum_unlabeled != ::std::default::Default::default() {
-                ::std::option::Option::Some(&self.enum_unlabeled)
+                ::std::option::Option::Some(self.enum_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self.very_large_field_number != ::std::default::Default::default() {
-                ::std::option::Option::Some(&self.very_large_field_number)
+                ::std::option::Option::Some(self.very_large_field_number)
             } else {
                 ::std::option::Option::None
             }
@@ -3392,7 +3392,7 @@ pub mod _puroro_nested {
                 }
                 pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     if self.i32_unlabeled != ::std::default::Default::default() {
-                        ::std::option::Option::Some(&self.i32_unlabeled)
+                        ::std::option::Option::Some(self.i32_unlabeled)
                     } else {
                         ::std::option::Option::None
                     }
