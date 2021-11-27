@@ -1875,12 +1875,20 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn i32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+            self.i32_repeated.iter().copied()
+        }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if !::puroro::internal::IsDefault::is_default(&self.float_unlabeled) {
                 ::std::option::Option::Some(self.float_unlabeled)
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn float_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = f32> {
+            self.float_repeated.iter().copied()
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
@@ -1889,10 +1897,21 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn string_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = &'this str> {
+            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
+        }
         pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             self.submsg_unlabeled
                 .as_ref()
                 .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn submsg_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item=&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+            let field: &::puroro::internal::NoAllocBumpVec<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>> = unsafe {
+            ::std::mem::transmute(&self.submsg_repeated)
+        };
+            ::puroro::internal::utils::BorrowedIter::new(field.iter())
         }
         pub fn enum_unlabeled_opt<'this>(
             &'this self,
@@ -1902,6 +1921,12 @@ pub mod _puroro_impls {
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn enum_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = self::_puroro_root::ser_tests3::Enum>
+        {
+            self.enum_repeated.iter().copied()
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.very_large_field_number) {

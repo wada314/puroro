@@ -1338,6 +1338,9 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
+        pub fn d<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+            self.d.iter().copied()
+        }
         pub fn d_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }

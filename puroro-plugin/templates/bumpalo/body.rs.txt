@@ -85,6 +85,24 @@ where
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
     {%- if field.is_repeated %}
+    
+    {#- ######## repeated getter ######## #}
+    pub fn {{ field.ident }}<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item={{ field.bumpalo_getter_type }}> {
+        {%- if field.is_length_delimited %}
+        {%- if field.is_message %}
+        {#- need to cast the field message type's lifetime #}
+        let field: &::puroro::internal::NoAllocBumpVec<{{ field.bumpalo_getter_type }}> = unsafe {
+            ::std::mem::transmute(&self.{{ field.ident }})
+        };
+        ::puroro::internal::utils::BorrowedIter::new(field.iter())
+        {%- else %} {#- if field.is_message #}
+        ::puroro::internal::utils::BorrowedIter::new(self.{{ field.ident }}.iter())
+        {%- endif %} {#- if field.is_message #}
+        {%- else %} {#- if field.is_length_delimited #}
+        self.{{ field.ident }}.iter().copied()
+        {%- endif %} {#- if field.is_length_delimited #}
+    }
+
     {%- else %} {#- if field.is_repeated #}
 
     {#- ######## non-repeated getter ######## #}

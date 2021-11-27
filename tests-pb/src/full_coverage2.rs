@@ -11245,6 +11245,9 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn i32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+            self.i32_repeated.iter().copied()
+        }
         pub fn float_required_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get(2).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.float_required)
@@ -11258,6 +11261,11 @@ where
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn float_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = f32> {
+            self.float_repeated.iter().copied()
         }
         pub fn bytes_required_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get(4).map_or(false, |v| *v) {
@@ -11273,6 +11281,11 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn bytes_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = &'this [u8]> {
+            ::puroro::internal::utils::BorrowedIter::new(self.bytes_repeated.iter())
+        }
         pub fn string_required_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get(6).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.string_required)
@@ -11286,6 +11299,11 @@ where
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn string_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = &'this str> {
+            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
         }
         pub fn enum_required_opt<'this>(
             &'this self,
@@ -11305,6 +11323,12 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn enum_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = self::_puroro_root::full_coverage2::Enum>
+        {
+            self.enum_repeated.iter().copied()
+        }
         pub fn submsg_required_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             self.submsg_required
                 .as_ref()
@@ -11314,6 +11338,12 @@ where
             self.submsg_optional
                 .as_ref()
                 .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn submsg_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item=&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+            let field: &::puroro::internal::NoAllocBumpVec<&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>> = unsafe {
+            ::std::mem::transmute(&self.submsg_repeated)
+        };
+            ::puroro::internal::utils::BorrowedIter::new(field.iter())
         }
         pub fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(10).map_or(false, |v| *v) {
@@ -11329,6 +11359,9 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn i64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i64> {
+            self.i64_repeated.iter().copied()
+        }
         pub fn u32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(12).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.u32_required)
@@ -11342,6 +11375,9 @@ where
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn u32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = u32> {
+            self.u32_repeated.iter().copied()
         }
         pub fn u64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(14).map_or(false, |v| *v) {
@@ -11357,6 +11393,9 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn u64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = u64> {
+            self.u64_repeated.iter().copied()
+        }
         pub fn s32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(16).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.s32_required)
@@ -11370,6 +11409,9 @@ where
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn s32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+            self.s32_repeated.iter().copied()
         }
         pub fn s64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(18).map_or(false, |v| *v) {
@@ -11385,6 +11427,9 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn s64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i64> {
+            self.s64_repeated.iter().copied()
+        }
         pub fn fixed32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(20).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.fixed32_required)
@@ -11398,6 +11443,11 @@ where
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn fixed32_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = u32> {
+            self.fixed32_repeated.iter().copied()
         }
         pub fn fixed64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(22).map_or(false, |v| *v) {
@@ -11413,6 +11463,11 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn fixed64_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = u64> {
+            self.fixed64_repeated.iter().copied()
+        }
         pub fn sfixed32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(24).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.sfixed32_required)
@@ -11426,6 +11481,11 @@ where
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn sfixed32_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+            self.sfixed32_repeated.iter().copied()
         }
         pub fn sfixed64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(26).map_or(false, |v| *v) {
@@ -11441,6 +11501,11 @@ where
                 ::std::option::Option::None
             }
         }
+        pub fn sfixed64_repeated<'this>(
+            &'this self,
+        ) -> impl 'this + ::std::iter::Iterator<Item = i64> {
+            self.sfixed64_repeated.iter().copied()
+        }
         pub fn f64_required_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             if self._bitfield.get(28).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.f64_required)
@@ -11454,6 +11519,9 @@ where
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn f64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = f64> {
+            self.f64_repeated.iter().copied()
         }
         pub fn i32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
