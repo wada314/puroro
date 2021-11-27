@@ -949,7 +949,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if *self._bitfield.get_unchecked(0) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_optional)
             } else {
                 ::std::option::Option::None
@@ -978,7 +978,7 @@ pub mod _puroro_impls {
         > {
             self.submsg_unlabeled
                 .as_ref()
-                .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()

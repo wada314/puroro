@@ -1062,7 +1062,7 @@ pub mod _puroro_impls {
         > {
             self.c
                 .as_ref()
-                .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
         }
         pub fn c_mut<'this>(
             &'this mut self,

@@ -539,7 +539,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if *self._bitfield.get_unchecked(0) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.a)
             } else {
                 ::std::option::Option::None
@@ -794,7 +794,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if *self._bitfield.get_unchecked(0) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None
@@ -1072,7 +1072,7 @@ pub mod _puroro_impls {
         > {
             self.c
                 .as_ref()
-                .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
         }
         pub fn c_mut<'this>(
             &'this mut self,

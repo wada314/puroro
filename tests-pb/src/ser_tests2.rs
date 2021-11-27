@@ -1851,21 +1851,21 @@ pub mod _puroro_impls {
             }
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if *self._bitfield.get_unchecked(0) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_optional)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            if *self._bitfield.get_unchecked(1) {
+            if self._bitfield.get(1).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.float_optional)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if *self._bitfield.get_unchecked(2) {
+            if self._bitfield.get(2).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.string_optional)
             } else {
                 ::std::option::Option::None
@@ -1874,19 +1874,19 @@ pub mod _puroro_impls {
         pub fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             self.submsg_optional
                 .as_ref()
-                .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
         }
         pub fn enum_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
-            if *self._bitfield.get_unchecked(3) {
+            if self._bitfield.get(3).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.enum_optional)
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if *self._bitfield.get_unchecked(4) {
+            if self._bitfield.get(4).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.very_large_field_number)
             } else {
                 ::std::option::Option::None
@@ -3126,7 +3126,7 @@ pub mod _puroro_traits {
         }
     }
 }
-#[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
+#[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
 pub enum Enum {
     Zeroth,
     First,
@@ -3400,7 +3400,7 @@ pub mod _puroro_nested {
                     }
                 }
                 pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    if *self._bitfield.get_unchecked(0) {
+                    if self._bitfield.get(0).map_or(false, |v| *v) {
                         ::std::option::Option::Some(self.i32_optional)
                     } else {
                         ::std::option::Option::None

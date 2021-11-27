@@ -1141,7 +1141,9 @@ pub mod _puroro_impls {
                 E::_None(_) => ::std::option::Option::None,
                 E::G2F32(val) => ::std::option::Option::Some(F::G2F32(val.clone())),
                 E::G2String(val) => ::std::option::Option::Some(F::G2String(val.as_ref())),
-                E::G2Submsg(val) => ::std::option::Option::Some(F::G2Submsg(val.as_ref())),
+                E::G2Submsg(val) => ::std::option::Option::Some(F::G2Submsg(unsafe {
+                    ::std::mem::transmute(val.as_ref())
+                })),
             }
         }
         fn group_three<'this>(
@@ -1237,11 +1239,7 @@ pub mod _puroro_impls {
                 5 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
                     if !matches!(&self.group_two, E::G2Submsg(_)) {
-                        self.group_two = E::G2Submsg(
-                            ::puroro::internal::impls::bumpalo::BumpMessage::new_with_parents_bump::<
-                                BT,
-                            >(&self._bump),
-                        );
+                        self.group_two = E::G2Submsg(todo!());
                     }
                     let field_value_mut_ref = match &mut self.group_two {
                         E::G2Submsg(v) => v,
@@ -1558,7 +1556,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if *self._bitfield.get_unchecked(0) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_optional)
             } else {
                 ::std::option::Option::None

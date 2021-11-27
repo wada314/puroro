@@ -225,7 +225,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if *self._bitfield.get_unchecked(0) {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.r#type)
             } else {
                 ::std::option::Option::None

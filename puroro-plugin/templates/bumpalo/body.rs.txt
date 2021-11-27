@@ -92,12 +92,12 @@ where
         {%- if field.is_message %}
         {#- Non-repeated message field. Field type is always `Optional<NoAllocBox<T>>`.#}
         {#- Need to cast the lifetime. #}
-        self.{{ field.ident }}.as_ref().map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+        self.{{ field.ident }}.as_ref().map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
 
         {%- else %} {#- if field.is_message #}
         {%- if field.has_optional_bit %}
         {#- Non-repeated, non-message, optional field. Optional bit is stored in the bitfield. #}
-        if *self._bitfield.get_unchecked({{ field.bitfield_index }}) {
+        if self._bitfield.get({{ field.bitfield_index }}).map_or(false, |v| *v) {
             ::std::option::Option::Some(
                 {%- if field.is_length_delimited %}
                 &self.{{ field.ident }}
@@ -191,7 +191,12 @@ where
             {%- for field in oneof.fields %}
             E::{{ field.ident }}(val) => ::std::option::Option::Some(
                 {% if field.is_length_delimited %}
+                {%- if field.is_message %}
+                {#- message field need to be cast the lifetime param #}
+                F::{{ field.ident }}(unsafe { ::std::mem::transmute(val.as_ref()) })
+                {%- else %} {#- if field.is_message #}
                 F::{{ field.ident }}(val.as_ref())
+                {%- endif %} {#- if field.is_message #}
                 {% else %}
                 F::{{ field.ident }}(val.clone())
                 {% endif %}
@@ -242,7 +247,9 @@ where
                 {
                     self.{{ oneof.field_ident }} = E::{{ field.ident }}(
                         {%- if field.is_message %}
-                        ::puroro::internal::impls::bumpalo::BumpMessage::new_with_parents_bump::<BT>(&self._bump)
+                        {#- need lifetime cast #}
+                        todo!()
+                        {# ::puroro::internal::impls::bumpalo::BumpMessage::new_with_parents_bump::<BT>(&self._bump) #}
                         {%- else %} {#- if field.is_message #}
                         ::puroro::internal::impls::bumpalo::BumpDefault::default_in(&self._bump)
                         {%- endif %} {#- if field.is_message #}
