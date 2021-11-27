@@ -197,7 +197,7 @@ struct Field {
     bumpalo_scalar_field_type: String,
     bumpalo_field_type: String,
     bumpalo_getter_deref_type: String,
-    bumpalo_mut_getter_type: String,
+    bumpalo_mut_getter_deref_type: String,
     bumpalo_maybe_field_message_path: Option<String>,
     bumpalo_maybe_borrowed_field_type: Option<String>,
     bumpalo_label_and_type_tags: String,
@@ -290,11 +290,8 @@ impl Field {
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
             bumpalo_scalar_field_type: f.bumpalo_scalar_field_type("'this")?,
             bumpalo_field_type: f.bumpalo_field_type()?,
-            bumpalo_getter_deref_type: f.bumpalo_scalar_field_type("'this")?,
-            bumpalo_mut_getter_type: format!(
-                "&'this mut {}",
-                f.bumpalo_scalar_field_type("'this")?
-            ),
+            bumpalo_getter_deref_type: f.bumpalo_getter_scalar_type("'this")?,
+            bumpalo_mut_getter_deref_type: f.bumpalo_scalar_field_type("'this")?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f.maybe_trait_scalar_getter_type_borrowed(
                 "Bumpalo",

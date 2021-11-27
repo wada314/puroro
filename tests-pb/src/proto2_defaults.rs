@@ -6491,36 +6491,28 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn string_default_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(45) {
                 ::std::option::Option::Some(&self.string_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_empty_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(46) {
                 ::std::option::Option::Some(&self.string_empty)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_abc_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(47) {
                 ::std::option::Option::Some(&self.string_abc)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_aiu_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(48) {
                 ::std::option::Option::Some(&self.string_aiu)
             } else {
@@ -6529,61 +6521,49 @@ pub mod _puroro_impls {
         }
         pub fn string_backslash_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        ) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(49) {
                 ::std::option::Option::Some(&self.string_backslash)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_tab_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(50) {
                 ::std::option::Option::Some(&self.string_tab)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_crlf_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(51) {
                 ::std::option::Option::Some(&self.string_crlf)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_default_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(52) {
                 ::std::option::Option::Some(&self.bytes_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_empty_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(53) {
                 ::std::option::Option::Some(&self.bytes_empty)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_abc_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(54) {
                 ::std::option::Option::Some(&self.bytes_abc)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_aiu_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(55) {
                 ::std::option::Option::Some(&self.bytes_aiu)
             } else {
@@ -6592,25 +6572,21 @@ pub mod _puroro_impls {
         }
         pub fn bytes_backslash_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        ) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(56) {
                 ::std::option::Option::Some(&self.bytes_backslash)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_tab_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(57) {
                 ::std::option::Option::Some(&self.bytes_tab)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_crlf_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(58) {
                 ::std::option::Option::Some(&self.bytes_crlf)
             } else {
@@ -6644,285 +6620,285 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_default_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_default_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
         }
-        pub fn i32_0_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_0_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(1, true);
             todo!()
         }
-        pub fn i32_42_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_42_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(2, true);
             todo!()
         }
-        pub fn i32_m42_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_m42_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(3, true);
             todo!()
         }
-        pub fn i32_2147483647_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_2147483647_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(4, true);
             todo!()
         }
-        pub fn i32_m2147483648_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_m2147483648_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(5, true);
             todo!()
         }
-        pub fn i32_0123_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_0123_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(6, true);
             todo!()
         }
-        pub fn i32_0x123_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_0x123_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(7, true);
             todo!()
         }
-        pub fn u32_default_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_default_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(8, true);
             todo!()
         }
-        pub fn u32_0_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_0_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(9, true);
             todo!()
         }
-        pub fn u32_42_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_42_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(10, true);
             todo!()
         }
-        pub fn u32_4294967295_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_4294967295_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(11, true);
             todo!()
         }
-        pub fn u32_0123_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_0123_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(12, true);
             todo!()
         }
-        pub fn u32_0x123_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_0x123_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(13, true);
             todo!()
         }
-        pub fn i64_default_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_default_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(14, true);
             todo!()
         }
-        pub fn i64_0_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_0_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(15, true);
             todo!()
         }
-        pub fn i64_42_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_42_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(16, true);
             todo!()
         }
-        pub fn i64_m42_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_m42_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(17, true);
             todo!()
         }
-        pub fn i64_9223372036854775807_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_9223372036854775807_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(18, true);
             todo!()
         }
-        pub fn i64_m9223372036854775808_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_m9223372036854775808_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(19, true);
             todo!()
         }
-        pub fn i64_0123_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_0123_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(20, true);
             todo!()
         }
-        pub fn i64_0x123_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_0x123_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(21, true);
             todo!()
         }
-        pub fn u64_default_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_default_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(22, true);
             todo!()
         }
-        pub fn u64_0_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_0_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(23, true);
             todo!()
         }
-        pub fn u64_42_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_42_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(24, true);
             todo!()
         }
-        pub fn u64_18446744073709551615_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_18446744073709551615_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(25, true);
             todo!()
         }
-        pub fn u64_0123_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_0123_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(26, true);
             todo!()
         }
-        pub fn u64_0x123_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_0x123_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(27, true);
             todo!()
         }
-        pub fn f32_default_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_default_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(28, true);
             todo!()
         }
-        pub fn f32_0_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(29, true);
             todo!()
         }
-        pub fn f32_m0_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_m0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(30, true);
             todo!()
         }
-        pub fn f32_0p_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_0p_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(31, true);
             todo!()
         }
-        pub fn f32_p0_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_p0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(32, true);
             todo!()
         }
-        pub fn f32_0p0_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_0p0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(33, true);
             todo!()
         }
-        pub fn f32_42_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_42_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(34, true);
             todo!()
         }
-        pub fn f32_m42_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_m42_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(35, true);
             todo!()
         }
-        pub fn f32_0p25_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_0p25_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(36, true);
             todo!()
         }
-        pub fn f32_1p5e2_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_1p5e2_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(37, true);
             todo!()
         }
-        pub fn f32_inf_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_inf_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(38, true);
             todo!()
         }
-        pub fn f32_minf_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_minf_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(39, true);
             todo!()
         }
-        pub fn f32_nan_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_nan_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(40, true);
             todo!()
         }
-        pub fn f32_mnan_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_mnan_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(41, true);
             todo!()
         }
-        pub fn bool_default_mut<'this>(&'this mut self) -> &'this mut &'this mut bool {
+        pub fn bool_default_mut<'this>(&'this mut self) -> &'this mut bool {
             self._bitfield.set(42, true);
             todo!()
         }
-        pub fn bool_true_mut<'this>(&'this mut self) -> &'this mut &'this mut bool {
+        pub fn bool_true_mut<'this>(&'this mut self) -> &'this mut bool {
             self._bitfield.set(43, true);
             todo!()
         }
-        pub fn bool_false_mut<'this>(&'this mut self) -> &'this mut &'this mut bool {
+        pub fn bool_false_mut<'this>(&'this mut self) -> &'this mut bool {
             self._bitfield.set(44, true);
             todo!()
         }
         pub fn string_default_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(45, true);
             todo!()
         }
         pub fn string_empty_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(46, true);
             todo!()
         }
         pub fn string_abc_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(47, true);
             todo!()
         }
         pub fn string_aiu_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(48, true);
             todo!()
         }
         pub fn string_backslash_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(49, true);
             todo!()
         }
         pub fn string_tab_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(50, true);
             todo!()
         }
         pub fn string_crlf_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(51, true);
             todo!()
         }
         pub fn bytes_default_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(52, true);
             todo!()
         }
         pub fn bytes_empty_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(53, true);
             todo!()
         }
         pub fn bytes_abc_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(54, true);
             todo!()
         }
         pub fn bytes_aiu_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(55, true);
             todo!()
         }
         pub fn bytes_backslash_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(56, true);
             todo!()
         }
         pub fn bytes_tab_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(57, true);
             todo!()
         }
         pub fn bytes_crlf_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(58, true);
             todo!()
         }
         pub fn enum_default_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+        ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
             self._bitfield.set(59, true);
             todo!()
         }
         pub fn enum_one_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+        ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
             self._bitfield.set(60, true);
             todo!()
         }
         pub fn enum_fourty_two_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+        ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
             self._bitfield.set(61, true);
             todo!()
         }
@@ -7427,381 +7403,251 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 2 => {
                     self._bitfield.set(1, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 3 => {
                     self._bitfield.set(2, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 4 => {
                     self._bitfield.set(3, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 5 => {
                     self._bitfield.set(4, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 6 => {
                     self._bitfield.set(5, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 7 => {
                     self._bitfield.set(6, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 8 => {
                     self._bitfield.set(7, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 11 => {
                     self._bitfield.set(8, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 12 => {
                     self._bitfield.set(9, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 13 => {
                     self._bitfield.set(10, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 15 => {
                     self._bitfield.set(11, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 17 => {
                     self._bitfield.set(12, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 18 => {
                     self._bitfield.set(13, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 21 => {
                     self._bitfield.set(14, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 22 => {
                     self._bitfield.set(15, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 23 => {
                     self._bitfield.set(16, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 24 => {
                     self._bitfield.set(17, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 25 => {
                     self._bitfield.set(18, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 26 => {
                     self._bitfield.set(19, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 27 => {
                     self._bitfield.set(20, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 28 => {
                     self._bitfield.set(21, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 31 => {
                     self._bitfield.set(22, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 32 => {
                     self._bitfield.set(23, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 33 => {
                     self._bitfield.set(24, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 35 => {
                     self._bitfield.set(25, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 37 => {
                     self._bitfield.set(26, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 38 => {
                     self._bitfield.set(27, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 41 => {
                     self._bitfield.set(28, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 42 => {
                     self._bitfield.set(29, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 43 => {
                     self._bitfield.set(30, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 44 => {
                     self._bitfield.set(31, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 45 => {
                     self._bitfield.set(32, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 46 => {
                     self._bitfield.set(33, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 47 => {
                     self._bitfield.set(34, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 48 => {
                     self._bitfield.set(35, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 49 => {
                     self._bitfield.set(36, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 50 => {
                     self._bitfield.set(37, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 51 => {
                     self._bitfield.set(38, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 52 => {
                     self._bitfield.set(39, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 53 => {
                     self._bitfield.set(40, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 54 => {
                     self._bitfield.set(41, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 61 => {
                     self._bitfield.set(42, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bool, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 62 => {
                     self._bitfield.set(43, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bool, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 63 => {
                     self._bitfield.set(44, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bool, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 71 => {
                     self._bitfield.set(45, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 72 => {
                     self._bitfield.set(46, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 73 => {
                     self._bitfield.set(47, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 74 => {
                     self._bitfield.set(48, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 75 => {
                     self._bitfield.set(49, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 76 => {
                     self._bitfield.set(50, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 77 => {
                     self._bitfield.set(51, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 81 => {
                     self._bitfield.set(52, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 82 => {
                     self._bitfield.set(53, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 83 => {
                     self._bitfield.set(54, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 84 => {
                     self._bitfield.set(55, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 85 => {
                     self._bitfield.set(56, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 86 => {
                     self._bitfield.set(57, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 87 => {
                     self._bitfield.set(58, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
                 91 => {
                     self._bitfield.set(59, true);
-                    DeserFieldFromBytesIter::<
-                        ::puroro::tags::Optional,
-                        ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
-                        BT,
-                    >::deser_field(todo!(), data, &self._bump)
+                    todo!()
                 }
                 92 => {
                     self._bitfield.set(60, true);
-                    DeserFieldFromBytesIter::<
-                        ::puroro::tags::Optional,
-                        ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
-                        BT,
-                    >::deser_field(todo!(), data, &self._bump)
+                    todo!()
                 }
                 93 => {
                     self._bitfield.set(61, true);
-                    DeserFieldFromBytesIter::<
-                        ::puroro::tags::Optional,
-                        ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
-                        BT,
-                    >::deser_field(todo!(), data, &self._bump)
+                    todo!()
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

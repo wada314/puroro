@@ -964,7 +964,7 @@ pub mod _puroro_impls {
         }
         pub fn string_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        ) -> ::std::option::Option<&'this &'this str> {
             if self.string_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.string_unlabeled)
             } else {
@@ -974,7 +974,7 @@ pub mod _puroro_impls {
         pub fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
+            &'this &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
                 BT::ChildsBumpTypes<'this>,
             >,
         > {
@@ -982,25 +982,29 @@ pub mod _puroro_impls {
                 .as_ref()
                 .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
         }
-        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
-        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
         }
-        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
-        pub fn f32_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn f32_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
             todo!()
         }
         pub fn string_unlabeled_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             todo!()
         }
-        pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+        pub fn submsg_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
+            BT::ChildsBumpTypes<'this>,
+        > {
             todo!()
         }
     }
@@ -1093,40 +1097,28 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
-            1 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            2 => {
-                self._bitfield.set(0, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            3 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            4 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            5 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            6 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>>, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
+                1 => {
+                    todo!()
+                }
+                2 => {
+                    self._bitfield.set(0, true);
+                    todo!()
+                }
+                3 => {
+                    todo!()
+                }
+                4 => {
+                    todo!()
+                }
+                5 => {
+                    todo!()
+                }
+                6 => {
+                    todo!()
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -1458,7 +1450,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
     }
@@ -1519,14 +1511,12 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
-            1 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
+                1 => {
+                    todo!()
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 

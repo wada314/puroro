@@ -231,7 +231,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn type_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
         }
@@ -299,9 +299,7 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
+                    todo!()
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

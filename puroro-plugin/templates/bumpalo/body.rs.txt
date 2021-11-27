@@ -118,7 +118,7 @@ where
     {#- ######## mut getter ######## #}
 
     {%- for field in m.fields %}
-    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> &'this mut {{ field.bumpalo_mut_getter_type }} {
+    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> &'this mut {{ field.bumpalo_mut_getter_deref_type }} {
         {%- if field.has_optional_bit %}
         self._bitfield.set({{ field.bitfield_index }}, true);
         {%- endif %} {#- if field.has_optional_bit #}
@@ -209,9 +209,11 @@ where
                 {%- if field.has_optional_bit %}
                 self._bitfield.set({{ field.bitfield_index }}, true);
                 {%- endif %}
-                DeserFieldFromBytesIter::<
+                {#- Temporaly disable #}
+                todo!()
+                {# DeserFieldFromBytesIter::<
                     {{ field.bumpalo_label_and_type_tags }}, BT
-                >::deser_field(&mut self.{{ field.ident }}, data, &self._bump)
+                >::deser_field(&mut self.{{ field.ident_unesc }}_mut(), data, &self._bump) #}
             }
             {%- endif %}
             {%- endfor %}
@@ -236,9 +238,11 @@ where
                     E::{{ field.ident }}(v) => v,
                     _ => unreachable!(),
                 };
-                DeserFieldFromBytesIter::<
+                {#- temporaly disable #}
+                todo!()
+                {#- DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }}, BT
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                >::deser_field(field_value_mut_ref, data, &self._bump)#}
             }
             {%- endfor %}
             {%- endfor %}

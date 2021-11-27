@@ -11259,36 +11259,28 @@ where
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_required_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_required_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(4) {
                 ::std::option::Option::Some(&self.bytes_required)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_optional_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpVec<u8>> {
+        pub fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
             if self._bitfield.get_unchecked(5) {
                 ::std::option::Option::Some(&self.bytes_optional)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_required_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_required_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(6) {
                 ::std::option::Option::Some(&self.string_required)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_optional_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(7) {
                 ::std::option::Option::Some(&self.string_optional)
             } else {
@@ -11313,12 +11305,12 @@ where
                 ::std::option::Option::None
             }
         }
-        pub fn submsg_required_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+        pub fn submsg_required_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             self.submsg_required
                 .as_ref()
                 .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
         }
-        pub fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+        pub fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             self.submsg_optional
                 .as_ref()
                 .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
@@ -11463,196 +11455,196 @@ where
                 ::std::option::Option::None
             }
         }
-        pub fn i32_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
         }
-        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(1, true);
             todo!()
         }
-        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
-        pub fn float_required_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn float_required_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(2, true);
             todo!()
         }
-        pub fn float_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn float_optional_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(3, true);
             todo!()
         }
-        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut f32 {
             todo!()
         }
         pub fn bytes_required_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(4, true);
             todo!()
         }
         pub fn bytes_optional_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             self._bitfield.set(5, true);
             todo!()
         }
         pub fn bytes_repeated_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
             todo!()
         }
         pub fn string_required_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(6, true);
             todo!()
         }
         pub fn string_optional_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(7, true);
             todo!()
         }
         pub fn string_repeated_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             todo!()
         }
         pub fn enum_required_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut self::_puroro_root::full_coverage2::Enum {
+        ) -> &'this mut self::_puroro_root::full_coverage2::Enum {
             self._bitfield.set(8, true);
             todo!()
         }
         pub fn enum_optional_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut self::_puroro_root::full_coverage2::Enum {
+        ) -> &'this mut self::_puroro_root::full_coverage2::Enum {
             self._bitfield.set(9, true);
             todo!()
         }
         pub fn enum_repeated_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut self::_puroro_root::full_coverage2::Enum {
+        ) -> &'this mut self::_puroro_root::full_coverage2::Enum {
             todo!()
         }
-        pub fn submsg_required_mut<'this>(&'this mut self) -> &'this mut &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+        pub fn submsg_required_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
             todo!()
         }
-        pub fn submsg_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+        pub fn submsg_optional_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
             todo!()
         }
-        pub fn submsg_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+        pub fn submsg_repeated_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
             todo!()
         }
-        pub fn i64_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(10, true);
             todo!()
         }
-        pub fn i64_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_optional_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(11, true);
             todo!()
         }
-        pub fn i64_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn i64_repeated_mut<'this>(&'this mut self) -> &'this mut i64 {
             todo!()
         }
-        pub fn u32_required_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_required_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(12, true);
             todo!()
         }
-        pub fn u32_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_optional_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(13, true);
             todo!()
         }
-        pub fn u32_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn u32_repeated_mut<'this>(&'this mut self) -> &'this mut u32 {
             todo!()
         }
-        pub fn u64_required_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_required_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(14, true);
             todo!()
         }
-        pub fn u64_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_optional_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(15, true);
             todo!()
         }
-        pub fn u64_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn u64_repeated_mut<'this>(&'this mut self) -> &'this mut u64 {
             todo!()
         }
-        pub fn s32_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn s32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(16, true);
             todo!()
         }
-        pub fn s32_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn s32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(17, true);
             todo!()
         }
-        pub fn s32_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn s32_repeated_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
-        pub fn s64_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn s64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(18, true);
             todo!()
         }
-        pub fn s64_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn s64_optional_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(19, true);
             todo!()
         }
-        pub fn s64_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn s64_repeated_mut<'this>(&'this mut self) -> &'this mut i64 {
             todo!()
         }
-        pub fn fixed32_required_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn fixed32_required_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(20, true);
             todo!()
         }
-        pub fn fixed32_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn fixed32_optional_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(21, true);
             todo!()
         }
-        pub fn fixed32_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut u32 {
+        pub fn fixed32_repeated_mut<'this>(&'this mut self) -> &'this mut u32 {
             todo!()
         }
-        pub fn fixed64_required_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn fixed64_required_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(22, true);
             todo!()
         }
-        pub fn fixed64_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn fixed64_optional_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(23, true);
             todo!()
         }
-        pub fn fixed64_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut u64 {
+        pub fn fixed64_repeated_mut<'this>(&'this mut self) -> &'this mut u64 {
             todo!()
         }
-        pub fn sfixed32_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn sfixed32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(24, true);
             todo!()
         }
-        pub fn sfixed32_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn sfixed32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(25, true);
             todo!()
         }
-        pub fn sfixed32_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn sfixed32_repeated_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
-        pub fn sfixed64_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn sfixed64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(26, true);
             todo!()
         }
-        pub fn sfixed64_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn sfixed64_optional_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(27, true);
             todo!()
         }
-        pub fn sfixed64_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+        pub fn sfixed64_repeated_mut<'this>(&'this mut self) -> &'this mut i64 {
             todo!()
         }
-        pub fn f64_required_mut<'this>(&'this mut self) -> &'this mut &'this mut f64 {
+        pub fn f64_required_mut<'this>(&'this mut self) -> &'this mut f64 {
             self._bitfield.set(28, true);
             todo!()
         }
-        pub fn f64_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut f64 {
+        pub fn f64_optional_mut<'this>(&'this mut self) -> &'this mut f64 {
             self._bitfield.set(29, true);
             todo!()
         }
-        pub fn f64_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut f64 {
+        pub fn f64_repeated_mut<'this>(&'this mut self) -> &'this mut f64 {
             todo!()
         }
     }
@@ -12071,279 +12063,183 @@ where
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
-            1 => {
-                self._bitfield.set(0, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            2 => {
-                self._bitfield.set(1, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            3 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            11 => {
-                self._bitfield.set(2, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            12 => {
-                self._bitfield.set(3, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            13 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Float, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            21 => {
-                self._bitfield.set(4, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            22 => {
-                self._bitfield.set(5, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            23 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Bytes, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            31 => {
-                self._bitfield.set(6, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            32 => {
-                self._bitfield.set(7, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            33 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::String, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            41 => {
-                self._bitfield.set(8, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            42 => {
-                self._bitfield.set(9, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            43 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            51 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>>, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            52 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>>, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            53 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            101 => {
-                self._bitfield.set(10, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            102 => {
-                self._bitfield.set(11, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            103 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            111 => {
-                self._bitfield.set(12, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            112 => {
-                self._bitfield.set(13, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            113 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::UInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            121 => {
-                self._bitfield.set(14, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            122 => {
-                self._bitfield.set(15, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            123 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::UInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            131 => {
-                self._bitfield.set(16, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::SInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            132 => {
-                self._bitfield.set(17, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::SInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            133 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::SInt32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            141 => {
-                self._bitfield.set(18, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::SInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            142 => {
-                self._bitfield.set(19, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::SInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            143 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::SInt64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            151 => {
-                self._bitfield.set(20, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Fixed32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            152 => {
-                self._bitfield.set(21, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Fixed32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            153 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Fixed32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            161 => {
-                self._bitfield.set(22, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Fixed64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            162 => {
-                self._bitfield.set(23, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Fixed64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            163 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Fixed64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            171 => {
-                self._bitfield.set(24, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::SFixed32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            172 => {
-                self._bitfield.set(25, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::SFixed32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            173 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::SFixed32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            181 => {
-                self._bitfield.set(26, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::SFixed64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            182 => {
-                self._bitfield.set(27, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::SFixed64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            183 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::SFixed64, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            191 => {
-                self._bitfield.set(28, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Required, ::puroro::tags::Double, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            192 => {
-                self._bitfield.set(29, true);
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Double, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
-            193 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Double, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
+                1 => {
+                    self._bitfield.set(0, true);
+                    todo!()
+                }
+                2 => {
+                    self._bitfield.set(1, true);
+                    todo!()
+                }
+                3 => {
+                    todo!()
+                }
+                11 => {
+                    self._bitfield.set(2, true);
+                    todo!()
+                }
+                12 => {
+                    self._bitfield.set(3, true);
+                    todo!()
+                }
+                13 => {
+                    todo!()
+                }
+                21 => {
+                    self._bitfield.set(4, true);
+                    todo!()
+                }
+                22 => {
+                    self._bitfield.set(5, true);
+                    todo!()
+                }
+                23 => {
+                    todo!()
+                }
+                31 => {
+                    self._bitfield.set(6, true);
+                    todo!()
+                }
+                32 => {
+                    self._bitfield.set(7, true);
+                    todo!()
+                }
+                33 => {
+                    todo!()
+                }
+                41 => {
+                    self._bitfield.set(8, true);
+                    todo!()
+                }
+                42 => {
+                    self._bitfield.set(9, true);
+                    todo!()
+                }
+                43 => {
+                    todo!()
+                }
+                51 => {
+                    todo!()
+                }
+                52 => {
+                    todo!()
+                }
+                53 => {
+                    todo!()
+                }
+                101 => {
+                    self._bitfield.set(10, true);
+                    todo!()
+                }
+                102 => {
+                    self._bitfield.set(11, true);
+                    todo!()
+                }
+                103 => {
+                    todo!()
+                }
+                111 => {
+                    self._bitfield.set(12, true);
+                    todo!()
+                }
+                112 => {
+                    self._bitfield.set(13, true);
+                    todo!()
+                }
+                113 => {
+                    todo!()
+                }
+                121 => {
+                    self._bitfield.set(14, true);
+                    todo!()
+                }
+                122 => {
+                    self._bitfield.set(15, true);
+                    todo!()
+                }
+                123 => {
+                    todo!()
+                }
+                131 => {
+                    self._bitfield.set(16, true);
+                    todo!()
+                }
+                132 => {
+                    self._bitfield.set(17, true);
+                    todo!()
+                }
+                133 => {
+                    todo!()
+                }
+                141 => {
+                    self._bitfield.set(18, true);
+                    todo!()
+                }
+                142 => {
+                    self._bitfield.set(19, true);
+                    todo!()
+                }
+                143 => {
+                    todo!()
+                }
+                151 => {
+                    self._bitfield.set(20, true);
+                    todo!()
+                }
+                152 => {
+                    self._bitfield.set(21, true);
+                    todo!()
+                }
+                153 => {
+                    todo!()
+                }
+                161 => {
+                    self._bitfield.set(22, true);
+                    todo!()
+                }
+                162 => {
+                    self._bitfield.set(23, true);
+                    todo!()
+                }
+                163 => {
+                    todo!()
+                }
+                171 => {
+                    self._bitfield.set(24, true);
+                    todo!()
+                }
+                172 => {
+                    self._bitfield.set(25, true);
+                    todo!()
+                }
+                173 => {
+                    todo!()
+                }
+                181 => {
+                    self._bitfield.set(26, true);
+                    todo!()
+                }
+                182 => {
+                    self._bitfield.set(27, true);
+                    todo!()
+                }
+                183 => {
+                    todo!()
+                }
+                191 => {
+                    self._bitfield.set(28, true);
+                    todo!()
+                }
+                192 => {
+                    self._bitfield.set(29, true);
+                    todo!()
+                }
+                193 => {
+                    todo!()
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -16162,11 +16058,11 @@ pub mod _puroro_nested {
                         ::std::option::Option::None
                     }
                 }
-                pub fn i32_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+                pub fn i32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
                     self._bitfield.set(0, true);
                     todo!()
                 }
-                pub fn i64_required_mut<'this>(&'this mut self) -> &'this mut &'this mut i64 {
+                pub fn i64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
                     self._bitfield.set(1, true);
                     todo!()
                 }
@@ -16241,19 +16137,11 @@ pub mod _puroro_nested {
                     match field_number {
                         1 => {
                             self._bitfield.set(0, true);
-                            DeserFieldFromBytesIter::<
-                                ::puroro::tags::Required,
-                                ::puroro::tags::Int32,
-                                BT,
-                            >::deser_field(todo!(), data, &self._bump)
+                            todo!()
                         }
                         101 => {
                             self._bitfield.set(1, true);
-                            DeserFieldFromBytesIter::<
-                                ::puroro::tags::Required,
-                                ::puroro::tags::Int64,
-                                BT,
-                            >::deser_field(todo!(), data, &self._bump)
+                            todo!()
                         }
 
                         _ => unimplemented!("TODO: This case should be handled properly..."),

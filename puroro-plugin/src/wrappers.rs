@@ -793,6 +793,40 @@ impl Field {
         })
     }
 
+    pub fn bumpalo_getter_scalar_type(&self, lt: &str) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => format!("&{} str", lt),
+            FieldType::Bytes => format!("&{} [u8]", lt),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::Message(m) => {
+                let msg_type = upgrade(&m)?
+                    .rust_impl_path("Bumpalo", &[&format!("BT::ChildsBumpTypes<{}>", lt)]);
+                format!("&{lt} {msg}", lt = lt, msg = msg_type)
+            }
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
+
+    pub fn bumpalo_getter_mutable_type(&self, lt: &str) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            // ↓ Maybe need to double check the lt params
+            FieldType::String => format!("::puroro::internal::RefMutBumpString<{}, {}>", lt, lt),
+            FieldType::Bytes => format!("::puroro::internal::RefMutBumpVec<{}, {}, u8>", lt, lt),
+            FieldType::Enum2(e) | FieldType::Enum3(e) => {
+                format!("&{lt} mut {ty}", lt = lt, ty = upgrade(&e)?.rust_path())
+            }
+            FieldType::Message(m) => {
+                let msg_type = upgrade(&m)?
+                    .rust_impl_path("Bumpalo", &[&format!("BT::ChildsBumpTypes<{}>", lt)]);
+                format!("&{lt} mut {msg}", lt = lt, msg = msg_type)
+            }
+            t => format!("&{lt} mut {ty}", lt = lt, ty = t.numerical_rust_type()?),
+        })
+    }
+
     pub fn single_field_type(&self) -> Result<String> {
         Ok(if self.is_repeated()? {
             "RepeatedType"

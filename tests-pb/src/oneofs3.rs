@@ -1061,9 +1061,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn g1_string_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn g1_string_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(1) {
                 ::std::option::Option::Some(&self.g1_string)
             } else {
@@ -1077,9 +1075,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn g2_string_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+        pub fn g2_string_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
             if self._bitfield.get_unchecked(3) {
                 ::std::option::Option::Some(&self.g2_string)
             } else {
@@ -1089,7 +1085,7 @@ pub mod _puroro_impls {
         pub fn g2_submsg_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
+            &'this &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
                 BT::ChildsBumpTypes<'this>,
             >,
         > {
@@ -1104,34 +1100,34 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn g1_int32_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn g1_int32_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
         }
         pub fn g1_string_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(1, true);
             todo!()
         }
-        pub fn g2_f32_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+        pub fn g2_f32_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(2, true);
             todo!()
         }
         pub fn g2_string_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
             self._bitfield.set(3, true);
             todo!()
         }
         pub fn g2_submsg_mut<'this>(
             &'this mut self,
-        ) -> &'this mut &'this mut self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
+        ) -> &'this mut self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
             BT::ChildsBumpTypes<'this>,
         > {
             todo!()
         }
-        pub fn g3_int32_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn g3_int32_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(4, true);
             todo!()
         }
@@ -1242,9 +1238,7 @@ pub mod _puroro_impls {
                         E::G1Int32(v) => v,
                         _ => unreachable!(),
                     };
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::Int32, BT
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                    todo!()
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
@@ -1259,9 +1253,7 @@ pub mod _puroro_impls {
                         E::G1String(v) => v,
                         _ => unreachable!(),
                     };
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::String, BT
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                    todo!()
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
@@ -1275,9 +1267,7 @@ pub mod _puroro_impls {
                         E::G2F32(v) => v,
                         _ => unreachable!(),
                     };
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::Float, BT
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                    todo!()
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
@@ -1292,9 +1282,7 @@ pub mod _puroro_impls {
                         E::G2String(v) => v,
                         _ => unreachable!(),
                     };
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::String, BT
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                    todo!()
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
@@ -1309,17 +1297,7 @@ pub mod _puroro_impls {
                         E::G2Submsg(v) => v,
                         _ => unreachable!(),
                     };
-                    DeserFieldFromBytesIter::<
-                        ::puroro::tags::OneofField,
-                        ::puroro::tags::Message<
-                            ::puroro::internal::NoAllocBumpBox<
-                                self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<
-                                    BT::ChildsBumpTypes<'static>,
-                                >,
-                            >,
-                        >,
-                        BT,
-                    >::deser_field(field_value_mut_ref, data, &self._bump)
+                    todo!()
                 }
                 6 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeBumpalo as E;
@@ -1334,9 +1312,7 @@ pub mod _puroro_impls {
                         E::G3Int32(v) => v,
                         _ => unreachable!(),
                     };
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, ::puroro::tags::Int32, BT
-                >::deser_field(field_value_mut_ref, data, &self._bump)
+                    todo!()
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1638,7 +1614,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
     }
@@ -1699,14 +1675,12 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
-            1 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(todo!() , data, &self._bump)
-            }
+                1 => {
+                    todo!()
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
