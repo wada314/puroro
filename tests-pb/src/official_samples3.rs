@@ -540,7 +540,14 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn a_mut(&mut self) -> &'this mut i32 {
+        pub fn a_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+            if self.a != ::std::default::Default::default() {
+                ::std::option::Option::Some(&self.a)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn a_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
             todo!()
         }
     }
@@ -604,7 +611,7 @@ pub mod _puroro_impls {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.a, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -784,7 +791,18 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn b_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        pub fn b_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+            if self.b != ::std::default::Default::default() {
+                ::std::option::Option::Some(&self.b)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn b_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
             todo!()
         }
     }
@@ -848,7 +866,7 @@ pub mod _puroro_impls {
             2 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::String, BT
-                >::deser_field(&mut self.b, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1043,11 +1061,18 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn c_mut(
-            &mut self,
-        ) -> &'this mut self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
-            BT::ChildsBumpTypes<'this>,
+        pub fn c_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
+                BT::ChildsBumpTypes<'this>,
+            >,
         > {
+            self.c
+                .as_ref()
+                .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+        }
+        pub fn c_mut<'this>(&'this mut self) -> &'this mut &'this mut self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<BT::ChildsBumpTypes<'this>>{
             todo!()
         }
     }
@@ -1126,7 +1151,7 @@ pub mod _puroro_impls {
                         >,
                     >,
                     BT,
-                >::deser_field(&mut self.c, data, &self._bump),
+                >::deser_field(todo!(), data, &self._bump),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1325,7 +1350,7 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn d_mut(&mut self) -> &'this mut i32 {
+        pub fn d_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
             todo!()
         }
     }
@@ -1394,7 +1419,7 @@ pub mod _puroro_impls {
             4 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.d, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),

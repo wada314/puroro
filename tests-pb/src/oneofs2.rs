@@ -1050,26 +1050,85 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn g1_int32_mut(&mut self) -> &'this mut i32 {
+        pub fn g1_int32_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+            if self._bitfield.get_unchecked(0) {
+                ::std::option::Option::Some(&self.g1_int32)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g1_string_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+            if self._bitfield.get_unchecked(1) {
+                ::std::option::Option::Some(&self.g1_string)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g2_f32_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+            if self._bitfield.get_unchecked(2) {
+                ::std::option::Option::Some(&self.g2_f32)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g2_string_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+            if self._bitfield.get_unchecked(3) {
+                ::std::option::Option::Some(&self.g2_string)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g2_submsg_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
+                BT::ChildsBumpTypes<'this>,
+            >,
+        > {
+            self.g2_submsg
+                .as_ref()
+                .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+        }
+        pub fn g3_int32_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+            if self._bitfield.get_unchecked(4) {
+                ::std::option::Option::Some(&self.g3_int32)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g1_int32_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+            self._bitfield.set(0, true);
             todo!()
         }
-        pub fn g1_string_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        pub fn g1_string_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+            self._bitfield.set(1, true);
             todo!()
         }
-        pub fn g2_f32_mut(&mut self) -> &'this mut f32 {
+        pub fn g2_f32_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
+            self._bitfield.set(2, true);
             todo!()
         }
-        pub fn g2_string_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        pub fn g2_string_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
+            self._bitfield.set(3, true);
             todo!()
         }
-        pub fn g2_submsg_mut(
-            &mut self,
-        ) -> &'this mut self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
+        pub fn g2_submsg_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
             BT::ChildsBumpTypes<'this>,
         > {
             todo!()
         }
-        pub fn g3_int32_mut(&mut self) -> &'this mut i32 {
+        pub fn g3_int32_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+            self._bitfield.set(4, true);
             todo!()
         }
     }
@@ -1568,7 +1627,15 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn i32_optional_mut(&mut self) -> &'this mut i32 {
+        pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+            if self._bitfield.get_unchecked(0) {
+                ::std::option::Option::Some(&self.i32_optional)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+            self._bitfield.set(0, true);
             todo!()
         }
     }
@@ -1637,7 +1704,7 @@ pub mod _puroro_impls {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.i32_optional, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

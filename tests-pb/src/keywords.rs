@@ -224,7 +224,15 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn type_mut(&mut self) -> &'this mut i32 {
+        pub fn type_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+            if self._bitfield.get_unchecked(0) {
+                ::std::option::Option::Some(&self.r#type)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn type_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
+            self._bitfield.set(0, true);
             todo!()
         }
     }
@@ -293,7 +301,7 @@ pub mod _puroro_impls {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.r#type, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

@@ -1868,37 +1868,91 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn i32_unlabeled_mut(&mut self) -> &'this mut i32 {
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+            if self.i32_unlabeled != ::std::default::Default::default() {
+                ::std::option::Option::Some(&self.i32_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+            if self.float_unlabeled != ::std::default::Default::default() {
+                ::std::option::Option::Some(&self.float_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<&'this ::puroro::internal::NoAllocBumpString> {
+            if self.string_unlabeled != ::std::default::Default::default() {
+                ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+            self.submsg_unlabeled
+                .as_ref()
+                .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
+        }
+        pub fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::Enum> {
+            if self.enum_unlabeled != ::std::default::Default::default() {
+                ::std::option::Option::Some(&self.enum_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn very_large_field_number_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<&'this i32> {
+            if self.very_large_field_number != ::std::default::Default::default() {
+                ::std::option::Option::Some(&self.very_large_field_number)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
             todo!()
         }
-        pub fn i32_repeated_mut(&mut self) -> &'this mut i32 {
+        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
             todo!()
         }
-        pub fn float_unlabeled_mut(&mut self) -> &'this mut f32 {
+        pub fn float_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
             todo!()
         }
-        pub fn float_repeated_mut(&mut self) -> &'this mut f32 {
+        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut f32 {
             todo!()
         }
-        pub fn string_unlabeled_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        pub fn string_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
             todo!()
         }
-        pub fn string_repeated_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        pub fn string_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut ::puroro::internal::NoAllocBumpString {
             todo!()
         }
-        pub fn submsg_unlabeled_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+        pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
             todo!()
         }
-        pub fn submsg_repeated_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+        pub fn submsg_repeated_mut<'this>(&'this mut self) -> &'this mut &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
             todo!()
         }
-        pub fn enum_unlabeled_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+        pub fn enum_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut self::_puroro_root::ser_tests3::Enum {
             todo!()
         }
-        pub fn enum_repeated_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+        pub fn enum_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut &'this mut self::_puroro_root::ser_tests3::Enum {
             todo!()
         }
-        pub fn very_large_field_number_mut(&mut self) -> &'this mut i32 {
+        pub fn very_large_field_number_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
             todo!()
         }
     }
@@ -2044,57 +2098,57 @@ pub mod _puroro_impls {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.i32_unlabeled, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             2 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.i32_repeated, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             3 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Float, BT
-                >::deser_field(&mut self.float_unlabeled, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             4 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Float, BT
-                >::deser_field(&mut self.float_repeated, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             5 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::String, BT
-                >::deser_field(&mut self.string_unlabeled, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             6 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::String, BT
-                >::deser_field(&mut self.string_repeated, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             7 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>>, BT
-                >::deser_field(&mut self.submsg_unlabeled, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             8 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>, BT
-                >::deser_field(&mut self.submsg_repeated, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             9 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>, BT
-                >::deser_field(&mut self.enum_unlabeled, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             10 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>, BT
-                >::deser_field(&mut self.enum_repeated, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
             536870911 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32, BT
-                >::deser_field(&mut self.very_large_field_number, data, &self._bump)
+                >::deser_field(todo!() , data, &self._bump)
             }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -3362,7 +3416,14 @@ pub mod _puroro_nested {
                         _bump: bump,
                     }
                 }
-                pub fn i32_unlabeled_mut(&mut self) -> &'this mut i32 {
+                pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+                    if self.i32_unlabeled != ::std::default::Default::default() {
+                        ::std::option::Option::Some(&self.i32_unlabeled)
+                    } else {
+                        ::std::option::Option::None
+                    }
+                }
+                pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut &'this mut i32 {
                     todo!()
                 }
             }
@@ -3427,9 +3488,7 @@ pub mod _puroro_nested {
                             ::puroro::tags::Unlabeled,
                             ::puroro::tags::Int32,
                             BT,
-                        >::deser_field(
-                            &mut self.i32_unlabeled, data, &self._bump
-                        ),
+                        >::deser_field(todo!(), data, &self._bump),
 
                         _ => unimplemented!("TODO: This case should be handled properly..."),
                     }
