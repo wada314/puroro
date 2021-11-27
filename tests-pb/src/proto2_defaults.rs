@@ -6170,6 +6170,196 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
+        pub fn i32_default_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_0_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_42_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_m42_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_2147483647_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_m2147483648_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_0123_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_0x123_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn u32_default_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u32_0_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u32_42_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u32_4294967295_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u32_0123_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u32_0x123_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn i64_default_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_0_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_42_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_m42_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_9223372036854775807_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_m9223372036854775808_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_0123_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_0x123_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn u64_default_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn u64_0_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn u64_42_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn u64_18446744073709551615_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn u64_0123_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn u64_0x123_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn f32_default_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_0_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_m0_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_0p_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_p0_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_0p0_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_42_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_m42_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_0p25_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_1p5e2_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_inf_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_minf_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_nan_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn f32_mnan_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn bool_default_mut(&mut self) -> &'this mut bool {
+            todo!()
+        }
+        pub fn bool_true_mut(&mut self) -> &'this mut bool {
+            todo!()
+        }
+        pub fn bool_false_mut(&mut self) -> &'this mut bool {
+            todo!()
+        }
+        pub fn string_default_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_empty_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_abc_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_aiu_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_backslash_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_tab_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_crlf_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn bytes_default_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_empty_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_abc_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_aiu_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_backslash_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_tab_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_crlf_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn enum_default_mut(
+            &mut self,
+        ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+            todo!()
+        }
+        pub fn enum_one_mut(&mut self) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+            todo!()
+        }
+        pub fn enum_fourty_two_mut(
+            &mut self,
+        ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+            todo!()
+        }
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where

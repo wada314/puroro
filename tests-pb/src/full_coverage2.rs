@@ -11231,6 +11231,150 @@ where
                 _bump: bump,
             }
         }
+        pub fn i32_required_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_optional_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_repeated_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn float_required_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn float_optional_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn float_repeated_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn bytes_required_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_optional_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn bytes_repeated_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+            todo!()
+        }
+        pub fn string_required_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_optional_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_repeated_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn enum_required_mut(&mut self) -> &'this mut self::_puroro_root::full_coverage2::Enum {
+            todo!()
+        }
+        pub fn enum_optional_mut(&mut self) -> &'this mut self::_puroro_root::full_coverage2::Enum {
+            todo!()
+        }
+        pub fn enum_repeated_mut(&mut self) -> &'this mut self::_puroro_root::full_coverage2::Enum {
+            todo!()
+        }
+        pub fn submsg_required_mut(&mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+            todo!()
+        }
+        pub fn submsg_optional_mut(&mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+            todo!()
+        }
+        pub fn submsg_repeated_mut(&mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+            todo!()
+        }
+        pub fn i64_required_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_optional_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn i64_repeated_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn u32_required_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u32_optional_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u32_repeated_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn u64_required_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn u64_optional_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn u64_repeated_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn s32_required_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn s32_optional_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn s32_repeated_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn s64_required_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn s64_optional_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn s64_repeated_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn fixed32_required_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn fixed32_optional_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn fixed32_repeated_mut(&mut self) -> &'this mut u32 {
+            todo!()
+        }
+        pub fn fixed64_required_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn fixed64_optional_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn fixed64_repeated_mut(&mut self) -> &'this mut u64 {
+            todo!()
+        }
+        pub fn sfixed32_required_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn sfixed32_optional_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn sfixed32_repeated_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn sfixed64_required_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn sfixed64_optional_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn sfixed64_repeated_mut(&mut self) -> &'this mut i64 {
+            todo!()
+        }
+        pub fn f64_required_mut(&mut self) -> &'this mut f64 {
+            todo!()
+        }
+        pub fn f64_optional_mut(&mut self) -> &'this mut f64 {
+            todo!()
+        }
+        pub fn f64_repeated_mut(&mut self) -> &'this mut f64 {
+            todo!()
+        }
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
@@ -15723,6 +15867,12 @@ pub mod _puroro_nested {
 
                         _bump: bump,
                     }
+                }
+                pub fn i32_required_mut(&mut self) -> &'this mut i32 {
+                    todo!()
+                }
+                pub fn i64_required_mut(&mut self) -> &'this mut i64 {
+                    todo!()
                 }
             }
 

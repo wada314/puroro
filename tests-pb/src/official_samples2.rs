@@ -538,6 +538,9 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
+        pub fn a_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<BT> where
@@ -783,6 +786,9 @@ pub mod _puroro_impls {
 
                 _bump: bump,
             }
+        }
+        pub fn b_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
         }
     }
 
@@ -1044,6 +1050,13 @@ pub mod _puroro_impls {
 
                 _bump: bump,
             }
+        }
+        pub fn c_mut(
+            &mut self,
+        ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+            BT::ChildsBumpTypes<'this>,
+        > {
+            todo!()
         }
     }
 
@@ -1319,6 +1332,9 @@ pub mod _puroro_impls {
 
                 _bump: bump,
             }
+        }
+        pub fn d_mut(&mut self) -> &'this mut i32 {
+            todo!()
         }
     }
 

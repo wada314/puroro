@@ -224,6 +224,9 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
+        pub fn type_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where

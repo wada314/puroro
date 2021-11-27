@@ -1868,6 +1868,39 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
+        pub fn i32_unlabeled_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn i32_repeated_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn float_unlabeled_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn float_repeated_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn string_unlabeled_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn string_repeated_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn submsg_unlabeled_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+            todo!()
+        }
+        pub fn submsg_repeated_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+            todo!()
+        }
+        pub fn enum_unlabeled_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+            todo!()
+        }
+        pub fn enum_repeated_mut(&mut self) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+            todo!()
+        }
+        pub fn very_large_field_number_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
@@ -3328,6 +3361,9 @@ pub mod _puroro_nested {
 
                         _bump: bump,
                     }
+                }
+                pub fn i32_unlabeled_mut(&mut self) -> &'this mut i32 {
+                    todo!()
                 }
             }
 

@@ -1050,6 +1050,28 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
+        pub fn g1_int32_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
+        pub fn g1_string_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn g2_f32_mut(&mut self) -> &'this mut f32 {
+            todo!()
+        }
+        pub fn g2_string_mut(&mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+            todo!()
+        }
+        pub fn g2_submsg_mut(
+            &mut self,
+        ) -> &'this mut self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<
+            BT::ChildsBumpTypes<'this>,
+        > {
+            todo!()
+        }
+        pub fn g3_int32_mut(&mut self) -> &'this mut i32 {
+            todo!()
+        }
     }
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
@@ -1545,6 +1567,9 @@ pub mod _puroro_impls {
 
                 _bump: bump,
             }
+        }
+        pub fn i32_optional_mut(&mut self) -> &'this mut i32 {
+            todo!()
         }
     }
 
