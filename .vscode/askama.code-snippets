@@ -4,7 +4,7 @@
         "body": [
             "{%- if $1 %}",
             "{%- else %} {#- if $1 #}",
-            "{%- endif %} {#- if $1 #"
+            "{%- endif %} {#- if $1 "
         ],
         "description": "askama if"
     },
@@ -12,7 +12,7 @@
         "prefix": "{%for",
         "body": [
             "{%- for $1 %}",
-            "{%- endfor %} {#- for $1 #"
+            "{%- endfor %} {#- for $1 "
         ],
         "description": "askama for"
     }

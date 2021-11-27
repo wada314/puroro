@@ -1868,46 +1868,42 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self.i32_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.i32_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self.float_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.float_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_unlabeled_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self.string_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.string_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+        pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             self.submsg_unlabeled
                 .as_ref()
                 .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
         }
         pub fn enum_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::Enum> {
+        ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
             if self.enum_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.enum_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn very_large_field_number_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this i32> {
+        pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self.very_large_field_number != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.very_large_field_number)
             } else {
@@ -1928,12 +1924,12 @@ pub mod _puroro_impls {
         }
         pub fn string_unlabeled_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             todo!()
         }
         pub fn string_repeated_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             todo!()
         }
         pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
@@ -1998,7 +1994,7 @@ pub mod _puroro_impls {
         = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            todo!()
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
@@ -2009,7 +2005,7 @@ pub mod _puroro_impls {
         = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.float_repeated.iter().cloned()
+            todo!()
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
@@ -2023,7 +2019,7 @@ pub mod _puroro_impls {
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
+            todo!()
         }
         type Field7MessageType<'this>
         where
@@ -2058,7 +2054,7 @@ pub mod _puroro_impls {
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
+            todo!()
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
@@ -2069,7 +2065,7 @@ pub mod _puroro_impls {
         = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests3::Enum>>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            self.enum_repeated.iter().cloned()
+            todo!()
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.very_large_field_number))
@@ -3394,7 +3390,7 @@ pub mod _puroro_nested {
                         _bump: bump,
                     }
                 }
-                pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+                pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     if self.i32_unlabeled != ::std::default::Default::default() {
                         ::std::option::Option::Some(&self.i32_unlabeled)
                     } else {

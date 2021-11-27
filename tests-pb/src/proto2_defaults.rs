@@ -6170,423 +6170,413 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(0) {
                 ::std::option::Option::Some(&self.i32_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(1) {
                 ::std::option::Option::Some(&self.i32_0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(2) {
                 ::std::option::Option::Some(&self.i32_42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(3) {
                 ::std::option::Option::Some(&self.i32_m42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(4) {
                 ::std::option::Option::Some(&self.i32_2147483647)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(5) {
                 ::std::option::Option::Some(&self.i32_m2147483648)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(6) {
                 ::std::option::Option::Some(&self.i32_0123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(7) {
                 ::std::option::Option::Some(&self.i32_0x123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<&'this u32> {
+        pub fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get_unchecked(8) {
                 ::std::option::Option::Some(&self.u32_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<&'this u32> {
+        pub fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get_unchecked(9) {
                 ::std::option::Option::Some(&self.u32_0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<&'this u32> {
+        pub fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get_unchecked(10) {
                 ::std::option::Option::Some(&self.u32_42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<&'this u32> {
+        pub fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get_unchecked(11) {
                 ::std::option::Option::Some(&self.u32_4294967295)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<&'this u32> {
+        pub fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get_unchecked(12) {
                 ::std::option::Option::Some(&self.u32_0123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<&'this u32> {
+        pub fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get_unchecked(13) {
                 ::std::option::Option::Some(&self.u32_0x123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<&'this i64> {
+        pub fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(14) {
                 ::std::option::Option::Some(&self.i64_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<&'this i64> {
+        pub fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(15) {
                 ::std::option::Option::Some(&self.i64_0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<&'this i64> {
+        pub fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(16) {
                 ::std::option::Option::Some(&self.i64_42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<&'this i64> {
+        pub fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(17) {
                 ::std::option::Option::Some(&self.i64_m42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_9223372036854775807_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this i64> {
+        pub fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(18) {
                 ::std::option::Option::Some(&self.i64_9223372036854775807)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_m9223372036854775808_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this i64> {
+        pub fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(19) {
                 ::std::option::Option::Some(&self.i64_m9223372036854775808)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<&'this i64> {
+        pub fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(20) {
                 ::std::option::Option::Some(&self.i64_0123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<&'this i64> {
+        pub fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get_unchecked(21) {
                 ::std::option::Option::Some(&self.i64_0x123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<&'this u64> {
+        pub fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get_unchecked(22) {
                 ::std::option::Option::Some(&self.u64_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<&'this u64> {
+        pub fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get_unchecked(23) {
                 ::std::option::Option::Some(&self.u64_0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<&'this u64> {
+        pub fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get_unchecked(24) {
                 ::std::option::Option::Some(&self.u64_42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u64_18446744073709551615_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this u64> {
+        pub fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get_unchecked(25) {
                 ::std::option::Option::Some(&self.u64_18446744073709551615)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<&'this u64> {
+        pub fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get_unchecked(26) {
                 ::std::option::Option::Some(&self.u64_0123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<&'this u64> {
+        pub fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get_unchecked(27) {
                 ::std::option::Option::Some(&self.u64_0x123)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(28) {
                 ::std::option::Option::Some(&self.f32_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(29) {
                 ::std::option::Option::Some(&self.f32_0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(30) {
                 ::std::option::Option::Some(&self.f32_m0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(31) {
                 ::std::option::Option::Some(&self.f32_0p)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(32) {
                 ::std::option::Option::Some(&self.f32_p0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(33) {
                 ::std::option::Option::Some(&self.f32_0p0)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(34) {
                 ::std::option::Option::Some(&self.f32_42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(35) {
                 ::std::option::Option::Some(&self.f32_m42)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(36) {
                 ::std::option::Option::Some(&self.f32_0p25)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(37) {
                 ::std::option::Option::Some(&self.f32_1p5e2)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(38) {
                 ::std::option::Option::Some(&self.f32_inf)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(39) {
                 ::std::option::Option::Some(&self.f32_minf)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(40) {
                 ::std::option::Option::Some(&self.f32_nan)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get_unchecked(41) {
                 ::std::option::Option::Some(&self.f32_mnan)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<&'this bool> {
+        pub fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             if self._bitfield.get_unchecked(42) {
                 ::std::option::Option::Some(&self.bool_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<&'this bool> {
+        pub fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             if self._bitfield.get_unchecked(43) {
                 ::std::option::Option::Some(&self.bool_true)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<&'this bool> {
+        pub fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             if self._bitfield.get_unchecked(44) {
                 ::std::option::Option::Some(&self.bool_false)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(45) {
                 ::std::option::Option::Some(&self.string_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(46) {
                 ::std::option::Option::Some(&self.string_empty)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(47) {
                 ::std::option::Option::Some(&self.string_abc)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(48) {
                 ::std::option::Option::Some(&self.string_aiu)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_backslash_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(49) {
                 ::std::option::Option::Some(&self.string_backslash)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(50) {
                 ::std::option::Option::Some(&self.string_tab)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(51) {
                 ::std::option::Option::Some(&self.string_crlf)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
+        pub fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get_unchecked(52) {
                 ::std::option::Option::Some(&self.bytes_default)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
+        pub fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get_unchecked(53) {
                 ::std::option::Option::Some(&self.bytes_empty)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
+        pub fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get_unchecked(54) {
                 ::std::option::Option::Some(&self.bytes_abc)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
+        pub fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get_unchecked(55) {
                 ::std::option::Option::Some(&self.bytes_aiu)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_backslash_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this &'this [u8]> {
+        pub fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get_unchecked(56) {
                 ::std::option::Option::Some(&self.bytes_backslash)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
+        pub fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get_unchecked(57) {
                 ::std::option::Option::Some(&self.bytes_tab)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this [u8]> {
+        pub fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get_unchecked(58) {
                 ::std::option::Option::Some(&self.bytes_crlf)
             } else {
@@ -6595,7 +6585,7 @@ pub mod _puroro_impls {
         }
         pub fn enum_default_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<&'this self::_puroro_root::proto2_defaults::MyEnum> {
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
             if self._bitfield.get_unchecked(59) {
                 ::std::option::Option::Some(&self.enum_default)
             } else {
@@ -6604,7 +6594,7 @@ pub mod _puroro_impls {
         }
         pub fn enum_one_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<&'this self::_puroro_root::proto2_defaults::MyEnum> {
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
             if self._bitfield.get_unchecked(60) {
                 ::std::option::Option::Some(&self.enum_one)
             } else {
@@ -6613,7 +6603,7 @@ pub mod _puroro_impls {
         }
         pub fn enum_fourty_two_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<&'this self::_puroro_root::proto2_defaults::MyEnum> {
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
             if self._bitfield.get_unchecked(61) {
                 ::std::option::Option::Some(&self.enum_fourty_two)
             } else {
@@ -6802,85 +6792,85 @@ pub mod _puroro_impls {
         }
         pub fn string_default_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(45, true);
             todo!()
         }
         pub fn string_empty_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(46, true);
             todo!()
         }
         pub fn string_abc_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(47, true);
             todo!()
         }
         pub fn string_aiu_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(48, true);
             todo!()
         }
         pub fn string_backslash_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(49, true);
             todo!()
         }
         pub fn string_tab_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(50, true);
             todo!()
         }
         pub fn string_crlf_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(51, true);
             todo!()
         }
         pub fn bytes_default_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(52, true);
             todo!()
         }
         pub fn bytes_empty_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(53, true);
             todo!()
         }
         pub fn bytes_abc_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(54, true);
             todo!()
         }
         pub fn bytes_aiu_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(55, true);
             todo!()
         }
         pub fn bytes_backslash_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(56, true);
             todo!()
         }
         pub fn bytes_tab_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(57, true);
             todo!()
         }
         pub fn bytes_crlf_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpVec<u8> {
+        ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(58, true);
             todo!()
         }

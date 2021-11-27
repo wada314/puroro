@@ -538,7 +538,7 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn a_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(0) {
                 ::std::option::Option::Some(&self.a)
             } else {
@@ -793,14 +793,14 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this &'this str> {
+        pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get_unchecked(0) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn b_mut<'this>(&'this mut self) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(0, true);
             todo!()
         }
@@ -1066,7 +1066,7 @@ pub mod _puroro_impls {
         pub fn c_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            &'this &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+            &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
                 BT::ChildsBumpTypes<'this>,
             >,
         > {
@@ -1391,7 +1391,7 @@ pub mod _puroro_impls {
         = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.d.iter().cloned()
+            todo!()
         }
     }
 

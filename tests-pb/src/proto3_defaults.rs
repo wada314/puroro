@@ -941,30 +941,28 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self.i32_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.i32_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get_unchecked(0) {
                 ::std::option::Option::Some(&self.i32_optional)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this f32> {
+        pub fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self.f32_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.f32_unlabeled)
             } else {
                 ::std::option::Option::None
             }
         }
-        pub fn string_unlabeled_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<&'this &'this str> {
+        pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self.string_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.string_unlabeled)
             } else {
@@ -974,7 +972,7 @@ pub mod _puroro_impls {
         pub fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            &'this &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
+            &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
                 BT::ChildsBumpTypes<'this>,
             >,
         > {
@@ -997,7 +995,7 @@ pub mod _puroro_impls {
         }
         pub fn string_unlabeled_mut<'this>(
             &'this mut self,
-        ) -> &'this mut ::puroro::internal::NoAllocBumpString {
+        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             todo!()
         }
         pub fn submsg_unlabeled_mut<'this>(
@@ -1057,7 +1055,7 @@ pub mod _puroro_impls {
         = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            todo!()
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_unlabeled))
@@ -1443,7 +1441,7 @@ pub mod _puroro_impls {
                 _bump: bump,
             }
         }
-        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this i32> {
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self.i32_unlabeled != ::std::default::Default::default() {
                 ::std::option::Option::Some(&self.i32_unlabeled)
             } else {

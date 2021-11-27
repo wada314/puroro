@@ -809,7 +809,7 @@ impl Field {
         })
     }
 
-    pub fn bumpalo_getter_mutable_type(&self, lt: &str) -> Result<String> {
+    pub fn bumpalo_getter_mut_type(&self, lt: &str) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             // ↓ Maybe need to double check the lt params

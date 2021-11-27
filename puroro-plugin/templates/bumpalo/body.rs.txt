@@ -87,7 +87,7 @@ where
     {%- else %} {#- if field.is_repeated #}
 
     {#- ######## non-repeated getter ######## #}
-    pub fn {{ field.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<&'this {{ field.bumpalo_getter_deref_type }}> {
+    pub fn {{ field.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ field.bumpalo_getter_type }}> {
         {%- if field.is_message %}
         {#- Non-repeated message field. Field type is always `Optional<NoAllocBox<T>>`.#}
         {#- Need to cast the lifetime. #}
@@ -97,7 +97,12 @@ where
         {%- if field.has_optional_bit %}
         {#- Non-repeated, non-message, optional field. Optional bit is stored in the bitfield. #}
         if self._bitfield.get_unchecked({{ field.bitfield_index }}) {
-            ::std::option::Option::Some(&self.{{ field.ident }})
+            ::std::option::Option::Some(
+                {%- if field.is_length_delimited %}
+                {%- else %} {#- if field.is_length_delimited #}
+                {%- endif %} {#- if field.is_length_delimited #}
+                &self.{{ field.ident }}
+            )
         } else {
             ::std::option::Option::None
         }
@@ -118,7 +123,7 @@ where
     {#- ######## mut getter ######## #}
 
     {%- for field in m.fields %}
-    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> &'this mut {{ field.bumpalo_mut_getter_deref_type }} {
+    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> {{ field.bumpalo_getter_mut_type }} {
         {%- if field.has_optional_bit %}
         self._bitfield.set({{ field.bitfield_index }}, true);
         {%- endif %} {#- if field.has_optional_bit #}
