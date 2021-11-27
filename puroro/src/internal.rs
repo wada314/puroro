@@ -39,3 +39,22 @@ where
 {
     *slice.get(index).expect("bitvec index out of bound.")
 }
+
+pub trait IsDefault {
+    fn is_default(&self) -> bool;
+}
+impl<T: Default + PartialEq> IsDefault for T {
+    fn is_default(&self) -> bool {
+        *self == Default::default()
+    }
+}
+impl<'a> IsDefault for NoAllocBumpString {
+    fn is_default(&self) -> bool {
+        self.is_empty()
+    }
+}
+impl<'a, T> IsDefault for NoAllocBumpVec<T> {
+    fn is_default(&self) -> bool {
+        self.is_empty()
+    }
+}

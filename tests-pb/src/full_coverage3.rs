@@ -11290,7 +11290,7 @@ where
             }
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self.i32_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
                 ::std::option::Option::Some(self.i32_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11304,7 +11304,7 @@ where
             }
         }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            if self.float_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.float_unlabeled) {
                 ::std::option::Option::Some(self.float_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11318,7 +11318,7 @@ where
             }
         }
         pub fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            if self.bytes_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.bytes_unlabeled) {
                 ::std::option::Option::Some(&self.bytes_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11332,7 +11332,7 @@ where
             }
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if self.string_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
                 ::std::option::Option::Some(&self.string_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11348,7 +11348,7 @@ where
         pub fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-            if self.enum_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.enum_unlabeled) {
                 ::std::option::Option::Some(self.enum_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11374,7 +11374,7 @@ where
                 .map(|x| ::std::mem::transmute(::std::ops::Deref::deref(x)))
         }
         pub fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            if self.i64_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.i64_unlabeled) {
                 ::std::option::Option::Some(self.i64_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11388,7 +11388,7 @@ where
             }
         }
         pub fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            if self.u32_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.u32_unlabeled) {
                 ::std::option::Option::Some(self.u32_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11402,7 +11402,7 @@ where
             }
         }
         pub fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            if self.u64_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.u64_unlabeled) {
                 ::std::option::Option::Some(self.u64_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11416,7 +11416,7 @@ where
             }
         }
         pub fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self.s32_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.s32_unlabeled) {
                 ::std::option::Option::Some(self.s32_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11430,7 +11430,7 @@ where
             }
         }
         pub fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            if self.s64_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.s64_unlabeled) {
                 ::std::option::Option::Some(self.s64_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11444,7 +11444,7 @@ where
             }
         }
         pub fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            if self.fixed32_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.fixed32_unlabeled) {
                 ::std::option::Option::Some(self.fixed32_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11458,7 +11458,7 @@ where
             }
         }
         pub fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            if self.fixed64_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.fixed64_unlabeled) {
                 ::std::option::Option::Some(self.fixed64_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11472,7 +11472,7 @@ where
             }
         }
         pub fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self.sfixed32_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.sfixed32_unlabeled) {
                 ::std::option::Option::Some(self.sfixed32_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11486,7 +11486,7 @@ where
             }
         }
         pub fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            if self.sfixed64_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.sfixed64_unlabeled) {
                 ::std::option::Option::Some(self.sfixed64_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -11500,7 +11500,7 @@ where
             }
         }
         pub fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
-            if self.f64_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.f64_unlabeled) {
                 ::std::option::Option::Some(self.f64_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -16022,14 +16022,14 @@ pub mod _puroro_nested {
                     }
                 }
                 pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    if self.i32_unlabeled != ::std::default::Default::default() {
+                    if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
                         ::std::option::Option::Some(self.i32_unlabeled)
                     } else {
                         ::std::option::Option::None
                     }
                 }
                 pub fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-                    if self.i64_unlabeled != ::std::default::Default::default() {
+                    if !::puroro::internal::IsDefault::is_default(&self.i64_unlabeled) {
                         ::std::option::Option::Some(self.i64_unlabeled)
                     } else {
                         ::std::option::Option::None

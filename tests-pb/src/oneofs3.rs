@@ -1562,7 +1562,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self.i32_unlabeled != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
                 ::std::option::Option::Some(self.i32_unlabeled)
             } else {
                 ::std::option::Option::None

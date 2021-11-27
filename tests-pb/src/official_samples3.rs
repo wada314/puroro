@@ -541,7 +541,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if self.a != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.a) {
                 ::std::option::Option::Some(self.a)
             } else {
                 ::std::option::Option::None
@@ -790,7 +790,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if self.b != ::std::default::Default::default() {
+            if !::puroro::internal::IsDefault::is_default(&self.b) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None
