@@ -1,7 +1,7 @@
 
-{#-
- # ################ Struct body ################
- #}
+{#-#############################################}
+{#-################ Struct body ################}
+{#-#############################################}
 pub struct {{ m.bumpalo_ident }}<'bump> {
     _bump: &'bump ::puroro::bumpalo::Bump,
     _bitfield: ::puroro::bitvec::array::BitArray<
@@ -23,7 +23,10 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
 
 pub type {{ m.bumpalo_owned_ident }} = ::puroro::BumpaloOwned<{{ m.bumpalo_ident }}<'static>>;
 
+
+{#-################################################}
 {#-################ Struct methods ################}
+{#-################################################}
 impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 
     {#- ######## new_in ######## #}
@@ -173,7 +176,9 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 }
 
 
+{#-####################################################}
 {#-################ puroro trait impls ################}
+{#-####################################################}
 impl<'bump> ::puroro::Message<super::_puroro_simple_impl::{{ m.simple_ident }}> for {{ m.bumpalo_ident }}<'bump> {}
 
 impl<'bump> ::puroro::BumpaloMessage<'bump> for {{ m.bumpalo_ident }}<'bump> {
