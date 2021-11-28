@@ -231,6 +231,15 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn r#type<'this>(&'this self) -> i32 {
+            match self.type_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_type(&self) -> bool {
+            self.type_opt.is_some()
+        }
         pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()

@@ -547,6 +547,15 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn a<'this>(&'this self) -> i32 {
+            match self.a_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_a(&self) -> bool {
+            self.a_opt.is_some()
+        }
         pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
@@ -795,6 +804,15 @@ pub mod _puroro_impls {
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn b<'this>(&'this self) -> &'this str {
+            match self.b_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_b(&self) -> bool {
+            self.b_opt.is_some()
         }
         pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             todo!()
@@ -1063,6 +1081,19 @@ pub mod _puroro_impls {
             self.c
                 .as_ref()
                 .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn c<'this>(
+            &'this self,
+        ) -> &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<
+            BT::ChildsBumpTypes<'this>,
+        > {
+            match self.c_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_c(&self) -> bool {
+            self.c_opt.is_some()
         }
         pub fn c_mut<'this>(
             &'this mut self,

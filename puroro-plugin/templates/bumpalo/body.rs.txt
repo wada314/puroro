@@ -106,6 +106,8 @@ where
     {%- else %} {#- if field.is_repeated #}
 
     {#- ######## non-repeated getter ######## #}
+
+    {#- optional getter #}
     pub fn {{ field.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ field.bumpalo_getter_type }}> {
         {%- if field.is_message %}
         {#- Non-repeated message field. Field type is always `Optional<NoAllocBox<T>>`.#}
@@ -141,6 +143,23 @@ where
         }
         {%- endif %} {#- if field.has_optional_bit #}
         {%- endif %} {#- if field.is_message #}
+    }
+
+    {#- normal getter, has_ getter #}
+    pub fn {{ field.ident }}<'this>(&'this self) -> {{ field.bumpalo_getter_type }} {
+        match self.{{ field.ident_unesc }}_opt() {
+            ::std::option::Option::Some(x) => x,
+            _ => {
+                {%- if field.has_default_value %}
+                {{ field.default_value }}
+                {%- else %} {#- if field.has_default_value #}
+                ::std::default::Default::default()
+                {%- endif %} {#- if field.has_default_value #}
+            }
+        }
+    }
+    pub fn has_{{ field.ident_unesc }}(&self) -> bool {
+        self.{{ field.ident_unesc }}_opt.is_some()
     }
 
     {%- endif %} {#- if field.is_repeated #}

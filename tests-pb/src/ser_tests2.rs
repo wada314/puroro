@@ -1857,6 +1857,15 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn i32_optional<'this>(&'this self) -> i32 {
+            match self.i32_optional_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_i32_optional(&self) -> bool {
+            self.i32_optional_opt.is_some()
+        }
         pub fn i32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
             self.i32_repeated.iter().copied()
         }
@@ -1866,6 +1875,15 @@ pub mod _puroro_impls {
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn float_optional<'this>(&'this self) -> f32 {
+            match self.float_optional_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_float_optional(&self) -> bool {
+            self.float_optional_opt.is_some()
         }
         pub fn float_repeated<'this>(
             &'this self,
@@ -1879,6 +1897,15 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn string_optional<'this>(&'this self) -> &'this str {
+            match self.string_optional_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_string_optional(&self) -> bool {
+            self.string_optional_opt.is_some()
+        }
         pub fn string_repeated<'this>(
             &'this self,
         ) -> impl 'this + ::std::iter::Iterator<Item = &'this str> {
@@ -1888,6 +1915,15 @@ pub mod _puroro_impls {
             self.submsg_optional
                 .as_ref()
                 .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn submsg_optional<'this>(&'this self) -> &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
+            match self.submsg_optional_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_submsg_optional(&self) -> bool {
+            self.submsg_optional_opt.is_some()
         }
         pub fn submsg_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item=&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             let field: &::puroro::internal::NoAllocBumpVec<&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>> = unsafe {
@@ -1904,6 +1940,15 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
+            match self.enum_optional_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_enum_optional(&self) -> bool {
+            self.enum_optional_opt.is_some()
+        }
         pub fn enum_repeated<'this>(
             &'this self,
         ) -> impl 'this + ::std::iter::Iterator<Item = self::_puroro_root::ser_tests2::Enum>
@@ -1916,6 +1961,15 @@ pub mod _puroro_impls {
             } else {
                 ::std::option::Option::None
             }
+        }
+        pub fn very_large_field_number<'this>(&'this self) -> i32 {
+            match self.very_large_field_number_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_very_large_field_number(&self) -> bool {
+            self.very_large_field_number_opt.is_some()
         }
         pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
@@ -3430,6 +3484,15 @@ pub mod _puroro_nested {
                     } else {
                         ::std::option::Option::None
                     }
+                }
+                pub fn i32_optional<'this>(&'this self) -> i32 {
+                    match self.i32_optional_opt() {
+                        ::std::option::Option::Some(x) => x,
+                        _ => ::std::default::Default::default(),
+                    }
+                }
+                pub fn has_i32_optional(&self) -> bool {
+                    self.i32_optional_opt.is_some()
                 }
                 pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
                     self._bitfield.set(0, true);

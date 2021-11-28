@@ -1566,6 +1566,15 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+        pub fn i32_unlabeled<'this>(&'this self) -> i32 {
+            match self.i32_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_i32_unlabeled(&self) -> bool {
+            self.i32_unlabeled_opt.is_some()
+        }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
