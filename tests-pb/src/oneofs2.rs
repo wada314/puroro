@@ -1569,7 +1569,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_i32_optional(&self) -> bool {
-            self.i32_optional_opt.is_some()
+            self.i32_optional_opt().is_some()
         }
         pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);

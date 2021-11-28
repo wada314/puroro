@@ -955,7 +955,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_i32_unlabeled(&self) -> bool {
-            self.i32_unlabeled_opt.is_some()
+            self.i32_unlabeled_opt().is_some()
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
@@ -971,7 +971,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_i32_optional(&self) -> bool {
-            self.i32_optional_opt.is_some()
+            self.i32_optional_opt().is_some()
         }
         pub fn i32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
             self.i32_repeated.iter().copied()
@@ -990,7 +990,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_f32_unlabeled(&self) -> bool {
-            self.f32_unlabeled_opt.is_some()
+            self.f32_unlabeled_opt().is_some()
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
@@ -1006,7 +1006,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_string_unlabeled(&self) -> bool {
-            self.string_unlabeled_opt.is_some()
+            self.string_unlabeled_opt().is_some()
         }
         pub fn submsg_unlabeled_opt<'this>(
             &'this self,
@@ -1021,16 +1021,15 @@ pub mod _puroro_impls {
         }
         pub fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
-            BT::ChildsBumpTypes<'this>,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
+                BT::ChildsBumpTypes<'this>,
+            >,
         > {
-            match self.submsg_unlabeled_opt() {
-                ::std::option::Option::Some(x) => x,
-                _ => ::std::default::Default::default(),
-            }
+            self.submsg_unlabeled_opt()
         }
         pub fn has_submsg_unlabeled(&self) -> bool {
-            self.submsg_unlabeled_opt.is_some()
+            self.submsg_unlabeled_opt().is_some()
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
@@ -1507,7 +1506,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_i32_unlabeled(&self) -> bool {
-            self.i32_unlabeled_opt.is_some()
+            self.i32_unlabeled_opt().is_some()
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()

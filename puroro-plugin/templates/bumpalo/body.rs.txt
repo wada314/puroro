@@ -87,11 +87,11 @@ where
     {%- if field.is_repeated %}
     
     {#- ######## repeated getter ######## #}
-    pub fn {{ field.ident }}<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item={{ field.bumpalo_getter_type }}> {
+    pub fn {{ field.ident }}<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item={{ field.bumpalo_getter_rep_item_type }}> {
         {%- if field.is_length_delimited %}
         {%- if field.is_message %}
         {#- need to cast the field message type's lifetime #}
-        let field: &::puroro::internal::NoAllocBumpVec<{{ field.bumpalo_getter_type }}> = unsafe {
+        let field: &::puroro::internal::NoAllocBumpVec<{{ field.bumpalo_getter_rep_item_type }}> = unsafe {
             ::std::mem::transmute(&self.{{ field.ident }})
         };
         ::puroro::internal::utils::BorrowedIter::new(field.iter())
@@ -108,7 +108,7 @@ where
     {#- ######## non-repeated getter ######## #}
 
     {#- optional getter #}
-    pub fn {{ field.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ field.bumpalo_getter_type }}> {
+    pub fn {{ field.ident_unesc }}_opt<'this>(&'this self) -> {{ field.bumpalo_getter_opt_type }} {
         {%- if field.is_message %}
         {#- Non-repeated message field. Field type is always `Optional<NoAllocBox<T>>`.#}
         {#- Need to cast the lifetime. #}
@@ -147,6 +147,10 @@ where
 
     {#- normal getter, has_ getter #}
     pub fn {{ field.ident }}<'this>(&'this self) -> {{ field.bumpalo_getter_type }} {
+        {%- if field.is_message %}
+        {#- For message, we return `Option` value even in normal getter method. #}
+        self.{{ field.ident_unesc }}_opt()
+        {%- else %} {#- if field.is_message #}
         match self.{{ field.ident_unesc }}_opt() {
             ::std::option::Option::Some(x) => x,
             _ => {
@@ -157,9 +161,10 @@ where
                 {%- endif %} {#- if field.has_default_value #}
             }
         }
+        {%- endif %} {#- if field.is_message #}
     }
     pub fn has_{{ field.ident_unesc }}(&self) -> bool {
-        self.{{ field.ident_unesc }}_opt.is_some()
+        self.{{ field.ident_unesc }}_opt().is_some()
     }
 
     {%- endif %} {#- if field.is_repeated #}

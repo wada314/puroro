@@ -11303,7 +11303,7 @@ where
             }
         }
         pub fn has_i32_unlabeled(&self) -> bool {
-            self.i32_unlabeled_opt.is_some()
+            self.i32_unlabeled_opt().is_some()
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
@@ -11319,7 +11319,7 @@ where
             }
         }
         pub fn has_i32_optional(&self) -> bool {
-            self.i32_optional_opt.is_some()
+            self.i32_optional_opt().is_some()
         }
         pub fn i32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
             self.i32_repeated.iter().copied()
@@ -11338,7 +11338,7 @@ where
             }
         }
         pub fn has_float_unlabeled(&self) -> bool {
-            self.float_unlabeled_opt.is_some()
+            self.float_unlabeled_opt().is_some()
         }
         pub fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get(1).map_or(false, |v| *v) {
@@ -11354,7 +11354,7 @@ where
             }
         }
         pub fn has_float_optional(&self) -> bool {
-            self.float_optional_opt.is_some()
+            self.float_optional_opt().is_some()
         }
         pub fn float_repeated<'this>(
             &'this self,
@@ -11375,7 +11375,7 @@ where
             }
         }
         pub fn has_bytes_unlabeled(&self) -> bool {
-            self.bytes_unlabeled_opt.is_some()
+            self.bytes_unlabeled_opt().is_some()
         }
         pub fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if self._bitfield.get(2).map_or(false, |v| *v) {
@@ -11391,7 +11391,7 @@ where
             }
         }
         pub fn has_bytes_optional(&self) -> bool {
-            self.bytes_optional_opt.is_some()
+            self.bytes_optional_opt().is_some()
         }
         pub fn bytes_repeated<'this>(
             &'this self,
@@ -11412,7 +11412,7 @@ where
             }
         }
         pub fn has_string_unlabeled(&self) -> bool {
-            self.string_unlabeled_opt.is_some()
+            self.string_unlabeled_opt().is_some()
         }
         pub fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get(3).map_or(false, |v| *v) {
@@ -11428,7 +11428,7 @@ where
             }
         }
         pub fn has_string_optional(&self) -> bool {
-            self.string_optional_opt.is_some()
+            self.string_optional_opt().is_some()
         }
         pub fn string_repeated<'this>(
             &'this self,
@@ -11451,7 +11451,7 @@ where
             }
         }
         pub fn has_enum_unlabeled(&self) -> bool {
-            self.enum_unlabeled_opt.is_some()
+            self.enum_unlabeled_opt().is_some()
         }
         pub fn enum_optional_opt<'this>(
             &'this self,
@@ -11469,7 +11469,7 @@ where
             }
         }
         pub fn has_enum_optional(&self) -> bool {
-            self.enum_optional_opt.is_some()
+            self.enum_optional_opt().is_some()
         }
         pub fn enum_repeated<'this>(
             &'this self,
@@ -11482,28 +11482,22 @@ where
                 .as_ref()
                 .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
         }
-        pub fn submsg_unlabeled<'this>(&'this self) -> &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
-            match self.submsg_unlabeled_opt() {
-                ::std::option::Option::Some(x) => x,
-                _ => ::std::default::Default::default(),
-            }
+        pub fn submsg_unlabeled<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+            self.submsg_unlabeled_opt()
         }
         pub fn has_submsg_unlabeled(&self) -> bool {
-            self.submsg_unlabeled_opt.is_some()
+            self.submsg_unlabeled_opt().is_some()
         }
         pub fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             self.submsg_optional
                 .as_ref()
                 .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
         }
-        pub fn submsg_optional<'this>(&'this self) -> &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
-            match self.submsg_optional_opt() {
-                ::std::option::Option::Some(x) => x,
-                _ => ::std::default::Default::default(),
-            }
+        pub fn submsg_optional<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
+            self.submsg_optional_opt()
         }
         pub fn has_submsg_optional(&self) -> bool {
-            self.submsg_optional_opt.is_some()
+            self.submsg_optional_opt().is_some()
         }
         pub fn submsg_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item=&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>>{
             let field: &::puroro::internal::NoAllocBumpVec<&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>> = unsafe {
@@ -11525,7 +11519,7 @@ where
             }
         }
         pub fn has_i64_unlabeled(&self) -> bool {
-            self.i64_unlabeled_opt.is_some()
+            self.i64_unlabeled_opt().is_some()
         }
         pub fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(5).map_or(false, |v| *v) {
@@ -11541,7 +11535,7 @@ where
             }
         }
         pub fn has_i64_optional(&self) -> bool {
-            self.i64_optional_opt.is_some()
+            self.i64_optional_opt().is_some()
         }
         pub fn i64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i64> {
             self.i64_repeated.iter().copied()
@@ -11560,7 +11554,7 @@ where
             }
         }
         pub fn has_u32_unlabeled(&self) -> bool {
-            self.u32_unlabeled_opt.is_some()
+            self.u32_unlabeled_opt().is_some()
         }
         pub fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(6).map_or(false, |v| *v) {
@@ -11576,7 +11570,7 @@ where
             }
         }
         pub fn has_u32_optional(&self) -> bool {
-            self.u32_optional_opt.is_some()
+            self.u32_optional_opt().is_some()
         }
         pub fn u32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = u32> {
             self.u32_repeated.iter().copied()
@@ -11595,7 +11589,7 @@ where
             }
         }
         pub fn has_u64_unlabeled(&self) -> bool {
-            self.u64_unlabeled_opt.is_some()
+            self.u64_unlabeled_opt().is_some()
         }
         pub fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(7).map_or(false, |v| *v) {
@@ -11611,7 +11605,7 @@ where
             }
         }
         pub fn has_u64_optional(&self) -> bool {
-            self.u64_optional_opt.is_some()
+            self.u64_optional_opt().is_some()
         }
         pub fn u64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = u64> {
             self.u64_repeated.iter().copied()
@@ -11630,7 +11624,7 @@ where
             }
         }
         pub fn has_s32_unlabeled(&self) -> bool {
-            self.s32_unlabeled_opt.is_some()
+            self.s32_unlabeled_opt().is_some()
         }
         pub fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(8).map_or(false, |v| *v) {
@@ -11646,7 +11640,7 @@ where
             }
         }
         pub fn has_s32_optional(&self) -> bool {
-            self.s32_optional_opt.is_some()
+            self.s32_optional_opt().is_some()
         }
         pub fn s32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
             self.s32_repeated.iter().copied()
@@ -11665,7 +11659,7 @@ where
             }
         }
         pub fn has_s64_unlabeled(&self) -> bool {
-            self.s64_unlabeled_opt.is_some()
+            self.s64_unlabeled_opt().is_some()
         }
         pub fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(9).map_or(false, |v| *v) {
@@ -11681,7 +11675,7 @@ where
             }
         }
         pub fn has_s64_optional(&self) -> bool {
-            self.s64_optional_opt.is_some()
+            self.s64_optional_opt().is_some()
         }
         pub fn s64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i64> {
             self.s64_repeated.iter().copied()
@@ -11700,7 +11694,7 @@ where
             }
         }
         pub fn has_fixed32_unlabeled(&self) -> bool {
-            self.fixed32_unlabeled_opt.is_some()
+            self.fixed32_unlabeled_opt().is_some()
         }
         pub fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(10).map_or(false, |v| *v) {
@@ -11716,7 +11710,7 @@ where
             }
         }
         pub fn has_fixed32_optional(&self) -> bool {
-            self.fixed32_optional_opt.is_some()
+            self.fixed32_optional_opt().is_some()
         }
         pub fn fixed32_repeated<'this>(
             &'this self,
@@ -11737,7 +11731,7 @@ where
             }
         }
         pub fn has_fixed64_unlabeled(&self) -> bool {
-            self.fixed64_unlabeled_opt.is_some()
+            self.fixed64_unlabeled_opt().is_some()
         }
         pub fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(11).map_or(false, |v| *v) {
@@ -11753,7 +11747,7 @@ where
             }
         }
         pub fn has_fixed64_optional(&self) -> bool {
-            self.fixed64_optional_opt.is_some()
+            self.fixed64_optional_opt().is_some()
         }
         pub fn fixed64_repeated<'this>(
             &'this self,
@@ -11774,7 +11768,7 @@ where
             }
         }
         pub fn has_sfixed32_unlabeled(&self) -> bool {
-            self.sfixed32_unlabeled_opt.is_some()
+            self.sfixed32_unlabeled_opt().is_some()
         }
         pub fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(12).map_or(false, |v| *v) {
@@ -11790,7 +11784,7 @@ where
             }
         }
         pub fn has_sfixed32_optional(&self) -> bool {
-            self.sfixed32_optional_opt.is_some()
+            self.sfixed32_optional_opt().is_some()
         }
         pub fn sfixed32_repeated<'this>(
             &'this self,
@@ -11811,7 +11805,7 @@ where
             }
         }
         pub fn has_sfixed64_unlabeled(&self) -> bool {
-            self.sfixed64_unlabeled_opt.is_some()
+            self.sfixed64_unlabeled_opt().is_some()
         }
         pub fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(13).map_or(false, |v| *v) {
@@ -11827,7 +11821,7 @@ where
             }
         }
         pub fn has_sfixed64_optional(&self) -> bool {
-            self.sfixed64_optional_opt.is_some()
+            self.sfixed64_optional_opt().is_some()
         }
         pub fn sfixed64_repeated<'this>(
             &'this self,
@@ -11848,7 +11842,7 @@ where
             }
         }
         pub fn has_f64_unlabeled(&self) -> bool {
-            self.f64_unlabeled_opt.is_some()
+            self.f64_unlabeled_opt().is_some()
         }
         pub fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             if self._bitfield.get(14).map_or(false, |v| *v) {
@@ -11864,7 +11858,7 @@ where
             }
         }
         pub fn has_f64_optional(&self) -> bool {
-            self.f64_optional_opt.is_some()
+            self.f64_optional_opt().is_some()
         }
         pub fn f64_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = f64> {
             self.f64_repeated.iter().copied()
@@ -16391,7 +16385,7 @@ pub mod _puroro_nested {
                     }
                 }
                 pub fn has_i32_unlabeled(&self) -> bool {
-                    self.i32_unlabeled_opt.is_some()
+                    self.i32_unlabeled_opt().is_some()
                 }
                 pub fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     if !::puroro::internal::IsDefault::is_default(&self.i64_unlabeled) {
@@ -16407,7 +16401,7 @@ pub mod _puroro_nested {
                     }
                 }
                 pub fn has_i64_unlabeled(&self) -> bool {
-                    self.i64_unlabeled_opt.is_some()
+                    self.i64_unlabeled_opt().is_some()
                 }
                 pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
                     todo!()

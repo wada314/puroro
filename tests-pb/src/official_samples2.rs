@@ -552,7 +552,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_a(&self) -> bool {
-            self.a_opt.is_some()
+            self.a_opt().is_some()
         }
         pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
@@ -816,7 +816,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_b(&self) -> bool {
-            self.b_opt.is_some()
+            self.b_opt().is_some()
         }
         pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(0, true);
@@ -1094,16 +1094,15 @@ pub mod _puroro_impls {
         }
         pub fn c<'this>(
             &'this self,
-        ) -> &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
-            BT::ChildsBumpTypes<'this>,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+                BT::ChildsBumpTypes<'this>,
+            >,
         > {
-            match self.c_opt() {
-                ::std::option::Option::Some(x) => x,
-                _ => ::std::default::Default::default(),
-            }
+            self.c_opt()
         }
         pub fn has_c(&self) -> bool {
-            self.c_opt.is_some()
+            self.c_opt().is_some()
         }
         pub fn c_mut<'this>(
             &'this mut self,

@@ -1573,7 +1573,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn has_i32_unlabeled(&self) -> bool {
-            self.i32_unlabeled_opt.is_some()
+            self.i32_unlabeled_opt().is_some()
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
