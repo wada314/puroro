@@ -258,6 +258,9 @@ pub mod _puroro_impls {
         pub fn has_recursive_unlabeled(&self) -> bool {
             self.recursive_unlabeled_opt().is_some()
         }
+        pub fn clear_recursive_unlabeled(&mut self) {
+            self.recursive_unlabeled = ::std::default::Default::default();
+        }
         pub fn recursive_unlabeled_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>

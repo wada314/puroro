@@ -536,6 +536,9 @@ pub mod _puroro_impls {
         pub fn has_a(&self) -> bool {
             self.a_opt().is_some()
         }
+        pub fn clear_a(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
@@ -739,6 +742,9 @@ pub mod _puroro_impls {
         }
         pub fn has_b(&self) -> bool {
             self.b_opt().is_some()
+        }
+        pub fn clear_b(&mut self) {
+            self._bitfield.set(0, false);
         }
         pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(0, true);
@@ -960,6 +966,9 @@ pub mod _puroro_impls {
         pub fn has_c(&self) -> bool {
             self.c_opt().is_some()
         }
+        pub fn clear_c(&mut self) {
+            self.c = ::std::default::Default::default();
+        }
         pub fn c_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>
@@ -1171,9 +1180,6 @@ pub mod _puroro_impls {
         }
         pub fn d<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
             self.d.iter().copied()
-        }
-        pub fn d_mut<'this>(&'this mut self) -> &'this mut i32 {
-            todo!()
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}

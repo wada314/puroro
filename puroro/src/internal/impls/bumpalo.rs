@@ -124,6 +124,14 @@ pub struct NoAllocVec<T> {
     capacity: usize,
 }
 impl<T> NoAllocVec<T> {
+    pub fn new() -> Self {
+        // Actually bump ptr is not needed when allocating.
+        // Maybe we somehow make a dangling bump ptr here to skip
+        // Bump::new() invocation...
+        let fake_bump = Bump::new();
+        let vec = Vec::new_in(&fake_bump);
+        unsafe { Self::from_vec(vec) }
+    }
     pub fn new_in(bump: &Bump) -> Self {
         let vec = Vec::new_in(bump);
         unsafe { Self::from_vec(vec) }
@@ -187,6 +195,11 @@ impl<T> Drop for NoAllocVec<T> {
         // bumpalo's Vec does not drop items so manually dropping it
         // https://github.com/fitzgen/bumpalo/issues/133
         unsafe { ptr::drop_in_place(ptr::slice_from_raw_parts_mut(self.ptr, self.length)) }
+    }
+}
+impl<T> Default for NoAllocVec<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -292,6 +305,13 @@ impl Borrow<str> for NoAllocString {
 impl AsRef<str> for NoAllocString {
     fn as_ref(&self) -> &str {
         self.deref()
+    }
+}
+impl Default for NoAllocString {
+    fn default() -> Self {
+        Self {
+            vec: Default::default(),
+        }
     }
 }
 

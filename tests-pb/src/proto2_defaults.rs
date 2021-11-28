@@ -7151,185 +7151,323 @@ pub mod _puroro_impls {
         pub fn has_enum_fourty_two(&self) -> bool {
             self.enum_fourty_two_opt().is_some()
         }
+        pub fn clear_i32_default(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn i32_default_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
+        }
+        pub fn clear_i32_0(&mut self) {
+            self._bitfield.set(1, false);
         }
         pub fn i32_0_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(1, true);
             todo!()
         }
+        pub fn clear_i32_42(&mut self) {
+            self._bitfield.set(2, false);
+        }
         pub fn i32_42_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(2, true);
             todo!()
+        }
+        pub fn clear_i32_m42(&mut self) {
+            self._bitfield.set(3, false);
         }
         pub fn i32_m42_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(3, true);
             todo!()
         }
+        pub fn clear_i32_2147483647(&mut self) {
+            self._bitfield.set(4, false);
+        }
         pub fn i32_2147483647_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(4, true);
             todo!()
+        }
+        pub fn clear_i32_m2147483648(&mut self) {
+            self._bitfield.set(5, false);
         }
         pub fn i32_m2147483648_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(5, true);
             todo!()
         }
+        pub fn clear_i32_0123(&mut self) {
+            self._bitfield.set(6, false);
+        }
         pub fn i32_0123_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(6, true);
             todo!()
+        }
+        pub fn clear_i32_0x123(&mut self) {
+            self._bitfield.set(7, false);
         }
         pub fn i32_0x123_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(7, true);
             todo!()
         }
+        pub fn clear_u32_default(&mut self) {
+            self._bitfield.set(8, false);
+        }
         pub fn u32_default_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(8, true);
             todo!()
+        }
+        pub fn clear_u32_0(&mut self) {
+            self._bitfield.set(9, false);
         }
         pub fn u32_0_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(9, true);
             todo!()
         }
+        pub fn clear_u32_42(&mut self) {
+            self._bitfield.set(10, false);
+        }
         pub fn u32_42_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(10, true);
             todo!()
+        }
+        pub fn clear_u32_4294967295(&mut self) {
+            self._bitfield.set(11, false);
         }
         pub fn u32_4294967295_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(11, true);
             todo!()
         }
+        pub fn clear_u32_0123(&mut self) {
+            self._bitfield.set(12, false);
+        }
         pub fn u32_0123_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(12, true);
             todo!()
+        }
+        pub fn clear_u32_0x123(&mut self) {
+            self._bitfield.set(13, false);
         }
         pub fn u32_0x123_mut<'this>(&'this mut self) -> &'this mut u32 {
             self._bitfield.set(13, true);
             todo!()
         }
+        pub fn clear_i64_default(&mut self) {
+            self._bitfield.set(14, false);
+        }
         pub fn i64_default_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(14, true);
             todo!()
+        }
+        pub fn clear_i64_0(&mut self) {
+            self._bitfield.set(15, false);
         }
         pub fn i64_0_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(15, true);
             todo!()
         }
+        pub fn clear_i64_42(&mut self) {
+            self._bitfield.set(16, false);
+        }
         pub fn i64_42_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(16, true);
             todo!()
+        }
+        pub fn clear_i64_m42(&mut self) {
+            self._bitfield.set(17, false);
         }
         pub fn i64_m42_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(17, true);
             todo!()
         }
+        pub fn clear_i64_9223372036854775807(&mut self) {
+            self._bitfield.set(18, false);
+        }
         pub fn i64_9223372036854775807_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(18, true);
             todo!()
+        }
+        pub fn clear_i64_m9223372036854775808(&mut self) {
+            self._bitfield.set(19, false);
         }
         pub fn i64_m9223372036854775808_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(19, true);
             todo!()
         }
+        pub fn clear_i64_0123(&mut self) {
+            self._bitfield.set(20, false);
+        }
         pub fn i64_0123_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(20, true);
             todo!()
+        }
+        pub fn clear_i64_0x123(&mut self) {
+            self._bitfield.set(21, false);
         }
         pub fn i64_0x123_mut<'this>(&'this mut self) -> &'this mut i64 {
             self._bitfield.set(21, true);
             todo!()
         }
+        pub fn clear_u64_default(&mut self) {
+            self._bitfield.set(22, false);
+        }
         pub fn u64_default_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(22, true);
             todo!()
+        }
+        pub fn clear_u64_0(&mut self) {
+            self._bitfield.set(23, false);
         }
         pub fn u64_0_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(23, true);
             todo!()
         }
+        pub fn clear_u64_42(&mut self) {
+            self._bitfield.set(24, false);
+        }
         pub fn u64_42_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(24, true);
             todo!()
+        }
+        pub fn clear_u64_18446744073709551615(&mut self) {
+            self._bitfield.set(25, false);
         }
         pub fn u64_18446744073709551615_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(25, true);
             todo!()
         }
+        pub fn clear_u64_0123(&mut self) {
+            self._bitfield.set(26, false);
+        }
         pub fn u64_0123_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(26, true);
             todo!()
+        }
+        pub fn clear_u64_0x123(&mut self) {
+            self._bitfield.set(27, false);
         }
         pub fn u64_0x123_mut<'this>(&'this mut self) -> &'this mut u64 {
             self._bitfield.set(27, true);
             todo!()
         }
+        pub fn clear_f32_default(&mut self) {
+            self._bitfield.set(28, false);
+        }
         pub fn f32_default_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(28, true);
             todo!()
+        }
+        pub fn clear_f32_0(&mut self) {
+            self._bitfield.set(29, false);
         }
         pub fn f32_0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(29, true);
             todo!()
         }
+        pub fn clear_f32_m0(&mut self) {
+            self._bitfield.set(30, false);
+        }
         pub fn f32_m0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(30, true);
             todo!()
+        }
+        pub fn clear_f32_0p(&mut self) {
+            self._bitfield.set(31, false);
         }
         pub fn f32_0p_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(31, true);
             todo!()
         }
+        pub fn clear_f32_p0(&mut self) {
+            self._bitfield.set(32, false);
+        }
         pub fn f32_p0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(32, true);
             todo!()
+        }
+        pub fn clear_f32_0p0(&mut self) {
+            self._bitfield.set(33, false);
         }
         pub fn f32_0p0_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(33, true);
             todo!()
         }
+        pub fn clear_f32_42(&mut self) {
+            self._bitfield.set(34, false);
+        }
         pub fn f32_42_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(34, true);
             todo!()
+        }
+        pub fn clear_f32_m42(&mut self) {
+            self._bitfield.set(35, false);
         }
         pub fn f32_m42_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(35, true);
             todo!()
         }
+        pub fn clear_f32_0p25(&mut self) {
+            self._bitfield.set(36, false);
+        }
         pub fn f32_0p25_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(36, true);
             todo!()
+        }
+        pub fn clear_f32_1p5e2(&mut self) {
+            self._bitfield.set(37, false);
         }
         pub fn f32_1p5e2_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(37, true);
             todo!()
         }
+        pub fn clear_f32_inf(&mut self) {
+            self._bitfield.set(38, false);
+        }
         pub fn f32_inf_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(38, true);
             todo!()
+        }
+        pub fn clear_f32_minf(&mut self) {
+            self._bitfield.set(39, false);
         }
         pub fn f32_minf_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(39, true);
             todo!()
         }
+        pub fn clear_f32_nan(&mut self) {
+            self._bitfield.set(40, false);
+        }
         pub fn f32_nan_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(40, true);
             todo!()
+        }
+        pub fn clear_f32_mnan(&mut self) {
+            self._bitfield.set(41, false);
         }
         pub fn f32_mnan_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(41, true);
             todo!()
         }
+        pub fn clear_bool_default(&mut self) {
+            self._bitfield.set(42, false);
+        }
         pub fn bool_default_mut<'this>(&'this mut self) -> &'this mut bool {
             self._bitfield.set(42, true);
             todo!()
+        }
+        pub fn clear_bool_true(&mut self) {
+            self._bitfield.set(43, false);
         }
         pub fn bool_true_mut<'this>(&'this mut self) -> &'this mut bool {
             self._bitfield.set(43, true);
             todo!()
         }
+        pub fn clear_bool_false(&mut self) {
+            self._bitfield.set(44, false);
+        }
         pub fn bool_false_mut<'this>(&'this mut self) -> &'this mut bool {
             self._bitfield.set(44, true);
             todo!()
+        }
+        pub fn clear_string_default(&mut self) {
+            self._bitfield.set(45, false);
         }
         pub fn string_default_mut<'this>(
             &'this mut self,
@@ -7337,11 +7475,17 @@ pub mod _puroro_impls {
             self._bitfield.set(45, true);
             todo!()
         }
+        pub fn clear_string_empty(&mut self) {
+            self._bitfield.set(46, false);
+        }
         pub fn string_empty_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(46, true);
             todo!()
+        }
+        pub fn clear_string_abc(&mut self) {
+            self._bitfield.set(47, false);
         }
         pub fn string_abc_mut<'this>(
             &'this mut self,
@@ -7349,11 +7493,17 @@ pub mod _puroro_impls {
             self._bitfield.set(47, true);
             todo!()
         }
+        pub fn clear_string_aiu(&mut self) {
+            self._bitfield.set(48, false);
+        }
         pub fn string_aiu_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(48, true);
             todo!()
+        }
+        pub fn clear_string_backslash(&mut self) {
+            self._bitfield.set(49, false);
         }
         pub fn string_backslash_mut<'this>(
             &'this mut self,
@@ -7361,11 +7511,17 @@ pub mod _puroro_impls {
             self._bitfield.set(49, true);
             todo!()
         }
+        pub fn clear_string_tab(&mut self) {
+            self._bitfield.set(50, false);
+        }
         pub fn string_tab_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
             self._bitfield.set(50, true);
             todo!()
+        }
+        pub fn clear_string_crlf(&mut self) {
+            self._bitfield.set(51, false);
         }
         pub fn string_crlf_mut<'this>(
             &'this mut self,
@@ -7373,11 +7529,17 @@ pub mod _puroro_impls {
             self._bitfield.set(51, true);
             todo!()
         }
+        pub fn clear_bytes_default(&mut self) {
+            self._bitfield.set(52, false);
+        }
         pub fn bytes_default_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(52, true);
             todo!()
+        }
+        pub fn clear_bytes_empty(&mut self) {
+            self._bitfield.set(53, false);
         }
         pub fn bytes_empty_mut<'this>(
             &'this mut self,
@@ -7385,11 +7547,17 @@ pub mod _puroro_impls {
             self._bitfield.set(53, true);
             todo!()
         }
+        pub fn clear_bytes_abc(&mut self) {
+            self._bitfield.set(54, false);
+        }
         pub fn bytes_abc_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(54, true);
             todo!()
+        }
+        pub fn clear_bytes_aiu(&mut self) {
+            self._bitfield.set(55, false);
         }
         pub fn bytes_aiu_mut<'this>(
             &'this mut self,
@@ -7397,11 +7565,17 @@ pub mod _puroro_impls {
             self._bitfield.set(55, true);
             todo!()
         }
+        pub fn clear_bytes_backslash(&mut self) {
+            self._bitfield.set(56, false);
+        }
         pub fn bytes_backslash_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(56, true);
             todo!()
+        }
+        pub fn clear_bytes_tab(&mut self) {
+            self._bitfield.set(57, false);
         }
         pub fn bytes_tab_mut<'this>(
             &'this mut self,
@@ -7409,11 +7583,17 @@ pub mod _puroro_impls {
             self._bitfield.set(57, true);
             todo!()
         }
+        pub fn clear_bytes_crlf(&mut self) {
+            self._bitfield.set(58, false);
+        }
         pub fn bytes_crlf_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
             self._bitfield.set(58, true);
             todo!()
+        }
+        pub fn clear_enum_default(&mut self) {
+            self._bitfield.set(59, false);
         }
         pub fn enum_default_mut<'this>(
             &'this mut self,
@@ -7421,11 +7601,17 @@ pub mod _puroro_impls {
             self._bitfield.set(59, true);
             todo!()
         }
+        pub fn clear_enum_one(&mut self) {
+            self._bitfield.set(60, false);
+        }
         pub fn enum_one_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
             self._bitfield.set(60, true);
             todo!()
+        }
+        pub fn clear_enum_fourty_two(&mut self) {
+            self._bitfield.set(61, false);
         }
         pub fn enum_fourty_two_mut<'this>(
             &'this mut self,

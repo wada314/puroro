@@ -223,6 +223,9 @@ pub mod _puroro_impls {
         pub fn has_type(&self) -> bool {
             self.type_opt().is_some()
         }
+        pub fn clear_type(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()

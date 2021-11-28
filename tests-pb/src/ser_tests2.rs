@@ -1951,19 +1951,22 @@ pub mod _puroro_impls {
         pub fn has_very_large_field_number(&self) -> bool {
             self.very_large_field_number_opt().is_some()
         }
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
         }
-        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut i32 {
-            todo!()
+        pub fn clear_float_optional(&mut self) {
+            self._bitfield.set(1, false);
         }
         pub fn float_optional_mut<'this>(&'this mut self) -> &'this mut f32 {
             self._bitfield.set(1, true);
             todo!()
         }
-        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut f32 {
-            todo!()
+        pub fn clear_string_optional(&mut self) {
+            self._bitfield.set(2, false);
         }
         pub fn string_optional_mut<'this>(
             &'this mut self,
@@ -1971,16 +1974,14 @@ pub mod _puroro_impls {
             self._bitfield.set(2, true);
             todo!()
         }
-        pub fn string_repeated_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
-            todo!()
+        pub fn clear_submsg_optional(&mut self) {
+            self.submsg_optional = ::std::default::Default::default();
         }
         pub fn submsg_optional_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
             todo!()
         }
-        pub fn submsg_repeated_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
-            todo!()
+        pub fn clear_enum_optional(&mut self) {
+            self._bitfield.set(3, false);
         }
         pub fn enum_optional_mut<'this>(
             &'this mut self,
@@ -1988,10 +1989,8 @@ pub mod _puroro_impls {
             self._bitfield.set(3, true);
             todo!()
         }
-        pub fn enum_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut self::_puroro_root::ser_tests2::Enum {
-            todo!()
+        pub fn clear_very_large_field_number(&mut self) {
+            self._bitfield.set(4, false);
         }
         pub fn very_large_field_number_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(4, true);
@@ -3395,6 +3394,9 @@ pub mod _puroro_nested {
                 }
                 pub fn has_i32_optional(&self) -> bool {
                     self.i32_optional_opt().is_some()
+                }
+                pub fn clear_i32_optional(&mut self) {
+                    self._bitfield.set(0, false);
                 }
                 pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
                     self._bitfield.set(0, true);

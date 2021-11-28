@@ -48,12 +48,12 @@ impl<T: Default + PartialEq> IsDefault for T {
         *self == Default::default()
     }
 }
-impl<'a> IsDefault for NoAllocBumpString {
+impl IsDefault for NoAllocBumpString {
     fn is_default(&self) -> bool {
         self.is_empty()
     }
 }
-impl<'a, T> IsDefault for NoAllocBumpVec<T> {
+impl<T> IsDefault for NoAllocBumpVec<T> {
     fn is_default(&self) -> bool {
         self.is_empty()
     }

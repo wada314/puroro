@@ -1037,35 +1037,6 @@ pub mod _puroro_impls {
                 group_three: ::std::default::Default::default(),
             }
         }
-        pub fn g1_int32_mut<'this>(&'this mut self) -> &'this mut i32 {
-            self._bitfield.set(0, true);
-            todo!()
-        }
-        pub fn g1_string_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
-            self._bitfield.set(1, true);
-            todo!()
-        }
-        pub fn g2_f32_mut<'this>(&'this mut self) -> &'this mut f32 {
-            self._bitfield.set(2, true);
-            todo!()
-        }
-        pub fn g2_string_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
-            self._bitfield.set(3, true);
-            todo!()
-        }
-        pub fn g2_submsg_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this> {
-            todo!()
-        }
-        pub fn g3_int32_mut<'this>(&'this mut self) -> &'this mut i32 {
-            self._bitfield.set(4, true);
-            todo!()
-        }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
@@ -1477,6 +1448,9 @@ pub mod _puroro_impls {
         }
         pub fn has_i32_unlabeled(&self) -> bool {
             self.i32_unlabeled_opt().is_some()
+        }
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
