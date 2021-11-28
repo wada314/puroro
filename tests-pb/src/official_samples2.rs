@@ -508,17 +508,39 @@ pub mod _puroro_impls {
     }
 
     pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
-
     impl<'bump> Test1Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
         }
+        pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.a)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn a<'this>(&'this self) -> i32 {
+            match self.a_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_a(&self) -> bool {
+            self.a_opt().is_some()
+        }
+        pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
+            self._bitfield.set(0, true);
+            todo!()
+        }
     }
-
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::BumpaloMessage<'bump> for Test1Bumpalo<'bump> {
@@ -558,9 +580,7 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::deser_field(&mut self.a, data, &self._bump)
+                    todo!()
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -692,17 +712,39 @@ pub mod _puroro_impls {
     }
 
     pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
-
     impl<'bump> Test2Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 b: ::puroro::internal::NoAllocBumpString::new_in(bump),
             }
         }
+        pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.b)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn b<'this>(&'this self) -> &'this str {
+            match self.b_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_b(&self) -> bool {
+            self.b_opt().is_some()
+        }
+        pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            self._bitfield.set(0, true);
+            todo!()
+        }
     }
-
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::BumpaloMessage<'bump> for Test2Bumpalo<'bump> {
@@ -742,9 +784,7 @@ pub mod _puroro_impls {
             match field_number {
                 2 => {
                     self._bitfield.set(0, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::String
-                >::deser_field(&mut self.b, data, &self._bump)
+                    todo!()
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -889,17 +929,44 @@ pub mod _puroro_impls {
     }
 
     pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<'static>>;
-
     impl<'bump> Test3Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 c: ::std::option::Option::None,
             }
         }
+        pub fn c_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>,
+        > {
+            self.c
+                .as_ref()
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn c<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>,
+        > {
+            self.c_opt()
+        }
+        pub fn has_c(&self) -> bool {
+            self.c_opt().is_some()
+        }
+        pub fn c_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>
+        {
+            todo!()
+        }
     }
-
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::BumpaloMessage<'bump> for Test3Bumpalo<'bump> {
@@ -918,7 +985,7 @@ pub mod _puroro_impls {
         type Field3MessageType<'this>
         where
             Self: 'this,
-        = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>;
+        = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|b| b.as_ref())
         }
@@ -937,16 +1004,9 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-                3 => DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Message<
-                        ::puroro::internal::NoAllocBumpBox<
-                            self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
-                                'bump,
-                            >,
-                        >,
-                    >,
-                >::deser_field(&mut self.c, data, &self._bump),
+                3 => {
+                    todo!()
+                }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1097,17 +1157,25 @@ pub mod _puroro_impls {
     }
 
     pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
-
     impl<'bump> Test4Bumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 d: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             }
         }
+        pub fn d<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+            self.d.iter().copied()
+        }
+        pub fn d_mut<'this>(&'this mut self) -> &'this mut i32 {
+            todo!()
+        }
     }
-
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
 
     impl<'bump> ::puroro::BumpaloMessage<'bump> for Test4Bumpalo<'bump> {
@@ -1129,7 +1197,7 @@ pub mod _puroro_impls {
         = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.d.iter().cloned()
+            todo!()
         }
     }
 
@@ -1146,14 +1214,12 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-            4 => {
-                DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated, ::puroro::tags::Int32
-                >::deser_field(&mut self.d, data, &self._bump)
-            }
+                4 => {
+                    todo!()
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 

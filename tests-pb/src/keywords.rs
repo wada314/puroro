@@ -195,17 +195,39 @@ pub mod _puroro_impls {
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
-
     impl<'bump> MsgBumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
             }
         }
+        pub fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.r#type)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn r#type<'this>(&'this self) -> i32 {
+            match self.type_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_type(&self) -> bool {
+            self.type_opt().is_some()
+        }
+        pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
+            self._bitfield.set(0, true);
+            todo!()
+        }
     }
-
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
     impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
@@ -245,9 +267,7 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
-                    DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::deser_field(&mut self.r#type, data, &self._bump)
+                    todo!()
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

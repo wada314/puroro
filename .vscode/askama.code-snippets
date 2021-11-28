@@ -1,6 +1,6 @@
 {
     "Askama If": {
-        "prefix": "{%if",
+        "prefix": "{if",
         "body": [
             "{%- if $1 %}",
             "{%- else %} {#- if $1 #}",
@@ -9,7 +9,7 @@
         "description": "askama if"
     },
     "Askama For": {
-        "prefix": "{%for",
+        "prefix": "{for",
         "body": [
             "{%- for $1 %}",
             "{%- endfor %} {#- for $1 #"

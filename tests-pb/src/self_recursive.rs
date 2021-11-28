@@ -227,17 +227,44 @@ pub mod _puroro_impls {
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
-
     impl<'bump> MsgBumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 recursive_unlabeled: ::std::option::Option::None,
             }
         }
+        pub fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>,
+        > {
+            self.recursive_unlabeled
+                .as_ref()
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn recursive_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>,
+        > {
+            self.recursive_unlabeled_opt()
+        }
+        pub fn has_recursive_unlabeled(&self) -> bool {
+            self.recursive_unlabeled_opt().is_some()
+        }
+        pub fn recursive_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>
+        {
+            todo!()
+        }
     }
-
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
     impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
@@ -256,7 +283,7 @@ pub mod _puroro_impls {
         type Field1MessageType<'this>
         where
             Self: 'this,
-        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>;
+        = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|b| b.as_ref())
         }
@@ -275,16 +302,9 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Message<
-                        ::puroro::internal::NoAllocBumpBox<
-                            self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
-                        >,
-                    >,
-                >::deser_field(
-                    &mut self.recursive_unlabeled, data, &self._bump
-                ),
+                1 => {
+                    todo!()
+                }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }

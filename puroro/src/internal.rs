@@ -25,6 +25,8 @@ pub use impls::bumpalo::BumpDefault;
 pub use impls::bumpalo::NoAllocBox as NoAllocBumpBox;
 pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
 pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
+pub use impls::bumpalo::RefMutString as RefMutBumpString;
+pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
@@ -36,4 +38,23 @@ where
     T: BitStore,
 {
     *slice.get(index).expect("bitvec index out of bound.")
+}
+
+pub trait IsDefault {
+    fn is_default(&self) -> bool;
+}
+impl<T: Default + PartialEq> IsDefault for T {
+    fn is_default(&self) -> bool {
+        *self == Default::default()
+    }
+}
+impl<'a> IsDefault for NoAllocBumpString {
+    fn is_default(&self) -> bool {
+        self.is_empty()
+    }
+}
+impl<'a, T> IsDefault for NoAllocBumpVec<T> {
+    fn is_default(&self) -> bool {
+        self.is_empty()
+    }
 }
