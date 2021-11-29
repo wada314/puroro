@@ -202,6 +202,7 @@ where
             {%- for field in m.fields %}
             {%- if field.is_repeated %}
             .field("{{ field.ident }}", &<Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self)
+                .into_iter()
                 .collect::<::std::vec::Vec<_>>())
             {%- else %} {#- if field.is_repeated #}
             {%- if field.has_optional_bit || field.is_explicit_oneof_field %}
