@@ -542,8 +542,8 @@ pub mod _puroro_impls {
         pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
             if !self.has_a() {
                 self.a = ::std::default::Default::default();
+                self._bitfield.set(0, true);
             }
-            self._bitfield.set(0, true);
             todo!()
         }
     }
@@ -749,11 +749,11 @@ pub mod _puroro_impls {
         pub fn clear_b(&mut self) {
             self._bitfield.set(0, false);
         }
-        pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+        pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
             if !self.has_b() {
                 self.b = ::std::default::Default::default();
+                self._bitfield.set(0, true);
             }
-            self._bitfield.set(0, true);
             todo!()
         }
     }
@@ -977,12 +977,16 @@ pub mod _puroro_impls {
         }
         pub fn c_mut<'this>(
             &'this mut self,
-        ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>
+        ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>
         {
-            if !self.has_c() {
-                todo!()
-            }
-            todo!()
+            if !self.has_c() {}
+            let bump = self._bump;
+            self.c.get_or_insert_with(|| {
+                ::puroro::internal::NoAllocBumpBox::new_in(
+                    ::puroro::internal::BumpDefault::default_in(bump),
+                    bump,
+                )
+            })
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}

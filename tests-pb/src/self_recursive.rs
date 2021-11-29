@@ -263,12 +263,16 @@ pub mod _puroro_impls {
         }
         pub fn recursive_unlabeled_mut<'this>(
             &'this mut self,
-        ) -> &'this mut self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>
+        ) -> &'this mut self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>
         {
-            if !self.has_recursive_unlabeled() {
-                todo!()
-            }
-            todo!()
+            if !self.has_recursive_unlabeled() {}
+            let bump = self._bump;
+            self.recursive_unlabeled.get_or_insert_with(|| {
+                ::puroro::internal::NoAllocBumpBox::new_in(
+                    ::puroro::internal::BumpDefault::default_in(bump),
+                    bump,
+                )
+            })
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}

@@ -805,20 +805,34 @@ impl Field {
         })
     }
 
-    pub fn bumpalo_getter_mut_type(&self, lt: &str) -> Result<String> {
+    pub fn bumpalo_getter_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             // ↓ Maybe need to double check the lt params
-            FieldType::String => format!("::puroro::internal::RefMutBumpString<{}, {}>", lt, lt),
-            FieldType::Bytes => format!("::puroro::internal::RefMutBumpVec<{}, {}, u8>", lt, lt),
+            FieldType::String => format!(
+                "::puroro::internal::RefMutBumpString<{}, {}>",
+                bump_lt, this_lt
+            ),
+            FieldType::Bytes => format!(
+                "::puroro::internal::RefMutBumpVec<{}, {}, u8>",
+                bump_lt, this_lt
+            ),
             FieldType::Enum2(e) | FieldType::Enum3(e) => {
-                format!("&{lt} mut {ty}", lt = lt, ty = upgrade(&e)?.rust_path())
+                format!(
+                    "&{lt} mut {ty}",
+                    lt = this_lt,
+                    ty = upgrade(&e)?.rust_path()
+                )
             }
             FieldType::Message(m) => {
-                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
-                format!("&{lt} mut {msg}", lt = lt, msg = msg_type)
+                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[bump_lt]);
+                format!("&{lt} mut {msg}", lt = this_lt, msg = msg_type)
             }
-            t => format!("&{lt} mut {ty}", lt = lt, ty = t.numerical_rust_type()?),
+            t => format!(
+                "&{lt} mut {ty}",
+                lt = this_lt,
+                ty = t.numerical_rust_type()?
+            ),
         })
     }
 

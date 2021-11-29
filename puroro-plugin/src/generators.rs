@@ -305,7 +305,7 @@ impl Field {
                 f.bumpalo_getter_scalar_type("'this")?
             ),
             bumpalo_getter_rep_item_type: f.bumpalo_getter_scalar_type("'this")?,
-            bumpalo_getter_mut_type: f.bumpalo_getter_mut_type("'this")?,
+            bumpalo_getter_mut_type: f.bumpalo_getter_mut_type("'bump", "'this")?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'this"])?,

@@ -229,8 +229,8 @@ pub mod _puroro_impls {
         pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
             if !self.has_type() {
                 self.r#type = ::std::default::Default::default();
+                self._bitfield.set(0, true);
             }
-            self._bitfield.set(0, true);
             todo!()
         }
     }

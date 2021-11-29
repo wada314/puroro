@@ -1992,7 +1992,7 @@ pub mod _puroro_impls {
         }
         pub fn string_unlabeled_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
             if !self.has_string_unlabeled() {
                 self.string_unlabeled = ::std::default::Default::default();
             }
@@ -2001,11 +2001,15 @@ pub mod _puroro_impls {
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
-        pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
-            if !self.has_submsg_unlabeled() {
-                todo!()
-            }
-            todo!()
+        pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
+            if !self.has_submsg_unlabeled() {}
+            let bump = self._bump;
+            self.submsg_unlabeled.get_or_insert_with(|| {
+                ::puroro::internal::NoAllocBumpBox::new_in(
+                    ::puroro::internal::BumpDefault::default_in(bump),
+                    bump,
+                )
+            })
         }
         pub fn clear_enum_unlabeled(&mut self) {
             self.enum_unlabeled = ::std::default::Default::default();
