@@ -1961,6 +1961,11 @@ pub mod _puroro_impls {
             }
             &mut self.i32_optional
         }
+        pub fn i32_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut i32> {
+            todo!()
+        }
         pub fn clear_float_optional(&mut self) {
             self._bitfield.set(1, false);
         }
@@ -1970,6 +1975,11 @@ pub mod _puroro_impls {
                 self._bitfield.set(1, true);
             }
             &mut self.float_optional
+        }
+        pub fn float_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut f32> {
+            todo!()
         }
         pub fn clear_string_optional(&mut self) {
             self._bitfield.set(2, false);
@@ -1982,6 +1992,15 @@ pub mod _puroro_impls {
                 self._bitfield.set(2, true);
             }
             unsafe { self.string_optional.as_mut_string_in(self._bump) }
+        }
+        pub fn string_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<
+            'bump,
+            'this,
+            ::puroro::internal::RefMutBumpString<'bump, 'this>,
+        > {
+            todo!()
         }
         pub fn clear_submsg_optional(&mut self) {
             self.submsg_optional = ::std::default::Default::default();
@@ -1998,6 +2017,9 @@ pub mod _puroro_impls {
                 )
             })
         }
+        pub fn submsg_repeated_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>{
+            todo!()
+        }
         pub fn clear_enum_optional(&mut self) {
             self._bitfield.set(3, false);
         }
@@ -2009,6 +2031,15 @@ pub mod _puroro_impls {
                 self._bitfield.set(3, true);
             }
             &mut self.enum_optional
+        }
+        pub fn enum_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<
+            'bump,
+            'this,
+            &'this mut self::_puroro_root::ser_tests2::Enum,
+        > {
+            todo!()
         }
         pub fn clear_very_large_field_number(&mut self) {
             self._bitfield.set(4, false);

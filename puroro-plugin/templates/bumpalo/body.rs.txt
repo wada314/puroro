@@ -169,6 +169,12 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {%- if !field.is_explicit_oneof_field %}
 
     {%- if field.is_repeated %}
+
+    {#- mut get repeated field #}
+    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, {{ field.bumpalo_getter_mut_type }}> {
+        todo!()
+    }
+
     {%- else %} {#- if field.is_repeated #}
 
     {#- clear scalar field #}
@@ -183,6 +189,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     }
 
     {#- mut get scalar field #}
+    {#- always returns an option-unwrapped mut reference. The value is initialized if it's not present. #}
     pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> {{ field.bumpalo_getter_mut_type }} {
         if !self.has_{{ field.ident_unesc }}() {
             {#- field is not set so we need to initialize it. #}

@@ -1186,6 +1186,11 @@ pub mod _puroro_impls {
         pub fn d<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
             self.d.iter().copied()
         }
+        pub fn d_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut i32> {
+            todo!()
+        }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
 
