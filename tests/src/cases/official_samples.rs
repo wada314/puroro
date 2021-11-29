@@ -92,7 +92,7 @@ fn proto2_test4_simple() {
     use std::io::Read as _;
     let mut t4 = s2::Test4::default();
     t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
-    assert_eq!(TEST4_EXPECTED, &t4.d().collect::<Vec<_>>());
+    assert_eq!(TEST4_EXPECTED, &t4.d().into_iter().collect::<Vec<_>>());
 }
 
 #[test]
@@ -101,5 +101,5 @@ fn proto3_test4_simple() {
     use std::io::Read as _;
     let mut t4 = s3::Test4::default();
     t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
-    assert_eq!(TEST4_EXPECTED, &t4.d().collect::<Vec<_>>());
+    assert_eq!(TEST4_EXPECTED, &t4.d().into_iter().collect::<Vec<_>>());
 }

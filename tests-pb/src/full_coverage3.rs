@@ -280,10 +280,10 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field3RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.i32_repeated)
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             if self.float_unlabeled == ::std::default::Default::default() {
@@ -295,10 +295,10 @@ pub mod _puroro_simple_impl {
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_optional)
         }
-        type Field13RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        type Field13RepeatedType<'this> = ::puroro::ClonedSlice<'this, f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            self.float_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.float_repeated)
         }
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
             if self.bytes_unlabeled.is_empty() {
@@ -350,12 +350,11 @@ pub mod _puroro_simple_impl {
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             Clone::clone(&self.enum_optional)
         }
-        type Field43RepeatedType<'this> = ::std::iter::Cloned<
-            ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::Enum>,
-        >;
+        type Field43RepeatedType<'this> =
+            ::puroro::ClonedSlice<'this, self::_puroro_root::full_coverage3::Enum>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            self.enum_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.enum_repeated)
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
@@ -383,10 +382,10 @@ pub mod _puroro_simple_impl {
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_optional)
         }
-        type Field103RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+        type Field103RepeatedType<'this> = ::puroro::ClonedSlice<'this, i64>;
 
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            self.i64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.i64_repeated)
         }
         fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             if self.u32_unlabeled == ::std::default::Default::default() {
@@ -398,10 +397,10 @@ pub mod _puroro_simple_impl {
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.u32_optional)
         }
-        type Field113RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
+        type Field113RepeatedType<'this> = ::puroro::ClonedSlice<'this, u32>;
 
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            self.u32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.u32_repeated)
         }
         fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             if self.u64_unlabeled == ::std::default::Default::default() {
@@ -413,10 +412,10 @@ pub mod _puroro_simple_impl {
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.u64_optional)
         }
-        type Field123RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
+        type Field123RepeatedType<'this> = ::puroro::ClonedSlice<'this, u64>;
 
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            self.u64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.u64_repeated)
         }
         fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             if self.s32_unlabeled == ::std::default::Default::default() {
@@ -428,10 +427,10 @@ pub mod _puroro_simple_impl {
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.s32_optional)
         }
-        type Field133RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field133RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
 
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            self.s32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.s32_repeated)
         }
         fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             if self.s64_unlabeled == ::std::default::Default::default() {
@@ -443,10 +442,10 @@ pub mod _puroro_simple_impl {
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.s64_optional)
         }
-        type Field143RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+        type Field143RepeatedType<'this> = ::puroro::ClonedSlice<'this, i64>;
 
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            self.s64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.s64_repeated)
         }
         fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             if self.fixed32_unlabeled == ::std::default::Default::default() {
@@ -458,10 +457,10 @@ pub mod _puroro_simple_impl {
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.fixed32_optional)
         }
-        type Field153RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
+        type Field153RepeatedType<'this> = ::puroro::ClonedSlice<'this, u32>;
 
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            self.fixed32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.fixed32_repeated)
         }
         fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             if self.fixed64_unlabeled == ::std::default::Default::default() {
@@ -473,10 +472,10 @@ pub mod _puroro_simple_impl {
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.fixed64_optional)
         }
-        type Field163RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
+        type Field163RepeatedType<'this> = ::puroro::ClonedSlice<'this, u64>;
 
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            self.fixed64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.fixed64_repeated)
         }
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             if self.sfixed32_unlabeled == ::std::default::Default::default() {
@@ -488,10 +487,10 @@ pub mod _puroro_simple_impl {
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.sfixed32_optional)
         }
-        type Field173RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field173RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
 
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            self.sfixed32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.sfixed32_repeated)
         }
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             if self.sfixed64_unlabeled == ::std::default::Default::default() {
@@ -503,10 +502,10 @@ pub mod _puroro_simple_impl {
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.sfixed64_optional)
         }
-        type Field183RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+        type Field183RepeatedType<'this> = ::puroro::ClonedSlice<'this, i64>;
 
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            self.sfixed64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.sfixed64_repeated)
         }
         fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
             if self.f64_unlabeled == ::std::default::Default::default() {
@@ -518,10 +517,10 @@ pub mod _puroro_simple_impl {
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             Clone::clone(&self.f64_optional)
         }
-        type Field193RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f64>>;
+        type Field193RepeatedType<'this> = ::puroro::ClonedSlice<'this, f64>;
 
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            self.f64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.f64_repeated)
         }
     }
 
@@ -1115,6 +1114,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "i32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1128,6 +1128,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "float_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1141,6 +1142,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "bytes_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::bytes_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1154,6 +1156,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "string_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1167,6 +1170,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "enum_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1180,6 +1184,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "submsg_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1193,6 +1198,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "i64_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::i64_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1206,6 +1212,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "u32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::u32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1219,6 +1226,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "u64_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::u64_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1232,6 +1240,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "s32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::s32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1245,6 +1254,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "s64_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::s64_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1258,6 +1268,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "fixed32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::fixed32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1271,6 +1282,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "fixed64_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::fixed64_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1284,6 +1296,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "sfixed32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::sfixed32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1297,6 +1310,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "sfixed64_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::sfixed64_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1310,6 +1324,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "f64_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::f64_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .finish()
@@ -11301,10 +11316,10 @@ pub mod _puroro_impls {
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::ClonedSlice<'this, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.i32_repeated)
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
@@ -11319,10 +11334,10 @@ pub mod _puroro_impls {
         type Field13RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        = ::puroro::ClonedSlice<'this, f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            self.float_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.float_repeated)
         }
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
             ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
@@ -11383,10 +11398,10 @@ pub mod _puroro_impls {
         type Field43RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::full_coverage3::Enum>>;
+        = ::puroro::ClonedSlice<'this, self::_puroro_root::full_coverage3::Enum>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            self.enum_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.enum_repeated)
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
@@ -11418,10 +11433,10 @@ pub mod _puroro_impls {
         type Field103RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+        = ::puroro::ClonedSlice<'this, i64>;
 
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            self.i64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.i64_repeated)
         }
         fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_unlabeled))
@@ -11436,10 +11451,10 @@ pub mod _puroro_impls {
         type Field113RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
+        = ::puroro::ClonedSlice<'this, u32>;
 
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            self.u32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.u32_repeated)
         }
         fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_unlabeled))
@@ -11454,10 +11469,10 @@ pub mod _puroro_impls {
         type Field123RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
+        = ::puroro::ClonedSlice<'this, u64>;
 
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            self.u64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.u64_repeated)
         }
         fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_unlabeled))
@@ -11472,10 +11487,10 @@ pub mod _puroro_impls {
         type Field133RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::ClonedSlice<'this, i32>;
 
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            self.s32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.s32_repeated)
         }
         fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_unlabeled))
@@ -11490,10 +11505,10 @@ pub mod _puroro_impls {
         type Field143RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+        = ::puroro::ClonedSlice<'this, i64>;
 
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            self.s64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.s64_repeated)
         }
         fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_unlabeled))
@@ -11508,10 +11523,10 @@ pub mod _puroro_impls {
         type Field153RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, u32>>;
+        = ::puroro::ClonedSlice<'this, u32>;
 
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            self.fixed32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.fixed32_repeated)
         }
         fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_unlabeled))
@@ -11526,10 +11541,10 @@ pub mod _puroro_impls {
         type Field163RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, u64>>;
+        = ::puroro::ClonedSlice<'this, u64>;
 
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            self.fixed64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.fixed64_repeated)
         }
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_unlabeled))
@@ -11544,10 +11559,10 @@ pub mod _puroro_impls {
         type Field173RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::ClonedSlice<'this, i32>;
 
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            self.sfixed32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.sfixed32_repeated)
         }
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_unlabeled))
@@ -11562,10 +11577,10 @@ pub mod _puroro_impls {
         type Field183RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i64>>;
+        = ::puroro::ClonedSlice<'this, i64>;
 
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            self.sfixed64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.sfixed64_repeated)
         }
         fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_unlabeled))
@@ -11580,10 +11595,10 @@ pub mod _puroro_impls {
         type Field193RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, f64>>;
+        = ::puroro::ClonedSlice<'this, f64>;
 
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            self.f64_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.f64_repeated)
         }
     }
 

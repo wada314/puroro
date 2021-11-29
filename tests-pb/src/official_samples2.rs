@@ -341,10 +341,10 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::Test4Trait for Test4 {
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field4RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.d.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.d)
         }
     }
 
@@ -403,6 +403,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "d",
                     &<Self as super::_puroro_traits::Test4Trait>::d(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .finish()
@@ -1126,10 +1127,10 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::ClonedSlice<'this, i32>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.d.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.d)
         }
     }
 

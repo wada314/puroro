@@ -225,6 +225,7 @@ pub use ::bitvec;
 pub use ::bumpalo;
 pub use ::either::Either;
 
+use ::std::iter;
 use ::std::ops::{Deref, DerefMut};
 
 // Bumpalo wrapper
@@ -277,3 +278,18 @@ impl<T> DerefMut for BumpaloOwned<T> {
 }
 
 impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
+
+/// Cloned slice, which can be accessed / iterated over `T` instead of `&T`.
+pub struct ClonedSlice<'slice, T>(&'slice [T]);
+impl<'slice, T> ClonedSlice<'slice, T> {
+    pub fn new(slice: &'slice [T]) -> Self {
+        Self(slice)
+    }
+}
+impl<'slice, T: Clone> IntoIterator for ClonedSlice<'slice, T> {
+    type Item = T;
+    type IntoIter = iter::Cloned<std::slice::Iter<'slice, T>>;
+    fn into_iter(self) -> Self::IntoIter {
+        <[T]>::iter(self.0).cloned()
+    }
+}
