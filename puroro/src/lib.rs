@@ -227,6 +227,7 @@ pub use ::either::Either;
 
 use ::std::iter;
 use ::std::ops::{Deref, DerefMut};
+use std::marker::PhantomData;
 
 // Bumpalo wrapper
 pub struct BumpaloOwned<T> {
@@ -291,5 +292,13 @@ impl<'slice, T: Clone> IntoIterator for ClonedSlice<'slice, T> {
     type IntoIter = iter::Cloned<std::slice::Iter<'slice, T>>;
     fn into_iter(self) -> Self::IntoIter {
         <[T]>::iter(self.0).cloned()
+    }
+}
+
+/// A slice wrapper that casts item type `T` into type `U`
+pub struct CastedSlice<'slice, T, U, F>(&'slice [T], PhantomData<(U, F)>);
+impl<'slice, T, U, F> CastedSlice<'slice, T, U, F> {
+    pub fn new(slice: &'slice [T]) -> Self {
+        Self(slice, PhantomData)
     }
 }
