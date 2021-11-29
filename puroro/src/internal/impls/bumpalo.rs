@@ -15,8 +15,7 @@
 //! # Bumpalo message structs
 //!
 //! **The implementation is highly experimental and the interface will change
-//! in very soon. I'm planning to make the struct fields private and make a mutable
-//! trait interface in future.**
+//! in very soon!!**
 //!
 
 pub mod de;

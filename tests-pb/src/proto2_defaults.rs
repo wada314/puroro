@@ -7155,6 +7155,9 @@ pub mod _puroro_impls {
             self._bitfield.set(0, false);
         }
         pub fn i32_default_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_default() {
+                self.i32_default = ::std::default::Default::default();
+            }
             self._bitfield.set(0, true);
             todo!()
         }
@@ -7162,6 +7165,9 @@ pub mod _puroro_impls {
             self._bitfield.set(1, false);
         }
         pub fn i32_0_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_0() {
+                self.i32_0 = ::std::default::Default::default();
+            }
             self._bitfield.set(1, true);
             todo!()
         }
@@ -7169,6 +7175,9 @@ pub mod _puroro_impls {
             self._bitfield.set(2, false);
         }
         pub fn i32_42_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_42() {
+                self.i32_42 = ::std::default::Default::default();
+            }
             self._bitfield.set(2, true);
             todo!()
         }
@@ -7176,6 +7185,9 @@ pub mod _puroro_impls {
             self._bitfield.set(3, false);
         }
         pub fn i32_m42_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_m42() {
+                self.i32_m42 = ::std::default::Default::default();
+            }
             self._bitfield.set(3, true);
             todo!()
         }
@@ -7183,6 +7195,9 @@ pub mod _puroro_impls {
             self._bitfield.set(4, false);
         }
         pub fn i32_2147483647_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_2147483647() {
+                self.i32_2147483647 = ::std::default::Default::default();
+            }
             self._bitfield.set(4, true);
             todo!()
         }
@@ -7190,6 +7205,9 @@ pub mod _puroro_impls {
             self._bitfield.set(5, false);
         }
         pub fn i32_m2147483648_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_m2147483648() {
+                self.i32_m2147483648 = ::std::default::Default::default();
+            }
             self._bitfield.set(5, true);
             todo!()
         }
@@ -7197,6 +7215,9 @@ pub mod _puroro_impls {
             self._bitfield.set(6, false);
         }
         pub fn i32_0123_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_0123() {
+                self.i32_0123 = ::std::default::Default::default();
+            }
             self._bitfield.set(6, true);
             todo!()
         }
@@ -7204,6 +7225,9 @@ pub mod _puroro_impls {
             self._bitfield.set(7, false);
         }
         pub fn i32_0x123_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_0x123() {
+                self.i32_0x123 = ::std::default::Default::default();
+            }
             self._bitfield.set(7, true);
             todo!()
         }
@@ -7211,6 +7235,9 @@ pub mod _puroro_impls {
             self._bitfield.set(8, false);
         }
         pub fn u32_default_mut<'this>(&'this mut self) -> &'this mut u32 {
+            if !self.has_u32_default() {
+                self.u32_default = ::std::default::Default::default();
+            }
             self._bitfield.set(8, true);
             todo!()
         }
@@ -7218,6 +7245,9 @@ pub mod _puroro_impls {
             self._bitfield.set(9, false);
         }
         pub fn u32_0_mut<'this>(&'this mut self) -> &'this mut u32 {
+            if !self.has_u32_0() {
+                self.u32_0 = ::std::default::Default::default();
+            }
             self._bitfield.set(9, true);
             todo!()
         }
@@ -7225,6 +7255,9 @@ pub mod _puroro_impls {
             self._bitfield.set(10, false);
         }
         pub fn u32_42_mut<'this>(&'this mut self) -> &'this mut u32 {
+            if !self.has_u32_42() {
+                self.u32_42 = ::std::default::Default::default();
+            }
             self._bitfield.set(10, true);
             todo!()
         }
@@ -7232,6 +7265,9 @@ pub mod _puroro_impls {
             self._bitfield.set(11, false);
         }
         pub fn u32_4294967295_mut<'this>(&'this mut self) -> &'this mut u32 {
+            if !self.has_u32_4294967295() {
+                self.u32_4294967295 = ::std::default::Default::default();
+            }
             self._bitfield.set(11, true);
             todo!()
         }
@@ -7239,6 +7275,9 @@ pub mod _puroro_impls {
             self._bitfield.set(12, false);
         }
         pub fn u32_0123_mut<'this>(&'this mut self) -> &'this mut u32 {
+            if !self.has_u32_0123() {
+                self.u32_0123 = ::std::default::Default::default();
+            }
             self._bitfield.set(12, true);
             todo!()
         }
@@ -7246,6 +7285,9 @@ pub mod _puroro_impls {
             self._bitfield.set(13, false);
         }
         pub fn u32_0x123_mut<'this>(&'this mut self) -> &'this mut u32 {
+            if !self.has_u32_0x123() {
+                self.u32_0x123 = ::std::default::Default::default();
+            }
             self._bitfield.set(13, true);
             todo!()
         }
@@ -7253,6 +7295,9 @@ pub mod _puroro_impls {
             self._bitfield.set(14, false);
         }
         pub fn i64_default_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_default() {
+                self.i64_default = ::std::default::Default::default();
+            }
             self._bitfield.set(14, true);
             todo!()
         }
@@ -7260,6 +7305,9 @@ pub mod _puroro_impls {
             self._bitfield.set(15, false);
         }
         pub fn i64_0_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_0() {
+                self.i64_0 = ::std::default::Default::default();
+            }
             self._bitfield.set(15, true);
             todo!()
         }
@@ -7267,6 +7315,9 @@ pub mod _puroro_impls {
             self._bitfield.set(16, false);
         }
         pub fn i64_42_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_42() {
+                self.i64_42 = ::std::default::Default::default();
+            }
             self._bitfield.set(16, true);
             todo!()
         }
@@ -7274,6 +7325,9 @@ pub mod _puroro_impls {
             self._bitfield.set(17, false);
         }
         pub fn i64_m42_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_m42() {
+                self.i64_m42 = ::std::default::Default::default();
+            }
             self._bitfield.set(17, true);
             todo!()
         }
@@ -7281,6 +7335,9 @@ pub mod _puroro_impls {
             self._bitfield.set(18, false);
         }
         pub fn i64_9223372036854775807_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_9223372036854775807() {
+                self.i64_9223372036854775807 = ::std::default::Default::default();
+            }
             self._bitfield.set(18, true);
             todo!()
         }
@@ -7288,6 +7345,9 @@ pub mod _puroro_impls {
             self._bitfield.set(19, false);
         }
         pub fn i64_m9223372036854775808_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_m9223372036854775808() {
+                self.i64_m9223372036854775808 = ::std::default::Default::default();
+            }
             self._bitfield.set(19, true);
             todo!()
         }
@@ -7295,6 +7355,9 @@ pub mod _puroro_impls {
             self._bitfield.set(20, false);
         }
         pub fn i64_0123_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_0123() {
+                self.i64_0123 = ::std::default::Default::default();
+            }
             self._bitfield.set(20, true);
             todo!()
         }
@@ -7302,6 +7365,9 @@ pub mod _puroro_impls {
             self._bitfield.set(21, false);
         }
         pub fn i64_0x123_mut<'this>(&'this mut self) -> &'this mut i64 {
+            if !self.has_i64_0x123() {
+                self.i64_0x123 = ::std::default::Default::default();
+            }
             self._bitfield.set(21, true);
             todo!()
         }
@@ -7309,6 +7375,9 @@ pub mod _puroro_impls {
             self._bitfield.set(22, false);
         }
         pub fn u64_default_mut<'this>(&'this mut self) -> &'this mut u64 {
+            if !self.has_u64_default() {
+                self.u64_default = ::std::default::Default::default();
+            }
             self._bitfield.set(22, true);
             todo!()
         }
@@ -7316,6 +7385,9 @@ pub mod _puroro_impls {
             self._bitfield.set(23, false);
         }
         pub fn u64_0_mut<'this>(&'this mut self) -> &'this mut u64 {
+            if !self.has_u64_0() {
+                self.u64_0 = ::std::default::Default::default();
+            }
             self._bitfield.set(23, true);
             todo!()
         }
@@ -7323,6 +7395,9 @@ pub mod _puroro_impls {
             self._bitfield.set(24, false);
         }
         pub fn u64_42_mut<'this>(&'this mut self) -> &'this mut u64 {
+            if !self.has_u64_42() {
+                self.u64_42 = ::std::default::Default::default();
+            }
             self._bitfield.set(24, true);
             todo!()
         }
@@ -7330,6 +7405,9 @@ pub mod _puroro_impls {
             self._bitfield.set(25, false);
         }
         pub fn u64_18446744073709551615_mut<'this>(&'this mut self) -> &'this mut u64 {
+            if !self.has_u64_18446744073709551615() {
+                self.u64_18446744073709551615 = ::std::default::Default::default();
+            }
             self._bitfield.set(25, true);
             todo!()
         }
@@ -7337,6 +7415,9 @@ pub mod _puroro_impls {
             self._bitfield.set(26, false);
         }
         pub fn u64_0123_mut<'this>(&'this mut self) -> &'this mut u64 {
+            if !self.has_u64_0123() {
+                self.u64_0123 = ::std::default::Default::default();
+            }
             self._bitfield.set(26, true);
             todo!()
         }
@@ -7344,6 +7425,9 @@ pub mod _puroro_impls {
             self._bitfield.set(27, false);
         }
         pub fn u64_0x123_mut<'this>(&'this mut self) -> &'this mut u64 {
+            if !self.has_u64_0x123() {
+                self.u64_0x123 = ::std::default::Default::default();
+            }
             self._bitfield.set(27, true);
             todo!()
         }
@@ -7351,6 +7435,9 @@ pub mod _puroro_impls {
             self._bitfield.set(28, false);
         }
         pub fn f32_default_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_default() {
+                self.f32_default = ::std::default::Default::default();
+            }
             self._bitfield.set(28, true);
             todo!()
         }
@@ -7358,6 +7445,9 @@ pub mod _puroro_impls {
             self._bitfield.set(29, false);
         }
         pub fn f32_0_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_0() {
+                self.f32_0 = ::std::default::Default::default();
+            }
             self._bitfield.set(29, true);
             todo!()
         }
@@ -7365,6 +7455,9 @@ pub mod _puroro_impls {
             self._bitfield.set(30, false);
         }
         pub fn f32_m0_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_m0() {
+                self.f32_m0 = ::std::default::Default::default();
+            }
             self._bitfield.set(30, true);
             todo!()
         }
@@ -7372,6 +7465,9 @@ pub mod _puroro_impls {
             self._bitfield.set(31, false);
         }
         pub fn f32_0p_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_0p() {
+                self.f32_0p = ::std::default::Default::default();
+            }
             self._bitfield.set(31, true);
             todo!()
         }
@@ -7379,6 +7475,9 @@ pub mod _puroro_impls {
             self._bitfield.set(32, false);
         }
         pub fn f32_p0_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_p0() {
+                self.f32_p0 = ::std::default::Default::default();
+            }
             self._bitfield.set(32, true);
             todo!()
         }
@@ -7386,6 +7485,9 @@ pub mod _puroro_impls {
             self._bitfield.set(33, false);
         }
         pub fn f32_0p0_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_0p0() {
+                self.f32_0p0 = ::std::default::Default::default();
+            }
             self._bitfield.set(33, true);
             todo!()
         }
@@ -7393,6 +7495,9 @@ pub mod _puroro_impls {
             self._bitfield.set(34, false);
         }
         pub fn f32_42_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_42() {
+                self.f32_42 = ::std::default::Default::default();
+            }
             self._bitfield.set(34, true);
             todo!()
         }
@@ -7400,6 +7505,9 @@ pub mod _puroro_impls {
             self._bitfield.set(35, false);
         }
         pub fn f32_m42_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_m42() {
+                self.f32_m42 = ::std::default::Default::default();
+            }
             self._bitfield.set(35, true);
             todo!()
         }
@@ -7407,6 +7515,9 @@ pub mod _puroro_impls {
             self._bitfield.set(36, false);
         }
         pub fn f32_0p25_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_0p25() {
+                self.f32_0p25 = ::std::default::Default::default();
+            }
             self._bitfield.set(36, true);
             todo!()
         }
@@ -7414,6 +7525,9 @@ pub mod _puroro_impls {
             self._bitfield.set(37, false);
         }
         pub fn f32_1p5e2_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_1p5e2() {
+                self.f32_1p5e2 = ::std::default::Default::default();
+            }
             self._bitfield.set(37, true);
             todo!()
         }
@@ -7421,6 +7535,9 @@ pub mod _puroro_impls {
             self._bitfield.set(38, false);
         }
         pub fn f32_inf_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_inf() {
+                self.f32_inf = ::std::default::Default::default();
+            }
             self._bitfield.set(38, true);
             todo!()
         }
@@ -7428,6 +7545,9 @@ pub mod _puroro_impls {
             self._bitfield.set(39, false);
         }
         pub fn f32_minf_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_minf() {
+                self.f32_minf = ::std::default::Default::default();
+            }
             self._bitfield.set(39, true);
             todo!()
         }
@@ -7435,6 +7555,9 @@ pub mod _puroro_impls {
             self._bitfield.set(40, false);
         }
         pub fn f32_nan_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_nan() {
+                self.f32_nan = ::std::default::Default::default();
+            }
             self._bitfield.set(40, true);
             todo!()
         }
@@ -7442,6 +7565,9 @@ pub mod _puroro_impls {
             self._bitfield.set(41, false);
         }
         pub fn f32_mnan_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_mnan() {
+                self.f32_mnan = ::std::default::Default::default();
+            }
             self._bitfield.set(41, true);
             todo!()
         }
@@ -7449,6 +7575,9 @@ pub mod _puroro_impls {
             self._bitfield.set(42, false);
         }
         pub fn bool_default_mut<'this>(&'this mut self) -> &'this mut bool {
+            if !self.has_bool_default() {
+                self.bool_default = ::std::default::Default::default();
+            }
             self._bitfield.set(42, true);
             todo!()
         }
@@ -7456,6 +7585,9 @@ pub mod _puroro_impls {
             self._bitfield.set(43, false);
         }
         pub fn bool_true_mut<'this>(&'this mut self) -> &'this mut bool {
+            if !self.has_bool_true() {
+                self.bool_true = ::std::default::Default::default();
+            }
             self._bitfield.set(43, true);
             todo!()
         }
@@ -7463,6 +7595,9 @@ pub mod _puroro_impls {
             self._bitfield.set(44, false);
         }
         pub fn bool_false_mut<'this>(&'this mut self) -> &'this mut bool {
+            if !self.has_bool_false() {
+                self.bool_false = ::std::default::Default::default();
+            }
             self._bitfield.set(44, true);
             todo!()
         }
@@ -7472,6 +7607,9 @@ pub mod _puroro_impls {
         pub fn string_default_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_default() {
+                self.string_default = ::std::default::Default::default();
+            }
             self._bitfield.set(45, true);
             todo!()
         }
@@ -7481,6 +7619,9 @@ pub mod _puroro_impls {
         pub fn string_empty_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_empty() {
+                self.string_empty = ::std::default::Default::default();
+            }
             self._bitfield.set(46, true);
             todo!()
         }
@@ -7490,6 +7631,9 @@ pub mod _puroro_impls {
         pub fn string_abc_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_abc() {
+                self.string_abc = ::std::default::Default::default();
+            }
             self._bitfield.set(47, true);
             todo!()
         }
@@ -7499,6 +7643,9 @@ pub mod _puroro_impls {
         pub fn string_aiu_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_aiu() {
+                self.string_aiu = ::std::default::Default::default();
+            }
             self._bitfield.set(48, true);
             todo!()
         }
@@ -7508,6 +7655,9 @@ pub mod _puroro_impls {
         pub fn string_backslash_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_backslash() {
+                self.string_backslash = ::std::default::Default::default();
+            }
             self._bitfield.set(49, true);
             todo!()
         }
@@ -7517,6 +7667,9 @@ pub mod _puroro_impls {
         pub fn string_tab_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_tab() {
+                self.string_tab = ::std::default::Default::default();
+            }
             self._bitfield.set(50, true);
             todo!()
         }
@@ -7526,6 +7679,9 @@ pub mod _puroro_impls {
         pub fn string_crlf_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_crlf() {
+                self.string_crlf = ::std::default::Default::default();
+            }
             self._bitfield.set(51, true);
             todo!()
         }
@@ -7535,6 +7691,9 @@ pub mod _puroro_impls {
         pub fn bytes_default_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
+            if !self.has_bytes_default() {
+                self.bytes_default = ::std::default::Default::default();
+            }
             self._bitfield.set(52, true);
             todo!()
         }
@@ -7544,6 +7703,9 @@ pub mod _puroro_impls {
         pub fn bytes_empty_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
+            if !self.has_bytes_empty() {
+                self.bytes_empty = ::std::default::Default::default();
+            }
             self._bitfield.set(53, true);
             todo!()
         }
@@ -7553,6 +7715,9 @@ pub mod _puroro_impls {
         pub fn bytes_abc_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
+            if !self.has_bytes_abc() {
+                self.bytes_abc = ::std::default::Default::default();
+            }
             self._bitfield.set(54, true);
             todo!()
         }
@@ -7562,6 +7727,9 @@ pub mod _puroro_impls {
         pub fn bytes_aiu_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
+            if !self.has_bytes_aiu() {
+                self.bytes_aiu = ::std::default::Default::default();
+            }
             self._bitfield.set(55, true);
             todo!()
         }
@@ -7571,6 +7739,9 @@ pub mod _puroro_impls {
         pub fn bytes_backslash_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
+            if !self.has_bytes_backslash() {
+                self.bytes_backslash = ::std::default::Default::default();
+            }
             self._bitfield.set(56, true);
             todo!()
         }
@@ -7580,6 +7751,9 @@ pub mod _puroro_impls {
         pub fn bytes_tab_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
+            if !self.has_bytes_tab() {
+                self.bytes_tab = ::std::default::Default::default();
+            }
             self._bitfield.set(57, true);
             todo!()
         }
@@ -7589,6 +7763,9 @@ pub mod _puroro_impls {
         pub fn bytes_crlf_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'this, 'this, u8> {
+            if !self.has_bytes_crlf() {
+                self.bytes_crlf = ::std::default::Default::default();
+            }
             self._bitfield.set(58, true);
             todo!()
         }
@@ -7598,6 +7775,9 @@ pub mod _puroro_impls {
         pub fn enum_default_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+            if !self.has_enum_default() {
+                self.enum_default = ::std::default::Default::default();
+            }
             self._bitfield.set(59, true);
             todo!()
         }
@@ -7607,6 +7787,9 @@ pub mod _puroro_impls {
         pub fn enum_one_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+            if !self.has_enum_one() {
+                self.enum_one = ::std::default::Default::default();
+            }
             self._bitfield.set(60, true);
             todo!()
         }
@@ -7616,6 +7799,9 @@ pub mod _puroro_impls {
         pub fn enum_fourty_two_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::proto2_defaults::MyEnum {
+            if !self.has_enum_fourty_two() {
+                self.enum_fourty_two = ::std::default::Default::default();
+            }
             self._bitfield.set(61, true);
             todo!()
         }

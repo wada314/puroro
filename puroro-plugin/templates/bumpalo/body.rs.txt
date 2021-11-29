@@ -175,6 +175,8 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     pub fn clear_{{ field.ident_unesc }}(&mut self) {
         {%- if field.has_optional_bit %}
         self._bitfield.set({{ field.bitfield_index }}, false);
+        {#- Skip dropping the field. No need to do that unless it's a message field, #}
+        {#- and the message field will never have optional bitfield. #}
         {%- else %} {#- if field.has_optional_bit #}
         self.{{ field.ident }} = ::std::default::Default::default();
         {%- endif %} {#- if field.has_optional_bit #}
@@ -182,6 +184,15 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     
     {#- mut get scalar field #}
     pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> {{ field.bumpalo_getter_mut_type }} {
+        if !self.has_{{ field.ident_unesc }}() {
+            {#- field is not set so we need to initialize it. #}
+            {%- if field.is_message %}
+            todo!()
+            {%- else %} {#- if field.is_message #}
+            self.{{ field.ident }} = ::std::default::Default::default();
+            {%- endif %} {#- if field.is_message #}
+        }
+
         {%- if field.has_optional_bit %}
         self._bitfield.set({{ field.bitfield_index }}, true);
         {%- endif %} {#- if field.has_optional_bit #}

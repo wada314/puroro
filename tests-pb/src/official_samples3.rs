@@ -542,6 +542,9 @@ pub mod _puroro_impls {
             self.a = ::std::default::Default::default();
         }
         pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_a() {
+                self.a = ::std::default::Default::default();
+            }
             todo!()
         }
     }
@@ -743,6 +746,9 @@ pub mod _puroro_impls {
             self.b = ::std::default::Default::default();
         }
         pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_b() {
+                self.b = ::std::default::Default::default();
+            }
             todo!()
         }
     }
@@ -963,6 +969,9 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> &'this mut self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'this>
         {
+            if !self.has_c() {
+                todo!()
+            }
             todo!()
         }
     }

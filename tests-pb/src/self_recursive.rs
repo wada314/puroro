@@ -265,6 +265,9 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> &'this mut self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>
         {
+            if !self.has_recursive_unlabeled() {
+                todo!()
+            }
             todo!()
         }
     }

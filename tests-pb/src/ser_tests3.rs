@@ -1973,12 +1973,18 @@ pub mod _puroro_impls {
             self.i32_unlabeled = ::std::default::Default::default();
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
         }
         pub fn float_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_float_unlabeled() {
+                self.float_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
         pub fn clear_string_unlabeled(&mut self) {
@@ -1987,12 +1993,18 @@ pub mod _puroro_impls {
         pub fn string_unlabeled_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
         pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
+            if !self.has_submsg_unlabeled() {
+                todo!()
+            }
             todo!()
         }
         pub fn clear_enum_unlabeled(&mut self) {
@@ -2001,12 +2013,18 @@ pub mod _puroro_impls {
         pub fn enum_unlabeled_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+            if !self.has_enum_unlabeled() {
+                self.enum_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
         pub fn clear_very_large_field_number(&mut self) {
             self.very_large_field_number = ::std::default::Default::default();
         }
         pub fn very_large_field_number_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_very_large_field_number() {
+                self.very_large_field_number = ::std::default::Default::default();
+            }
             todo!()
         }
     }
@@ -3390,6 +3408,9 @@ pub mod _puroro_nested {
                     self.i32_unlabeled = ::std::default::Default::default();
                 }
                 pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+                    if !self.has_i32_unlabeled() {
+                        self.i32_unlabeled = ::std::default::Default::default();
+                    }
                     todo!()
                 }
             }

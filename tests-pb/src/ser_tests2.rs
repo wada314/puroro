@@ -1955,6 +1955,9 @@ pub mod _puroro_impls {
             self._bitfield.set(0, false);
         }
         pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+            }
             self._bitfield.set(0, true);
             todo!()
         }
@@ -1962,6 +1965,9 @@ pub mod _puroro_impls {
             self._bitfield.set(1, false);
         }
         pub fn float_optional_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_float_optional() {
+                self.float_optional = ::std::default::Default::default();
+            }
             self._bitfield.set(1, true);
             todo!()
         }
@@ -1971,6 +1977,9 @@ pub mod _puroro_impls {
         pub fn string_optional_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_optional() {
+                self.string_optional = ::std::default::Default::default();
+            }
             self._bitfield.set(2, true);
             todo!()
         }
@@ -1978,6 +1987,9 @@ pub mod _puroro_impls {
             self.submsg_optional = ::std::default::Default::default();
         }
         pub fn submsg_optional_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
+            if !self.has_submsg_optional() {
+                todo!()
+            }
             todo!()
         }
         pub fn clear_enum_optional(&mut self) {
@@ -1986,6 +1998,9 @@ pub mod _puroro_impls {
         pub fn enum_optional_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::ser_tests2::Enum {
+            if !self.has_enum_optional() {
+                self.enum_optional = ::std::default::Default::default();
+            }
             self._bitfield.set(3, true);
             todo!()
         }
@@ -1993,6 +2008,9 @@ pub mod _puroro_impls {
             self._bitfield.set(4, false);
         }
         pub fn very_large_field_number_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_very_large_field_number() {
+                self.very_large_field_number = ::std::default::Default::default();
+            }
             self._bitfield.set(4, true);
             todo!()
         }
@@ -3399,6 +3417,9 @@ pub mod _puroro_nested {
                     self._bitfield.set(0, false);
                 }
                 pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+                    if !self.has_i32_optional() {
+                        self.i32_optional = ::std::default::Default::default();
+                    }
                     self._bitfield.set(0, true);
                     todo!()
                 }

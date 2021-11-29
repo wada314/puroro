@@ -1449,6 +1449,9 @@ pub mod _puroro_impls {
             self._bitfield.set(0, false);
         }
         pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+            }
             self._bitfield.set(0, true);
             todo!()
         }

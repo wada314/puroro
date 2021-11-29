@@ -1012,12 +1012,18 @@ pub mod _puroro_impls {
             self.i32_unlabeled = ::std::default::Default::default();
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
         pub fn clear_i32_optional(&mut self) {
             self._bitfield.set(0, false);
         }
         pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+            }
             self._bitfield.set(0, true);
             todo!()
         }
@@ -1025,6 +1031,9 @@ pub mod _puroro_impls {
             self.f32_unlabeled = ::std::default::Default::default();
         }
         pub fn f32_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_unlabeled() {
+                self.f32_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
         pub fn clear_string_unlabeled(&mut self) {
@@ -1033,6 +1042,9 @@ pub mod _puroro_impls {
         pub fn string_unlabeled_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpString<'this, 'this> {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
         pub fn clear_submsg_unlabeled(&mut self) {
@@ -1042,6 +1054,9 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> &'this mut self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>
         {
+            if !self.has_submsg_unlabeled() {
+                todo!()
+            }
             todo!()
         }
     }
@@ -1431,6 +1446,9 @@ pub mod _puroro_impls {
             self.i32_unlabeled = ::std::default::Default::default();
         }
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
             todo!()
         }
     }
