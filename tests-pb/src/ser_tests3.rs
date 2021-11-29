@@ -1976,7 +1976,7 @@ pub mod _puroro_impls {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.i32_unlabeled
         }
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
@@ -1985,7 +1985,7 @@ pub mod _puroro_impls {
             if !self.has_float_unlabeled() {
                 self.float_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.float_unlabeled
         }
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
@@ -1996,13 +1996,15 @@ pub mod _puroro_impls {
             if !self.has_string_unlabeled() {
                 self.string_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
         pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
-            if !self.has_submsg_unlabeled() {}
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
             let bump = self._bump;
             self.submsg_unlabeled.get_or_insert_with(|| {
                 ::puroro::internal::NoAllocBumpBox::new_in(
@@ -2020,7 +2022,7 @@ pub mod _puroro_impls {
             if !self.has_enum_unlabeled() {
                 self.enum_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.enum_unlabeled
         }
         pub fn clear_very_large_field_number(&mut self) {
             self.very_large_field_number = ::std::default::Default::default();
@@ -2029,7 +2031,7 @@ pub mod _puroro_impls {
             if !self.has_very_large_field_number() {
                 self.very_large_field_number = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.very_large_field_number
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
@@ -3415,7 +3417,7 @@ pub mod _puroro_nested {
                     if !self.has_i32_unlabeled() {
                         self.i32_unlabeled = ::std::default::Default::default();
                     }
-                    todo!()
+                    &mut self.i32_unlabeled
                 }
             }
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}

@@ -544,7 +544,7 @@ pub mod _puroro_impls {
                 self.a = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
-            todo!()
+            &mut self.a
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
@@ -754,7 +754,7 @@ pub mod _puroro_impls {
                 self.b = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
-            todo!()
+            unsafe { self.b.as_mut_string_in(self._bump) }
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
@@ -979,7 +979,9 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>
         {
-            if !self.has_c() {}
+            if !self.has_c() {
+                self.c = ::std::default::Default::default();
+            }
             let bump = self._bump;
             self.c.get_or_insert_with(|| {
                 ::puroro::internal::NoAllocBumpBox::new_in(

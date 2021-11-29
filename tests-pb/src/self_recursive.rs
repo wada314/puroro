@@ -265,7 +265,9 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> &'this mut self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>
         {
-            if !self.has_recursive_unlabeled() {}
+            if !self.has_recursive_unlabeled() {
+                self.recursive_unlabeled = ::std::default::Default::default();
+            }
             let bump = self._bump;
             self.recursive_unlabeled.get_or_insert_with(|| {
                 ::puroro::internal::NoAllocBumpBox::new_in(

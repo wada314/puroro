@@ -1015,7 +1015,7 @@ pub mod _puroro_impls {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.i32_unlabeled
         }
         pub fn clear_i32_optional(&mut self) {
             self._bitfield.set(0, false);
@@ -1025,7 +1025,7 @@ pub mod _puroro_impls {
                 self.i32_optional = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
-            todo!()
+            &mut self.i32_optional
         }
         pub fn clear_f32_unlabeled(&mut self) {
             self.f32_unlabeled = ::std::default::Default::default();
@@ -1034,7 +1034,7 @@ pub mod _puroro_impls {
             if !self.has_f32_unlabeled() {
                 self.f32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.f32_unlabeled
         }
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
@@ -1045,7 +1045,7 @@ pub mod _puroro_impls {
             if !self.has_string_unlabeled() {
                 self.string_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
@@ -1054,7 +1054,9 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> &'this mut self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>
         {
-            if !self.has_submsg_unlabeled() {}
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
             let bump = self._bump;
             self.submsg_unlabeled.get_or_insert_with(|| {
                 ::puroro::internal::NoAllocBumpBox::new_in(
@@ -1453,7 +1455,7 @@ pub mod _puroro_impls {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.i32_unlabeled
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}

@@ -279,7 +279,7 @@ impl NoAllocString {
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_string_mut_in<'bump, 'string>(
+    pub unsafe fn as_mut_string_in<'bump, 'string>(
         &'string mut self,
         bump: &'bump Bump,
     ) -> RefMutString<'bump, 'string> {

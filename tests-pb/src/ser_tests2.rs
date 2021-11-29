@@ -1959,7 +1959,7 @@ pub mod _puroro_impls {
                 self.i32_optional = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
-            todo!()
+            &mut self.i32_optional
         }
         pub fn clear_float_optional(&mut self) {
             self._bitfield.set(1, false);
@@ -1969,7 +1969,7 @@ pub mod _puroro_impls {
                 self.float_optional = ::std::default::Default::default();
                 self._bitfield.set(1, true);
             }
-            todo!()
+            &mut self.float_optional
         }
         pub fn clear_string_optional(&mut self) {
             self._bitfield.set(2, false);
@@ -1981,13 +1981,15 @@ pub mod _puroro_impls {
                 self.string_optional = ::std::default::Default::default();
                 self._bitfield.set(2, true);
             }
-            todo!()
+            unsafe { self.string_optional.as_mut_string_in(self._bump) }
         }
         pub fn clear_submsg_optional(&mut self) {
             self.submsg_optional = ::std::default::Default::default();
         }
         pub fn submsg_optional_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
-            if !self.has_submsg_optional() {}
+            if !self.has_submsg_optional() {
+                self.submsg_optional = ::std::default::Default::default();
+            }
             let bump = self._bump;
             self.submsg_optional.get_or_insert_with(|| {
                 ::puroro::internal::NoAllocBumpBox::new_in(
@@ -2006,7 +2008,7 @@ pub mod _puroro_impls {
                 self.enum_optional = ::std::default::Default::default();
                 self._bitfield.set(3, true);
             }
-            todo!()
+            &mut self.enum_optional
         }
         pub fn clear_very_large_field_number(&mut self) {
             self._bitfield.set(4, false);
@@ -2016,7 +2018,7 @@ pub mod _puroro_impls {
                 self.very_large_field_number = ::std::default::Default::default();
                 self._bitfield.set(4, true);
             }
-            todo!()
+            &mut self.very_large_field_number
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
@@ -3425,7 +3427,7 @@ pub mod _puroro_nested {
                         self.i32_optional = ::std::default::Default::default();
                         self._bitfield.set(0, true);
                     }
-                    todo!()
+                    &mut self.i32_optional
                 }
             }
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}

@@ -1453,7 +1453,7 @@ pub mod _puroro_impls {
                 self.i32_optional = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
-            todo!()
+            &mut self.i32_optional
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}

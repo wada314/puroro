@@ -11855,7 +11855,7 @@ pub mod _puroro_impls {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.i32_unlabeled
         }
         pub fn clear_i32_optional(&mut self) {
             self._bitfield.set(0, false);
@@ -11865,7 +11865,7 @@ pub mod _puroro_impls {
                 self.i32_optional = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
-            todo!()
+            &mut self.i32_optional
         }
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
@@ -11874,7 +11874,7 @@ pub mod _puroro_impls {
             if !self.has_float_unlabeled() {
                 self.float_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.float_unlabeled
         }
         pub fn clear_float_optional(&mut self) {
             self._bitfield.set(1, false);
@@ -11884,7 +11884,7 @@ pub mod _puroro_impls {
                 self.float_optional = ::std::default::Default::default();
                 self._bitfield.set(1, true);
             }
-            todo!()
+            &mut self.float_optional
         }
         pub fn clear_bytes_unlabeled(&mut self) {
             self.bytes_unlabeled = ::std::default::Default::default();
@@ -11895,7 +11895,7 @@ pub mod _puroro_impls {
             if !self.has_bytes_unlabeled() {
                 self.bytes_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            unsafe { self.bytes_unlabeled.as_mut_vec_in(self._bump) }
         }
         pub fn clear_bytes_optional(&mut self) {
             self._bitfield.set(2, false);
@@ -11907,7 +11907,7 @@ pub mod _puroro_impls {
                 self.bytes_optional = ::std::default::Default::default();
                 self._bitfield.set(2, true);
             }
-            todo!()
+            unsafe { self.bytes_optional.as_mut_vec_in(self._bump) }
         }
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
@@ -11918,7 +11918,7 @@ pub mod _puroro_impls {
             if !self.has_string_unlabeled() {
                 self.string_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
         }
         pub fn clear_string_optional(&mut self) {
             self._bitfield.set(3, false);
@@ -11930,7 +11930,7 @@ pub mod _puroro_impls {
                 self.string_optional = ::std::default::Default::default();
                 self._bitfield.set(3, true);
             }
-            todo!()
+            unsafe { self.string_optional.as_mut_string_in(self._bump) }
         }
         pub fn clear_enum_unlabeled(&mut self) {
             self.enum_unlabeled = ::std::default::Default::default();
@@ -11941,7 +11941,7 @@ pub mod _puroro_impls {
             if !self.has_enum_unlabeled() {
                 self.enum_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.enum_unlabeled
         }
         pub fn clear_enum_optional(&mut self) {
             self._bitfield.set(4, false);
@@ -11953,13 +11953,15 @@ pub mod _puroro_impls {
                 self.enum_optional = ::std::default::Default::default();
                 self._bitfield.set(4, true);
             }
-            todo!()
+            &mut self.enum_optional
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
         pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
-            if !self.has_submsg_unlabeled() {}
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
             let bump = self._bump;
             self.submsg_unlabeled.get_or_insert_with(|| {
                 ::puroro::internal::NoAllocBumpBox::new_in(
@@ -11972,7 +11974,9 @@ pub mod _puroro_impls {
             self.submsg_optional = ::std::default::Default::default();
         }
         pub fn submsg_optional_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
-            if !self.has_submsg_optional() {}
+            if !self.has_submsg_optional() {
+                self.submsg_optional = ::std::default::Default::default();
+            }
             let bump = self._bump;
             self.submsg_optional.get_or_insert_with(|| {
                 ::puroro::internal::NoAllocBumpBox::new_in(
@@ -11988,7 +11992,7 @@ pub mod _puroro_impls {
             if !self.has_i64_unlabeled() {
                 self.i64_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.i64_unlabeled
         }
         pub fn clear_i64_optional(&mut self) {
             self._bitfield.set(5, false);
@@ -11998,7 +12002,7 @@ pub mod _puroro_impls {
                 self.i64_optional = ::std::default::Default::default();
                 self._bitfield.set(5, true);
             }
-            todo!()
+            &mut self.i64_optional
         }
         pub fn clear_u32_unlabeled(&mut self) {
             self.u32_unlabeled = ::std::default::Default::default();
@@ -12007,7 +12011,7 @@ pub mod _puroro_impls {
             if !self.has_u32_unlabeled() {
                 self.u32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.u32_unlabeled
         }
         pub fn clear_u32_optional(&mut self) {
             self._bitfield.set(6, false);
@@ -12017,7 +12021,7 @@ pub mod _puroro_impls {
                 self.u32_optional = ::std::default::Default::default();
                 self._bitfield.set(6, true);
             }
-            todo!()
+            &mut self.u32_optional
         }
         pub fn clear_u64_unlabeled(&mut self) {
             self.u64_unlabeled = ::std::default::Default::default();
@@ -12026,7 +12030,7 @@ pub mod _puroro_impls {
             if !self.has_u64_unlabeled() {
                 self.u64_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.u64_unlabeled
         }
         pub fn clear_u64_optional(&mut self) {
             self._bitfield.set(7, false);
@@ -12036,7 +12040,7 @@ pub mod _puroro_impls {
                 self.u64_optional = ::std::default::Default::default();
                 self._bitfield.set(7, true);
             }
-            todo!()
+            &mut self.u64_optional
         }
         pub fn clear_s32_unlabeled(&mut self) {
             self.s32_unlabeled = ::std::default::Default::default();
@@ -12045,7 +12049,7 @@ pub mod _puroro_impls {
             if !self.has_s32_unlabeled() {
                 self.s32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.s32_unlabeled
         }
         pub fn clear_s32_optional(&mut self) {
             self._bitfield.set(8, false);
@@ -12055,7 +12059,7 @@ pub mod _puroro_impls {
                 self.s32_optional = ::std::default::Default::default();
                 self._bitfield.set(8, true);
             }
-            todo!()
+            &mut self.s32_optional
         }
         pub fn clear_s64_unlabeled(&mut self) {
             self.s64_unlabeled = ::std::default::Default::default();
@@ -12064,7 +12068,7 @@ pub mod _puroro_impls {
             if !self.has_s64_unlabeled() {
                 self.s64_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.s64_unlabeled
         }
         pub fn clear_s64_optional(&mut self) {
             self._bitfield.set(9, false);
@@ -12074,7 +12078,7 @@ pub mod _puroro_impls {
                 self.s64_optional = ::std::default::Default::default();
                 self._bitfield.set(9, true);
             }
-            todo!()
+            &mut self.s64_optional
         }
         pub fn clear_fixed32_unlabeled(&mut self) {
             self.fixed32_unlabeled = ::std::default::Default::default();
@@ -12083,7 +12087,7 @@ pub mod _puroro_impls {
             if !self.has_fixed32_unlabeled() {
                 self.fixed32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.fixed32_unlabeled
         }
         pub fn clear_fixed32_optional(&mut self) {
             self._bitfield.set(10, false);
@@ -12093,7 +12097,7 @@ pub mod _puroro_impls {
                 self.fixed32_optional = ::std::default::Default::default();
                 self._bitfield.set(10, true);
             }
-            todo!()
+            &mut self.fixed32_optional
         }
         pub fn clear_fixed64_unlabeled(&mut self) {
             self.fixed64_unlabeled = ::std::default::Default::default();
@@ -12102,7 +12106,7 @@ pub mod _puroro_impls {
             if !self.has_fixed64_unlabeled() {
                 self.fixed64_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.fixed64_unlabeled
         }
         pub fn clear_fixed64_optional(&mut self) {
             self._bitfield.set(11, false);
@@ -12112,7 +12116,7 @@ pub mod _puroro_impls {
                 self.fixed64_optional = ::std::default::Default::default();
                 self._bitfield.set(11, true);
             }
-            todo!()
+            &mut self.fixed64_optional
         }
         pub fn clear_sfixed32_unlabeled(&mut self) {
             self.sfixed32_unlabeled = ::std::default::Default::default();
@@ -12121,7 +12125,7 @@ pub mod _puroro_impls {
             if !self.has_sfixed32_unlabeled() {
                 self.sfixed32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.sfixed32_unlabeled
         }
         pub fn clear_sfixed32_optional(&mut self) {
             self._bitfield.set(12, false);
@@ -12131,7 +12135,7 @@ pub mod _puroro_impls {
                 self.sfixed32_optional = ::std::default::Default::default();
                 self._bitfield.set(12, true);
             }
-            todo!()
+            &mut self.sfixed32_optional
         }
         pub fn clear_sfixed64_unlabeled(&mut self) {
             self.sfixed64_unlabeled = ::std::default::Default::default();
@@ -12140,7 +12144,7 @@ pub mod _puroro_impls {
             if !self.has_sfixed64_unlabeled() {
                 self.sfixed64_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.sfixed64_unlabeled
         }
         pub fn clear_sfixed64_optional(&mut self) {
             self._bitfield.set(13, false);
@@ -12150,7 +12154,7 @@ pub mod _puroro_impls {
                 self.sfixed64_optional = ::std::default::Default::default();
                 self._bitfield.set(13, true);
             }
-            todo!()
+            &mut self.sfixed64_optional
         }
         pub fn clear_f64_unlabeled(&mut self) {
             self.f64_unlabeled = ::std::default::Default::default();
@@ -12159,7 +12163,7 @@ pub mod _puroro_impls {
             if !self.has_f64_unlabeled() {
                 self.f64_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.f64_unlabeled
         }
         pub fn clear_f64_optional(&mut self) {
             self._bitfield.set(14, false);
@@ -12169,7 +12173,7 @@ pub mod _puroro_impls {
                 self.f64_optional = ::std::default::Default::default();
                 self._bitfield.set(14, true);
             }
-            todo!()
+            &mut self.f64_optional
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
@@ -16431,7 +16435,7 @@ pub mod _puroro_nested {
                     if !self.has_i32_unlabeled() {
                         self.i32_unlabeled = ::std::default::Default::default();
                     }
-                    todo!()
+                    &mut self.i32_unlabeled
                 }
                 pub fn clear_i64_unlabeled(&mut self) {
                     self.i64_unlabeled = ::std::default::Default::default();
@@ -16440,7 +16444,7 @@ pub mod _puroro_nested {
                     if !self.has_i64_unlabeled() {
                         self.i64_unlabeled = ::std::default::Default::default();
                     }
-                    todo!()
+                    &mut self.i64_unlabeled
                 }
             }
             impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}

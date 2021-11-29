@@ -1456,7 +1456,7 @@ pub mod _puroro_impls {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
-            todo!()
+            &mut self.i32_unlabeled
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
