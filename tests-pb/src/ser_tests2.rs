@@ -100,18 +100,18 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field2RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.i32_repeated)
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_optional)
         }
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        type Field4RepeatedType<'this> = ::puroro::ClonedSlice<'this, f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.float_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.float_repeated)
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
@@ -150,10 +150,10 @@ pub mod _puroro_simple_impl {
             Clone::clone(&self.enum_optional)
         }
         type Field10RepeatedType<'this> =
-            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests2::Enum>>;
+            ::puroro::ClonedSlice<'this, self::_puroro_root::ser_tests2::Enum>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            self.enum_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.enum_repeated)
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.very_large_field_number)
@@ -337,6 +337,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "i32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -346,6 +347,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "float_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -355,6 +357,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "string_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -364,6 +367,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "submsg_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -373,6 +377,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "enum_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1961,11 +1966,6 @@ pub mod _puroro_impls {
             }
             &mut self.i32_optional
         }
-        pub fn i32_repeated_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut i32> {
-            todo!()
-        }
         pub fn clear_float_optional(&mut self) {
             self._bitfield.set(1, false);
         }
@@ -1975,11 +1975,6 @@ pub mod _puroro_impls {
                 self._bitfield.set(1, true);
             }
             &mut self.float_optional
-        }
-        pub fn float_repeated_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut f32> {
-            todo!()
         }
         pub fn clear_string_optional(&mut self) {
             self._bitfield.set(2, false);
@@ -1992,15 +1987,6 @@ pub mod _puroro_impls {
                 self._bitfield.set(2, true);
             }
             unsafe { self.string_optional.as_mut_string_in(self._bump) }
-        }
-        pub fn string_repeated_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<
-            'bump,
-            'this,
-            ::puroro::internal::RefMutBumpString<'bump, 'this>,
-        > {
-            todo!()
         }
         pub fn clear_submsg_optional(&mut self) {
             self.submsg_optional = ::std::default::Default::default();
@@ -2017,9 +2003,6 @@ pub mod _puroro_impls {
                 )
             })
         }
-        pub fn submsg_repeated_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>{
-            todo!()
-        }
         pub fn clear_enum_optional(&mut self) {
             self._bitfield.set(3, false);
         }
@@ -2031,15 +2014,6 @@ pub mod _puroro_impls {
                 self._bitfield.set(3, true);
             }
             &mut self.enum_optional
-        }
-        pub fn enum_repeated_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<
-            'bump,
-            'this,
-            &'this mut self::_puroro_root::ser_tests2::Enum,
-        > {
-            todo!()
         }
         pub fn clear_very_large_field_number(&mut self) {
             self._bitfield.set(4, false);
@@ -2077,7 +2051,7 @@ pub mod _puroro_impls {
         type Field2RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::ClonedSlice<'this, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             todo!()
@@ -2092,7 +2066,7 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        = ::puroro::ClonedSlice<'this, f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             todo!()
@@ -2145,7 +2119,7 @@ pub mod _puroro_impls {
         type Field10RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests2::Enum>>;
+        = ::puroro::ClonedSlice<'this, self::_puroro_root::ser_tests2::Enum>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             todo!()

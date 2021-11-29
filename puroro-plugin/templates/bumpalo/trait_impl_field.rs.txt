@@ -15,7 +15,7 @@ type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
         ::std::slice::Iter<'this, {{ f.bumpalo_getter_rep_item_type }}>>;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-    ::std::iter::Cloned<::std::slice::Iter<'this, {{ f.trait_scalar_getter_type }}>>;
+    ::puroro::ClonedSlice<'this, {{ f.trait_scalar_getter_type }}>;
 {%- endmatch %}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
@@ -26,7 +26,7 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
     {%- when Some with (borrowed) %}
     ::puroro::internal::utils::BorrowedIter::new(self.{{ f.ident }}.iter())
     {%- else %}
-    self.{{ f.ident }}.iter().cloned()
+    ::puroro::ClonedSlice::new(&self.{{ f.ident }})
     {%- endmatch %}
     #}
 }

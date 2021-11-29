@@ -69,10 +69,10 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field3RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::puroro::ClonedSlice::new(&self.i32_repeated)
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             if self.f32_unlabeled == ::std::default::Default::default() {
@@ -221,6 +221,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "i32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -1027,11 +1028,6 @@ pub mod _puroro_impls {
             }
             &mut self.i32_optional
         }
-        pub fn i32_repeated_mut<'this>(
-            &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, &'this mut i32> {
-            todo!()
-        }
         pub fn clear_f32_unlabeled(&mut self) {
             self.f32_unlabeled = ::std::default::Default::default();
         }
@@ -1099,7 +1095,7 @@ pub mod _puroro_impls {
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::ClonedSlice<'this, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             todo!()
