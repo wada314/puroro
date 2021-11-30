@@ -293,11 +293,15 @@ impl Field {
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
             bumpalo_field_type: f.bumpalo_field_type()?,
             bumpalo_getter_type: {
-                let bare_type = f.bumpalo_getter_scalar_type("'this")?;
-                if f.is_message()? {
-                    format!("::std::option::Option<{}>", bare_type)
+                if f.is_repeated()? {
+                    f.bumpalo_getter_repeated_type()?
                 } else {
-                    bare_type
+                    let bare_type = f.bumpalo_getter_scalar_type("'this")?;
+                    if f.is_message()? {
+                        format!("::std::option::Option<{}>", bare_type)
+                    } else {
+                        bare_type
+                    }
                 }
             },
             bumpalo_getter_opt_type: format!(

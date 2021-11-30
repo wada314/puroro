@@ -805,6 +805,27 @@ impl Field {
         })
     }
 
+    pub fn bumpalo_getter_repeated_type(&self, lt: &str) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => format!(
+                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpStr, str",
+                lt
+            ),
+            FieldType::Bytes => format!(
+                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpVec<u8>, [u8]",
+                lt
+            ),
+            FieldType::Message(m) => {
+                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
+                format!("&{lt} {msg}", lt = lt, msg = msg_type)
+            }
+            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
+
     pub fn bumpalo_getter_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,

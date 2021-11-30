@@ -211,11 +211,13 @@
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
 mod common_traits;
+mod common_types;
 mod error;
 pub mod internal;
 pub mod tags;
 
 pub use self::common_traits::*;
+pub use self::common_types::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
@@ -225,9 +227,7 @@ pub use ::bitvec;
 pub use ::bumpalo;
 pub use ::either::Either;
 
-use ::std::iter;
 use ::std::ops::{Deref, DerefMut};
-use std::marker::PhantomData;
 
 // Bumpalo wrapper
 pub struct BumpaloOwned<T> {
@@ -279,26 +279,3 @@ impl<T> DerefMut for BumpaloOwned<T> {
 }
 
 impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
-
-/// Cloned slice, which can be accessed / iterated over `T` instead of `&T`.
-pub struct ClonedSlice<'slice, T>(&'slice [T]);
-impl<'slice, T> ClonedSlice<'slice, T> {
-    pub fn new(slice: &'slice [T]) -> Self {
-        Self(slice)
-    }
-}
-impl<'slice, T: Clone> IntoIterator for ClonedSlice<'slice, T> {
-    type Item = T;
-    type IntoIter = iter::Cloned<std::slice::Iter<'slice, T>>;
-    fn into_iter(self) -> Self::IntoIter {
-        <[T]>::iter(self.0).cloned()
-    }
-}
-
-/// A slice wrapper that casts item type `T` into type `U`
-pub struct CastedSlice<'slice, T, U, F>(&'slice [T], PhantomData<(U, F)>);
-impl<'slice, T, U, F> CastedSlice<'slice, T, U, F> {
-    pub fn new(slice: &'slice [T]) -> Self {
-        Self(slice, PhantomData)
-    }
-}
