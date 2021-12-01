@@ -290,7 +290,7 @@ impl Field {
                 )
             })?,
             single_field_type: f.single_field_type()?,
-            single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
+            single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
             bumpalo_field_type: f.bumpalo_field_type()?.into(),
             bumpalo_getter_type: {
                 if f.is_repeated()? {
