@@ -955,7 +955,7 @@ pub mod _puroro_impls {
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
-        pub fn i32_repeated<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+        pub fn i32_repeated<'this>(&'this self) -> i32 {
             self.i32_repeated.iter().copied()
         }
         pub fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {

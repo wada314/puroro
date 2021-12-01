@@ -21,6 +21,7 @@ use ::itertools::Itertools;
 use ::once_cell::unsync::{Lazy, OnceCell};
 use ::puroro_protobuf_compiled::google::protobuf;
 use ::std::borrow::Borrow;
+use ::std::borrow::Cow;
 use ::std::collections::{HashMap, VecDeque};
 use ::std::convert::TryInto;
 use ::std::hash::Hash;
@@ -790,18 +791,19 @@ impl Field {
         })
     }
 
-    pub fn bumpalo_getter_scalar_type(&self, lt: &str) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => format!("&{} str", lt),
-            FieldType::Bytes => format!("&{} [u8]", lt),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::Message(m) => {
-                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
-                format!("&{lt} {msg}", lt = lt, msg = msg_type)
+    pub fn bumpalo_getter_scalar_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        Ok(match self.field_type()?.categories()? {
+            FieldTypeCategories::LengthDelimited(LdFieldType::String) => {
+                format!("&{} str", lt).into()
             }
-            t => t.numerical_rust_type()?.to_string(),
+            FieldTypeCategories::LengthDelimited(LdFieldType::Bytes) => {
+                format!("&{} [u8]", lt).into()
+            }
+            FieldTypeCategories::LengthDelimited(LdFieldType::Message(m)) => {
+                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
+                format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
+            }
+            FieldTypeCategories::Trivial(field_type) => field_type.rust_type_name()?,
         })
     }
 
@@ -1147,6 +1149,30 @@ impl FieldType {
         })
     }
 
+    pub fn categories(self) -> Result<FieldTypeCategories> {
+        Ok(match self {
+            FieldType::Double => FieldTypeCategories::Trivial(TrivialFieldType::Double),
+            FieldType::Float => FieldTypeCategories::Trivial(TrivialFieldType::Float),
+            FieldType::Int32 => FieldTypeCategories::Trivial(TrivialFieldType::Int32),
+            FieldType::Int64 => FieldTypeCategories::Trivial(TrivialFieldType::Int64),
+            FieldType::UInt32 => FieldTypeCategories::Trivial(TrivialFieldType::UInt32),
+            FieldType::UInt64 => FieldTypeCategories::Trivial(TrivialFieldType::UInt64),
+            FieldType::SInt32 => FieldTypeCategories::Trivial(TrivialFieldType::SInt32),
+            FieldType::SInt64 => FieldTypeCategories::Trivial(TrivialFieldType::SInt64),
+            FieldType::Fixed32 => FieldTypeCategories::Trivial(TrivialFieldType::Fixed32),
+            FieldType::Fixed64 => FieldTypeCategories::Trivial(TrivialFieldType::Fixed64),
+            FieldType::SFixed32 => FieldTypeCategories::Trivial(TrivialFieldType::SFixed32),
+            FieldType::SFixed64 => FieldTypeCategories::Trivial(TrivialFieldType::SFixed64),
+            FieldType::Bool => FieldTypeCategories::Trivial(TrivialFieldType::Bool),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => FieldTypeCategories::LengthDelimited(LdFieldType::String),
+            FieldType::Bytes => FieldTypeCategories::LengthDelimited(LdFieldType::Bytes),
+            FieldType::Enum2(e) => FieldTypeCategories::Trivial(TrivialFieldType::Enum2(e)),
+            FieldType::Enum3(e) => FieldTypeCategories::Trivial(TrivialFieldType::Enum3(e)),
+            FieldType::Message(m) => FieldTypeCategories::LengthDelimited(LdFieldType::Message(m)),
+        })
+    }
+
     pub fn proto_name(&self) -> Result<String> {
         Ok(match self {
             FieldType::Double => "double".to_string(),
@@ -1170,6 +1196,55 @@ impl FieldType {
             FieldType::Message(m) => upgrade(m)?.proto_name().to_string(),
         })
     }
+}
+
+pub enum LdFieldType {
+    String,
+    Bytes,
+    Message(Weak<Message>),
+}
+
+pub enum TrivialFieldType {
+    Double,
+    Float,
+    Int32,
+    Int64,
+    UInt32,
+    UInt64,
+    SInt32,
+    SInt64,
+    Fixed32,
+    Fixed64,
+    SFixed32,
+    SFixed64,
+    Bool,
+    Enum2(Weak<Enum>),
+    Enum3(Weak<Enum>),
+}
+
+impl TrivialFieldType {
+    pub fn rust_type_name(&self) -> Result<Cow<'static, str>> {
+        Ok(match self {
+            TrivialFieldType::Double => "f64".into(),
+            TrivialFieldType::Float => "f32".into(),
+            TrivialFieldType::Int32 => "i32".into(),
+            TrivialFieldType::Int64 => "i64".into(),
+            TrivialFieldType::UInt32 => "u32".into(),
+            TrivialFieldType::UInt64 => "u64".into(),
+            TrivialFieldType::SInt32 => "i32".into(),
+            TrivialFieldType::SInt64 => "i64".into(),
+            TrivialFieldType::Fixed32 => "u32".into(),
+            TrivialFieldType::Fixed64 => "u64".into(),
+            TrivialFieldType::SFixed32 => "i32".into(),
+            TrivialFieldType::SFixed64 => "i64".into(),
+            TrivialFieldType::Bool => "bool".into(),
+        })
+    }
+}
+
+pub enum FieldTypeCategories {
+    LengthDelimited(LdFieldType),
+    Trivial(TrivialFieldType),
 }
 
 #[derive(Debug, Clone)]

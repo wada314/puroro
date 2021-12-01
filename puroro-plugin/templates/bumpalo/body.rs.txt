@@ -79,7 +79,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {%- if field.is_repeated %}
     
     {#- ######## repeated getter ######## #}
-    pub fn {{ field.ident }}<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item={{ field.bumpalo_getter_rep_item_type }}> {
+    pub fn {{ field.ident }}<'this>(&'this self) -> {{ field.bumpalo_getter_type }} {
         {%- if field.is_length_delimited %}
         {%- if field.is_message %}
         {#- need to cast the field message type's lifetime #}

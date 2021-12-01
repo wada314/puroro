@@ -294,7 +294,7 @@ impl Field {
             bumpalo_field_type: f.bumpalo_field_type()?,
             bumpalo_getter_type: {
                 if f.is_repeated()? {
-                    f.bumpalo_getter_repeated_type()?
+                    f.bumpalo_getter_repeated_type("'this")?
                 } else {
                     let bare_type = f.bumpalo_getter_scalar_type("'this")?;
                     if f.is_message()? {

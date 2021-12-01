@@ -1194,7 +1194,7 @@ pub mod _puroro_impls {
                 d: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             }
         }
-        pub fn d<'this>(&'this self) -> impl 'this + ::std::iter::Iterator<Item = i32> {
+        pub fn d<'this>(&'this self) -> i32 {
             self.d.iter().copied()
         }
     }
