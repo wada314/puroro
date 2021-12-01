@@ -34,6 +34,7 @@ use protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
 };
+use puroro::tags::LengthDelimited;
 
 #[derive(Debug)]
 pub struct Context {
@@ -792,69 +793,62 @@ impl Field {
     }
 
     pub fn bumpalo_getter_scalar_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
-            FieldTypeCategories::LengthDelimited(LdFieldType::String) => {
-                format!("&{} str", lt).into()
-            }
-            FieldTypeCategories::LengthDelimited(LdFieldType::Bytes) => {
-                format!("&{} [u8]", lt).into()
-            }
-            FieldTypeCategories::LengthDelimited(LdFieldType::Message(m)) => {
+            LengthDelimited(String) => format!("&{} str", lt).into(),
+            LengthDelimited(Bytes) => format!("&{} [u8]", lt).into(),
+            LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
                 format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
             }
-            FieldTypeCategories::Trivial(field_type) => field_type.rust_type_name()?,
+            Trivial(field_type) => field_type.rust_type_name()?,
         })
     }
 
-    pub fn bumpalo_getter_repeated_type(&self, lt: &str) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => format!(
+    pub fn bumpalo_getter_repeated_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => format!(
                 "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpStr, str",
                 lt
-            ),
-            FieldType::Bytes => format!(
+            )
+            .into(),
+            LengthDelimited(Bytes) => format!(
                 "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpVec<u8>, [u8]",
                 lt
-            ),
-            FieldType::Message(m) => {
+            )
+            .into(),
+            LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
-                format!("&{lt} {msg}", lt = lt, msg = msg_type)
+                format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
             }
-            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            t => t.numerical_rust_type()?.to_string(),
+            Trivial(field_type) => field_type.rust_type_name()?,
         })
     }
 
     pub fn bumpalo_getter_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
             // ↓ Maybe need to double check the lt params
-            FieldType::String => format!(
+            LengthDelimited(String) => format!(
                 "::puroro::internal::RefMutBumpString<{}, {}>",
                 bump_lt, this_lt
             ),
-            FieldType::Bytes => format!(
+            LengthDelimited(Bytes) => format!(
                 "::puroro::internal::RefMutBumpVec<{}, {}, u8>",
                 bump_lt, this_lt
             ),
-            FieldType::Enum2(e) | FieldType::Enum3(e) => {
-                format!(
-                    "&{lt} mut {ty}",
-                    lt = this_lt,
-                    ty = upgrade(&e)?.rust_path()
-                )
-            }
-            FieldType::Message(m) => {
+            LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[bump_lt]);
                 format!("&{lt} mut {msg}", lt = this_lt, msg = msg_type)
             }
-            t => format!(
+            Trivial(field_type) => format!(
                 "&{lt} mut {ty}",
                 lt = this_lt,
-                ty = t.numerical_rust_type()?
+                ty = field_type.rust_type_name()?
             ),
         })
     }

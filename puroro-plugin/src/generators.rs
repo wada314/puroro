@@ -294,13 +294,13 @@ impl Field {
             bumpalo_field_type: f.bumpalo_field_type()?,
             bumpalo_getter_type: {
                 if f.is_repeated()? {
-                    f.bumpalo_getter_repeated_type("'this")?
+                    f.bumpalo_getter_repeated_type("'this")?.to_string()
                 } else {
                     let bare_type = f.bumpalo_getter_scalar_type("'this")?;
                     if f.is_message()? {
                         format!("::std::option::Option<{}>", bare_type)
                     } else {
-                        bare_type
+                        bare_type.to_string()
                     }
                 }
             },
@@ -308,7 +308,7 @@ impl Field {
                 "::std::option::Option<{}>",
                 f.bumpalo_getter_scalar_type("'this")?
             ),
-            bumpalo_getter_rep_item_type: f.bumpalo_getter_scalar_type("'this")?,
+            bumpalo_getter_rep_item_type: f.bumpalo_getter_scalar_type("'this")?.to_string(),
             bumpalo_getter_mut_type: f.bumpalo_getter_mut_type("'bump", "'this")?,
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
