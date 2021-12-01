@@ -31,13 +31,13 @@ impl<'slice, T: Clone> IntoIterator for ClonedSlice<'slice, T> {
     }
 }
 
-pub struct AsRefSlice<'slice, T, U>(&'slice [T], PhantomData<U>);
-impl<'slice, T, U> AsRefSlice<'slice, T, U> {
+pub struct AsRefSlice<'slice, T, U: ?Sized>(&'slice [T], PhantomData<U>);
+impl<'slice, T, U: ?Sized> AsRefSlice<'slice, T, U> {
     pub fn new(slice: &'slice [T]) -> Self {
         Self(slice, PhantomData)
     }
 }
-impl<'slice, T: AsRef<U>, U: 'slice> IntoIterator for AsRefSlice<'slice, T, U> {
+impl<'slice, T: AsRef<U>, U: 'slice + ?Sized> IntoIterator for AsRefSlice<'slice, T, U> {
     type Item = &'slice U;
     type IntoIter = AsRefIter<'slice, slice::Iter<'slice, T>, U>;
     fn into_iter(self) -> Self::IntoIter {
@@ -45,18 +45,19 @@ impl<'slice, T: AsRef<U>, U: 'slice> IntoIterator for AsRefSlice<'slice, T, U> {
     }
 }
 
-pub struct AsRefIter<'slice, I, R>(I, PhantomData<&'slice R>);
-impl<'slice, I, R> AsRefIter<'slice, I, R> {
+pub struct AsRefIter<'slice, I, T: ?Sized>(I, PhantomData<&'slice T>);
+impl<'slice, I, T: ?Sized> AsRefIter<'slice, I, T> {
     pub fn new(iter: I) -> Self {
         Self(iter, PhantomData)
     }
 }
-impl<'slice, I, T, R> Iterator for AsRefIter<'slice, I, R>
+impl<'slice, I, T, U> Iterator for AsRefIter<'slice, I, T>
 where
-    I: Iterator<Item = &'slice T>,
-    T: 'slice + AsRef<R>,
+    I: Iterator<Item = &'slice U>,
+    U: 'slice + AsRef<T>,
+    T: ?Sized,
 {
-    type Item = &'slice R;
+    type Item = &'slice T;
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next().map(|x| x.as_ref())
     }

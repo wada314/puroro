@@ -812,12 +812,12 @@ impl Field {
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
             LengthDelimited(String) => format!(
-                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpStr, str",
+                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpStr, str>",
                 lt
             )
             .into(),
             LengthDelimited(Bytes) => format!(
-                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpVec<u8>, [u8]",
+                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpVec<u8>, [u8]>",
                 lt
             )
             .into(),
