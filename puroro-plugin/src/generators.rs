@@ -265,7 +265,7 @@ impl Field {
                     -1
                 }
             },
-            trait_scalar_getter_type: f.trait_scalar_getter_type()?,
+            trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
             trait_maybe_field_message_trait_path,
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
@@ -461,10 +461,10 @@ impl OneofField {
                     | wrappers::FieldType::Message(_)
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
-            field_type: f.trait_oneof_field_type("'msg", "T")?,
+            field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
             simple_field_type: f.simple_oneof_field_type()?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
-            trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
+            trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
