@@ -275,8 +275,8 @@ impl Field {
                 ))
             })?,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
-            simple_field_type: f.simple_field_type()?,
-            simple_scalar_field_type: f.simple_scalar_field_type()?,
+            simple_field_type: f.simple_field_type()?.into(),
+            simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple", &[])?,
@@ -291,7 +291,7 @@ impl Field {
             })?,
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
-            bumpalo_field_type: f.bumpalo_field_type()?,
+            bumpalo_field_type: f.bumpalo_field_type()?.into(),
             bumpalo_getter_type: {
                 if f.is_repeated()? {
                     f.bumpalo_getter_repeated_type("'this")?.to_string()
@@ -462,8 +462,8 @@ impl OneofField {
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             field_type: f.trait_oneof_field_type("'msg", "T")?,
-            simple_field_type: f.simple_oneof_field_type()?,
-            bumpalo_field_type: f.bumpalo_oneof_field_type()?,
+            simple_field_type: f.simple_oneof_field_type()?.into(),
+            bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(
