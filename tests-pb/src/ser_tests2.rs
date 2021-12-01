@@ -1908,20 +1908,8 @@ pub mod _puroro_impls {
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(
-            &'this self,
-        ) -> ::puroro::AsRefSlice<
-            'this,
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                'this,
-            >,
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                'this,
-            >,
-        > {
-            let field_ref: &[&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>] = unsafe {
-            ::std::mem::transmute(&self.submsg_repeated)
-        };
+        pub fn submsg_repeated<'this>(&'this self) -> ::puroro::AsRefSlice<'this, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>, &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
+            let field_ref: &[_] = unsafe { ::std::mem::transmute(self.submsg_repeated.as_ref()) };
             ::puroro::AsRefSlice::new(field_ref)
         }
         pub fn enum_optional_opt<'this>(

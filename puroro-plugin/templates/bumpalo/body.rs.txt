@@ -83,8 +83,8 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         {%- if field.is_length_delimited %}
         {%- if field.is_message %}
         {#- need to cast the field message type's lifetime #}
-        let field_ref: &[{{ field.bumpalo_getter_rep_item_type }}] = unsafe {
-            ::std::mem::transmute(&self.{{ field.ident }})
+        let field_ref: &[_] = unsafe {
+            ::std::mem::transmute(self.{{ field.ident }}.as_ref())
         };
         ::puroro::AsRefSlice::new(field_ref)
         {%- else %} {#- if field.is_message #}
