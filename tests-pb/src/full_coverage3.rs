@@ -11321,8 +11321,8 @@ pub mod _puroro_impls {
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
-        pub fn i32_repeated<'this>(&'this self) -> i32 {
-            self.i32_repeated.iter().copied()
+        pub fn i32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
+            ::puroro::ClonedSlice::new(&self.i32_repeated)
         }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if !::puroro::internal::IsDefault::is_default(&self.float_unlabeled) {
@@ -11356,8 +11356,8 @@ pub mod _puroro_impls {
         pub fn has_float_optional(&self) -> bool {
             self.float_optional_opt().is_some()
         }
-        pub fn float_repeated<'this>(&'this self) -> f32 {
-            self.float_repeated.iter().copied()
+        pub fn float_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, f32> {
+            ::puroro::ClonedSlice::new(&self.float_repeated)
         }
         pub fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             if !::puroro::internal::IsDefault::is_default(&self.bytes_unlabeled) {
@@ -11394,7 +11394,7 @@ pub mod _puroro_impls {
         pub fn bytes_repeated<'this>(
             &'this self,
         ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpVec<u8>, [u8]> {
-            ::puroro::internal::utils::BorrowedIter::new(self.bytes_repeated.iter())
+            ::puroro::AsRefSlice::new(&self.bytes_repeated)
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
@@ -11430,8 +11430,8 @@ pub mod _puroro_impls {
         }
         pub fn string_repeated<'this>(
             &'this self,
-        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpStr, str> {
-            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
+        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpString, str> {
+            ::puroro::AsRefSlice::new(&self.string_repeated)
         }
         pub fn enum_unlabeled_opt<'this>(
             &'this self,
@@ -11469,8 +11469,10 @@ pub mod _puroro_impls {
         pub fn has_enum_optional(&self) -> bool {
             self.enum_optional_opt().is_some()
         }
-        pub fn enum_repeated<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            self.enum_repeated.iter().copied()
+        pub fn enum_repeated<'this>(
+            &'this self,
+        ) -> ::puroro::ClonedSlice<'this, self::_puroro_root::full_coverage3::Enum> {
+            ::puroro::ClonedSlice::new(&self.enum_repeated)
         }
         pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
             self.submsg_unlabeled
@@ -11494,11 +11496,21 @@ pub mod _puroro_impls {
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(&'this self) -> &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
-            let field: &::puroro::internal::NoAllocBumpVec<&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> = unsafe {
+        pub fn submsg_repeated<'this>(
+            &'this self,
+        ) -> ::puroro::AsRefSlice<
+            'this,
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >,
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >,
+        > {
+            let field_ref: &[&'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>] = unsafe {
             ::std::mem::transmute(&self.submsg_repeated)
         };
-            ::puroro::internal::utils::BorrowedIter::new(field.iter())
+            ::puroro::AsRefSlice::new(field_ref)
         }
         pub fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if !::puroro::internal::IsDefault::is_default(&self.i64_unlabeled) {
@@ -11532,8 +11544,8 @@ pub mod _puroro_impls {
         pub fn has_i64_optional(&self) -> bool {
             self.i64_optional_opt().is_some()
         }
-        pub fn i64_repeated<'this>(&'this self) -> i64 {
-            self.i64_repeated.iter().copied()
+        pub fn i64_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i64> {
+            ::puroro::ClonedSlice::new(&self.i64_repeated)
         }
         pub fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if !::puroro::internal::IsDefault::is_default(&self.u32_unlabeled) {
@@ -11567,8 +11579,8 @@ pub mod _puroro_impls {
         pub fn has_u32_optional(&self) -> bool {
             self.u32_optional_opt().is_some()
         }
-        pub fn u32_repeated<'this>(&'this self) -> u32 {
-            self.u32_repeated.iter().copied()
+        pub fn u32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, u32> {
+            ::puroro::ClonedSlice::new(&self.u32_repeated)
         }
         pub fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if !::puroro::internal::IsDefault::is_default(&self.u64_unlabeled) {
@@ -11602,8 +11614,8 @@ pub mod _puroro_impls {
         pub fn has_u64_optional(&self) -> bool {
             self.u64_optional_opt().is_some()
         }
-        pub fn u64_repeated<'this>(&'this self) -> u64 {
-            self.u64_repeated.iter().copied()
+        pub fn u64_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, u64> {
+            ::puroro::ClonedSlice::new(&self.u64_repeated)
         }
         pub fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.s32_unlabeled) {
@@ -11637,8 +11649,8 @@ pub mod _puroro_impls {
         pub fn has_s32_optional(&self) -> bool {
             self.s32_optional_opt().is_some()
         }
-        pub fn s32_repeated<'this>(&'this self) -> i32 {
-            self.s32_repeated.iter().copied()
+        pub fn s32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
+            ::puroro::ClonedSlice::new(&self.s32_repeated)
         }
         pub fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if !::puroro::internal::IsDefault::is_default(&self.s64_unlabeled) {
@@ -11672,8 +11684,8 @@ pub mod _puroro_impls {
         pub fn has_s64_optional(&self) -> bool {
             self.s64_optional_opt().is_some()
         }
-        pub fn s64_repeated<'this>(&'this self) -> i64 {
-            self.s64_repeated.iter().copied()
+        pub fn s64_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i64> {
+            ::puroro::ClonedSlice::new(&self.s64_repeated)
         }
         pub fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if !::puroro::internal::IsDefault::is_default(&self.fixed32_unlabeled) {
@@ -11707,8 +11719,8 @@ pub mod _puroro_impls {
         pub fn has_fixed32_optional(&self) -> bool {
             self.fixed32_optional_opt().is_some()
         }
-        pub fn fixed32_repeated<'this>(&'this self) -> u32 {
-            self.fixed32_repeated.iter().copied()
+        pub fn fixed32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, u32> {
+            ::puroro::ClonedSlice::new(&self.fixed32_repeated)
         }
         pub fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if !::puroro::internal::IsDefault::is_default(&self.fixed64_unlabeled) {
@@ -11742,8 +11754,8 @@ pub mod _puroro_impls {
         pub fn has_fixed64_optional(&self) -> bool {
             self.fixed64_optional_opt().is_some()
         }
-        pub fn fixed64_repeated<'this>(&'this self) -> u64 {
-            self.fixed64_repeated.iter().copied()
+        pub fn fixed64_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, u64> {
+            ::puroro::ClonedSlice::new(&self.fixed64_repeated)
         }
         pub fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.sfixed32_unlabeled) {
@@ -11777,8 +11789,8 @@ pub mod _puroro_impls {
         pub fn has_sfixed32_optional(&self) -> bool {
             self.sfixed32_optional_opt().is_some()
         }
-        pub fn sfixed32_repeated<'this>(&'this self) -> i32 {
-            self.sfixed32_repeated.iter().copied()
+        pub fn sfixed32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
+            ::puroro::ClonedSlice::new(&self.sfixed32_repeated)
         }
         pub fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if !::puroro::internal::IsDefault::is_default(&self.sfixed64_unlabeled) {
@@ -11812,8 +11824,8 @@ pub mod _puroro_impls {
         pub fn has_sfixed64_optional(&self) -> bool {
             self.sfixed64_optional_opt().is_some()
         }
-        pub fn sfixed64_repeated<'this>(&'this self) -> i64 {
-            self.sfixed64_repeated.iter().copied()
+        pub fn sfixed64_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i64> {
+            ::puroro::ClonedSlice::new(&self.sfixed64_repeated)
         }
         pub fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             if !::puroro::internal::IsDefault::is_default(&self.f64_unlabeled) {
@@ -11847,8 +11859,8 @@ pub mod _puroro_impls {
         pub fn has_f64_optional(&self) -> bool {
             self.f64_optional_opt().is_some()
         }
-        pub fn f64_repeated<'this>(&'this self) -> f64 {
-            self.f64_repeated.iter().copied()
+        pub fn f64_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, f64> {
+            ::puroro::ClonedSlice::new(&self.f64_repeated)
         }
         pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();

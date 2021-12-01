@@ -83,15 +83,15 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         {%- if field.is_length_delimited %}
         {%- if field.is_message %}
         {#- need to cast the field message type's lifetime #}
-        let field: &::puroro::internal::NoAllocBumpVec<{{ field.bumpalo_getter_rep_item_type }}> = unsafe {
+        let field_ref: &[{{ field.bumpalo_getter_rep_item_type }}] = unsafe {
             ::std::mem::transmute(&self.{{ field.ident }})
         };
-        ::puroro::internal::utils::BorrowedIter::new(field.iter())
+        ::puroro::AsRefSlice::new(field_ref)
         {%- else %} {#- if field.is_message #}
-        ::puroro::internal::utils::BorrowedIter::new(self.{{ field.ident }}.iter())
+        ::puroro::AsRefSlice::new(&self.{{ field.ident }})
         {%- endif %} {#- if field.is_message #}
         {%- else %} {#- if field.is_length_delimited #}
-        self.{{ field.ident }}.iter().copied()
+        ::puroro::ClonedSlice::new(&self.{{ field.ident }})
         {%- endif %} {#- if field.is_length_delimited #}
     }
 

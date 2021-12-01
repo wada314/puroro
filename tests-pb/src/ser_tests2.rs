@@ -1854,8 +1854,8 @@ pub mod _puroro_impls {
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
-        pub fn i32_repeated<'this>(&'this self) -> i32 {
-            self.i32_repeated.iter().copied()
+        pub fn i32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
+            ::puroro::ClonedSlice::new(&self.i32_repeated)
         }
         pub fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get(1).map_or(false, |v| *v) {
@@ -1873,8 +1873,8 @@ pub mod _puroro_impls {
         pub fn has_float_optional(&self) -> bool {
             self.float_optional_opt().is_some()
         }
-        pub fn float_repeated<'this>(&'this self) -> f32 {
-            self.float_repeated.iter().copied()
+        pub fn float_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, f32> {
+            ::puroro::ClonedSlice::new(&self.float_repeated)
         }
         pub fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get(2).map_or(false, |v| *v) {
@@ -1894,8 +1894,8 @@ pub mod _puroro_impls {
         }
         pub fn string_repeated<'this>(
             &'this self,
-        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpStr, str> {
-            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
+        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpString, str> {
+            ::puroro::AsRefSlice::new(&self.string_repeated)
         }
         pub fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
             self.submsg_optional
@@ -1908,11 +1908,21 @@ pub mod _puroro_impls {
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(&'this self) -> &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
-            let field: &::puroro::internal::NoAllocBumpVec<&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> = unsafe {
+        pub fn submsg_repeated<'this>(
+            &'this self,
+        ) -> ::puroro::AsRefSlice<
+            'this,
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >,
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >,
+        > {
+            let field_ref: &[&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>] = unsafe {
             ::std::mem::transmute(&self.submsg_repeated)
         };
-            ::puroro::internal::utils::BorrowedIter::new(field.iter())
+            ::puroro::AsRefSlice::new(field_ref)
         }
         pub fn enum_optional_opt<'this>(
             &'this self,
@@ -1932,8 +1942,10 @@ pub mod _puroro_impls {
         pub fn has_enum_optional(&self) -> bool {
             self.enum_optional_opt().is_some()
         }
-        pub fn enum_repeated<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
-            self.enum_repeated.iter().copied()
+        pub fn enum_repeated<'this>(
+            &'this self,
+        ) -> ::puroro::ClonedSlice<'this, self::_puroro_root::ser_tests2::Enum> {
+            ::puroro::ClonedSlice::new(&self.enum_repeated)
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(4).map_or(false, |v| *v) {

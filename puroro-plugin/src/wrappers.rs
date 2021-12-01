@@ -812,21 +812,28 @@ impl Field {
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
             LengthDelimited(String) => format!(
-                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpStr, str>",
+                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpString, str>",
                 lt
-            )
-            .into(),
+            ),
             LengthDelimited(Bytes) => format!(
                 "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpVec<u8>, [u8]>",
                 lt
-            )
-            .into(),
+            ),
             LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
-                format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
+                format!(
+                    "::puroro::AsRefSlice<{lt}, {msg}, {msg}>",
+                    lt = lt,
+                    msg = msg_type
+                )
             }
-            Trivial(field_type) => field_type.rust_type_name()?,
-        })
+            Trivial(field_type) => format!(
+                "::puroro::ClonedSlice<{lt}, {ty}>",
+                lt = lt,
+                ty = field_type.rust_type_name()?
+            ),
+        }
+        .into())
     }
 
     pub fn bumpalo_getter_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {

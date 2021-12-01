@@ -1872,8 +1872,8 @@ pub mod _puroro_impls {
         pub fn has_i32_unlabeled(&self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
-        pub fn i32_repeated<'this>(&'this self) -> i32 {
-            self.i32_repeated.iter().copied()
+        pub fn i32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
+            ::puroro::ClonedSlice::new(&self.i32_repeated)
         }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if !::puroro::internal::IsDefault::is_default(&self.float_unlabeled) {
@@ -1891,8 +1891,8 @@ pub mod _puroro_impls {
         pub fn has_float_unlabeled(&self) -> bool {
             self.float_unlabeled_opt().is_some()
         }
-        pub fn float_repeated<'this>(&'this self) -> f32 {
-            self.float_repeated.iter().copied()
+        pub fn float_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, f32> {
+            ::puroro::ClonedSlice::new(&self.float_repeated)
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
@@ -1912,8 +1912,8 @@ pub mod _puroro_impls {
         }
         pub fn string_repeated<'this>(
             &'this self,
-        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpStr, str> {
-            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
+        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpString, str> {
+            ::puroro::AsRefSlice::new(&self.string_repeated)
         }
         pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
             self.submsg_unlabeled
@@ -1926,11 +1926,21 @@ pub mod _puroro_impls {
         pub fn has_submsg_unlabeled(&self) -> bool {
             self.submsg_unlabeled_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(&'this self) -> &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>{
-            let field: &::puroro::internal::NoAllocBumpVec<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> = unsafe {
+        pub fn submsg_repeated<'this>(
+            &'this self,
+        ) -> ::puroro::AsRefSlice<
+            'this,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >,
+        > {
+            let field_ref: &[&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>] = unsafe {
             ::std::mem::transmute(&self.submsg_repeated)
         };
-            ::puroro::internal::utils::BorrowedIter::new(field.iter())
+            ::puroro::AsRefSlice::new(field_ref)
         }
         pub fn enum_unlabeled_opt<'this>(
             &'this self,
@@ -1950,8 +1960,10 @@ pub mod _puroro_impls {
         pub fn has_enum_unlabeled(&self) -> bool {
             self.enum_unlabeled_opt().is_some()
         }
-        pub fn enum_repeated<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
-            self.enum_repeated.iter().copied()
+        pub fn enum_repeated<'this>(
+            &'this self,
+        ) -> ::puroro::ClonedSlice<'this, self::_puroro_root::ser_tests3::Enum> {
+            ::puroro::ClonedSlice::new(&self.enum_repeated)
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.very_large_field_number) {
