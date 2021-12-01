@@ -1144,26 +1144,27 @@ impl FieldType {
     }
 
     pub fn categories(self) -> Result<FieldTypeCategories> {
+        use FieldTypeCategories::*;
         Ok(match self {
-            FieldType::Double => FieldTypeCategories::Trivial(TrivialFieldType::Double),
-            FieldType::Float => FieldTypeCategories::Trivial(TrivialFieldType::Float),
-            FieldType::Int32 => FieldTypeCategories::Trivial(TrivialFieldType::Int32),
-            FieldType::Int64 => FieldTypeCategories::Trivial(TrivialFieldType::Int64),
-            FieldType::UInt32 => FieldTypeCategories::Trivial(TrivialFieldType::UInt32),
-            FieldType::UInt64 => FieldTypeCategories::Trivial(TrivialFieldType::UInt64),
-            FieldType::SInt32 => FieldTypeCategories::Trivial(TrivialFieldType::SInt32),
-            FieldType::SInt64 => FieldTypeCategories::Trivial(TrivialFieldType::SInt64),
-            FieldType::Fixed32 => FieldTypeCategories::Trivial(TrivialFieldType::Fixed32),
-            FieldType::Fixed64 => FieldTypeCategories::Trivial(TrivialFieldType::Fixed64),
-            FieldType::SFixed32 => FieldTypeCategories::Trivial(TrivialFieldType::SFixed32),
-            FieldType::SFixed64 => FieldTypeCategories::Trivial(TrivialFieldType::SFixed64),
-            FieldType::Bool => FieldTypeCategories::Trivial(TrivialFieldType::Bool),
+            FieldType::Double => Trivial(TrivialFieldType::Double),
+            FieldType::Float => Trivial(TrivialFieldType::Float),
+            FieldType::Int32 => Trivial(TrivialFieldType::Int32),
+            FieldType::Int64 => Trivial(TrivialFieldType::Int64),
+            FieldType::UInt32 => Trivial(TrivialFieldType::UInt32),
+            FieldType::UInt64 => Trivial(TrivialFieldType::UInt64),
+            FieldType::SInt32 => Trivial(TrivialFieldType::SInt32),
+            FieldType::SInt64 => Trivial(TrivialFieldType::SInt64),
+            FieldType::Fixed32 => Trivial(TrivialFieldType::Fixed32),
+            FieldType::Fixed64 => Trivial(TrivialFieldType::Fixed64),
+            FieldType::SFixed32 => Trivial(TrivialFieldType::SFixed32),
+            FieldType::SFixed64 => Trivial(TrivialFieldType::SFixed64),
+            FieldType::Bool => Trivial(TrivialFieldType::Bool),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => FieldTypeCategories::LengthDelimited(LdFieldType::String),
-            FieldType::Bytes => FieldTypeCategories::LengthDelimited(LdFieldType::Bytes),
-            FieldType::Enum2(e) => FieldTypeCategories::Trivial(TrivialFieldType::Enum2(e)),
-            FieldType::Enum3(e) => FieldTypeCategories::Trivial(TrivialFieldType::Enum3(e)),
-            FieldType::Message(m) => FieldTypeCategories::LengthDelimited(LdFieldType::Message(m)),
+            FieldType::String => LengthDelimited(LdFieldType::String),
+            FieldType::Bytes => LengthDelimited(LdFieldType::Bytes),
+            FieldType::Enum2(e) => Trivial(TrivialFieldType::Enum2(e)),
+            FieldType::Enum3(e) => Trivial(TrivialFieldType::Enum3(e)),
+            FieldType::Message(m) => LengthDelimited(LdFieldType::Message(m)),
         })
     }
 
@@ -1232,6 +1233,9 @@ impl TrivialFieldType {
             TrivialFieldType::SFixed32 => "i32".into(),
             TrivialFieldType::SFixed64 => "i64".into(),
             TrivialFieldType::Bool => "bool".into(),
+            TrivialFieldType::Enum2(e) | TrivialFieldType::Enum3(e) => {
+                upgrade(e)?.rust_path().into()
+            }
         })
     }
 }
