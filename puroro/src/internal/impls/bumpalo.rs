@@ -107,6 +107,20 @@ impl<T> Drop for NoAllocBox<T> {
     }
 }
 
+pub trait AddBump {
+    type AddToRef<'bump, 'this>
+    where
+        Self: 'bump + 'this;
+    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this>;
+    type AddToMutRef<'bump, 'this>
+    where
+        Self: 'bump + 'this;
+    fn add_bump_mut<'bump, 'this>(
+        &'this mut self,
+        bump: &'bump Bump,
+    ) -> Self::AddToMutRef<'bump, 'this>;
+}
+
 /// A vec for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
 ///
@@ -167,6 +181,25 @@ impl<T> NoAllocVec<T> {
             ref_vec: self,
             bump,
         }
+    }
+}
+impl<T> AddBump for NoAllocVec<T> {
+    type AddToRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = Vec<'bump, T>;
+    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
+        unsafe { self.as_vec_in(bump) }
+    }
+    type AddToMutRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = RefMutVec<'bump, 'this, T>;
+    fn add_bump_mut<'bump, 'this>(
+        &'this mut self,
+        bump: &'bump Bump,
+    ) -> Self::AddToMutRef<'bump, 'this> {
+        unsafe { self.as_mut_vec_in(bump) }
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -363,6 +396,25 @@ impl NoAllocString {
             temp_string: ManuallyDrop::new(self.as_string_in(bump)),
             ref_string: self,
         }
+    }
+}
+impl AddBump for NoAllocString {
+    type AddToRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = String<'bump>;
+    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
+        unsafe { self.as_string_in(bump) }
+    }
+    type AddToMutRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = RefMutString<'bump, 'this>;
+    fn add_bump_mut<'bump, 'this>(
+        &'this mut self,
+        bump: &'bump Bump,
+    ) -> Self::AddToMutRef<'bump, 'this> {
+        unsafe { self.as_mut_string_in(bump) }
     }
 }
 
