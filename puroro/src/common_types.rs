@@ -31,6 +31,7 @@ impl<'slice, T: Clone> IntoIterator for ClonedSlice<'slice, T> {
     }
 }
 
+/// A proxied slice, which accesses the elements via `AsRef<T>`.
 pub struct AsRefSlice<'slice, T, U: ?Sized>(&'slice [T], PhantomData<U>);
 impl<'slice, T, U: ?Sized> AsRefSlice<'slice, T, U> {
     pub fn new(slice: &'slice [T]) -> Self {
