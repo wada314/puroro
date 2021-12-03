@@ -15713,16 +15713,11 @@ pub mod _puroro_traits {
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field3RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field3RepeatedType<'this>>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.i32_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i32_repeated()),
+            )
         }
         fn float_required_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.float_required_opt())
@@ -15734,16 +15729,11 @@ pub mod _puroro_traits {
         type Field13RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field13RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field13RepeatedType<'this>>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.float_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.float_repeated()),
+            )
         }
         fn bytes_required_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             self.as_ref().and_then(|msg| msg.bytes_required_opt())
@@ -15755,16 +15745,11 @@ pub mod _puroro_traits {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field23RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field23RepeatedType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.bytes_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.bytes_repeated()),
+            )
         }
         fn string_required_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.string_required_opt())
@@ -15776,16 +15761,11 @@ pub mod _puroro_traits {
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field33RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field33RepeatedType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.string_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.string_repeated()),
+            )
         }
         fn enum_required_opt<'this>(
             &'this self,
@@ -15801,16 +15781,11 @@ pub mod _puroro_traits {
         type Field43RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field43RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field43RepeatedType<'this>>;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.enum_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.enum_repeated()),
+            )
         }
         type Field51MessageType<'this>
         where
@@ -15838,16 +15813,11 @@ pub mod _puroro_traits {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field53RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field53RepeatedType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.submsg_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.submsg_repeated()),
+            )
         }
         fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().and_then(|msg| msg.i64_required_opt())
@@ -15859,16 +15829,11 @@ pub mod _puroro_traits {
         type Field103RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field103RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field103RepeatedType<'this>>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.i64_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i64_repeated()),
+            )
         }
         fn u32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             self.as_ref().and_then(|msg| msg.u32_required_opt())
@@ -15880,16 +15845,11 @@ pub mod _puroro_traits {
         type Field113RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field113RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field113RepeatedType<'this>>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.u32_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.u32_repeated()),
+            )
         }
         fn u64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().and_then(|msg| msg.u64_required_opt())
@@ -15901,16 +15861,11 @@ pub mod _puroro_traits {
         type Field123RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field123RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field123RepeatedType<'this>>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.u64_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.u64_repeated()),
+            )
         }
         fn s32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.s32_required_opt())
@@ -15922,16 +15877,11 @@ pub mod _puroro_traits {
         type Field133RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field133RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field133RepeatedType<'this>>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.s32_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.s32_repeated()),
+            )
         }
         fn s64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().and_then(|msg| msg.s64_required_opt())
@@ -15943,16 +15893,11 @@ pub mod _puroro_traits {
         type Field143RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field143RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field143RepeatedType<'this>>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.s64_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.s64_repeated()),
+            )
         }
         fn fixed32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             self.as_ref().and_then(|msg| msg.fixed32_required_opt())
@@ -15964,16 +15909,11 @@ pub mod _puroro_traits {
         type Field153RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field153RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field153RepeatedType<'this>>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.fixed32_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.fixed32_repeated()),
+            )
         }
         fn fixed64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             self.as_ref().and_then(|msg| msg.fixed64_required_opt())
@@ -15985,16 +15925,11 @@ pub mod _puroro_traits {
         type Field163RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field163RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field163RepeatedType<'this>>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.fixed64_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.fixed64_repeated()),
+            )
         }
         fn sfixed32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.sfixed32_required_opt())
@@ -16006,16 +15941,11 @@ pub mod _puroro_traits {
         type Field173RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field173RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field173RepeatedType<'this>>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.sfixed32_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.sfixed32_repeated()),
+            )
         }
         fn sfixed64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().and_then(|msg| msg.sfixed64_required_opt())
@@ -16027,16 +15957,11 @@ pub mod _puroro_traits {
         type Field183RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field183RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field183RepeatedType<'this>>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.sfixed64_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.sfixed64_repeated()),
+            )
         }
         fn f64_required_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             self.as_ref().and_then(|msg| msg.f64_required_opt())
@@ -16048,16 +15973,11 @@ pub mod _puroro_traits {
         type Field193RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field193RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field193RepeatedType<'this>>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.f64_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.f64_repeated()),
+            )
         }
     }
 }
