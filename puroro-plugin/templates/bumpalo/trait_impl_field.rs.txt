@@ -10,9 +10,7 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_
 {%- match f.bumpalo_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-    ::puroro::internal::utils::BorrowedIter<
-        {{ borrowed }},
-        ::std::slice::Iter<'this, {{ f.bumpalo_getter_rep_item_type }}>>;
+    ::puroro::AsRefSlice<'this, {{ f.bumpalo_getter_rep_item_type }}, {{ borrowed }}>;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
     ::puroro::ClonedSlice<'this, {{ f.trait_scalar_getter_type }}>;

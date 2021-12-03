@@ -2071,7 +2071,7 @@ pub mod _puroro_impls {
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::utils::BorrowedIter<str, ::std::slice::Iter<'this, &'this str>>;
+        = ::puroro::AsRefSlice<'this, &'this str, str>;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             todo!()
@@ -2092,9 +2092,7 @@ pub mod _puroro_impls {
             'this,
         >;
         type Field8RepeatedType<'this> where Self: 'this =
-    ::puroro::internal::utils::BorrowedIter<
-        self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>,
-        ::std::slice::Iter<'this, &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>>;
+    ::puroro::AsRefSlice<'this, &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             todo!()

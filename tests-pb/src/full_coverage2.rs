@@ -12207,7 +12207,7 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::utils::BorrowedIter<[u8], ::std::slice::Iter<'this, &'this [u8]>>;
+        = ::puroro::AsRefSlice<'this, &'this [u8], [u8]>;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             todo!()
@@ -12229,7 +12229,7 @@ pub mod _puroro_impls {
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::utils::BorrowedIter<str, ::std::slice::Iter<'this, &'this str>>;
+        = ::puroro::AsRefSlice<'this, &'this str, str>;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             todo!()
@@ -12270,9 +12270,7 @@ pub mod _puroro_impls {
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         type Field53RepeatedType<'this> where Self: 'this =
-    ::puroro::internal::utils::BorrowedIter<
-        self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>,
-        ::std::slice::Iter<'this, &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>>;
+    ::puroro::AsRefSlice<'this, &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             todo!()
