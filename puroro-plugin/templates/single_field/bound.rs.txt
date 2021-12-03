@@ -25,7 +25,6 @@ ScalarType: ::std::convert::Into<{{ f.single_numerical_rust_type }}> +
 {%- endif %} {#- if f.is_length_delimited #}
 
 {%- if f.is_repeated %}
-for <'a> &'a RepeatedType: ::std::iter::IntoIterator<
-    Item = &'a ScalarType
->,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
 {%- endif %}

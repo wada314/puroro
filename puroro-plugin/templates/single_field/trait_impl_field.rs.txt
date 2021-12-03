@@ -8,12 +8,12 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this ScalarType
 
 {%- if f.is_length_delimited %}
 {%- if f.is_message %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter;
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this = &'this RepeatedType;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = ::puroro::internal::impls::single_field::AsRefIter<
-        <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+    = ::puroro::internal::impls::single_field::AsRefRepeatedField<
+        'this,
+        RepeatedType,
         {%- if f.is_bytes %}
         [u8],
         {%- endif %}
