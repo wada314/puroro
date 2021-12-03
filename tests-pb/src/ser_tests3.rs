@@ -126,13 +126,10 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
-        type Field6RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
-            str,
-            ::std::slice::Iter<'this, ::std::string::String>,
-        >;
+        type Field6RepeatedType<'this> = ::puroro::AsRefSlice<'this, ::std::string::String, str>;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::AsRefSlice::new(&self.string_repeated)
         }
         type Field7MessageType<'this>
         where
@@ -145,16 +142,14 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        type Field8RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
+        type Field8RepeatedType<'this> = ::puroro::AsRefSlice<
+            'this,
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            >,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
+            ::puroro::AsRefSlice::new(&self.submsg_repeated)
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             if self.enum_unlabeled == ::std::default::Default::default() {

@@ -123,7 +123,7 @@ pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {
 ///
 /// Currently this trait is just an analogous of [`std::iter::IntoIterator`].
 pub trait RepeatedField<'msg>: IntoIterator {}
-impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
+impl<'msg, T> RepeatedField<'msg> for &'msg [T] {}
 
 /// Bumpalo message, initialized from bump ptr instance.
 pub trait BumpaloMessage<'bump> {

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::RepeatedField;
 use ::std::iter;
 use ::std::marker::PhantomData;
 use ::std::slice;
@@ -30,14 +31,16 @@ impl<'slice, T: Clone> IntoIterator for ClonedSlice<'slice, T> {
         self.0.iter().cloned()
     }
 }
+impl<'slice, T: Clone> RepeatedField<'slice> for ClonedSlice<'slice, T> {}
 
-/// A proxied slice, which accesses the elements via `AsRef<T>`.
+/// A proxied slice, which accesses the elements via `AsRef<U>`.
 pub struct AsRefSlice<'slice, T, U: ?Sized>(&'slice [T], PhantomData<U>);
 impl<'slice, T, U: ?Sized> AsRefSlice<'slice, T, U> {
     pub fn new(slice: &'slice [T]) -> Self {
         Self(slice, PhantomData)
     }
 }
+impl<'slice, T: AsRef<U>, U: 'slice + ?Sized> RepeatedField<'slice> for AsRefSlice<'slice, T, U> {}
 impl<'slice, T: AsRef<U>, U: 'slice + ?Sized> IntoIterator for AsRefSlice<'slice, T, U> {
     type Item = &'slice U;
     type IntoIter = AsRefIter<'slice, slice::Iter<'slice, T>, U>;

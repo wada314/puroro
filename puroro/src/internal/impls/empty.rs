@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::RepeatedField;
 use ::std::marker::PhantomData;
 
 #[derive(Default)]
@@ -21,6 +22,8 @@ impl<T> EmptyRepeatedField<T> {
         Self(PhantomData)
     }
 }
+
+impl<'msg, T> RepeatedField<'msg> for EmptyRepeatedField<T> {}
 
 impl<T> IntoIterator for EmptyRepeatedField<T> {
     type Item = T;
