@@ -272,68 +272,6 @@ impl<'bump, 'vec, T> Drop for RefMutVec<'bump, 'vec, T> {
     }
 }
 
-pub struct RefMutVecOfString<'bump, 'vec> {
-    temp_vec: ManuallyDrop<Vec<'bump, NoAllocString>>,
-    ref_vec: &'vec mut NoAllocVec<NoAllocString>,
-    bump: &'bump Bump,
-}
-impl<'bump, 'vec> RefMutVecOfString<'bump, 'vec> {
-    pub fn last_mut(&'vec mut self) -> Option<RefMutString<'bump, 'vec>> {
-        let bump = self.bump;
-        self.temp_vec
-            .last_mut()
-            .map(|s| unsafe { s.as_mut_string_in(bump) })
-    }
-    pub fn push_new(&'vec mut self) -> RefMutString<'bump, 'vec> {
-        self.temp_vec.push(NoAllocString::new_in(self.bump));
-        let new_string_mut_ref = self.temp_vec.last_mut().unwrap();
-        unsafe { new_string_mut_ref.as_mut_string_in(self.bump) }
-    }
-}
-impl<'bump, 'vec> Drop for RefMutVecOfString<'bump, 'vec> {
-    fn drop(&mut self) {
-        // We can drop without a bump ptr, though we cannot get benefit of
-        // bump memory reusing when the deallocated memory block is the last block
-        // allocated by the bump instance.
-        // It's not much a deal if we are creating a complex data structure like
-        // protobuf I guess though...
-        unsafe {
-            *self.ref_vec = NoAllocVec::from_vec(ManuallyDrop::take(&mut self.temp_vec));
-        }
-    }
-}
-
-pub struct RefMutVecOfBytes<'bump, 'vec> {
-    temp_vec: ManuallyDrop<Vec<'bump, NoAllocVec<u8>>>,
-    ref_vec: &'vec mut NoAllocVec<NoAllocVec<u8>>,
-    bump: &'bump Bump,
-}
-impl<'bump, 'vec> RefMutVecOfBytes<'bump, 'vec> {
-    pub fn last_mut(&'vec mut self) -> Option<RefMutVec<'bump, 'vec, u8>> {
-        let bump = self.bump;
-        self.temp_vec
-            .last_mut()
-            .map(|s| unsafe { s.as_mut_vec_in(bump) })
-    }
-    pub fn push_new(&'vec mut self) -> RefMutVec<'bump, 'vec, u8> {
-        self.temp_vec.push(NoAllocVec::new_in(self.bump));
-        let new_vec_mut_ref = self.temp_vec.last_mut().unwrap();
-        unsafe { new_vec_mut_ref.as_mut_vec_in(self.bump) }
-    }
-}
-impl<'bump, 'vec> Drop for RefMutVecOfBytes<'bump, 'vec> {
-    fn drop(&mut self) {
-        // We can drop without a bump ptr, though we cannot get benefit of
-        // bump memory reusing when the deallocated memory block is the last block
-        // allocated by the bump instance.
-        // It's not much a deal if we are creating a complex data structure like
-        // protobuf I guess though...
-        unsafe {
-            *self.ref_vec = NoAllocVec::from_vec(ManuallyDrop::take(&mut self.temp_vec));
-        }
-    }
-}
-
 /// A string for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
 ///
