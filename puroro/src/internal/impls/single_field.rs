@@ -59,6 +59,8 @@ where
     }
 }
 
+pub struct CloneThenIntoRepeatedField<T, U>(T, PhantomData<U>);
+
 pub struct CloneThenIntoIter<I, T>(I, PhantomData<T>);
 impl<I, T> CloneThenIntoIter<I, T> {
     pub fn new(iter: I) -> Self {

@@ -119,12 +119,6 @@ pub trait Enum2:
 }
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
-/// A trait for repaeted field value returned from message traits getter methods.
-///
-/// Currently this trait is just an analogous of [`std::iter::IntoIterator`].
-pub trait RepeatedField<'msg>: IntoIterator {}
-impl<'msg, T> RepeatedField<'msg> for &'msg [T] {}
-
 /// Bumpalo message, initialized from bump ptr instance.
 pub trait BumpaloMessage<'bump> {
     fn new_in(bump: &'bump Bump) -> Self;
