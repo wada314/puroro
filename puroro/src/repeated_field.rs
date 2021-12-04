@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use ::std::iter;
+use ::std::marker::PhantomData;
 
 /// A trait for repeated field value returned from message traits getter methods.
 ///
@@ -70,5 +71,18 @@ where
     type Item = <M as Map>::To;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|x| self.map.map(x))
+    }
+}
+
+pub struct CloneThenInto<'a, T, U>(PhantomData<&'a (T, U)>);
+impl<'a, T, U> Map for CloneThenInto<'a, T, U>
+where
+    T: Clone + Into<U>,
+{
+    type From = &'a T;
+    type To = U;
+
+    fn map(&self, from: Self::From) -> Self::To {
+        <T as Into<U>>::into(<T as Clone>::clone(from))
     }
 }
