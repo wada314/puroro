@@ -30,28 +30,30 @@ impl<T, F> MappedRepeatedField<T, F> {
         Self { inner, map }
     }
 }
-impl<'msg, T, U, F> RepeatedField<'msg> for MappedRepeatedField<T, F>
+impl<'msg, T, F> RepeatedField<'msg> for MappedRepeatedField<T, F>
 where
     T: IntoIterator,
-    F: Map<<T as IntoIterator>::Item, U>,
+    F: Map<From = <T as IntoIterator>::Item>,
 {
 }
-impl<T, U, F> IntoIterator for MappedRepeatedField<T, F>
+impl<T, F> IntoIterator for MappedRepeatedField<T, F>
 where
     T: IntoIterator,
-    F: Map<<T as IntoIterator>::Item, U>,
+    F: Map<From = <T as IntoIterator>::Item>,
 {
-    type Item = U;
+    type Item = <F as Map>::To;
     type IntoIter = MapIter<<T as IntoIterator>::IntoIter, F>;
     fn into_iter(self) -> Self::IntoIter {
         MapIter::new(self.inner.into_iter(), self.map)
     }
 }
 
-trait Map<From, To> {
-    fn map(from: From) -> To;
+pub trait Map {
+    type From;
+    type To;
+    fn map(&self, from: Self::From) -> Self::To;
 }
-struct MapIter<I, M> {
+pub struct MapIter<I, M> {
     iter: I,
     map: M,
 }
@@ -60,12 +62,12 @@ impl<I, M> MapIter<I, M> {
         Self { iter, map }
     }
 }
-impl<I, M, To> Iterator for MapIter<I, M>
+impl<I, M> Iterator for MapIter<I, M>
 where
     I: Iterator,
-    M: Map<<I as Iterator>::Item, To>,
+    M: Map<From = <I as Iterator>::Item>,
 {
-    type Item = To;
+    type Item = <M as Map>::To;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|x| self.map.map(x))
     }
