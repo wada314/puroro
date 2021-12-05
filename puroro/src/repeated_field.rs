@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::iter;
 use ::std::marker::PhantomData;
 
 /// A trait for repeated field value returned from message traits getter methods.

@@ -69,10 +69,11 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
+        type Field3RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::ClonedSlice::new(&self.i32_repeated)
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             if self.f32_unlabeled == ::std::default::Default::default() {

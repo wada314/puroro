@@ -100,26 +100,33 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field2RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
+        type Field2RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::ClonedSlice::new(&self.i32_repeated)
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_optional)
         }
-        type Field4RepeatedType<'this> = ::puroro::ClonedSlice<'this, f32>;
+        type Field4RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::ClonedSlice::new(&self.float_repeated)
+            ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field6RepeatedType<'this> = ::puroro::AsRefSlice<'this, ::std::string::String, str>;
+        type Field6RepeatedType<'this> = ::puroro::AsRefRepeatedField<
+            'this,
+            ::std::vec::Vec<::std::string::String>,
+            ::std::string::String,
+            str,
+        >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::AsRefSlice::new(&self.string_repeated)
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         type Field7MessageType<'this>
         where
@@ -132,23 +139,30 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        type Field8RepeatedType<'this> = ::puroro::AsRefSlice<
+        type Field8RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
+            ::std::vec::Vec<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+            >,
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::AsRefSlice::new(&self.submsg_repeated)
+            ::puroro::AsRefRepeatedField::new(&self.submsg_repeated)
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             Clone::clone(&self.enum_optional)
         }
-        type Field10RepeatedType<'this> =
-            ::puroro::ClonedSlice<'this, self::_puroro_root::ser_tests2::Enum>;
+        type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
+            self::_puroro_root::ser_tests2::Enum,
+            self::_puroro_root::ser_tests2::Enum,
+        >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro::ClonedSlice::new(&self.enum_repeated)
+            ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.very_large_field_number)

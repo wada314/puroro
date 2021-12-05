@@ -179,7 +179,6 @@ impl<T> NoAllocVec<T> {
         RefMutVec {
             temp_vec: ManuallyDrop::new(self.as_vec_in(bump)),
             ref_vec: self,
-            bump,
         }
     }
 }
@@ -239,7 +238,6 @@ impl<T> Default for NoAllocVec<T> {
 pub struct RefMutVec<'bump, 'vec, T> {
     temp_vec: ManuallyDrop<Vec<'bump, T>>,
     ref_vec: &'vec mut NoAllocVec<T>,
-    bump: &'bump Bump,
 }
 impl<'bump, 'vec, T: Default> RefMutVec<'bump, 'vec, T> {
     pub fn push_new(&mut self) -> &mut T {

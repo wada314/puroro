@@ -341,10 +341,11 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::Test4Trait for Test4 {
-        type Field4RepeatedType<'this> = ::puroro::ClonedSlice<'this, i32>;
+        type Field4RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::ClonedSlice::new(&self.d)
+            ::puroro::CloneThenIntoRepeatedField::new(&self.d)
         }
     }
 
