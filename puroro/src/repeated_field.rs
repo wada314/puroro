@@ -27,7 +27,7 @@ pub struct MappedRepeatedField<T, F> {
     map: F,
 }
 impl<T, F> MappedRepeatedField<T, F> {
-    pub fn new(inner: T, map: F) -> Self {
+    pub fn new_with_map(inner: T, map: F) -> Self {
         Self { inner, map }
     }
 }
@@ -84,5 +84,12 @@ where
 
     fn map(&self, from: Self::From) -> Self::To {
         <T as Into<U>>::into(<T as Clone>::clone(from))
+    }
+}
+pub type CloneThenIntoRepeatedField<'a, R, T, U> =
+    MappedRepeatedField<&'a R, CloneThenInto<'a, T, U>>;
+impl<'a, R, T, U> CloneThenIntoRepeatedField<'a, R, T, U> {
+    pub fn new(inner: &'a R) -> Self {
+        Self::new_with_map(inner, CloneThenInto(PhantomData))
     }
 }
