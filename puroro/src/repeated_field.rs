@@ -96,20 +96,21 @@ impl<'a, InnerRepeated, InnerItem, TargetItem>
     }
 }
 
-pub struct AsRefMap<'a, From, To>(PhantomData<&'a (From, To)>);
+pub struct AsRefMap<'a, From, To: ?Sized>(PhantomData<&'a (From, To)>);
 impl<'a, From, To> Map for AsRefMap<'a, From, To>
 where
     From: AsRef<To>,
+    To: ?Sized,
 {
     type From = &'a From;
     type To = &'a To;
     fn map(&self, from: Self::From) -> Self::To {
-        AsRef::as_ref(&from)
+        AsRef::as_ref(from)
     }
 }
 pub type AsRefRepeatedField<'a, InnerRepeated, InnerItem, TargetItem> =
     MappedRepeatedField<&'a InnerRepeated, AsRefMap<'a, InnerItem, TargetItem>>;
-impl<'a, InnerRepeated, InnerItem, TargetItem>
+impl<'a, InnerRepeated, InnerItem, TargetItem: ?Sized>
     AsRefRepeatedField<'a, InnerRepeated, InnerItem, TargetItem>
 {
     pub fn new(inner: &'a InnerRepeated) -> Self {
