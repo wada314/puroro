@@ -74,22 +74,24 @@ where
     }
 }
 
-pub struct CloneThenInto<'a, T, U>(PhantomData<&'a (T, U)>);
-impl<'a, T, U> Map for CloneThenInto<'a, T, U>
+pub struct CloneThenInto<'a, From, To>(PhantomData<&'a (From, To)>);
+impl<'a, From, To> Map for CloneThenInto<'a, From, To>
 where
-    T: Clone + Into<U>,
+    From: Clone + Into<To>,
 {
-    type From = &'a T;
-    type To = U;
+    type From = &'a From;
+    type To = To;
 
     fn map(&self, from: Self::From) -> Self::To {
-        <T as Into<U>>::into(<T as Clone>::clone(from))
+        <From as Into<To>>::into(<From as Clone>::clone(from))
     }
 }
-pub type CloneThenIntoRepeatedField<'a, R, T, U> =
-    MappedRepeatedField<&'a R, CloneThenInto<'a, T, U>>;
-impl<'a, R, T, U> CloneThenIntoRepeatedField<'a, R, T, U> {
-    pub fn new(inner: &'a R) -> Self {
+pub type CloneThenIntoRepeatedField<'a, InnerRepeated, InnerItem, TargetItem> =
+    MappedRepeatedField<&'a InnerRepeated, CloneThenInto<'a, InnerItem, TargetItem>>;
+impl<'a, InnerRepeated, InnerItem, TargetItem>
+    CloneThenIntoRepeatedField<'a, InnerRepeated, InnerItem, TargetItem>
+{
+    pub fn new(inner: &'a InnerRepeated) -> Self {
         Self::new_with_map(inner, CloneThenInto(PhantomData))
     }
 }
