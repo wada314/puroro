@@ -1104,12 +1104,10 @@ pub mod _puroro_impls {
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::AsRefRepeatedField<'this, RepeatedType, str>;
+        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::AsRefIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.string_repeated),
-            )
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         type Field7MessageType<'this>
         where

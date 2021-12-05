@@ -3103,12 +3103,10 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::AsRefRepeatedField<'this, RepeatedType, [u8]>;
+        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, [u8]>;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::AsRefIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.bytes_repeated),
-            )
+            ::puroro::AsRefRepeatedField::new(&self.bytes_repeated)
         }
         type Field33RepeatedType<'this>
         where
@@ -3715,12 +3713,10 @@ pub mod _puroro_impls {
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::AsRefRepeatedField<'this, RepeatedType, str>;
+        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::AsRefIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.string_repeated),
-            )
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         type Field43RepeatedType<'this>
         where
