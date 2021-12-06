@@ -1387,7 +1387,7 @@ pub mod _puroro_impls {
         = &'this RepeatedType;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::std::iter::IntoIterator::into_iter(&self.submsg_repeated)
+            &self.submsg_repeated
         }
         type Field10RepeatedType<'this>
         where

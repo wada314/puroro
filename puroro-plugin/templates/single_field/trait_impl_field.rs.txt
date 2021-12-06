@@ -32,7 +32,7 @@ type Field{{ f.number }}RepeatedType<'this> where Self: 'this
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
-    ::std::iter::IntoIterator::into_iter(&self.{{ f.ident }})
+    &self.{{ f.ident }}
     {%- else %}
     ::puroro::AsRefRepeatedField::new(&self.{{ f.ident }})
     {%- endif %}
