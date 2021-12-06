@@ -357,15 +357,10 @@ pub mod _puroro_simple_impl {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        type Field53RepeatedType<'this> = ::puroro::AsRefRepeatedField<
-    'this,
-    ::std::vec::Vec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>,
-    self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-    self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg
->;
+        type Field53RepeatedType<'this> = &'this [self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg];
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro::AsRefRepeatedField::new(&self.submsg_repeated)
+            &self.submsg_repeated
         }
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_required)
