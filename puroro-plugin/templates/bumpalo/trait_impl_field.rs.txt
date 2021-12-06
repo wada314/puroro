@@ -10,7 +10,7 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_
 {%- match f.bumpalo_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-    ::puroro::AsRefSlice<'this, {{ f.bumpalo_getter_rep_item_type }}, {{ borrowed }}>;
+    ::puroro::AsRefRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.bumpalo_field_rep_item_type }}, {{ borrowed }}>;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
     ::puroro::CloneThenIntoRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.trait_scalar_getter_type }}, {{ f.trait_scalar_getter_type }}>;
@@ -19,7 +19,7 @@ type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
     {%- match f.bumpalo_maybe_borrowed_field_type %}
     {%- when Some with (borrowed) %}
-    &self.{{ f.ident }}
+    ::puroro::AsRefRepeatedField::new(&self.{{ f.ident }})
     {%- else %}
     ::puroro::CloneThenIntoRepeatedField::new(&self.{{ f.ident }})
     {%- endmatch %}

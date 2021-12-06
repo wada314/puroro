@@ -2098,10 +2098,15 @@ pub mod _puroro_impls {
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::AsRefSlice<'this, &'this str, str>;
+        = ::puroro::AsRefRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+            ::puroro::internal::NoAllocBumpString,
+            str,
+        >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            &self.string_repeated
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         type Field7MessageType<'this>
         where
@@ -2118,11 +2123,26 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
             'this,
         >;
-        type Field8RepeatedType<'this> where Self: 'this =
-    ::puroro::AsRefSlice<'this, &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::AsRefRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                    'bump,
+                >,
+            >,
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'bump,
+            >,
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >,
+        >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            &self.submsg_repeated
+            ::puroro::AsRefRepeatedField::new(&self.submsg_repeated)
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 3) {

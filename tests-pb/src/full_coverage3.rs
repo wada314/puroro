@@ -12280,10 +12280,15 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::AsRefSlice<'this, &'this [u8], [u8]>;
+        = ::puroro::AsRefRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpVec<u8>>,
+            ::puroro::internal::NoAllocBumpVec<u8>,
+            [u8],
+        >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            &self.bytes_repeated
+            ::puroro::AsRefRepeatedField::new(&self.bytes_repeated)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
@@ -12298,10 +12303,15 @@ pub mod _puroro_impls {
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::AsRefSlice<'this, &'this str, str>;
+        = ::puroro::AsRefRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+            ::puroro::internal::NoAllocBumpString,
+            str,
+        >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            &self.string_repeated
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         fn enum_unlabeled_opt<'this>(
             &'this self,
@@ -12340,10 +12350,10 @@ pub mod _puroro_impls {
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         type Field53RepeatedType<'this> where Self: 'this =
-    ::puroro::AsRefSlice<'this, &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
+    ::puroro::AsRefRepeatedField<'this, ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            &self.submsg_repeated
+            ::puroro::AsRefRepeatedField::new(&self.submsg_repeated)
         }
         fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))

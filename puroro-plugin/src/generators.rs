@@ -197,6 +197,7 @@ struct Field {
     single_field_type: String,
     single_numerical_rust_type: String,
     bumpalo_field_type: String,
+    bumpalo_field_rep_item_type: String,
     bumpalo_getter_type: String,
     bumpalo_getter_opt_type: String,
     bumpalo_getter_mut_type: String,
@@ -292,6 +293,7 @@ impl Field {
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
             bumpalo_field_type: f.bumpalo_field_type()?.into(),
+            bumpalo_field_rep_item_type: f.bumpalo_scalar_field_type()?.into(),
             bumpalo_getter_type: {
                 if f.is_repeated()? {
                     f.bumpalo_getter_repeated_type("'this")?.to_string()
