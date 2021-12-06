@@ -823,11 +823,9 @@ impl Field {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
                 format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
             }
-            Trivial(field_type) => format!(
-                "::puroro::ClonedSlice<{lt}, {ty}>",
-                lt = lt,
-                ty = field_type.rust_type_name()?
-            ),
+            Trivial(field_type) => {
+                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_name()?)
+            }
         }
         .into())
     }

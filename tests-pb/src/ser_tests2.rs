@@ -1866,8 +1866,8 @@ pub mod _puroro_impls {
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
-        pub fn i32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
-            ::puroro::ClonedSlice::new(&self.i32_repeated)
+        pub fn i32_repeated<'this>(&'this self) -> &'this [i32] {
+            &self.i32_repeated
         }
         pub fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get(1).map_or(false, |v| *v) {
@@ -1885,8 +1885,8 @@ pub mod _puroro_impls {
         pub fn has_float_optional(&self) -> bool {
             self.float_optional_opt().is_some()
         }
-        pub fn float_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, f32> {
-            ::puroro::ClonedSlice::new(&self.float_repeated)
+        pub fn float_repeated<'this>(&'this self) -> &'this [f32] {
+            &self.float_repeated
         }
         pub fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get(2).map_or(false, |v| *v) {
@@ -1941,10 +1941,8 @@ pub mod _puroro_impls {
         pub fn has_enum_optional(&self) -> bool {
             self.enum_optional_opt().is_some()
         }
-        pub fn enum_repeated<'this>(
-            &'this self,
-        ) -> ::puroro::ClonedSlice<'this, self::_puroro_root::ser_tests2::Enum> {
-            ::puroro::ClonedSlice::new(&self.enum_repeated)
+        pub fn enum_repeated<'this>(&'this self) -> &'this [self::_puroro_root::ser_tests2::Enum] {
+            &self.enum_repeated
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(4).map_or(false, |v| *v) {

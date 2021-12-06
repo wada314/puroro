@@ -1884,8 +1884,8 @@ pub mod _puroro_impls {
         pub fn has_i32_unlabeled(&self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
-        pub fn i32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
-            ::puroro::ClonedSlice::new(&self.i32_repeated)
+        pub fn i32_repeated<'this>(&'this self) -> &'this [i32] {
+            &self.i32_repeated
         }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if !::puroro::internal::IsDefault::is_default(&self.float_unlabeled) {
@@ -1903,8 +1903,8 @@ pub mod _puroro_impls {
         pub fn has_float_unlabeled(&self) -> bool {
             self.float_unlabeled_opt().is_some()
         }
-        pub fn float_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, f32> {
-            ::puroro::ClonedSlice::new(&self.float_repeated)
+        pub fn float_repeated<'this>(&'this self) -> &'this [f32] {
+            &self.float_repeated
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
@@ -1959,10 +1959,8 @@ pub mod _puroro_impls {
         pub fn has_enum_unlabeled(&self) -> bool {
             self.enum_unlabeled_opt().is_some()
         }
-        pub fn enum_repeated<'this>(
-            &'this self,
-        ) -> ::puroro::ClonedSlice<'this, self::_puroro_root::ser_tests3::Enum> {
-            ::puroro::ClonedSlice::new(&self.enum_repeated)
+        pub fn enum_repeated<'this>(&'this self) -> &'this [self::_puroro_root::ser_tests3::Enum] {
+            &self.enum_repeated
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.very_large_field_number) {

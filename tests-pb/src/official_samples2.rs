@@ -1195,8 +1195,8 @@ pub mod _puroro_impls {
                 d: ::puroro::internal::NoAllocBumpVec::new_in(bump),
             }
         }
-        pub fn d<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
-            ::puroro::ClonedSlice::new(&self.d)
+        pub fn d<'this>(&'this self) -> &'this [i32] {
+            &self.d
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}

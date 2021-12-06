@@ -87,7 +87,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         ::puroro::AsRefSlice::new(&self.{{ field.ident }})
         {%- endif %} {#- if field.is_message #}
         {%- else %} {#- if field.is_length_delimited #}
-        ::puroro::ClonedSlice::new(&self.{{ field.ident }})
+        &self.{{ field.ident }}
         {%- endif %} {#- if field.is_length_delimited #}
     }
 

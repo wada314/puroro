@@ -956,8 +956,8 @@ pub mod _puroro_impls {
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
-        pub fn i32_repeated<'this>(&'this self) -> ::puroro::ClonedSlice<'this, i32> {
-            ::puroro::ClonedSlice::new(&self.i32_repeated)
+        pub fn i32_repeated<'this>(&'this self) -> &'this [i32] {
+            &self.i32_repeated
         }
         pub fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if !::puroro::internal::IsDefault::is_default(&self.f32_unlabeled) {
