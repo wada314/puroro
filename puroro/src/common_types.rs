@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use crate::RepeatedField;
-use ::std::iter;
 use ::std::marker::PhantomData;
 use ::std::slice;
 

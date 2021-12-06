@@ -11421,8 +11421,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_repeated<'this>(
             &'this self,
-        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpVec<u8>, [u8]> {
-            ::puroro::AsRefSlice::new(&self.bytes_repeated)
+        ) -> &'this [impl ::std::ops::Deref<Target = [u8]>] {
+            &self.bytes_repeated
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
@@ -11458,8 +11458,8 @@ pub mod _puroro_impls {
         }
         pub fn string_repeated<'this>(
             &'this self,
-        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpString, str> {
-            ::puroro::AsRefSlice::new(&self.string_repeated)
+        ) -> &'this [impl ::std::ops::Deref<Target = str>] {
+            &self.string_repeated
         }
         pub fn enum_unlabeled_opt<'this>(
             &'this self,

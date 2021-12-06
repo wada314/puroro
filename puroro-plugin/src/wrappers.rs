@@ -811,14 +811,12 @@ impl Field {
         use FieldTypeCategories::*;
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
-            LengthDelimited(String) => format!(
-                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpString, str>",
-                lt
-            ),
-            LengthDelimited(Bytes) => format!(
-                "::puroro::AsRefSlice<{}, ::puroro::internal::NoAllocBumpVec<u8>, [u8]>",
-                lt
-            ),
+            LengthDelimited(String) => {
+                format!("&{lt}[impl ::std::ops::Deref<Target=str>]", lt = lt)
+            }
+            LengthDelimited(Bytes) => {
+                format!("&{lt}[impl ::std::ops::Deref<Target=[u8]>]", lt = lt)
+            }
             LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
                 format!("&{lt}[{msg}]", lt = lt, msg = msg_type)

@@ -1924,8 +1924,8 @@ pub mod _puroro_impls {
         }
         pub fn string_repeated<'this>(
             &'this self,
-        ) -> ::puroro::AsRefSlice<'this, ::puroro::internal::NoAllocBumpString, str> {
-            ::puroro::AsRefSlice::new(&self.string_repeated)
+        ) -> &'this [impl ::std::ops::Deref<Target = str>] {
+            &self.string_repeated
         }
         pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
             self.submsg_unlabeled
