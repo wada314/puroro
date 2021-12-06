@@ -822,7 +822,7 @@ impl Field {
             LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
                 format!(
-                    "::puroro::AsRefSlice<{lt}, {msg}, &{lt} {msg}>",
+                    "impl ::puroro::RepeatedField<{lt}> + IntoIterator<Item=&{lt} {msg}>",
                     lt = lt,
                     msg = msg_type
                 )

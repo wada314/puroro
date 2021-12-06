@@ -7,12 +7,15 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_
 
 {%- if f.is_repeated %}
 
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
 {%- match f.bumpalo_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
+{%- if f.is_message %}
+    ::puroro::BumpLifetimeCastRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.bumpalo_field_rep_item_type }}, {{ borrowed }}>;
+{%- else %} {#- if f.is_message #}
     ::puroro::AsRefRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.bumpalo_field_rep_item_type }}, {{ borrowed }}>;
+{%- endif %} {#- if f.is_message #}
 {%- else %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
     ::puroro::CloneThenIntoRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.trait_scalar_getter_type }}, {{ f.trait_scalar_getter_type }}>;
 {%- endmatch %}
 

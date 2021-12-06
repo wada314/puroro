@@ -1920,9 +1920,8 @@ pub mod _puroro_impls {
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(&'this self) -> ::puroro::AsRefSlice<'this, self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>, &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
-            let field_ref: &[_] = unsafe { ::std::mem::transmute(self.submsg_repeated.as_ref()) };
-            ::puroro::AsRefSlice::new(field_ref)
+        pub fn submsg_repeated<'this>(&'this self) -> impl ::puroro::RepeatedField<'this> + IntoIterator<Item=&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
+            ::puroro::BumpLifetimeCastRepeatedField::new(&self.submsg_repeated)
         }
         pub fn enum_optional_opt<'this>(
             &'this self,
@@ -2055,6 +2054,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -2075,6 +2075,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -2095,6 +2096,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field6RepeatedType<'this>
         where
             Self: 'this,
@@ -2123,10 +2125,11 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
             'this,
         >;
+
         type Field8RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::AsRefRepeatedField<
+        = ::puroro::BumpLifetimeCastRepeatedField<
             'this,
             ::puroro::internal::NoAllocBumpVec<
                 self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
@@ -2151,6 +2154,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field10RepeatedType<'this>
         where
             Self: 'this,

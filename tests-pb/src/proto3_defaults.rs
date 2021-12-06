@@ -1093,6 +1093,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field3RepeatedType<'this>
         where
             Self: 'this,

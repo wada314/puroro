@@ -11466,9 +11466,8 @@ pub mod _puroro_impls {
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(&'this self) -> ::puroro::AsRefSlice<'this, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>, &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
-            let field_ref: &[_] = unsafe { ::std::mem::transmute(self.submsg_repeated.as_ref()) };
-            ::puroro::AsRefSlice::new(field_ref)
+        pub fn submsg_repeated<'this>(&'this self) -> impl ::puroro::RepeatedField<'this> + IntoIterator<Item=&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
+            ::puroro::BumpLifetimeCastRepeatedField::new(&self.submsg_repeated)
         }
         pub fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(10).map_or(false, |v| *v) {
@@ -12192,6 +12191,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -12219,6 +12219,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field13RepeatedType<'this>
         where
             Self: 'this,
@@ -12246,6 +12247,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field23RepeatedType<'this>
         where
             Self: 'this,
@@ -12273,6 +12275,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field33RepeatedType<'this>
         where
             Self: 'this,
@@ -12304,6 +12307,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field43RepeatedType<'this>
         where
             Self: 'this,
@@ -12326,8 +12330,9 @@ pub mod _puroro_impls {
             self.submsg_optional.as_ref().map(|b| b.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
+
         type Field53RepeatedType<'this> where Self: 'this =
-    ::puroro::AsRefRepeatedField<'this, ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
+    ::puroro::BumpLifetimeCastRepeatedField<'this, ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.submsg_repeated)
@@ -12346,6 +12351,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field103RepeatedType<'this>
         where
             Self: 'this,
@@ -12373,6 +12379,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field113RepeatedType<'this>
         where
             Self: 'this,
@@ -12400,6 +12407,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field123RepeatedType<'this>
         where
             Self: 'this,
@@ -12427,6 +12435,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field133RepeatedType<'this>
         where
             Self: 'this,
@@ -12454,6 +12463,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field143RepeatedType<'this>
         where
             Self: 'this,
@@ -12481,6 +12491,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field153RepeatedType<'this>
         where
             Self: 'this,
@@ -12508,6 +12519,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field163RepeatedType<'this>
         where
             Self: 'this,
@@ -12535,6 +12547,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field173RepeatedType<'this>
         where
             Self: 'this,
@@ -12562,6 +12575,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field183RepeatedType<'this>
         where
             Self: 'this,
@@ -12589,6 +12603,7 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field193RepeatedType<'this>
         where
             Self: 'this,
