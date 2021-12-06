@@ -17,22 +17,6 @@ use ::std::iter;
 use ::std::marker::PhantomData;
 use ::std::slice;
 
-/// Cloned slice, which can be accessed / iterated over `T` instead of `&T`.
-pub struct ClonedSlice<'slice, T>(&'slice [T]);
-impl<'slice, T> ClonedSlice<'slice, T> {
-    pub fn new(slice: &'slice [T]) -> Self {
-        Self(slice)
-    }
-}
-impl<'slice, T: Clone> IntoIterator for ClonedSlice<'slice, T> {
-    type Item = T;
-    type IntoIter = iter::Cloned<std::slice::Iter<'slice, T>>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.iter().cloned()
-    }
-}
-impl<'slice, T: Clone> RepeatedField<'slice> for ClonedSlice<'slice, T> {}
-
 /// A proxied slice, which accesses the elements via `AsRef<U>`.
 pub struct AsRefSlice<'slice, T, U: ?Sized>(&'slice [T], PhantomData<U>);
 impl<'slice, T, U: ?Sized> AsRefSlice<'slice, T, U> {
