@@ -821,11 +821,7 @@ impl Field {
             ),
             LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
-                format!(
-                    "impl ::puroro::RepeatedField<{lt}> + IntoIterator<Item=&{lt} {msg}>",
-                    lt = lt,
-                    msg = msg_type
-                )
+                format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
             }
             Trivial(field_type) => format!(
                 "::puroro::ClonedSlice<{lt}, {ty}>",

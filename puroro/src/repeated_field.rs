@@ -21,6 +21,7 @@ use ::std::mem;
 pub trait RepeatedField<'msg>: IntoIterator {}
 
 impl<'msg, T> RepeatedField<'msg> for &'msg [T] {}
+impl<'msg, T> RepeatedField<'msg> for &'msg crate::internal::NoAllocBumpVec<T> {}
 
 pub struct MappedRepeatedField<T, F> {
     inner: T,

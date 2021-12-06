@@ -160,6 +160,13 @@ impl<T> NoAllocVec<T> {
         result
     }
 
+    /// Returns a unsafely casted vector. Super duper unsafe!
+    /// TODO: Maybe add little more restriction for safety.
+    /// e.g. Require the item to implement some sort of marker trait.
+    pub unsafe fn cast_item_unchecked<U>(&self) -> &NoAllocVec<U> {
+        mem::transmute(self)
+    }
+
     /// Construct an immutable [`Vec`](bumpalo::collections::Vec) by adding bump ptr.
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///

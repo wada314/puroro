@@ -82,7 +82,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     pub fn {{ field.ident }}<'this>(&'this self) -> {{ field.bumpalo_getter_type }} {
         {%- if field.is_length_delimited %}
         {%- if field.is_message %}
-        ::puroro::BumpLifetimeCastRepeatedField::new(&self.{{ field.ident }})
+        unsafe { self.{{ field.ident }}.cast_item_unchecked() }
         {%- else %} {#- if field.is_message #}
         ::puroro::AsRefSlice::new(&self.{{ field.ident }})
         {%- endif %} {#- if field.is_message #}

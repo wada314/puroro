@@ -1938,8 +1938,8 @@ pub mod _puroro_impls {
         pub fn has_submsg_unlabeled(&self) -> bool {
             self.submsg_unlabeled_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(&'this self) -> impl ::puroro::RepeatedField<'this> + IntoIterator<Item=&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
-            ::puroro::BumpLifetimeCastRepeatedField::new(&self.submsg_repeated)
+        pub fn submsg_repeated<'this>(&'this self) -> &'this[self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>]{
+            unsafe { self.submsg_repeated.cast_item_unchecked() }
         }
         pub fn enum_unlabeled_opt<'this>(
             &'this self,
@@ -2127,26 +2127,11 @@ pub mod _puroro_impls {
             'this,
         >;
 
-        type Field8RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::BumpLifetimeCastRepeatedField<
-            'this,
-            ::puroro::internal::NoAllocBumpVec<
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                    'bump,
-                >,
-            >,
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                'bump,
-            >,
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                'this,
-            >,
-        >;
+        type Field8RepeatedType<'this> where Self: 'this =
+    &'this [self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>];
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::AsRefRepeatedField::new(&self.submsg_repeated)
+            unsafe { self.submsg_repeated.cast_item_unchecked() }
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))

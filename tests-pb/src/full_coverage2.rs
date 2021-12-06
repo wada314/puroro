@@ -11466,8 +11466,8 @@ pub mod _puroro_impls {
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
-        pub fn submsg_repeated<'this>(&'this self) -> impl ::puroro::RepeatedField<'this> + IntoIterator<Item=&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
-            ::puroro::BumpLifetimeCastRepeatedField::new(&self.submsg_repeated)
+        pub fn submsg_repeated<'this>(&'this self) -> &'this[self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>]{
+            unsafe { self.submsg_repeated.cast_item_unchecked() }
         }
         pub fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(10).map_or(false, |v| *v) {
@@ -12332,10 +12332,10 @@ pub mod _puroro_impls {
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
 
         type Field53RepeatedType<'this> where Self: 'this =
-    ::puroro::BumpLifetimeCastRepeatedField<'this, ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>, self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>;
+    &'this [self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>];
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro::AsRefRepeatedField::new(&self.submsg_repeated)
+            unsafe { self.submsg_repeated.cast_item_unchecked() }
         }
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 10) {
