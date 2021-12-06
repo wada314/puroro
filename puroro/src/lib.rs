@@ -220,9 +220,7 @@ pub mod tags;
 pub use self::common_traits::*;
 pub use self::common_types::*;
 pub use self::error::{ErrorKind, PuroroError};
-pub use self::repeated_field::{
-    AsRefRepeatedField, BumpLifetimeCastRepeatedField, CloneThenIntoRepeatedField, RepeatedField,
-};
+pub use self::repeated_field::{AsRefRepeatedField, CloneThenIntoRepeatedField, RepeatedField};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports

@@ -118,21 +118,3 @@ impl<'a, InnerRepeated, InnerItem, TargetItem: ?Sized>
         Self::new_with_map(inner, AsRefMap(PhantomData))
     }
 }
-
-pub struct BumpLifetimeCast<'a, From, To>(PhantomData<&'a (From, To)>);
-impl<'a, From, To> Map for BumpLifetimeCast<'a, From, To> {
-    type From = &'a From;
-    type To = &'a To;
-    fn map(&self, from: Self::From) -> Self::To {
-        unsafe { mem::transmute(from) }
-    }
-}
-pub type BumpLifetimeCastRepeatedField<'a, InnerRepeated, InnerItem, TargetItem> =
-    MappedRepeatedField<&'a InnerRepeated, BumpLifetimeCast<'a, InnerItem, TargetItem>>;
-impl<'a, InnerRepeated, InnerItem, TargetItem>
-    BumpLifetimeCastRepeatedField<'a, InnerRepeated, InnerItem, TargetItem>
-{
-    pub fn new(inner: &'a InnerRepeated) -> Self {
-        Self::new_with_map(inner, BumpLifetimeCast(PhantomData))
-    }
-}

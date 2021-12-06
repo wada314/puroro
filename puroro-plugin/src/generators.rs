@@ -294,16 +294,14 @@ impl Field {
             single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
             bumpalo_field_type: f.bumpalo_field_type()?.into(),
             bumpalo_field_rep_item_type: f.bumpalo_scalar_field_type()?.into(),
-            bumpalo_getter_type: {
-                if f.is_repeated()? {
-                    f.bumpalo_getter_repeated_type("'this")?.to_string()
+            bumpalo_getter_type: if f.is_repeated()? {
+                f.bumpalo_getter_repeated_type("'this")?.to_string()
+            } else {
+                let bare_type = f.bumpalo_getter_scalar_type("'this")?;
+                if f.is_message()? {
+                    format!("::std::option::Option<{}>", bare_type)
                 } else {
-                    let bare_type = f.bumpalo_getter_scalar_type("'this")?;
-                    if f.is_message()? {
-                        format!("::std::option::Option<{}>", bare_type)
-                    } else {
-                        bare_type.to_string()
-                    }
+                    bare_type.to_string()
                 }
             },
             bumpalo_getter_opt_type: format!(
@@ -311,7 +309,11 @@ impl Field {
                 f.bumpalo_getter_scalar_type("'this")?
             ),
             bumpalo_getter_rep_item_type: f.bumpalo_getter_scalar_type("'this")?.to_string(),
-            bumpalo_getter_mut_type: f.bumpalo_getter_mut_type("'bump", "'this")?,
+            bumpalo_getter_mut_type: if f.is_repeated()? {
+                todo!()
+            } else {
+                f.bumpalo_getter_mut_type("'bump", "'this")?
+            },
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'this"])?,
