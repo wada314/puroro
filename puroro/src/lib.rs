@@ -211,14 +211,12 @@
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
 mod common_traits;
-mod common_types;
 mod error;
 pub mod internal;
 pub mod repeated_field;
 pub mod tags;
 
 pub use self::common_traits::*;
-pub use self::common_types::*;
 pub use self::error::{ErrorKind, PuroroError};
 pub use self::repeated_field::{AsRefRepeatedField, CloneThenIntoRepeatedField, RepeatedField};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;

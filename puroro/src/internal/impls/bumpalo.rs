@@ -167,16 +167,6 @@ impl<T> NoAllocVec<T> {
         mem::transmute(self)
     }
 
-    /// Construct an immutable [`Vec`](bumpalo::collections::Vec) by adding bump ptr.
-    /// This function must take a same bump ref with the one given in `new_in` method.
-    ///
-    /// # Safety
-    /// This function is unsafe because there are no guarantee that the
-    /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> Vec<'bump, T> {
-        Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump)
-    }
-
     /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
@@ -321,16 +311,6 @@ impl NoAllocString {
 
     pub fn from_utf8_unchecked(vec: NoAllocVec<u8>) -> Self {
         Self { vec }
-    }
-
-    /// Construct an immutable [`String`](bumpalo::collections::String) by adding bump ptr.
-    /// This function must take a same bump ref with the one given in `new_in` method.
-    ///
-    /// # Safety
-    /// This function is unsafe because there are no guarantee that the
-    /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> String<'bump> {
-        String::from_utf8_unchecked(self.vec.as_vec_in(bump))
     }
 
     /// Construct a mutable [`String`](bumpalo::collections::String) by adding bump ptr.
