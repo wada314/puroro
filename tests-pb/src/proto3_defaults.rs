@@ -1096,10 +1096,15 @@ pub mod _puroro_impls {
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::ClonedSlice<'this, i32>;
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<i32>,
+            i32,
+            i32,
+        >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            todo!()
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_unlabeled))

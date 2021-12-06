@@ -28,6 +28,7 @@ use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
 use ::std::ptr;
 use ::std::ptr::NonNull;
+use ::std::slice;
 use ::std::str::Utf8Error;
 
 pub trait BumpDefault<'bump> {
@@ -232,6 +233,13 @@ impl<T> Drop for NoAllocVec<T> {
 impl<T> Default for NoAllocVec<T> {
     fn default() -> Self {
         Self::new()
+    }
+}
+impl<'a, T> IntoIterator for &'a NoAllocVec<T> {
+    type Item = &'a T;
+    type IntoIter = slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.deref().into_iter()
     }
 }
 

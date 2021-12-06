@@ -1207,10 +1207,15 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::ClonedSlice<'this, i32>;
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<i32>,
+            i32,
+            i32,
+        >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            todo!()
+            ::puroro::CloneThenIntoRepeatedField::new(&self.d)
         }
     }
 

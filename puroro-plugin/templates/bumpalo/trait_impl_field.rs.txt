@@ -13,20 +13,16 @@ type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
     ::puroro::AsRefSlice<'this, {{ f.bumpalo_getter_rep_item_type }}, {{ borrowed }}>;
 {%- else %}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-    ::puroro::ClonedSlice<'this, {{ f.trait_scalar_getter_type }}>;
+    ::puroro::CloneThenIntoRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.trait_scalar_getter_type }}, {{ f.trait_scalar_getter_type }}>;
 {%- endmatch %}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
-    todo!()
-    {#- temporary disabling #}
-    {#-
     {%- match f.bumpalo_maybe_borrowed_field_type %}
     {%- when Some with (borrowed) %}
-    ::puroro::internal::utils::BorrowedIter::new(self.{{ f.ident }}.iter())
+    &self.{{ f.ident }}
     {%- else %}
-    ::puroro::ClonedSlice::new(&self.{{ f.ident }})
+    ::puroro::CloneThenIntoRepeatedField::new(&self.{{ f.ident }})
     {%- endmatch %}
-    #}
 }
 
 {%- else %} {#- if f.is_repeated #}
