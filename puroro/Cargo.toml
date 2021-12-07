@@ -2,7 +2,7 @@
 name = "puroro"
 version = "0.3.1"
 authors = ["Shohei Wada <pc@wada314.jp>"]
-edition = "2018"
+edition = "2021"
 license = "Apache-2.0"
 description = "A Rust implementation of Google Protocol Buffer."
 repository = "https://github.com/wada314/puroro"

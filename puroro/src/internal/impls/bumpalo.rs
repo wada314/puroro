@@ -446,9 +446,8 @@ where
             .map(|v| <T as AddBump>::add_bump(v, self.bump))
     }
     pub fn get_mut(&mut self, index: usize) -> Option<<T as AddBump>::AddToMutRef<'bump, '_>> {
-        let bump = self.bump;
         self.vec
             .get_mut(index)
-            .map(|v| <T as AddBump>::add_bump_mut(v, bump))
+            .map(|v| <T as AddBump>::add_bump_mut(v, self.bump))
     }
 }
