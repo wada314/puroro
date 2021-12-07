@@ -310,7 +310,7 @@ impl Field {
             ),
             bumpalo_getter_rep_item_type: f.bumpalo_getter_scalar_type("'this")?.to_string(),
             bumpalo_getter_mut_type: if f.is_repeated()? {
-                todo!()
+                f.bumpalo_getter_repeated_mut_type("'bump", "'this")?
             } else {
                 f.bumpalo_getter_mut_type("'bump", "'this")?
             },

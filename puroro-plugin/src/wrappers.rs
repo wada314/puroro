@@ -853,6 +853,10 @@ impl Field {
         })
     }
 
+    pub fn bumpalo_getter_repeated_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {
+        todo!()
+    }
+
     pub fn single_field_type(&self) -> Result<String> {
         Ok(if self.is_repeated()? {
             "RepeatedType"

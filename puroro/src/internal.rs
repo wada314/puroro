@@ -21,12 +21,12 @@ pub mod types;
 pub mod utils;
 pub mod variant;
 
-pub use impls::bumpalo::BumpDefault;
 pub use impls::bumpalo::NoAllocBox as NoAllocBumpBox;
 pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
 pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
 pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
+pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
 
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
