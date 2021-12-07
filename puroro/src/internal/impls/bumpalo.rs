@@ -25,7 +25,7 @@ use crate::bumpalo::Bump;
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
-use ::std::ops::{Deref, DerefMut};
+use ::std::ops::{Deref, DerefMut, Index};
 use ::std::ptr;
 use ::std::ptr::NonNull;
 use ::std::slice;
@@ -427,7 +427,12 @@ impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
     }
 }
 
-pub struct AddBumpVec<'vec, 'bump, T> {
+pub struct AddBumpVecView<'vec, 'bump, T> {
     vec: &'vec mut Vec<'bump, T>,
     bump: &'bump Bump,
+}
+impl<'vec, 'bump, T> AddBumpVecView<'vec, 'bump, T> {
+    fn new(vec: &'vec mut Vec<'bump, T>, bump: &'bump Bump) -> Self {
+        Self { vec, bump }
+    }
 }
