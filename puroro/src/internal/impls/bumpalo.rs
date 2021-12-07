@@ -477,10 +477,10 @@ where
 }
 impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
 where
-    T: AddBump + BumpDefault<'bump>,
+    T: AddBump + Default,
 {
     pub fn push_default(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
-        self.vec.push(BumpDefault::default_in(self.bump));
+        self.vec.push(Default::default());
         <T as AddBump>::add_bump_mut(self.vec.last_mut().unwrap(), self.bump)
     }
 }
