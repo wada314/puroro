@@ -167,6 +167,22 @@ impl<T> NoAllocVec<T> {
         mem::transmute(self)
     }
 
+    /// Construct an immutable [`Vec`](bumpalo::collections::Vec) by adding bump ptr.
+    /// This function must take a same bump ref with the one given in `new_in` method.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
+    /// Also, if the `ManuallyDrop` inner value has been taken then it's also unsafe.
+    unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<Vec<'bump, T>> {
+        ManuallyDrop::new(Vec::from_raw_parts_in(
+            self.ptr,
+            self.length,
+            self.capacity,
+            bump,
+        ))
+    }
+
     /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
@@ -175,7 +191,7 @@ impl<T> NoAllocVec<T> {
     /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_mut_vec_in<'bump>(&mut self, bump: &'bump Bump) -> RefMutVec<'bump, '_, T> {
         RefMutVec {
-            temp_vec: ManuallyDrop::new(self.as_vec_in(bump)),
+            temp_vec: self.as_vec_in(bump),
             ref_vec: self,
         }
     }
@@ -184,7 +200,7 @@ impl<T> AddBump for NoAllocVec<T> {
     type AddToRef<'bump, 'this>
     where
         Self: 'bump + 'this,
-    = Vec<'bump, T>;
+    = ManuallyDrop<Vec<'bump, T>>;
     fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
         unsafe { self.as_vec_in(bump) }
     }
@@ -313,6 +329,19 @@ impl NoAllocString {
         Self { vec }
     }
 
+    /// Construct an immutable [`String`](bumpalo::collections::String) by adding bump ptr.
+    /// This function must take a same bump ref with the one given in `new_in` method.
+    ///
+    /// # Safety
+    /// This function is unsafe because there are no guarantee that the
+    /// given `bump` is the same instance with the one given at construction time.
+    /// Also, if the `ManuallyDrop` inner value has been taken then it's also unsafe.
+    unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<String<'bump>> {
+        ManuallyDrop::new(String::from_utf8_unchecked(ManuallyDrop::into_inner(
+            self.vec.as_vec_in(bump),
+        )))
+    }
+
     /// Construct a mutable [`String`](bumpalo::collections::String) by adding bump ptr.
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
@@ -324,7 +353,7 @@ impl NoAllocString {
         bump: &'bump Bump,
     ) -> RefMutString<'bump, 'string> {
         RefMutString {
-            temp_string: ManuallyDrop::new(self.as_string_in(bump)),
+            temp_string: self.as_string_in(bump),
             ref_string: self,
         }
     }
@@ -333,7 +362,7 @@ impl AddBump for NoAllocString {
     type AddToRef<'bump, 'this>
     where
         Self: 'bump + 'this,
-    = String<'bump>;
+    = ManuallyDrop<String<'bump>>;
     fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
         unsafe { self.as_string_in(bump) }
     }
@@ -396,4 +425,9 @@ impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
             self.ref_string.vec = NoAllocVec::from_vec(vec);
         }
     }
+}
+
+pub struct AddBumpVec<'vec, 'bump, T> {
+    vec: &'vec mut Vec<'bump, T>,
+    bump: &'bump Bump,
 }
