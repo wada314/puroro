@@ -122,6 +122,11 @@ pub trait AddBump {
     ) -> Self::AddToMutRef<'bump, 'this>;
 }
 
+pub trait RemoveBump {
+    type Removed;
+    fn remove_bump(self) -> Self::Removed;
+}
+
 /// A vec for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
 ///
@@ -150,7 +155,7 @@ impl<T> NoAllocVec<T> {
         let vec = Vec::new_in(bump);
         unsafe { Self::from_vec(vec) }
     }
-    pub unsafe fn from_vec<'bump>(mut vec: Vec<'bump, T>) -> Self {
+    pub fn from_vec<'bump>(mut vec: Vec<'bump, T>) -> Self {
         let result = Self {
             ptr: vec.as_mut_ptr(),
             length: vec.len(),
@@ -213,6 +218,12 @@ impl<T> AddBump for NoAllocVec<T> {
         bump: &'bump Bump,
     ) -> Self::AddToMutRef<'bump, 'this> {
         unsafe { self.as_mut_vec_in(bump) }
+    }
+}
+impl<'bump, T> RemoveBump for Vec<'bump, T> {
+    type Removed = NoAllocVec<T>;
+    fn remove_bump(self) -> Self::Removed {
+        NoAllocVec::from_vec(self)
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -377,6 +388,12 @@ impl AddBump for NoAllocString {
         unsafe { self.as_mut_string_in(bump) }
     }
 }
+impl<'bump> RemoveBump for String<'bump> {
+    type Removed = NoAllocString;
+    fn remove_bump(self) -> Self::Removed {
+        NoAllocString::from_utf8_unchecked(NoAllocVec::from_vec(self.into_bytes()))
+    }
+}
 
 impl Deref for NoAllocString {
     type Target = str;
@@ -435,6 +452,13 @@ impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
     fn new(vec: &'vec mut Vec<'bump, T>, bump: &'bump Bump) -> Self {
         Self { vec, bump }
     }
+
+    pub fn push<U>(&mut self, val: U)
+    where
+        U: RemoveBump<Removed = T>,
+    {
+        self.vec.push(<U as RemoveBump>::remove_bump(val));
+    }
 }
 impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
 where
@@ -449,5 +473,14 @@ where
         self.vec
             .get_mut(index)
             .map(|v| <T as AddBump>::add_bump_mut(v, self.bump))
+    }
+}
+impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
+where
+    T: AddBump + BumpDefault<'bump>,
+{
+    pub fn push_new(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
+        self.vec.push(BumpDefault::default_in(self.bump));
+        <T as AddBump>::add_bump_mut(self.vec.last_mut().unwrap(), self.bump)
     }
 }
