@@ -11896,6 +11896,9 @@ pub mod _puroro_impls {
             }
             &mut self.i32_optional
         }
+        pub fn i32_repeated(&mut self) -> &'this mut i32 {
+            todo!()
+        }
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
         }
@@ -11914,6 +11917,9 @@ pub mod _puroro_impls {
                 self._bitfield.set(1, true);
             }
             &mut self.float_optional
+        }
+        pub fn float_repeated(&mut self) -> &'this mut f32 {
+            todo!()
         }
         pub fn clear_bytes_unlabeled(&mut self) {
             self.bytes_unlabeled = ::std::default::Default::default();
@@ -11938,6 +11944,9 @@ pub mod _puroro_impls {
             }
             unsafe { self.bytes_optional.as_mut_vec_in(self._bump) }
         }
+        pub fn bytes_repeated(&mut self) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+            todo!()
+        }
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
         }
@@ -11961,6 +11970,9 @@ pub mod _puroro_impls {
             }
             unsafe { self.string_optional.as_mut_string_in(self._bump) }
         }
+        pub fn string_repeated(&mut self) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+            todo!()
+        }
         pub fn clear_enum_unlabeled(&mut self) {
             self.enum_unlabeled = ::std::default::Default::default();
         }
@@ -11983,6 +11995,9 @@ pub mod _puroro_impls {
                 self._bitfield.set(4, true);
             }
             &mut self.enum_optional
+        }
+        pub fn enum_repeated(&mut self) -> &'this mut self::_puroro_root::full_coverage3::Enum {
+            todo!()
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
@@ -12014,6 +12029,9 @@ pub mod _puroro_impls {
                 )
             })
         }
+        pub fn submsg_repeated(&mut self) -> &'this mut self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
+            todo!()
+        }
         pub fn clear_i64_unlabeled(&mut self) {
             self.i64_unlabeled = ::std::default::Default::default();
         }
@@ -12032,6 +12050,9 @@ pub mod _puroro_impls {
                 self._bitfield.set(5, true);
             }
             &mut self.i64_optional
+        }
+        pub fn i64_repeated(&mut self) -> &'this mut i64 {
+            todo!()
         }
         pub fn clear_u32_unlabeled(&mut self) {
             self.u32_unlabeled = ::std::default::Default::default();
@@ -12052,6 +12073,9 @@ pub mod _puroro_impls {
             }
             &mut self.u32_optional
         }
+        pub fn u32_repeated(&mut self) -> &'this mut u32 {
+            todo!()
+        }
         pub fn clear_u64_unlabeled(&mut self) {
             self.u64_unlabeled = ::std::default::Default::default();
         }
@@ -12070,6 +12094,9 @@ pub mod _puroro_impls {
                 self._bitfield.set(7, true);
             }
             &mut self.u64_optional
+        }
+        pub fn u64_repeated(&mut self) -> &'this mut u64 {
+            todo!()
         }
         pub fn clear_s32_unlabeled(&mut self) {
             self.s32_unlabeled = ::std::default::Default::default();
@@ -12090,6 +12117,9 @@ pub mod _puroro_impls {
             }
             &mut self.s32_optional
         }
+        pub fn s32_repeated(&mut self) -> &'this mut i32 {
+            todo!()
+        }
         pub fn clear_s64_unlabeled(&mut self) {
             self.s64_unlabeled = ::std::default::Default::default();
         }
@@ -12108,6 +12138,9 @@ pub mod _puroro_impls {
                 self._bitfield.set(9, true);
             }
             &mut self.s64_optional
+        }
+        pub fn s64_repeated(&mut self) -> &'this mut i64 {
+            todo!()
         }
         pub fn clear_fixed32_unlabeled(&mut self) {
             self.fixed32_unlabeled = ::std::default::Default::default();
@@ -12128,6 +12161,9 @@ pub mod _puroro_impls {
             }
             &mut self.fixed32_optional
         }
+        pub fn fixed32_repeated(&mut self) -> &'this mut u32 {
+            todo!()
+        }
         pub fn clear_fixed64_unlabeled(&mut self) {
             self.fixed64_unlabeled = ::std::default::Default::default();
         }
@@ -12146,6 +12182,9 @@ pub mod _puroro_impls {
                 self._bitfield.set(11, true);
             }
             &mut self.fixed64_optional
+        }
+        pub fn fixed64_repeated(&mut self) -> &'this mut u64 {
+            todo!()
         }
         pub fn clear_sfixed32_unlabeled(&mut self) {
             self.sfixed32_unlabeled = ::std::default::Default::default();
@@ -12166,6 +12205,9 @@ pub mod _puroro_impls {
             }
             &mut self.sfixed32_optional
         }
+        pub fn sfixed32_repeated(&mut self) -> &'this mut i32 {
+            todo!()
+        }
         pub fn clear_sfixed64_unlabeled(&mut self) {
             self.sfixed64_unlabeled = ::std::default::Default::default();
         }
@@ -12185,6 +12227,9 @@ pub mod _puroro_impls {
             }
             &mut self.sfixed64_optional
         }
+        pub fn sfixed64_repeated(&mut self) -> &'this mut i64 {
+            todo!()
+        }
         pub fn clear_f64_unlabeled(&mut self) {
             self.f64_unlabeled = ::std::default::Default::default();
         }
@@ -12203,6 +12248,9 @@ pub mod _puroro_impls {
                 self._bitfield.set(14, true);
             }
             &mut self.f64_optional
+        }
+        pub fn f64_repeated(&mut self) -> &'this mut f64 {
+            todo!()
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}

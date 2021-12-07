@@ -854,7 +854,21 @@ impl Field {
     }
 
     pub fn bumpalo_getter_repeated_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {
-        todo!()
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => todo!(),
+            LengthDelimited(Bytes) => todo!(),
+            LengthDelimited(Message(m)) => todo!(),
+            Trivial(field_type) => {
+                format!(
+                    "::puroro::internal::RefMutBumpVec<{bump_lt}, {this_lt}, {ty}>",
+                    bump_lt = bump_lt,
+                    this_lt = this_lt,
+                    ty = field_type.rust_type_name()?
+                )
+            }
+        })
     }
 
     pub fn single_field_type(&self) -> Result<String> {

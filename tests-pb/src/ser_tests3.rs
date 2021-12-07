@@ -1987,6 +1987,9 @@ pub mod _puroro_impls {
             }
             &mut self.i32_unlabeled
         }
+        pub fn i32_repeated(&mut self) -> &'this mut i32 {
+            todo!()
+        }
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
         }
@@ -1995,6 +1998,9 @@ pub mod _puroro_impls {
                 self.float_unlabeled = ::std::default::Default::default();
             }
             &mut self.float_unlabeled
+        }
+        pub fn float_repeated(&mut self) -> &'this mut f32 {
+            todo!()
         }
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
@@ -2006,6 +2012,9 @@ pub mod _puroro_impls {
                 self.string_unlabeled = ::std::default::Default::default();
             }
             unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
+        }
+        pub fn string_repeated(&mut self) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+            todo!()
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
@@ -2022,6 +2031,9 @@ pub mod _puroro_impls {
                 )
             })
         }
+        pub fn submsg_repeated(&mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
+            todo!()
+        }
         pub fn clear_enum_unlabeled(&mut self) {
             self.enum_unlabeled = ::std::default::Default::default();
         }
@@ -2032,6 +2044,9 @@ pub mod _puroro_impls {
                 self.enum_unlabeled = ::std::default::Default::default();
             }
             &mut self.enum_unlabeled
+        }
+        pub fn enum_repeated(&mut self) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+            todo!()
         }
         pub fn clear_very_large_field_number(&mut self) {
             self.very_large_field_number = ::std::default::Default::default();

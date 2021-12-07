@@ -1198,6 +1198,9 @@ pub mod _puroro_impls {
         pub fn d<'this>(&'this self) -> &'this [i32] {
             &self.d
         }
+        pub fn d(&mut self) -> &'this mut i32 {
+            todo!()
+        }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
 
