@@ -427,12 +427,22 @@ impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
     }
 }
 
-pub struct AddBumpVecView<'vec, 'bump, T> {
+pub struct AddBumpVecView<'bump, 'vec, T> {
     vec: &'vec mut Vec<'bump, T>,
     bump: &'bump Bump,
 }
-impl<'vec, 'bump, T> AddBumpVecView<'vec, 'bump, T> {
+impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
     fn new(vec: &'vec mut Vec<'bump, T>, bump: &'bump Bump) -> Self {
         Self { vec, bump }
+    }
+}
+impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
+where
+    T: AddBump,
+{
+    pub fn get(&self, index: usize) -> Option<<T as AddBump>::AddToRef<'bump, '_>> {
+        self.vec
+            .get(index)
+            .map(|v| <T as AddBump>::add_bump(v, self.bump))
     }
 }
