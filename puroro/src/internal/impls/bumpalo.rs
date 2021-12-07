@@ -272,7 +272,7 @@ pub struct RefMutVec<'bump, 'vec, T> {
     ref_vec: &'vec mut NoAllocVec<T>,
 }
 impl<'bump, 'vec, T: Default> RefMutVec<'bump, 'vec, T> {
-    pub fn push_new(&mut self) -> &mut T {
+    pub fn push_default(&mut self) -> &mut T {
         self.temp_vec.push(T::default());
         self.last_mut().unwrap()
     }
@@ -479,7 +479,7 @@ impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
 where
     T: AddBump + BumpDefault<'bump>,
 {
-    pub fn push_new(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
+    pub fn push_default(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
         self.vec.push(BumpDefault::default_in(self.bump));
         <T as AddBump>::add_bump_mut(self.vec.last_mut().unwrap(), self.bump)
     }
