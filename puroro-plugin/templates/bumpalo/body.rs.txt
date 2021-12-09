@@ -269,8 +269,8 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
 }
 
 impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_ident }}<'bump> {
-    fn deser_field<I>(
-        &mut self,
+    fn deser_field<'this, I>(
+        &'this mut self,
         field_number: i32,
         data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
     ) -> ::puroro::Result<()>
@@ -285,11 +285,9 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 {%- if field.has_optional_bit %}
                 self._bitfield.set({{ field.bitfield_index }}, true);
                 {%- endif %}
-                {#- Temporaly disable #}
-                todo!()
-                {# DeserFieldFromBytesIter::<
-                    {{ field.bumpalo_label_and_type_tags }}, BT
-                >::deser_field(&mut self.{{ field.ident_unesc }}_mut(), data, &self._bump) #}
+                DeserFieldFromBytesIter::<
+                    {{ field.bumpalo_label_and_type_tags }}
+                >::deser_field(&mut self.{{ field.ident }}, data, self._bump)
             }
             {%- endif %}
             {%- endfor %}
@@ -308,7 +306,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                         todo!()
                         {#::puroro::BumpaloMessage::new_in(&self._bump)#}
                         {%- else %} {#- if field.is_message #}
-                        ::puroro::internal::BumpDefault::default_in(&self._bump)
+                        ::puroro::internal::BumpDefault::default_in(self._bump)
                         {%- endif %} {#- if field.is_message #}
                     );
                 }

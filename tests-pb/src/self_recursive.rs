@@ -302,8 +302,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -314,9 +314,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => {
-                    todo!()
-                }
+                1 => DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled,
+                    ::puroro::tags::Message<
+                        ::puroro::internal::NoAllocBumpBox<
+                            self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'bump>,
+                        >,
+                    >,
+                >::deser_field(&mut self.recursive_unlabeled, data, self._bump),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }

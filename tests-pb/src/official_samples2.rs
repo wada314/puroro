@@ -574,8 +574,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test1Bumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -588,7 +588,9 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
-                    todo!()
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.a, data, self._bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -784,8 +786,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test2Bumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -798,7 +800,9 @@ pub mod _puroro_impls {
             match field_number {
                 2 => {
                     self._bitfield.set(0, true);
-                    todo!()
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.b, data, self._bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1018,8 +1022,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test3Bumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -1030,9 +1034,16 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-                3 => {
-                    todo!()
-                }
+                3 => DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional,
+                    ::puroro::tags::Message<
+                        ::puroro::internal::NoAllocBumpBox<
+                            self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+                                'bump,
+                            >,
+                        >,
+                    >,
+                >::deser_field(&mut self.c, data, self._bump),
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1235,8 +1246,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test4Bumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -1247,12 +1258,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-                4 => {
-                    todo!()
-                }
-
-                _ => unimplemented!("TODO: This case should be handled properly..."),
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.d, data, self._bump)
             }
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 

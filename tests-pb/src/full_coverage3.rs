@@ -12692,8 +12692,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -12704,168 +12704,264 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => {
-                    todo!()
-                }
-                2 => {
-                    self._bitfield.set(0, true);
-                    todo!()
-                }
-                3 => {
-                    todo!()
-                }
-                11 => {
-                    todo!()
-                }
-                12 => {
-                    self._bitfield.set(1, true);
-                    todo!()
-                }
-                13 => {
-                    todo!()
-                }
-                21 => {
-                    todo!()
-                }
-                22 => {
-                    self._bitfield.set(2, true);
-                    todo!()
-                }
-                23 => {
-                    todo!()
-                }
-                31 => {
-                    todo!()
-                }
-                32 => {
-                    self._bitfield.set(3, true);
-                    todo!()
-                }
-                33 => {
-                    todo!()
-                }
-                41 => {
-                    todo!()
-                }
-                42 => {
-                    self._bitfield.set(4, true);
-                    todo!()
-                }
-                43 => {
-                    todo!()
-                }
-                51 => {
-                    todo!()
-                }
-                52 => {
-                    todo!()
-                }
-                53 => {
-                    todo!()
-                }
-                101 => {
-                    todo!()
-                }
-                102 => {
-                    self._bitfield.set(5, true);
-                    todo!()
-                }
-                103 => {
-                    todo!()
-                }
-                111 => {
-                    todo!()
-                }
-                112 => {
-                    self._bitfield.set(6, true);
-                    todo!()
-                }
-                113 => {
-                    todo!()
-                }
-                121 => {
-                    todo!()
-                }
-                122 => {
-                    self._bitfield.set(7, true);
-                    todo!()
-                }
-                123 => {
-                    todo!()
-                }
-                131 => {
-                    todo!()
-                }
-                132 => {
-                    self._bitfield.set(8, true);
-                    todo!()
-                }
-                133 => {
-                    todo!()
-                }
-                141 => {
-                    todo!()
-                }
-                142 => {
-                    self._bitfield.set(9, true);
-                    todo!()
-                }
-                143 => {
-                    todo!()
-                }
-                151 => {
-                    todo!()
-                }
-                152 => {
-                    self._bitfield.set(10, true);
-                    todo!()
-                }
-                153 => {
-                    todo!()
-                }
-                161 => {
-                    todo!()
-                }
-                162 => {
-                    self._bitfield.set(11, true);
-                    todo!()
-                }
-                163 => {
-                    todo!()
-                }
-                171 => {
-                    todo!()
-                }
-                172 => {
-                    self._bitfield.set(12, true);
-                    todo!()
-                }
-                173 => {
-                    todo!()
-                }
-                181 => {
-                    todo!()
-                }
-                182 => {
-                    self._bitfield.set(13, true);
-                    todo!()
-                }
-                183 => {
-                    todo!()
-                }
-                191 => {
-                    todo!()
-                }
-                192 => {
-                    self._bitfield.set(14, true);
-                    todo!()
-                }
-                193 => {
-                    todo!()
-                }
-
-                _ => unimplemented!("TODO: This case should be handled properly..."),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data, self._bump)
             }
+            2 => {
+                self._bitfield.set(0, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_optional, data, self._bump)
+            }
+            3 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_repeated, data, self._bump)
+            }
+            11 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                >::deser_field(&mut self.float_unlabeled, data, self._bump)
+            }
+            12 => {
+                self._bitfield.set(1, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.float_optional, data, self._bump)
+            }
+            13 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Float
+                >::deser_field(&mut self.float_repeated, data, self._bump)
+            }
+            21 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_unlabeled, data, self._bump)
+            }
+            22 => {
+                self._bitfield.set(2, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_optional, data, self._bump)
+            }
+            23 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_repeated, data, self._bump)
+            }
+            31 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.string_unlabeled, data, self._bump)
+            }
+            32 => {
+                self._bitfield.set(3, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_optional, data, self._bump)
+            }
+            33 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::String
+                >::deser_field(&mut self.string_repeated, data, self._bump)
+            }
+            41 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_unlabeled, data, self._bump)
+            }
+            42 => {
+                self._bitfield.set(4, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_optional, data, self._bump)
+            }
+            43 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_repeated, data, self._bump)
+            }
+            51 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                >::deser_field(&mut self.submsg_unlabeled, data, self._bump)
+            }
+            52 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                >::deser_field(&mut self.submsg_optional, data, self._bump)
+            }
+            53 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
+                >::deser_field(&mut self.submsg_repeated, data, self._bump)
+            }
+            101 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_unlabeled, data, self._bump)
+            }
+            102 => {
+                self._bitfield.set(5, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_optional, data, self._bump)
+            }
+            103 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_repeated, data, self._bump)
+            }
+            111 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_unlabeled, data, self._bump)
+            }
+            112 => {
+                self._bitfield.set(6, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_optional, data, self._bump)
+            }
+            113 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_repeated, data, self._bump)
+            }
+            121 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_unlabeled, data, self._bump)
+            }
+            122 => {
+                self._bitfield.set(7, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_optional, data, self._bump)
+            }
+            123 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_repeated, data, self._bump)
+            }
+            131 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_unlabeled, data, self._bump)
+            }
+            132 => {
+                self._bitfield.set(8, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_optional, data, self._bump)
+            }
+            133 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_repeated, data, self._bump)
+            }
+            141 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_unlabeled, data, self._bump)
+            }
+            142 => {
+                self._bitfield.set(9, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_optional, data, self._bump)
+            }
+            143 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_repeated, data, self._bump)
+            }
+            151 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_unlabeled, data, self._bump)
+            }
+            152 => {
+                self._bitfield.set(10, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_optional, data, self._bump)
+            }
+            153 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_repeated, data, self._bump)
+            }
+            161 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_unlabeled, data, self._bump)
+            }
+            162 => {
+                self._bitfield.set(11, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_optional, data, self._bump)
+            }
+            163 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_repeated, data, self._bump)
+            }
+            171 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_unlabeled, data, self._bump)
+            }
+            172 => {
+                self._bitfield.set(12, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_optional, data, self._bump)
+            }
+            173 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_repeated, data, self._bump)
+            }
+            181 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_unlabeled, data, self._bump)
+            }
+            182 => {
+                self._bitfield.set(13, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_optional, data, self._bump)
+            }
+            183 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_repeated, data, self._bump)
+            }
+            191 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_unlabeled, data, self._bump)
+            }
+            192 => {
+                self._bitfield.set(14, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_optional, data, self._bump)
+            }
+            193 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_repeated, data, self._bump)
+            }
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 
@@ -16612,8 +16708,8 @@ pub mod _puroro_nested {
             }
 
             impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
-                fn deser_field<I>(
-                    &mut self,
+                fn deser_field<'this, I>(
+                    &'this mut self,
                     field_number: i32,
                     data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -16624,12 +16720,18 @@ pub mod _puroro_nested {
                 {
                     use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
                     match field_number {
-                        1 => {
-                            todo!()
-                        }
-                        101 => {
-                            todo!()
-                        }
+                        1 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Unlabeled,
+                            ::puroro::tags::Int32,
+                        >::deser_field(
+                            &mut self.i32_unlabeled, data, self._bump
+                        ),
+                        101 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Unlabeled,
+                            ::puroro::tags::Int64,
+                        >::deser_field(
+                            &mut self.i64_unlabeled, data, self._bump
+                        ),
 
                         _ => unimplemented!("TODO: This case should be handled properly..."),
                     }

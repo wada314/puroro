@@ -2187,8 +2187,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -2199,42 +2199,64 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => {
-                    todo!()
-                }
-                2 => {
-                    todo!()
-                }
-                3 => {
-                    todo!()
-                }
-                4 => {
-                    todo!()
-                }
-                5 => {
-                    todo!()
-                }
-                6 => {
-                    todo!()
-                }
-                7 => {
-                    todo!()
-                }
-                8 => {
-                    todo!()
-                }
-                9 => {
-                    todo!()
-                }
-                10 => {
-                    todo!()
-                }
-                536870911 => {
-                    todo!()
-                }
-
-                _ => unimplemented!("TODO: This case should be handled properly..."),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data, self._bump)
             }
+            2 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_repeated, data, self._bump)
+            }
+            3 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                >::deser_field(&mut self.float_unlabeled, data, self._bump)
+            }
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Float
+                >::deser_field(&mut self.float_repeated, data, self._bump)
+            }
+            5 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.string_unlabeled, data, self._bump)
+            }
+            6 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::String
+                >::deser_field(&mut self.string_repeated, data, self._bump)
+            }
+            7 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                >::deser_field(&mut self.submsg_unlabeled, data, self._bump)
+            }
+            8 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
+                >::deser_field(&mut self.submsg_repeated, data, self._bump)
+            }
+            9 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                >::deser_field(&mut self.enum_unlabeled, data, self._bump)
+            }
+            10 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                >::deser_field(&mut self.enum_repeated, data, self._bump)
+            }
+            536870911 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.very_large_field_number, data, self._bump)
+            }
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 
@@ -3486,8 +3508,8 @@ pub mod _puroro_nested {
             }
 
             impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
-                fn deser_field<I>(
-                    &mut self,
+                fn deser_field<'this, I>(
+                    &'this mut self,
                     field_number: i32,
                     data: ::puroro::internal::types::FieldData<
                         &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -3498,9 +3520,12 @@ pub mod _puroro_nested {
                 {
                     use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
                     match field_number {
-                        1 => {
-                            todo!()
-                        }
+                        1 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Unlabeled,
+                            ::puroro::tags::Int32,
+                        >::deser_field(
+                            &mut self.i32_unlabeled, data, self._bump
+                        ),
 
                         _ => unimplemented!("TODO: This case should be handled properly..."),
                     }

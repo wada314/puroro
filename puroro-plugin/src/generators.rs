@@ -320,11 +320,11 @@ impl Field {
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["'this"])
+                        msg.rust_impl_path("Bumpalo", &["'bump"])
                     } else {
                         format!(
                             "::puroro::internal::NoAllocBumpBox<{}>",
-                            msg.rust_impl_path("Bumpalo", &["'this"])
+                            msg.rust_impl_path("Bumpalo", &["'bump"])
                         )
                     },
                 )
