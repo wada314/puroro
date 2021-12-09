@@ -21,6 +21,7 @@ use ::itertools::Itertools;
 use ::once_cell::unsync::{Lazy, OnceCell};
 use ::puroro_protobuf_compiled::google::protobuf;
 use ::std::borrow::Borrow;
+use ::std::borrow::Cow;
 use ::std::collections::{HashMap, VecDeque};
 use ::std::convert::TryInto;
 use ::std::hash::Hash;
@@ -33,6 +34,7 @@ use protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
 };
+use puroro::tags::LengthDelimited;
 
 #[derive(Debug)]
 pub struct Context {
@@ -635,33 +637,35 @@ impl Field {
         ))
     }
 
-    pub fn trait_scalar_getter_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => "&'this str".to_string(),
-            FieldType::Bytes => "&'this [u8]".to_string(),
-            FieldType::Message(_) => format!(
+    pub fn trait_scalar_getter_type(&self) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => "&'this str".into(),
+            LengthDelimited(Bytes) => "&'this [u8]".into(),
+            LengthDelimited(Message(_)) => format!(
                 "Self::Field{number}MessageType<'this>",
                 number = self.number()
-            ),
-            t => t.numerical_rust_type()?.to_string(),
+            )
+            .into(),
+            Trivial(field_type) => field_type.rust_type_name()?,
         })
     }
-    pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => format!("&{lt} str", lt = lt),
-            FieldType::Bytes => format!("&{lt} [u8]", lt = lt),
-            FieldType::Message(_) => format!(
+    pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => format!("&{lt} str", lt = lt).into(),
+            LengthDelimited(Bytes) => format!("&{lt} [u8]", lt = lt).into(),
+            LengthDelimited(Message(_)) => format!(
                 "<{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>",
                 lt = lt,
                 trait_impl = trait_impl,
                 trait_path = self.message()?.rust_trait_path(),
                 number = self.number(),
-            ),
-            t => t.numerical_rust_type()?.to_string(),
+            )
+            .into(),
+            Trivial(field_type) => field_type.rust_type_name()?,
         })
     }
 
@@ -702,91 +706,182 @@ impl Field {
         Ok(matches!(self.field_label(), Ok(FieldLabel::Repeated)))
     }
 
-    pub fn bumpalo_oneof_field_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String => "::puroro::internal::NoAllocBumpString".to_string(),
-            FieldType::Bytes => "::puroro::internal::NoAllocBumpVec<u8>".to_string(),
-            FieldType::Message(m) => {
+    pub fn bumpalo_oneof_field_type(&self) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        let bare_type = match self.field_type()?.categories()? {
+            LengthDelimited(String) => "::puroro::internal::NoAllocBumpString".into(),
+            LengthDelimited(Bytes) => "::puroro::internal::NoAllocBumpVec<u8>".into(),
+            LengthDelimited(Message(m)) => {
                 let bumpalo_message_type = upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]);
                 format!(
                     "::puroro::internal::NoAllocBumpBox<{message_type}>",
                     message_type = bumpalo_message_type,
                 )
+                .into()
             }
-            t => t.numerical_rust_type()?.to_string(),
-        })
+            Trivial(field_type) => field_type.rust_type_name()?,
+        };
+        Ok(format!("::puroro::internal::Bare<{}>", bare_type).into())
     }
 
-    pub fn simple_field_type(&self) -> Result<String> {
+    pub fn simple_field_type(&self) -> Result<Cow<'static, str>> {
         let scalar_type = self.simple_scalar_field_type()?;
         Ok(match self.field_label()? {
             FieldLabel::OneofField => scalar_type,
             FieldLabel::Required | FieldLabel::Optional => {
-                format!("::std::option::Option<{}>", scalar_type)
+                format!("::std::option::Option<{}>", scalar_type).into()
             }
             FieldLabel::Unlabeled => {
                 if matches!(self.field_type(), Ok(FieldType::Message(_))) {
-                    format!("::std::option::Option<{}>", scalar_type)
+                    format!("::std::option::Option<{}>", scalar_type).into()
                 } else {
                     scalar_type
                 }
             }
-            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type),
+            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type).into(),
         })
     }
 
-    pub fn simple_oneof_field_type(&self) -> Result<String> {
+    pub fn simple_oneof_field_type(&self) -> Result<Cow<'static, str>> {
         let scalar_type = self.simple_scalar_field_type()?;
         Ok(scalar_type)
     }
 
-    pub fn simple_scalar_field_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "::std::string::String".to_string(),
-            FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::Message(m) => {
+    pub fn simple_scalar_field_type(&self) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => "::std::string::String".into(),
+            LengthDelimited(Bytes) => "::std::vec::Vec<u8>".into(),
+            LengthDelimited(Message(m)) => {
                 let bare_msg = upgrade(&m)?.rust_impl_path("Simple", &[]);
                 if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
-                    bare_msg
+                    bare_msg.into()
                 } else {
-                    format!("::std::boxed::Box<{}>", bare_msg)
+                    format!("::std::boxed::Box<{}>", bare_msg).into()
                 }
             }
-            t => t.numerical_rust_type()?.to_string(),
+            Trivial(field_type) => field_type.rust_type_name()?,
         })
     }
 
-    pub fn bumpalo_field_type(&self) -> Result<String> {
+    pub fn bumpalo_field_type(&self) -> Result<Cow<'static, str>> {
         let scalar_type = self.bumpalo_scalar_field_type()?;
         if self.is_repeated()? {
-            Ok(format!(
-                "::puroro::internal::NoAllocBumpVec<{}>",
-                scalar_type
-            ))
+            Ok(format!("::puroro::internal::NoAllocBumpVec<{}>", scalar_type).into())
         } else if self.is_message()? {
             Ok(format!(
                 "::std::option::Option<::puroro::internal::NoAllocBumpBox<{}>>",
                 scalar_type
-            ))
+            )
+            .into())
         } else {
-            Ok(scalar_type)
+            Ok(format!("::puroro::internal::Bare<{}>", scalar_type).into())
         }
     }
 
-    pub fn bumpalo_scalar_field_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "::puroro::internal::NoAllocBumpString".to_string(),
-            FieldType::Bytes => "::puroro::internal::NoAllocBumpVec<u8>".to_string(),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::Message(m) => upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]),
-            t => t.numerical_rust_type()?.to_string(),
+    pub fn bumpalo_scalar_field_type(&self) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => "::puroro::internal::NoAllocBumpString".into(),
+            LengthDelimited(Bytes) => "::puroro::internal::NoAllocBumpVec<u8>".into(),
+            LengthDelimited(Message(m)) => {
+                upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]).into()
+            }
+            Trivial(field_type) => field_type.rust_type_name()?,
+        })
+    }
+
+    pub fn bumpalo_getter_scalar_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => format!("&{} str", lt).into(),
+            LengthDelimited(Bytes) => format!("&{} [u8]", lt).into(),
+            LengthDelimited(Message(m)) => {
+                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
+                format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
+            }
+            Trivial(field_type) => field_type.rust_type_name()?,
+        })
+    }
+
+    pub fn bumpalo_getter_repeated_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => {
+                format!("&{lt}[impl ::std::ops::Deref<Target=str>]", lt = lt)
+            }
+            LengthDelimited(Bytes) => {
+                format!("&{lt}[impl ::std::ops::Deref<Target=[u8]>]", lt = lt)
+            }
+            LengthDelimited(Message(m)) => {
+                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[lt]);
+                format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
+            }
+            Trivial(field_type) => {
+                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_name()?)
+            }
+        }
+        .into())
+    }
+
+    pub fn bumpalo_getter_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            // ↓ Maybe need to double check the lt params
+            LengthDelimited(String) => format!(
+                "::puroro::internal::RefMutBumpString<{}, {}>",
+                bump_lt, this_lt
+            ),
+            LengthDelimited(Bytes) => format!(
+                "::puroro::internal::RefMutBumpVec<{}, {}, u8>",
+                bump_lt, this_lt
+            ),
+            LengthDelimited(Message(m)) => {
+                let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[bump_lt]);
+                format!("&{lt} mut {msg}", lt = this_lt, msg = msg_type)
+            }
+            Trivial(field_type) => format!(
+                "&{lt} mut {ty}",
+                lt = this_lt,
+                ty = field_type.rust_type_name()?
+            ),
+        })
+    }
+
+    pub fn bumpalo_getter_repeated_mut_type(&self, bump_lt: &str, this_lt: &str) -> Result<String> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => format!(
+                "::puroro::internal::AddBumpVecView<{bump_lt}, {this_lt}, ::puroro::internal::NoAllocBumpString>",
+                bump_lt = bump_lt,
+                this_lt = this_lt
+            ),
+            LengthDelimited(Bytes) => format!(
+                "::puroro::internal::AddBumpVecView<{bump_lt}, {this_lt}, ::puroro::internal::NoAllocBumpVec<u8>>",
+                bump_lt = bump_lt,
+                this_lt = this_lt
+            ),
+            LengthDelimited(Message(m)) => format!(
+                "::puroro::internal::RefMutBumpVec<{bump_lt}, {this_lt}, {ty}>",
+                bump_lt = bump_lt,
+                this_lt = this_lt,
+                ty = upgrade(&m)?.rust_impl_path("Bumpalo", &[bump_lt])
+            ),
+            Trivial(field_type) => {
+                format!(
+                    "::puroro::internal::RefMutBumpVec<{bump_lt}, {this_lt}, {ty}>",
+                    bump_lt = bump_lt,
+                    this_lt = this_lt,
+                    ty = field_type.rust_type_name()?
+                )
+            }
         })
     }
 
@@ -799,11 +894,10 @@ impl Field {
         .to_string())
     }
 
-    pub fn single_numerical_rust_type(&self) -> Result<String> {
-        Ok(match self.field_type()? {
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            t => t.numerical_rust_type()?.to_string(),
+    pub fn single_numerical_rust_type(&self) -> Result<Cow<'static, str>> {
+        Ok(match self.field_type()?.categories()? {
+            FieldTypeCategories::Trivial(field_type) => field_type.rust_type_name()?,
+            _ => "".into(),
         })
     }
 }
@@ -1059,24 +1153,28 @@ impl FieldType {
         })
     }
 
-    pub fn numerical_rust_type(&self) -> Result<&'static str> {
-        Ok(match *self {
-            FieldType::Double => "f64",
-            FieldType::Float => "f32",
-            FieldType::Int32 => "i32",
-            FieldType::Int64 => "i64",
-            FieldType::UInt32 => "u32",
-            FieldType::UInt64 => "u64",
-            FieldType::SInt32 => "i32",
-            FieldType::SInt64 => "i64",
-            FieldType::Fixed32 => "u32",
-            FieldType::Fixed64 => "u64",
-            FieldType::SFixed32 => "i32",
-            FieldType::SFixed64 => "i64",
-            FieldType::Bool => "bool",
-            _ => Err(ErrorKind::InternalError {
-                detail: "numerical_rust_type() is invoked for non-numerical type".to_string(),
-            })?,
+    pub fn categories(self) -> Result<FieldTypeCategories> {
+        use FieldTypeCategories::*;
+        Ok(match self {
+            FieldType::Double => Trivial(TrivialFieldType::Double),
+            FieldType::Float => Trivial(TrivialFieldType::Float),
+            FieldType::Int32 => Trivial(TrivialFieldType::Int32),
+            FieldType::Int64 => Trivial(TrivialFieldType::Int64),
+            FieldType::UInt32 => Trivial(TrivialFieldType::UInt32),
+            FieldType::UInt64 => Trivial(TrivialFieldType::UInt64),
+            FieldType::SInt32 => Trivial(TrivialFieldType::SInt32),
+            FieldType::SInt64 => Trivial(TrivialFieldType::SInt64),
+            FieldType::Fixed32 => Trivial(TrivialFieldType::Fixed32),
+            FieldType::Fixed64 => Trivial(TrivialFieldType::Fixed64),
+            FieldType::SFixed32 => Trivial(TrivialFieldType::SFixed32),
+            FieldType::SFixed64 => Trivial(TrivialFieldType::SFixed64),
+            FieldType::Bool => Trivial(TrivialFieldType::Bool),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => LengthDelimited(LdFieldType::String),
+            FieldType::Bytes => LengthDelimited(LdFieldType::Bytes),
+            FieldType::Enum2(e) => Trivial(TrivialFieldType::Enum2(e)),
+            FieldType::Enum3(e) => Trivial(TrivialFieldType::Enum3(e)),
+            FieldType::Message(m) => LengthDelimited(LdFieldType::Message(m)),
         })
     }
 
@@ -1103,6 +1201,58 @@ impl FieldType {
             FieldType::Message(m) => upgrade(m)?.proto_name().to_string(),
         })
     }
+}
+
+pub enum LdFieldType {
+    String,
+    Bytes,
+    Message(Weak<Message>),
+}
+
+pub enum TrivialFieldType {
+    Double,
+    Float,
+    Int32,
+    Int64,
+    UInt32,
+    UInt64,
+    SInt32,
+    SInt64,
+    Fixed32,
+    Fixed64,
+    SFixed32,
+    SFixed64,
+    Bool,
+    Enum2(Weak<Enum>),
+    Enum3(Weak<Enum>),
+}
+
+impl TrivialFieldType {
+    pub fn rust_type_name(&self) -> Result<Cow<'static, str>> {
+        Ok(match self {
+            TrivialFieldType::Double => "f64".into(),
+            TrivialFieldType::Float => "f32".into(),
+            TrivialFieldType::Int32 => "i32".into(),
+            TrivialFieldType::Int64 => "i64".into(),
+            TrivialFieldType::UInt32 => "u32".into(),
+            TrivialFieldType::UInt64 => "u64".into(),
+            TrivialFieldType::SInt32 => "i32".into(),
+            TrivialFieldType::SInt64 => "i64".into(),
+            TrivialFieldType::Fixed32 => "u32".into(),
+            TrivialFieldType::Fixed64 => "u64".into(),
+            TrivialFieldType::SFixed32 => "i32".into(),
+            TrivialFieldType::SFixed64 => "i64".into(),
+            TrivialFieldType::Bool => "bool".into(),
+            TrivialFieldType::Enum2(e) | TrivialFieldType::Enum3(e) => {
+                upgrade(e)?.rust_path().into()
+            }
+        })
+    }
+}
+
+pub enum FieldTypeCategories {
+    LengthDelimited(LdFieldType),
+    Trivial(TrivialFieldType),
 }
 
 #[derive(Debug, Clone)]

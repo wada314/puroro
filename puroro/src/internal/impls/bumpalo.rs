@@ -15,20 +15,21 @@
 //! # Bumpalo message structs
 //!
 //! **The implementation is highly experimental and the interface will change
-//! in very soon. I'm planning to make the struct fields private and make a mutable
-//! trait interface in future.**
+//! in very soon!!**
 //!
 
 pub mod de;
 
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
+use crate::internal::Bare;
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
 use ::std::ops::{Deref, DerefMut};
 use ::std::ptr;
 use ::std::ptr::NonNull;
+use ::std::slice;
 use ::std::str::Utf8Error;
 
 pub trait BumpDefault<'bump> {
@@ -47,6 +48,11 @@ impl<'bump, T> BumpDefault<'bump> for NoAllocVec<T> {
 impl<'bump, T> BumpDefault<'bump> for Option<T> {
     fn default_in(_: &'bump Bump) -> Self {
         ::std::default::Default::default()
+    }
+}
+impl<'bump, T: BumpDefault<'bump>> BumpDefault<'bump> for Bare<T> {
+    fn default_in(bump: &'bump Bump) -> Self {
+        Bare::new(BumpDefault::default_in(bump))
     }
 }
 macro_rules! impl_bumpalo_default {
@@ -108,6 +114,25 @@ impl<T> Drop for NoAllocBox<T> {
     }
 }
 
+pub trait AddBump {
+    type AddToRef<'bump, 'this>
+    where
+        Self: 'bump + 'this;
+    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this>;
+    type AddToMutRef<'bump, 'this>
+    where
+        Self: 'bump + 'this;
+    fn add_bump_mut<'bump, 'this>(
+        &'this mut self,
+        bump: &'bump Bump,
+    ) -> Self::AddToMutRef<'bump, 'this>;
+}
+
+pub trait RemoveBump {
+    type Removed;
+    fn remove_bump(self) -> Self::Removed;
+}
+
 /// A vec for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!
 ///
@@ -124,11 +149,19 @@ pub struct NoAllocVec<T> {
     capacity: usize,
 }
 impl<T> NoAllocVec<T> {
+    pub fn new() -> Self {
+        // Actually bump ptr is not needed when allocating.
+        // Maybe we somehow make a dangling bump ptr here to skip
+        // Bump::new() invocation...
+        let fake_bump = Bump::new();
+        let vec = Vec::new_in(&fake_bump);
+        Self::from_vec(vec)
+    }
     pub fn new_in(bump: &Bump) -> Self {
         let vec = Vec::new_in(bump);
-        unsafe { Self::from_vec(vec) }
+        Self::from_vec(vec)
     }
-    pub unsafe fn from_vec<'bump>(mut vec: Vec<'bump, T>) -> Self {
+    pub fn from_vec<'bump>(mut vec: Vec<'bump, T>) -> Self {
         let result = Self {
             ptr: vec.as_mut_ptr(),
             length: vec.len(),
@@ -138,14 +171,27 @@ impl<T> NoAllocVec<T> {
         result
     }
 
+    /// Returns a unsafely casted vector. Super duper unsafe!
+    /// TODO: Maybe add little more restriction for safety.
+    /// e.g. Require the item to implement some sort of marker trait.
+    pub unsafe fn cast_item_unchecked<U>(&self) -> &NoAllocVec<U> {
+        mem::transmute(self)
+    }
+
     /// Construct an immutable [`Vec`](bumpalo::collections::Vec) by adding bump ptr.
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> Vec<'bump, T> {
-        Vec::from_raw_parts_in(self.ptr, self.length, self.capacity, bump)
+    /// Also, if the `ManuallyDrop` inner value has been taken then it's also unsafe.
+    unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<Vec<'bump, T>> {
+        ManuallyDrop::new(Vec::from_raw_parts_in(
+            self.ptr,
+            self.length,
+            self.capacity,
+            bump,
+        ))
     }
 
     /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
@@ -156,9 +202,41 @@ impl<T> NoAllocVec<T> {
     /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_mut_vec_in<'bump>(&mut self, bump: &'bump Bump) -> RefMutVec<'bump, '_, T> {
         RefMutVec {
-            temp_vec: ManuallyDrop::new(self.as_vec_in(bump)),
+            temp_vec: self.as_vec_in(bump),
             ref_vec: self,
         }
+    }
+
+    pub unsafe fn as_add_bump_vec_view_in<'bump>(
+        &mut self,
+        bump: &'bump Bump,
+    ) -> AddBumpVecView<'bump, '_, T> {
+        AddBumpVecView::new(self.as_mut_vec_in(bump), bump)
+    }
+}
+impl<T> AddBump for NoAllocVec<T> {
+    type AddToRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = ManuallyDrop<Vec<'bump, T>>;
+    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
+        unsafe { self.as_vec_in(bump) }
+    }
+    type AddToMutRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = RefMutVec<'bump, 'this, T>;
+    fn add_bump_mut<'bump, 'this>(
+        &'this mut self,
+        bump: &'bump Bump,
+    ) -> Self::AddToMutRef<'bump, 'this> {
+        unsafe { self.as_mut_vec_in(bump) }
+    }
+}
+impl<'bump, T> RemoveBump for Vec<'bump, T> {
+    type Removed = NoAllocVec<T>;
+    fn remove_bump(self) -> Self::Removed {
+        NoAllocVec::from_vec(self)
     }
 }
 impl<T> Deref for NoAllocVec<T> {
@@ -189,10 +267,28 @@ impl<T> Drop for NoAllocVec<T> {
         unsafe { ptr::drop_in_place(ptr::slice_from_raw_parts_mut(self.ptr, self.length)) }
     }
 }
+impl<T> Default for NoAllocVec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<'a, T> IntoIterator for &'a NoAllocVec<T> {
+    type Item = &'a T;
+    type IntoIter = slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.deref().into_iter()
+    }
+}
 
 pub struct RefMutVec<'bump, 'vec, T> {
     temp_vec: ManuallyDrop<Vec<'bump, T>>,
     ref_vec: &'vec mut NoAllocVec<T>,
+}
+impl<'bump, 'vec, T: Default> RefMutVec<'bump, 'vec, T> {
+    pub fn push_default(&mut self) -> &mut T {
+        self.temp_vec.push(T::default());
+        self.last_mut().unwrap()
+    }
 }
 
 impl<'bump, 'vec, T: 'bump> Deref for RefMutVec<'bump, 'vec, T> {
@@ -233,6 +329,12 @@ pub struct NoAllocString {
     vec: NoAllocVec<u8>,
 }
 impl NoAllocString {
+    pub fn new() -> Self {
+        Self {
+            vec: NoAllocVec::new(),
+        }
+    }
+
     pub fn new_in(bump: &Bump) -> Self {
         Self {
             vec: NoAllocVec::new_in(bump),
@@ -257,8 +359,11 @@ impl NoAllocString {
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> String<'bump> {
-        String::from_utf8_unchecked(self.vec.as_vec_in(bump))
+    /// Also, if the `ManuallyDrop` inner value has been taken then it's also unsafe.
+    unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<String<'bump>> {
+        ManuallyDrop::new(String::from_utf8_unchecked(ManuallyDrop::into_inner(
+            self.vec.as_vec_in(bump),
+        )))
     }
 
     /// Construct a mutable [`String`](bumpalo::collections::String) by adding bump ptr.
@@ -267,14 +372,39 @@ impl NoAllocString {
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_string_mut_in<'bump, 'string>(
+    pub unsafe fn as_mut_string_in<'bump, 'string>(
         &'string mut self,
         bump: &'bump Bump,
     ) -> RefMutString<'bump, 'string> {
         RefMutString {
-            temp_string: ManuallyDrop::new(self.as_string_in(bump)),
+            temp_string: self.as_string_in(bump),
             ref_string: self,
         }
+    }
+}
+impl AddBump for NoAllocString {
+    type AddToRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = ManuallyDrop<String<'bump>>;
+    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
+        unsafe { self.as_string_in(bump) }
+    }
+    type AddToMutRef<'bump, 'this>
+    where
+        Self: 'bump + 'this,
+    = RefMutString<'bump, 'this>;
+    fn add_bump_mut<'bump, 'this>(
+        &'this mut self,
+        bump: &'bump Bump,
+    ) -> Self::AddToMutRef<'bump, 'this> {
+        unsafe { self.as_mut_string_in(bump) }
+    }
+}
+impl<'bump> RemoveBump for String<'bump> {
+    type Removed = NoAllocString;
+    fn remove_bump(self) -> Self::Removed {
+        NoAllocString::from_utf8_unchecked(NoAllocVec::from_vec(self.into_bytes()))
     }
 }
 
@@ -292,6 +422,13 @@ impl Borrow<str> for NoAllocString {
 impl AsRef<str> for NoAllocString {
     fn as_ref(&self) -> &str {
         self.deref()
+    }
+}
+impl Default for NoAllocString {
+    fn default() -> Self {
+        Self {
+            vec: Default::default(),
+        }
     }
 }
 
@@ -317,5 +454,46 @@ impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
             let vec = ManuallyDrop::take(&mut self.temp_string).into_bytes();
             self.ref_string.vec = NoAllocVec::from_vec(vec);
         }
+    }
+}
+
+pub struct AddBumpVecView<'bump, 'vec, T> {
+    vec: RefMutVec<'bump, 'vec, T>,
+    bump: &'bump Bump,
+}
+impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
+    unsafe fn new(vec: RefMutVec<'bump, 'vec, T>, bump: &'bump Bump) -> Self {
+        Self { vec, bump }
+    }
+
+    pub fn push<U>(&mut self, val: U)
+    where
+        U: RemoveBump<Removed = T>,
+    {
+        self.vec.push(<U as RemoveBump>::remove_bump(val));
+    }
+}
+impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
+where
+    T: AddBump,
+{
+    pub fn get(&self, index: usize) -> Option<<T as AddBump>::AddToRef<'bump, '_>> {
+        self.vec
+            .get(index)
+            .map(|v| <T as AddBump>::add_bump(v, self.bump))
+    }
+    pub fn get_mut(&mut self, index: usize) -> Option<<T as AddBump>::AddToMutRef<'bump, '_>> {
+        self.vec
+            .get_mut(index)
+            .map(|v| <T as AddBump>::add_bump_mut(v, self.bump))
+    }
+}
+impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
+where
+    T: AddBump + Default,
+{
+    pub fn push_default(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
+        self.vec.push(Default::default());
+        <T as AddBump>::add_bump_mut(self.vec.last_mut().unwrap(), self.bump)
     }
 }

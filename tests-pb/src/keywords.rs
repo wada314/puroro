@@ -191,21 +191,49 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
-        r#type: i32,
+        r#type: ::puroro::internal::Bare<i32>,
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
-
     impl<'bump> MsgBumpalo<'bump> {
         pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
             }
         }
+        pub fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.r#type.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn r#type<'this>(&'this self) -> i32 {
+            match self.type_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_type(&self) -> bool {
+            self.type_opt().is_some()
+        }
+        pub fn clear_type(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_type() {
+                self.r#type = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
+            &mut self.r#type
+        }
     }
-
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
     impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
@@ -231,8 +259,8 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
-        fn deser_field<I>(
-            &mut self,
+        fn deser_field<'this, I>(
+            &'this mut self,
             field_number: i32,
             data: ::puroro::internal::types::FieldData<
                 &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
@@ -247,7 +275,7 @@ pub mod _puroro_impls {
                     self._bitfield.set(0, true);
                     DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional, ::puroro::tags::Int32
-                >::deser_field(&mut self.r#type, data, &self._bump)
+                >::deser_field(&mut self.r#type, data, self._bump)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

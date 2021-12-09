@@ -13,22 +13,23 @@
 // limitations under the License.
 
 use crate::RepeatedField;
-use ::std::marker::PhantomData;
+use ::std::iter;
+use ::std::option;
 
-#[derive(Default)]
-pub struct EmptyRepeatedField<T>(PhantomData<T>);
-impl<T> EmptyRepeatedField<T> {
-    pub fn new() -> Self {
-        Self(PhantomData)
+pub struct OptionRepeatedField<R>(Option<R>);
+impl<R> OptionRepeatedField<R> {
+    pub fn new(maybe_repeated_field: Option<R>) -> Self {
+        Self(maybe_repeated_field)
     }
 }
-
-impl<'msg, T> RepeatedField<'msg> for EmptyRepeatedField<T> {}
-
-impl<T> IntoIterator for EmptyRepeatedField<T> {
-    type Item = T;
-    type IntoIter = ::std::iter::Empty<T>;
+impl<'msg, R> RepeatedField<'msg> for OptionRepeatedField<R> where R: RepeatedField<'msg> {}
+impl<R> IntoIterator for OptionRepeatedField<R>
+where
+    R: IntoIterator,
+{
+    type Item = <R as IntoIterator>::Item;
+    type IntoIter = iter::Flatten<option::IntoIter<R>>;
     fn into_iter(self) -> Self::IntoIter {
-        ::std::iter::empty()
+        self.0.into_iter().flatten()
     }
 }

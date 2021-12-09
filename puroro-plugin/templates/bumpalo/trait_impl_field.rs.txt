@@ -7,23 +7,28 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_
 
 {%- if f.is_repeated %}
 
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
 {%- match f.bumpalo_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-    ::puroro::internal::utils::BorrowedIter<
-        {{ borrowed }},
-        ::std::slice::Iter<'this, {{ f.bumpalo_scalar_field_type }}>>;
+{%- if f.is_message %}
+    &'this [{{ borrowed }}];
+{%- else %} {#- if f.is_message #}
+    ::puroro::AsRefRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.bumpalo_field_rep_item_type }}, {{ borrowed }}>;
+{%- endif %} {#- if f.is_message #}
 {%- else %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-    ::puroro::ClonedSlice<'this, {{ f.trait_scalar_getter_type }}>;
+    ::puroro::CloneThenIntoRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.trait_scalar_getter_type }}, {{ f.trait_scalar_getter_type }}>;
 {%- endmatch %}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
     {%- match f.bumpalo_maybe_borrowed_field_type %}
     {%- when Some with (borrowed) %}
-    ::puroro::internal::utils::BorrowedIter::new(self.{{ f.ident }}.iter())
+    {%- if f.is_message %}
+    unsafe { self.{{ f.ident }}.cast_item_unchecked() }
+    {%- else %} {#- if f.is_message #}
+    ::puroro::AsRefRepeatedField::new(&self.{{ f.ident }})
+    {%- endif %} {#- if f.is_message #}
     {%- else %}
-    ::puroro::ClonedSlice::new(&self.{{ f.ident }})
+    ::puroro::CloneThenIntoRepeatedField::new(&self.{{ f.ident }})
     {%- endmatch %}
 }
 

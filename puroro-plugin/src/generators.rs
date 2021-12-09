@@ -197,7 +197,10 @@ struct Field {
     single_field_type: String,
     single_numerical_rust_type: String,
     bumpalo_field_type: String,
-    bumpalo_scalar_field_type: String,
+    bumpalo_field_rep_item_type: String,
+    bumpalo_getter_type: String,
+    bumpalo_getter_opt_type: String,
+    bumpalo_getter_mut_type: String,
     bumpalo_maybe_field_message_path: Option<String>,
     bumpalo_maybe_borrowed_field_type: Option<String>,
     bumpalo_label_and_type_tags: String,
@@ -219,7 +222,7 @@ impl Field {
             };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'bump"]))
+                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'this"]))
             } else {
                 None
             };
@@ -262,7 +265,7 @@ impl Field {
                     -1
                 }
             },
-            trait_scalar_getter_type: f.trait_scalar_getter_type()?,
+            trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
             trait_maybe_field_message_trait_path,
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
@@ -272,8 +275,8 @@ impl Field {
                 ))
             })?,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
-            simple_field_type: f.simple_field_type()?,
-            simple_scalar_field_type: f.simple_scalar_field_type()?,
+            simple_field_type: f.simple_field_type()?.into(),
+            simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple", &[])?,
@@ -287,12 +290,31 @@ impl Field {
                 )
             })?,
             single_field_type: f.single_field_type()?,
-            single_numerical_rust_type: f.single_numerical_rust_type().unwrap_or("".to_string()),
-            bumpalo_field_type: f.bumpalo_field_type()?,
-            bumpalo_scalar_field_type: f.bumpalo_scalar_field_type()?,
+            single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
+            bumpalo_field_type: f.bumpalo_field_type()?.into(),
+            bumpalo_field_rep_item_type: f.bumpalo_scalar_field_type()?.into(),
+            bumpalo_getter_type: if f.is_repeated()? {
+                f.bumpalo_getter_repeated_type("'this")?.to_string()
+            } else {
+                let bare_type = f.bumpalo_getter_scalar_type("'this")?;
+                if f.is_message()? {
+                    format!("::std::option::Option<{}>", bare_type)
+                } else {
+                    bare_type.to_string()
+                }
+            },
+            bumpalo_getter_opt_type: format!(
+                "::std::option::Option<{}>",
+                f.bumpalo_getter_scalar_type("'this")?
+            ),
+            bumpalo_getter_mut_type: if f.is_repeated()? {
+                f.bumpalo_getter_repeated_mut_type("'bump", "'this")?
+            } else {
+                f.bumpalo_getter_mut_type("'bump", "'this")?
+            },
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'bump"])?,
+                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'this"])?,
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
@@ -441,30 +463,21 @@ impl OneofField {
                     | wrappers::FieldType::Message(_)
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
-            field_type: f.trait_oneof_field_type("'msg", "T")?,
-            simple_field_type: f.simple_oneof_field_type()?,
-            bumpalo_field_type: f.bumpalo_oneof_field_type()?,
-            trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
+            field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
+            simple_field_type: f.simple_oneof_field_type()?.into(),
+            bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
+            trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
-                Ok(
-                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Simple", &[])
-                    } else {
-                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple", &[]))
-                    },
-                )
+                Ok(format!(
+                    "::std::boxed::Box<{}>",
+                    msg.rust_impl_path("Simple", &[])
+                ))
             })?,
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
-                Ok(
-                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["'bump"])
-                    } else {
-                        format!(
-                            "::puroro::internal::NoAllocBumpBox<{}>",
-                            msg.rust_impl_path("Bumpalo", &["'bump"])
-                        )
-                    },
-                )
+                Ok(format!(
+                    "::puroro::internal::NoAllocBumpBox<{}>",
+                    msg.rust_impl_path("Bumpalo", &["'bump"])
+                ))
             })?,
         })
     }

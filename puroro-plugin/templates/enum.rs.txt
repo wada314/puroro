@@ -1,4 +1,4 @@
-#[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
+#[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
 pub enum {{ ident }} {
     {%- for value in values %}
     {{ value.ident }},
