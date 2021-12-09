@@ -1973,7 +1973,7 @@ pub mod _puroro_impls {
         pub fn i32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.i32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_float_optional(&mut self) {
             self._bitfield.set(1, false);
@@ -1988,7 +1988,7 @@ pub mod _puroro_impls {
         pub fn float_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, f32> {
-            todo!()
+            unsafe { self.float_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_string_optional(&mut self) {
             self._bitfield.set(2, false);
@@ -2006,7 +2006,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocBumpString>
         {
-            todo!()
+            unsafe { self.string_repeated.as_add_bump_vec_view_in(self._bump) }
         }
         pub fn clear_submsg_optional(&mut self) {
             self.submsg_optional = ::std::default::Default::default();
@@ -2050,7 +2050,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, self::_puroro_root::ser_tests2::Enum>
         {
-            todo!()
+            unsafe { self.enum_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_very_large_field_number(&mut self) {
             self._bitfield.set(4, false);

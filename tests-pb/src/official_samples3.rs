@@ -1191,7 +1191,7 @@ pub mod _puroro_impls {
         pub fn d_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.d.as_mut_vec_in(self._bump) }
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}

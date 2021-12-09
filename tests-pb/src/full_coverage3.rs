@@ -11899,7 +11899,7 @@ pub mod _puroro_impls {
         pub fn i32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.i32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
@@ -11923,7 +11923,7 @@ pub mod _puroro_impls {
         pub fn float_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, f32> {
-            todo!()
+            unsafe { self.float_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_bytes_unlabeled(&mut self) {
             self.bytes_unlabeled = ::std::default::Default::default();
@@ -11952,7 +11952,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocBumpVec<u8>>
         {
-            todo!()
+            unsafe { self.bytes_repeated.as_add_bump_vec_view_in(self._bump) }
         }
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
@@ -11981,7 +11981,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocBumpString>
         {
-            todo!()
+            unsafe { self.string_repeated.as_add_bump_vec_view_in(self._bump) }
         }
         pub fn clear_enum_unlabeled(&mut self) {
             self.enum_unlabeled = ::std::default::Default::default();
@@ -12010,7 +12010,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, self::_puroro_root::full_coverage3::Enum>
         {
-            todo!()
+            unsafe { self.enum_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
@@ -12075,7 +12075,7 @@ pub mod _puroro_impls {
         pub fn i64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i64> {
-            todo!()
+            unsafe { self.i64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_u32_unlabeled(&mut self) {
             self.u32_unlabeled = ::std::default::Default::default();
@@ -12099,7 +12099,7 @@ pub mod _puroro_impls {
         pub fn u32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u32> {
-            todo!()
+            unsafe { self.u32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_u64_unlabeled(&mut self) {
             self.u64_unlabeled = ::std::default::Default::default();
@@ -12123,7 +12123,7 @@ pub mod _puroro_impls {
         pub fn u64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u64> {
-            todo!()
+            unsafe { self.u64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_s32_unlabeled(&mut self) {
             self.s32_unlabeled = ::std::default::Default::default();
@@ -12147,7 +12147,7 @@ pub mod _puroro_impls {
         pub fn s32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.s32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_s64_unlabeled(&mut self) {
             self.s64_unlabeled = ::std::default::Default::default();
@@ -12171,7 +12171,7 @@ pub mod _puroro_impls {
         pub fn s64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i64> {
-            todo!()
+            unsafe { self.s64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_fixed32_unlabeled(&mut self) {
             self.fixed32_unlabeled = ::std::default::Default::default();
@@ -12195,7 +12195,7 @@ pub mod _puroro_impls {
         pub fn fixed32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u32> {
-            todo!()
+            unsafe { self.fixed32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_fixed64_unlabeled(&mut self) {
             self.fixed64_unlabeled = ::std::default::Default::default();
@@ -12219,7 +12219,7 @@ pub mod _puroro_impls {
         pub fn fixed64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u64> {
-            todo!()
+            unsafe { self.fixed64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_sfixed32_unlabeled(&mut self) {
             self.sfixed32_unlabeled = ::std::default::Default::default();
@@ -12243,7 +12243,7 @@ pub mod _puroro_impls {
         pub fn sfixed32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.sfixed32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_sfixed64_unlabeled(&mut self) {
             self.sfixed64_unlabeled = ::std::default::Default::default();
@@ -12267,7 +12267,7 @@ pub mod _puroro_impls {
         pub fn sfixed64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i64> {
-            todo!()
+            unsafe { self.sfixed64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_f64_unlabeled(&mut self) {
             self.f64_unlabeled = ::std::default::Default::default();
@@ -12291,7 +12291,7 @@ pub mod _puroro_impls {
         pub fn f64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, f64> {
-            todo!()
+            unsafe { self.f64_repeated.as_mut_vec_in(self._bump) }
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}

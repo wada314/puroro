@@ -164,17 +164,16 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 
     {#- mut get repeated field #}
     pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> {{ field.bumpalo_getter_mut_type }} {
-        {%- if field.is_repeated %}
+        {%- if field.is_length_delimited %}
         {%- if field.is_message %}
         unsafe { self.{{ field.ident }}.as_mut_vec_in(self._bump) }
         {%- else %} {#- if field.is_message #}
-        todo!()
+        unsafe { self.{{ field.ident }}.as_add_bump_vec_view_in(self._bump) }
         {%- endif %} {#- if field.is_message #}
-        {%- else %} {#- if field.is_repeated #}
-        &mut self.{{ field.ident }}
-        {%- endif %} {#- if field.is_repeated #}
+        {%- else %} {#- if field.is_length_delimited #}
+        unsafe { self.{{ field.ident }}.as_mut_vec_in(self._bump) }
+        {%- endif %} {#- if field.is_length_delimited #}
     }
-    {#- TODO!! What should I do for e.g. repeated bytes field? #}
 
     {%- else %} {#- if field.is_repeated #}
 

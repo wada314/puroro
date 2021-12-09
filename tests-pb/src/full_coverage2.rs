@@ -11842,7 +11842,7 @@ pub mod _puroro_impls {
         pub fn i32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.i32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_float_required(&mut self) {
             self._bitfield.set(2, false);
@@ -11867,7 +11867,7 @@ pub mod _puroro_impls {
         pub fn float_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, f32> {
-            todo!()
+            unsafe { self.float_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_bytes_required(&mut self) {
             self._bitfield.set(4, false);
@@ -11897,7 +11897,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocBumpVec<u8>>
         {
-            todo!()
+            unsafe { self.bytes_repeated.as_add_bump_vec_view_in(self._bump) }
         }
         pub fn clear_string_required(&mut self) {
             self._bitfield.set(6, false);
@@ -11927,7 +11927,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocBumpString>
         {
-            todo!()
+            unsafe { self.string_repeated.as_add_bump_vec_view_in(self._bump) }
         }
         pub fn clear_enum_required(&mut self) {
             self._bitfield.set(8, false);
@@ -11957,7 +11957,7 @@ pub mod _puroro_impls {
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, self::_puroro_root::full_coverage2::Enum>
         {
-            todo!()
+            unsafe { self.enum_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_submsg_required(&mut self) {
             self.submsg_required = ::std::default::Default::default();
@@ -12023,7 +12023,7 @@ pub mod _puroro_impls {
         pub fn i64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i64> {
-            todo!()
+            unsafe { self.i64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_u32_required(&mut self) {
             self._bitfield.set(12, false);
@@ -12048,7 +12048,7 @@ pub mod _puroro_impls {
         pub fn u32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u32> {
-            todo!()
+            unsafe { self.u32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_u64_required(&mut self) {
             self._bitfield.set(14, false);
@@ -12073,7 +12073,7 @@ pub mod _puroro_impls {
         pub fn u64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u64> {
-            todo!()
+            unsafe { self.u64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_s32_required(&mut self) {
             self._bitfield.set(16, false);
@@ -12098,7 +12098,7 @@ pub mod _puroro_impls {
         pub fn s32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.s32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_s64_required(&mut self) {
             self._bitfield.set(18, false);
@@ -12123,7 +12123,7 @@ pub mod _puroro_impls {
         pub fn s64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i64> {
-            todo!()
+            unsafe { self.s64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_fixed32_required(&mut self) {
             self._bitfield.set(20, false);
@@ -12148,7 +12148,7 @@ pub mod _puroro_impls {
         pub fn fixed32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u32> {
-            todo!()
+            unsafe { self.fixed32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_fixed64_required(&mut self) {
             self._bitfield.set(22, false);
@@ -12173,7 +12173,7 @@ pub mod _puroro_impls {
         pub fn fixed64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u64> {
-            todo!()
+            unsafe { self.fixed64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_sfixed32_required(&mut self) {
             self._bitfield.set(24, false);
@@ -12198,7 +12198,7 @@ pub mod _puroro_impls {
         pub fn sfixed32_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-            todo!()
+            unsafe { self.sfixed32_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_sfixed64_required(&mut self) {
             self._bitfield.set(26, false);
@@ -12223,7 +12223,7 @@ pub mod _puroro_impls {
         pub fn sfixed64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i64> {
-            todo!()
+            unsafe { self.sfixed64_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_f64_required(&mut self) {
             self._bitfield.set(28, false);
@@ -12248,7 +12248,7 @@ pub mod _puroro_impls {
         pub fn f64_repeated_mut<'this>(
             &'this mut self,
         ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, f64> {
-            todo!()
+            unsafe { self.f64_repeated.as_mut_vec_in(self._bump) }
         }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}

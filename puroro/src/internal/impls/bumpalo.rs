@@ -200,6 +200,13 @@ impl<T> NoAllocVec<T> {
             ref_vec: self,
         }
     }
+
+    pub unsafe fn as_add_bump_vec_view_in<'bump>(
+        &mut self,
+        bump: &'bump Bump,
+    ) -> AddBumpVecView<'bump, '_, T> {
+        AddBumpVecView::new(self.as_mut_vec_in(bump), bump)
+    }
 }
 impl<T> AddBump for NoAllocVec<T> {
     type AddToRef<'bump, 'this>
@@ -449,7 +456,7 @@ pub struct AddBumpVecView<'bump, 'vec, T> {
     bump: &'bump Bump,
 }
 impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
-    fn new(vec: RefMutVec<'bump, 'vec, T>, bump: &'bump Bump) -> Self {
+    unsafe fn new(vec: RefMutVec<'bump, 'vec, T>, bump: &'bump Bump) -> Self {
         Self { vec, bump }
     }
 
