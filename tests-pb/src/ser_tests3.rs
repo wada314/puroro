@@ -1822,11 +1822,11 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        i32_unlabeled: i32,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
         i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
-        float_unlabeled: f32,
+        float_unlabeled: ::puroro::internal::Bare<f32>,
         float_repeated: ::puroro::internal::NoAllocBumpVec<f32>,
-        string_unlabeled: ::puroro::internal::NoAllocBumpString,
+        string_unlabeled: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
         string_repeated: ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
         submsg_unlabeled: ::std::option::Option<
             ::puroro::internal::NoAllocBumpBox<
@@ -1840,9 +1840,9 @@ pub mod _puroro_impls {
                 'bump,
             >,
         >,
-        enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
+        enum_unlabeled: ::puroro::internal::Bare<self::_puroro_root::ser_tests3::Enum>,
         enum_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::ser_tests3::Enum>,
-        very_large_field_number: i32,
+        very_large_field_number: ::puroro::internal::Bare<i32>,
     }
 
     pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
@@ -1870,7 +1870,7 @@ pub mod _puroro_impls {
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
-                ::std::option::Option::Some(self.i32_unlabeled)
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -1889,7 +1889,7 @@ pub mod _puroro_impls {
         }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if !::puroro::internal::IsDefault::is_default(&self.float_unlabeled) {
-                ::std::option::Option::Some(self.float_unlabeled)
+                ::std::option::Option::Some(self.float_unlabeled.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -1945,7 +1945,7 @@ pub mod _puroro_impls {
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
             if !::puroro::internal::IsDefault::is_default(&self.enum_unlabeled) {
-                ::std::option::Option::Some(self.enum_unlabeled)
+                ::std::option::Option::Some(self.enum_unlabeled.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -1964,7 +1964,7 @@ pub mod _puroro_impls {
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.very_large_field_number) {
-                ::std::option::Option::Some(self.very_large_field_number)
+                ::std::option::Option::Some(self.very_large_field_number.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -3423,7 +3423,7 @@ pub mod _puroro_nested {
                     ::puroro::bitvec::order::Lsb0,
                     [u32; (0 + 31) / 32],
                 >,
-                i32_unlabeled: i32,
+                i32_unlabeled: ::puroro::internal::Bare<i32>,
             }
 
             pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
@@ -3441,7 +3441,7 @@ pub mod _puroro_nested {
                 }
                 pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
-                        ::std::option::Option::Some(self.i32_unlabeled)
+                        ::std::option::Option::Some(self.i32_unlabeled.inner())
                     } else {
                         ::std::option::Option::None
                     }

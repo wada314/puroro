@@ -11149,53 +11149,53 @@ pub mod _puroro_impls {
         ::puroro::bitvec::order::Lsb0,
         [u32; (30 + 31) / 32],
     >,
-    i32_required: i32,
-    i32_optional: i32,
+    i32_required: ::puroro::internal::Bare<i32>,
+    i32_optional: ::puroro::internal::Bare<i32>,
     i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
-    float_required: f32,
-    float_optional: f32,
+    float_required: ::puroro::internal::Bare<f32>,
+    float_optional: ::puroro::internal::Bare<f32>,
     float_repeated: ::puroro::internal::NoAllocBumpVec<f32>,
-    bytes_required: ::puroro::internal::NoAllocBumpVec<u8>,
-    bytes_optional: ::puroro::internal::NoAllocBumpVec<u8>,
+    bytes_required: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpVec<u8>>,
+    bytes_optional: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpVec<u8>>,
     bytes_repeated: ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpVec<u8>>,
-    string_required: ::puroro::internal::NoAllocBumpString,
-    string_optional: ::puroro::internal::NoAllocBumpString,
+    string_required: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
+    string_optional: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
     string_repeated: ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
-    enum_required: self::_puroro_root::full_coverage2::Enum,
-    enum_optional: self::_puroro_root::full_coverage2::Enum,
+    enum_required: ::puroro::internal::Bare<self::_puroro_root::full_coverage2::Enum>,
+    enum_optional: ::puroro::internal::Bare<self::_puroro_root::full_coverage2::Enum>,
     enum_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::Enum>,
     submsg_required: ::std::option::Option<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
     submsg_optional: ::std::option::Option<::puroro::internal::NoAllocBumpBox<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>,
     submsg_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>,
-    i64_required: i64,
-    i64_optional: i64,
+    i64_required: ::puroro::internal::Bare<i64>,
+    i64_optional: ::puroro::internal::Bare<i64>,
     i64_repeated: ::puroro::internal::NoAllocBumpVec<i64>,
-    u32_required: u32,
-    u32_optional: u32,
+    u32_required: ::puroro::internal::Bare<u32>,
+    u32_optional: ::puroro::internal::Bare<u32>,
     u32_repeated: ::puroro::internal::NoAllocBumpVec<u32>,
-    u64_required: u64,
-    u64_optional: u64,
+    u64_required: ::puroro::internal::Bare<u64>,
+    u64_optional: ::puroro::internal::Bare<u64>,
     u64_repeated: ::puroro::internal::NoAllocBumpVec<u64>,
-    s32_required: i32,
-    s32_optional: i32,
+    s32_required: ::puroro::internal::Bare<i32>,
+    s32_optional: ::puroro::internal::Bare<i32>,
     s32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
-    s64_required: i64,
-    s64_optional: i64,
+    s64_required: ::puroro::internal::Bare<i64>,
+    s64_optional: ::puroro::internal::Bare<i64>,
     s64_repeated: ::puroro::internal::NoAllocBumpVec<i64>,
-    fixed32_required: u32,
-    fixed32_optional: u32,
+    fixed32_required: ::puroro::internal::Bare<u32>,
+    fixed32_optional: ::puroro::internal::Bare<u32>,
     fixed32_repeated: ::puroro::internal::NoAllocBumpVec<u32>,
-    fixed64_required: u64,
-    fixed64_optional: u64,
+    fixed64_required: ::puroro::internal::Bare<u64>,
+    fixed64_optional: ::puroro::internal::Bare<u64>,
     fixed64_repeated: ::puroro::internal::NoAllocBumpVec<u64>,
-    sfixed32_required: i32,
-    sfixed32_optional: i32,
+    sfixed32_required: ::puroro::internal::Bare<i32>,
+    sfixed32_optional: ::puroro::internal::Bare<i32>,
     sfixed32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
-    sfixed64_required: i64,
-    sfixed64_optional: i64,
+    sfixed64_required: ::puroro::internal::Bare<i64>,
+    sfixed64_optional: ::puroro::internal::Bare<i64>,
     sfixed64_repeated: ::puroro::internal::NoAllocBumpVec<i64>,
-    f64_required: f64,
-    f64_optional: f64,
+    f64_required: ::puroro::internal::Bare<f64>,
+    f64_optional: ::puroro::internal::Bare<f64>,
     f64_repeated: ::puroro::internal::NoAllocBumpVec<f64>,
 }
 
@@ -11261,7 +11261,7 @@ pub mod _puroro_impls {
         }
         pub fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.i32_required)
+                ::std::option::Option::Some(self.i32_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11277,7 +11277,7 @@ pub mod _puroro_impls {
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(1).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.i32_optional)
+                ::std::option::Option::Some(self.i32_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11296,7 +11296,7 @@ pub mod _puroro_impls {
         }
         pub fn float_required_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get(2).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.float_required)
+                ::std::option::Option::Some(self.float_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11312,7 +11312,7 @@ pub mod _puroro_impls {
         }
         pub fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             if self._bitfield.get(3).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.float_optional)
+                ::std::option::Option::Some(self.float_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11407,7 +11407,7 @@ pub mod _puroro_impls {
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
             if self._bitfield.get(8).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.enum_required)
+                ::std::option::Option::Some(self.enum_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11425,7 +11425,7 @@ pub mod _puroro_impls {
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
             if self._bitfield.get(9).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.enum_optional)
+                ::std::option::Option::Some(self.enum_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11471,7 +11471,7 @@ pub mod _puroro_impls {
         }
         pub fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(10).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.i64_required)
+                ::std::option::Option::Some(self.i64_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11487,7 +11487,7 @@ pub mod _puroro_impls {
         }
         pub fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(11).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.i64_optional)
+                ::std::option::Option::Some(self.i64_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11506,7 +11506,7 @@ pub mod _puroro_impls {
         }
         pub fn u32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(12).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.u32_required)
+                ::std::option::Option::Some(self.u32_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11522,7 +11522,7 @@ pub mod _puroro_impls {
         }
         pub fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(13).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.u32_optional)
+                ::std::option::Option::Some(self.u32_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11541,7 +11541,7 @@ pub mod _puroro_impls {
         }
         pub fn u64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(14).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.u64_required)
+                ::std::option::Option::Some(self.u64_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11557,7 +11557,7 @@ pub mod _puroro_impls {
         }
         pub fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(15).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.u64_optional)
+                ::std::option::Option::Some(self.u64_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11576,7 +11576,7 @@ pub mod _puroro_impls {
         }
         pub fn s32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(16).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.s32_required)
+                ::std::option::Option::Some(self.s32_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11592,7 +11592,7 @@ pub mod _puroro_impls {
         }
         pub fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(17).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.s32_optional)
+                ::std::option::Option::Some(self.s32_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11611,7 +11611,7 @@ pub mod _puroro_impls {
         }
         pub fn s64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(18).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.s64_required)
+                ::std::option::Option::Some(self.s64_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11627,7 +11627,7 @@ pub mod _puroro_impls {
         }
         pub fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(19).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.s64_optional)
+                ::std::option::Option::Some(self.s64_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11646,7 +11646,7 @@ pub mod _puroro_impls {
         }
         pub fn fixed32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(20).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.fixed32_required)
+                ::std::option::Option::Some(self.fixed32_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11662,7 +11662,7 @@ pub mod _puroro_impls {
         }
         pub fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             if self._bitfield.get(21).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.fixed32_optional)
+                ::std::option::Option::Some(self.fixed32_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11681,7 +11681,7 @@ pub mod _puroro_impls {
         }
         pub fn fixed64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(22).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.fixed64_required)
+                ::std::option::Option::Some(self.fixed64_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11697,7 +11697,7 @@ pub mod _puroro_impls {
         }
         pub fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             if self._bitfield.get(23).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.fixed64_optional)
+                ::std::option::Option::Some(self.fixed64_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11716,7 +11716,7 @@ pub mod _puroro_impls {
         }
         pub fn sfixed32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(24).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.sfixed32_required)
+                ::std::option::Option::Some(self.sfixed32_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11732,7 +11732,7 @@ pub mod _puroro_impls {
         }
         pub fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(25).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.sfixed32_optional)
+                ::std::option::Option::Some(self.sfixed32_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11751,7 +11751,7 @@ pub mod _puroro_impls {
         }
         pub fn sfixed64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(26).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.sfixed64_required)
+                ::std::option::Option::Some(self.sfixed64_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11767,7 +11767,7 @@ pub mod _puroro_impls {
         }
         pub fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             if self._bitfield.get(27).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.sfixed64_optional)
+                ::std::option::Option::Some(self.sfixed64_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11786,7 +11786,7 @@ pub mod _puroro_impls {
         }
         pub fn f64_required_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             if self._bitfield.get(28).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.f64_required)
+                ::std::option::Option::Some(self.f64_required.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -11802,7 +11802,7 @@ pub mod _puroro_impls {
         }
         pub fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             if self._bitfield.get(29).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.f64_optional)
+                ::std::option::Option::Some(self.f64_optional.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -16542,8 +16542,8 @@ pub mod _puroro_nested {
                     ::puroro::bitvec::order::Lsb0,
                     [u32; (2 + 31) / 32],
                 >,
-                i32_required: i32,
-                i64_required: i64,
+                i32_required: ::puroro::internal::Bare<i32>,
+                i64_required: ::puroro::internal::Bare<i64>,
             }
 
             pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
@@ -16562,7 +16562,7 @@ pub mod _puroro_nested {
                 }
                 pub fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     if self._bitfield.get(0).map_or(false, |v| *v) {
-                        ::std::option::Option::Some(self.i32_required)
+                        ::std::option::Option::Some(self.i32_required.inner())
                     } else {
                         ::std::option::Option::None
                     }
@@ -16578,7 +16578,7 @@ pub mod _puroro_nested {
                 }
                 pub fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     if self._bitfield.get(1).map_or(false, |v| *v) {
-                        ::std::option::Option::Some(self.i64_required)
+                        ::std::option::Option::Some(self.i64_required.inner())
                     } else {
                         ::std::option::Option::None
                     }

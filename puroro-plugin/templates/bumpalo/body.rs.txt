@@ -106,7 +106,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
                 {%- if field.is_length_delimited %}
                 &self.{{ field.ident }}
                 {%- else %} {#- if field.is_length_delimited #}
-                self.{{ field.ident }}
+                self.{{ field.ident }}.inner()
                 {%- endif %} {#- if field.is_length_delimited #}
             )
         } else {
@@ -119,7 +119,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
                 {%- if field.is_length_delimited %}
                 &self.{{ field.ident }}
                 {%- else %} {#- if field.is_length_delimited #}
-                self.{{ field.ident }}
+                self.{{ field.ident }}.inner()
                 {%- endif %} {#- if field.is_length_delimited #}
             )
         } else {

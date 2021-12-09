@@ -506,7 +506,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
-        a: i32,
+        a: ::puroro::internal::Bare<i32>,
     }
 
     pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
@@ -524,7 +524,7 @@ pub mod _puroro_impls {
         }
         pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.a)
+                ::std::option::Option::Some(self.a.inner())
             } else {
                 ::std::option::Option::None
             }
@@ -716,7 +716,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
-        b: ::puroro::internal::NoAllocBumpString,
+        b: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
     }
 
     pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;

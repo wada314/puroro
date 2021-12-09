@@ -776,7 +776,7 @@ impl Field {
             )
             .into())
         } else {
-            Ok(scalar_type)
+            Ok(format!("::puroro::internal::Bare<{}>", scalar_type).into())
         }
     }
 

@@ -1413,7 +1413,7 @@ pub mod _puroro_impls {
         _bump: &'bump ::puroro::bumpalo::Bump,
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
-        i32_optional: i32,
+        i32_optional: ::puroro::internal::Bare<i32>,
     }
 
     pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
@@ -1431,7 +1431,7 @@ pub mod _puroro_impls {
         }
         pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
-                ::std::option::Option::Some(self.i32_optional)
+                ::std::option::Option::Some(self.i32_optional.inner())
             } else {
                 ::std::option::Option::None
             }
