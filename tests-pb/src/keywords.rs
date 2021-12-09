@@ -195,6 +195,7 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+<<<<<<< HEAD
         r#type: i32,
 
         _bump: BT::BumpPtr,
@@ -217,6 +218,18 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+        r#type: ::puroro::internal::Bare<i32>,
+    }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
@@ -231,6 +244,16 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+<<<<<<< HEAD
+=======
+        pub fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.r#type.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+>>>>>>> master
         pub fn r#type<'this>(&'this self) -> i32 {
             match self.type_opt() {
                 ::std::option::Option::Some(x) => x,
@@ -240,6 +263,7 @@ pub mod _puroro_impls {
         pub fn has_type(&self) -> bool {
             self.type_opt().is_some()
         }
+<<<<<<< HEAD
         pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
             self._bitfield.set(0, true);
             todo!()
@@ -251,6 +275,25 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+        pub fn clear_type(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn type_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_type() {
+                self.r#type = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
+            &mut self.r#type
+        }
+    }
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for MsgBumpalo<BT>
@@ -287,12 +330,16 @@ pub mod _puroro_impls {
         }
     }
 
+<<<<<<< HEAD
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -308,7 +355,13 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
+<<<<<<< HEAD
                     todo!()
+=======
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.r#type, data, self._bump)
+>>>>>>> master
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),

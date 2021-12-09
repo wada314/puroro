@@ -168,16 +168,18 @@
 mod common_traits;
 mod error;
 pub mod internal;
+pub mod repeated_field;
 pub mod tags;
+
+pub use self::common_traits::*;
+pub use self::error::{ErrorKind, PuroroError};
+pub use self::repeated_field::{AsRefRepeatedField, CloneThenIntoRepeatedField, RepeatedField};
+pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
 pub use ::bitvec;
 pub use ::bumpalo;
 pub use ::either::Either;
-
-pub use self::common_traits::*;
-pub use self::error::{ErrorKind, PuroroError};
-pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 /////////// playground, DELETE ME before merging!
 

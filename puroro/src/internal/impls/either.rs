@@ -21,6 +21,14 @@ impl<T, U> EitherRepeatedField<T, U> {
         Self(from)
     }
 }
+
+impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedField<T, U>
+where
+    T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
+    U: RepeatedField<'msg>,
+{
+}
+
 impl<'msg, T, U> IntoIterator for EitherRepeatedField<T, U>
 where
     T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
@@ -38,6 +46,14 @@ impl<T, U> EitherRepeatedLDField<T, U> {
     pub fn new(from: Either<T, U>) -> Self {
         Self(from)
     }
+}
+impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedLDField<T, U>
+where
+    T: RepeatedField<'msg> + IntoIterator,
+    U: RepeatedField<'msg> + IntoIterator,
+    <T as IntoIterator>::Item: Deref<Target = <<U as IntoIterator>::Item as Deref>::Target>,
+    <U as IntoIterator>::Item: Deref,
+{
 }
 impl<'msg, T, U> IntoIterator for EitherRepeatedLDField<T, U>
 where
@@ -63,6 +79,12 @@ impl<T, U> EitherRepeatedMessageField<T, U> {
     pub fn new(from: Either<T, U>) -> Self {
         Self(from)
     }
+}
+impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedMessageField<T, U>
+where
+    T: RepeatedField<'msg> + IntoIterator,
+    U: RepeatedField<'msg> + IntoIterator,
+{
 }
 impl<'msg, T, U> IntoIterator for EitherRepeatedMessageField<T, U>
 where

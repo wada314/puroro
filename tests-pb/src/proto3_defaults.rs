@@ -69,10 +69,11 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field3RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             if self.f32_unlabeled == ::std::default::Default::default() {
@@ -221,6 +222,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "i32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -549,7 +551,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub i32_repeated: RepeatedType,
     }
@@ -561,7 +564,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
@@ -572,20 +576,16 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::CloneThenIntoIter<
-            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
-            i32,
-        >;
+        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.i32_repeated),
-            )
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         type Field6MessageType<'this>
         where
@@ -600,7 +600,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -626,7 +627,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -896,11 +898,11 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
-        i32_unlabeled: i32,
-        i32_optional: i32,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
+        i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
-        f32_unlabeled: f32,
-        string_unlabeled: ::puroro::internal::NoAllocBumpString,
+        f32_unlabeled: ::puroro::internal::Bare<f32>,
+        string_unlabeled: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
         submsg_unlabeled: ::std::option::Option<
             ::puroro::internal::NoAllocBumpBox<
                 self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
@@ -912,6 +914,7 @@ pub mod _puroro_impls {
         _bump: BT::BumpPtr,
     }
 
+<<<<<<< HEAD
     pub type MsgBumpaloRef<'bump> = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
     pub type MsgBumpaloRc = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpRc>;
     pub type MsgBumpaloArc = MsgBumpalo<::puroro::internal::impls::bumpalo::BumpArc>;
@@ -929,17 +932,181 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
+<<<<<<< HEAD
                 i32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
                 f32_unlabeled: ::std::default::Default::default(),
                 string_unlabeled: ::puroro::internal::NoAllocBumpString::new_in(bump_ref),
                 submsg_unlabeled: ::std::option::Option::None,
 
                 _bump: bump,
+=======
+                i32_repeated: ::std::default::Default::default(),
+                f32_unlabeled: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
             }
+        }
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_unlabeled<'this>(&'this self) -> i32 {
+            match self.i32_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_i32_unlabeled(&self) -> bool {
+            self.i32_unlabeled_opt().is_some()
+        }
+        pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_optional<'this>(&'this self) -> i32 {
+            match self.i32_optional_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_i32_optional(&self) -> bool {
+            self.i32_optional_opt().is_some()
+        }
+        pub fn i32_repeated<'this>(&'this self) -> &'this [i32] {
+            &self.i32_repeated
+        }
+        pub fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.f32_unlabeled) {
+                ::std::option::Option::Some(self.f32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn f32_unlabeled<'this>(&'this self) -> f32 {
+            match self.f32_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_f32_unlabeled(&self) -> bool {
+            self.f32_unlabeled_opt().is_some()
+        }
+        pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
+                ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn string_unlabeled<'this>(&'this self) -> &'this str {
+            match self.string_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_string_unlabeled(&self) -> bool {
+            self.string_unlabeled_opt().is_some()
+        }
+        pub fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>,
+        > {
+            self.submsg_unlabeled
+                .as_ref()
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>,
+        > {
+            self.submsg_unlabeled_opt()
+        }
+        pub fn has_submsg_unlabeled(&self) -> bool {
+            self.submsg_unlabeled_opt().is_some()
+        }
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.i32_unlabeled
+        }
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
+            &mut self.i32_optional
+        }
+        pub fn i32_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
+            unsafe { self.i32_repeated.as_mut_vec_in(self._bump) }
+        }
+        pub fn clear_f32_unlabeled(&mut self) {
+            self.f32_unlabeled = ::std::default::Default::default();
+        }
+        pub fn f32_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_unlabeled() {
+                self.f32_unlabeled = ::std::default::Default::default();
+>>>>>>> master
+            }
+            &mut self.f32_unlabeled
+        }
+        pub fn clear_string_unlabeled(&mut self) {
+            self.string_unlabeled = ::std::default::Default::default();
+        }
+        pub fn string_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
+            unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
+        }
+        pub fn clear_submsg_unlabeled(&mut self) {
+            self.submsg_unlabeled = ::std::default::Default::default();
+        }
+        pub fn submsg_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>
+        {
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.submsg_unlabeled.get_or_insert_with(|| {
+                ::puroro::internal::NoAllocBumpBox::new_in(
+                    ::puroro::internal::BumpDefault::default_in(bump),
+                    bump,
+                )
+            })
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
@@ -1057,12 +1224,21 @@ pub mod _puroro_impls {
             todo!()
         }
     }
+<<<<<<< HEAD
 
     impl<BT> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<BT> where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for MsgBumpalo<BT>
@@ -1100,13 +1276,23 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<i32>,
+            i32,
+            i32,
+        >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+<<<<<<< HEAD
             todo!()
+=======
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
+>>>>>>> master
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_unlabeled))
@@ -1117,9 +1303,13 @@ pub mod _puroro_impls {
         type Field6MessageType<'this>
         where
             Self: 'this,
+<<<<<<< HEAD
         = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<
             BT::ChildsBumpTypes<'this>,
         >;
+=======
+        = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>;
+>>>>>>> master
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
             self.submsg_unlabeled
                 .as_ref()
@@ -1127,12 +1317,16 @@ pub mod _puroro_impls {
         }
     }
 
+<<<<<<< HEAD
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -1146,6 +1340,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
+<<<<<<< HEAD
                 1 => {
                     todo!()
                 }
@@ -1168,6 +1363,42 @@ pub mod _puroro_impls {
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
+=======
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data, self._bump)
+            }
+            2 => {
+                self._bitfield.set(0, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_optional, data, self._bump)
+            }
+            3 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_repeated, data, self._bump)
+            }
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_unlabeled, data, self._bump)
+            }
+            5 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.string_unlabeled, data, self._bump)
+            }
+            6 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>>>
+                >::deser_field(&mut self.submsg_unlabeled, data, self._bump)
+            }
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+>>>>>>> master
         }
     }
 
@@ -1308,7 +1539,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             MsgBuilder((
                 self.0,
@@ -1462,6 +1694,7 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+<<<<<<< HEAD
         i32_unlabeled: i32,
 
         _bump: BT::BumpPtr,
@@ -1485,6 +1718,18 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
+    }
+
+    pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+    impl<'bump> SubmsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
@@ -1493,8 +1738,13 @@ pub mod _puroro_impls {
             }
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+<<<<<<< HEAD
             if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
                 ::std::option::Option::Some(self.i32_unlabeled)
+=======
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
+>>>>>>> master
             } else {
                 ::std::option::Option::None
             }
@@ -1508,6 +1758,7 @@ pub mod _puroro_impls {
         pub fn has_i32_unlabeled(&self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
+<<<<<<< HEAD
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
@@ -1518,6 +1769,24 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.i32_unlabeled
+        }
+    }
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for SubmsgBumpalo<BT>
@@ -1550,12 +1819,16 @@ pub mod _puroro_impls {
         }
     }
 
+<<<<<<< HEAD
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -1569,9 +1842,17 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
+<<<<<<< HEAD
                 1 => {
                     todo!()
                 }
+=======
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data, self._bump)
+            }
+>>>>>>> master
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1922,16 +2203,11 @@ pub mod _puroro_traits {
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field3RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field3RepeatedType<'this>>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.i32_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i32_repeated()),
+            )
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.f32_unlabeled_opt())

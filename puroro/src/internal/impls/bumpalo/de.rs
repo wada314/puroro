@@ -20,8 +20,8 @@ use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::FieldData;
 use crate::internal::variant::VariantTypeTag;
-use crate::internal::{NoAllocBumpString, NoAllocBumpVec};
-use crate::{tags, ErrorKind, Result};
+use crate::internal::{Bare, NoAllocBumpString, NoAllocBumpVec};
+use crate::{tags, BumpaloMessage, ErrorKind, Result};
 use ::std::marker::PhantomData;
 
 pub trait VecOrOptionOrBare<T> {
@@ -76,9 +76,9 @@ impl<T> VecOrOptionOrBare<T> for NoAllocBumpVec<T> {
         <[T]>::iter(self)
     }
 }
-impl<T> VecOrOptionOrBare<T> for T {
+impl<T> VecOrOptionOrBare<T> for Bare<T> {
     fn push_in(&mut self, val: T, _: &Bump) {
-        *self = val;
+        **self = val;
     }
     fn get_or_insert_with_in<F>(&mut self, _: F, _: &Bump) -> &mut T
     where

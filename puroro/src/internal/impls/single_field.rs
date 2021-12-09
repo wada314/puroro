@@ -12,7 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::RepeatedField;
 use ::std::marker::PhantomData;
+
+pub struct AsRefRepeatedField<'field, T, R: ?Sized>(&'field T, PhantomData<R>);
+impl<'field, T, R: ?Sized> AsRefRepeatedField<'field, T, R> {
+    pub fn new(repeated_field: &'field T) -> Self {
+        Self(repeated_field, PhantomData)
+    }
+}
+impl<'field, T, U, R: ?Sized> IntoIterator for AsRefRepeatedField<'field, T, R>
+where
+    &'field T: IntoIterator<Item = &'field U>,
+    U: 'field + AsRef<R>,
+    R: 'field,
+{
+    type Item = &'field R;
+    type IntoIter = AsRefIter<<&'field T as IntoIterator>::IntoIter, R>;
+    fn into_iter(self) -> Self::IntoIter {
+        AsRefIter::new(self.0.into_iter())
+    }
+}
+impl<'field, T, U, R: ?Sized> RepeatedField<'field> for AsRefRepeatedField<'field, T, R>
+where
+    &'field T: IntoIterator<Item = &'field U>,
+    U: 'field + AsRef<R>,
+    R: 'field,
+{
+}
 
 pub struct AsRefIter<I, R: ?Sized>(I, PhantomData<R>);
 impl<I, R: ?Sized> AsRefIter<I, R> {
@@ -31,6 +58,8 @@ where
         self.0.next().map(|r| r.as_ref())
     }
 }
+
+pub struct CloneThenIntoRepeatedField<T, U>(T, PhantomData<U>);
 
 pub struct CloneThenIntoIter<I, T>(I, PhantomData<T>);
 impl<I, T> CloneThenIntoIter<I, T> {

@@ -21,16 +21,20 @@ pub mod types;
 pub mod utils;
 pub mod variant;
 
-pub use impls::bumpalo::BumpDefault;
 pub use impls::bumpalo::NoAllocBox as NoAllocBumpBox;
 pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
 pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
 pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
+<<<<<<< HEAD
+=======
+pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
+>>>>>>> master
 
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
 use ::bitvec::store::BitStore;
+use ::std::ops::{Deref, DerefMut};
 
 pub fn get_bitvec_bit<O, T>(slice: &BitSlice<O, T>, index: usize) -> bool
 where
@@ -48,13 +52,66 @@ impl<T: Default + PartialEq> IsDefault for T {
         *self == Default::default()
     }
 }
+<<<<<<< HEAD
 impl<'a> IsDefault for NoAllocBumpString {
+=======
+impl IsDefault for NoAllocBumpString {
+>>>>>>> master
     fn is_default(&self) -> bool {
         self.is_empty()
     }
 }
+<<<<<<< HEAD
 impl<'a, T> IsDefault for NoAllocBumpVec<T> {
+=======
+impl<T> IsDefault for NoAllocBumpVec<T> {
+>>>>>>> master
     fn is_default(&self) -> bool {
         self.is_empty()
     }
 }
+<<<<<<< HEAD
+=======
+
+pub struct Bare<T>(T);
+impl<T> Bare<T> {
+    pub fn new(val: T) -> Self {
+        Self(val)
+    }
+    pub fn inner(self) -> T {
+        self.0
+    }
+}
+impl<T> Deref for Bare<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl<T> DerefMut for Bare<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+impl<T> From<T> for Bare<T> {
+    fn from(from: T) -> Self {
+        Self(from)
+    }
+}
+impl<T: Default> Default for Bare<T> {
+    fn default() -> Self {
+        Self(Default::default())
+    }
+}
+impl<T: PartialEq> PartialEq for Bare<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+impl<T: Clone> Clone for Bare<T> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+impl<T: Copy> Copy for Bare<T> {}
+>>>>>>> master

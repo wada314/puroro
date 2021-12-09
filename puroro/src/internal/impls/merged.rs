@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::Either;
+use crate::{Either, RepeatedField};
 use ::std::iter::Chain;
 use ::std::ops::Deref;
 
@@ -21,6 +21,13 @@ impl<T, U> MergedRepeatedField<T, U> {
     pub fn new(t: T, u: U) -> Self {
         Self(t, u)
     }
+}
+
+impl<'msg, T, U> RepeatedField<'msg> for MergedRepeatedField<T, U>
+where
+    T: IntoIterator<Item = <U as IntoIterator>::Item>,
+    U: IntoIterator,
+{
 }
 impl<T, U> IntoIterator for MergedRepeatedField<T, U>
 where
@@ -39,6 +46,14 @@ impl<T, U> MergedRepeatedLDField<T, U> {
     pub fn new(t: T, u: U) -> Self {
         Self(t, u)
     }
+}
+impl<'msg, T, U> RepeatedField<'msg> for MergedRepeatedLDField<T, U>
+where
+    T: IntoIterator,
+    U: IntoIterator,
+    <T as IntoIterator>::Item: Deref<Target = <<U as IntoIterator>::Item as Deref>::Target>,
+    <U as IntoIterator>::Item: Deref,
+{
 }
 impl<T, U> IntoIterator for MergedRepeatedLDField<T, U>
 where
@@ -63,6 +78,12 @@ impl<T, U> MergedRepeatedMessageField<T, U> {
     pub fn new(t: T, u: U) -> Self {
         Self(t, u)
     }
+}
+impl<'msg, T, U> RepeatedField<'msg> for MergedRepeatedMessageField<T, U>
+where
+    T: IntoIterator,
+    U: IntoIterator,
+{
 }
 impl<T, U> IntoIterator for MergedRepeatedMessageField<T, U>
 where

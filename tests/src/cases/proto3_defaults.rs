@@ -98,23 +98,30 @@ fn test_i32_optional() {
 fn test_i32_repeated() {
     use std::io::Read as _;
     let mut msg = <Msg as Default>::default();
-    assert_eq!(None, msg.i32_repeated().next());
-    assert_eq!(0, msg.i32_repeated().len());
 
     *msg.i32_repeated_mut() = vec![10, 20];
-    assert_eq!(&vec![10, 20], &msg.i32_repeated().collect::<Vec<_>>());
+    assert_eq!(
+        &vec![10, 20],
+        &msg.i32_repeated().into_iter().collect::<Vec<_>>()
+    );
 
     msg.merge_from_bytes(INPUT_FIELD3_I32_ZERO.bytes()).unwrap();
-    assert_eq!(&vec![10, 20, 0], &msg.i32_repeated().collect::<Vec<_>>());
+    assert_eq!(
+        &vec![10, 20, 0],
+        &msg.i32_repeated().into_iter().collect::<Vec<_>>()
+    );
 
     msg.merge_from_bytes(INPUT_FIELD3_I32_ONE.bytes()).unwrap();
-    assert_eq!(&vec![10, 20, 0, 1], &msg.i32_repeated().collect::<Vec<_>>());
+    assert_eq!(
+        &vec![10, 20, 0, 1],
+        &msg.i32_repeated().into_iter().collect::<Vec<_>>()
+    );
 
     msg.merge_from_bytes(INPUT_FIELD3_I32_PACKED_ZERO_TO_THREE.bytes())
         .unwrap();
     assert_eq!(
         &vec![10, 20, 0, 1, 0, 1, 2, 3],
-        &msg.i32_repeated().collect::<Vec<_>>()
+        &msg.i32_repeated().into_iter().collect::<Vec<_>>()
     );
 }
 

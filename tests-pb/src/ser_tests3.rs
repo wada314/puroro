@@ -102,10 +102,11 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.i32_unlabeled.clone())
             }
         }
-        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field2RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            self.i32_repeated.iter().cloned()
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             if self.float_unlabeled == ::std::default::Default::default() {
@@ -114,10 +115,11 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.float_unlabeled.clone())
             }
         }
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        type Field4RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.float_repeated.iter().cloned()
+            ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             if self.string_unlabeled.is_empty() {
@@ -126,13 +128,15 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
-        type Field6RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
+        type Field6RepeatedType<'this> = ::puroro::AsRefRepeatedField<
+            'this,
+            ::std::vec::Vec<::std::string::String>,
+            ::std::string::String,
             str,
-            ::std::slice::Iter<'this, ::std::string::String>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::utils::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         type Field7MessageType<'this>
         where
@@ -145,16 +149,10 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        type Field8RepeatedType<'this> = ::puroro::internal::utils::BorrowedIter<
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            ::std::slice::Iter<
-                'this,
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            >,
-        >;
+        type Field8RepeatedType<'this> = &'this [self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg];
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::utils::BorrowedIter::new(self.submsg_repeated.iter())
+            &self.submsg_repeated
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             if self.enum_unlabeled == ::std::default::Default::default() {
@@ -163,11 +161,15 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.enum_unlabeled.clone())
             }
         }
-        type Field10RepeatedType<'this> =
-            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests3::Enum>>;
+        type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro_root::ser_tests3::Enum,
+        >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            self.enum_repeated.iter().cloned()
+            ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             if self.very_large_field_number == ::std::default::Default::default() {
@@ -355,6 +357,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "i32_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -364,6 +367,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "float_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -373,6 +377,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "string_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -382,6 +387,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "submsg_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -391,6 +397,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "enum_repeated",
                     &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .field(
@@ -569,7 +576,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub i32_repeated: RepeatedType,
     }
@@ -581,7 +589,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
@@ -592,20 +601,16 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field2RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::CloneThenIntoIter<
-            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
-            i32,
-        >;
+        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.i32_repeated),
-            )
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         type Field4RepeatedType<'this>
         where
@@ -654,7 +659,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -680,7 +686,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -815,7 +822,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub float_repeated: RepeatedType,
     }
@@ -827,7 +835,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
@@ -838,7 +847,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field2RepeatedType<'this>
         where
@@ -850,15 +860,10 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::CloneThenIntoIter<
-            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
-            f32,
-        >;
+        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.float_repeated),
-            )
+            ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         type Field6RepeatedType<'this>
         where
@@ -900,7 +905,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -926,7 +932,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -1059,7 +1066,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub string_repeated: RepeatedType,
     }
@@ -1071,7 +1079,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
@@ -1082,7 +1091,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field2RepeatedType<'this>
         where
@@ -1101,15 +1111,10 @@ pub mod _puroro_impls {
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::AsRefIter<
-            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
-            str,
-        >;
+        = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::AsRefIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.string_repeated),
-            )
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         type Field7MessageType<'this>
         where
@@ -1144,7 +1149,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1170,7 +1176,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -1315,7 +1322,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub submsg_repeated: RepeatedType,
     }
@@ -1328,7 +1336,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
@@ -1340,7 +1349,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field2RepeatedType<'this>
         where
@@ -1374,10 +1384,10 @@ pub mod _puroro_impls {
         type Field8RepeatedType<'this>
         where
             Self: 'this,
-        = <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter;
+        = &'this RepeatedType;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::std::iter::IntoIterator::into_iter(&self.submsg_repeated)
+            &self.submsg_repeated
         }
         type Field10RepeatedType<'this>
         where
@@ -1398,7 +1408,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
@@ -1429,7 +1440,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -1566,7 +1578,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub enum_repeated: RepeatedType,
     }
@@ -1578,7 +1591,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
@@ -1589,7 +1603,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field2RepeatedType<'this>
         where
@@ -1630,15 +1645,15 @@ pub mod _puroro_impls {
         type Field10RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::CloneThenIntoIter<
-            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            RepeatedType,
+            ScalarType,
             self::_puroro_root::ser_tests3::Enum,
         >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.enum_repeated),
-            )
+            ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
     }
 
@@ -1649,7 +1664,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1675,7 +1691,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self {
@@ -1809,11 +1826,11 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-        i32_unlabeled: i32,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
         i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
-        float_unlabeled: f32,
+        float_unlabeled: ::puroro::internal::Bare<f32>,
         float_repeated: ::puroro::internal::NoAllocBumpVec<f32>,
-        string_unlabeled: ::puroro::internal::NoAllocBumpString,
+        string_unlabeled: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
         string_repeated: ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
         submsg_unlabeled: ::std::option::Option<
             ::puroro::internal::NoAllocBumpBox<
@@ -1827,8 +1844,9 @@ pub mod _puroro_impls {
                 BT::ChildsBumpTypes<'static>,
             >,
         >,
-        enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
+        enum_unlabeled: ::puroro::internal::Bare<self::_puroro_root::ser_tests3::Enum>,
         enum_repeated: ::puroro::internal::NoAllocBumpVec<self::_puroro_root::ser_tests3::Enum>,
+<<<<<<< HEAD
         very_large_field_number: i32,
 
         _bump: BT::BumpPtr,
@@ -1851,9 +1869,22 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+        very_large_field_number: ::puroro::internal::Bare<i32>,
+    }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
+<<<<<<< HEAD
                 i32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
                 float_unlabeled: ::std::default::Default::default(),
                 float_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
@@ -1863,6 +1894,17 @@ pub mod _puroro_impls {
                 submsg_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
                 enum_unlabeled: ::std::default::Default::default(),
                 enum_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
+=======
+                i32_repeated: ::std::default::Default::default(),
+                float_unlabeled: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                enum_unlabeled: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+>>>>>>> master
                 very_large_field_number: ::std::default::Default::default(),
 
                 _bump: bump,
@@ -1977,6 +2019,110 @@ pub mod _puroro_impls {
                 ::std::option::Option::None
             }
         }
+<<<<<<< HEAD
+=======
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_unlabeled<'this>(&'this self) -> i32 {
+            match self.i32_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_i32_unlabeled(&self) -> bool {
+            self.i32_unlabeled_opt().is_some()
+        }
+        pub fn i32_repeated<'this>(&'this self) -> &'this [i32] {
+            &self.i32_repeated
+        }
+        pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.float_unlabeled) {
+                ::std::option::Option::Some(self.float_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn float_unlabeled<'this>(&'this self) -> f32 {
+            match self.float_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_float_unlabeled(&self) -> bool {
+            self.float_unlabeled_opt().is_some()
+        }
+        pub fn float_repeated<'this>(&'this self) -> &'this [f32] {
+            &self.float_repeated
+        }
+        pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
+                ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn string_unlabeled<'this>(&'this self) -> &'this str {
+            match self.string_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_string_unlabeled(&self) -> bool {
+            self.string_unlabeled_opt().is_some()
+        }
+        pub fn string_repeated<'this>(
+            &'this self,
+        ) -> &'this [impl ::std::ops::Deref<Target = str>] {
+            &self.string_repeated
+        }
+        pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
+            self.submsg_unlabeled
+                .as_ref()
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn submsg_unlabeled<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
+            self.submsg_unlabeled_opt()
+        }
+        pub fn has_submsg_unlabeled(&self) -> bool {
+            self.submsg_unlabeled_opt().is_some()
+        }
+        pub fn submsg_repeated<'this>(&'this self) -> &'this[self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>]{
+            unsafe { self.submsg_repeated.cast_item_unchecked() }
+        }
+        pub fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
+            if !::puroro::internal::IsDefault::is_default(&*self.enum_unlabeled) {
+                ::std::option::Option::Some(self.enum_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
+            match self.enum_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_enum_unlabeled(&self) -> bool {
+            self.enum_unlabeled_opt().is_some()
+        }
+        pub fn enum_repeated<'this>(&'this self) -> &'this [self::_puroro_root::ser_tests3::Enum] {
+            &self.enum_repeated
+        }
+        pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.very_large_field_number) {
+                ::std::option::Option::Some(self.very_large_field_number.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+>>>>>>> master
         pub fn very_large_field_number<'this>(&'this self) -> i32 {
             match self.very_large_field_number_opt() {
                 ::std::option::Option::Some(x) => x,
@@ -1986,6 +2132,7 @@ pub mod _puroro_impls {
         pub fn has_very_large_field_number(&self) -> bool {
             self.very_large_field_number_opt().is_some()
         }
+<<<<<<< HEAD
         pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             todo!()
         }
@@ -2013,10 +2160,86 @@ pub mod _puroro_impls {
         }
         pub fn submsg_repeated_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<BT::ChildsBumpTypes<'this>>{
             todo!()
+=======
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.i32_unlabeled
+        }
+        pub fn i32_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
+            unsafe { self.i32_repeated.as_mut_vec_in(self._bump) }
+        }
+        pub fn clear_float_unlabeled(&mut self) {
+            self.float_unlabeled = ::std::default::Default::default();
+        }
+        pub fn float_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_float_unlabeled() {
+                self.float_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.float_unlabeled
+        }
+        pub fn float_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, f32> {
+            unsafe { self.float_repeated.as_mut_vec_in(self._bump) }
+        }
+        pub fn clear_string_unlabeled(&mut self) {
+            self.string_unlabeled = ::std::default::Default::default();
+        }
+        pub fn string_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
+            unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
+        }
+        pub fn string_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocBumpString>
+        {
+            unsafe { self.string_repeated.as_add_bump_vec_view_in(self._bump) }
+        }
+        pub fn clear_submsg_unlabeled(&mut self) {
+            self.submsg_unlabeled = ::std::default::Default::default();
+        }
+        pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>{
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.submsg_unlabeled.get_or_insert_with(|| {
+                ::puroro::internal::NoAllocBumpBox::new_in(
+                    ::puroro::internal::BumpDefault::default_in(bump),
+                    bump,
+                )
+            })
+        }
+        pub fn submsg_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<
+            'bump,
+            'this,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'bump,
+            >,
+        > {
+            unsafe { self.submsg_repeated.as_mut_vec_in(self._bump) }
+        }
+        pub fn clear_enum_unlabeled(&mut self) {
+            self.enum_unlabeled = ::std::default::Default::default();
+>>>>>>> master
         }
         pub fn enum_unlabeled_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+<<<<<<< HEAD
             todo!()
         }
         pub fn enum_repeated_mut<'this>(
@@ -2034,6 +2257,35 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+            if !self.has_enum_unlabeled() {
+                self.enum_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.enum_unlabeled
+        }
+        pub fn enum_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, self::_puroro_root::ser_tests3::Enum>
+        {
+            unsafe { self.enum_repeated.as_mut_vec_in(self._bump) }
+        }
+        pub fn clear_very_large_field_number(&mut self) {
+            self.very_large_field_number = ::std::default::Default::default();
+        }
+        pub fn very_large_field_number_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_very_large_field_number() {
+                self.very_large_field_number = ::std::default::Default::default();
+            }
+            &mut self.very_large_field_number
+        }
+    }
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for MsgBumpalo<BT>
@@ -2064,44 +2316,75 @@ pub mod _puroro_impls {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
+
         type Field2RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<i32>,
+            i32,
+            i32,
+        >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+<<<<<<< HEAD
             todo!()
+=======
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
+>>>>>>> master
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
         }
+
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<f32>,
+            f32,
+            f32,
+        >;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+<<<<<<< HEAD
             todo!()
+=======
+            ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
+>>>>>>> master
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
+
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::utils::BorrowedIter<
+        = ::puroro::AsRefRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<::puroro::internal::NoAllocBumpString>,
+            ::puroro::internal::NoAllocBumpString,
             str,
-            ::std::slice::Iter<'this, ::puroro::internal::NoAllocBumpString>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+<<<<<<< HEAD
             todo!()
+=======
+            ::puroro::AsRefRepeatedField::new(&self.string_repeated)
+>>>>>>> master
         }
         type Field7MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+<<<<<<< HEAD
             BT::ChildsBumpTypes<'this>,
+=======
+            'this,
+>>>>>>> master
         >;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             self.submsg_unlabeled
@@ -2112,6 +2395,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+<<<<<<< HEAD
             BT::ChildsBumpTypes<'this>,
         >;
         type Field8RepeatedType<'this>
@@ -2127,33 +2411,57 @@ pub mod _puroro_impls {
                     BT::ChildsBumpTypes<'this>,
                 >,
             >,
+=======
+            'this,
+>>>>>>> master
         >;
 
+        type Field8RepeatedType<'this> where Self: 'this =
+    &'this [self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>];
+
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+<<<<<<< HEAD
             todo!()
+=======
+            unsafe { self.submsg_repeated.cast_item_unchecked() }
+>>>>>>> master
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
         }
+
         type Field10RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests3::Enum>>;
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<self::_puroro_root::ser_tests3::Enum>,
+            self::_puroro_root::ser_tests3::Enum,
+            self::_puroro_root::ser_tests3::Enum,
+        >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+<<<<<<< HEAD
             todo!()
+=======
+            ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
+>>>>>>> master
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             ::std::option::Option::Some(::std::clone::Clone::clone(&self.very_large_field_number))
         }
     }
 
+<<<<<<< HEAD
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -2167,6 +2475,7 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
+<<<<<<< HEAD
                 1 => {
                     todo!()
                 }
@@ -2200,6 +2509,63 @@ pub mod _puroro_impls {
                 536870911 => {
                     todo!()
                 }
+=======
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data, self._bump)
+            }
+            2 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_repeated, data, self._bump)
+            }
+            3 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                >::deser_field(&mut self.float_unlabeled, data, self._bump)
+            }
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Float
+                >::deser_field(&mut self.float_repeated, data, self._bump)
+            }
+            5 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.string_unlabeled, data, self._bump)
+            }
+            6 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::String
+                >::deser_field(&mut self.string_repeated, data, self._bump)
+            }
+            7 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::puroro::internal::NoAllocBumpBox<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>>
+                >::deser_field(&mut self.submsg_unlabeled, data, self._bump)
+            }
+            8 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'bump>>
+                >::deser_field(&mut self.submsg_repeated, data, self._bump)
+            }
+            9 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                >::deser_field(&mut self.enum_unlabeled, data, self._bump)
+            }
+            10 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                >::deser_field(&mut self.enum_repeated, data, self._bump)
+            }
+            536870911 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.very_large_field_number, data, self._bump)
+            }
+>>>>>>> master
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -2374,7 +2740,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             MsgBuilder((
                 self.0,
@@ -2411,7 +2778,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             MsgBuilder((
                 self.0,
@@ -2448,7 +2816,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             MsgBuilder((
                 self.0,
@@ -2487,7 +2856,8 @@ pub mod _puroro_impls {
                     + ::std::clone::Clone
                     + ::std::cmp::PartialEq
                     + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             MsgBuilder((
                 self.0,
@@ -2524,7 +2894,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             MsgBuilder((
                 self.0,
@@ -3087,16 +3458,11 @@ pub mod _puroro_traits {
         type Field2RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field2RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field2RepeatedType<'this>>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.i32_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i32_repeated()),
+            )
         }
         fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.float_unlabeled_opt())
@@ -3105,16 +3471,11 @@ pub mod _puroro_traits {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field4RepeatedType<'this>>;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.float_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.float_repeated()),
+            )
         }
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
@@ -3123,16 +3484,11 @@ pub mod _puroro_traits {
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field6RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field6RepeatedType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.string_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.string_repeated()),
+            )
         }
         type Field7MessageType<'this>
         where
@@ -3151,16 +3507,11 @@ pub mod _puroro_traits {
         type Field8RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field8RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field8RepeatedType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.submsg_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.submsg_repeated()),
+            )
         }
         fn enum_unlabeled_opt<'this>(
             &'this self,
@@ -3171,16 +3522,11 @@ pub mod _puroro_traits {
         type Field10RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field10RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field10RepeatedType<'this>>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.enum_repeated().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.enum_repeated()),
+            )
         }
         fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref()
@@ -3436,6 +3782,7 @@ pub mod _puroro_nested {
                     ::puroro::bitvec::order::Lsb0,
                     [u32; (0 + 31) / 32],
                 >,
+<<<<<<< HEAD
                 i32_unlabeled: i32,
 
                 _bump: BT::BumpPtr,
@@ -3459,6 +3806,18 @@ pub mod _puroro_nested {
                     #[allow(unused)]
                     let bump_ref: &::puroro::bumpalo::Bump =
                         unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+                i32_unlabeled: ::puroro::internal::Bare<i32>,
+            }
+
+            pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+            impl<'bump> SubmsgBumpalo<'bump> {
+                pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    #[allow(unused)]
+                    let bump_ref: &::puroro::bumpalo::Bump =
+                        unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
                     Self {
                         _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
@@ -3473,6 +3832,16 @@ pub mod _puroro_nested {
                         ::std::option::Option::None
                     }
                 }
+<<<<<<< HEAD
+=======
+                pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                        ::std::option::Option::Some(self.i32_unlabeled.inner())
+                    } else {
+                        ::std::option::Option::None
+                    }
+                }
+>>>>>>> master
                 pub fn i32_unlabeled<'this>(&'this self) -> i32 {
                     match self.i32_unlabeled_opt() {
                         ::std::option::Option::Some(x) => x,
@@ -3482,6 +3851,7 @@ pub mod _puroro_nested {
                 pub fn has_i32_unlabeled(&self) -> bool {
                     self.i32_unlabeled_opt().is_some()
                 }
+<<<<<<< HEAD
                 pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
                     todo!()
                 }
@@ -3492,6 +3862,24 @@ pub mod _puroro_nested {
                     + ::std::fmt::Debug
                     + ::std::cmp::PartialEq
             {
+=======
+                pub fn clear_i32_unlabeled(&mut self) {
+                    self.i32_unlabeled = ::std::default::Default::default();
+                }
+                pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+                    if !self.has_i32_unlabeled() {
+                        self.i32_unlabeled = ::std::default::Default::default();
+                    }
+                    &mut self.i32_unlabeled
+                }
+            }
+            impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+
+            impl<'bump> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump> {
+                fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+                    Self::new_in(bump)
+                }
+>>>>>>> master
             }
 
             impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for SubmsgBumpalo<BT>
@@ -3524,12 +3912,16 @@ pub mod _puroro_nested {
                 }
             }
 
+<<<<<<< HEAD
             impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<BT>
             where
                 BT: ::puroro::internal::impls::bumpalo::BumpTypes
                     + ::std::fmt::Debug
                     + ::std::cmp::PartialEq,
             {
+=======
+            impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
+>>>>>>> master
                 fn deser_field<'this, I>(
                     &'this mut self,
                     field_number: i32,
@@ -3543,9 +3935,18 @@ pub mod _puroro_nested {
                     use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
                     match field_number {
+<<<<<<< HEAD
                         1 => {
                             todo!()
                         }
+=======
+                        1 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Unlabeled,
+                            ::puroro::tags::Int32,
+                        >::deser_field(
+                            &mut self.i32_unlabeled, data, self._bump
+                        ),
+>>>>>>> master
 
                         _ => unimplemented!("TODO: This case should be handled properly..."),
                     }

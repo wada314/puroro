@@ -341,10 +341,11 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::Test4Trait for Test4 {
-        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        type Field4RepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.d.iter().cloned()
+            ::puroro::CloneThenIntoRepeatedField::new(&self.d)
         }
     }
 
@@ -403,6 +404,7 @@ pub mod _puroro_simple_impl {
                 .field(
                     "d",
                     &<Self as super::_puroro_traits::Test4Trait>::d(self)
+                        .into_iter()
                         .collect::<::std::vec::Vec<_>>(),
                 )
                 .finish()
@@ -508,6 +510,7 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+<<<<<<< HEAD
         a: i32,
 
         _bump: BT::BumpPtr,
@@ -531,6 +534,18 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+        a: ::puroro::internal::Bare<i32>,
+    }
+
+    pub type Test1BumpaloOwned = ::puroro::BumpaloOwned<Test1Bumpalo<'static>>;
+    impl<'bump> Test1Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
@@ -551,6 +566,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+<<<<<<< HEAD
         pub fn has_a(&self) -> bool {
             self.a_opt().is_some()
         }
@@ -565,6 +581,41 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+        pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.a.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn a<'this>(&'this self) -> i32 {
+            match self.a_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_a(&self) -> bool {
+            self.a_opt().is_some()
+        }
+        pub fn clear_a(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_a() {
+                self.a = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
+            &mut self.a
+        }
+    }
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test1> for Test1Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test1Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test1Bumpalo<BT>
@@ -601,12 +652,16 @@ pub mod _puroro_impls {
         }
     }
 
+<<<<<<< HEAD
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for Test1Bumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test1Bumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -622,7 +677,13 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     self._bitfield.set(0, true);
+<<<<<<< HEAD
                     todo!()
+=======
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.a, data, self._bump)
+>>>>>>> master
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -772,6 +833,7 @@ pub mod _puroro_impls {
     {
         _bitfield:
             ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+<<<<<<< HEAD
         b: ::puroro::internal::NoAllocBumpString,
 
         _bump: BT::BumpPtr,
@@ -795,8 +857,21 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+        b: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
+    }
+
+    pub type Test2BumpaloOwned = ::puroro::BumpaloOwned<Test2Bumpalo<'static>>;
+    impl<'bump> Test2Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
+<<<<<<< HEAD
                 b: ::puroro::internal::NoAllocBumpString::new_in(bump_ref),
 
                 _bump: bump,
@@ -829,6 +904,44 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+                b: ::std::default::Default::default(),
+            }
+        }
+        pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.b)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn b<'this>(&'this self) -> &'this str {
+            match self.b_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+        pub fn has_b(&self) -> bool {
+            self.b_opt().is_some()
+        }
+        pub fn clear_b(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+            if !self.has_b() {
+                self.b = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
+            unsafe { self.b.as_mut_string_in(self._bump) }
+        }
+    }
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test2> for Test2Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test2Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test2Bumpalo<BT>
@@ -865,12 +978,16 @@ pub mod _puroro_impls {
         }
     }
 
+<<<<<<< HEAD
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for Test2Bumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test2Bumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -886,7 +1003,13 @@ pub mod _puroro_impls {
             match field_number {
                 2 => {
                     self._bitfield.set(0, true);
+<<<<<<< HEAD
                     todo!()
+=======
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.b, data, self._bump)
+>>>>>>> master
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -1056,6 +1179,7 @@ pub mod _puroro_impls {
         _bump: BT::BumpPtr,
     }
 
+<<<<<<< HEAD
     pub type Test3BumpaloRef<'bump> =
         Test3Bumpalo<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
     pub type Test3BumpaloRc = Test3Bumpalo<::puroro::internal::impls::bumpalo::BumpRc>;
@@ -1074,19 +1198,36 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+    pub type Test3BumpaloOwned = ::puroro::BumpaloOwned<Test3Bumpalo<'static>>;
+    impl<'bump> Test3Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
+<<<<<<< HEAD
                 c: ::std::option::Option::None,
 
                 _bump: bump,
+=======
+                c: ::std::default::Default::default(),
+>>>>>>> master
             }
         }
         pub fn c_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
+<<<<<<< HEAD
             &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
                 BT::ChildsBumpTypes<'this>,
             >,
+=======
+            &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>,
+>>>>>>> master
         > {
             self.c
                 .as_ref()
@@ -1095,15 +1236,20 @@ pub mod _puroro_impls {
         pub fn c<'this>(
             &'this self,
         ) -> ::std::option::Option<
+<<<<<<< HEAD
             &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
                 BT::ChildsBumpTypes<'this>,
             >,
+=======
+            &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>,
+>>>>>>> master
         > {
             self.c_opt()
         }
         pub fn has_c(&self) -> bool {
             self.c_opt().is_some()
         }
+<<<<<<< HEAD
         pub fn c_mut<'this>(
             &'this mut self,
         ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
@@ -1118,6 +1264,33 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+        pub fn clear_c(&mut self) {
+            self.c = ::std::default::Default::default();
+        }
+        pub fn c_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'bump>
+        {
+            if !self.has_c() {
+                self.c = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.c.get_or_insert_with(|| {
+                ::puroro::internal::NoAllocBumpBox::new_in(
+                    ::puroro::internal::BumpDefault::default_in(bump),
+                    bump,
+                )
+            })
+        }
+    }
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test3> for Test3Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test3Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test3Bumpalo<BT>
@@ -1148,9 +1321,13 @@ pub mod _puroro_impls {
         type Field3MessageType<'this>
         where
             Self: 'this,
+<<<<<<< HEAD
         = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
             BT::ChildsBumpTypes<'this>,
         >;
+=======
+        = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>;
+>>>>>>> master
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c
                 .as_ref()
@@ -1158,12 +1335,16 @@ pub mod _puroro_impls {
         }
     }
 
+<<<<<<< HEAD
     impl<BT> ::puroro::internal::de::DeserMessageFromBytesIter for Test3Bumpalo<BT>
     where
         BT: ::puroro::internal::impls::bumpalo::BumpTypes
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test3Bumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -1177,9 +1358,22 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
+<<<<<<< HEAD
                 3 => {
                     todo!()
                 }
+=======
+                3 => DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional,
+                    ::puroro::tags::Message<
+                        ::puroro::internal::NoAllocBumpBox<
+                            self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<
+                                'bump,
+                            >,
+                        >,
+                    >,
+                >::deser_field(&mut self.c, data, self._bump),
+>>>>>>> master
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1265,7 +1459,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         pub d: RepeatedType,
     }
@@ -1277,7 +1472,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
     }
 
@@ -1288,20 +1484,16 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::single_field::CloneThenIntoIter<
-            <&'this RepeatedType as ::std::iter::IntoIterator>::IntoIter,
-            i32,
-        >;
+        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::single_field::CloneThenIntoIter::new(
-                ::std::iter::IntoIterator::into_iter(&self.d),
-            )
+            ::puroro::CloneThenIntoRepeatedField::new(&self.d)
         }
     }
 
@@ -1312,7 +1504,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::Test4Trait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1334,7 +1527,8 @@ pub mod _puroro_impls {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
         fn from(value: RepeatedType) -> Self {
             Self { d: value }
@@ -1353,6 +1547,7 @@ pub mod _puroro_impls {
         _bump: BT::BumpPtr,
     }
 
+<<<<<<< HEAD
     pub type Test4BumpaloRef<'bump> =
         Test4Bumpalo<::puroro::internal::impls::bumpalo::BumpRef<'bump>>;
     pub type Test4BumpaloRc = Test4Bumpalo<::puroro::internal::impls::bumpalo::BumpRc>;
@@ -1371,8 +1566,18 @@ pub mod _puroro_impls {
             #[allow(unused)]
             let bump_ref: &::puroro::bumpalo::Bump =
                 unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+=======
+    pub type Test4BumpaloOwned = ::puroro::BumpaloOwned<Test4Bumpalo<'static>>;
+    impl<'bump> Test4Bumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+>>>>>>> master
             Self {
                 _bitfield: ::std::default::Default::default(),
+<<<<<<< HEAD
                 d: ::puroro::internal::NoAllocBumpVec::new_in(bump_ref),
 
                 _bump: bump,
@@ -1391,6 +1596,26 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq
     {
+=======
+                d: ::std::default::Default::default(),
+            }
+        }
+        pub fn d<'this>(&'this self) -> &'this [i32] {
+            &self.d
+        }
+        pub fn d_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
+            unsafe { self.d.as_mut_vec_in(self._bump) }
+        }
+    }
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Test4> for Test4Bumpalo<'bump> {}
+
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for Test4Bumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
+>>>>>>> master
     }
 
     impl<'parent, BT> ::puroro::internal::impls::bumpalo::BumpMessage<'parent> for Test4Bumpalo<BT>
@@ -1421,9 +1646,15 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<i32>,
+            i32,
+            i32,
+        >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+<<<<<<< HEAD
             todo!()
         }
     }
@@ -1434,6 +1665,13 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug
             + ::std::cmp::PartialEq,
     {
+=======
+            ::puroro::CloneThenIntoRepeatedField::new(&self.d)
+        }
+    }
+
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test4Bumpalo<'bump> {
+>>>>>>> master
         fn deser_field<'this, I>(
             &'this mut self,
             field_number: i32,
@@ -1447,9 +1685,17 @@ pub mod _puroro_impls {
             use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
 
             match field_number {
+<<<<<<< HEAD
                 4 => {
                     todo!()
                 }
+=======
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.d, data, self._bump)
+            }
+>>>>>>> master
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
             }
@@ -1504,7 +1750,8 @@ pub mod _puroro_impls {
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType: ::std::iter::IntoIterator<Item = &'a ScalarType>,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
             Test4Builder((self.0, Test4SingleField4 { d: value }))
         }
@@ -1903,16 +2150,11 @@ pub mod _puroro_traits {
         type Field4RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<
-            ::std::option::IntoIter<
-                <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
-            >,
-        >;
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field4RepeatedType<'this>>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.d().into_iter())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.d()),
+            )
         }
     }
 }
