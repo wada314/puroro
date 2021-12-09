@@ -20,6 +20,8 @@ use ::std::marker::PhantomData;
 pub trait RepeatedField<'msg>: IntoIterator {}
 
 impl<'msg, T> RepeatedField<'msg> for &'msg [T] {}
+impl<'msg, T> RepeatedField<'msg> for &'msg Vec<T> {}
+impl<'msg, T, const LEN: usize> RepeatedField<'msg> for &'msg [T; LEN] {}
 impl<'msg, T> RepeatedField<'msg> for &'msg crate::internal::NoAllocBumpVec<T> {}
 
 pub struct MappedRepeatedField<T, F> {
