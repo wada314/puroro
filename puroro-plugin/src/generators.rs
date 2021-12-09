@@ -201,7 +201,6 @@ struct Field {
     bumpalo_getter_type: String,
     bumpalo_getter_opt_type: String,
     bumpalo_getter_mut_type: String,
-    bumpalo_getter_rep_item_type: String,
     bumpalo_maybe_field_message_path: Option<String>,
     bumpalo_maybe_borrowed_field_type: Option<String>,
     bumpalo_label_and_type_tags: String,
@@ -308,7 +307,6 @@ impl Field {
                 "::std::option::Option<{}>",
                 f.bumpalo_getter_scalar_type("'this")?
             ),
-            bumpalo_getter_rep_item_type: f.bumpalo_getter_scalar_type("'this")?.to_string(),
             bumpalo_getter_mut_type: if f.is_repeated()? {
                 f.bumpalo_getter_repeated_mut_type("'bump", "'this")?
             } else {
