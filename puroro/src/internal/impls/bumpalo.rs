@@ -25,7 +25,7 @@ use crate::bumpalo::Bump;
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
-use ::std::ops::{Deref, DerefMut, Index};
+use ::std::ops::{Deref, DerefMut};
 use ::std::ptr;
 use ::std::ptr::NonNull;
 use ::std::slice;
@@ -149,11 +149,11 @@ impl<T> NoAllocVec<T> {
         // Bump::new() invocation...
         let fake_bump = Bump::new();
         let vec = Vec::new_in(&fake_bump);
-        unsafe { Self::from_vec(vec) }
+        Self::from_vec(vec)
     }
     pub fn new_in(bump: &Bump) -> Self {
         let vec = Vec::new_in(bump);
-        unsafe { Self::from_vec(vec) }
+        Self::from_vec(vec)
     }
     pub fn from_vec<'bump>(mut vec: Vec<'bump, T>) -> Self {
         let result = Self {

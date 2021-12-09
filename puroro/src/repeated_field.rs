@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use ::std::marker::PhantomData;
-use ::std::mem;
 
 /// A trait for repeated field value returned from message traits getter methods.
 ///
