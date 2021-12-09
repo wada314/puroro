@@ -445,11 +445,11 @@ impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
 }
 
 pub struct AddBumpVecView<'bump, 'vec, T> {
-    vec: &'vec mut Vec<'bump, T>,
+    vec: RefMutVec<'bump, 'vec, T>,
     bump: &'bump Bump,
 }
 impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
-    fn new(vec: &'vec mut Vec<'bump, T>, bump: &'bump Bump) -> Self {
+    fn new(vec: RefMutVec<'bump, 'vec, T>, bump: &'bump Bump) -> Self {
         Self { vec, bump }
     }
 

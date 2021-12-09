@@ -1188,7 +1188,9 @@ pub mod _puroro_impls {
         pub fn d<'this>(&'this self) -> &'this [i32] {
             &self.d
         }
-        pub fn d(&mut self) -> &'this mut i32 {
+        pub fn d_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
             todo!()
         }
     }

@@ -1029,7 +1029,9 @@ pub mod _puroro_impls {
             }
             &mut self.i32_optional
         }
-        pub fn i32_repeated(&mut self) -> &'this mut i32 {
+        pub fn i32_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
             todo!()
         }
         pub fn clear_f32_unlabeled(&mut self) {

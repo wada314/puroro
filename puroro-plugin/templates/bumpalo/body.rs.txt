@@ -163,7 +163,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {%- if field.is_repeated %}
 
     {#- mut get repeated field #}
-    pub fn {{ field.ident }}(&mut self) -> {{ field.bumpalo_getter_mut_type }} {
+    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> {{ field.bumpalo_getter_mut_type }} {
         todo!()
     }
     {#- TODO!! What should I do for e.g. repeated bytes field? #}
