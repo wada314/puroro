@@ -12051,7 +12051,7 @@ pub mod _puroro_impls {
                 'bump,
             >,
         > {
-            todo!()
+            unsafe { self.submsg_repeated.as_mut_vec_in(self._bump) }
         }
         pub fn clear_i64_unlabeled(&mut self) {
             self.i64_unlabeled = ::std::default::Default::default();
