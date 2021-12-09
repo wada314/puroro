@@ -259,7 +259,7 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
                 F::{{ field.ident }}(val.as_ref())
                 {%- endif %} {#- if field.is_message #}
                 {% else %}
-                F::{{ field.ident }}(val.clone())
+                F::{{ field.ident }}(val.inner().clone())
                 {% endif %}
             ),
             {%- endfor %}
@@ -302,9 +302,7 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                 {
                     self.{{ oneof.field_ident }} = E::{{ field.ident }}(
                         {%- if field.is_message %}
-                        {#- need lifetime cast #}
-                        todo!()
-                        {#::puroro::BumpaloMessage::new_in(&self._bump)#}
+                        ::puroro::internal::Bare::new(::puroro::BumpaloMessage::new_in(self._bump))
                         {%- else %} {#- if field.is_message #}
                         ::puroro::internal::BumpDefault::default_in(self._bump)
                         {%- endif %} {#- if field.is_message #}
@@ -314,11 +312,9 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
                     E::{{ field.ident }}(v) => v,
                     _ => unreachable!(),
                 };
-                {#- temporaly disable #}
-                todo!()
-                {#- DeserFieldFromBytesIter::<
+                DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }},
-                >::deser_field(field_value_mut_ref, data, &self._bump)#}
+                >::deser_field(field_value_mut_ref, data, self._bump)
             }
             {%- endfor %}
             {%- endfor %}

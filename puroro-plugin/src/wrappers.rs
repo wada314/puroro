@@ -709,7 +709,7 @@ impl Field {
     pub fn bumpalo_oneof_field_type(&self) -> Result<Cow<'static, str>> {
         use FieldTypeCategories::*;
         use LdFieldType::*;
-        Ok(match self.field_type()?.categories()? {
+        let bare_type = match self.field_type()?.categories()? {
             LengthDelimited(String) => "::puroro::internal::NoAllocBumpString".into(),
             LengthDelimited(Bytes) => "::puroro::internal::NoAllocBumpVec<u8>".into(),
             LengthDelimited(Message(m)) => {
@@ -721,7 +721,8 @@ impl Field {
                 .into()
             }
             Trivial(field_type) => field_type.rust_type_name()?,
-        })
+        };
+        Ok(format!("::puroro::internal::Bare<{}>", bare_type).into())
     }
 
     pub fn simple_field_type(&self) -> Result<Cow<'static, str>> {

@@ -470,25 +470,16 @@ impl OneofField {
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
-                Ok(
-                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Simple", &[])
-                    } else {
-                        format!("::std::boxed::Box<{}>", msg.rust_impl_path("Simple", &[]))
-                    },
-                )
+                Ok(format!(
+                    "::std::boxed::Box<{}>",
+                    msg.rust_impl_path("Simple", &[])
+                ))
             })?,
             bumpalo_field_type_tag: f.rust_type_tag(|msg| {
-                Ok(
-                    if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
-                        msg.rust_impl_path("Bumpalo", &["'bump"])
-                    } else {
-                        format!(
-                            "::puroro::internal::NoAllocBumpBox<{}>",
-                            msg.rust_impl_path("Bumpalo", &["'bump"])
-                        )
-                    },
-                )
+                Ok(format!(
+                    "::puroro::internal::NoAllocBumpBox<{}>",
+                    msg.rust_impl_path("Bumpalo", &["'bump"])
+                ))
             })?,
         })
     }

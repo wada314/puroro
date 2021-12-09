@@ -22,6 +22,7 @@ pub mod de;
 
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
+use crate::internal::Bare;
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
@@ -47,6 +48,11 @@ impl<'bump, T> BumpDefault<'bump> for NoAllocVec<T> {
 impl<'bump, T> BumpDefault<'bump> for Option<T> {
     fn default_in(_: &'bump Bump) -> Self {
         ::std::default::Default::default()
+    }
+}
+impl<'bump, T: BumpDefault<'bump>> BumpDefault<'bump> for Bare<T> {
+    fn default_in(bump: &'bump Bump) -> Self {
+        Bare::new(BumpDefault::default_in(bump))
     }
 }
 macro_rules! impl_bumpalo_default {
