@@ -47,23 +47,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
-            {%- if field.is_repeated %}
-            {{ field.ident }}: ::puroro::internal::NoAllocBumpVec::new_in(bump),
-            {%- else %}
-            {%- if field.is_length_delimited %}
-            {%- if field.is_message %}
-            {{ field.ident }}: ::std::option::Option::None,
-            {%- endif %} {#- if field.is_message #}
-            {%- if field.is_string %}
-            {{ field.ident }}: ::puroro::internal::NoAllocBumpString::new_in(bump),
-            {%- endif %} {#- if field.is_string #}
-            {%- if field.is_bytes %}
-            {{ field.ident }}: ::puroro::internal::NoAllocBumpVec::new_in(bump),
-            {%- endif %} {#- if field.is_bytes #}
-            {%- else %} {#- if field.is_length_delimited #}
             {{ field.ident }}: ::std::default::Default::default(),
-            {%- endif %} {#- if field.is_length_delimited #}
-            {%- endif %} {#- if field.is_repeated #}
             {%- endif %} {#- if !field.is_explicit_oneof_field #}
             {%- endfor %} {#- for field in m.fields #}
 
@@ -114,7 +98,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         }
         {%- else %} {#- if field.has_optional_bit #}
         {#- Non-repeated, non-message, unlabeled field. Treat as unexisting when it's default value. #}
-        if !::puroro::internal::IsDefault::is_default(&self.{{ field.ident }}) {
+        if !::puroro::internal::IsDefault::is_default(&*self.{{ field.ident }}) {
             ::std::option::Option::Some(
                 {%- if field.is_length_delimited %}
                 &self.{{ field.ident }}

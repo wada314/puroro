@@ -236,7 +236,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                recursive_unlabeled: ::std::option::Option::None,
+                recursive_unlabeled: ::std::default::Default::default(),
             }
         }
         pub fn recursive_unlabeled_opt<'this>(

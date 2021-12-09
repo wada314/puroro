@@ -525,7 +525,7 @@ pub mod _puroro_impls {
             }
         }
         pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if !::puroro::internal::IsDefault::is_default(&self.a) {
+            if !::puroro::internal::IsDefault::is_default(&*self.a) {
                 ::std::option::Option::Some(self.a.inner())
             } else {
                 ::std::option::Option::None
@@ -725,11 +725,11 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                b: ::puroro::internal::NoAllocBumpString::new_in(bump),
+                b: ::std::default::Default::default(),
             }
         }
         pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if !::puroro::internal::IsDefault::is_default(&self.b) {
+            if !::puroro::internal::IsDefault::is_default(&*self.b) {
                 ::std::option::Option::Some(&self.b)
             } else {
                 ::std::option::Option::None
@@ -942,7 +942,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                c: ::std::option::Option::None,
+                c: ::std::default::Default::default(),
             }
         }
         pub fn c_opt<'this>(
@@ -1182,7 +1182,7 @@ pub mod _puroro_impls {
             Self {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
-                d: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                d: ::std::default::Default::default(),
             }
         }
         pub fn d<'this>(&'this self) -> &'this [i32] {

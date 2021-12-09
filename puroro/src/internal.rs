@@ -95,3 +95,9 @@ impl<T: PartialEq> PartialEq for Bare<T> {
         self.0 == other.0
     }
 }
+impl<T: Clone> Clone for Bare<T> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+impl<T: Copy> Copy for Bare<T> {}

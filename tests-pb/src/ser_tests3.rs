@@ -1856,20 +1856,20 @@ pub mod _puroro_impls {
                 _bump: bump,
                 _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
-                i32_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                i32_repeated: ::std::default::Default::default(),
                 float_unlabeled: ::std::default::Default::default(),
-                float_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
-                string_unlabeled: ::puroro::internal::NoAllocBumpString::new_in(bump),
-                string_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
-                submsg_unlabeled: ::std::option::Option::None,
-                submsg_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                float_repeated: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
                 enum_unlabeled: ::std::default::Default::default(),
-                enum_repeated: ::puroro::internal::NoAllocBumpVec::new_in(bump),
+                enum_repeated: ::std::default::Default::default(),
                 very_large_field_number: ::std::default::Default::default(),
             }
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
                 ::std::option::Option::Some(self.i32_unlabeled.inner())
             } else {
                 ::std::option::Option::None
@@ -1888,7 +1888,7 @@ pub mod _puroro_impls {
             &self.i32_repeated
         }
         pub fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            if !::puroro::internal::IsDefault::is_default(&self.float_unlabeled) {
+            if !::puroro::internal::IsDefault::is_default(&*self.float_unlabeled) {
                 ::std::option::Option::Some(self.float_unlabeled.inner())
             } else {
                 ::std::option::Option::None
@@ -1907,7 +1907,7 @@ pub mod _puroro_impls {
             &self.float_repeated
         }
         pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            if !::puroro::internal::IsDefault::is_default(&self.string_unlabeled) {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
                 ::std::option::Option::Some(&self.string_unlabeled)
             } else {
                 ::std::option::Option::None
@@ -1944,7 +1944,7 @@ pub mod _puroro_impls {
         pub fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
-            if !::puroro::internal::IsDefault::is_default(&self.enum_unlabeled) {
+            if !::puroro::internal::IsDefault::is_default(&*self.enum_unlabeled) {
                 ::std::option::Option::Some(self.enum_unlabeled.inner())
             } else {
                 ::std::option::Option::None
@@ -1963,7 +1963,7 @@ pub mod _puroro_impls {
             &self.enum_repeated
         }
         pub fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            if !::puroro::internal::IsDefault::is_default(&self.very_large_field_number) {
+            if !::puroro::internal::IsDefault::is_default(&*self.very_large_field_number) {
                 ::std::option::Option::Some(self.very_large_field_number.inner())
             } else {
                 ::std::option::Option::None
@@ -3440,7 +3440,7 @@ pub mod _puroro_nested {
                     }
                 }
                 pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-                    if !::puroro::internal::IsDefault::is_default(&self.i32_unlabeled) {
+                    if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
                         ::std::option::Option::Some(self.i32_unlabeled.inner())
                     } else {
                         ::std::option::Option::None
