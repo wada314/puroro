@@ -1494,7 +1494,11 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+            <Self>::i32_unlabeled_opt(self)
+            /*
+            ::std::option::Option::Some(
+                ::std::clone::Clone::clone(&self.i32_unlabeled))
+            */
         }
     }
 

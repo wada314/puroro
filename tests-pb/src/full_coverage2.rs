@@ -12267,18 +12267,28 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_required_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::i32_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.i32_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::i32_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 1) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.i32_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field3RepeatedType<'this>
@@ -12295,18 +12305,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_required_opt<'this>(&'this self) -> Option<f32> {
+            <Self>::float_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 2) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.float_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
+            <Self>::float_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 3) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.float_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field13RepeatedType<'this>
@@ -12323,18 +12343,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn bytes_required_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <Self>::bytes_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 4) {
-                ::std::option::Option::Some(self.bytes_required.as_ref())
+                ::std::option::Option::Some(
+                    self.bytes_required.as_ref()
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
+            <Self>::bytes_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 5) {
-                ::std::option::Option::Some(self.bytes_optional.as_ref())
+                ::std::option::Option::Some(
+                    self.bytes_optional.as_ref()
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field23RepeatedType<'this>
@@ -12351,18 +12381,28 @@ pub mod _puroro_impls {
             ::puroro::AsRefRepeatedField::new(&self.bytes_repeated)
         }
         fn string_required_opt<'this>(&'this self) -> Option<&'this str> {
+            <Self>::string_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 6) {
-                ::std::option::Option::Some(self.string_required.as_ref())
+                ::std::option::Option::Some(
+                    self.string_required.as_ref()
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+            <Self>::string_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 7) {
-                ::std::option::Option::Some(self.string_optional.as_ref())
+                ::std::option::Option::Some(
+                    self.string_optional.as_ref()
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field33RepeatedType<'this>
@@ -12381,20 +12421,30 @@ pub mod _puroro_impls {
         fn enum_required_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
+            <Self>::enum_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 8) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.enum_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
+            <Self>::enum_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 9) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.enum_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field43RepeatedType<'this>
@@ -12412,11 +12462,17 @@ pub mod _puroro_impls {
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+            <Self>::submsg_required_opt(self)
+            /*
             self.submsg_required.as_ref().map(|b| b.as_ref())
+            */
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+            <Self>::submsg_optional_opt(self)
+            /*
             self.submsg_optional.as_ref().map(|b| b.as_ref())
+            */
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
 
@@ -12427,18 +12483,28 @@ pub mod _puroro_impls {
             unsafe { self.submsg_repeated.cast_item_unchecked() }
         }
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
+            <Self>::i64_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 10) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.i64_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <Self>::i64_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 11) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.i64_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field103RepeatedType<'this>
@@ -12455,18 +12521,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i64_repeated)
         }
         fn u32_required_opt<'this>(&'this self) -> Option<u32> {
+            <Self>::u32_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 12) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.u32_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
+            <Self>::u32_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 13) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.u32_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field113RepeatedType<'this>
@@ -12483,18 +12559,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.u32_repeated)
         }
         fn u64_required_opt<'this>(&'this self) -> Option<u64> {
+            <Self>::u64_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 14) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.u64_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
+            <Self>::u64_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 15) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.u64_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field123RepeatedType<'this>
@@ -12511,18 +12597,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.u64_repeated)
         }
         fn s32_required_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::s32_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 16) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.s32_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::s32_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 17) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.s32_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field133RepeatedType<'this>
@@ -12539,18 +12635,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.s32_repeated)
         }
         fn s64_required_opt<'this>(&'this self) -> Option<i64> {
+            <Self>::s64_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 18) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.s64_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <Self>::s64_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 19) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.s64_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field143RepeatedType<'this>
@@ -12567,18 +12673,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.s64_repeated)
         }
         fn fixed32_required_opt<'this>(&'this self) -> Option<u32> {
+            <Self>::fixed32_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 20) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.fixed32_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
+            <Self>::fixed32_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 21) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.fixed32_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field153RepeatedType<'this>
@@ -12595,18 +12711,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.fixed32_repeated)
         }
         fn fixed64_required_opt<'this>(&'this self) -> Option<u64> {
+            <Self>::fixed64_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 22) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.fixed64_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
+            <Self>::fixed64_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 23) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.fixed64_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field163RepeatedType<'this>
@@ -12623,18 +12749,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.fixed64_repeated)
         }
         fn sfixed32_required_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::sfixed32_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 24) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.sfixed32_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::sfixed32_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 25) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.sfixed32_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field173RepeatedType<'this>
@@ -12651,18 +12787,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.sfixed32_repeated)
         }
         fn sfixed64_required_opt<'this>(&'this self) -> Option<i64> {
+            <Self>::sfixed64_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 26) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.sfixed64_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <Self>::sfixed64_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 27) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.sfixed64_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field183RepeatedType<'this>
@@ -12679,18 +12825,28 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.sfixed64_repeated)
         }
         fn f64_required_opt<'this>(&'this self) -> Option<f64> {
+            <Self>::f64_required_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 28) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_required))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.f64_required)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
+            <Self>::f64_optional_opt(self)
+            /*
             if ::puroro::internal::get_bitvec_bit(&self._bitfield, 29) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_optional))
+                ::std::option::Option::Some(
+                    ::std::clone::Clone::clone(&self.f64_optional)
+                )
             } else {
                 ::std::option::Option::None
             }
+            */
         }
 
         type Field193RepeatedType<'this>
@@ -16725,18 +16881,28 @@ pub mod _puroro_nested {
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_required_opt<'this>(&'this self) -> Option<i32> {
+                    <Self>::i32_required_opt(self)
+                    /*
                     if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_required))
+                        ::std::option::Option::Some(
+                            ::std::clone::Clone::clone(&self.i32_required)
+                        )
                     } else {
                         ::std::option::Option::None
                     }
+                    */
                 }
                 fn i64_required_opt<'this>(&'this self) -> Option<i64> {
+                    <Self>::i64_required_opt(self)
+                    /*
                     if ::puroro::internal::get_bitvec_bit(&self._bitfield, 1) {
-                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_required))
+                        ::std::option::Option::Some(
+                            ::std::clone::Clone::clone(&self.i64_required)
+                        )
                     } else {
                         ::std::option::Option::None
                     }
+                    */
                 }
             }
 

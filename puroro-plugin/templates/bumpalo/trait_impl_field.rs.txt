@@ -36,41 +36,7 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 
 {%- if !f.is_explicit_oneof_field %}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
-    {%- if f.has_optional_bit %}
-
-    {#-
-     # The field type is a bare value type, and an optional bit is available in the bitfield.
-     # Maybe wrap the field with Some() depend on the bitfield's optional bit value.
-     #}
-    if ::puroro::internal::get_bitvec_bit(&self._bitfield, {{ f.bitfield_index }}) {
-        ::std::option::Option::Some(
-            {%- if f.is_length_delimited %}
-            self.{{ f.ident }}.as_ref()
-            {%- else %}
-            ::std::clone::Clone::clone(&self.{{ f.ident }})
-            {%- endif %}
-        )
-    } else {
-        ::std::option::Option::None
-    }
-    {%- else %} {#- if f.has_optional_bit #}
-    {%- if f.is_message %}
-    
-    {#- The field is Option<Box<M>> type. Return by as_ref()-ing the internal Box. #}
-    self.{{ f.ident }}.as_ref().map(|b| b.as_ref())
-
-    {%- else %} {#- if f.is_message #}
-
-    {#- The field is bare value type. Wrap it by Some() and return it. #}
-    ::std::option::Option::Some(
-        {%- if f.is_length_delimited %}
-        self.{{ f.ident }}.as_ref()
-        {%- else %}
-        ::std::clone::Clone::clone(&self.{{ f.ident }})
-        {%- endif %})
-
-    {%- endif %} {#- if f.is_message #}
-    {%- endif %} {#- if f.has_optional_bit #}
+    <Self>::{{ f.ident_unesc }}_opt(self)
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
