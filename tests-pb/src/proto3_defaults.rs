@@ -1610,6 +1610,9 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
+        type Field3RepeatedItemType<'this>: ::std::ops::Deref<Target = i32>
+        where
+            Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             self.f32_unlabeled_opt()

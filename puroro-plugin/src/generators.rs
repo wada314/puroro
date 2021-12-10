@@ -186,6 +186,7 @@ struct Field {
     has_optional_bit: bool,
     bitfield_index: i32,
     trait_scalar_getter_type: String,
+    trait_rep_item_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
     trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
@@ -266,6 +267,7 @@ impl Field {
                 }
             },
             trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
+            trait_rep_item_type: f.trait_rep_item_type()?.into(),
             trait_maybe_field_message_trait_path,
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(

@@ -15,6 +15,9 @@ pub trait {{ m.trait_ident }} {
         ::puroro::RepeatedField<'this>
         + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>
     where Self: 'this;
+    type Field{{ field.number }}RepeatedItemType<'this>: 
+        ::std::ops::Deref<Target = {{ field.trait_rep_item_type }}>
+    where Self: 'this;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
 
     {%- else %} {#- if field.is_repeated #}

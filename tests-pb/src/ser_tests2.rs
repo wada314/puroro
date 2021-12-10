@@ -2608,6 +2608,9 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
+        type Field2RepeatedItemType<'this>: ::std::ops::Deref<Target = i32>
+        where
+            Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
         fn float_optional<'this>(&'this self) -> f32 {
             self.float_optional_opt()
@@ -2624,6 +2627,9 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = f32>
         where
             Self: 'this;
+        type Field4RepeatedItemType<'this>: ::std::ops::Deref<Target = f32>
+        where
+            Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
         fn string_optional<'this>(&'this self) -> &'this str {
             self.string_optional_opt()
@@ -2638,6 +2644,9 @@ pub mod _puroro_traits {
 
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = &'this str>
+        where
+            Self: 'this;
+        type Field6RepeatedItemType<'this>: ::std::ops::Deref<Target = str>
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
@@ -2663,6 +2672,11 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = Self::Field8MessageType<'this>>
         where
             Self: 'this;
+        type Field8RepeatedItemType<'this>: ::std::ops::Deref<
+            Target = Self::Field8MessageType<'this>,
+        >
+        where
+            Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
         fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
             self.enum_optional_opt()
@@ -2679,6 +2693,11 @@ pub mod _puroro_traits {
 
         type Field10RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = self::_puroro_root::ser_tests2::Enum>
+        where
+            Self: 'this;
+        type Field10RepeatedItemType<'this>: ::std::ops::Deref<
+            Target = self::_puroro_root::ser_tests2::Enum,
+        >
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;

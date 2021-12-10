@@ -1611,6 +1611,9 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
+        type Field4RepeatedItemType<'this>: ::std::ops::Deref<Target = i32>
+        where
+            Self: 'this;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
     }
 
