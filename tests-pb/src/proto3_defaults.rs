@@ -1089,14 +1089,10 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+            <Self>::i32_unlabeled_opt(self)
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_optional))
-            } else {
-                ::std::option::Option::None
-            }
+            <Self>::i32_optional_opt(self)
         }
 
         type Field3RepeatedType<'this>
@@ -1113,17 +1109,17 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_unlabeled))
+            <Self>::f32_unlabeled_opt(self)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-            ::std::option::Option::Some(self.string_unlabeled.as_ref())
+            <Self>::string_unlabeled_opt(self)
         }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
+            <Self>::submsg_unlabeled_opt(self)
         }
     }
 
@@ -1500,7 +1496,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+            <Self>::i32_unlabeled_opt(self)
         }
     }
 

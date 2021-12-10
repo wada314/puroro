@@ -566,7 +566,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
+            <Self>::a_opt(self)
         }
     }
 
@@ -772,7 +772,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            ::std::option::Option::Some(self.b.as_ref())
+            <Self>::b_opt(self)
         }
     }
 
@@ -1007,7 +1007,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'this>;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|b| b.as_ref())
+            <Self>::c_opt(self)
         }
     }
 

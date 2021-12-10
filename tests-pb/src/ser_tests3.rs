@@ -2092,7 +2092,7 @@ pub mod _puroro_impls {
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+            <Self>::i32_unlabeled_opt(self)
         }
 
         type Field2RepeatedType<'this>
@@ -2109,7 +2109,7 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
+            <Self>::float_unlabeled_opt(self)
         }
 
         type Field4RepeatedType<'this>
@@ -2126,7 +2126,7 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-            ::std::option::Option::Some(self.string_unlabeled.as_ref())
+            <Self>::string_unlabeled_opt(self)
         }
 
         type Field6RepeatedType<'this>
@@ -2149,7 +2149,7 @@ pub mod _puroro_impls {
             'this,
         >;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
+            <Self>::submsg_unlabeled_opt(self)
         }
         type Field8MessageType<'this>
         where
@@ -2165,7 +2165,7 @@ pub mod _puroro_impls {
             unsafe { self.submsg_repeated.cast_item_unchecked() }
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
+            <Self>::enum_unlabeled_opt(self)
         }
 
         type Field10RepeatedType<'this>
@@ -2182,7 +2182,7 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.very_large_field_number))
+            <Self>::very_large_field_number_opt(self)
         }
     }
 
@@ -3503,7 +3503,7 @@ pub mod _puroro_nested {
 
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-                    ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                    <Self>::i32_unlabeled_opt(self)
                 }
             }
 
