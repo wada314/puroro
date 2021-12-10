@@ -1,4 +1,7 @@
 
+{#-#############################################}
+{#-################ Struct body ################}
+{#-#############################################}
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- if !field.is_explicit_oneof_field %}
@@ -14,6 +17,9 @@ pub struct {{ m.simple_ident }} {
 }
 impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_ident }} {}
 
+{#-####################################################}
+{#-################ puroro trait impls ################}
+{#-####################################################}
 impl {{ m.simple_ident }} {
     pub fn new() -> Self {
         Self {        
@@ -186,6 +192,10 @@ where
         ::std::result::Result::Ok(())
     }
 }
+
+{#-#################################################}
+{#-################ std trait impls ################}
+{#-#################################################}
 
 impl ::std::default::Default for {{ m.simple_ident }} {
     fn default() -> Self {
