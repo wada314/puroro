@@ -2080,15 +2080,6 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.i32_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field2RepeatedType<'this>
@@ -2106,15 +2097,6 @@ pub mod _puroro_impls {
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 1) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.float_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field4RepeatedType<'this>
@@ -2132,15 +2114,6 @@ pub mod _puroro_impls {
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 2) {
-                ::std::option::Option::Some(
-                    self.string_optional.as_ref()
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field6RepeatedType<'this>
@@ -2164,9 +2137,6 @@ pub mod _puroro_impls {
         >;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             <Self>::submsg_optional_opt(self)
-            /*
-            self.submsg_optional.as_ref().map(|b| b.as_ref())
-            */
         }
         type Field8MessageType<'this>
         where
@@ -2183,15 +2153,6 @@ pub mod _puroro_impls {
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             <Self>::enum_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 3) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.enum_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field10RepeatedType<'this>
@@ -2209,15 +2170,6 @@ pub mod _puroro_impls {
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             <Self>::very_large_field_number_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 4) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.very_large_field_number)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
     }
 
@@ -3540,15 +3492,6 @@ pub mod _puroro_nested {
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
                     <Self>::i32_optional_opt(self)
-                    /*
-                    if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                        ::std::option::Option::Some(
-                            ::std::clone::Clone::clone(&self.i32_optional)
-                        )
-                    } else {
-                        ::std::option::Option::None
-                    }
-                    */
                 }
             }
 

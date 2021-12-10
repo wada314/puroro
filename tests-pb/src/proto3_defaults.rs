@@ -1090,22 +1090,9 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.i32_unlabeled))
-            */
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.i32_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field3RepeatedType<'this>
@@ -1123,17 +1110,9 @@ pub mod _puroro_impls {
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.f32_unlabeled))
-            */
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                self.string_unlabeled.as_ref())
-            */
         }
         type Field6MessageType<'this>
         where
@@ -1141,9 +1120,6 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
             <Self>::submsg_unlabeled_opt(self)
-            /*
-            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
-            */
         }
     }
 
@@ -1521,10 +1497,6 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.i32_unlabeled))
-            */
         }
     }
 

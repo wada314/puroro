@@ -251,15 +251,6 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             <Self>::type_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.r#type)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
     }
 

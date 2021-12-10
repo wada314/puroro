@@ -12311,22 +12311,9 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.i32_unlabeled))
-            */
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 0) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.i32_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field3RepeatedType<'this>
@@ -12344,22 +12331,9 @@ pub mod _puroro_impls {
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.float_unlabeled))
-            */
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 1) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.float_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field13RepeatedType<'this>
@@ -12377,22 +12351,9 @@ pub mod _puroro_impls {
         }
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                self.bytes_unlabeled.as_ref())
-            */
         }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 2) {
-                ::std::option::Option::Some(
-                    self.bytes_optional.as_ref()
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field23RepeatedType<'this>
@@ -12410,22 +12371,9 @@ pub mod _puroro_impls {
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                self.string_unlabeled.as_ref())
-            */
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 3) {
-                ::std::option::Option::Some(
-                    self.string_optional.as_ref()
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field33RepeatedType<'this>
@@ -12445,24 +12393,11 @@ pub mod _puroro_impls {
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             <Self>::enum_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.enum_unlabeled))
-            */
         }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             <Self>::enum_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 4) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.enum_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field43RepeatedType<'this>
@@ -12481,16 +12416,10 @@ pub mod _puroro_impls {
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             <Self>::submsg_unlabeled_opt(self)
-            /*
-            self.submsg_unlabeled.as_ref().map(|b| b.as_ref())
-            */
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             <Self>::submsg_optional_opt(self)
-            /*
-            self.submsg_optional.as_ref().map(|b| b.as_ref())
-            */
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
 
@@ -12502,22 +12431,9 @@ pub mod _puroro_impls {
         }
         fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.i64_unlabeled))
-            */
         }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 5) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.i64_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field103RepeatedType<'this>
@@ -12535,22 +12451,9 @@ pub mod _puroro_impls {
         }
         fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.u32_unlabeled))
-            */
         }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 6) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.u32_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field113RepeatedType<'this>
@@ -12568,22 +12471,9 @@ pub mod _puroro_impls {
         }
         fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.u64_unlabeled))
-            */
         }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 7) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.u64_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field123RepeatedType<'this>
@@ -12601,22 +12491,9 @@ pub mod _puroro_impls {
         }
         fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::s32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.s32_unlabeled))
-            */
         }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::s32_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 8) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.s32_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field133RepeatedType<'this>
@@ -12634,22 +12511,9 @@ pub mod _puroro_impls {
         }
         fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <Self>::s64_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.s64_unlabeled))
-            */
         }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::s64_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 9) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.s64_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field143RepeatedType<'this>
@@ -12667,22 +12531,9 @@ pub mod _puroro_impls {
         }
         fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             <Self>::fixed32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.fixed32_unlabeled))
-            */
         }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             <Self>::fixed32_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 10) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.fixed32_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field153RepeatedType<'this>
@@ -12700,22 +12551,9 @@ pub mod _puroro_impls {
         }
         fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             <Self>::fixed64_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.fixed64_unlabeled))
-            */
         }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             <Self>::fixed64_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 11) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.fixed64_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field163RepeatedType<'this>
@@ -12733,22 +12571,9 @@ pub mod _puroro_impls {
         }
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::sfixed32_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.sfixed32_unlabeled))
-            */
         }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::sfixed32_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 12) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.sfixed32_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field173RepeatedType<'this>
@@ -12766,22 +12591,9 @@ pub mod _puroro_impls {
         }
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <Self>::sfixed64_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.sfixed64_unlabeled))
-            */
         }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::sfixed64_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 13) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.sfixed64_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field183RepeatedType<'this>
@@ -12799,22 +12611,9 @@ pub mod _puroro_impls {
         }
         fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
             <Self>::f64_unlabeled_opt(self)
-            /*
-            ::std::option::Option::Some(
-                ::std::clone::Clone::clone(&self.f64_unlabeled))
-            */
         }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             <Self>::f64_optional_opt(self)
-            /*
-            if ::puroro::internal::get_bitvec_bit(&self._bitfield, 14) {
-                ::std::option::Option::Some(
-                    ::std::clone::Clone::clone(&self.f64_optional)
-                )
-            } else {
-                ::std::option::Option::None
-            }
-            */
         }
 
         type Field193RepeatedType<'this>
@@ -16842,17 +16641,9 @@ pub mod _puroro_nested {
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
                     <Self>::i32_unlabeled_opt(self)
-                    /*
-                    ::std::option::Option::Some(
-                        ::std::clone::Clone::clone(&self.i32_unlabeled))
-                    */
                 }
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
                     <Self>::i64_unlabeled_opt(self)
-                    /*
-                    ::std::option::Option::Some(
-                        ::std::clone::Clone::clone(&self.i64_unlabeled))
-                    */
                 }
             }
 
