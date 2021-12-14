@@ -11,10 +11,14 @@ pub trait {{ m.trait_ident }} {
 
     {%- if field.is_repeated %}
 
+    {# &[String]: IntoIterator<Item=impl Deref<Target = impl Deref<Target = str>>> #}
+    {# &[i32]: IntoIterator<Item=impl Deref<Target = i32>> #}
     type Field{{ field.number }}RepeatedType<'this>:
         ::puroro::RepeatedField<'this>
-        + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>
+        + ::std::iter::IntoIterator<Item = Self::Field{{ field.number }}RepeatedItemType>
     where Self: 'this;
+    {# &String: Deref<Target = impl Deref<Target = str>> #}
+    {# &i32: Deref<Target = i32> #}
     type Field{{ field.number }}RepeatedItemType<'this>: 
         ::std::ops::Deref<Target = {{ field.trait_rep_item_type }}>
     where Self: 'this;
