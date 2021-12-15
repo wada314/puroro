@@ -14,9 +14,11 @@ pub trait {{ m.trait_ident }} {
     {%- if field.is_repeated %}
 
     {# &[MyMessageImpl1] #}
-    {# impl Iterator<Item=MyMessageImpl2> #}
+    {# impl Iterator<Item = MyMessageImpl2> #}
     {# &[String] #}
     {# &[puroro::NoAllocString] #}
+    {# &[&str] #}
+    {# impl Iterator<Item = impl Deref<Target = str>> #}
     {# &[i32] #}
     {# iter::repeat(&5).take(3) #}
     type Field{{ field.number }}RepeatedType<'this>:
@@ -26,6 +28,8 @@ pub trait {{ m.trait_ident }} {
     {# &MyMessageImpl1 #}
     {# MyMessageImpl2 #}
     {# &String #}
+    {# &&str #}
+    {# impl Deref<Target = str> #}
     {# &::puroro::NoAllocString #}
     {# &i32 #}
     type Field{{ field.number }}RepeatedItemType<'this>: 
@@ -43,8 +47,10 @@ pub trait {{ m.trait_ident }} {
         self.{{ field.ident_unesc }}_opt()
     }
     {%- else %}
-    {# &String #}
+    {# &str #}
     {# &i32 #}
+    {# Deref<Target = str> #} {# Some impl may want to construct the string in-place and return by value #}
+    {# Deref<Target = i32> #} {# ditto. #}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
         {%- if field.has_default_value %}
         self.{{ field.ident_unesc }}_opt().unwrap_or({{ field.default_value }})
