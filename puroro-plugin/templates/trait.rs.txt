@@ -4,6 +4,8 @@ pub trait {{ m.trait_ident }} {
 
     {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
+    {# &MyMessageImpl1 #}
+    {# MyMessageImpl2 #} {# Some message impl may want to construct the child message in place and return by value #}
     type Field{{ field.number }}MessageType<'this>: {{ field_msg_path }}
         where Self: 'this;
     {%- else %}
@@ -11,15 +13,22 @@ pub trait {{ m.trait_ident }} {
 
     {%- if field.is_repeated %}
 
-    {# &[String]: IntoIterator<Item=impl Deref<Target = impl Deref<Target = str>>> #}
-    {# &[i32]: IntoIterator<Item=impl Deref<Target = i32>> #}
+    {# &[MyMessageImpl1] #}
+    {# impl Iterator<Item=MyMessageImpl2> #}
+    {# &[String] #}
+    {# &[puroro::NoAllocString] #}
+    {# &[i32] #}
+    {# iter::repeat(&5).take(3) #}
     type Field{{ field.number }}RepeatedType<'this>:
         ::puroro::RepeatedField<'this>
-        + ::std::iter::IntoIterator<Item = Self::Field{{ field.number }}RepeatedItemRefType>
+        + ::std::iter::IntoIterator<Item = Self::Field{{ field.number }}RepeatedItemType>
     where Self: 'this;
-    {# &String: Deref<Target = impl Deref<Target = str>> #}
-    {# &i32: Deref<Target = i32> #}
-    type Field{{ field.number }}RepeatedItemRefType<'this>: 
+    {# &MyMessageImpl1 #}
+    {# MyMessageImpl2 #}
+    {# &String #}
+    {# &::puroro::NoAllocString #}
+    {# &i32 #}
+    type Field{{ field.number }}RepeatedItemType<'this>: 
         ::std::ops::Deref<Target = {{ field.trait_rep_item_type }}>
     where Self: 'this;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
@@ -28,10 +37,14 @@ pub trait {{ m.trait_ident }} {
 
     {%- if field.is_message %}
     {#- the getter method returns Option<T> for message field #}
+    {# Option<&MyMessageImpl1> #}
+    {# Option<MyMessageImpl2> #}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
         self.{{ field.ident_unesc }}_opt()
     }
     {%- else %}
+    {# &String #}
+    {# &i32 #}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
         {%- if field.has_default_value %}
         self.{{ field.ident_unesc }}_opt().unwrap_or({{ field.default_value }})

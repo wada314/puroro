@@ -1610,10 +1610,11 @@ pub mod _puroro_traits {
 
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = i32>
+            + ::std::iter::IntoIterator<Item = Self::Field4RepeatedItemRefType>
         where
             Self: 'this;
-        type Field4RepeatedItemType<'this>: ::std::ops::Deref<Target = i32>
+
+        type Field4RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
         where
             Self: 'this;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;

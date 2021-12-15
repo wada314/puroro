@@ -1607,10 +1607,11 @@ pub mod _puroro_traits {
         }
 
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = i32>
+            + ::std::iter::IntoIterator<Item = Self::Field3RepeatedItemRefType>
         where
             Self: 'this;
-        type Field3RepeatedItemType<'this>: ::std::ops::Deref<Target = i32>
+
+        type Field3RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;

@@ -2605,10 +2605,11 @@ pub mod _puroro_traits {
         }
 
         type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = i32>
+            + ::std::iter::IntoIterator<Item = Self::Field2RepeatedItemRefType>
         where
             Self: 'this;
-        type Field2RepeatedItemType<'this>: ::std::ops::Deref<Target = i32>
+
+        type Field2RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
@@ -2624,10 +2625,11 @@ pub mod _puroro_traits {
         }
 
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = f32>
+            + ::std::iter::IntoIterator<Item = Self::Field4RepeatedItemRefType>
         where
             Self: 'this;
-        type Field4RepeatedItemType<'this>: ::std::ops::Deref<Target = f32>
+
+        type Field4RepeatedItemRefType<'this>: ::std::ops::Deref<Target = f32>
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
@@ -2643,10 +2645,11 @@ pub mod _puroro_traits {
         }
 
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = &'this str>
+            + ::std::iter::IntoIterator<Item = Self::Field6RepeatedItemRefType>
         where
             Self: 'this;
-        type Field6RepeatedItemType<'this>: ::std::ops::Deref<Target = str>
+
+        type Field6RepeatedItemRefType<'this>: ::std::ops::Deref<Target = str>
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
@@ -2669,10 +2672,11 @@ pub mod _puroro_traits {
             where Self: 'this;
 
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field8MessageType<'this>>
+            + ::std::iter::IntoIterator<Item = Self::Field8RepeatedItemRefType>
         where
             Self: 'this;
-        type Field8RepeatedItemType<'this>: ::std::ops::Deref<
+
+        type Field8RepeatedItemRefType<'this>: ::std::ops::Deref<
             Target = Self::Field8MessageType<'this>,
         >
         where
@@ -2692,10 +2696,11 @@ pub mod _puroro_traits {
         }
 
         type Field10RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = self::_puroro_root::ser_tests2::Enum>
+            + ::std::iter::IntoIterator<Item = Self::Field10RepeatedItemRefType>
         where
             Self: 'this;
-        type Field10RepeatedItemType<'this>: ::std::ops::Deref<
+
+        type Field10RepeatedItemRefType<'this>: ::std::ops::Deref<
             Target = self::_puroro_root::ser_tests2::Enum,
         >
         where
