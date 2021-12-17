@@ -9850,6 +9850,7 @@ pub mod _puroro_traits {
             self.i32_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_i32_default<'this>(&'this self) -> bool {
             self.i32_default_opt().is_some()
         }
@@ -9860,6 +9861,7 @@ pub mod _puroro_traits {
         fn i32_0<'this>(&'this self) -> i32 {
             self.i32_0_opt().unwrap_or(0)
         }
+
         fn has_i32_0<'this>(&'this self) -> bool {
             self.i32_0_opt().is_some()
         }
@@ -9870,6 +9872,7 @@ pub mod _puroro_traits {
         fn i32_42<'this>(&'this self) -> i32 {
             self.i32_42_opt().unwrap_or(42)
         }
+
         fn has_i32_42<'this>(&'this self) -> bool {
             self.i32_42_opt().is_some()
         }
@@ -9880,6 +9883,7 @@ pub mod _puroro_traits {
         fn i32_m42<'this>(&'this self) -> i32 {
             self.i32_m42_opt().unwrap_or(-42)
         }
+
         fn has_i32_m42<'this>(&'this self) -> bool {
             self.i32_m42_opt().is_some()
         }
@@ -9890,6 +9894,7 @@ pub mod _puroro_traits {
         fn i32_2147483647<'this>(&'this self) -> i32 {
             self.i32_2147483647_opt().unwrap_or(2147483647)
         }
+
         fn has_i32_2147483647<'this>(&'this self) -> bool {
             self.i32_2147483647_opt().is_some()
         }
@@ -9900,6 +9905,7 @@ pub mod _puroro_traits {
         fn i32_m2147483648<'this>(&'this self) -> i32 {
             self.i32_m2147483648_opt().unwrap_or(-2147483648)
         }
+
         fn has_i32_m2147483648<'this>(&'this self) -> bool {
             self.i32_m2147483648_opt().is_some()
         }
@@ -9910,6 +9916,7 @@ pub mod _puroro_traits {
         fn i32_0123<'this>(&'this self) -> i32 {
             self.i32_0123_opt().unwrap_or(83)
         }
+
         fn has_i32_0123<'this>(&'this self) -> bool {
             self.i32_0123_opt().is_some()
         }
@@ -9920,6 +9927,7 @@ pub mod _puroro_traits {
         fn i32_0x123<'this>(&'this self) -> i32 {
             self.i32_0x123_opt().unwrap_or(291)
         }
+
         fn has_i32_0x123<'this>(&'this self) -> bool {
             self.i32_0x123_opt().is_some()
         }
@@ -9931,6 +9939,7 @@ pub mod _puroro_traits {
             self.u32_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_u32_default<'this>(&'this self) -> bool {
             self.u32_default_opt().is_some()
         }
@@ -9941,6 +9950,7 @@ pub mod _puroro_traits {
         fn u32_0<'this>(&'this self) -> u32 {
             self.u32_0_opt().unwrap_or(0)
         }
+
         fn has_u32_0<'this>(&'this self) -> bool {
             self.u32_0_opt().is_some()
         }
@@ -9951,6 +9961,7 @@ pub mod _puroro_traits {
         fn u32_42<'this>(&'this self) -> u32 {
             self.u32_42_opt().unwrap_or(42)
         }
+
         fn has_u32_42<'this>(&'this self) -> bool {
             self.u32_42_opt().is_some()
         }
@@ -9961,6 +9972,7 @@ pub mod _puroro_traits {
         fn u32_4294967295<'this>(&'this self) -> u32 {
             self.u32_4294967295_opt().unwrap_or(4294967295)
         }
+
         fn has_u32_4294967295<'this>(&'this self) -> bool {
             self.u32_4294967295_opt().is_some()
         }
@@ -9971,6 +9983,7 @@ pub mod _puroro_traits {
         fn u32_0123<'this>(&'this self) -> u32 {
             self.u32_0123_opt().unwrap_or(83)
         }
+
         fn has_u32_0123<'this>(&'this self) -> bool {
             self.u32_0123_opt().is_some()
         }
@@ -9981,6 +9994,7 @@ pub mod _puroro_traits {
         fn u32_0x123<'this>(&'this self) -> u32 {
             self.u32_0x123_opt().unwrap_or(291)
         }
+
         fn has_u32_0x123<'this>(&'this self) -> bool {
             self.u32_0x123_opt().is_some()
         }
@@ -9992,6 +10006,7 @@ pub mod _puroro_traits {
             self.i64_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_i64_default<'this>(&'this self) -> bool {
             self.i64_default_opt().is_some()
         }
@@ -10002,6 +10017,7 @@ pub mod _puroro_traits {
         fn i64_0<'this>(&'this self) -> i64 {
             self.i64_0_opt().unwrap_or(0)
         }
+
         fn has_i64_0<'this>(&'this self) -> bool {
             self.i64_0_opt().is_some()
         }
@@ -10012,6 +10028,7 @@ pub mod _puroro_traits {
         fn i64_42<'this>(&'this self) -> i64 {
             self.i64_42_opt().unwrap_or(42)
         }
+
         fn has_i64_42<'this>(&'this self) -> bool {
             self.i64_42_opt().is_some()
         }
@@ -10022,6 +10039,7 @@ pub mod _puroro_traits {
         fn i64_m42<'this>(&'this self) -> i64 {
             self.i64_m42_opt().unwrap_or(-42)
         }
+
         fn has_i64_m42<'this>(&'this self) -> bool {
             self.i64_m42_opt().is_some()
         }
@@ -10033,6 +10051,7 @@ pub mod _puroro_traits {
             self.i64_9223372036854775807_opt()
                 .unwrap_or(9223372036854775807)
         }
+
         fn has_i64_9223372036854775807<'this>(&'this self) -> bool {
             self.i64_9223372036854775807_opt().is_some()
         }
@@ -10044,6 +10063,7 @@ pub mod _puroro_traits {
             self.i64_m9223372036854775808_opt()
                 .unwrap_or(-9223372036854775808)
         }
+
         fn has_i64_m9223372036854775808<'this>(&'this self) -> bool {
             self.i64_m9223372036854775808_opt().is_some()
         }
@@ -10054,6 +10074,7 @@ pub mod _puroro_traits {
         fn i64_0123<'this>(&'this self) -> i64 {
             self.i64_0123_opt().unwrap_or(83)
         }
+
         fn has_i64_0123<'this>(&'this self) -> bool {
             self.i64_0123_opt().is_some()
         }
@@ -10064,6 +10085,7 @@ pub mod _puroro_traits {
         fn i64_0x123<'this>(&'this self) -> i64 {
             self.i64_0x123_opt().unwrap_or(291)
         }
+
         fn has_i64_0x123<'this>(&'this self) -> bool {
             self.i64_0x123_opt().is_some()
         }
@@ -10075,6 +10097,7 @@ pub mod _puroro_traits {
             self.u64_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_u64_default<'this>(&'this self) -> bool {
             self.u64_default_opt().is_some()
         }
@@ -10085,6 +10108,7 @@ pub mod _puroro_traits {
         fn u64_0<'this>(&'this self) -> u64 {
             self.u64_0_opt().unwrap_or(0)
         }
+
         fn has_u64_0<'this>(&'this self) -> bool {
             self.u64_0_opt().is_some()
         }
@@ -10095,6 +10119,7 @@ pub mod _puroro_traits {
         fn u64_42<'this>(&'this self) -> u64 {
             self.u64_42_opt().unwrap_or(42)
         }
+
         fn has_u64_42<'this>(&'this self) -> bool {
             self.u64_42_opt().is_some()
         }
@@ -10106,6 +10131,7 @@ pub mod _puroro_traits {
             self.u64_18446744073709551615_opt()
                 .unwrap_or(18446744073709551615)
         }
+
         fn has_u64_18446744073709551615<'this>(&'this self) -> bool {
             self.u64_18446744073709551615_opt().is_some()
         }
@@ -10116,6 +10142,7 @@ pub mod _puroro_traits {
         fn u64_0123<'this>(&'this self) -> u64 {
             self.u64_0123_opt().unwrap_or(83)
         }
+
         fn has_u64_0123<'this>(&'this self) -> bool {
             self.u64_0123_opt().is_some()
         }
@@ -10126,6 +10153,7 @@ pub mod _puroro_traits {
         fn u64_0x123<'this>(&'this self) -> u64 {
             self.u64_0x123_opt().unwrap_or(291)
         }
+
         fn has_u64_0x123<'this>(&'this self) -> bool {
             self.u64_0x123_opt().is_some()
         }
@@ -10137,6 +10165,7 @@ pub mod _puroro_traits {
             self.f32_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_f32_default<'this>(&'this self) -> bool {
             self.f32_default_opt().is_some()
         }
@@ -10147,6 +10176,7 @@ pub mod _puroro_traits {
         fn f32_0<'this>(&'this self) -> f32 {
             self.f32_0_opt().unwrap_or(0f32)
         }
+
         fn has_f32_0<'this>(&'this self) -> bool {
             self.f32_0_opt().is_some()
         }
@@ -10157,6 +10187,7 @@ pub mod _puroro_traits {
         fn f32_m0<'this>(&'this self) -> f32 {
             self.f32_m0_opt().unwrap_or(-0f32)
         }
+
         fn has_f32_m0<'this>(&'this self) -> bool {
             self.f32_m0_opt().is_some()
         }
@@ -10167,6 +10198,7 @@ pub mod _puroro_traits {
         fn f32_0p<'this>(&'this self) -> f32 {
             self.f32_0p_opt().unwrap_or(0f32)
         }
+
         fn has_f32_0p<'this>(&'this self) -> bool {
             self.f32_0p_opt().is_some()
         }
@@ -10177,6 +10209,7 @@ pub mod _puroro_traits {
         fn f32_p0<'this>(&'this self) -> f32 {
             self.f32_p0_opt().unwrap_or(0f32)
         }
+
         fn has_f32_p0<'this>(&'this self) -> bool {
             self.f32_p0_opt().is_some()
         }
@@ -10187,6 +10220,7 @@ pub mod _puroro_traits {
         fn f32_0p0<'this>(&'this self) -> f32 {
             self.f32_0p0_opt().unwrap_or(0f32)
         }
+
         fn has_f32_0p0<'this>(&'this self) -> bool {
             self.f32_0p0_opt().is_some()
         }
@@ -10197,6 +10231,7 @@ pub mod _puroro_traits {
         fn f32_42<'this>(&'this self) -> f32 {
             self.f32_42_opt().unwrap_or(42f32)
         }
+
         fn has_f32_42<'this>(&'this self) -> bool {
             self.f32_42_opt().is_some()
         }
@@ -10207,6 +10242,7 @@ pub mod _puroro_traits {
         fn f32_m42<'this>(&'this self) -> f32 {
             self.f32_m42_opt().unwrap_or(-42f32)
         }
+
         fn has_f32_m42<'this>(&'this self) -> bool {
             self.f32_m42_opt().is_some()
         }
@@ -10217,6 +10253,7 @@ pub mod _puroro_traits {
         fn f32_0p25<'this>(&'this self) -> f32 {
             self.f32_0p25_opt().unwrap_or(0.25f32)
         }
+
         fn has_f32_0p25<'this>(&'this self) -> bool {
             self.f32_0p25_opt().is_some()
         }
@@ -10227,6 +10264,7 @@ pub mod _puroro_traits {
         fn f32_1p5e2<'this>(&'this self) -> f32 {
             self.f32_1p5e2_opt().unwrap_or(150f32)
         }
+
         fn has_f32_1p5e2<'this>(&'this self) -> bool {
             self.f32_1p5e2_opt().is_some()
         }
@@ -10237,6 +10275,7 @@ pub mod _puroro_traits {
         fn f32_inf<'this>(&'this self) -> f32 {
             self.f32_inf_opt().unwrap_or(f32::INFINITY)
         }
+
         fn has_f32_inf<'this>(&'this self) -> bool {
             self.f32_inf_opt().is_some()
         }
@@ -10247,6 +10286,7 @@ pub mod _puroro_traits {
         fn f32_minf<'this>(&'this self) -> f32 {
             self.f32_minf_opt().unwrap_or(f32::NEG_INFINITY)
         }
+
         fn has_f32_minf<'this>(&'this self) -> bool {
             self.f32_minf_opt().is_some()
         }
@@ -10257,6 +10297,7 @@ pub mod _puroro_traits {
         fn f32_nan<'this>(&'this self) -> f32 {
             self.f32_nan_opt().unwrap_or(f32::NAN)
         }
+
         fn has_f32_nan<'this>(&'this self) -> bool {
             self.f32_nan_opt().is_some()
         }
@@ -10267,6 +10308,7 @@ pub mod _puroro_traits {
         fn f32_mnan<'this>(&'this self) -> f32 {
             self.f32_mnan_opt().unwrap_or(f32::NAN)
         }
+
         fn has_f32_mnan<'this>(&'this self) -> bool {
             self.f32_mnan_opt().is_some()
         }
@@ -10278,6 +10320,7 @@ pub mod _puroro_traits {
             self.bool_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_bool_default<'this>(&'this self) -> bool {
             self.bool_default_opt().is_some()
         }
@@ -10288,6 +10331,7 @@ pub mod _puroro_traits {
         fn bool_true<'this>(&'this self) -> bool {
             self.bool_true_opt().unwrap_or(true)
         }
+
         fn has_bool_true<'this>(&'this self) -> bool {
             self.bool_true_opt().is_some()
         }
@@ -10298,6 +10342,7 @@ pub mod _puroro_traits {
         fn bool_false<'this>(&'this self) -> bool {
             self.bool_false_opt().unwrap_or(false)
         }
+
         fn has_bool_false<'this>(&'this self) -> bool {
             self.bool_false_opt().is_some()
         }
@@ -10306,6 +10351,7 @@ pub mod _puroro_traits {
         }
 
         type Field71ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -10313,6 +10359,7 @@ pub mod _puroro_traits {
             self.string_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_string_default<'this>(&'this self) -> bool {
             self.string_default_opt().is_some()
         }
@@ -10323,12 +10370,16 @@ pub mod _puroro_traits {
         }
 
         type Field72ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
+        const FIELD_72_DEFAULT_VALUE: Field72ScalarGetterType<'static>;
 
         fn string_empty<'this>(&'this self) -> Self::Field72ScalarGetterType<'this> {
-            self.string_empty_opt().unwrap_or("")
+            self.string_empty_opt()
+                .unwrap_or(Self::FIELD_72_DEFAULT_VALUE)
         }
+
         fn has_string_empty<'this>(&'this self) -> bool {
             self.string_empty_opt().is_some()
         }
@@ -10339,12 +10390,16 @@ pub mod _puroro_traits {
         }
 
         type Field73ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
+        const FIELD_73_DEFAULT_VALUE: Field73ScalarGetterType<'static>;
 
         fn string_abc<'this>(&'this self) -> Self::Field73ScalarGetterType<'this> {
-            self.string_abc_opt().unwrap_or("abc")
+            self.string_abc_opt()
+                .unwrap_or(Self::FIELD_73_DEFAULT_VALUE)
         }
+
         fn has_string_abc<'this>(&'this self) -> bool {
             self.string_abc_opt().is_some()
         }
@@ -10355,12 +10410,16 @@ pub mod _puroro_traits {
         }
 
         type Field74ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
+        const FIELD_74_DEFAULT_VALUE: Field74ScalarGetterType<'static>;
 
         fn string_aiu<'this>(&'this self) -> Self::Field74ScalarGetterType<'this> {
-            self.string_aiu_opt().unwrap_or("\u{3042}\u{3044}\u{3046}")
+            self.string_aiu_opt()
+                .unwrap_or(Self::FIELD_74_DEFAULT_VALUE)
         }
+
         fn has_string_aiu<'this>(&'this self) -> bool {
             self.string_aiu_opt().is_some()
         }
@@ -10371,12 +10430,16 @@ pub mod _puroro_traits {
         }
 
         type Field75ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
+        const FIELD_75_DEFAULT_VALUE: Field75ScalarGetterType<'static>;
 
         fn string_backslash<'this>(&'this self) -> Self::Field75ScalarGetterType<'this> {
-            self.string_backslash_opt().unwrap_or("\\")
+            self.string_backslash_opt()
+                .unwrap_or(Self::FIELD_75_DEFAULT_VALUE)
         }
+
         fn has_string_backslash<'this>(&'this self) -> bool {
             self.string_backslash_opt().is_some()
         }
@@ -10387,12 +10450,16 @@ pub mod _puroro_traits {
         }
 
         type Field76ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
+        const FIELD_76_DEFAULT_VALUE: Field76ScalarGetterType<'static>;
 
         fn string_tab<'this>(&'this self) -> Self::Field76ScalarGetterType<'this> {
-            self.string_tab_opt().unwrap_or("\t")
+            self.string_tab_opt()
+                .unwrap_or(Self::FIELD_76_DEFAULT_VALUE)
         }
+
         fn has_string_tab<'this>(&'this self) -> bool {
             self.string_tab_opt().is_some()
         }
@@ -10403,12 +10470,16 @@ pub mod _puroro_traits {
         }
 
         type Field77ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
+        const FIELD_77_DEFAULT_VALUE: Field77ScalarGetterType<'static>;
 
         fn string_crlf<'this>(&'this self) -> Self::Field77ScalarGetterType<'this> {
-            self.string_crlf_opt().unwrap_or("\r\n")
+            self.string_crlf_opt()
+                .unwrap_or(Self::FIELD_77_DEFAULT_VALUE)
         }
+
         fn has_string_crlf<'this>(&'this self) -> bool {
             self.string_crlf_opt().is_some()
         }
@@ -10419,6 +10490,7 @@ pub mod _puroro_traits {
         }
 
         type Field81ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
 
@@ -10426,6 +10498,7 @@ pub mod _puroro_traits {
             self.bytes_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_bytes_default<'this>(&'this self) -> bool {
             self.bytes_default_opt().is_some()
         }
@@ -10436,12 +10509,16 @@ pub mod _puroro_traits {
         }
 
         type Field82ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
+        const FIELD_82_DEFAULT_VALUE: Field82ScalarGetterType<'static>;
 
         fn bytes_empty<'this>(&'this self) -> Self::Field82ScalarGetterType<'this> {
-            self.bytes_empty_opt().unwrap_or(b"")
+            self.bytes_empty_opt()
+                .unwrap_or(Self::FIELD_82_DEFAULT_VALUE)
         }
+
         fn has_bytes_empty<'this>(&'this self) -> bool {
             self.bytes_empty_opt().is_some()
         }
@@ -10452,12 +10529,15 @@ pub mod _puroro_traits {
         }
 
         type Field83ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
+        const FIELD_83_DEFAULT_VALUE: Field83ScalarGetterType<'static>;
 
         fn bytes_abc<'this>(&'this self) -> Self::Field83ScalarGetterType<'this> {
-            self.bytes_abc_opt().unwrap_or(b"\x61\x62\x63")
+            self.bytes_abc_opt().unwrap_or(Self::FIELD_83_DEFAULT_VALUE)
         }
+
         fn has_bytes_abc<'this>(&'this self) -> bool {
             self.bytes_abc_opt().is_some()
         }
@@ -10468,13 +10548,15 @@ pub mod _puroro_traits {
         }
 
         type Field84ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
+        const FIELD_84_DEFAULT_VALUE: Field84ScalarGetterType<'static>;
 
         fn bytes_aiu<'this>(&'this self) -> Self::Field84ScalarGetterType<'this> {
-            self.bytes_aiu_opt()
-                .unwrap_or(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
+            self.bytes_aiu_opt().unwrap_or(Self::FIELD_84_DEFAULT_VALUE)
         }
+
         fn has_bytes_aiu<'this>(&'this self) -> bool {
             self.bytes_aiu_opt().is_some()
         }
@@ -10485,12 +10567,16 @@ pub mod _puroro_traits {
         }
 
         type Field85ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
+        const FIELD_85_DEFAULT_VALUE: Field85ScalarGetterType<'static>;
 
         fn bytes_backslash<'this>(&'this self) -> Self::Field85ScalarGetterType<'this> {
-            self.bytes_backslash_opt().unwrap_or(b"\x5c")
+            self.bytes_backslash_opt()
+                .unwrap_or(Self::FIELD_85_DEFAULT_VALUE)
         }
+
         fn has_bytes_backslash<'this>(&'this self) -> bool {
             self.bytes_backslash_opt().is_some()
         }
@@ -10501,12 +10587,15 @@ pub mod _puroro_traits {
         }
 
         type Field86ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
+        const FIELD_86_DEFAULT_VALUE: Field86ScalarGetterType<'static>;
 
         fn bytes_tab<'this>(&'this self) -> Self::Field86ScalarGetterType<'this> {
-            self.bytes_tab_opt().unwrap_or(b"\x09")
+            self.bytes_tab_opt().unwrap_or(Self::FIELD_86_DEFAULT_VALUE)
         }
+
         fn has_bytes_tab<'this>(&'this self) -> bool {
             self.bytes_tab_opt().is_some()
         }
@@ -10517,12 +10606,16 @@ pub mod _puroro_traits {
         }
 
         type Field87ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
+        const FIELD_87_DEFAULT_VALUE: Field87ScalarGetterType<'static>;
 
         fn bytes_crlf<'this>(&'this self) -> Self::Field87ScalarGetterType<'this> {
-            self.bytes_crlf_opt().unwrap_or(b"\x0d\x0a")
+            self.bytes_crlf_opt()
+                .unwrap_or(Self::FIELD_87_DEFAULT_VALUE)
         }
+
         fn has_bytes_crlf<'this>(&'this self) -> bool {
             self.bytes_crlf_opt().is_some()
         }
@@ -10536,6 +10629,7 @@ pub mod _puroro_traits {
             self.enum_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_enum_default<'this>(&'this self) -> bool {
             self.enum_default_opt().is_some()
         }
@@ -10549,6 +10643,7 @@ pub mod _puroro_traits {
             self.enum_one_opt()
                 .unwrap_or(self::_puroro_root::proto2_defaults::MyEnum::One)
         }
+
         fn has_enum_one<'this>(&'this self) -> bool {
             self.enum_one_opt().is_some()
         }
@@ -10562,6 +10657,7 @@ pub mod _puroro_traits {
             self.enum_fourty_two_opt()
                 .unwrap_or(self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo)
         }
+
         fn has_enum_fourty_two<'this>(&'this self) -> bool {
             self.enum_fourty_two_opt().is_some()
         }
@@ -10709,145 +10805,95 @@ pub mod _puroro_traits {
             fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).bool_false_opt()
             }
-            type Field71ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field71ScalarGetterType<'this>;
-            fn string_default_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
+            type Field71ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field71ScalarGetterType<'this>;
+            fn string_default_opt<'this>(&'this self) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
                 (**self).string_default_opt()
             }
-            type Field72ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field72ScalarGetterType<'this>;
-            fn string_empty_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
+            type Field72ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field72ScalarGetterType<'this>;
+            const FIELD_72_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_72_DEFAULT_VALUE;
+            fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
                 (**self).string_empty_opt()
             }
-            type Field73ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field73ScalarGetterType<'this>;
-            fn string_abc_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
+            type Field73ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field73ScalarGetterType<'this>;
+            const FIELD_73_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_73_DEFAULT_VALUE;
+            fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
                 (**self).string_abc_opt()
             }
-            type Field74ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field74ScalarGetterType<'this>;
-            fn string_aiu_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
+            type Field74ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field74ScalarGetterType<'this>;
+            const FIELD_74_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_74_DEFAULT_VALUE;
+            fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
                 (**self).string_aiu_opt()
             }
-            type Field75ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field75ScalarGetterType<'this>;
-            fn string_backslash_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
+            type Field75ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field75ScalarGetterType<'this>;
+            const FIELD_75_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_75_DEFAULT_VALUE;
+            fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
                 (**self).string_backslash_opt()
             }
-            type Field76ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field76ScalarGetterType<'this>;
-            fn string_tab_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
+            type Field76ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field76ScalarGetterType<'this>;
+            const FIELD_76_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_76_DEFAULT_VALUE;
+            fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
                 (**self).string_tab_opt()
             }
-            type Field77ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field77ScalarGetterType<'this>;
-            fn string_crlf_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
+            type Field77ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field77ScalarGetterType<'this>;
+            const FIELD_77_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_77_DEFAULT_VALUE;
+            fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
                 (**self).string_crlf_opt()
             }
-            type Field81ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field81ScalarGetterType<'this>;
-            fn bytes_default_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
+            type Field81ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field81ScalarGetterType<'this>;
+            fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
                 (**self).bytes_default_opt()
             }
-            type Field82ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field82ScalarGetterType<'this>;
-            fn bytes_empty_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
+            type Field82ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field82ScalarGetterType<'this>;
+            const FIELD_82_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_82_DEFAULT_VALUE;
+            fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
                 (**self).bytes_empty_opt()
             }
-            type Field83ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field83ScalarGetterType<'this>;
-            fn bytes_abc_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
+            type Field83ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field83ScalarGetterType<'this>;
+            const FIELD_83_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_83_DEFAULT_VALUE;
+            fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
                 (**self).bytes_abc_opt()
             }
-            type Field84ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field84ScalarGetterType<'this>;
-            fn bytes_aiu_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
+            type Field84ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field84ScalarGetterType<'this>;
+            const FIELD_84_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_84_DEFAULT_VALUE;
+            fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
                 (**self).bytes_aiu_opt()
             }
-            type Field85ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field85ScalarGetterType<'this>;
-            fn bytes_backslash_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
+            type Field85ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field85ScalarGetterType<'this>;
+            const FIELD_85_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_85_DEFAULT_VALUE;
+            fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
                 (**self).bytes_backslash_opt()
             }
-            type Field86ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field86ScalarGetterType<'this>;
-            fn bytes_tab_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
+            type Field86ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field86ScalarGetterType<'this>;
+            const FIELD_86_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_86_DEFAULT_VALUE;
+            fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
                 (**self).bytes_tab_opt()
             }
-            type Field87ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty>::Field87ScalarGetterType<'this>;
-            fn bytes_crlf_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
+            type Field87ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field87ScalarGetterType<'this>;
+            const FIELD_87_DEFAULT_VALUE = <$ty as MsgTrait>::FIELD_87_DEFAULT_VALUE;
+            fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
                 (**self).bytes_crlf_opt()
             }
-            fn enum_default_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            fn enum_default_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_default_opt()
             }
-            fn enum_one_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            fn enum_one_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_one_opt()
             }
-            fn enum_fourty_two_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            fn enum_fourty_two_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_fourty_two_opt()
             }
         };

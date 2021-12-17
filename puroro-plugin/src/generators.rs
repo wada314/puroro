@@ -192,7 +192,6 @@ struct Field {
     simple_field_type: String,
     simple_scalar_field_type: String,
     simple_maybe_field_message_path: Option<String>,
-    simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
@@ -278,8 +277,6 @@ impl Field {
             simple_field_type: f.simple_field_type()?.into(),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_maybe_field_message_path,
-            simple_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Simple", &[])?,
             simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {

@@ -400,11 +400,11 @@ pub mod _puroro_traits {
         type Field1ScalarGetterType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
             where Self: 'this;
 
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+        fn recursive_unlabeled<'this>(&'this self) -> Self::Field1ScalarGetterType<'this> {
             self.recursive_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
             self.recursive_unlabeled_opt().is_some()
         }
@@ -420,7 +420,7 @@ pub mod _puroro_traits {
             type Field1ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field1ScalarGetterType<'this>;
+            = <$ty as MsgTrait>::Field1ScalarGetterType<'this>;
             fn recursive_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {

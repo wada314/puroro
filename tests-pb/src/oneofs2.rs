@@ -1585,11 +1585,13 @@ pub mod _puroro_traits {
             self.g1_int32_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_g1_int32<'this>(&'this self) -> bool {
             self.g1_int32_opt().is_some()
         }
 
         type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -1597,6 +1599,7 @@ pub mod _puroro_traits {
             self.g1_string_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_g1_string<'this>(&'this self) -> bool {
             self.g1_string_opt().is_some()
         }
@@ -1605,11 +1608,13 @@ pub mod _puroro_traits {
             self.g2_f32_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_g2_f32<'this>(&'this self) -> bool {
             self.g2_f32_opt().is_some()
         }
 
         type Field4ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -1617,6 +1622,7 @@ pub mod _puroro_traits {
             self.g2_string_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_g2_string<'this>(&'this self) -> bool {
             self.g2_string_opt().is_some()
         }
@@ -1625,11 +1631,11 @@ pub mod _puroro_traits {
         where
             Self: 'this;
 
-        fn g2_submsg<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
+        fn g2_submsg<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.g2_submsg_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_g2_submsg<'this>(&'this self) -> bool {
             self.g2_submsg_opt().is_some()
         }
@@ -1638,6 +1644,7 @@ pub mod _puroro_traits {
             self.g3_int32_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_g3_int32<'this>(&'this self) -> bool {
             self.g3_int32_opt().is_some()
         }
@@ -1750,15 +1757,15 @@ pub mod _puroro_traits {
             type Field2ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field2ScalarGetterType<'this>;
+            = <$ty as MsgTrait>::Field2ScalarGetterType<'this>;
             type Field4ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field4ScalarGetterType<'this>;
+            = <$ty as MsgTrait>::Field4ScalarGetterType<'this>;
             type Field5ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field5ScalarGetterType<'this>;
+            = <$ty as MsgTrait>::Field5ScalarGetterType<'this>;
             fn group_one<'this>(
                 &'this self,
             ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -2008,6 +2015,7 @@ pub mod _puroro_traits {
             self.i32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
         }

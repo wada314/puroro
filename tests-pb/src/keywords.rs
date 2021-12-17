@@ -339,6 +339,7 @@ pub mod _puroro_traits {
             self.type_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_type<'this>(&'this self) -> bool {
             self.type_opt().is_some()
         }

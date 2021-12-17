@@ -1591,6 +1591,7 @@ pub mod _puroro_traits {
             self.i32_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
@@ -1602,6 +1603,7 @@ pub mod _puroro_traits {
             self.i32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
         }
@@ -1619,6 +1621,7 @@ pub mod _puroro_traits {
             self.f32_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_f32_unlabeled<'this>(&'this self) -> bool {
             self.f32_unlabeled_opt().is_some()
         }
@@ -1627,6 +1630,7 @@ pub mod _puroro_traits {
         }
 
         type Field5ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -1634,6 +1638,7 @@ pub mod _puroro_traits {
             self.string_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
         }
@@ -1646,11 +1651,11 @@ pub mod _puroro_traits {
         type Field6ScalarGetterType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6ScalarGetterType<'this> {
             self.submsg_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
         }
@@ -1673,7 +1678,7 @@ pub mod _puroro_traits {
             type Field3RepeatedType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field3RepeatedType<'this>;
+            = <$ty as MsgTrait>::Field3RepeatedType<'this>;
             fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
                 (**self).i32_repeated()
             }
@@ -1683,7 +1688,7 @@ pub mod _puroro_traits {
             type Field5ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field5ScalarGetterType<'this>;
+            = <$ty as MsgTrait>::Field5ScalarGetterType<'this>;
             fn string_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
@@ -1692,7 +1697,7 @@ pub mod _puroro_traits {
             type Field6ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field6ScalarGetterType<'this>;
+            = <$ty as MsgTrait>::Field6ScalarGetterType<'this>;
             fn submsg_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
@@ -1908,6 +1913,7 @@ pub mod _puroro_traits {
             self.i32_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }

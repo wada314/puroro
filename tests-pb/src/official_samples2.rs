@@ -1319,6 +1319,7 @@ pub mod _puroro_traits {
             self.a_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_a<'this>(&'this self) -> bool {
             self.a_opt().is_some()
         }
@@ -1402,6 +1403,7 @@ pub mod _puroro_traits {
 
     pub trait Test2Trait {
         type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
+            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -1409,6 +1411,7 @@ pub mod _puroro_traits {
             self.b_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_b<'this>(&'this self) -> bool {
             self.b_opt().is_some()
         }
@@ -1422,7 +1425,7 @@ pub mod _puroro_traits {
             type Field2ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field2ScalarGetterType<'this>;
+            = <$ty as Test2Trait>::Field2ScalarGetterType<'this>;
             fn b_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
@@ -1500,9 +1503,11 @@ pub mod _puroro_traits {
         type Field3ScalarGetterType<'this>: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             where Self: 'this;
 
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+        fn c<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             self.c_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
+
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()
         }
@@ -1516,7 +1521,7 @@ pub mod _puroro_traits {
             type Field3ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field3ScalarGetterType<'this>;
+            = <$ty as Test3Trait>::Field3ScalarGetterType<'this>;
             fn c_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
@@ -1634,7 +1639,7 @@ pub mod _puroro_traits {
             type Field4RepeatedType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field4RepeatedType<'this>;
+            = <$ty as Test4Trait>::Field4RepeatedType<'this>;
             fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
                 (**self).d()
             }
