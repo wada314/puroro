@@ -641,24 +641,23 @@ impl Field {
         use FieldTypeCategories::*;
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
-            LengthDelimited(String) => "&'this str".into(),
-            LengthDelimited(Bytes) => "&'this [u8]".into(),
-            LengthDelimited(Message(_)) => format!(
-                "Self::Field{number}MessageType<'this>",
+            LengthDelimited(_) => format!(
+                "Self::Field{number}ScalarGetterType<'this>",
                 number = self.number()
             )
             .into(),
+            // Note: For trivial types, the trait getter returns by value, not by ref.
+            // Some implementation may want to generate the value in place.
             Trivial(field_type) => field_type.rust_type_name()?,
         })
     }
+
     pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<Cow<'static, str>> {
         use FieldTypeCategories::*;
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
-            LengthDelimited(String) => format!("&{lt} str", lt = lt).into(),
-            LengthDelimited(Bytes) => format!("&{lt} [u8]", lt = lt).into(),
-            LengthDelimited(Message(_)) => format!(
-                "<{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>",
+            LengthDelimited(_) => format!(
+                "<{trait_impl} as {trait_path}>::Field{number}ScalarGetterType<{lt}>",
                 lt = lt,
                 trait_impl = trait_impl,
                 trait_path = self.message()?.rust_trait_path(),

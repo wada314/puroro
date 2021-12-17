@@ -1589,7 +1589,11 @@ pub mod _puroro_traits {
             self.g1_int32_opt().is_some()
         }
 
-        fn g1_string<'this>(&'this self) -> &'this str {
+        type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn g1_string<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             self.g1_string_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
@@ -1605,7 +1609,11 @@ pub mod _puroro_traits {
             self.g2_f32_opt().is_some()
         }
 
-        fn g2_string<'this>(&'this self) -> &'this str {
+        type Field4ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn g2_string<'this>(&'this self) -> Self::Field4ScalarGetterType<'this> {
             self.g2_string_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
@@ -1613,11 +1621,13 @@ pub mod _puroro_traits {
             self.g2_string_opt().is_some()
         }
 
-        type Field5MessageType<'this>: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
+        type Field5ScalarGetterType<'this>: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
         where
             Self: 'this;
 
-        fn g2_submsg<'this>(&'this self) -> ::std::option::Option<Self::Field5MessageType<'this>> {
+        fn g2_submsg<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
             self.g2_submsg_opt()
         }
         fn has_g2_submsg<'this>(&'this self) -> bool {
@@ -1633,7 +1643,7 @@ pub mod _puroro_traits {
         }
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             ::std::option::Option::None
         }
@@ -1648,7 +1658,13 @@ pub mod _puroro_traits {
                 }
             })
         }
-        fn g1_string_opt<'this>(&'this self) -> Option<&'this str> {
+        fn g1_string_opt<'this>(
+            &'this self,
+        ) -> Option<
+            <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2ScalarGetterType<
+                'this,
+            >,
+        > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.group_one().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
@@ -1676,7 +1692,13 @@ pub mod _puroro_traits {
                 }
             })
         }
-        fn g2_string_opt<'this>(&'this self) -> Option<&'this str> {
+        fn g2_string_opt<'this>(
+            &'this self,
+        ) -> Option<
+            <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4ScalarGetterType<
+                'this,
+            >,
+        > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             self.group_two().and_then(|oneof| {
                 #[allow(irrefutable_let_patterns)]
@@ -1690,7 +1712,7 @@ pub mod _puroro_traits {
         fn g2_submsg_opt<'this>(
             &'this self,
         ) -> Option<
-            <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
+            <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5ScalarGetterType<
                 'this,
             >,
         > {
@@ -1706,7 +1728,8 @@ pub mod _puroro_traits {
         }
         fn group_three<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<'this>>
+        {
             ::std::option::Option::None
         }
         fn g3_int32_opt<'this>(&'this self) -> Option<i32> {
@@ -1724,10 +1747,18 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type Field5MessageType<'this>
+            type Field2ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field5MessageType<'this>;
+            = <$ty>::Field2ScalarGetterType<'this>;
+            type Field4ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field4ScalarGetterType<'this>;
+            type Field5ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field5ScalarGetterType<'this>;
             fn group_one<'this>(
                 &'this self,
             ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -2072,12 +2103,18 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            pub enum GroupOne<'msg> {
+            pub enum GroupOne<'msg, T>
+            where
+                T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
                 G1Int32(i32),
-                G1String(&'msg str),
+                G1String(<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'msg>),
             }
 
-            impl<'msg> GroupOne<'msg> {
+            impl<'msg, T> GroupOne<'msg, T>
+            where
+                T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
                 pub fn g1_int32(self) -> ::std::option::Option<i32> {
                     match self {
                         Self::G1Int32(v) => ::std::option::Option::Some(v),
@@ -2085,7 +2122,7 @@ pub mod _puroro_nested {
                         _ => None,
                     }
                 }
-                pub fn g1_string(self) -> ::std::option::Option<&'msg str> {
+                pub fn g1_string(self) -> ::std::option::Option<<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'msg>>{
                     match self {
                         Self::G1String(v) => ::std::option::Option::Some(v),
                         #[allow(unreachable_patterns)]
@@ -2094,36 +2131,49 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'msg> ::std::fmt::Debug for GroupOne<'msg>
+            impl<'msg, T> ::std::fmt::Debug for GroupOne<'msg, T>
             where
                 i32: ::std::fmt::Debug,
-                &'msg str: ::std::fmt::Debug,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'msg>: ::std::fmt::Debug,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     match self {
-                        Self::G1Int32(v) => f.debug_tuple("GroupOne::G1Int32").field(&v).finish(),
-                        Self::G1String(v) => f.debug_tuple("GroupOne::G1String").field(&v).finish(),
+                        Self::G1Int32(v) => f
+                            .debug_tuple("GroupOne::G1Int32")
+                            .field(&v)
+                            .finish(),
+                        Self::G1String(v) => f
+                            .debug_tuple("GroupOne::G1String")
+                            .field(&v)
+                            .finish(),
                     }
                 }
             }
 
-            impl<'msg> ::std::clone::Clone for GroupOne<'msg>
+            impl<'msg, T> ::std::clone::Clone for GroupOne<'msg, T>
             where
                 i32: ::std::clone::Clone,
-                &'msg str: ::std::clone::Clone,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'msg>: ::std::clone::Clone,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 fn clone(&self) -> Self {
                     match self {
-                        Self::G1Int32(v) => Self::G1Int32(::std::clone::Clone::clone(&v)),
-                        Self::G1String(v) => Self::G1String(::std::clone::Clone::clone(&v)),
+                        Self::G1Int32(v) => Self::G1Int32(
+                            ::std::clone::Clone::clone(&v)
+                        ),
+                        Self::G1String(v) => Self::G1String(
+                            ::std::clone::Clone::clone(&v)
+                        ),
                     }
                 }
             }
 
-            impl<'msg> ::std::cmp::PartialEq for GroupOne<'msg>
+            impl<'msg, T> ::std::cmp::PartialEq for GroupOne<'msg, T>
             where
                 i32: ::std::cmp::PartialEq,
-                &'msg str: ::std::cmp::PartialEq,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'msg>: ::std::cmp::PartialEq,
+                T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 fn eq(&self, rhs: &Self) -> bool {
                     match (self, rhs) {
@@ -2134,14 +2184,71 @@ pub mod _puroro_nested {
                     }
                 }
             }
+            impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, &'_ T>
+            where
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupOne<'msg, T>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
+            impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, &'_ mut T>
+            where
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupOne<'msg, T>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
+            impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, ::std::boxed::Box<T>>
+            where
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupOne<'msg, T>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
+            impl<'msg, 'bump, T> ::std::convert::From<GroupOne<'msg, T>>
+                for GroupOne<'msg, ::puroro::bumpalo::boxed::Box<'bump, T>>
+            where
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupOne<'msg, T>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
+            impl<'msg, 'bump, T> ::std::convert::From<GroupOne<'msg, T>>
+                for GroupOne<'msg, ::puroro::BumpaloOwned<T>>
+            where
+                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupOne<'msg, T>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
 
             pub enum GroupTwo<'msg, T>
             where
                 T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 G2F32(f32),
-                G2String(&'msg str),
-                G2Submsg(<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<'msg>),
+                G2String(<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'msg>),
+                G2Submsg(<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'msg>),
             }
 
             impl<'msg, T> GroupTwo<'msg, T>
@@ -2155,20 +2262,14 @@ pub mod _puroro_nested {
                         _ => None,
                     }
                 }
-                pub fn g2_string(self) -> ::std::option::Option<&'msg str> {
+                pub fn g2_string(self) -> ::std::option::Option<<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'msg>>{
                     match self {
                         Self::G2String(v) => ::std::option::Option::Some(v),
                         #[allow(unreachable_patterns)]
                         _ => None,
                     }
                 }
-                pub fn g2_submsg(
-                    self,
-                ) -> ::std::option::Option<
-                    <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
-                        'msg,
-                    >,
-                > {
+                pub fn g2_submsg(self) -> ::std::option::Option<<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'msg>>{
                     match self {
                         Self::G2Submsg(v) => ::std::option::Option::Some(v),
                         #[allow(unreachable_patterns)]
@@ -2180,17 +2281,24 @@ pub mod _puroro_nested {
             impl<'msg, T> ::std::fmt::Debug for GroupTwo<'msg, T>
             where
                 f32: ::std::fmt::Debug,
-                &'msg str: ::std::fmt::Debug,
-                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
-                    'msg,
-                >: ::std::fmt::Debug,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'msg>: ::std::fmt::Debug,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'msg>: ::std::fmt::Debug,
                 T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     match self {
-                        Self::G2F32(v) => f.debug_tuple("GroupTwo::G2F32").field(&v).finish(),
-                        Self::G2String(v) => f.debug_tuple("GroupTwo::G2String").field(&v).finish(),
-                        Self::G2Submsg(v) => f.debug_tuple("GroupTwo::G2Submsg").field(&v).finish(),
+                        Self::G2F32(v) => f
+                            .debug_tuple("GroupTwo::G2F32")
+                            .field(&v)
+                            .finish(),
+                        Self::G2String(v) => f
+                            .debug_tuple("GroupTwo::G2String")
+                            .field(&v)
+                            .finish(),
+                        Self::G2Submsg(v) => f
+                            .debug_tuple("GroupTwo::G2Submsg")
+                            .field(&v)
+                            .finish(),
                     }
                 }
             }
@@ -2198,17 +2306,21 @@ pub mod _puroro_nested {
             impl<'msg, T> ::std::clone::Clone for GroupTwo<'msg, T>
             where
                 f32: ::std::clone::Clone,
-                &'msg str: ::std::clone::Clone,
-                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
-                    'msg,
-                >: ::std::clone::Clone,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'msg>: ::std::clone::Clone,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'msg>: ::std::clone::Clone,
                 T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 fn clone(&self) -> Self {
                     match self {
-                        Self::G2F32(v) => Self::G2F32(::std::clone::Clone::clone(&v)),
-                        Self::G2String(v) => Self::G2String(::std::clone::Clone::clone(&v)),
-                        Self::G2Submsg(v) => Self::G2Submsg(::std::clone::Clone::clone(&v)),
+                        Self::G2F32(v) => Self::G2F32(
+                            ::std::clone::Clone::clone(&v)
+                        ),
+                        Self::G2String(v) => Self::G2String(
+                            ::std::clone::Clone::clone(&v)
+                        ),
+                        Self::G2Submsg(v) => Self::G2Submsg(
+                            ::std::clone::Clone::clone(&v)
+                        ),
                     }
                 }
             }
@@ -2216,10 +2328,8 @@ pub mod _puroro_nested {
             impl<'msg, T> ::std::cmp::PartialEq for GroupTwo<'msg, T>
             where
                 f32: ::std::cmp::PartialEq,
-                &'msg str: ::std::cmp::PartialEq,
-                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
-                    'msg,
-                >: ::std::cmp::PartialEq,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'msg>: ::std::cmp::PartialEq,
+                <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'msg>: ::std::cmp::PartialEq,
                 T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 fn eq(&self, rhs: &Self) -> bool {

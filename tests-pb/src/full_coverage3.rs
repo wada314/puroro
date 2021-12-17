@@ -302,14 +302,14 @@ pub mod _puroro_simple_impl {
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
-        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<Self::Field21ScalarGetterType<'this>> {
             if self.bytes_unlabeled.is_empty() {
                 ::std::option::Option::None
             } else {
                 ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
             }
         }
-        fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
             self.bytes_optional.as_ref().map(|v| v.as_ref())
         }
         type Field23RepeatedType<'this> = ::puroro::AsRefRepeatedField<
@@ -322,14 +322,16 @@ pub mod _puroro_simple_impl {
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.bytes_repeated)
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field31ScalarGetterType<'this>> {
             if self.string_unlabeled.is_empty() {
                 ::std::option::Option::None
             } else {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
-        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
         type Field33RepeatedType<'this> = ::puroro::AsRefRepeatedField<
@@ -367,11 +369,13 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field51ScalarGetterType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
@@ -1515,14 +1519,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1550,7 +1558,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1713,14 +1723,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1748,7 +1762,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1916,14 +1932,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -1951,7 +1971,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2121,14 +2143,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2156,7 +2182,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2320,14 +2348,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2355,7 +2387,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2523,14 +2557,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2558,7 +2596,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2720,20 +2760,26 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
         }
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2761,7 +2807,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2917,20 +2965,26 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_optional.as_ref())
         }
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -2958,7 +3012,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3133,7 +3189,9 @@ pub mod _puroro_impls {
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3161,7 +3219,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3325,18 +3385,24 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3364,7 +3430,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3522,18 +3590,24 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_optional.as_ref())
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3561,7 +3635,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3728,7 +3804,9 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3764,7 +3842,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3928,14 +4008,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -3971,7 +4055,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4129,14 +4215,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4172,7 +4262,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4339,14 +4431,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4378,7 +4474,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4545,14 +4643,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4572,7 +4674,7 @@ pub mod _puroro_impls {
 
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.submsg_unlabeled)
         }
         type Field52MessageType<'this>
@@ -4586,7 +4688,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4753,14 +4857,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4784,7 +4892,7 @@ pub mod _puroro_impls {
 
         fn submsg_optional_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.submsg_optional)
         }
         type Field53MessageType<'this>
@@ -4794,7 +4902,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -4970,14 +5080,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5176,14 +5290,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5211,7 +5329,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5375,14 +5495,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5410,7 +5534,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5583,14 +5709,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5618,7 +5748,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5783,14 +5915,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5818,7 +5954,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -5982,14 +6120,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6017,7 +6159,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6190,14 +6334,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6225,7 +6373,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6390,14 +6540,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6425,7 +6579,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6589,14 +6745,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6624,7 +6784,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6797,14 +6959,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6832,7 +6998,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -6997,14 +7165,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7032,7 +7204,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7196,14 +7370,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7231,7 +7409,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7404,14 +7584,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7439,7 +7623,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7604,14 +7790,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7639,7 +7829,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7803,14 +7995,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -7838,7 +8034,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8011,14 +8209,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8046,7 +8248,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8211,14 +8415,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8246,7 +8454,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8410,14 +8620,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8445,7 +8659,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8618,14 +8834,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8653,7 +8873,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8818,14 +9040,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -8853,7 +9079,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9017,14 +9245,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9052,7 +9284,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9225,14 +9459,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9260,7 +9498,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9425,14 +9665,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9460,7 +9704,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9624,14 +9870,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9659,7 +9909,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9832,14 +10084,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -9867,7 +10123,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10032,14 +10290,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10067,7 +10329,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10231,14 +10495,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10266,7 +10534,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10439,14 +10709,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10474,7 +10748,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10639,14 +10915,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10674,7 +10954,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10838,14 +11120,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -10873,7 +11159,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -11046,14 +11334,18 @@ pub mod _puroro_impls {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -11081,7 +11373,9 @@ pub mod _puroro_impls {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -12349,10 +12643,10 @@ pub mod _puroro_impls {
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
-        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<Self::Field21ScalarGetterType<'this>> {
             <Self>::bytes_unlabeled_opt(self)
         }
-        fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
             <Self>::bytes_optional_opt(self)
         }
 
@@ -12369,10 +12663,12 @@ pub mod _puroro_impls {
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.bytes_repeated)
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field31ScalarGetterType<'this>> {
             <Self>::string_unlabeled_opt(self)
         }
-        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
             <Self>::string_optional_opt(self)
         }
 
@@ -12414,11 +12710,13 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field51ScalarGetterType<'this>> {
             <Self>::submsg_unlabeled_opt(self)
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
-        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
             <Self>::submsg_optional_opt(self)
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
@@ -14240,11 +14538,7 @@ pub mod _puroro_traits {
         }
 
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field3RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field3RepeatedItemType<'this>: i32
+            + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
@@ -14272,75 +14566,95 @@ pub mod _puroro_traits {
         }
 
         type Field13RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field13RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field13RepeatedItemType<'this>: f32
+            + ::std::iter::IntoIterator<Item = f32>
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this>;
 
-        fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
+        type Field21ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_unlabeled<'this>(&'this self) -> Self::Field21ScalarGetterType<'this> {
             self.bytes_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_bytes_unlabeled<'this>(&'this self) -> bool {
             self.bytes_unlabeled_opt().is_some()
         }
-        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_optional<'this>(&'this self) -> &'this [u8] {
+        type Field22ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_optional<'this>(&'this self) -> Self::Field22ScalarGetterType<'this> {
             self.bytes_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_bytes_optional<'this>(&'this self) -> bool {
             self.bytes_optional_opt().is_some()
         }
-        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        type Field23RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field23RepeatedItemType>
+        type Field23ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
         where
             Self: 'this;
 
-        type Field23RepeatedItemType<'this>: ::std::convert::AsRef<[u8]>
+        type Field23RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = Self::Field23ScalarGetterType<'this>>
         where
             Self: 'this;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this>;
 
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
+        type Field31ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_unlabeled<'this>(&'this self) -> Self::Field31ScalarGetterType<'this> {
             self.string_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn string_optional<'this>(&'this self) -> &'this str {
+        type Field32ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_optional<'this>(&'this self) -> Self::Field32ScalarGetterType<'this> {
             self.string_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
         }
-        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        type Field33RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field33RepeatedItemType>
+        type Field33ScalarGetterType<'this>: ::std::convert::AsRef<str>
         where
             Self: 'this;
 
-        type Field33RepeatedItemType<'this>: ::std::convert::AsRef<str>
+        type Field33RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = Self::Field33ScalarGetterType<'this>>
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this>;
@@ -14372,21 +14686,17 @@ pub mod _puroro_traits {
         }
 
         type Field43RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field43RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field43RepeatedItemType<'this>: self::_puroro_root::full_coverage3::Enum
+            + ::std::iter::IntoIterator<Item = self::_puroro_root::full_coverage3::Enum>
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this>;
 
-        type Field51MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field51ScalarGetterType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
             self.submsg_unlabeled_opt()
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
@@ -14394,16 +14704,16 @@ pub mod _puroro_traits {
         }
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        type Field52MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field52ScalarGetterType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         fn submsg_optional<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
             self.submsg_optional_opt()
         }
         fn has_submsg_optional<'this>(&'this self) -> bool {
@@ -14411,19 +14721,15 @@ pub mod _puroro_traits {
         }
         fn submsg_optional_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        type Field53MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field53ScalarGetterType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         type Field53RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field53RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field53RepeatedItemType<'this>: Self::Field53MessageType<'this>
+            + ::std::iter::IntoIterator<Item = Self::Field53ScalarGetterType<'this>>
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this>;
@@ -14451,11 +14757,7 @@ pub mod _puroro_traits {
         }
 
         type Field103RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field103RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field103RepeatedItemType<'this>: i64
+            + ::std::iter::IntoIterator<Item = i64>
         where
             Self: 'this;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this>;
@@ -14483,11 +14785,7 @@ pub mod _puroro_traits {
         }
 
         type Field113RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field113RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field113RepeatedItemType<'this>: u32
+            + ::std::iter::IntoIterator<Item = u32>
         where
             Self: 'this;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this>;
@@ -14515,11 +14813,7 @@ pub mod _puroro_traits {
         }
 
         type Field123RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field123RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field123RepeatedItemType<'this>: u64
+            + ::std::iter::IntoIterator<Item = u64>
         where
             Self: 'this;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this>;
@@ -14547,11 +14841,7 @@ pub mod _puroro_traits {
         }
 
         type Field133RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field133RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field133RepeatedItemType<'this>: i32
+            + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this>;
@@ -14579,11 +14869,7 @@ pub mod _puroro_traits {
         }
 
         type Field143RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field143RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field143RepeatedItemType<'this>: i64
+            + ::std::iter::IntoIterator<Item = i64>
         where
             Self: 'this;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this>;
@@ -14611,11 +14897,7 @@ pub mod _puroro_traits {
         }
 
         type Field153RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field153RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field153RepeatedItemType<'this>: u32
+            + ::std::iter::IntoIterator<Item = u32>
         where
             Self: 'this;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this>;
@@ -14643,11 +14925,7 @@ pub mod _puroro_traits {
         }
 
         type Field163RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field163RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field163RepeatedItemType<'this>: u64
+            + ::std::iter::IntoIterator<Item = u64>
         where
             Self: 'this;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this>;
@@ -14675,11 +14953,7 @@ pub mod _puroro_traits {
         }
 
         type Field173RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field173RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field173RepeatedItemType<'this>: i32
+            + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this>;
@@ -14707,11 +14981,7 @@ pub mod _puroro_traits {
         }
 
         type Field183RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field183RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field183RepeatedItemType<'this>: i64
+            + ::std::iter::IntoIterator<Item = i64>
         where
             Self: 'this;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this>;
@@ -14739,11 +15009,7 @@ pub mod _puroro_traits {
         }
 
         type Field193RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field193RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field193RepeatedItemType<'this>: f64
+            + ::std::iter::IntoIterator<Item = f64>
         where
             Self: 'this;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this>;
@@ -14779,12 +15045,28 @@ pub mod _puroro_traits {
             fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
                 (**self).float_repeated()
             }
-            fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field21ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field21ScalarGetterType<'this>;
+            fn bytes_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
                 (**self).bytes_unlabeled_opt()
             }
-            fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field22ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field22ScalarGetterType<'this>;
+            fn bytes_optional_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
                 (**self).bytes_optional_opt()
             }
+            type Field23ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field23ScalarGetterType<'this>;
 
             type Field23RepeatedType<'this>
             where
@@ -14793,12 +15075,28 @@ pub mod _puroro_traits {
             fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
                 (**self).bytes_repeated()
             }
-            fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field31ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field31ScalarGetterType<'this>;
+            fn string_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
                 (**self).string_unlabeled_opt()
             }
-            fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field32ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field32ScalarGetterType<'this>;
+            fn string_optional_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
                 (**self).string_optional_opt()
             }
+            type Field33ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field33ScalarGetterType<'this>;
 
             type Field33RepeatedType<'this>
             where
@@ -14825,28 +15123,28 @@ pub mod _puroro_traits {
             fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
                 (**self).enum_repeated()
             }
-            type Field51MessageType<'this>
+            type Field51ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field51MessageType<'this>;
+            = <$ty>::Field51ScalarGetterType<'this>;
             fn submsg_unlabeled_opt<'this>(
                 &'this self,
-            ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+            ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
-            type Field52MessageType<'this>
+            type Field52ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field52MessageType<'this>;
+            = <$ty>::Field52ScalarGetterType<'this>;
             fn submsg_optional_opt<'this>(
                 &'this self,
-            ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+            ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
                 (**self).submsg_optional_opt()
             }
-            type Field53MessageType<'this>
+            type Field53ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field53MessageType<'this>;
+            = <$ty>::Field53ScalarGetterType<'this>;
 
             type Field53RepeatedType<'this>
             where
@@ -15050,14 +15348,18 @@ pub mod _puroro_traits {
         type Field23RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field33RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -15085,7 +15387,9 @@ pub mod _puroro_traits {
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
@@ -15209,11 +15513,11 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::float_repeated(&self.1),
             )
         }
-        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<Self::Field21ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_unlabeled_opt(&self.0))
         }
-        fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_optional_opt(&self.0))
         }
@@ -15231,11 +15535,13 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::bytes_repeated(&self.1),
             )
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field31ScalarGetterType<'this>> {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
         }
-        fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
             <U as MsgTrait>::string_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_optional_opt(&self.0))
         }
@@ -15286,7 +15592,9 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::Field51MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field51MessageType<'this>>,
         );
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field51ScalarGetterType<'this>> {
             match (
                 <T as MsgTrait>::submsg_unlabeled_opt(&self.0),
                 <U as MsgTrait>::submsg_unlabeled_opt(&self.1),
@@ -15304,7 +15612,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::Field52MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field52MessageType<'this>>,
         );
-        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
             match (
                 <T as MsgTrait>::submsg_optional_opt(&self.0),
                 <U as MsgTrait>::submsg_optional_opt(&self.1),
@@ -15616,13 +15924,17 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as MsgTrait>::float_repeated(u)),
             )
         }
-        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_unlabeled_opt(t),
                 |u| <U as MsgTrait>::bytes_unlabeled_opt(u),
             )
         }
-        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_optional_opt(t),
                 |u| <U as MsgTrait>::bytes_optional_opt(u),
@@ -15643,13 +15955,17 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as MsgTrait>::bytes_repeated(u)),
             )
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_unlabeled_opt(t),
                 |u| <U as MsgTrait>::string_unlabeled_opt(u),
             )
         }
-        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_optional_opt(t),
                 |u| <U as MsgTrait>::string_optional_opt(u),
@@ -15710,7 +16026,7 @@ pub mod _puroro_traits {
         >;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
@@ -15725,7 +16041,7 @@ pub mod _puroro_traits {
         >;
         fn submsg_optional_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::submsg_optional_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::submsg_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
@@ -16060,10 +16376,14 @@ pub mod _puroro_traits {
                 self.as_ref().map(|msg| msg.float_repeated()),
             )
         }
-        fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_unlabeled_opt())
         }
-        fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_optional_opt())
         }
 
@@ -16076,10 +16396,14 @@ pub mod _puroro_traits {
                 self.as_ref().map(|msg| msg.bytes_repeated()),
             )
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
-        fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_optional_opt())
         }
 
@@ -16118,7 +16442,7 @@ pub mod _puroro_traits {
         = T::Field51MessageType<'this>;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.submsg_unlabeled_opt())
         }
         type Field52MessageType<'this>
@@ -16127,7 +16451,7 @@ pub mod _puroro_traits {
         = T::Field52MessageType<'this>;
         fn submsg_optional_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.submsg_optional_opt())
         }
         type Field53MessageType<'this>

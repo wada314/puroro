@@ -130,7 +130,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::Test2Trait for Test2 {
-        fn b_opt<'this>(&'this self) -> Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
             if self.b.is_empty() {
                 ::std::option::Option::None
             } else {
@@ -240,7 +240,7 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_simple_impl::Test1;
-        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
@@ -670,7 +670,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.b.as_ref())
         }
     }
@@ -771,7 +771,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
-        fn b_opt<'this>(&'this self) -> Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
             <Self>::b_opt(self)
         }
     }
@@ -881,7 +881,7 @@ pub mod _puroro_impls {
             Self: 'this,
         = &'this ScalarType;
 
-        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.c)
         }
     }
@@ -1006,7 +1006,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'this>;
-        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
             <Self>::c_opt(self)
         }
     }
@@ -1399,21 +1399,31 @@ pub mod _puroro_traits {
     }
 
     pub trait Test2Trait {
-        fn b<'this>(&'this self) -> &'this str {
+        type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn b<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             self.b_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_b<'this>(&'this self) -> bool {
             self.b_opt().is_some()
         }
-        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
     }
 
     macro_rules! test2_delegate {
         ($ty:ty) => {
-            fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field2ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field2ScalarGetterType<'this>;
+            fn b_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
                 (**self).b_opt()
             }
         };
@@ -1459,7 +1469,7 @@ pub mod _puroro_traits {
         T: Test2Trait,
         U: Test2Trait,
     {
-        fn b_opt<'this>(&'this self) -> Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
             <U as Test2Trait>::b_opt(&self.1).or_else(|| <T as Test2Trait>::b_opt(&self.0))
         }
     }
@@ -1468,7 +1478,7 @@ pub mod _puroro_traits {
         T: Test2Trait,
         U: Test2Trait,
     {
-        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as Test2Trait>::b_opt(t),
                 |u| <U as Test2Trait>::b_opt(u),
@@ -1479,33 +1489,35 @@ pub mod _puroro_traits {
     where
         T: Test2Trait,
     {
-        fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.b_opt())
         }
     }
 
     pub trait Test3Trait {
-        type Field3MessageType<'this>: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+        type Field3ScalarGetterType<'this>: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
             where Self: 'this;
 
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             self.c_opt()
         }
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()
         }
-        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
     }
 
     macro_rules! test3_delegate {
         ($ty:ty) => {
-            type Field3MessageType<'this>
+            type Field3ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field3MessageType<'this>;
-            fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            = <$ty>::Field3ScalarGetterType<'this>;
+            fn c_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
                 (**self).c_opt()
             }
         };
@@ -1563,7 +1575,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
         );
-        fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
             match (
                 <T as Test3Trait>::c_opt(&self.0),
                 <U as Test3Trait>::c_opt(&self.1),
@@ -1587,7 +1599,7 @@ pub mod _puroro_traits {
             <T as Test3Trait>::Field3MessageType<'this>,
             <U as Test3Trait>::Field3MessageType<'this>,
         >;
-        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as Test3Trait>::c_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as Test3Trait>::c_opt(u).map(|u| ::puroro::Either::Right(u)),
@@ -1602,18 +1614,14 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = T::Field3MessageType<'this>;
-        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.c_opt())
         }
     }
 
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field4RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field4RepeatedItemType<'this>: i32
+            + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;

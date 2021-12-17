@@ -82,7 +82,7 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.f32_unlabeled.clone())
             }
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
             if self.string_unlabeled.is_empty() {
                 ::std::option::Option::None
             } else {
@@ -93,7 +93,7 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6ScalarGetterType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
@@ -756,7 +756,9 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
         type Field6MessageType<'this>
@@ -844,7 +846,7 @@ pub mod _puroro_impls {
 
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.submsg_unlabeled)
         }
     }
@@ -1111,14 +1113,14 @@ pub mod _puroro_impls {
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_unlabeled_opt(self)
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
             <Self>::string_unlabeled_opt(self)
         }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6ScalarGetterType<'this>> {
             <Self>::submsg_unlabeled_opt(self)
         }
     }
@@ -1608,11 +1610,7 @@ pub mod _puroro_traits {
         }
 
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field3RepeatedItemType>
-        where
-            Self: 'this;
-
-        type Field3RepeatedItemType<'this>: i32
+            + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
@@ -1628,23 +1626,29 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
 
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
+        type Field5ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.string_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        type Field6MessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+        type Field6ScalarGetterType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             self.submsg_unlabeled_opt()
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
@@ -1652,7 +1656,7 @@ pub mod _puroro_traits {
         }
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
     }
@@ -1676,16 +1680,22 @@ pub mod _puroro_traits {
             fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_unlabeled_opt()
             }
-            fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-                (**self).string_unlabeled_opt()
-            }
-            type Field6MessageType<'this>
+            type Field5ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field6MessageType<'this>;
+            = <$ty>::Field5ScalarGetterType<'this>;
+            fn string_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
+                (**self).string_unlabeled_opt()
+            }
+            type Field6ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field6ScalarGetterType<'this>;
             fn submsg_unlabeled_opt<'this>(
                 &'this self,
-            ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+            ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
         };
@@ -1769,7 +1779,7 @@ pub mod _puroro_traits {
             <U as MsgTrait>::f32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::f32_unlabeled_opt(&self.0))
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
         }
@@ -1780,7 +1790,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::Field6MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field6MessageType<'this>>,
         );
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6ScalarGetterType<'this>> {
             match (
                 <T as MsgTrait>::submsg_unlabeled_opt(&self.0),
                 <U as MsgTrait>::submsg_unlabeled_opt(&self.1),
@@ -1830,7 +1840,9 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::f32_unlabeled_opt(u),
             )
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_unlabeled_opt(t),
                 |u| <U as MsgTrait>::string_unlabeled_opt(u),
@@ -1845,7 +1857,7 @@ pub mod _puroro_traits {
         >;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
@@ -1875,7 +1887,9 @@ pub mod _puroro_traits {
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.f32_unlabeled_opt())
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
         type Field6MessageType<'this>
@@ -1884,7 +1898,7 @@ pub mod _puroro_traits {
         = T::Field6MessageType<'this>;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.submsg_unlabeled_opt())
         }
     }

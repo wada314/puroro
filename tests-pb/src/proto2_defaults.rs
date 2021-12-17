@@ -481,46 +481,48 @@ pub mod _puroro_simple_impl {
         fn bool_false_opt<'this>(&'this self) -> Option<bool> {
             Clone::clone(&self.bool_false)
         }
-        fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
             self.string_default.as_ref().map(|v| v.as_ref())
         }
-        fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
             self.string_empty.as_ref().map(|v| v.as_ref())
         }
-        fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
             self.string_abc.as_ref().map(|v| v.as_ref())
         }
-        fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
             self.string_aiu.as_ref().map(|v| v.as_ref())
         }
-        fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field75ScalarGetterType<'this>> {
             self.string_backslash.as_ref().map(|v| v.as_ref())
         }
-        fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
             self.string_tab.as_ref().map(|v| v.as_ref())
         }
-        fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
             self.string_crlf.as_ref().map(|v| v.as_ref())
         }
-        fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_default_opt<'this>(&'this self) -> Option<Self::Field81ScalarGetterType<'this>> {
             self.bytes_default.as_ref().map(|v| v.as_ref())
         }
-        fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_empty_opt<'this>(&'this self) -> Option<Self::Field82ScalarGetterType<'this>> {
             self.bytes_empty.as_ref().map(|v| v.as_ref())
         }
-        fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_abc_opt<'this>(&'this self) -> Option<Self::Field83ScalarGetterType<'this>> {
             self.bytes_abc.as_ref().map(|v| v.as_ref())
         }
-        fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_aiu_opt<'this>(&'this self) -> Option<Self::Field84ScalarGetterType<'this>> {
             self.bytes_aiu.as_ref().map(|v| v.as_ref())
         }
-        fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_backslash_opt<'this>(&'this self) -> Option<Self::Field85ScalarGetterType<'this>> {
             self.bytes_backslash.as_ref().map(|v| v.as_ref())
         }
-        fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_tab_opt<'this>(&'this self) -> Option<Self::Field86ScalarGetterType<'this>> {
             self.bytes_tab.as_ref().map(|v| v.as_ref())
         }
-        fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_crlf_opt<'this>(&'this self) -> Option<Self::Field87ScalarGetterType<'this>> {
             self.bytes_crlf.as_ref().map(|v| v.as_ref())
         }
         fn enum_default_opt<'this>(
@@ -4857,7 +4859,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_default.as_ref())
         }
     }
@@ -4927,7 +4931,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_empty.as_ref())
         }
     }
@@ -4997,7 +5003,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_abc.as_ref())
         }
     }
@@ -5065,7 +5073,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_aiu.as_ref())
         }
     }
@@ -5133,7 +5143,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_backslash.as_ref())
         }
     }
@@ -5203,7 +5215,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_tab.as_ref())
         }
     }
@@ -5271,7 +5285,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.string_crlf.as_ref())
         }
     }
@@ -5339,7 +5355,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_default.as_ref())
         }
     }
@@ -5409,7 +5427,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_empty.as_ref())
         }
     }
@@ -5477,7 +5497,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_abc.as_ref())
         }
     }
@@ -5545,7 +5567,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_aiu.as_ref())
         }
     }
@@ -5613,7 +5637,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_backslash.as_ref())
         }
     }
@@ -5683,7 +5709,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_tab.as_ref())
         }
     }
@@ -5751,7 +5779,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
             ::std::option::Option::Some(self.bytes_crlf.as_ref())
         }
     }
@@ -7956,46 +7986,48 @@ pub mod _puroro_impls {
         fn bool_false_opt<'this>(&'this self) -> Option<bool> {
             <Self>::bool_false_opt(self)
         }
-        fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
             <Self>::string_default_opt(self)
         }
-        fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
             <Self>::string_empty_opt(self)
         }
-        fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
             <Self>::string_abc_opt(self)
         }
-        fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
             <Self>::string_aiu_opt(self)
         }
-        fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field75ScalarGetterType<'this>> {
             <Self>::string_backslash_opt(self)
         }
-        fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
             <Self>::string_tab_opt(self)
         }
-        fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
             <Self>::string_crlf_opt(self)
         }
-        fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_default_opt<'this>(&'this self) -> Option<Self::Field81ScalarGetterType<'this>> {
             <Self>::bytes_default_opt(self)
         }
-        fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_empty_opt<'this>(&'this self) -> Option<Self::Field82ScalarGetterType<'this>> {
             <Self>::bytes_empty_opt(self)
         }
-        fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_abc_opt<'this>(&'this self) -> Option<Self::Field83ScalarGetterType<'this>> {
             <Self>::bytes_abc_opt(self)
         }
-        fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_aiu_opt<'this>(&'this self) -> Option<Self::Field84ScalarGetterType<'this>> {
             <Self>::bytes_aiu_opt(self)
         }
-        fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_backslash_opt<'this>(&'this self) -> Option<Self::Field85ScalarGetterType<'this>> {
             <Self>::bytes_backslash_opt(self)
         }
-        fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_tab_opt<'this>(&'this self) -> Option<Self::Field86ScalarGetterType<'this>> {
             <Self>::bytes_tab_opt(self)
         }
-        fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_crlf_opt<'this>(&'this self) -> Option<Self::Field87ScalarGetterType<'this>> {
             <Self>::bytes_crlf_opt(self)
         }
         fn enum_default_opt<'this>(
@@ -10273,146 +10305,230 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
 
-        fn string_default<'this>(&'this self) -> &'this str {
+        type Field71ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_default<'this>(&'this self) -> Self::Field71ScalarGetterType<'this> {
             self.string_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_string_default<'this>(&'this self) -> bool {
             self.string_default_opt().is_some()
         }
-        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn string_empty<'this>(&'this self) -> &'this str {
+        type Field72ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_empty<'this>(&'this self) -> Self::Field72ScalarGetterType<'this> {
             self.string_empty_opt().unwrap_or("")
         }
         fn has_string_empty<'this>(&'this self) -> bool {
             self.string_empty_opt().is_some()
         }
-        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn string_abc<'this>(&'this self) -> &'this str {
+        type Field73ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_abc<'this>(&'this self) -> Self::Field73ScalarGetterType<'this> {
             self.string_abc_opt().unwrap_or("abc")
         }
         fn has_string_abc<'this>(&'this self) -> bool {
             self.string_abc_opt().is_some()
         }
-        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn string_aiu<'this>(&'this self) -> &'this str {
+        type Field74ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_aiu<'this>(&'this self) -> Self::Field74ScalarGetterType<'this> {
             self.string_aiu_opt().unwrap_or("\u{3042}\u{3044}\u{3046}")
         }
         fn has_string_aiu<'this>(&'this self) -> bool {
             self.string_aiu_opt().is_some()
         }
-        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn string_backslash<'this>(&'this self) -> &'this str {
+        type Field75ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_backslash<'this>(&'this self) -> Self::Field75ScalarGetterType<'this> {
             self.string_backslash_opt().unwrap_or("\\")
         }
         fn has_string_backslash<'this>(&'this self) -> bool {
             self.string_backslash_opt().is_some()
         }
-        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn string_tab<'this>(&'this self) -> &'this str {
+        type Field76ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_tab<'this>(&'this self) -> Self::Field76ScalarGetterType<'this> {
             self.string_tab_opt().unwrap_or("\t")
         }
         fn has_string_tab<'this>(&'this self) -> bool {
             self.string_tab_opt().is_some()
         }
-        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn string_crlf<'this>(&'this self) -> &'this str {
+        type Field77ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where
+            Self: 'this;
+
+        fn string_crlf<'this>(&'this self) -> Self::Field77ScalarGetterType<'this> {
             self.string_crlf_opt().unwrap_or("\r\n")
         }
         fn has_string_crlf<'this>(&'this self) -> bool {
             self.string_crlf_opt().is_some()
         }
-        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+        type Field81ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_default<'this>(&'this self) -> Self::Field81ScalarGetterType<'this> {
             self.bytes_default_opt()
                 .unwrap_or_else(::std::default::Default::default)
         }
         fn has_bytes_default<'this>(&'this self) -> bool {
             self.bytes_default_opt().is_some()
         }
-        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+        type Field82ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_empty<'this>(&'this self) -> Self::Field82ScalarGetterType<'this> {
             self.bytes_empty_opt().unwrap_or(b"")
         }
         fn has_bytes_empty<'this>(&'this self) -> bool {
             self.bytes_empty_opt().is_some()
         }
-        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+        type Field83ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_abc<'this>(&'this self) -> Self::Field83ScalarGetterType<'this> {
             self.bytes_abc_opt().unwrap_or(b"\x61\x62\x63")
         }
         fn has_bytes_abc<'this>(&'this self) -> bool {
             self.bytes_abc_opt().is_some()
         }
-        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+        type Field84ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_aiu<'this>(&'this self) -> Self::Field84ScalarGetterType<'this> {
             self.bytes_aiu_opt()
                 .unwrap_or(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
         }
         fn has_bytes_aiu<'this>(&'this self) -> bool {
             self.bytes_aiu_opt().is_some()
         }
-        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+        type Field85ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_backslash<'this>(&'this self) -> Self::Field85ScalarGetterType<'this> {
             self.bytes_backslash_opt().unwrap_or(b"\x5c")
         }
         fn has_bytes_backslash<'this>(&'this self) -> bool {
             self.bytes_backslash_opt().is_some()
         }
-        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+        type Field86ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_tab<'this>(&'this self) -> Self::Field86ScalarGetterType<'this> {
             self.bytes_tab_opt().unwrap_or(b"\x09")
         }
         fn has_bytes_tab<'this>(&'this self) -> bool {
             self.bytes_tab_opt().is_some()
         }
-        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
-        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+        type Field87ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where
+            Self: 'this;
+
+        fn bytes_crlf<'this>(&'this self) -> Self::Field87ScalarGetterType<'this> {
             self.bytes_crlf_opt().unwrap_or(b"\x0d\x0a")
         }
         fn has_bytes_crlf<'this>(&'this self) -> bool {
             self.bytes_crlf_opt().is_some()
         }
-        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
 
@@ -10593,46 +10709,130 @@ pub mod _puroro_traits {
             fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).bool_false_opt()
             }
-            fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field71ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field71ScalarGetterType<'this>;
+            fn string_default_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
                 (**self).string_default_opt()
             }
-            fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field72ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field72ScalarGetterType<'this>;
+            fn string_empty_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
                 (**self).string_empty_opt()
             }
-            fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field73ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field73ScalarGetterType<'this>;
+            fn string_abc_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
                 (**self).string_abc_opt()
             }
-            fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field74ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field74ScalarGetterType<'this>;
+            fn string_aiu_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
                 (**self).string_aiu_opt()
             }
-            fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field75ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field75ScalarGetterType<'this>;
+            fn string_backslash_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
                 (**self).string_backslash_opt()
             }
-            fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field76ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field76ScalarGetterType<'this>;
+            fn string_tab_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
                 (**self).string_tab_opt()
             }
-            fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            type Field77ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field77ScalarGetterType<'this>;
+            fn string_crlf_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
                 (**self).string_crlf_opt()
             }
-            fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field81ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field81ScalarGetterType<'this>;
+            fn bytes_default_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
                 (**self).bytes_default_opt()
             }
-            fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field82ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field82ScalarGetterType<'this>;
+            fn bytes_empty_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
                 (**self).bytes_empty_opt()
             }
-            fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field83ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field83ScalarGetterType<'this>;
+            fn bytes_abc_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
                 (**self).bytes_abc_opt()
             }
-            fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field84ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field84ScalarGetterType<'this>;
+            fn bytes_aiu_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
                 (**self).bytes_aiu_opt()
             }
-            fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field85ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field85ScalarGetterType<'this>;
+            fn bytes_backslash_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
                 (**self).bytes_backslash_opt()
             }
-            fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field86ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field86ScalarGetterType<'this>;
+            fn bytes_tab_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
                 (**self).bytes_tab_opt()
             }
-            fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+            type Field87ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty>::Field87ScalarGetterType<'this>;
+            fn bytes_crlf_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
                 (**self).bytes_crlf_opt()
             }
             fn enum_default_opt<'this>(
@@ -10854,59 +11054,61 @@ pub mod _puroro_traits {
             <U as MsgTrait>::bool_false_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bool_false_opt(&self.0))
         }
-        fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
             <U as MsgTrait>::string_default_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_default_opt(&self.0))
         }
-        fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
             <U as MsgTrait>::string_empty_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_empty_opt(&self.0))
         }
-        fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
             <U as MsgTrait>::string_abc_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_abc_opt(&self.0))
         }
-        fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
             <U as MsgTrait>::string_aiu_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_aiu_opt(&self.0))
         }
-        fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field75ScalarGetterType<'this>> {
             <U as MsgTrait>::string_backslash_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_backslash_opt(&self.0))
         }
-        fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
             <U as MsgTrait>::string_tab_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_tab_opt(&self.0))
         }
-        fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
+        fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
             <U as MsgTrait>::string_crlf_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_crlf_opt(&self.0))
         }
-        fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_default_opt<'this>(&'this self) -> Option<Self::Field81ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_default_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_default_opt(&self.0))
         }
-        fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_empty_opt<'this>(&'this self) -> Option<Self::Field82ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_empty_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_empty_opt(&self.0))
         }
-        fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_abc_opt<'this>(&'this self) -> Option<Self::Field83ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_abc_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_abc_opt(&self.0))
         }
-        fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_aiu_opt<'this>(&'this self) -> Option<Self::Field84ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_aiu_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_aiu_opt(&self.0))
         }
-        fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_backslash_opt<'this>(&'this self) -> Option<Self::Field85ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_backslash_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_backslash_opt(&self.0))
         }
-        fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_tab_opt<'this>(&'this self) -> Option<Self::Field86ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_tab_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_tab_opt(&self.0))
         }
-        fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
+        fn bytes_crlf_opt<'this>(&'this self) -> Option<Self::Field87ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_crlf_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_crlf_opt(&self.0))
         }
@@ -11202,85 +11404,113 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::bool_false_opt(u),
             )
         }
-        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_default_opt(t),
                 |u| <U as MsgTrait>::string_default_opt(u),
             )
         }
-        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_empty_opt(t),
                 |u| <U as MsgTrait>::string_empty_opt(u),
             )
         }
-        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_abc_opt(t),
                 |u| <U as MsgTrait>::string_abc_opt(u),
             )
         }
-        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_aiu_opt(t),
                 |u| <U as MsgTrait>::string_aiu_opt(u),
             )
         }
-        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_backslash_opt(t),
                 |u| <U as MsgTrait>::string_backslash_opt(u),
             )
         }
-        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_tab_opt(t),
                 |u| <U as MsgTrait>::string_tab_opt(u),
             )
         }
-        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_crlf_opt(t),
                 |u| <U as MsgTrait>::string_crlf_opt(u),
             )
         }
-        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_default_opt(t),
                 |u| <U as MsgTrait>::bytes_default_opt(u),
             )
         }
-        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_empty_opt(t),
                 |u| <U as MsgTrait>::bytes_empty_opt(u),
             )
         }
-        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_abc_opt(t),
                 |u| <U as MsgTrait>::bytes_abc_opt(u),
             )
         }
-        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_aiu_opt(t),
                 |u| <U as MsgTrait>::bytes_aiu_opt(u),
             )
         }
-        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_backslash_opt(t),
                 |u| <U as MsgTrait>::bytes_backslash_opt(u),
             )
         }
-        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_tab_opt(t),
                 |u| <U as MsgTrait>::bytes_tab_opt(u),
             )
         }
-        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::bytes_crlf_opt(t),
                 |u| <U as MsgTrait>::bytes_crlf_opt(u),
@@ -11453,46 +11683,74 @@ pub mod _puroro_traits {
         fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             self.as_ref().and_then(|msg| msg.bool_false_opt())
         }
-        fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_default_opt())
         }
-        fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_empty_opt())
         }
-        fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_abc_opt())
         }
-        fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_aiu_opt())
         }
-        fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_backslash_opt())
         }
-        fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_tab_opt())
         }
-        fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+        fn string_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.string_crlf_opt())
         }
-        fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_default_opt())
         }
-        fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_empty_opt())
         }
-        fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_abc_opt())
         }
-        fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_aiu_opt())
         }
-        fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_backslash_opt())
         }
-        fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_tab_opt())
         }
-        fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
+        fn bytes_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.bytes_crlf_opt())
         }
         fn enum_default_opt<'this>(

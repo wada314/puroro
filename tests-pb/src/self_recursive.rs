@@ -37,7 +37,9 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
-        fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
+        fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field1ScalarGetterType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
@@ -169,7 +171,7 @@ pub mod _puroro_impls {
 
         fn recursive_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.recursive_unlabeled)
         }
     }
@@ -296,7 +298,9 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>;
-        fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
+        fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field1ScalarGetterType<'this>> {
             <Self>::recursive_unlabeled_opt(self)
         }
     }
@@ -393,13 +397,12 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
-        type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
-        where
-            Self: 'this;
+        type Field1ScalarGetterType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            where Self: 'this;
 
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             self.recursive_unlabeled_opt()
         }
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
@@ -407,20 +410,20 @@ pub mod _puroro_traits {
         }
         fn recursive_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             ::std::option::Option::None
         }
     }
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type Field1MessageType<'this>
+            type Field1ScalarGetterType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field1MessageType<'this>;
+            = <$ty>::Field1ScalarGetterType<'this>;
             fn recursive_unlabeled_opt<'this>(
                 &'this self,
-            ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+            ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
                 (**self).recursive_unlabeled_opt()
             }
         };
@@ -478,7 +481,9 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::Field1MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field1MessageType<'this>>,
         );
-        fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
+        fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field1ScalarGetterType<'this>> {
             match (
                 <T as MsgTrait>::recursive_unlabeled_opt(&self.0),
                 <U as MsgTrait>::recursive_unlabeled_opt(&self.1),
@@ -504,7 +509,7 @@ pub mod _puroro_traits {
         >;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::recursive_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::recursive_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
@@ -521,7 +526,7 @@ pub mod _puroro_traits {
         = T::Field1MessageType<'this>;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.recursive_unlabeled_opt())
         }
     }

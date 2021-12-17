@@ -1,11 +1,7 @@
 
 {%- let maybe_gp %}
 {%- if has_ld_field %}
-{%- if has_message_field %}
 {%- let maybe_gp = "<'msg, T>" %}
-{%- else %}
-{%- let maybe_gp = "<'msg>" %}
-{%- endif %}
 {%- else %}
 {%- let maybe_gp = "" %}
 {%- endif %}
@@ -13,10 +9,7 @@
 pub enum {{ enum_ident }}{{ maybe_gp }}
 {%- if has_ld_field %}
 where
-    {%- if has_message_field %}
     T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
-{%- else %}
 {%- endif %}
 {
     {%- for field in fields %}
@@ -27,9 +20,7 @@ where
 impl{{ maybe_gp }} {{ enum_ident }}{{ maybe_gp }}
 {%- if has_ld_field %}
 where
-    {%- if has_message_field %}
     T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
 {%- endif %}
 {
     {%- for field in fields %}
@@ -50,9 +41,7 @@ where
     {{ field.field_type }}: ::std::fmt::Debug,
     {%- endfor %} {#- for field in fields #}
     {%- if has_ld_field %}
-    {%- if has_message_field %}
     T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
     {%- endif %}
 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
@@ -73,9 +62,7 @@ where
     {{ field.field_type }}: ::std::clone::Clone,
     {%- endfor %} {#- for field in fields #}
     {%- if has_ld_field %}
-    {%- if has_message_field %}
     T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
     {%- endif %}
 {
     fn clone(&self) -> Self {
@@ -95,9 +82,7 @@ where
     {{ field.field_type }}: ::std::cmp::PartialEq,
     {%- endfor %} {#- for field in fields #}
     {%- if has_ld_field %}
-    {%- if has_message_field %}
     T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
     {%- endif %}
 {
     fn eq(&self, rhs: &Self) -> bool {
@@ -111,7 +96,7 @@ where
     }
 }
 
-{%- if has_message_field %}
+{%- if has_ld_field %}
 impl{{ maybe_gp }} ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
 for {{ enum_ident }}<'msg, &'_ T>
 where
@@ -127,7 +112,7 @@ where
 }
 {%- endif %}
 
-{%- if has_message_field %}
+{%- if has_ld_field %}
 impl{{ maybe_gp }} ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
 for {{ enum_ident }}<'msg, &'_ mut T>
 where
@@ -143,7 +128,7 @@ where
 }
 {%- endif %}
 
-{%- if has_message_field %}
+{%- if has_ld_field %}
 impl{{ maybe_gp }} ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
 for {{ enum_ident }}<'msg, ::std::boxed::Box<T>>
 where
@@ -159,7 +144,7 @@ where
 }
 {%- endif %}
 
-{%- if has_message_field %}
+{%- if has_ld_field %}
 impl<'msg, 'bump, T> ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
 for {{ enum_ident }}<'msg, ::puroro::bumpalo::boxed::Box<'bump, T>>
 where
@@ -175,7 +160,7 @@ where
 }
 {%- endif %}
 
-{%- if has_message_field %}
+{%- if has_ld_field %}
 impl<'msg, 'bump, T> ::std::convert::From<{{ enum_ident }}{{ maybe_gp }}>
 for {{ enum_ident }}<'msg, ::puroro::BumpaloOwned<T>>
 where

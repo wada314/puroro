@@ -5,9 +5,25 @@ pub trait {{ m.trait_ident }} {
     {%- if field.is_message %}
     {# &MyMessageImpl1 #}
     {# MyMessageImpl2 #} {# Some message impl may want to construct the child message in place and return by value #}
-    type Field{{ field.number }}MessageType<'this>: {{ field.trait_field_message_trait_path }}
+    type Field{{ field.number }}ScalarGetterType<'this>: {{ field.trait_field_message_trait_path }}
         where Self: 'this;
     {%- endif %} {#- if field.is_message #}
+
+    {%- if field.is_string %}
+    {# &&str #}
+    {# &str #}
+    {# &String #}
+    type Field{{ field.number }}ScalarGetterType<'this>: ::std::convert::AsRef<str>
+        where Self: 'this;
+    {%- endif %} {#- if field.is_string #}
+
+    {%- if field.is_bytes %}
+    {# &&[u8] #}
+    {# &[u8] #}
+    {# &Vec<u8> #}
+    type Field{{ field.number }}ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
+        where Self: 'this;
+    {%- endif %} {#- if field.is_bytes #}
 
     {%- if field.is_repeated %}
 
@@ -16,12 +32,11 @@ pub trait {{ m.trait_ident }} {
     {# &[String] #}
     {# &[puroro::NoAllocString] #}
     {# &[&str] #}
-    {# impl Iterator<Item = impl Deref<Target = str>> #}
-    {# &[i32] #}
-    {# iter::repeat(&5).take(3) #}
+    {# impl Iterator<Item = impl AsRef<str>> #}
+    {# iter::repeat(5).take(3) #}
     type Field{{ field.number }}RepeatedType<'this>:
         ::puroro::RepeatedField<'this>
-        + ::std::iter::IntoIterator<Item = {# TODO #}>
+        + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>
     where Self: 'this;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
 
@@ -37,8 +52,8 @@ pub trait {{ m.trait_ident }} {
     {%- else %}
     {# &str #}
     {# &i32 #}
-    {# Deref<Target = str> #} {# Some impl may want to construct the string in-place and return by value #}
-    {# Deref<Target = i32> #} {# ditto. #}
+    {# String #} {# Some impl may want to construct the string in-place and return by value #}
+    {# Vec<i32> #} {# ditto. #}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
         {%- if field.has_default_value %}
         self.{{ field.ident_unesc }}_opt().unwrap_or({{ field.default_value }})
@@ -68,12 +83,10 @@ pub trait {{ m.trait_ident }} {
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
             <'this, Self>
-            {%- else %}
+            {%- else %} {#- if oneof.has_ld_field #}
             <'this>
-            {%- endif %}
-            {%- endif %}
+            {%- endif %} {#- if oneof.has_ld_field #}
         >
     {
         ::std::option::Option::None
@@ -91,15 +104,16 @@ pub trait {{ m.trait_ident }} {
             }
         })
     }
-    {%- endfor %}
-    {%- endfor %}
+    {%- endfor %} {#- for field in oneof.fields #}
+
+    {%- endfor %} {#- for field in m.fields #}
 }
 
 macro_rules! {{ m.trait_delegate_macro_ident }} {
     ($ty:ty) => {
         {%- for field in m.fields %}
-        {%- if field.is_message %}
-        type Field{{ field.number }}MessageType<'this> where Self: 'this = <$ty>::Field{{ field.number }}MessageType<'this>;
+        {%- if field.is_length_delimited %}
+        type Field{{ field.number }}ScalarGetterType<'this> where Self: 'this = <$ty>::Field{{ field.number }}ScalarGetterType<'this>;
         {%- endif %}
 
         {%- if field.is_repeated %}
@@ -119,7 +133,7 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
 
         {%- endif %} {#- if field.is_repeated #}
 
-        {%- endfor %}
+        {%- endfor %} {#- for field in m.fields #}
 
         {%- for oneof in m.oneofs %}
         fn {{ oneof.field_ident }}<'this>(&'this self) ->
