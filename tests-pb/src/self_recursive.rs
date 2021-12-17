@@ -417,14 +417,13 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type Field1ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field1ScalarGetterType<'this>;
-            fn recursive_unlabeled_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            type Field1ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field1ScalarGetterType<'this>;
+            fn recursive_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
                 (**self).recursive_unlabeled_opt()
+            }
+            fn field_recursive_unlabeled_default_value() -> <$ty as MsgTrait>::Field1ScalarGetterType {
+                <$ty as MsgTrait>::recursive_unlabeled_default_value()
             }
         };
     }

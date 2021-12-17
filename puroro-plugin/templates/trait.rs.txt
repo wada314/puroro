@@ -45,10 +45,6 @@ pub trait {{ m.trait_ident }} {
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
 
     {%- else %} {#- if field.is_repeated #}
-    
-    {%- if field.is_length_delimited && field.has_default_value %}
-    const FIELD_{{ field.number }}_DEFAULT_VALUE: Field{{ field.number }}ScalarGetterType<'static>;
-    {%- endif %} {#- if field.is_length_delimited && field.has_default_value #}
 
     {# &MyMessageImpl1 #}
     {# MyMessageImpl2 #}
@@ -57,16 +53,16 @@ pub trait {{ m.trait_ident }} {
     {# Vec<i32> #} {# ditto. #}
     {# i32 #} {# The numerical types are returned by value, not by ref. #}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-        {%- if field.has_default_value %}
         {%- if field.is_length_delimited %}
-        self.{{ field.ident_unesc }}_opt().unwrap_or(Self::FIELD_{{ field.number }}_DEFAULT_VALUE)
+        self.{{ field.ident_unesc }}_opt().unwrap_or(Self::{{ field.ident_unesc }}_default_value())
         {%- else %} {#- if field.is_length_delimited #}
         self.{{ field.ident_unesc }}_opt().unwrap_or({{ field.default_value }})
         {%- endif %} {#- if field.is_length_delimited #}
-        {%- else %} {#- if field.has_default_value #}
-        self.{{ field.ident_unesc }}_opt().unwrap_or_else(::std::default::Default::default)
-        {%- endif %} {#- if field.has_default_value #}
     }
+    
+    {%- if field.is_length_delimited && field.has_default_value %}
+    fn {{ field.ident_unesc }}_default_value() -> Field{{ field.number }}ScalarGetterType<'static>;
+    {%- endif %} {#- if field.is_length_delimited && field.has_default_value #}
 
     fn has_{{ field.ident_unesc }}<'this>(&'this self) -> bool {
         self.{{ field.ident_unesc }}_opt().is_some()
@@ -133,15 +129,17 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
 
         {%- else %} {#- if field.is_repeated #}
 
-        {%- if field.is_length_delimited && field.has_default_value %}
-        const FIELD_{{ field.number }}_DEFAULT_VALUE = <$ty as {{ m.trait_ident }}>::FIELD_{{ field.number }}_DEFAULT_VALUE;
-        {%- endif %} {#- if field.is_length_delimited && field.has_default_value #}
-
         {%- if !field.is_explicit_oneof_field %}
         fn {{ field.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
             (**self).{{ field.ident_unesc }}_opt()
         }
         {%- endif %}
+
+        {%- if field.is_length_delimited %}
+        fn field_{{ field.ident_unesc }}_default_value() -> <$ty as {{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType {
+            <$ty as {{ m.trait_ident }}>::{{ field.ident_unesc }}_default_value()
+        }
+        {%- endif %} {#- if field.is_length_delimited #}
 
         {%- endif %} {#- if field.is_repeated #}
 

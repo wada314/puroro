@@ -1760,14 +1760,23 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty as MsgTrait>::Field2ScalarGetterType<'this>;
+            fn field_g1_string_default_value() -> <$ty as MsgTrait>::Field2ScalarGetterType {
+                <$ty as MsgTrait>::g1_string_default_value()
+            }
             type Field4ScalarGetterType<'this>
             where
                 Self: 'this,
             = <$ty as MsgTrait>::Field4ScalarGetterType<'this>;
+            fn field_g2_string_default_value() -> <$ty as MsgTrait>::Field4ScalarGetterType {
+                <$ty as MsgTrait>::g2_string_default_value()
+            }
             type Field5ScalarGetterType<'this>
             where
                 Self: 'this,
             = <$ty as MsgTrait>::Field5ScalarGetterType<'this>;
+            fn field_g2_submsg_default_value() -> <$ty as MsgTrait>::Field5ScalarGetterType {
+                <$ty as MsgTrait>::g2_submsg_default_value()
+            }
             fn group_one<'this>(
                 &'this self,
             ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>

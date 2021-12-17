@@ -2756,6 +2756,9 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
                 (**self).string_unlabeled_opt()
             }
+            fn field_string_unlabeled_default_value() -> <$ty as MsgTrait>::Field5ScalarGetterType {
+                <$ty as MsgTrait>::string_unlabeled_default_value()
+            }
             type Field6ScalarGetterType<'this>
             where
                 Self: 'this,
@@ -2776,6 +2779,9 @@ pub mod _puroro_traits {
                 &'this self,
             ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
                 (**self).submsg_unlabeled_opt()
+            }
+            fn field_submsg_unlabeled_default_value() -> <$ty as MsgTrait>::Field7ScalarGetterType {
+                <$ty as MsgTrait>::submsg_unlabeled_default_value()
             }
             type Field8ScalarGetterType<'this>
             where

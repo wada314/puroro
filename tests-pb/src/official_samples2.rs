@@ -1431,6 +1431,9 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
                 (**self).b_opt()
             }
+            fn field_b_default_value() -> <$ty as Test2Trait>::Field2ScalarGetterType {
+                <$ty as Test2Trait>::b_default_value()
+            }
         };
     }
 
@@ -1526,6 +1529,9 @@ pub mod _puroro_traits {
                 &'this self,
             ) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
                 (**self).c_opt()
+            }
+            fn field_c_default_value() -> <$ty as Test3Trait>::Field3ScalarGetterType {
+                <$ty as Test3Trait>::c_default_value()
             }
         };
     }

@@ -15080,6 +15080,9 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
                 (**self).bytes_unlabeled_opt()
             }
+            fn field_bytes_unlabeled_default_value() -> <$ty as MsgTrait>::Field21ScalarGetterType {
+                <$ty as MsgTrait>::bytes_unlabeled_default_value()
+            }
             type Field22ScalarGetterType<'this>
             where
                 Self: 'this,
@@ -15088,6 +15091,9 @@ pub mod _puroro_traits {
                 &'this self,
             ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
                 (**self).bytes_optional_opt()
+            }
+            fn field_bytes_optional_default_value() -> <$ty as MsgTrait>::Field22ScalarGetterType {
+                <$ty as MsgTrait>::bytes_optional_default_value()
             }
             type Field23ScalarGetterType<'this>
             where
@@ -15110,6 +15116,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
                 (**self).string_unlabeled_opt()
             }
+            fn field_string_unlabeled_default_value() -> <$ty as MsgTrait>::Field31ScalarGetterType
+            {
+                <$ty as MsgTrait>::string_unlabeled_default_value()
+            }
             type Field32ScalarGetterType<'this>
             where
                 Self: 'this,
@@ -15118,6 +15128,9 @@ pub mod _puroro_traits {
                 &'this self,
             ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
                 (**self).string_optional_opt()
+            }
+            fn field_string_optional_default_value() -> <$ty as MsgTrait>::Field32ScalarGetterType {
+                <$ty as MsgTrait>::string_optional_default_value()
             }
             type Field33ScalarGetterType<'this>
             where
@@ -15158,6 +15171,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
+            fn field_submsg_unlabeled_default_value() -> <$ty as MsgTrait>::Field51ScalarGetterType
+            {
+                <$ty as MsgTrait>::submsg_unlabeled_default_value()
+            }
             type Field52ScalarGetterType<'this>
             where
                 Self: 'this,
@@ -15166,6 +15183,9 @@ pub mod _puroro_traits {
                 &'this self,
             ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
                 (**self).submsg_optional_opt()
+            }
+            fn field_submsg_optional_default_value() -> <$ty as MsgTrait>::Field52ScalarGetterType {
+                <$ty as MsgTrait>::submsg_optional_default_value()
             }
             type Field53ScalarGetterType<'this>
             where
