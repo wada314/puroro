@@ -186,7 +186,7 @@ struct Field {
     has_optional_bit: bool,
     bitfield_index: i32,
     trait_scalar_getter_type: String,
-    trait_maybe_field_message_trait_path: Option<String>,
+    trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
     simple_field_type: String,
@@ -208,11 +208,11 @@ struct Field {
 
 impl Field {
     fn try_new(f: &wrappers::Field, bitfield_index: &mut i32) -> Result<Self> {
-        let trait_maybe_field_message_trait_path =
+        let trait_field_message_trait_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_trait_path())
+                upgrade(&m)?.rust_trait_path()
             } else {
-                None
+                "".to_string()
             };
         let simple_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
@@ -266,7 +266,7 @@ impl Field {
                 }
             },
             trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
-            trait_maybe_field_message_trait_path,
+            trait_field_message_trait_path,
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
                     "<Self as super::_puroro_traits::{trait_ident}>::Field{number}MessageType<'_>",

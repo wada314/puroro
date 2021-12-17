@@ -2,14 +2,12 @@
 pub trait {{ m.trait_ident }} {
     {%- for field in m.fields %}
 
-    {%- match field.trait_maybe_field_message_trait_path %}
-    {%- when Some with (field_msg_path) %}
+    {%- if field.is_message %}
     {# &MyMessageImpl1 #}
     {# MyMessageImpl2 #} {# Some message impl may want to construct the child message in place and return by value #}
-    type Field{{ field.number }}MessageType<'this>: {{ field_msg_path }}
+    type Field{{ field.number }}MessageType<'this>: {{ field.trait_field_message_trait_path }}
         where Self: 'this;
-    {%- else %}
-    {%- endmatch %}
+    {%- endif %} {#- if field.is_message #}
 
     {%- if field.is_repeated %}
 
