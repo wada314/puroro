@@ -23,17 +23,7 @@ pub trait {{ m.trait_ident }} {
     {# iter::repeat(&5).take(3) #}
     type Field{{ field.number }}RepeatedType<'this>:
         ::puroro::RepeatedField<'this>
-        + ::std::iter::IntoIterator<Item = Self::Field{{ field.number }}RepeatedItemType>
-    where Self: 'this;
-    {# &MyMessageImpl1 #}
-    {# MyMessageImpl2 #}
-    {# &String #}
-    {# &&str #}
-    {# impl Deref<Target = str> #}
-    {# &::puroro::NoAllocString #}
-    {# &i32 #}
-    type Field{{ field.number }}RepeatedItemType<'this>: 
-        ::std::ops::Deref<Target = {{ field.trait_rep_item_type }}>
+        + ::std::iter::IntoIterator<Item = {# TODO #}>
     where Self: 'this;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
 

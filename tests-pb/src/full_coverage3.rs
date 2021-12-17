@@ -14227,6 +14227,7 @@ pub mod _puroro_traits {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
+
         fn i32_optional<'this>(&'this self) -> i32 {
             self.i32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14239,14 +14240,15 @@ pub mod _puroro_traits {
         }
 
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field3RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field3RepeatedItemType>
         where
             Self: 'this;
 
-        type Field3RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
+        type Field3RepeatedItemType<'this>: i32
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
+
         fn float_unlabeled<'this>(&'this self) -> f32 {
             self.float_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14257,6 +14259,7 @@ pub mod _puroro_traits {
         fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
+
         fn float_optional<'this>(&'this self) -> f32 {
             self.float_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14269,14 +14272,15 @@ pub mod _puroro_traits {
         }
 
         type Field13RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field13RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field13RepeatedItemType>
         where
             Self: 'this;
 
-        type Field13RepeatedItemRefType<'this>: ::std::ops::Deref<Target = f32>
+        type Field13RepeatedItemType<'this>: f32
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this>;
+
         fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
             self.bytes_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14287,6 +14291,7 @@ pub mod _puroro_traits {
         fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
+
         fn bytes_optional<'this>(&'this self) -> &'this [u8] {
             self.bytes_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14299,14 +14304,15 @@ pub mod _puroro_traits {
         }
 
         type Field23RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field23RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field23RepeatedItemType>
         where
             Self: 'this;
 
-        type Field23RepeatedItemRefType<'this>: ::std::ops::Deref<Target = [u8]>
+        type Field23RepeatedItemType<'this>: ::std::convert::AsRef<[u8]>
         where
             Self: 'this;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this>;
+
         fn string_unlabeled<'this>(&'this self) -> &'this str {
             self.string_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14317,6 +14323,7 @@ pub mod _puroro_traits {
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
+
         fn string_optional<'this>(&'this self) -> &'this str {
             self.string_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14329,14 +14336,15 @@ pub mod _puroro_traits {
         }
 
         type Field33RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field33RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field33RepeatedItemType>
         where
             Self: 'this;
 
-        type Field33RepeatedItemRefType<'this>: ::std::ops::Deref<Target = str>
+        type Field33RepeatedItemType<'this>: ::std::convert::AsRef<str>
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this>;
+
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             self.enum_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14349,6 +14357,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
             ::std::option::Option::None
         }
+
         fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             self.enum_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14363,18 +14372,18 @@ pub mod _puroro_traits {
         }
 
         type Field43RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field43RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field43RepeatedItemType>
         where
             Self: 'this;
 
-        type Field43RepeatedItemRefType<'this>: ::std::ops::Deref<
-            Target = self::_puroro_root::full_coverage3::Enum,
-        >
+        type Field43RepeatedItemType<'this>: self::_puroro_root::full_coverage3::Enum
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this>;
+
         type Field51MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
+
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
@@ -14388,8 +14397,10 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
             ::std::option::Option::None
         }
+
         type Field52MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
+
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
@@ -14403,20 +14414,20 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
             ::std::option::Option::None
         }
+
         type Field53MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         type Field53RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field53RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field53RepeatedItemType>
         where
             Self: 'this;
 
-        type Field53RepeatedItemRefType<'this>: ::std::ops::Deref<
-            Target = Self::Field53MessageType<'this>,
-        >
+        type Field53RepeatedItemType<'this>: Self::Field53MessageType<'this>
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this>;
+
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             self.i64_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14427,6 +14438,7 @@ pub mod _puroro_traits {
         fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
+
         fn i64_optional<'this>(&'this self) -> i64 {
             self.i64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14439,14 +14451,15 @@ pub mod _puroro_traits {
         }
 
         type Field103RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field103RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field103RepeatedItemType>
         where
             Self: 'this;
 
-        type Field103RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i64>
+        type Field103RepeatedItemType<'this>: i64
         where
             Self: 'this;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this>;
+
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             self.u32_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14457,6 +14470,7 @@ pub mod _puroro_traits {
         fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
+
         fn u32_optional<'this>(&'this self) -> u32 {
             self.u32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14469,14 +14483,15 @@ pub mod _puroro_traits {
         }
 
         type Field113RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field113RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field113RepeatedItemType>
         where
             Self: 'this;
 
-        type Field113RepeatedItemRefType<'this>: ::std::ops::Deref<Target = u32>
+        type Field113RepeatedItemType<'this>: u32
         where
             Self: 'this;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this>;
+
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             self.u64_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14487,6 +14502,7 @@ pub mod _puroro_traits {
         fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
+
         fn u64_optional<'this>(&'this self) -> u64 {
             self.u64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14499,14 +14515,15 @@ pub mod _puroro_traits {
         }
 
         type Field123RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field123RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field123RepeatedItemType>
         where
             Self: 'this;
 
-        type Field123RepeatedItemRefType<'this>: ::std::ops::Deref<Target = u64>
+        type Field123RepeatedItemType<'this>: u64
         where
             Self: 'this;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this>;
+
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             self.s32_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14517,6 +14534,7 @@ pub mod _puroro_traits {
         fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
+
         fn s32_optional<'this>(&'this self) -> i32 {
             self.s32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14529,14 +14547,15 @@ pub mod _puroro_traits {
         }
 
         type Field133RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field133RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field133RepeatedItemType>
         where
             Self: 'this;
 
-        type Field133RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
+        type Field133RepeatedItemType<'this>: i32
         where
             Self: 'this;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this>;
+
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             self.s64_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14547,6 +14566,7 @@ pub mod _puroro_traits {
         fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
+
         fn s64_optional<'this>(&'this self) -> i64 {
             self.s64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14559,14 +14579,15 @@ pub mod _puroro_traits {
         }
 
         type Field143RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field143RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field143RepeatedItemType>
         where
             Self: 'this;
 
-        type Field143RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i64>
+        type Field143RepeatedItemType<'this>: i64
         where
             Self: 'this;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this>;
+
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             self.fixed32_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14577,6 +14598,7 @@ pub mod _puroro_traits {
         fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
+
         fn fixed32_optional<'this>(&'this self) -> u32 {
             self.fixed32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14589,14 +14611,15 @@ pub mod _puroro_traits {
         }
 
         type Field153RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field153RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field153RepeatedItemType>
         where
             Self: 'this;
 
-        type Field153RepeatedItemRefType<'this>: ::std::ops::Deref<Target = u32>
+        type Field153RepeatedItemType<'this>: u32
         where
             Self: 'this;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this>;
+
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             self.fixed64_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14607,6 +14630,7 @@ pub mod _puroro_traits {
         fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
+
         fn fixed64_optional<'this>(&'this self) -> u64 {
             self.fixed64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14619,14 +14643,15 @@ pub mod _puroro_traits {
         }
 
         type Field163RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field163RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field163RepeatedItemType>
         where
             Self: 'this;
 
-        type Field163RepeatedItemRefType<'this>: ::std::ops::Deref<Target = u64>
+        type Field163RepeatedItemType<'this>: u64
         where
             Self: 'this;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this>;
+
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             self.sfixed32_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14637,6 +14662,7 @@ pub mod _puroro_traits {
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
+
         fn sfixed32_optional<'this>(&'this self) -> i32 {
             self.sfixed32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14649,14 +14675,15 @@ pub mod _puroro_traits {
         }
 
         type Field173RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field173RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field173RepeatedItemType>
         where
             Self: 'this;
 
-        type Field173RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
+        type Field173RepeatedItemType<'this>: i32
         where
             Self: 'this;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this>;
+
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             self.sfixed64_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14667,6 +14694,7 @@ pub mod _puroro_traits {
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
+
         fn sfixed64_optional<'this>(&'this self) -> i64 {
             self.sfixed64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14679,14 +14707,15 @@ pub mod _puroro_traits {
         }
 
         type Field183RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field183RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field183RepeatedItemType>
         where
             Self: 'this;
 
-        type Field183RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i64>
+        type Field183RepeatedItemType<'this>: i64
         where
             Self: 'this;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this>;
+
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             self.f64_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14697,6 +14726,7 @@ pub mod _puroro_traits {
         fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             ::std::option::Option::None
         }
+
         fn f64_optional<'this>(&'this self) -> f64 {
             self.f64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14709,11 +14739,11 @@ pub mod _puroro_traits {
         }
 
         type Field193RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field193RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field193RepeatedItemType>
         where
             Self: 'this;
 
-        type Field193RepeatedItemRefType<'this>: ::std::ops::Deref<Target = f64>
+        type Field193RepeatedItemType<'this>: f64
         where
             Self: 'this;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this>;
@@ -16843,6 +16873,7 @@ pub mod _puroro_nested {
                 fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
+
                 fn i64_unlabeled<'this>(&'this self) -> i64 {
                     self.i64_unlabeled_opt()
                         .unwrap_or_else(::std::default::Default::default)

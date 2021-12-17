@@ -1489,6 +1489,7 @@ pub mod _puroro_traits {
     pub trait Test3Trait {
         type Field3MessageType<'this>: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             where Self: 'this;
+
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.c_opt()
         }
@@ -1610,11 +1611,11 @@ pub mod _puroro_traits {
 
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field4RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field4RepeatedItemType>
         where
             Self: 'this;
 
-        type Field4RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
+        type Field4RepeatedItemType<'this>: i32
         where
             Self: 'this;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;

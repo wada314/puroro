@@ -396,6 +396,7 @@ pub mod _puroro_traits {
         type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
         where
             Self: 'this;
+
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1MessageType<'this>> {

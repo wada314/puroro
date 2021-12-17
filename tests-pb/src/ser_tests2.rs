@@ -2605,14 +2605,15 @@ pub mod _puroro_traits {
         }
 
         type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field2RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field2RepeatedItemType>
         where
             Self: 'this;
 
-        type Field2RepeatedItemRefType<'this>: ::std::ops::Deref<Target = i32>
+        type Field2RepeatedItemType<'this>: i32
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
+
         fn float_optional<'this>(&'this self) -> f32 {
             self.float_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2625,14 +2626,15 @@ pub mod _puroro_traits {
         }
 
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field4RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field4RepeatedItemType>
         where
             Self: 'this;
 
-        type Field4RepeatedItemRefType<'this>: ::std::ops::Deref<Target = f32>
+        type Field4RepeatedItemType<'this>: f32
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
+
         fn string_optional<'this>(&'this self) -> &'this str {
             self.string_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2645,16 +2647,18 @@ pub mod _puroro_traits {
         }
 
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field6RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field6RepeatedItemType>
         where
             Self: 'this;
 
-        type Field6RepeatedItemRefType<'this>: ::std::ops::Deref<Target = str>
+        type Field6RepeatedItemType<'this>: ::std::convert::AsRef<str>
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
+
         type Field7MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
+
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
@@ -2668,20 +2672,20 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::option::Option::None
         }
+
         type Field8MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field8RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field8RepeatedItemType>
         where
             Self: 'this;
 
-        type Field8RepeatedItemRefType<'this>: ::std::ops::Deref<
-            Target = Self::Field8MessageType<'this>,
-        >
+        type Field8RepeatedItemType<'this>: Self::Field8MessageType<'this>
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
+
         fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
             self.enum_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2696,16 +2700,15 @@ pub mod _puroro_traits {
         }
 
         type Field10RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field10RepeatedItemRefType>
+            + ::std::iter::IntoIterator<Item = Self::Field10RepeatedItemType>
         where
             Self: 'this;
 
-        type Field10RepeatedItemRefType<'this>: ::std::ops::Deref<
-            Target = self::_puroro_root::ser_tests2::Enum,
-        >
+        type Field10RepeatedItemType<'this>: self::_puroro_root::ser_tests2::Enum
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;
+
         fn very_large_field_number<'this>(&'this self) -> i32 {
             self.very_large_field_number_opt()
                 .unwrap_or_else(::std::default::Default::default)

@@ -669,21 +669,6 @@ impl Field {
         })
     }
 
-    pub fn trait_rep_item_type(&self) -> Result<Cow<'static, str>> {
-        use FieldTypeCategories::*;
-        use LdFieldType::*;
-        Ok(match self.field_type()?.categories()? {
-            LengthDelimited(String) => "str".into(),
-            LengthDelimited(Bytes) => "[u8]".into(),
-            LengthDelimited(Message(_)) => format!(
-                "Self::Field{number}MessageType<'this>",
-                number = self.number(),
-            )
-            .into(),
-            Trivial(field_type) => field_type.rust_type_name()?.into(),
-        })
-    }
-
     pub fn maybe_trait_scalar_getter_type_borrowed(
         &self,
         impl_name: &str,
