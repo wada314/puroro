@@ -289,7 +289,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::Test3Trait>::Field3MessageType<'_>,
+                    <Self as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::Test3Trait>::c_opt(self),

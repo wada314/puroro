@@ -84,7 +84,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),

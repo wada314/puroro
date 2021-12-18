@@ -267,7 +267,7 @@ impl Field {
             trait_field_message_trait_path,
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
-                    "<Self as super::_puroro_traits::{trait_ident}>::Field{number}MessageType<'_>",
+                    "<Self as super::_puroro_traits::{trait_ident}>::Field{number}ScalarGetterType<'_>",
                     trait_ident = f.message()?.rust_trait_ident(),
                     number = f.number(),
                 ))

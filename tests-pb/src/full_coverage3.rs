@@ -856,7 +856,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::Field51ScalarGetterType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
@@ -866,7 +866,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::Field52ScalarGetterType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
@@ -876,7 +876,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field53MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::Field53ScalarGetterType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),

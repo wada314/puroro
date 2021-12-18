@@ -301,7 +301,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
