@@ -1316,8 +1316,7 @@ pub mod _puroro_traits {
 
     pub trait Test1Trait {
         fn a<'this>(&'this self) -> i32 {
-            self.a_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.a_opt().unwrap_or(::std::default::Default::default())
         }
 
         fn has_a<'this>(&'this self) -> bool {
@@ -1408,8 +1407,7 @@ pub mod _puroro_traits {
             Self: 'this;
 
         fn b<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
-            self.b_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.b_opt().unwrap_or(Self::b_default_value())
         }
 
         fn has_b<'this>(&'this self) -> bool {
@@ -1507,8 +1505,7 @@ pub mod _puroro_traits {
             where Self: 'this;
 
         fn c<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
-            self.c_opt()
-                .unwrap_or_else(::std::default::Default::default)
+            self.c_opt().unwrap_or(Self::c_default_value())
         }
 
         fn has_c<'this>(&'this self) -> bool {

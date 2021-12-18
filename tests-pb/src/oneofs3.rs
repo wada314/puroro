@@ -1585,7 +1585,7 @@ pub mod _puroro_traits {
     pub trait MsgTrait {
         fn g1_int32<'this>(&'this self) -> i32 {
             self.g1_int32_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_g1_int32<'this>(&'this self) -> bool {
@@ -1599,7 +1599,7 @@ pub mod _puroro_traits {
 
         fn g1_string<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             self.g1_string_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::g1_string_default_value())
         }
 
         fn has_g1_string<'this>(&'this self) -> bool {
@@ -1608,7 +1608,7 @@ pub mod _puroro_traits {
 
         fn g2_f32<'this>(&'this self) -> f32 {
             self.g2_f32_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_g2_f32<'this>(&'this self) -> bool {
@@ -1622,7 +1622,7 @@ pub mod _puroro_traits {
 
         fn g2_string<'this>(&'this self) -> Self::Field4ScalarGetterType<'this> {
             self.g2_string_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::g2_string_default_value())
         }
 
         fn has_g2_string<'this>(&'this self) -> bool {
@@ -1635,7 +1635,7 @@ pub mod _puroro_traits {
 
         fn g2_submsg<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.g2_submsg_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::g2_submsg_default_value())
         }
 
         fn has_g2_submsg<'this>(&'this self) -> bool {
@@ -1644,7 +1644,7 @@ pub mod _puroro_traits {
 
         fn g3_int32<'this>(&'this self) -> i32 {
             self.g3_int32_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_g3_int32<'this>(&'this self) -> bool {
@@ -2024,7 +2024,7 @@ pub mod _puroro_traits {
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             self.i32_unlabeled_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_i32_unlabeled<'this>(&'this self) -> bool {

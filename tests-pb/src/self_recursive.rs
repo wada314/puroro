@@ -402,7 +402,7 @@ pub mod _puroro_traits {
 
         fn recursive_unlabeled<'this>(&'this self) -> Self::Field1ScalarGetterType<'this> {
             self.recursive_unlabeled_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::recursive_unlabeled_default_value())
         }
 
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {

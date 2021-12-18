@@ -2592,7 +2592,7 @@ pub mod _puroro_traits {
     pub trait MsgTrait {
         fn i32_optional<'this>(&'this self) -> i32 {
             self.i32_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_i32_optional<'this>(&'this self) -> bool {
@@ -2610,7 +2610,7 @@ pub mod _puroro_traits {
 
         fn float_optional<'this>(&'this self) -> f32 {
             self.float_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_float_optional<'this>(&'this self) -> bool {
@@ -2633,7 +2633,7 @@ pub mod _puroro_traits {
 
         fn string_optional<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.string_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::string_optional_default_value())
         }
 
         fn has_string_optional<'this>(&'this self) -> bool {
@@ -2661,7 +2661,7 @@ pub mod _puroro_traits {
 
         fn submsg_optional<'this>(&'this self) -> Self::Field7ScalarGetterType<'this> {
             self.submsg_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::submsg_optional_default_value())
         }
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
@@ -2684,7 +2684,7 @@ pub mod _puroro_traits {
 
         fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
             self.enum_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_enum_optional<'this>(&'this self) -> bool {
@@ -2704,7 +2704,7 @@ pub mod _puroro_traits {
 
         fn very_large_field_number<'this>(&'this self) -> i32 {
             self.very_large_field_number_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_very_large_field_number<'this>(&'this self) -> bool {
@@ -3624,7 +3624,7 @@ pub mod _puroro_nested {
             pub trait SubmsgTrait {
                 fn i32_optional<'this>(&'this self) -> i32 {
                     self.i32_optional_opt()
-                        .unwrap_or_else(::std::default::Default::default)
+                        .unwrap_or(::std::default::Default::default())
                 }
 
                 fn has_i32_optional<'this>(&'this self) -> bool {

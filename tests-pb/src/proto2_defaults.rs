@@ -9848,7 +9848,7 @@ pub mod _puroro_traits {
     pub trait MsgTrait {
         fn i32_default<'this>(&'this self) -> i32 {
             self.i32_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_i32_default<'this>(&'this self) -> bool {
@@ -9937,7 +9937,7 @@ pub mod _puroro_traits {
 
         fn u32_default<'this>(&'this self) -> u32 {
             self.u32_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_u32_default<'this>(&'this self) -> bool {
@@ -10004,7 +10004,7 @@ pub mod _puroro_traits {
 
         fn i64_default<'this>(&'this self) -> i64 {
             self.i64_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_i64_default<'this>(&'this self) -> bool {
@@ -10095,7 +10095,7 @@ pub mod _puroro_traits {
 
         fn u64_default<'this>(&'this self) -> u64 {
             self.u64_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_u64_default<'this>(&'this self) -> bool {
@@ -10163,7 +10163,7 @@ pub mod _puroro_traits {
 
         fn f32_default<'this>(&'this self) -> f32 {
             self.f32_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_f32_default<'this>(&'this self) -> bool {
@@ -10318,7 +10318,7 @@ pub mod _puroro_traits {
 
         fn bool_default<'this>(&'this self) -> bool {
             self.bool_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_bool_default<'this>(&'this self) -> bool {
@@ -10357,7 +10357,7 @@ pub mod _puroro_traits {
 
         fn string_default<'this>(&'this self) -> Self::Field71ScalarGetterType<'this> {
             self.string_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::string_default_default_value())
         }
 
         fn has_string_default<'this>(&'this self) -> bool {
@@ -10496,7 +10496,7 @@ pub mod _puroro_traits {
 
         fn bytes_default<'this>(&'this self) -> Self::Field81ScalarGetterType<'this> {
             self.bytes_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(Self::bytes_default_default_value())
         }
 
         fn has_bytes_default<'this>(&'this self) -> bool {
@@ -10630,7 +10630,7 @@ pub mod _puroro_traits {
 
         fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
             self.enum_default_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_enum_default<'this>(&'this self) -> bool {

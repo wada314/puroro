@@ -337,7 +337,7 @@ pub mod _puroro_traits {
     pub trait MsgTrait {
         fn r#type<'this>(&'this self) -> i32 {
             self.type_opt()
-                .unwrap_or_else(::std::default::Default::default)
+                .unwrap_or(::std::default::Default::default())
         }
 
         fn has_type<'this>(&'this self) -> bool {
