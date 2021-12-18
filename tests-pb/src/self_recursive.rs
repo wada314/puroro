@@ -151,6 +151,7 @@ pub mod _puroro_traits {
             self.recursive_unlabeled_opt()
                 .unwrap_or(Self::recursive_unlabeled_default_value())
         }
+        fn recursive_unlabeled_default_value() -> Field1ScalarGetterType<'static>;
 
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
             self.recursive_unlabeled_opt().is_some()

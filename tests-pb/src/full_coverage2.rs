@@ -1498,6 +1498,7 @@ pub mod _puroro_traits {
             self.bytes_required_opt()
                 .unwrap_or(Self::bytes_required_default_value())
         }
+        fn bytes_required_default_value() -> Field21ScalarGetterType<'static>;
 
         fn has_bytes_required<'this>(&'this self) -> bool {
             self.bytes_required_opt().is_some()
@@ -1517,6 +1518,7 @@ pub mod _puroro_traits {
             self.bytes_optional_opt()
                 .unwrap_or(Self::bytes_optional_default_value())
         }
+        fn bytes_optional_default_value() -> Field22ScalarGetterType<'static>;
 
         fn has_bytes_optional<'this>(&'this self) -> bool {
             self.bytes_optional_opt().is_some()
@@ -1547,6 +1549,7 @@ pub mod _puroro_traits {
             self.string_required_opt()
                 .unwrap_or(Self::string_required_default_value())
         }
+        fn string_required_default_value() -> Field31ScalarGetterType<'static>;
 
         fn has_string_required<'this>(&'this self) -> bool {
             self.string_required_opt().is_some()
@@ -1566,6 +1569,7 @@ pub mod _puroro_traits {
             self.string_optional_opt()
                 .unwrap_or(Self::string_optional_default_value())
         }
+        fn string_optional_default_value() -> Field32ScalarGetterType<'static>;
 
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
@@ -1628,6 +1632,7 @@ pub mod _puroro_traits {
             self.submsg_required_opt()
                 .unwrap_or(Self::submsg_required_default_value())
         }
+        fn submsg_required_default_value() -> Field51ScalarGetterType<'static>;
 
         fn has_submsg_required<'this>(&'this self) -> bool {
             self.submsg_required_opt().is_some()
@@ -1645,6 +1650,7 @@ pub mod _puroro_traits {
             self.submsg_optional_opt()
                 .unwrap_or(Self::submsg_optional_default_value())
         }
+        fn submsg_optional_default_value() -> Field52ScalarGetterType<'static>;
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()

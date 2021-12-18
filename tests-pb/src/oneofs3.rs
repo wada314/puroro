@@ -515,6 +515,7 @@ pub mod _puroro_traits {
             self.g1_string_opt()
                 .unwrap_or(Self::g1_string_default_value())
         }
+        fn g1_string_default_value() -> Field2ScalarGetterType<'static>;
 
         fn has_g1_string<'this>(&'this self) -> bool {
             self.g1_string_opt().is_some()
@@ -538,6 +539,7 @@ pub mod _puroro_traits {
             self.g2_string_opt()
                 .unwrap_or(Self::g2_string_default_value())
         }
+        fn g2_string_default_value() -> Field4ScalarGetterType<'static>;
 
         fn has_g2_string<'this>(&'this self) -> bool {
             self.g2_string_opt().is_some()
@@ -551,6 +553,7 @@ pub mod _puroro_traits {
             self.g2_submsg_opt()
                 .unwrap_or(Self::g2_submsg_default_value())
         }
+        fn g2_submsg_default_value() -> Field5ScalarGetterType<'static>;
 
         fn has_g2_submsg<'this>(&'this self) -> bool {
             self.g2_submsg_opt().is_some()

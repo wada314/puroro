@@ -439,6 +439,7 @@ pub mod _puroro_traits {
             self.string_unlabeled_opt()
                 .unwrap_or(Self::string_unlabeled_default_value())
         }
+        fn string_unlabeled_default_value() -> Field5ScalarGetterType<'static>;
 
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
@@ -456,6 +457,7 @@ pub mod _puroro_traits {
             self.submsg_unlabeled_opt()
                 .unwrap_or(Self::submsg_unlabeled_default_value())
         }
+        fn submsg_unlabeled_default_value() -> Field6ScalarGetterType<'static>;
 
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()

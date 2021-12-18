@@ -60,9 +60,9 @@ pub trait {{ m.trait_ident }} {
         {%- endif %} {#- if field.is_length_delimited #}
     }
     
-    {%- if field.is_length_delimited && field.has_default_value %}
+    {%- if field.is_length_delimited %}
     fn {{ field.ident_unesc }}_default_value() -> Field{{ field.number }}ScalarGetterType<'static>;
-    {%- endif %} {#- if field.is_length_delimited && field.has_default_value #}
+    {%- endif %} {#- if field.is_length_delimited #}
 
     fn has_{{ field.ident_unesc }}<'this>(&'this self) -> bool {
         self.{{ field.ident_unesc }}_opt().is_some()

@@ -2238,6 +2238,7 @@ pub mod _puroro_traits {
             self.string_default_opt()
                 .unwrap_or(Self::string_default_default_value())
         }
+        fn string_default_default_value() -> Field71ScalarGetterType<'static>;
 
         fn has_string_default<'this>(&'this self) -> bool {
             self.string_default_opt().is_some()
@@ -2377,6 +2378,7 @@ pub mod _puroro_traits {
             self.bytes_default_opt()
                 .unwrap_or(Self::bytes_default_default_value())
         }
+        fn bytes_default_default_value() -> Field81ScalarGetterType<'static>;
 
         fn has_bytes_default<'this>(&'this self) -> bool {
             self.bytes_default_opt().is_some()

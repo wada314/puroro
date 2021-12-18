@@ -540,6 +540,7 @@ pub mod _puroro_traits {
         fn b<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             self.b_opt().unwrap_or(Self::b_default_value())
         }
+        fn b_default_value() -> Field2ScalarGetterType<'static>;
 
         fn has_b<'this>(&'this self) -> bool {
             self.b_opt().is_some()
@@ -638,6 +639,7 @@ pub mod _puroro_traits {
         fn c<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             self.c_opt().unwrap_or(Self::c_default_value())
         }
+        fn c_default_value() -> Field3ScalarGetterType<'static>;
 
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()
