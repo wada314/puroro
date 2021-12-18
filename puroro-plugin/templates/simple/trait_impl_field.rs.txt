@@ -1,9 +1,15 @@
 
-{%- match f.simple_maybe_field_message_path %}
-{%- when Some with (struct_path) %}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }};
-{%- else %}
-{%- endmatch %}
+{%- if f.is_message %}
+type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = &'this {{ f.simple_field_message_path }};
+{%- endif %} {#- if f.is_message #}
+
+{%- if f.is_string %}
+type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = &'this ::std::string::String;
+{%- endif %} {#- if f.is_string #}
+
+{%- if f.is_bytes %}
+type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = &'this ::std::vec::Vec<u8>;
+{%- endif %} {#- if f.is_bytes #}
 
 {%- if f.is_repeated %}
 
@@ -34,33 +40,33 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
 
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
-    {#- Message, the field type is Option<T> #}
+    {#- Message, the field type is Option<Box<T>> #}
     self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
-    {%- else %}
-    {#- String / Bytes, the field type is T #}
+    {%- else %} {#- if f.is_message #}
+    {#- String / Bytes, the field type is String / Vec<u8> #}
     if self.{{ f.ident }}.is_empty() {
         ::std::option::Option::None
     } else {
         ::std::option::Option::Some(self.{{ f.ident }}.as_ref())
     }
-    {%- endif %}
-    {%- else %}
-    {#- Numerical types, the field type is T #}
+    {%- endif %} {#- if f.is_message #}
+    {%- else %} {#- if f.is_length_delimited #}
+    {#- Numerical types, the field type is i32, i64, etc. #}
     if self.{{ f.ident }} == ::std::default::Default::default() {
         ::std::option::Option::None
     } else {
         ::std::option::Option::Some(self.{{ f.ident }}.clone())
     }
-    {%- endif %}
+    {%- endif %} {#- if f.is_length_delimited #}
 
     {%- else %} {#- if f.is_unlabeled #}
 
-    {#- The field type is Option<T> #}
+    {#- The field type is Option<Box<Message>>, Option<String>, etc. #}
     {%- if f.is_length_delimited %}
     self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
-    {%- else %}
+    {%- else %} {#- if f.is_length_delimited #}
     Clone::clone(&self.{{ f.ident }})
-    {%- endif %}
+    {%- endif %} {#- if f.is_length_delimited #}
 
     {%- endif %} {#- if f.is_unlabeled #}
 }

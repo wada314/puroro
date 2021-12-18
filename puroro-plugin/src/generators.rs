@@ -191,7 +191,7 @@ struct Field {
     oneof_enum_value_ident: String,
     simple_field_type: String,
     simple_scalar_field_type: String,
-    simple_maybe_field_message_path: Option<String>,
+    simple_field_message_path: String,
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
@@ -213,12 +213,11 @@ impl Field {
             } else {
                 "".to_string()
             };
-        let simple_maybe_field_message_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Simple", &[]))
-            } else {
-                None
-            };
+        let simple_field_message_path = if let wrappers::FieldType::Message(m) = f.field_type()? {
+            upgrade(&m)?.rust_impl_path("Simple", &[])
+        } else {
+            "".to_string()
+        };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'this"]))
@@ -276,7 +275,7 @@ impl Field {
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
             simple_field_type: f.simple_field_type()?.into(),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
-            simple_maybe_field_message_path,
+            simple_field_message_path,
             simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
