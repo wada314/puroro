@@ -151,7 +151,7 @@ pub mod _puroro_traits {
             self.recursive_unlabeled_opt()
                 .unwrap_or(Self::recursive_unlabeled_default_value())
         }
-        fn recursive_unlabeled_default_value() -> Field1ScalarGetterType<'static>;
+        fn recursive_unlabeled_default_value() -> Self::Field1ScalarGetterType<'static>;
 
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
             self.recursive_unlabeled_opt().is_some()
@@ -165,12 +165,17 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type Field1ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field1ScalarGetterType<'this>;
-            fn recursive_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            type Field1ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field1ScalarGetterType<'this>;
+            fn recursive_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
                 (**self).recursive_unlabeled_opt()
             }
-            fn field_recursive_unlabeled_default_value() -> <$ty as MsgTrait>::Field1ScalarGetterType {
+            fn recursive_unlabeled_default_value()
+            -> <$ty as MsgTrait>::Field1ScalarGetterType<'static> {
                 <$ty as MsgTrait>::recursive_unlabeled_default_value()
             }
         };
