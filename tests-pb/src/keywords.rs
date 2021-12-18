@@ -180,36 +180,6 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-    impl MsgTrait for () {}
-    impl<T, U> MsgTrait for (T, U)
-    where
-        T: MsgTrait,
-        U: MsgTrait,
-    {
-        fn type_opt<'this>(&'this self) -> Option<i32> {
-            <U as MsgTrait>::type_opt(&self.1).or_else(|| <T as MsgTrait>::type_opt(&self.0))
-        }
-    }
-    impl<T, U> MsgTrait for ::puroro::Either<T, U>
-    where
-        T: MsgTrait,
-        U: MsgTrait,
-    {
-        fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                |t| <T as MsgTrait>::type_opt(t),
-                |u| <U as MsgTrait>::type_opt(u),
-            )
-        }
-    }
-    impl<T> MsgTrait for ::std::option::Option<T>
-    where
-        T: MsgTrait,
-    {
-        fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().and_then(|msg| msg.type_opt())
-        }
-    }
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {

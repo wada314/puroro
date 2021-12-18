@@ -1,6 +1,6 @@
-{%- if f.is_message %}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = T::Field{{ f.number }}MessageType<'this>;
-{%- endif %}
+{%- if f.is_length_delimited %}
+type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = T::Field{{ f.number }}ScalarGetterType<'this>;
+{%- endif %} {#- if f.is_length_delimited #}
 
 {%- if f.is_repeated %}
 
