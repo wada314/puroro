@@ -61,7 +61,7 @@ pub trait {{ m.trait_ident }} {
     }
     
     {%- if field.is_length_delimited %}
-    fn {{ field.ident_unesc }}_default_value() -> Field{{ field.number }}ScalarGetterType<'static>;
+    fn {{ field.ident_unesc }}_default_value() -> Self::Field{{ field.number }}ScalarGetterType<'static>;
     {%- endif %} {#- if field.is_length_delimited #}
 
     fn has_{{ field.ident_unesc }}<'this>(&'this self) -> bool {
@@ -86,8 +86,6 @@ pub trait {{ m.trait_ident }} {
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_ld_field %}
             <'this, Self>
-            {%- else %} {#- if oneof.has_ld_field #}
-            <'this>
             {%- endif %} {#- if oneof.has_ld_field #}
         >
     {
@@ -136,7 +134,7 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
         {%- endif %}
 
         {%- if field.is_length_delimited %}
-        fn field_{{ field.ident_unesc }}_default_value() -> <$ty as {{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType {
+        fn {{ field.ident_unesc }}_default_value() -> <$ty as {{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'static> {
             <$ty as {{ m.trait_ident }}>::{{ field.ident_unesc }}_default_value()
         }
         {%- endif %} {#- if field.is_length_delimited #}
@@ -150,11 +148,7 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
             ::std::option::Option<
                 super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
                 {%- if oneof.has_ld_field %}
-                {%- if oneof.has_message_field %}
                 <'this, Self>
-                {%- else %}
-                <'this>
-                {%- endif %}
                 {%- endif %}
             >
         {

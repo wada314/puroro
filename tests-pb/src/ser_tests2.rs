@@ -488,7 +488,7 @@ pub mod _puroro_traits {
             self.string_optional_opt()
                 .unwrap_or(Self::string_optional_default_value())
         }
-        fn string_optional_default_value() -> Field5ScalarGetterType<'static>;
+        fn string_optional_default_value() -> Self::Field5ScalarGetterType<'static>;
 
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
@@ -517,7 +517,7 @@ pub mod _puroro_traits {
             self.submsg_optional_opt()
                 .unwrap_or(Self::submsg_optional_default_value())
         }
-        fn submsg_optional_default_value() -> Field7ScalarGetterType<'static>;
+        fn submsg_optional_default_value() -> Self::Field7ScalarGetterType<'static>;
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -603,7 +603,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
                 (**self).string_optional_opt()
             }
-            fn field_string_optional_default_value() -> <$ty as MsgTrait>::Field5ScalarGetterType {
+            fn string_optional_default_value() -> <$ty as MsgTrait>::Field5ScalarGetterType<'static>
+            {
                 <$ty as MsgTrait>::string_optional_default_value()
             }
             type Field6ScalarGetterType<'this>
@@ -627,7 +628,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
                 (**self).submsg_optional_opt()
             }
-            fn field_submsg_optional_default_value() -> <$ty as MsgTrait>::Field7ScalarGetterType {
+            fn submsg_optional_default_value() -> <$ty as MsgTrait>::Field7ScalarGetterType<'static>
+            {
                 <$ty as MsgTrait>::submsg_optional_default_value()
             }
             type Field8ScalarGetterType<'this>

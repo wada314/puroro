@@ -75,11 +75,7 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
             <'this, Self>
-            {%- else %}
-            <'this>
-            {%- endif %}
             {%- endif %}
         >
     {

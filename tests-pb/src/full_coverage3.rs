@@ -1560,7 +1560,7 @@ pub mod _puroro_traits {
             self.bytes_unlabeled_opt()
                 .unwrap_or(Self::bytes_unlabeled_default_value())
         }
-        fn bytes_unlabeled_default_value() -> Field21ScalarGetterType<'static>;
+        fn bytes_unlabeled_default_value() -> Self::Field21ScalarGetterType<'static>;
 
         fn has_bytes_unlabeled<'this>(&'this self) -> bool {
             self.bytes_unlabeled_opt().is_some()
@@ -1580,7 +1580,7 @@ pub mod _puroro_traits {
             self.bytes_optional_opt()
                 .unwrap_or(Self::bytes_optional_default_value())
         }
-        fn bytes_optional_default_value() -> Field22ScalarGetterType<'static>;
+        fn bytes_optional_default_value() -> Self::Field22ScalarGetterType<'static>;
 
         fn has_bytes_optional<'this>(&'this self) -> bool {
             self.bytes_optional_opt().is_some()
@@ -1611,7 +1611,7 @@ pub mod _puroro_traits {
             self.string_unlabeled_opt()
                 .unwrap_or(Self::string_unlabeled_default_value())
         }
-        fn string_unlabeled_default_value() -> Field31ScalarGetterType<'static>;
+        fn string_unlabeled_default_value() -> Self::Field31ScalarGetterType<'static>;
 
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
@@ -1631,7 +1631,7 @@ pub mod _puroro_traits {
             self.string_optional_opt()
                 .unwrap_or(Self::string_optional_default_value())
         }
-        fn string_optional_default_value() -> Field32ScalarGetterType<'static>;
+        fn string_optional_default_value() -> Self::Field32ScalarGetterType<'static>;
 
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
@@ -1694,7 +1694,7 @@ pub mod _puroro_traits {
             self.submsg_unlabeled_opt()
                 .unwrap_or(Self::submsg_unlabeled_default_value())
         }
-        fn submsg_unlabeled_default_value() -> Field51ScalarGetterType<'static>;
+        fn submsg_unlabeled_default_value() -> Self::Field51ScalarGetterType<'static>;
 
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
@@ -1712,7 +1712,7 @@ pub mod _puroro_traits {
             self.submsg_optional_opt()
                 .unwrap_or(Self::submsg_optional_default_value())
         }
-        fn submsg_optional_default_value() -> Field52ScalarGetterType<'static>;
+        fn submsg_optional_default_value() -> Self::Field52ScalarGetterType<'static>;
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -2042,10 +2042,8 @@ pub mod _puroro_traits {
                 (**self).i32_optional_opt()
             }
 
-            type Field3RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field3RepeatedType<'this>;
+            type Field3RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field3RepeatedType<'this>;
             fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
                 (**self).i32_repeated()
             }
@@ -2056,138 +2054,92 @@ pub mod _puroro_traits {
                 (**self).float_optional_opt()
             }
 
-            type Field13RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field13RepeatedType<'this>;
+            type Field13RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field13RepeatedType<'this>;
             fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
                 (**self).float_repeated()
             }
-            type Field21ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field21ScalarGetterType<'this>;
-            fn bytes_unlabeled_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
+            type Field21ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field21ScalarGetterType<'this>;
+            fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
                 (**self).bytes_unlabeled_opt()
             }
-            fn field_bytes_unlabeled_default_value() -> <$ty as MsgTrait>::Field21ScalarGetterType {
+            fn bytes_unlabeled_default_value() -> <$ty as MsgTrait>::Field21ScalarGetterType<'static> {
                 <$ty as MsgTrait>::bytes_unlabeled_default_value()
             }
-            type Field22ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field22ScalarGetterType<'this>;
-            fn bytes_optional_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
+            type Field22ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field22ScalarGetterType<'this>;
+            fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
                 (**self).bytes_optional_opt()
             }
-            fn field_bytes_optional_default_value() -> <$ty as MsgTrait>::Field22ScalarGetterType {
+            fn bytes_optional_default_value() -> <$ty as MsgTrait>::Field22ScalarGetterType<'static> {
                 <$ty as MsgTrait>::bytes_optional_default_value()
             }
-            type Field23ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field23ScalarGetterType<'this>;
+            type Field23ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field23ScalarGetterType<'this>;
 
-            type Field23RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field23RepeatedType<'this>;
+            type Field23RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field23RepeatedType<'this>;
             fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
                 (**self).bytes_repeated()
             }
-            type Field31ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field31ScalarGetterType<'this>;
-            fn string_unlabeled_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
+            type Field31ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field31ScalarGetterType<'this>;
+            fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
                 (**self).string_unlabeled_opt()
             }
-            fn field_string_unlabeled_default_value() -> <$ty as MsgTrait>::Field31ScalarGetterType
-            {
+            fn string_unlabeled_default_value() -> <$ty as MsgTrait>::Field31ScalarGetterType<'static> {
                 <$ty as MsgTrait>::string_unlabeled_default_value()
             }
-            type Field32ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field32ScalarGetterType<'this>;
-            fn string_optional_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
+            type Field32ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field32ScalarGetterType<'this>;
+            fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
                 (**self).string_optional_opt()
             }
-            fn field_string_optional_default_value() -> <$ty as MsgTrait>::Field32ScalarGetterType {
+            fn string_optional_default_value() -> <$ty as MsgTrait>::Field32ScalarGetterType<'static> {
                 <$ty as MsgTrait>::string_optional_default_value()
             }
-            type Field33ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field33ScalarGetterType<'this>;
+            type Field33ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field33ScalarGetterType<'this>;
 
-            type Field33RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field33RepeatedType<'this>;
+            type Field33RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field33RepeatedType<'this>;
             fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
                 (**self).string_repeated()
             }
-            fn enum_unlabeled_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            fn enum_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
                 (**self).enum_unlabeled_opt()
             }
-            fn enum_optional_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            fn enum_optional_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
                 (**self).enum_optional_opt()
             }
 
-            type Field43RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field43RepeatedType<'this>;
+            type Field43RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field43RepeatedType<'this>;
             fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
                 (**self).enum_repeated()
             }
-            type Field51ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field51ScalarGetterType<'this>;
-            fn submsg_unlabeled_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
+            type Field51ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field51ScalarGetterType<'this>;
+            fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
-            fn field_submsg_unlabeled_default_value() -> <$ty as MsgTrait>::Field51ScalarGetterType
-            {
+            fn submsg_unlabeled_default_value() -> <$ty as MsgTrait>::Field51ScalarGetterType<'static> {
                 <$ty as MsgTrait>::submsg_unlabeled_default_value()
             }
-            type Field52ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field52ScalarGetterType<'this>;
-            fn submsg_optional_opt<'this>(
-                &'this self,
-            ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
+            type Field52ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field52ScalarGetterType<'this>;
+            fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
                 (**self).submsg_optional_opt()
             }
-            fn field_submsg_optional_default_value() -> <$ty as MsgTrait>::Field52ScalarGetterType {
+            fn submsg_optional_default_value() -> <$ty as MsgTrait>::Field52ScalarGetterType<'static> {
                 <$ty as MsgTrait>::submsg_optional_default_value()
             }
-            type Field53ScalarGetterType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field53ScalarGetterType<'this>;
+            type Field53ScalarGetterType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field53ScalarGetterType<'this>;
 
-            type Field53RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field53RepeatedType<'this>;
+            type Field53RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field53RepeatedType<'this>;
             fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
                 (**self).submsg_repeated()
             }
@@ -2198,10 +2150,8 @@ pub mod _puroro_traits {
                 (**self).i64_optional_opt()
             }
 
-            type Field103RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field103RepeatedType<'this>;
+            type Field103RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field103RepeatedType<'this>;
             fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
                 (**self).i64_repeated()
             }
@@ -2212,10 +2162,8 @@ pub mod _puroro_traits {
                 (**self).u32_optional_opt()
             }
 
-            type Field113RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field113RepeatedType<'this>;
+            type Field113RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field113RepeatedType<'this>;
             fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
                 (**self).u32_repeated()
             }
@@ -2226,10 +2174,8 @@ pub mod _puroro_traits {
                 (**self).u64_optional_opt()
             }
 
-            type Field123RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field123RepeatedType<'this>;
+            type Field123RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field123RepeatedType<'this>;
             fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
                 (**self).u64_repeated()
             }
@@ -2240,10 +2186,8 @@ pub mod _puroro_traits {
                 (**self).s32_optional_opt()
             }
 
-            type Field133RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field133RepeatedType<'this>;
+            type Field133RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field133RepeatedType<'this>;
             fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
                 (**self).s32_repeated()
             }
@@ -2254,10 +2198,8 @@ pub mod _puroro_traits {
                 (**self).s64_optional_opt()
             }
 
-            type Field143RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field143RepeatedType<'this>;
+            type Field143RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field143RepeatedType<'this>;
             fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
                 (**self).s64_repeated()
             }
@@ -2268,10 +2210,8 @@ pub mod _puroro_traits {
                 (**self).fixed32_optional_opt()
             }
 
-            type Field153RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field153RepeatedType<'this>;
+            type Field153RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field153RepeatedType<'this>;
             fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
                 (**self).fixed32_repeated()
             }
@@ -2282,10 +2222,8 @@ pub mod _puroro_traits {
                 (**self).fixed64_optional_opt()
             }
 
-            type Field163RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field163RepeatedType<'this>;
+            type Field163RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field163RepeatedType<'this>;
             fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
                 (**self).fixed64_repeated()
             }
@@ -2296,10 +2234,8 @@ pub mod _puroro_traits {
                 (**self).sfixed32_optional_opt()
             }
 
-            type Field173RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field173RepeatedType<'this>;
+            type Field173RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field173RepeatedType<'this>;
             fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
                 (**self).sfixed32_repeated()
             }
@@ -2310,10 +2246,8 @@ pub mod _puroro_traits {
                 (**self).sfixed64_optional_opt()
             }
 
-            type Field183RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field183RepeatedType<'this>;
+            type Field183RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field183RepeatedType<'this>;
             fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
                 (**self).sfixed64_repeated()
             }
@@ -2324,10 +2258,8 @@ pub mod _puroro_traits {
                 (**self).f64_optional_opt()
             }
 
-            type Field193RepeatedType<'this>
-            where
-                Self: 'this,
-            = <$ty as MsgTrait>::Field193RepeatedType<'this>;
+            type Field193RepeatedType<'this> where Self: 'this =
+                <$ty as MsgTrait>::Field193RepeatedType<'this>;
             fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
                 (**self).f64_repeated()
             }
