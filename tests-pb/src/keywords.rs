@@ -180,6 +180,7 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+    impl MsgTrait for () {}
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {

@@ -3003,6 +3003,64 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+    impl MsgTrait for () {
+        type Field71ScalarGetterType<'this> = &'this str;
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field72ScalarGetterType<'this> = &'this str;
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
+            ""
+        }
+        type Field73ScalarGetterType<'this> = &'this str;
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
+            "abc"
+        }
+        type Field74ScalarGetterType<'this> = &'this str;
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        type Field75ScalarGetterType<'this> = &'this str;
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
+            "\\"
+        }
+        type Field76ScalarGetterType<'this> = &'this str;
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
+            "\t"
+        }
+        type Field77ScalarGetterType<'this> = &'this str;
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
+            "\r\n"
+        }
+        type Field81ScalarGetterType<'this> = &'this [u8];
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field82ScalarGetterType<'this> = &'this [u8];
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
+            b""
+        }
+        type Field83ScalarGetterType<'this> = &'this [u8];
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
+            b"\x61\x62\x63"
+        }
+        type Field84ScalarGetterType<'this> = &'this [u8];
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        type Field85ScalarGetterType<'this> = &'this [u8];
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
+            b"\x5c"
+        }
+        type Field86ScalarGetterType<'this> = &'this [u8];
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
+            b"\x09"
+        }
+        type Field87ScalarGetterType<'this> = &'this [u8];
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
+            b"\x0d\x0a"
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
 pub enum MyEnum {

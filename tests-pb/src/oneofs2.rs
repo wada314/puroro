@@ -763,6 +763,35 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+    impl MsgTrait for () {
+        type Field2ScalarGetterType<'this> = &'this str;
+        fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field4ScalarGetterType<'this> = &'this str;
+        fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field5ScalarGetterType<'this> = ();
+        fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        fn group_one<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
+            None
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+            None
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            None
+        }
+    }
 
     pub trait SubmsgTrait {
         fn i32_optional<'this>(&'this self) -> i32 {
@@ -820,6 +849,7 @@ pub mod _puroro_traits {
     {
         submsg_delegate!(T);
     }
+    impl SubmsgTrait for () {}
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {

@@ -730,6 +730,55 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+    impl MsgTrait for () {
+        type Field2RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field5ScalarGetterType<'this> = &'this str;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field6ScalarGetterType<'this> = &'this str;
+        type Field6RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field6ScalarGetterType<'this>>;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field7ScalarGetterType<'this> = ();
+        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field8ScalarGetterType<'this> = ();
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8ScalarGetterType<'this>>;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field10RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            self::_puroro_root::ser_tests3::Enum,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -960,6 +1009,7 @@ pub mod _puroro_nested {
             {
                 submsg_delegate!(T);
             }
+            impl SubmsgTrait for () {}
         }
         pub use _puroro_nested::*;
         pub mod _puroro_nested {

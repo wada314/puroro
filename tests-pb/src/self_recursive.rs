@@ -223,6 +223,12 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+    impl MsgTrait for () {
+        type Field1ScalarGetterType<'this> = ();
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+    }
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {

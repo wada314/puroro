@@ -513,6 +513,7 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
+    impl Test1Trait for () {}
 
     pub trait Test2Trait {
         type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
@@ -583,6 +584,12 @@ pub mod _puroro_traits {
     {
         test2_delegate!(T);
     }
+    impl Test2Trait for () {
+        type Field2ScalarGetterType<'this> = &'this str;
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+    }
 
     pub trait Test3Trait {
         type Field3ScalarGetterType<'this>: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
@@ -652,6 +659,12 @@ pub mod _puroro_traits {
     {
         test3_delegate!(T);
     }
+    impl Test3Trait for () {
+        type Field3ScalarGetterType<'this> = ();
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+    }
 
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -706,6 +719,15 @@ pub mod _puroro_traits {
         T: Test4Trait,
     {
         test4_delegate!(T);
+    }
+    impl Test4Trait for () {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
     }
 }
 pub use _puroro_nested::*;

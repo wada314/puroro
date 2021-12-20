@@ -567,6 +567,23 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
+    impl MsgTrait for () {
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field5ScalarGetterType<'this> = &'this str;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field6ScalarGetterType<'this> = ();
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+    }
 
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -624,6 +641,7 @@ pub mod _puroro_traits {
     {
         submsg_delegate!(T);
     }
+    impl SubmsgTrait for () {}
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
