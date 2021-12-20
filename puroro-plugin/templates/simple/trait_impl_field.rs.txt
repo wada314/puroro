@@ -79,7 +79,7 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
 }
 
 {%- if field.is_length_delimited %}
-fn {{ field.ident_unesc }}_default_value() -> Self::Field{{ field.number }}ScalarGetterType<'static> {
+fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
     {%- if field.is_message %}
     static DEFAULT_VALUE: {{ field.simple_field_message_path }} = ::std::default::Default::default();
     {%- endif %} {#- if field.is_message #}

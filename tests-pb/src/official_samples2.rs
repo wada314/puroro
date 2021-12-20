@@ -136,7 +136,7 @@ pub mod _puroro_simple_impl {
         fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
             self.b.as_ref()
         }
-        fn b_default_value() -> Self::Field2ScalarGetterType<'static> {
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             static DEFAULT_VALUE: ::std::string::String =
                 ::std::convert::From::<&str>::from(::std::default::Default::default());
 
@@ -251,7 +251,7 @@ pub mod _puroro_simple_impl {
         fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
             self.c.as_ref().map(|x| x.as_ref())
         }
-        fn c_default_value() -> Self::Field3ScalarGetterType<'static> {
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
             static DEFAULT_VALUE:
                 self::_puroro_root::official_samples2::_puroro_simple_impl::Test1 =
                 ::std::default::Default::default();
@@ -518,9 +518,9 @@ pub mod _puroro_traits {
             Self: 'this;
 
         fn b<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
-            self.b_opt().unwrap_or(Self::b_default_value())
+            self.b_opt().unwrap_or(self.b_default_value())
         }
-        fn b_default_value() -> Self::Field2ScalarGetterType<'static>;
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_>;
 
         fn has_b<'this>(&'this self) -> bool {
             self.b_opt().is_some()
@@ -541,8 +541,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
                 (**self).b_opt()
             }
-            fn b_default_value() -> <$ty as Test2Trait>::Field2ScalarGetterType<'static> {
-                <$ty as Test2Trait>::b_default_value()
+            fn b_default_value(&self) -> <$ty as Test2Trait>::Field2ScalarGetterType<'_> {
+                <$ty as Test2Trait>::b_default_value(self)
             }
         };
     }
@@ -587,9 +587,9 @@ pub mod _puroro_traits {
             where Self: 'this;
 
         fn c<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
-            self.c_opt().unwrap_or(Self::c_default_value())
+            self.c_opt().unwrap_or(self.c_default_value())
         }
-        fn c_default_value() -> Self::Field3ScalarGetterType<'static>;
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_>;
 
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()
@@ -610,8 +610,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
                 (**self).c_opt()
             }
-            fn c_default_value() -> <$ty as Test3Trait>::Field3ScalarGetterType<'static> {
-                <$ty as Test3Trait>::c_default_value()
+            fn c_default_value(&self) -> <$ty as Test3Trait>::Field3ScalarGetterType<'_> {
+                <$ty as Test3Trait>::c_default_value(self)
             }
         };
     }

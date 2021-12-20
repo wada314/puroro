@@ -132,7 +132,7 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(&self.string_unlabeled)
             }
         }
-        fn string_unlabeled_default_value() -> Self::Field5ScalarGetterType<'static> {
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             static DEFAULT_VALUE: ::std::string::String =
                 ::std::convert::From::<&str>::from(::std::default::Default::default());
 
@@ -154,7 +154,7 @@ pub mod _puroro_simple_impl {
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7ScalarGetterType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
-        fn submsg_unlabeled_default_value() -> Self::Field7ScalarGetterType<'static> {
+        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             static DEFAULT_VALUE:
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg =
                 ::std::default::Default::default();
@@ -516,9 +516,9 @@ pub mod _puroro_traits {
 
         fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.string_unlabeled_opt()
-                .unwrap_or(Self::string_unlabeled_default_value())
+                .unwrap_or(self.string_unlabeled_default_value())
         }
-        fn string_unlabeled_default_value() -> Self::Field5ScalarGetterType<'static>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_>;
 
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
@@ -544,9 +544,9 @@ pub mod _puroro_traits {
 
         fn submsg_unlabeled<'this>(&'this self) -> Self::Field7ScalarGetterType<'this> {
             self.submsg_unlabeled_opt()
-                .unwrap_or(Self::submsg_unlabeled_default_value())
+                .unwrap_or(self.submsg_unlabeled_default_value())
         }
-        fn submsg_unlabeled_default_value() -> Self::Field7ScalarGetterType<'static>;
+        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_>;
 
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
@@ -605,8 +605,10 @@ pub mod _puroro_traits {
                 (**self).i32_unlabeled_opt()
             }
 
-            type Field2RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field2RepeatedType<'this>;
+            type Field2RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field2RepeatedType<'this>;
             fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
                 (**self).i32_repeated()
             }
@@ -614,49 +616,75 @@ pub mod _puroro_traits {
                 (**self).float_unlabeled_opt()
             }
 
-            type Field4RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field4RepeatedType<'this>;
+            type Field4RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field4RepeatedType<'this>;
             fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
                 (**self).float_repeated()
             }
-            type Field5ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field5ScalarGetterType<'this>;
-            fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
+            type Field5ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field5ScalarGetterType<'this>;
+            fn string_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
                 (**self).string_unlabeled_opt()
             }
-            fn string_unlabeled_default_value() -> <$ty as MsgTrait>::Field5ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_unlabeled_default_value()
+            fn string_unlabeled_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field5ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_unlabeled_default_value(self)
             }
-            type Field6ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field6ScalarGetterType<'this>;
+            type Field6ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field6ScalarGetterType<'this>;
 
-            type Field6RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field6RepeatedType<'this>;
+            type Field6RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field6RepeatedType<'this>;
             fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
                 (**self).string_repeated()
             }
-            type Field7ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field7ScalarGetterType<'this>;
-            fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
+            type Field7ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field7ScalarGetterType<'this>;
+            fn submsg_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
-            fn submsg_unlabeled_default_value() -> <$ty as MsgTrait>::Field7ScalarGetterType<'static> {
-                <$ty as MsgTrait>::submsg_unlabeled_default_value()
+            fn submsg_unlabeled_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field7ScalarGetterType<'_> {
+                <$ty as MsgTrait>::submsg_unlabeled_default_value(self)
             }
-            type Field8ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field8ScalarGetterType<'this>;
+            type Field8ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field8ScalarGetterType<'this>;
 
-            type Field8RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field8RepeatedType<'this>;
+            type Field8RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field8RepeatedType<'this>;
             fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
                 (**self).submsg_repeated()
             }
-            fn enum_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
+            fn enum_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
                 (**self).enum_unlabeled_opt()
             }
 
-            type Field10RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field10RepeatedType<'this>;
+            type Field10RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field10RepeatedType<'this>;
             fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
                 (**self).enum_repeated()
             }

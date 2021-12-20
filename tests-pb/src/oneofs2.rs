@@ -508,9 +508,9 @@ pub mod _puroro_traits {
 
         fn g1_string<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             self.g1_string_opt()
-                .unwrap_or(Self::g1_string_default_value())
+                .unwrap_or(self.g1_string_default_value())
         }
-        fn g1_string_default_value() -> Self::Field2ScalarGetterType<'static>;
+        fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_>;
 
         fn has_g1_string<'this>(&'this self) -> bool {
             self.g1_string_opt().is_some()
@@ -531,9 +531,9 @@ pub mod _puroro_traits {
 
         fn g2_string<'this>(&'this self) -> Self::Field4ScalarGetterType<'this> {
             self.g2_string_opt()
-                .unwrap_or(Self::g2_string_default_value())
+                .unwrap_or(self.g2_string_default_value())
         }
-        fn g2_string_default_value() -> Self::Field4ScalarGetterType<'static>;
+        fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_>;
 
         fn has_g2_string<'this>(&'this self) -> bool {
             self.g2_string_opt().is_some()
@@ -545,9 +545,9 @@ pub mod _puroro_traits {
 
         fn g2_submsg<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.g2_submsg_opt()
-                .unwrap_or(Self::g2_submsg_default_value())
+                .unwrap_or(self.g2_submsg_default_value())
         }
-        fn g2_submsg_default_value() -> Self::Field5ScalarGetterType<'static>;
+        fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_>;
 
         fn has_g2_submsg<'this>(&'this self) -> bool {
             self.g2_submsg_opt().is_some()
@@ -670,22 +670,22 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty as MsgTrait>::Field2ScalarGetterType<'this>;
-            fn g1_string_default_value() -> <$ty as MsgTrait>::Field2ScalarGetterType<'static> {
-                <$ty as MsgTrait>::g1_string_default_value()
+            fn g1_string_default_value(&self) -> <$ty as MsgTrait>::Field2ScalarGetterType<'_> {
+                <$ty as MsgTrait>::g1_string_default_value(self)
             }
             type Field4ScalarGetterType<'this>
             where
                 Self: 'this,
             = <$ty as MsgTrait>::Field4ScalarGetterType<'this>;
-            fn g2_string_default_value() -> <$ty as MsgTrait>::Field4ScalarGetterType<'static> {
-                <$ty as MsgTrait>::g2_string_default_value()
+            fn g2_string_default_value(&self) -> <$ty as MsgTrait>::Field4ScalarGetterType<'_> {
+                <$ty as MsgTrait>::g2_string_default_value(self)
             }
             type Field5ScalarGetterType<'this>
             where
                 Self: 'this,
             = <$ty as MsgTrait>::Field5ScalarGetterType<'this>;
-            fn g2_submsg_default_value() -> <$ty as MsgTrait>::Field5ScalarGetterType<'static> {
-                <$ty as MsgTrait>::g2_submsg_default_value()
+            fn g2_submsg_default_value(&self) -> <$ty as MsgTrait>::Field5ScalarGetterType<'_> {
+                <$ty as MsgTrait>::g2_submsg_default_value(self)
             }
             fn group_one<'this>(
                 &'this self,
