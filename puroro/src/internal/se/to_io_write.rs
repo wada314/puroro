@@ -132,19 +132,25 @@ impl<L> SerFieldToIoWrite<L, tags::Bytes>
 where
     L: tags::FieldLabelTag,
 {
-    pub fn ser_field<'a, FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<'a, FieldType, W, ItemType>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()>
     where
-        FieldType: 'a + IntoIterator<Item = &'a [u8]>,
+        FieldType: 'a + IntoIterator<Item = &'a ItemType>,
+        ItemType: 'a + AsRef<[u8]>,
         W: Write,
     {
         for item in field.into_iter() {
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             let len_i32: i32 = item
+                .as_ref()
                 .len()
                 .try_into()
                 .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            out.write(item)?;
+            out.write(item.as_ref())?;
         }
         Ok(())
     }
@@ -154,19 +160,25 @@ impl<L> SerFieldToIoWrite<L, tags::String>
 where
     L: tags::FieldLabelTag,
 {
-    pub fn ser_field<'a, FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<'a, FieldType, W, ItemType>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+    ) -> Result<()>
     where
-        FieldType: 'a + IntoIterator<Item = &'a str>,
+        FieldType: 'a + IntoIterator<Item = &'a ItemType>,
+        ItemType: 'a + AsRef<str>,
         W: Write,
     {
         for item in field.into_iter() {
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             let len_i32: i32 = item
+                .as_ref()
                 .len()
                 .try_into()
                 .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            out.write(item.as_bytes())?;
+            out.write(item.as_ref().as_bytes())?;
         }
         Ok(())
     }
