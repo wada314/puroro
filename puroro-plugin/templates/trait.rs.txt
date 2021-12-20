@@ -14,8 +14,7 @@ pub trait {{ m.trait_ident }} {
     {# &str #}
     {# &String #}
     {# String #}
-    type Field{{ field.number }}ScalarGetterType<'this>:
-        ::std::convert::AsRef<str> + ::std::convert::From<&'static str>
+    type Field{{ field.number }}ScalarGetterType<'this>: ::std::convert::AsRef<str>
         where Self: 'this;
     {%- endif %} {#- if field.is_string #}
 
@@ -24,8 +23,7 @@ pub trait {{ m.trait_ident }} {
     {# &[u8] #}
     {# &Vec<u8> #}
     {# Vec<u8> #}
-    type Field{{ field.number }}ScalarGetterType<'this>:
-        ::std::convert::AsRef<[u8]> + ::std::convert::From<&'static [u8]>
+    type Field{{ field.number }}ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
         where Self: 'this;
     {%- endif %} {#- if field.is_bytes #}
 

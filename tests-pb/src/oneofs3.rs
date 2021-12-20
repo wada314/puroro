@@ -507,7 +507,6 @@ pub mod _puroro_traits {
         }
 
         type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -531,7 +530,6 @@ pub mod _puroro_traits {
         }
 
         type Field4ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 

@@ -313,12 +313,24 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
             }
         }
+        fn bytes_unlabeled_default_value() -> Self::Field21ScalarGetterType<'static> {
+            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
+                ::std::convert::From::<&[u8]>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
         type Field22ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
             self.bytes_optional.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_optional_default_value() -> Self::Field22ScalarGetterType<'static> {
+            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
+                ::std::convert::From::<&[u8]>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
         }
         type Field23ScalarGetterType<'this>
         where
@@ -342,12 +354,24 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
+        fn string_unlabeled_default_value() -> Self::Field31ScalarGetterType<'static> {
+            static DEFAULT_VALUE: ::std::string::String =
+                ::std::convert::From::<&str>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
         type Field32ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
         fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
             self.string_optional.as_ref().map(|v| v.as_ref())
+        }
+        fn string_optional_default_value() -> Self::Field32ScalarGetterType<'static> {
+            static DEFAULT_VALUE: ::std::string::String =
+                ::std::convert::From::<&str>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
         }
         type Field33ScalarGetterType<'this>
         where
@@ -388,9 +412,23 @@ pub mod _puroro_simple_impl {
         ) -> Option<Self::Field51ScalarGetterType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
+        fn submsg_unlabeled_default_value() -> Self::Field51ScalarGetterType<'static> {
+            static DEFAULT_VALUE:
+                self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg =
+                ::std::default::Default::default();
+
+            &DEFAULT_VALUE
+        }
         type Field52ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
+        }
+        fn submsg_optional_default_value() -> Self::Field52ScalarGetterType<'static> {
+            static DEFAULT_VALUE:
+                self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg =
+                ::std::default::Default::default();
+
+            &DEFAULT_VALUE
         }
         type Field53ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         type Field53RepeatedType<'this> = &'this [self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg];
@@ -1552,7 +1590,6 @@ pub mod _puroro_traits {
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this>;
 
         type Field21ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
-            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
 
@@ -1572,7 +1609,6 @@ pub mod _puroro_traits {
         }
 
         type Field22ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
-            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
 
@@ -1592,7 +1628,6 @@ pub mod _puroro_traits {
         }
 
         type Field23ScalarGetterType<'this>: ::std::convert::AsRef<[u8]>
-            + ::std::convert::From<&'static [u8]>
         where
             Self: 'this;
 
@@ -1603,7 +1638,6 @@ pub mod _puroro_traits {
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this>;
 
         type Field31ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -1623,7 +1657,6 @@ pub mod _puroro_traits {
         }
 
         type Field32ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -1643,7 +1676,6 @@ pub mod _puroro_traits {
         }
 
         type Field33ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 

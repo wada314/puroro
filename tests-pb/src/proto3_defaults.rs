@@ -93,12 +93,24 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
+        fn string_unlabeled_default_value() -> Self::Field5ScalarGetterType<'static> {
+            static DEFAULT_VALUE: ::std::string::String =
+                ::std::convert::From::<&str>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
         type Field6ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6ScalarGetterType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+        }
+        fn submsg_unlabeled_default_value() -> Self::Field6ScalarGetterType<'static> {
+            static DEFAULT_VALUE: self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg =
+                ::std::default::Default::default();
+
+            &DEFAULT_VALUE
         }
     }
 
@@ -431,7 +443,6 @@ pub mod _puroro_traits {
         }
 
         type Field5ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 

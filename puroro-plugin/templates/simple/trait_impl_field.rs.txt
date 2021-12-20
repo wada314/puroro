@@ -70,6 +70,23 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
 
     {%- endif %} {#- if f.is_unlabeled #}
 }
+
+{%- if field.is_length_delimited %}
+fn {{ field.ident_unesc }}_default_value() -> Self::Field{{ field.number }}ScalarGetterType<'static> {
+    {%- if field.is_message %}
+    static DEFAULT_VALUE: {{ field.simple_field_message_path }} = ::std::default::Default::default();
+    {%- endif %} {#- if field.is_message #}
+    {%- if field.is_string %}
+    static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from({{ field.default_value }});
+    {%- endif %} {#- if field.is_string #}
+    {%- if field.is_bytes %}
+    static DEFAULT_VALUE: ::std::vec::Vec<u8> = ::std::convert::From::<&[u8]>::from({{ field.default_value }});
+    {%- endif %} {#- if field.is_string #}
+
+    &DEFAULT_VALUE
+}
+{%- endif %} {#- if field.is_length_delimited #}
+
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
 {%- endif %} {#- if f.is_repeated #}

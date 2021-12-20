@@ -132,6 +132,12 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
+        fn string_unlabeled_default_value() -> Self::Field5ScalarGetterType<'static> {
+            static DEFAULT_VALUE: ::std::string::String =
+                ::std::convert::From::<&str>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
         type Field6ScalarGetterType<'this>
         where
             Self: 'this,
@@ -147,6 +153,13 @@ pub mod _puroro_simple_impl {
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7ScalarGetterType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+        }
+        fn submsg_unlabeled_default_value() -> Self::Field7ScalarGetterType<'static> {
+            static DEFAULT_VALUE:
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg =
+                ::std::default::Default::default();
+
+            &DEFAULT_VALUE
         }
         type Field8ScalarGetterType<'this>
         where
@@ -498,7 +511,6 @@ pub mod _puroro_traits {
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
 
         type Field5ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
@@ -518,7 +530,6 @@ pub mod _puroro_traits {
         }
 
         type Field6ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 

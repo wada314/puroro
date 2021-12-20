@@ -141,6 +141,12 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.b.as_ref())
             }
         }
+        fn b_default_value() -> Self::Field2ScalarGetterType<'static> {
+            static DEFAULT_VALUE: ::std::string::String =
+                ::std::convert::From::<&str>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
     }
 
     impl ::puroro::MessageRepresentativeImpl for Test2 {}
@@ -246,6 +252,13 @@ pub mod _puroro_simple_impl {
         = &'this self::_puroro_root::official_samples3::_puroro_simple_impl::Test1;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
+        }
+        fn c_default_value() -> Self::Field3ScalarGetterType<'static> {
+            static DEFAULT_VALUE:
+                self::_puroro_root::official_samples3::_puroro_simple_impl::Test1 =
+                ::std::default::Default::default();
+
+            &DEFAULT_VALUE
         }
     }
 
@@ -503,7 +516,6 @@ pub mod _puroro_traits {
 
     pub trait Test2Trait {
         type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
-            + ::std::convert::From<&'static str>
         where
             Self: 'this;
 
