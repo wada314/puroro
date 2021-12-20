@@ -1,11 +1,22 @@
 impl<T> {{ m.trait_ident }} for ::std::option::Option<T>
 where
-    T: {{ m.trait_ident }},
+    T: ::std::default::Default + {{ m.trait_ident }},
 {
     {%- for field in m.fields %}
-    {%- if f.is_length_delimited %}
-    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = T::Field{{ f.number }}ScalarGetterType<'this>;
-    {%- endif %} {#- if f.is_length_delimited #}
+    {%- if f.is_message %}
+    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this =
+        ::std::option::Option<T::Field{{ f.number }}ScalarGetterType<'this>>;
+    {%- endif %} {#- if f.is_message #}
+    {%- if f.is_string %}
+    {#- !!!!!FIXME!!!!! #}
+    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this =
+        ::std::option::Option<T::Field{{ f.number }}ScalarGetterType<'this>>;
+    {%- endif %} {#- if f.is_string #}
+    {%- if f.is_bytes %}
+    {#- !!!!!FIXME!!!!! #}
+    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this =
+        ::std::option::Option<T::Field{{ f.number }}ScalarGetterType<'this>>;
+    {%- endif %} {#- if f.is_bytes #}
 
     {%- if f.is_repeated %}
 
