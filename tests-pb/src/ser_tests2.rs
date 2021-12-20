@@ -120,7 +120,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_optional_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            self.string_optional.as_ref()
         }
         fn string_optional_default_value() -> Self::Field5ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -142,7 +142,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7ScalarGetterType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            self.submsg_optional.as_ref().map(|x| x.as_ref())
         }
         fn submsg_optional_default_value() -> Self::Field7ScalarGetterType<'static> {
             static DEFAULT_VALUE:

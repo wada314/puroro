@@ -480,7 +480,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
-            self.string_default.as_ref().map(|v| v.as_ref())
+            self.string_default.as_ref()
         }
         fn string_default_default_value() -> Self::Field71ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -493,7 +493,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
-            self.string_empty.as_ref().map(|v| v.as_ref())
+            self.string_empty.as_ref()
         }
         fn string_empty_default_value() -> Self::Field72ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("");
@@ -505,7 +505,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
-            self.string_abc.as_ref().map(|v| v.as_ref())
+            self.string_abc.as_ref()
         }
         fn string_abc_default_value() -> Self::Field73ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("abc");
@@ -517,7 +517,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
-            self.string_aiu.as_ref().map(|v| v.as_ref())
+            self.string_aiu.as_ref()
         }
         fn string_aiu_default_value() -> Self::Field74ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -532,7 +532,7 @@ pub mod _puroro_simple_impl {
         fn string_backslash_opt<'this>(
             &'this self,
         ) -> Option<Self::Field75ScalarGetterType<'this>> {
-            self.string_backslash.as_ref().map(|v| v.as_ref())
+            self.string_backslash.as_ref()
         }
         fn string_backslash_default_value() -> Self::Field75ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("\\");
@@ -544,7 +544,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
-            self.string_tab.as_ref().map(|v| v.as_ref())
+            self.string_tab.as_ref()
         }
         fn string_tab_default_value() -> Self::Field76ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("\t");
@@ -556,7 +556,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
-            self.string_crlf.as_ref().map(|v| v.as_ref())
+            self.string_crlf.as_ref()
         }
         fn string_crlf_default_value() -> Self::Field77ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -569,7 +569,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_default_opt<'this>(&'this self) -> Option<Self::Field81ScalarGetterType<'this>> {
-            self.bytes_default.as_ref().map(|v| v.as_ref())
+            self.bytes_default.as_ref()
         }
         fn bytes_default_default_value() -> Self::Field81ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -582,7 +582,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_empty_opt<'this>(&'this self) -> Option<Self::Field82ScalarGetterType<'this>> {
-            self.bytes_empty.as_ref().map(|v| v.as_ref())
+            self.bytes_empty.as_ref()
         }
         fn bytes_empty_default_value() -> Self::Field82ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> = ::std::convert::From::<&[u8]>::from(b"");
@@ -594,7 +594,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_abc_opt<'this>(&'this self) -> Option<Self::Field83ScalarGetterType<'this>> {
-            self.bytes_abc.as_ref().map(|v| v.as_ref())
+            self.bytes_abc.as_ref()
         }
         fn bytes_abc_default_value() -> Self::Field83ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -607,7 +607,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_aiu_opt<'this>(&'this self) -> Option<Self::Field84ScalarGetterType<'this>> {
-            self.bytes_aiu.as_ref().map(|v| v.as_ref())
+            self.bytes_aiu.as_ref()
         }
         fn bytes_aiu_default_value() -> Self::Field84ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -620,7 +620,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_backslash_opt<'this>(&'this self) -> Option<Self::Field85ScalarGetterType<'this>> {
-            self.bytes_backslash.as_ref().map(|v| v.as_ref())
+            self.bytes_backslash.as_ref()
         }
         fn bytes_backslash_default_value() -> Self::Field85ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -633,7 +633,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_tab_opt<'this>(&'this self) -> Option<Self::Field86ScalarGetterType<'this>> {
-            self.bytes_tab.as_ref().map(|v| v.as_ref())
+            self.bytes_tab.as_ref()
         }
         fn bytes_tab_default_value() -> Self::Field86ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -646,7 +646,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_crlf_opt<'this>(&'this self) -> Option<Self::Field87ScalarGetterType<'this>> {
-            self.bytes_crlf.as_ref().map(|v| v.as_ref())
+            self.bytes_crlf.as_ref()
         }
         fn bytes_crlf_default_value() -> Self::Field87ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =

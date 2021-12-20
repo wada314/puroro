@@ -129,7 +129,7 @@ pub mod _puroro_simple_impl {
             if self.string_unlabeled.is_empty() {
                 ::std::option::Option::None
             } else {
-                ::std::option::Option::Some(self.string_unlabeled.as_ref())
+                ::std::option::Option::Some(&self.string_unlabeled)
             }
         }
         fn string_unlabeled_default_value() -> Self::Field5ScalarGetterType<'static> {

@@ -301,7 +301,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_required_opt<'this>(&'this self) -> Option<Self::Field21ScalarGetterType<'this>> {
-            self.bytes_required.as_ref().map(|v| v.as_ref())
+            self.bytes_required.as_ref()
         }
         fn bytes_required_default_value() -> Self::Field21ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -314,7 +314,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
-            self.bytes_optional.as_ref().map(|v| v.as_ref())
+            self.bytes_optional.as_ref()
         }
         fn bytes_optional_default_value() -> Self::Field22ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -336,7 +336,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_required_opt<'this>(&'this self) -> Option<Self::Field31ScalarGetterType<'this>> {
-            self.string_required.as_ref().map(|v| v.as_ref())
+            self.string_required.as_ref()
         }
         fn string_required_default_value() -> Self::Field31ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -349,7 +349,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            self.string_optional.as_ref()
         }
         fn string_optional_default_value() -> Self::Field32ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -388,7 +388,7 @@ pub mod _puroro_simple_impl {
         }
         type Field51ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51ScalarGetterType<'this>> {
-            self.submsg_required.as_ref().map(|v| v.as_ref())
+            self.submsg_required.as_ref().map(|x| x.as_ref())
         }
         fn submsg_required_default_value() -> Self::Field51ScalarGetterType<'static> {
             static DEFAULT_VALUE:
@@ -399,7 +399,7 @@ pub mod _puroro_simple_impl {
         }
         type Field52ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            self.submsg_optional.as_ref().map(|x| x.as_ref())
         }
         fn submsg_optional_default_value() -> Self::Field52ScalarGetterType<'static> {
             static DEFAULT_VALUE:

@@ -310,7 +310,7 @@ pub mod _puroro_simple_impl {
             if self.bytes_unlabeled.is_empty() {
                 ::std::option::Option::None
             } else {
-                ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
+                ::std::option::Option::Some(&self.bytes_unlabeled)
             }
         }
         fn bytes_unlabeled_default_value() -> Self::Field21ScalarGetterType<'static> {
@@ -324,7 +324,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
-            self.bytes_optional.as_ref().map(|v| v.as_ref())
+            self.bytes_optional.as_ref()
         }
         fn bytes_optional_default_value() -> Self::Field22ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::vec::Vec<u8> =
@@ -351,7 +351,7 @@ pub mod _puroro_simple_impl {
             if self.string_unlabeled.is_empty() {
                 ::std::option::Option::None
             } else {
-                ::std::option::Option::Some(self.string_unlabeled.as_ref())
+                ::std::option::Option::Some(&self.string_unlabeled)
             }
         }
         fn string_unlabeled_default_value() -> Self::Field31ScalarGetterType<'static> {
@@ -365,7 +365,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            self.string_optional.as_ref()
         }
         fn string_optional_default_value() -> Self::Field32ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -421,7 +421,7 @@ pub mod _puroro_simple_impl {
         }
         type Field52ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            self.submsg_optional.as_ref().map(|x| x.as_ref())
         }
         fn submsg_optional_default_value() -> Self::Field52ScalarGetterType<'static> {
             static DEFAULT_VALUE:

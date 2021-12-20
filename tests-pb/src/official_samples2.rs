@@ -134,7 +134,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
-            self.b.as_ref().map(|v| v.as_ref())
+            self.b.as_ref()
         }
         fn b_default_value() -> Self::Field2ScalarGetterType<'static> {
             static DEFAULT_VALUE: ::std::string::String =
@@ -249,7 +249,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            self.c.as_ref().map(|x| x.as_ref())
         }
         fn c_default_value() -> Self::Field3ScalarGetterType<'static> {
             static DEFAULT_VALUE:

@@ -138,7 +138,7 @@ pub mod _puroro_simple_impl {
             if self.b.is_empty() {
                 ::std::option::Option::None
             } else {
-                ::std::option::Option::Some(self.b.as_ref())
+                ::std::option::Option::Some(&self.b)
             }
         }
         fn b_default_value() -> Self::Field2ScalarGetterType<'static> {
