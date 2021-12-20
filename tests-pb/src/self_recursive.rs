@@ -43,8 +43,9 @@ pub mod _puroro_simple_impl {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
         fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            static DEFAULT_VALUE: self::_puroro_root::self_recursive::_puroro_simple_impl::Msg =
-                ::std::default::Default::default();
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+                self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+            > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
 
             &DEFAULT_VALUE
         }

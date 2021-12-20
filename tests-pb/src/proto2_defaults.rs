@@ -483,8 +483,10 @@ pub mod _puroro_simple_impl {
             self.string_default.as_ref()
         }
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -496,7 +498,8 @@ pub mod _puroro_simple_impl {
             self.string_empty.as_ref()
         }
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from(""));
 
             &DEFAULT_VALUE
         }
@@ -508,7 +511,8 @@ pub mod _puroro_simple_impl {
             self.string_abc.as_ref()
         }
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("abc");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("abc"));
 
             &DEFAULT_VALUE
         }
@@ -520,8 +524,10 @@ pub mod _puroro_simple_impl {
             self.string_aiu.as_ref()
         }
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from("\u{3042}\u{3044}\u{3046}");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from("\u{3042}\u{3044}\u{3046}")
+                });
 
             &DEFAULT_VALUE
         }
@@ -535,7 +541,8 @@ pub mod _puroro_simple_impl {
             self.string_backslash.as_ref()
         }
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("\\");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("\\"));
 
             &DEFAULT_VALUE
         }
@@ -547,7 +554,8 @@ pub mod _puroro_simple_impl {
             self.string_tab.as_ref()
         }
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from("\t");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("\t"));
 
             &DEFAULT_VALUE
         }
@@ -559,8 +567,8 @@ pub mod _puroro_simple_impl {
             self.string_crlf.as_ref()
         }
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from("\r\n");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("\r\n"));
 
             &DEFAULT_VALUE
         }
@@ -572,8 +580,10 @@ pub mod _puroro_simple_impl {
             self.bytes_default.as_ref()
         }
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -585,7 +595,8 @@ pub mod _puroro_simple_impl {
             self.bytes_empty.as_ref()
         }
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> = ::std::convert::From::<&[u8]>::from(b"");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&[u8]>::from(b""));
 
             &DEFAULT_VALUE
         }
@@ -597,8 +608,10 @@ pub mod _puroro_simple_impl {
             self.bytes_abc.as_ref()
         }
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(b"\x61\x62\x63");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x61\x62\x63")
+                });
 
             &DEFAULT_VALUE
         }
@@ -610,8 +623,10 @@ pub mod _puroro_simple_impl {
             self.bytes_aiu.as_ref()
         }
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
+                });
 
             &DEFAULT_VALUE
         }
@@ -623,8 +638,10 @@ pub mod _puroro_simple_impl {
             self.bytes_backslash.as_ref()
         }
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(b"\x5c");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x5c")
+                });
 
             &DEFAULT_VALUE
         }
@@ -636,8 +653,10 @@ pub mod _puroro_simple_impl {
             self.bytes_tab.as_ref()
         }
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(b"\x09");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x09")
+                });
 
             &DEFAULT_VALUE
         }
@@ -649,8 +668,10 @@ pub mod _puroro_simple_impl {
             self.bytes_crlf.as_ref()
         }
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(b"\x0d\x0a");
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x0d\x0a")
+                });
 
             &DEFAULT_VALUE
         }

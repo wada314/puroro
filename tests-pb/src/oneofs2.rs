@@ -112,8 +112,10 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -122,8 +124,10 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -132,8 +136,9 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            static DEFAULT_VALUE: self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg =
-                ::std::default::Default::default();
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+                self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
+            > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
 
             &DEFAULT_VALUE
         }

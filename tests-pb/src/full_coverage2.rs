@@ -304,8 +304,10 @@ pub mod _puroro_simple_impl {
             self.bytes_required.as_ref()
         }
         fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -317,8 +319,10 @@ pub mod _puroro_simple_impl {
             self.bytes_optional.as_ref()
         }
         fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::vec::Vec<u8> =
-                ::std::convert::From::<&[u8]>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -339,8 +343,10 @@ pub mod _puroro_simple_impl {
             self.string_required.as_ref()
         }
         fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -352,8 +358,10 @@ pub mod _puroro_simple_impl {
             self.string_optional.as_ref()
         }
         fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -391,9 +399,9 @@ pub mod _puroro_simple_impl {
             self.submsg_required.as_ref().map(|x| x.as_ref())
         }
         fn submsg_required_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
-            static DEFAULT_VALUE:
-                self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg =
-                ::std::default::Default::default();
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy< self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg
+    > = ::puroro::once_cell::sync::Lazy::new(|| { ::std::default::Default::default()
+    });
 
             &DEFAULT_VALUE
         }
@@ -402,9 +410,9 @@ pub mod _puroro_simple_impl {
             self.submsg_optional.as_ref().map(|x| x.as_ref())
         }
         fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
-            static DEFAULT_VALUE:
-                self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg =
-                ::std::default::Default::default();
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy< self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg
+    > = ::puroro::once_cell::sync::Lazy::new(|| { ::std::default::Default::default()
+    });
 
             &DEFAULT_VALUE
         }

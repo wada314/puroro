@@ -82,15 +82,15 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
 
 {%- if field.is_length_delimited %}
 fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
-    {%- if field.is_message %}
-    static DEFAULT_VALUE: {{ field.simple_field_message_path }} = ::std::default::Default::default();
-    {%- endif %} {#- if field.is_message #}
-    {%- if field.is_string %}
-    static DEFAULT_VALUE: ::std::string::String = ::std::convert::From::<&str>::from({{ field.default_value }});
-    {%- endif %} {#- if field.is_string #}
-    {%- if field.is_bytes %}
-    static DEFAULT_VALUE: ::std::vec::Vec<u8> = ::std::convert::From::<&[u8]>::from({{ field.default_value }});
-    {%- endif %} {#- if field.is_string #}
+    static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+        {%- if field.is_message %} {{ field.simple_field_message_path }} {%- endif %}
+        {%- if field.is_string %} ::std::string::String {%- endif %}
+        {%- if field.is_bytes %} ::std::vec::Vec<u8> {%- endif %}
+    > = ::puroro::once_cell::sync::Lazy::new(|| {
+        {%- if field.is_message %} ::std::default::Default::default() {%- endif %}
+        {%- if field.is_string %} ::std::convert::From::<&str>::from({{ field.default_value }}) {%- endif %}
+        {%- if field.is_bytes %} ::std::convert::From::<&[u8]>::from({{ field.default_value }}) {%- endif %}
+    });
 
     &DEFAULT_VALUE
 }

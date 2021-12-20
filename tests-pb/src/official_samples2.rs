@@ -137,8 +137,10 @@ pub mod _puroro_simple_impl {
             self.b.as_ref()
         }
         fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
-            static DEFAULT_VALUE: ::std::string::String =
-                ::std::convert::From::<&str>::from(::std::default::Default::default());
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
 
             &DEFAULT_VALUE
         }
@@ -252,9 +254,9 @@ pub mod _puroro_simple_impl {
             self.c.as_ref().map(|x| x.as_ref())
         }
         fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            static DEFAULT_VALUE:
-                self::_puroro_root::official_samples2::_puroro_simple_impl::Test1 =
-                ::std::default::Default::default();
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+                self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
+            > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
 
             &DEFAULT_VALUE
         }
