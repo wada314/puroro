@@ -78,6 +78,8 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
     {%- endif %} {#- if f.is_unlabeled #}
 }
 
+{%- endif %} {#- if !f.is_explicit_oneof_field #}
+
 {%- if field.is_length_delimited %}
 fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
     {%- if field.is_message %}
@@ -93,7 +95,5 @@ fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}
     &DEFAULT_VALUE
 }
 {%- endif %} {#- if field.is_length_delimited #}
-
-{%- endif %} {#- if !f.is_explicit_oneof_field #}
 
 {%- endif %} {#- if f.is_repeated #}

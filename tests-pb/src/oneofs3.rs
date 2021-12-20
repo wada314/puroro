@@ -111,14 +111,32 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this ::std::string::String;
+        fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::std::string::String =
+                ::std::convert::From::<&str>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
         type Field4ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
+        fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::std::string::String =
+                ::std::convert::From::<&str>::from(::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
         type Field5ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg;
+        fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            static DEFAULT_VALUE: self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg =
+                ::std::default::Default::default();
+
+            &DEFAULT_VALUE
+        }
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -126,8 +144,7 @@ pub mod _puroro_simple_impl {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
             self.group_one.as_ref().map(|oneof| match oneof {
                 E::G1Int32(v) => F::G1Int32(v.clone()),
-
-                E::G1String(v) => F::G1String(v.as_ref()),
+                E::G1String(v) => F::G1String(v),
             })
         }
         fn group_two<'this>(
@@ -137,9 +154,7 @@ pub mod _puroro_simple_impl {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
             self.group_two.as_ref().map(|oneof| match oneof {
                 E::G2F32(v) => F::G2F32(v.clone()),
-
-                E::G2String(v) => F::G2String(v.as_ref()),
-
+                E::G2String(v) => F::G2String(v),
                 E::G2Submsg(v) => F::G2Submsg(v.as_ref()),
             })
         }
@@ -1211,17 +1226,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            pub(crate) enum GroupOneBumpalo<'bump> {
-                _None(::std::marker::PhantomData<&'bump ()>),
-                G1Int32(::puroro::internal::Bare<i32>),
-                G1String(::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>),
-            }
-
-            impl<'bump> ::std::default::Default for GroupOneBumpalo<'bump> {
-                fn default() -> Self {
-                    Self::_None(::std::marker::PhantomData)
-                }
-            }
 
             pub(crate) enum GroupTwoSimple {
                 G2F32(f32),
@@ -1266,24 +1270,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            pub(crate) enum GroupTwoBumpalo<'bump> {
-                _None(::std::marker::PhantomData<&'bump ()>),
-                G2F32(::puroro::internal::Bare<f32>),
-                G2String(::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>),
-                G2Submsg(
-                    ::puroro::internal::Bare<
-                        ::puroro::internal::NoAllocBumpBox<
-                            self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'bump>,
-                        >,
-                    >,
-                ),
-            }
-
-            impl<'bump> ::std::default::Default for GroupTwoBumpalo<'bump> {
-                fn default() -> Self {
-                    Self::_None(::std::marker::PhantomData)
-                }
-            }
 
             pub(crate) enum GroupThreeSimple {
                 G3Int32(i32),
@@ -1315,16 +1301,6 @@ pub mod _puroro_nested {
                         #[allow(unreachable_patterns)]
                         _ => false,
                     }
-                }
-            }
-            pub(crate) enum GroupThreeBumpalo<'bump> {
-                _None(::std::marker::PhantomData<&'bump ()>),
-                G3Int32(::puroro::internal::Bare<i32>),
-            }
-
-            impl<'bump> ::std::default::Default for GroupThreeBumpalo<'bump> {
-                fn default() -> Self {
-                    Self::_None(::std::marker::PhantomData)
                 }
             }
         }
