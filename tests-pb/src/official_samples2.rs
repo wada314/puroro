@@ -134,7 +134,15 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
-            self.b.as_ref().map(|v| v.as_ref())
+            self.b.as_ref()
+        }
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
     }
 
@@ -243,7 +251,14 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            self.c.as_ref().map(|x| x.as_ref())
+        }
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+                self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
+            > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
+
+            &DEFAULT_VALUE
         }
     }
 
@@ -498,6 +513,15 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
+    impl Test1Trait for () {}
+    impl<T> Test1Trait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + Test1Trait,
+    {
+        fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.a_opt())
+        }
+    }
 
     pub trait Test2Trait {
         type Field2ScalarGetterType<'this>: ::std::convert::AsRef<str>
@@ -505,9 +529,9 @@ pub mod _puroro_traits {
             Self: 'this;
 
         fn b<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
-            self.b_opt().unwrap_or(Self::b_default_value())
+            self.b_opt().unwrap_or(self.b_default_value())
         }
-        fn b_default_value() -> Self::Field2ScalarGetterType<'static>;
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_>;
 
         fn has_b<'this>(&'this self) -> bool {
             self.b_opt().is_some()
@@ -528,8 +552,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
                 (**self).b_opt()
             }
-            fn b_default_value() -> <$ty as Test2Trait>::Field2ScalarGetterType<'static> {
-                <$ty as Test2Trait>::b_default_value()
+            fn b_default_value(&self) -> <$ty as Test2Trait>::Field2ScalarGetterType<'_> {
+                <$ty as Test2Trait>::b_default_value(self)
             }
         };
     }
@@ -568,15 +592,36 @@ pub mod _puroro_traits {
     {
         test2_delegate!(T);
     }
+    impl Test2Trait for () {
+        type Field2ScalarGetterType<'this> = &'this str;
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+    }
+    impl<T> Test2Trait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + Test2Trait,
+    {
+        type Field2ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field2ScalarGetterType<'this>>;
+        fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.b_opt())
+        }
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            todo!()
+        }
+    }
 
     pub trait Test3Trait {
         type Field3ScalarGetterType<'this>: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             where Self: 'this;
 
         fn c<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
-            self.c_opt().unwrap_or(Self::c_default_value())
+            self.c_opt().unwrap_or(self.c_default_value())
         }
-        fn c_default_value() -> Self::Field3ScalarGetterType<'static>;
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_>;
 
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()
@@ -597,8 +642,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
                 (**self).c_opt()
             }
-            fn c_default_value() -> <$ty as Test3Trait>::Field3ScalarGetterType<'static> {
-                <$ty as Test3Trait>::c_default_value()
+            fn c_default_value(&self) -> <$ty as Test3Trait>::Field3ScalarGetterType<'_> {
+                <$ty as Test3Trait>::c_default_value(self)
             }
         };
     }
@@ -636,6 +681,27 @@ pub mod _puroro_traits {
         T: Test3Trait,
     {
         test3_delegate!(T);
+    }
+    impl Test3Trait for () {
+        type Field3ScalarGetterType<'this> = ();
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+    }
+    impl<T> Test3Trait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + Test3Trait,
+    {
+        type Field3ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field3ScalarGetterType<'this>>;
+        fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.c_opt())
+        }
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+            todo!()
+        }
     }
 
     pub trait Test4Trait {
@@ -691,6 +757,29 @@ pub mod _puroro_traits {
         T: Test4Trait,
     {
         test4_delegate!(T);
+    }
+    impl Test4Trait for () {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+    impl<T> Test4Trait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + Test4Trait,
+    {
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field4RepeatedType<'this>>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.d()),
+            )
+        }
     }
 }
 pub use _puroro_nested::*;

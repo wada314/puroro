@@ -226,6 +226,7 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
+pub use ::once_cell;
 
 use ::std::ops::{Deref, DerefMut};
 

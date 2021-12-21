@@ -37,17 +37,19 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 {%- if !f.is_explicit_oneof_field %}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     {%- if f.is_unlabeled %}
+    {#- proto3 unlabled field #}
 
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
-    {#- Message, the field type is Option<Box<T>> #}
+    {#- Message, the field type is `Option<Box<Message>>`, and the return type is `Option<&Message>`. #}
     self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
     {%- else %} {#- if f.is_message #}
-    {#- String / Bytes, the field type is String / Vec<u8> #}
+    {#- String / Bytes, the field types are `String` / `Vec<u8>`. #}
+    {#- The return types are  `Option<&String>` / `Option<&Vec<u8>>`. #}
     if self.{{ f.ident }}.is_empty() {
         ::std::option::Option::None
     } else {
-        ::std::option::Option::Some(self.{{ f.ident }}.as_ref())
+        ::std::option::Option::Some(&self.{{ f.ident }})
     }
     {%- endif %} {#- if f.is_message #}
     {%- else %} {#- if f.is_length_delimited #}
@@ -60,16 +62,38 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
     {%- endif %} {#- if f.is_length_delimited #}
 
     {%- else %} {#- if f.is_unlabeled #}
+    {#- proto2/3 optional/required field #}
 
     {#- The field type is Option<Box<Message>>, Option<String>, etc. #}
     {%- if f.is_length_delimited %}
-    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
+    {%- if f.is_message %}
+    self.{{ f.ident }}.as_ref().map(|x| x.as_ref())
+    {%- else %} {#- if f.is_message #}
+    self.{{ f.ident }}.as_ref()
+    {%- endif %} {#- if f.is_message #}
     {%- else %} {#- if f.is_length_delimited #}
     Clone::clone(&self.{{ f.ident }})
     {%- endif %} {#- if f.is_length_delimited #}
 
     {%- endif %} {#- if f.is_unlabeled #}
 }
+
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
+
+{%- if field.is_length_delimited %}
+fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
+    static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+        {%- if field.is_message %} {{ field.simple_field_message_path }} {%- endif %}
+        {%- if field.is_string %} ::std::string::String {%- endif %}
+        {%- if field.is_bytes %} ::std::vec::Vec<u8> {%- endif %}
+    > = ::puroro::once_cell::sync::Lazy::new(|| {
+        {%- if field.is_message %} ::std::default::Default::default() {%- endif %}
+        {%- if field.is_string %} ::std::convert::From::<&str>::from({{ field.default_value }}) {%- endif %}
+        {%- if field.is_bytes %} ::std::convert::From::<&[u8]>::from({{ field.default_value }}) {%- endif %}
+    });
+
+    &DEFAULT_VALUE
+}
+{%- endif %} {#- if field.is_length_delimited #}
 
 {%- endif %} {#- if f.is_repeated #}

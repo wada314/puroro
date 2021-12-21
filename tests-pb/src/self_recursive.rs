@@ -42,6 +42,13 @@ pub mod _puroro_simple_impl {
         ) -> Option<Self::Field1ScalarGetterType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+                self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+            > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
+
+            &DEFAULT_VALUE
+        }
     }
 
     impl ::puroro::MessageRepresentativeImpl for Msg {}
@@ -149,9 +156,9 @@ pub mod _puroro_traits {
 
         fn recursive_unlabeled<'this>(&'this self) -> Self::Field1ScalarGetterType<'this> {
             self.recursive_unlabeled_opt()
-                .unwrap_or(Self::recursive_unlabeled_default_value())
+                .unwrap_or(self.recursive_unlabeled_default_value())
         }
-        fn recursive_unlabeled_default_value() -> Self::Field1ScalarGetterType<'static>;
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_>;
 
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
             self.recursive_unlabeled_opt().is_some()
@@ -174,9 +181,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
                 (**self).recursive_unlabeled_opt()
             }
-            fn recursive_unlabeled_default_value()
-            -> <$ty as MsgTrait>::Field1ScalarGetterType<'static> {
-                <$ty as MsgTrait>::recursive_unlabeled_default_value()
+            fn recursive_unlabeled_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field1ScalarGetterType<'_> {
+                <$ty as MsgTrait>::recursive_unlabeled_default_value(self)
             }
         };
     }
@@ -214,6 +222,29 @@ pub mod _puroro_traits {
         T: MsgTrait,
     {
         msg_delegate!(T);
+    }
+    impl MsgTrait for () {
+        type Field1ScalarGetterType<'this> = ();
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+    }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + MsgTrait,
+    {
+        type Field1ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field1ScalarGetterType<'this>>;
+        fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.recursive_unlabeled_opt())
+        }
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            todo!()
+        }
     }
 }
 pub use _puroro_nested::*;

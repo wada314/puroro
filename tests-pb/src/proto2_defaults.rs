@@ -480,28 +480,56 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
-            self.string_default.as_ref().map(|v| v.as_ref())
+            self.string_default.as_ref()
+        }
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
         type Field72ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
         fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
-            self.string_empty.as_ref().map(|v| v.as_ref())
+            self.string_empty.as_ref()
+        }
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from(""));
+
+            &DEFAULT_VALUE
         }
         type Field73ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
         fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
-            self.string_abc.as_ref().map(|v| v.as_ref())
+            self.string_abc.as_ref()
+        }
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("abc"));
+
+            &DEFAULT_VALUE
         }
         type Field74ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
         fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
-            self.string_aiu.as_ref().map(|v| v.as_ref())
+            self.string_aiu.as_ref()
+        }
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from("\u{3042}\u{3044}\u{3046}")
+                });
+
+            &DEFAULT_VALUE
         }
         type Field75ScalarGetterType<'this>
         where
@@ -510,70 +538,142 @@ pub mod _puroro_simple_impl {
         fn string_backslash_opt<'this>(
             &'this self,
         ) -> Option<Self::Field75ScalarGetterType<'this>> {
-            self.string_backslash.as_ref().map(|v| v.as_ref())
+            self.string_backslash.as_ref()
+        }
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("\\"));
+
+            &DEFAULT_VALUE
         }
         type Field76ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
         fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
-            self.string_tab.as_ref().map(|v| v.as_ref())
+            self.string_tab.as_ref()
+        }
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("\t"));
+
+            &DEFAULT_VALUE
         }
         type Field77ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
         fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
-            self.string_crlf.as_ref().map(|v| v.as_ref())
+            self.string_crlf.as_ref()
+        }
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&str>::from("\r\n"));
+
+            &DEFAULT_VALUE
         }
         type Field81ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_default_opt<'this>(&'this self) -> Option<Self::Field81ScalarGetterType<'this>> {
-            self.bytes_default.as_ref().map(|v| v.as_ref())
+            self.bytes_default.as_ref()
+        }
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
         type Field82ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_empty_opt<'this>(&'this self) -> Option<Self::Field82ScalarGetterType<'this>> {
-            self.bytes_empty.as_ref().map(|v| v.as_ref())
+            self.bytes_empty.as_ref()
+        }
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| ::std::convert::From::<&[u8]>::from(b""));
+
+            &DEFAULT_VALUE
         }
         type Field83ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_abc_opt<'this>(&'this self) -> Option<Self::Field83ScalarGetterType<'this>> {
-            self.bytes_abc.as_ref().map(|v| v.as_ref())
+            self.bytes_abc.as_ref()
+        }
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x61\x62\x63")
+                });
+
+            &DEFAULT_VALUE
         }
         type Field84ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_aiu_opt<'this>(&'this self) -> Option<Self::Field84ScalarGetterType<'this>> {
-            self.bytes_aiu.as_ref().map(|v| v.as_ref())
+            self.bytes_aiu.as_ref()
+        }
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
+                });
+
+            &DEFAULT_VALUE
         }
         type Field85ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_backslash_opt<'this>(&'this self) -> Option<Self::Field85ScalarGetterType<'this>> {
-            self.bytes_backslash.as_ref().map(|v| v.as_ref())
+            self.bytes_backslash.as_ref()
+        }
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x5c")
+                });
+
+            &DEFAULT_VALUE
         }
         type Field86ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_tab_opt<'this>(&'this self) -> Option<Self::Field86ScalarGetterType<'this>> {
-            self.bytes_tab.as_ref().map(|v| v.as_ref())
+            self.bytes_tab.as_ref()
+        }
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x09")
+                });
+
+            &DEFAULT_VALUE
         }
         type Field87ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_crlf_opt<'this>(&'this self) -> Option<Self::Field87ScalarGetterType<'this>> {
-            self.bytes_crlf.as_ref().map(|v| v.as_ref())
+            self.bytes_crlf.as_ref()
+        }
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(b"\x0d\x0a")
+                });
+
+            &DEFAULT_VALUE
         }
         fn enum_default_opt<'this>(
             &'this self,
@@ -2235,9 +2335,9 @@ pub mod _puroro_traits {
 
         fn string_default<'this>(&'this self) -> Self::Field71ScalarGetterType<'this> {
             self.string_default_opt()
-                .unwrap_or(Self::string_default_default_value())
+                .unwrap_or(self.string_default_default_value())
         }
-        fn string_default_default_value() -> Self::Field71ScalarGetterType<'static>;
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_>;
 
         fn has_string_default<'this>(&'this self) -> bool {
             self.string_default_opt().is_some()
@@ -2254,9 +2354,9 @@ pub mod _puroro_traits {
 
         fn string_empty<'this>(&'this self) -> Self::Field72ScalarGetterType<'this> {
             self.string_empty_opt()
-                .unwrap_or(Self::string_empty_default_value())
+                .unwrap_or(self.string_empty_default_value())
         }
-        fn string_empty_default_value() -> Self::Field72ScalarGetterType<'static>;
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_>;
 
         fn has_string_empty<'this>(&'this self) -> bool {
             self.string_empty_opt().is_some()
@@ -2273,9 +2373,9 @@ pub mod _puroro_traits {
 
         fn string_abc<'this>(&'this self) -> Self::Field73ScalarGetterType<'this> {
             self.string_abc_opt()
-                .unwrap_or(Self::string_abc_default_value())
+                .unwrap_or(self.string_abc_default_value())
         }
-        fn string_abc_default_value() -> Self::Field73ScalarGetterType<'static>;
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_>;
 
         fn has_string_abc<'this>(&'this self) -> bool {
             self.string_abc_opt().is_some()
@@ -2292,9 +2392,9 @@ pub mod _puroro_traits {
 
         fn string_aiu<'this>(&'this self) -> Self::Field74ScalarGetterType<'this> {
             self.string_aiu_opt()
-                .unwrap_or(Self::string_aiu_default_value())
+                .unwrap_or(self.string_aiu_default_value())
         }
-        fn string_aiu_default_value() -> Self::Field74ScalarGetterType<'static>;
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_>;
 
         fn has_string_aiu<'this>(&'this self) -> bool {
             self.string_aiu_opt().is_some()
@@ -2311,9 +2411,9 @@ pub mod _puroro_traits {
 
         fn string_backslash<'this>(&'this self) -> Self::Field75ScalarGetterType<'this> {
             self.string_backslash_opt()
-                .unwrap_or(Self::string_backslash_default_value())
+                .unwrap_or(self.string_backslash_default_value())
         }
-        fn string_backslash_default_value() -> Self::Field75ScalarGetterType<'static>;
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_>;
 
         fn has_string_backslash<'this>(&'this self) -> bool {
             self.string_backslash_opt().is_some()
@@ -2330,9 +2430,9 @@ pub mod _puroro_traits {
 
         fn string_tab<'this>(&'this self) -> Self::Field76ScalarGetterType<'this> {
             self.string_tab_opt()
-                .unwrap_or(Self::string_tab_default_value())
+                .unwrap_or(self.string_tab_default_value())
         }
-        fn string_tab_default_value() -> Self::Field76ScalarGetterType<'static>;
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_>;
 
         fn has_string_tab<'this>(&'this self) -> bool {
             self.string_tab_opt().is_some()
@@ -2349,9 +2449,9 @@ pub mod _puroro_traits {
 
         fn string_crlf<'this>(&'this self) -> Self::Field77ScalarGetterType<'this> {
             self.string_crlf_opt()
-                .unwrap_or(Self::string_crlf_default_value())
+                .unwrap_or(self.string_crlf_default_value())
         }
-        fn string_crlf_default_value() -> Self::Field77ScalarGetterType<'static>;
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_>;
 
         fn has_string_crlf<'this>(&'this self) -> bool {
             self.string_crlf_opt().is_some()
@@ -2368,9 +2468,9 @@ pub mod _puroro_traits {
 
         fn bytes_default<'this>(&'this self) -> Self::Field81ScalarGetterType<'this> {
             self.bytes_default_opt()
-                .unwrap_or(Self::bytes_default_default_value())
+                .unwrap_or(self.bytes_default_default_value())
         }
-        fn bytes_default_default_value() -> Self::Field81ScalarGetterType<'static>;
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_>;
 
         fn has_bytes_default<'this>(&'this self) -> bool {
             self.bytes_default_opt().is_some()
@@ -2387,9 +2487,9 @@ pub mod _puroro_traits {
 
         fn bytes_empty<'this>(&'this self) -> Self::Field82ScalarGetterType<'this> {
             self.bytes_empty_opt()
-                .unwrap_or(Self::bytes_empty_default_value())
+                .unwrap_or(self.bytes_empty_default_value())
         }
-        fn bytes_empty_default_value() -> Self::Field82ScalarGetterType<'static>;
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_>;
 
         fn has_bytes_empty<'this>(&'this self) -> bool {
             self.bytes_empty_opt().is_some()
@@ -2406,9 +2506,9 @@ pub mod _puroro_traits {
 
         fn bytes_abc<'this>(&'this self) -> Self::Field83ScalarGetterType<'this> {
             self.bytes_abc_opt()
-                .unwrap_or(Self::bytes_abc_default_value())
+                .unwrap_or(self.bytes_abc_default_value())
         }
-        fn bytes_abc_default_value() -> Self::Field83ScalarGetterType<'static>;
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_>;
 
         fn has_bytes_abc<'this>(&'this self) -> bool {
             self.bytes_abc_opt().is_some()
@@ -2425,9 +2525,9 @@ pub mod _puroro_traits {
 
         fn bytes_aiu<'this>(&'this self) -> Self::Field84ScalarGetterType<'this> {
             self.bytes_aiu_opt()
-                .unwrap_or(Self::bytes_aiu_default_value())
+                .unwrap_or(self.bytes_aiu_default_value())
         }
-        fn bytes_aiu_default_value() -> Self::Field84ScalarGetterType<'static>;
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_>;
 
         fn has_bytes_aiu<'this>(&'this self) -> bool {
             self.bytes_aiu_opt().is_some()
@@ -2444,9 +2544,9 @@ pub mod _puroro_traits {
 
         fn bytes_backslash<'this>(&'this self) -> Self::Field85ScalarGetterType<'this> {
             self.bytes_backslash_opt()
-                .unwrap_or(Self::bytes_backslash_default_value())
+                .unwrap_or(self.bytes_backslash_default_value())
         }
-        fn bytes_backslash_default_value() -> Self::Field85ScalarGetterType<'static>;
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_>;
 
         fn has_bytes_backslash<'this>(&'this self) -> bool {
             self.bytes_backslash_opt().is_some()
@@ -2463,9 +2563,9 @@ pub mod _puroro_traits {
 
         fn bytes_tab<'this>(&'this self) -> Self::Field86ScalarGetterType<'this> {
             self.bytes_tab_opt()
-                .unwrap_or(Self::bytes_tab_default_value())
+                .unwrap_or(self.bytes_tab_default_value())
         }
-        fn bytes_tab_default_value() -> Self::Field86ScalarGetterType<'static>;
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_>;
 
         fn has_bytes_tab<'this>(&'this self) -> bool {
             self.bytes_tab_opt().is_some()
@@ -2482,9 +2582,9 @@ pub mod _puroro_traits {
 
         fn bytes_crlf<'this>(&'this self) -> Self::Field87ScalarGetterType<'this> {
             self.bytes_crlf_opt()
-                .unwrap_or(Self::bytes_crlf_default_value())
+                .unwrap_or(self.bytes_crlf_default_value())
         }
-        fn bytes_crlf_default_value() -> Self::Field87ScalarGetterType<'static>;
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_>;
 
         fn has_bytes_crlf<'this>(&'this self) -> bool {
             self.bytes_crlf_opt().is_some()
@@ -2675,125 +2775,195 @@ pub mod _puroro_traits {
             fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).bool_false_opt()
             }
-            type Field71ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field71ScalarGetterType<'this>;
-            fn string_default_opt<'this>(&'this self) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
+            type Field71ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field71ScalarGetterType<'this>;
+            fn string_default_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
                 (**self).string_default_opt()
             }
-            fn string_default_default_value() -> <$ty as MsgTrait>::Field71ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_default_default_value()
+            fn string_default_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field71ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_default_default_value(self)
             }
-            type Field72ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field72ScalarGetterType<'this>;
-            fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
+            type Field72ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field72ScalarGetterType<'this>;
+            fn string_empty_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
                 (**self).string_empty_opt()
             }
-            fn string_empty_default_value() -> <$ty as MsgTrait>::Field72ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_empty_default_value()
+            fn string_empty_default_value(&self) -> <$ty as MsgTrait>::Field72ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_empty_default_value(self)
             }
-            type Field73ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field73ScalarGetterType<'this>;
-            fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
+            type Field73ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field73ScalarGetterType<'this>;
+            fn string_abc_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
                 (**self).string_abc_opt()
             }
-            fn string_abc_default_value() -> <$ty as MsgTrait>::Field73ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_abc_default_value()
+            fn string_abc_default_value(&self) -> <$ty as MsgTrait>::Field73ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_abc_default_value(self)
             }
-            type Field74ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field74ScalarGetterType<'this>;
-            fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
+            type Field74ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field74ScalarGetterType<'this>;
+            fn string_aiu_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
                 (**self).string_aiu_opt()
             }
-            fn string_aiu_default_value() -> <$ty as MsgTrait>::Field74ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_aiu_default_value()
+            fn string_aiu_default_value(&self) -> <$ty as MsgTrait>::Field74ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_aiu_default_value(self)
             }
-            type Field75ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field75ScalarGetterType<'this>;
-            fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
+            type Field75ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field75ScalarGetterType<'this>;
+            fn string_backslash_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
                 (**self).string_backslash_opt()
             }
-            fn string_backslash_default_value() -> <$ty as MsgTrait>::Field75ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_backslash_default_value()
+            fn string_backslash_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field75ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_backslash_default_value(self)
             }
-            type Field76ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field76ScalarGetterType<'this>;
-            fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
+            type Field76ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field76ScalarGetterType<'this>;
+            fn string_tab_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
                 (**self).string_tab_opt()
             }
-            fn string_tab_default_value() -> <$ty as MsgTrait>::Field76ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_tab_default_value()
+            fn string_tab_default_value(&self) -> <$ty as MsgTrait>::Field76ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_tab_default_value(self)
             }
-            type Field77ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field77ScalarGetterType<'this>;
-            fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
+            type Field77ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field77ScalarGetterType<'this>;
+            fn string_crlf_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
                 (**self).string_crlf_opt()
             }
-            fn string_crlf_default_value() -> <$ty as MsgTrait>::Field77ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_crlf_default_value()
+            fn string_crlf_default_value(&self) -> <$ty as MsgTrait>::Field77ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_crlf_default_value(self)
             }
-            type Field81ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field81ScalarGetterType<'this>;
-            fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
+            type Field81ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field81ScalarGetterType<'this>;
+            fn bytes_default_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
                 (**self).bytes_default_opt()
             }
-            fn bytes_default_default_value() -> <$ty as MsgTrait>::Field81ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_default_default_value()
+            fn bytes_default_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field81ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_default_default_value(self)
             }
-            type Field82ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field82ScalarGetterType<'this>;
-            fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
+            type Field82ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field82ScalarGetterType<'this>;
+            fn bytes_empty_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
                 (**self).bytes_empty_opt()
             }
-            fn bytes_empty_default_value() -> <$ty as MsgTrait>::Field82ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_empty_default_value()
+            fn bytes_empty_default_value(&self) -> <$ty as MsgTrait>::Field82ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_empty_default_value(self)
             }
-            type Field83ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field83ScalarGetterType<'this>;
-            fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
+            type Field83ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field83ScalarGetterType<'this>;
+            fn bytes_abc_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
                 (**self).bytes_abc_opt()
             }
-            fn bytes_abc_default_value() -> <$ty as MsgTrait>::Field83ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_abc_default_value()
+            fn bytes_abc_default_value(&self) -> <$ty as MsgTrait>::Field83ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_abc_default_value(self)
             }
-            type Field84ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field84ScalarGetterType<'this>;
-            fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
+            type Field84ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field84ScalarGetterType<'this>;
+            fn bytes_aiu_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
                 (**self).bytes_aiu_opt()
             }
-            fn bytes_aiu_default_value() -> <$ty as MsgTrait>::Field84ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_aiu_default_value()
+            fn bytes_aiu_default_value(&self) -> <$ty as MsgTrait>::Field84ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_aiu_default_value(self)
             }
-            type Field85ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field85ScalarGetterType<'this>;
-            fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
+            type Field85ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field85ScalarGetterType<'this>;
+            fn bytes_backslash_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
                 (**self).bytes_backslash_opt()
             }
-            fn bytes_backslash_default_value() -> <$ty as MsgTrait>::Field85ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_backslash_default_value()
+            fn bytes_backslash_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field85ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_backslash_default_value(self)
             }
-            type Field86ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field86ScalarGetterType<'this>;
-            fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
+            type Field86ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field86ScalarGetterType<'this>;
+            fn bytes_tab_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
                 (**self).bytes_tab_opt()
             }
-            fn bytes_tab_default_value() -> <$ty as MsgTrait>::Field86ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_tab_default_value()
+            fn bytes_tab_default_value(&self) -> <$ty as MsgTrait>::Field86ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_tab_default_value(self)
             }
-            type Field87ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field87ScalarGetterType<'this>;
-            fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
+            type Field87ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field87ScalarGetterType<'this>;
+            fn bytes_crlf_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
                 (**self).bytes_crlf_opt()
             }
-            fn bytes_crlf_default_value() -> <$ty as MsgTrait>::Field87ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_crlf_default_value()
+            fn bytes_crlf_default_value(&self) -> <$ty as MsgTrait>::Field87ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_crlf_default_value(self)
             }
-            fn enum_default_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            fn enum_default_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_default_opt()
             }
-            fn enum_one_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            fn enum_one_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_one_opt()
             }
-            fn enum_fourty_two_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            fn enum_fourty_two_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_fourty_two_opt()
             }
         };
@@ -2832,6 +3002,390 @@ pub mod _puroro_traits {
         T: MsgTrait,
     {
         msg_delegate!(T);
+    }
+    impl MsgTrait for () {
+        type Field71ScalarGetterType<'this> = &'this str;
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field72ScalarGetterType<'this> = &'this str;
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
+            ""
+        }
+        type Field73ScalarGetterType<'this> = &'this str;
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
+            "abc"
+        }
+        type Field74ScalarGetterType<'this> = &'this str;
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        type Field75ScalarGetterType<'this> = &'this str;
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
+            "\\"
+        }
+        type Field76ScalarGetterType<'this> = &'this str;
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
+            "\t"
+        }
+        type Field77ScalarGetterType<'this> = &'this str;
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
+            "\r\n"
+        }
+        type Field81ScalarGetterType<'this> = &'this [u8];
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field82ScalarGetterType<'this> = &'this [u8];
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
+            b""
+        }
+        type Field83ScalarGetterType<'this> = &'this [u8];
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
+            b"\x61\x62\x63"
+        }
+        type Field84ScalarGetterType<'this> = &'this [u8];
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        type Field85ScalarGetterType<'this> = &'this [u8];
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
+            b"\x5c"
+        }
+        type Field86ScalarGetterType<'this> = &'this [u8];
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
+            b"\x09"
+        }
+        type Field87ScalarGetterType<'this> = &'this [u8];
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
+            b"\x0d\x0a"
+        }
+    }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + MsgTrait,
+    {
+        fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_default_opt())
+        }
+        fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_0_opt())
+        }
+        fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_42_opt())
+        }
+        fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_m42_opt())
+        }
+        fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_2147483647_opt())
+        }
+        fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_m2147483648_opt())
+        }
+        fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_0123_opt())
+        }
+        fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_0x123_opt())
+        }
+        fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_default_opt())
+        }
+        fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_0_opt())
+        }
+        fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_42_opt())
+        }
+        fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_4294967295_opt())
+        }
+        fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_0123_opt())
+        }
+        fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_0x123_opt())
+        }
+        fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_default_opt())
+        }
+        fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_0_opt())
+        }
+        fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_42_opt())
+        }
+        fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_m42_opt())
+        }
+        fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref()
+                .and_then(|msg| msg.i64_9223372036854775807_opt())
+        }
+        fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref()
+                .and_then(|msg| msg.i64_m9223372036854775808_opt())
+        }
+        fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_0123_opt())
+        }
+        fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_0x123_opt())
+        }
+        fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_default_opt())
+        }
+        fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_0_opt())
+        }
+        fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_42_opt())
+        }
+        fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref()
+                .and_then(|msg| msg.u64_18446744073709551615_opt())
+        }
+        fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_0123_opt())
+        }
+        fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_0x123_opt())
+        }
+        fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_default_opt())
+        }
+        fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0_opt())
+        }
+        fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_m0_opt())
+        }
+        fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0p_opt())
+        }
+        fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_p0_opt())
+        }
+        fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0p0_opt())
+        }
+        fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_42_opt())
+        }
+        fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_m42_opt())
+        }
+        fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_0p25_opt())
+        }
+        fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_1p5e2_opt())
+        }
+        fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_inf_opt())
+        }
+        fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_minf_opt())
+        }
+        fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_nan_opt())
+        }
+        fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.f32_mnan_opt())
+        }
+        fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_default_opt())
+        }
+        fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_true_opt())
+        }
+        fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().and_then(|msg| msg.bool_false_opt())
+        }
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field71ScalarGetterType<'this>>;
+        fn string_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_default_opt())
+        }
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field72ScalarGetterType<'this>>;
+        fn string_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_empty_opt())
+        }
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field73ScalarGetterType<'this>>;
+        fn string_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_abc_opt())
+        }
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field74ScalarGetterType<'this>>;
+        fn string_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_aiu_opt())
+        }
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field75ScalarGetterType<'this>>;
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_backslash_opt())
+        }
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field76ScalarGetterType<'this>>;
+        fn string_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_tab_opt())
+        }
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field77ScalarGetterType<'this>>;
+        fn string_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_crlf_opt())
+        }
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field81ScalarGetterType<'this>>;
+        fn bytes_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_default_opt())
+        }
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field82ScalarGetterType<'this>>;
+        fn bytes_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_empty_opt())
+        }
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field83ScalarGetterType<'this>>;
+        fn bytes_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_abc_opt())
+        }
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field84ScalarGetterType<'this>>;
+        fn bytes_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_aiu_opt())
+        }
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field85ScalarGetterType<'this>>;
+        fn bytes_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_backslash_opt())
+        }
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field86ScalarGetterType<'this>>;
+        fn bytes_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_tab_opt())
+        }
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field87ScalarGetterType<'this>>;
+        fn bytes_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_crlf_opt())
+        }
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
+            todo!()
+        }
+        fn enum_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_default_opt())
+        }
+        fn enum_one_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_one_opt())
+        }
+        fn enum_fourty_two_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().and_then(|msg| msg.enum_fourty_two_opt())
+        }
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]

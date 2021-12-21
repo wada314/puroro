@@ -301,14 +301,30 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_required_opt<'this>(&'this self) -> Option<Self::Field21ScalarGetterType<'this>> {
-            self.bytes_required.as_ref().map(|v| v.as_ref())
+            self.bytes_required.as_ref()
+        }
+        fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
         type Field22ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::vec::Vec<u8>;
         fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
-            self.bytes_optional.as_ref().map(|v| v.as_ref())
+            self.bytes_optional.as_ref()
+        }
+        fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::vec::Vec<u8>> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&[u8]>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
         type Field23ScalarGetterType<'this>
         where
@@ -324,14 +340,30 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_required_opt<'this>(&'this self) -> Option<Self::Field31ScalarGetterType<'this>> {
-            self.string_required.as_ref().map(|v| v.as_ref())
+            self.string_required.as_ref()
+        }
+        fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
         type Field32ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ::std::string::String;
         fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            self.string_optional.as_ref()
+        }
+        fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
         type Field33ScalarGetterType<'this>
         where
@@ -364,11 +396,25 @@ pub mod _puroro_simple_impl {
         }
         type Field51ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51ScalarGetterType<'this>> {
-            self.submsg_required.as_ref().map(|v| v.as_ref())
+            self.submsg_required.as_ref().map(|x| x.as_ref())
+        }
+        fn submsg_required_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy< self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg
+    > = ::puroro::once_cell::sync::Lazy::new(|| { ::std::default::Default::default()
+    });
+
+            &DEFAULT_VALUE
         }
         type Field52ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            self.submsg_optional.as_ref().map(|x| x.as_ref())
+        }
+        fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy< self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg
+    > = ::puroro::once_cell::sync::Lazy::new(|| { ::std::default::Default::default()
+    });
+
+            &DEFAULT_VALUE
         }
         type Field53ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         type Field53RepeatedType<'this> = &'this [self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg];
@@ -1495,9 +1541,9 @@ pub mod _puroro_traits {
 
         fn bytes_required<'this>(&'this self) -> Self::Field21ScalarGetterType<'this> {
             self.bytes_required_opt()
-                .unwrap_or(Self::bytes_required_default_value())
+                .unwrap_or(self.bytes_required_default_value())
         }
-        fn bytes_required_default_value() -> Self::Field21ScalarGetterType<'static>;
+        fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_>;
 
         fn has_bytes_required<'this>(&'this self) -> bool {
             self.bytes_required_opt().is_some()
@@ -1514,9 +1560,9 @@ pub mod _puroro_traits {
 
         fn bytes_optional<'this>(&'this self) -> Self::Field22ScalarGetterType<'this> {
             self.bytes_optional_opt()
-                .unwrap_or(Self::bytes_optional_default_value())
+                .unwrap_or(self.bytes_optional_default_value())
         }
-        fn bytes_optional_default_value() -> Self::Field22ScalarGetterType<'static>;
+        fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_>;
 
         fn has_bytes_optional<'this>(&'this self) -> bool {
             self.bytes_optional_opt().is_some()
@@ -1543,9 +1589,9 @@ pub mod _puroro_traits {
 
         fn string_required<'this>(&'this self) -> Self::Field31ScalarGetterType<'this> {
             self.string_required_opt()
-                .unwrap_or(Self::string_required_default_value())
+                .unwrap_or(self.string_required_default_value())
         }
-        fn string_required_default_value() -> Self::Field31ScalarGetterType<'static>;
+        fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_>;
 
         fn has_string_required<'this>(&'this self) -> bool {
             self.string_required_opt().is_some()
@@ -1562,9 +1608,9 @@ pub mod _puroro_traits {
 
         fn string_optional<'this>(&'this self) -> Self::Field32ScalarGetterType<'this> {
             self.string_optional_opt()
-                .unwrap_or(Self::string_optional_default_value())
+                .unwrap_or(self.string_optional_default_value())
         }
-        fn string_optional_default_value() -> Self::Field32ScalarGetterType<'static>;
+        fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_>;
 
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
@@ -1624,9 +1670,9 @@ pub mod _puroro_traits {
 
         fn submsg_required<'this>(&'this self) -> Self::Field51ScalarGetterType<'this> {
             self.submsg_required_opt()
-                .unwrap_or(Self::submsg_required_default_value())
+                .unwrap_or(self.submsg_required_default_value())
         }
-        fn submsg_required_default_value() -> Self::Field51ScalarGetterType<'static>;
+        fn submsg_required_default_value(&self) -> Self::Field51ScalarGetterType<'_>;
 
         fn has_submsg_required<'this>(&'this self) -> bool {
             self.submsg_required_opt().is_some()
@@ -1642,9 +1688,9 @@ pub mod _puroro_traits {
 
         fn submsg_optional<'this>(&'this self) -> Self::Field52ScalarGetterType<'this> {
             self.submsg_optional_opt()
-                .unwrap_or(Self::submsg_optional_default_value())
+                .unwrap_or(self.submsg_optional_default_value())
         }
-        fn submsg_optional_default_value() -> Self::Field52ScalarGetterType<'static>;
+        fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_>;
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -1974,8 +2020,10 @@ pub mod _puroro_traits {
                 (**self).i32_optional_opt()
             }
 
-            type Field3RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field3RepeatedType<'this>;
+            type Field3RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field3RepeatedType<'this>;
             fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
                 (**self).i32_repeated()
             }
@@ -1986,92 +2034,148 @@ pub mod _puroro_traits {
                 (**self).float_optional_opt()
             }
 
-            type Field13RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field13RepeatedType<'this>;
+            type Field13RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field13RepeatedType<'this>;
             fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
                 (**self).float_repeated()
             }
-            type Field21ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field21ScalarGetterType<'this>;
-            fn bytes_required_opt<'this>(&'this self) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
+            type Field21ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field21ScalarGetterType<'this>;
+            fn bytes_required_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
                 (**self).bytes_required_opt()
             }
-            fn bytes_required_default_value() -> <$ty as MsgTrait>::Field21ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_required_default_value()
+            fn bytes_required_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field21ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_required_default_value(self)
             }
-            type Field22ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field22ScalarGetterType<'this>;
-            fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
+            type Field22ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field22ScalarGetterType<'this>;
+            fn bytes_optional_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
                 (**self).bytes_optional_opt()
             }
-            fn bytes_optional_default_value() -> <$ty as MsgTrait>::Field22ScalarGetterType<'static> {
-                <$ty as MsgTrait>::bytes_optional_default_value()
+            fn bytes_optional_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field22ScalarGetterType<'_> {
+                <$ty as MsgTrait>::bytes_optional_default_value(self)
             }
-            type Field23ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field23ScalarGetterType<'this>;
+            type Field23ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field23ScalarGetterType<'this>;
 
-            type Field23RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field23RepeatedType<'this>;
+            type Field23RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field23RepeatedType<'this>;
             fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
                 (**self).bytes_repeated()
             }
-            type Field31ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field31ScalarGetterType<'this>;
-            fn string_required_opt<'this>(&'this self) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
+            type Field31ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field31ScalarGetterType<'this>;
+            fn string_required_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
                 (**self).string_required_opt()
             }
-            fn string_required_default_value() -> <$ty as MsgTrait>::Field31ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_required_default_value()
+            fn string_required_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field31ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_required_default_value(self)
             }
-            type Field32ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field32ScalarGetterType<'this>;
-            fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
+            type Field32ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field32ScalarGetterType<'this>;
+            fn string_optional_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
                 (**self).string_optional_opt()
             }
-            fn string_optional_default_value() -> <$ty as MsgTrait>::Field32ScalarGetterType<'static> {
-                <$ty as MsgTrait>::string_optional_default_value()
+            fn string_optional_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field32ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_optional_default_value(self)
             }
-            type Field33ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field33ScalarGetterType<'this>;
+            type Field33ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field33ScalarGetterType<'this>;
 
-            type Field33RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field33RepeatedType<'this>;
+            type Field33RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field33RepeatedType<'this>;
             fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
                 (**self).string_repeated()
             }
-            fn enum_required_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
+            fn enum_required_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
                 (**self).enum_required_opt()
             }
-            fn enum_optional_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
+            fn enum_optional_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
                 (**self).enum_optional_opt()
             }
 
-            type Field43RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field43RepeatedType<'this>;
+            type Field43RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field43RepeatedType<'this>;
             fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
                 (**self).enum_repeated()
             }
-            type Field51ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field51ScalarGetterType<'this>;
-            fn submsg_required_opt<'this>(&'this self) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
+            type Field51ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field51ScalarGetterType<'this>;
+            fn submsg_required_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
                 (**self).submsg_required_opt()
             }
-            fn submsg_required_default_value() -> <$ty as MsgTrait>::Field51ScalarGetterType<'static> {
-                <$ty as MsgTrait>::submsg_required_default_value()
+            fn submsg_required_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field51ScalarGetterType<'_> {
+                <$ty as MsgTrait>::submsg_required_default_value(self)
             }
-            type Field52ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field52ScalarGetterType<'this>;
-            fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
+            type Field52ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field52ScalarGetterType<'this>;
+            fn submsg_optional_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
                 (**self).submsg_optional_opt()
             }
-            fn submsg_optional_default_value() -> <$ty as MsgTrait>::Field52ScalarGetterType<'static> {
-                <$ty as MsgTrait>::submsg_optional_default_value()
+            fn submsg_optional_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field52ScalarGetterType<'_> {
+                <$ty as MsgTrait>::submsg_optional_default_value(self)
             }
-            type Field53ScalarGetterType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field53ScalarGetterType<'this>;
+            type Field53ScalarGetterType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field53ScalarGetterType<'this>;
 
-            type Field53RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field53RepeatedType<'this>;
+            type Field53RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field53RepeatedType<'this>;
             fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
                 (**self).submsg_repeated()
             }
@@ -2082,8 +2186,10 @@ pub mod _puroro_traits {
                 (**self).i64_optional_opt()
             }
 
-            type Field103RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field103RepeatedType<'this>;
+            type Field103RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field103RepeatedType<'this>;
             fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
                 (**self).i64_repeated()
             }
@@ -2094,8 +2200,10 @@ pub mod _puroro_traits {
                 (**self).u32_optional_opt()
             }
 
-            type Field113RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field113RepeatedType<'this>;
+            type Field113RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field113RepeatedType<'this>;
             fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
                 (**self).u32_repeated()
             }
@@ -2106,8 +2214,10 @@ pub mod _puroro_traits {
                 (**self).u64_optional_opt()
             }
 
-            type Field123RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field123RepeatedType<'this>;
+            type Field123RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field123RepeatedType<'this>;
             fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
                 (**self).u64_repeated()
             }
@@ -2118,8 +2228,10 @@ pub mod _puroro_traits {
                 (**self).s32_optional_opt()
             }
 
-            type Field133RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field133RepeatedType<'this>;
+            type Field133RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field133RepeatedType<'this>;
             fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
                 (**self).s32_repeated()
             }
@@ -2130,8 +2242,10 @@ pub mod _puroro_traits {
                 (**self).s64_optional_opt()
             }
 
-            type Field143RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field143RepeatedType<'this>;
+            type Field143RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field143RepeatedType<'this>;
             fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
                 (**self).s64_repeated()
             }
@@ -2142,8 +2256,10 @@ pub mod _puroro_traits {
                 (**self).fixed32_optional_opt()
             }
 
-            type Field153RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field153RepeatedType<'this>;
+            type Field153RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field153RepeatedType<'this>;
             fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
                 (**self).fixed32_repeated()
             }
@@ -2154,8 +2270,10 @@ pub mod _puroro_traits {
                 (**self).fixed64_optional_opt()
             }
 
-            type Field163RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field163RepeatedType<'this>;
+            type Field163RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field163RepeatedType<'this>;
             fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
                 (**self).fixed64_repeated()
             }
@@ -2166,8 +2284,10 @@ pub mod _puroro_traits {
                 (**self).sfixed32_optional_opt()
             }
 
-            type Field173RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field173RepeatedType<'this>;
+            type Field173RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field173RepeatedType<'this>;
             fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
                 (**self).sfixed32_repeated()
             }
@@ -2178,8 +2298,10 @@ pub mod _puroro_traits {
                 (**self).sfixed64_optional_opt()
             }
 
-            type Field183RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field183RepeatedType<'this>;
+            type Field183RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field183RepeatedType<'this>;
             fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
                 (**self).sfixed64_repeated()
             }
@@ -2190,8 +2312,10 @@ pub mod _puroro_traits {
                 (**self).f64_optional_opt()
             }
 
-            type Field193RepeatedType<'this> where Self: 'this =
-                <$ty as MsgTrait>::Field193RepeatedType<'this>;
+            type Field193RepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty as MsgTrait>::Field193RepeatedType<'this>;
             fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
                 (**self).f64_repeated()
             }
@@ -2231,6 +2355,486 @@ pub mod _puroro_traits {
         T: MsgTrait,
     {
         msg_delegate!(T);
+    }
+    impl MsgTrait for () {
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field13RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field21ScalarGetterType<'this> = &'this [u8];
+        fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field22ScalarGetterType<'this> = &'this [u8];
+        fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field23ScalarGetterType<'this> = &'this [u8];
+        type Field23RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field23ScalarGetterType<'this>,
+        >;
+        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field31ScalarGetterType<'this> = &'this str;
+        fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field32ScalarGetterType<'this> = &'this str;
+        fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field33ScalarGetterType<'this> = &'this str;
+        type Field33RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field33ScalarGetterType<'this>,
+        >;
+        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field43RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            self::_puroro_root::full_coverage2::Enum,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field51ScalarGetterType<'this> = ();
+        fn submsg_required_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field52ScalarGetterType<'this> = ();
+        fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field53ScalarGetterType<'this> = ();
+        type Field53RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::Field53ScalarGetterType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field103RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field113RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field123RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field133RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field143RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field153RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field163RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field173RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field183RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field193RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
+        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + MsgTrait,
+    {
+        fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_required_opt())
+        }
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_optional_opt())
+        }
+
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field3RepeatedType<'this>>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i32_repeated()),
+            )
+        }
+        fn float_required_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.float_required_opt())
+        }
+        fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.float_optional_opt())
+        }
+
+        type Field13RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field13RepeatedType<'this>>;
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.float_repeated()),
+            )
+        }
+        type Field21ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field21ScalarGetterType<'this>>;
+        fn bytes_required_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_required_opt())
+        }
+        fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field22ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field22ScalarGetterType<'this>>;
+        fn bytes_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.bytes_optional_opt())
+        }
+        fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field23ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field23ScalarGetterType<'this>>;
+
+        type Field23RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field23RepeatedType<'this>>;
+        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.bytes_repeated()),
+            )
+        }
+        type Field31ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field31ScalarGetterType<'this>>;
+        fn string_required_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_required_opt())
+        }
+        fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field32ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field32ScalarGetterType<'this>>;
+        fn string_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_optional_opt())
+        }
+        fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field33ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field33ScalarGetterType<'this>>;
+
+        type Field33RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field33RepeatedType<'this>>;
+        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.string_repeated()),
+            )
+        }
+        fn enum_required_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
+            self.as_ref().and_then(|msg| msg.enum_required_opt())
+        }
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
+            self.as_ref().and_then(|msg| msg.enum_optional_opt())
+        }
+
+        type Field43RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field43RepeatedType<'this>>;
+        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.enum_repeated()),
+            )
+        }
+        type Field51ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field51ScalarGetterType<'this>>;
+        fn submsg_required_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.submsg_required_opt())
+        }
+        fn submsg_required_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field52ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field52ScalarGetterType<'this>>;
+        fn submsg_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.submsg_optional_opt())
+        }
+        fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field53ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field53ScalarGetterType<'this>>;
+
+        type Field53RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field53RepeatedType<'this>>;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.submsg_repeated()),
+            )
+        }
+        fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_required_opt())
+        }
+        fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.i64_optional_opt())
+        }
+
+        type Field103RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field103RepeatedType<'this>>;
+        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i64_repeated()),
+            )
+        }
+        fn u32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_required_opt())
+        }
+        fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.u32_optional_opt())
+        }
+
+        type Field113RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field113RepeatedType<'this>>;
+        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.u32_repeated()),
+            )
+        }
+        fn u64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_required_opt())
+        }
+        fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.u64_optional_opt())
+        }
+
+        type Field123RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field123RepeatedType<'this>>;
+        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.u64_repeated()),
+            )
+        }
+        fn s32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.s32_required_opt())
+        }
+        fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.s32_optional_opt())
+        }
+
+        type Field133RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field133RepeatedType<'this>>;
+        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.s32_repeated()),
+            )
+        }
+        fn s64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.s64_required_opt())
+        }
+        fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.s64_optional_opt())
+        }
+
+        type Field143RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field143RepeatedType<'this>>;
+        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.s64_repeated()),
+            )
+        }
+        fn fixed32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.fixed32_required_opt())
+        }
+        fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().and_then(|msg| msg.fixed32_optional_opt())
+        }
+
+        type Field153RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field153RepeatedType<'this>>;
+        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.fixed32_repeated()),
+            )
+        }
+        fn fixed64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.fixed64_required_opt())
+        }
+        fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().and_then(|msg| msg.fixed64_optional_opt())
+        }
+
+        type Field163RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field163RepeatedType<'this>>;
+        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.fixed64_repeated()),
+            )
+        }
+        fn sfixed32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.sfixed32_required_opt())
+        }
+        fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.sfixed32_optional_opt())
+        }
+
+        type Field173RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field173RepeatedType<'this>>;
+        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.sfixed32_repeated()),
+            )
+        }
+        fn sfixed64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.sfixed64_required_opt())
+        }
+        fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().and_then(|msg| msg.sfixed64_optional_opt())
+        }
+
+        type Field183RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field183RepeatedType<'this>>;
+        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.sfixed64_repeated()),
+            )
+        }
+        fn f64_required_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            self.as_ref().and_then(|msg| msg.f64_required_opt())
+        }
+        fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            self.as_ref().and_then(|msg| msg.f64_optional_opt())
+        }
+
+        type Field193RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field193RepeatedType<'this>>;
+        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.f64_repeated()),
+            )
+        }
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
@@ -2498,6 +3102,18 @@ pub mod _puroro_nested {
                 T: SubmsgTrait,
             {
                 submsg_delegate!(T);
+            }
+            impl SubmsgTrait for () {}
+            impl<T> SubmsgTrait for ::std::option::Option<T>
+            where
+                T: ::std::default::Default + SubmsgTrait,
+            {
+                fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    self.as_ref().and_then(|msg| msg.i32_required_opt())
+                }
+                fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                    self.as_ref().and_then(|msg| msg.i64_required_opt())
+                }
             }
         }
         pub use _puroro_nested::*;

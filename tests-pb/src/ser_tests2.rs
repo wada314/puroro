@@ -120,7 +120,15 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this ::std::string::String;
         fn string_optional_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            self.string_optional.as_ref()
+        }
+        fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
+                ::puroro::once_cell::sync::Lazy::new(|| {
+                    ::std::convert::From::<&str>::from(::std::default::Default::default())
+                });
+
+            &DEFAULT_VALUE
         }
         type Field6ScalarGetterType<'this>
         where
@@ -136,7 +144,14 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7ScalarGetterType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            self.submsg_optional.as_ref().map(|x| x.as_ref())
+        }
+        fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+            static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+            > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
+
+            &DEFAULT_VALUE
         }
         type Field8ScalarGetterType<'this>
         where
@@ -485,9 +500,9 @@ pub mod _puroro_traits {
 
         fn string_optional<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.string_optional_opt()
-                .unwrap_or(Self::string_optional_default_value())
+                .unwrap_or(self.string_optional_default_value())
         }
-        fn string_optional_default_value() -> Self::Field5ScalarGetterType<'static>;
+        fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_>;
 
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
@@ -513,9 +528,9 @@ pub mod _puroro_traits {
 
         fn submsg_optional<'this>(&'this self) -> Self::Field7ScalarGetterType<'this> {
             self.submsg_optional_opt()
-                .unwrap_or(Self::submsg_optional_default_value())
+                .unwrap_or(self.submsg_optional_default_value())
         }
-        fn submsg_optional_default_value() -> Self::Field7ScalarGetterType<'static>;
+        fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_>;
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -601,9 +616,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
                 (**self).string_optional_opt()
             }
-            fn string_optional_default_value() -> <$ty as MsgTrait>::Field5ScalarGetterType<'static>
-            {
-                <$ty as MsgTrait>::string_optional_default_value()
+            fn string_optional_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field5ScalarGetterType<'_> {
+                <$ty as MsgTrait>::string_optional_default_value(self)
             }
             type Field6ScalarGetterType<'this>
             where
@@ -626,9 +642,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
                 (**self).submsg_optional_opt()
             }
-            fn submsg_optional_default_value() -> <$ty as MsgTrait>::Field7ScalarGetterType<'static>
-            {
-                <$ty as MsgTrait>::submsg_optional_default_value()
+            fn submsg_optional_default_value(
+                &self,
+            ) -> <$ty as MsgTrait>::Field7ScalarGetterType<'_> {
+                <$ty as MsgTrait>::submsg_optional_default_value(self)
             }
             type Field8ScalarGetterType<'this>
             where
@@ -694,6 +711,157 @@ pub mod _puroro_traits {
         T: MsgTrait,
     {
         msg_delegate!(T);
+    }
+    impl MsgTrait for () {
+        type Field2RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field5ScalarGetterType<'this> = &'this str;
+        fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field6ScalarGetterType<'this> = &'this str;
+        type Field6RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field6ScalarGetterType<'this>>;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field7ScalarGetterType<'this> = ();
+        fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+            ::std::default::Default::default()
+        }
+        type Field8ScalarGetterType<'this> = ();
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8ScalarGetterType<'this>>;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field10RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            self::_puroro_root::ser_tests2::Enum,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: ::std::default::Default + MsgTrait,
+    {
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().and_then(|msg| msg.i32_optional_opt())
+        }
+
+        type Field2RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field2RepeatedType<'this>>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i32_repeated()),
+            )
+        }
+        fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().and_then(|msg| msg.float_optional_opt())
+        }
+
+        type Field4RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field4RepeatedType<'this>>;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.float_repeated()),
+            )
+        }
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field5ScalarGetterType<'this>>;
+        fn string_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.string_optional_opt())
+        }
+        fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field6ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field6ScalarGetterType<'this>>;
+
+        type Field6RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field6RepeatedType<'this>>;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.string_repeated()),
+            )
+        }
+        type Field7ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field7ScalarGetterType<'this>>;
+        fn submsg_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
+            self.as_ref().and_then(|msg| msg.submsg_optional_opt())
+        }
+        fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+            todo!()
+        }
+        type Field8ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::std::option::Option<T::Field8ScalarGetterType<'this>>;
+
+        type Field8RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field8RepeatedType<'this>>;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.submsg_repeated()),
+            )
+        }
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
+            self.as_ref().and_then(|msg| msg.enum_optional_opt())
+        }
+
+        type Field10RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field10RepeatedType<'this>>;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.enum_repeated()),
+            )
+        }
+        fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref()
+                .and_then(|msg| msg.very_large_field_number_opt())
+        }
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
@@ -919,6 +1087,15 @@ pub mod _puroro_nested {
                 T: SubmsgTrait,
             {
                 submsg_delegate!(T);
+            }
+            impl SubmsgTrait for () {}
+            impl<T> SubmsgTrait for ::std::option::Option<T>
+            where
+                T: ::std::default::Default + SubmsgTrait,
+            {
+                fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    self.as_ref().and_then(|msg| msg.i32_optional_opt())
+                }
             }
         }
         pub use _puroro_nested::*;

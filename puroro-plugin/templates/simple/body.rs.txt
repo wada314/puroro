@@ -83,11 +83,15 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
         self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
             {%- for field in oneof.fields %}
-            {% if field.is_length_delimited %}
+            {%- if field.is_length_delimited %}
+            {%- if field.is_message %}
             E::{{ field.ident }}(v) => F::{{ field.ident }}(v.as_ref()),
-            {%- else %}
+            {%- else %} {#- if field.is_message #}
+            E::{{ field.ident }}(v) => F::{{ field.ident }}(v),
+            {%- endif %} {#- if field.is_message #}
+            {%- else %} {#- if field.is_length_delimited #}
             E::{{ field.ident }}(v) => F::{{ field.ident }}(v.clone()),
-            {%- endif %}
+            {%- endif %} {#- if field.is_length_delimited #}
             {%- endfor %}
         })
     }

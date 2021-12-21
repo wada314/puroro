@@ -52,14 +52,14 @@ pub trait {{ m.trait_ident }} {
     {# i32 #} {# The numerical types are returned by value, not by ref. #}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
         {%- if field.is_length_delimited %}
-        self.{{ field.ident_unesc }}_opt().unwrap_or(Self::{{ field.ident_unesc }}_default_value())
+        self.{{ field.ident_unesc }}_opt().unwrap_or(self.{{ field.ident_unesc }}_default_value())
         {%- else %} {#- if field.is_length_delimited #}
         self.{{ field.ident_unesc }}_opt().unwrap_or({{ field.default_value }})
         {%- endif %} {#- if field.is_length_delimited #}
     }
     
     {%- if field.is_length_delimited %}
-    fn {{ field.ident_unesc }}_default_value() -> Self::Field{{ field.number }}ScalarGetterType<'static>;
+    fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_>;
     {%- endif %} {#- if field.is_length_delimited #}
 
     fn has_{{ field.ident_unesc }}<'this>(&'this self) -> bool {
@@ -132,8 +132,10 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
         {%- endif %}
 
         {%- if field.is_length_delimited %}
-        fn {{ field.ident_unesc }}_default_value() -> <$ty as {{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'static> {
-            <$ty as {{ m.trait_ident }}>::{{ field.ident_unesc }}_default_value()
+        fn {{ field.ident_unesc }}_default_value(&self) -> 
+            <$ty as {{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'_>
+        {
+            <$ty as {{ m.trait_ident }}>::{{ field.ident_unesc }}_default_value(self)
         }
         {%- endif %} {#- if field.is_length_delimited #}
 
@@ -191,16 +193,12 @@ where
     {{ m.trait_delegate_macro_ident }}!(T);
 }
 
-{#
 {%- include "empty/trait_impl.rs.txt" %}
+{%- include "option/trait_impl.rs.txt" %}
+{#
 {%- include "merged/trait_impl.rs.txt" %}
 {%- include "either/trait_impl.rs.txt" %}
-{%- include "option/trait_impl.rs.txt" %}
 #}
-
-{%- macro empty_trait_impl_field(f) -%}
-{%- include "empty/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
 
 {%- macro either_trait_impl_field(f) -%}
 {%- include "either/trait_impl_field.rs.txt" %}
@@ -208,9 +206,5 @@ where
 
 {%- macro merged_trait_impl_field(f) -%}
 {%- include "merged/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro option_trait_impl_field(f) -%}
-{%- include "option/trait_impl_field.rs.txt" %}
 {%- endmacro -%}
 
