@@ -231,12 +231,12 @@ pub mod _puroro_traits {
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + MsgTrait,
+        T: MsgTrait,
     {
         type Field1ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field1ScalarGetterType<'this>>;
+        = T::Field1ScalarGetterType<'this>;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {

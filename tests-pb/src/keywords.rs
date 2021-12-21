@@ -183,7 +183,7 @@ pub mod _puroro_traits {
     impl MsgTrait for () {}
     impl<T> MsgTrait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + MsgTrait,
+        T: MsgTrait,
     {
         fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.type_opt())

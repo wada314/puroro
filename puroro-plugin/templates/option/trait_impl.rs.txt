@@ -1,21 +1,18 @@
 impl<T> {{ m.trait_ident }} for ::std::option::Option<T>
 where
-    T: ::std::default::Default + {{ m.trait_ident }},
+    T: {{ m.trait_ident }},
 {
     {%- for f in m.fields %}
     {%- if f.is_message %}
-    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this =
-        ::std::option::Option<T::Field{{ f.number }}ScalarGetterType<'this>>;
+    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = T::Field{{ f.number }}ScalarGetterType<'this>;
     {%- endif %} {#- if f.is_message #}
     {%- if f.is_string %}
-    {#- !!!!!FIXME!!!!! #}
     type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this =
-        ::std::option::Option<T::Field{{ f.number }}ScalarGetterType<'this>>;
+        ::puroro::Either<T::Field{{ f.number }}ScalarGetterType<'this>, &'this str>;
     {%- endif %} {#- if f.is_string #}
     {%- if f.is_bytes %}
-    {#- !!!!!FIXME!!!!! #}
     type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this =
-        ::std::option::Option<T::Field{{ f.number }}ScalarGetterType<'this>>;
+        ::puroro::Either<T::Field{{ f.number }}ScalarGetterType<'this>, &'this [u8]>;
     {%- endif %} {#- if f.is_bytes #}
 
     {%- if f.is_repeated %}
@@ -30,7 +27,15 @@ where
 
     {%- if !f.is_explicit_oneof_field %}
     fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
+        {%- if f.is_length_delimited %}
+        {%- if f.is_message %}
         self.as_ref().and_then(|msg| msg.{{ f.ident_unesc }}_opt())
+        {%- else %} {#- if f.is_message #}
+        self.as_ref().and_then(|msg| msg.{{ f.ident_unesc }}_opt().map(|val| ::puroro::Either::Left(val)))
+        {%- endif %} {#- if f.is_message #}
+        {%- else %} {#- if f.is_length_delimited #}
+        self.as_ref().and_then(|msg| msg.{{ f.ident_unesc }}_opt())
+        {%- endif %} {#- if f.is_length_delimited #}
     }
     {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
@@ -48,11 +53,7 @@ where
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
             <'this, Self>
-            {%- else %}
-            <'this>
-            {%- endif %}
             {%- endif %}
         >
     {

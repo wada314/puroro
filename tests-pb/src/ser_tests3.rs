@@ -781,7 +781,7 @@ pub mod _puroro_traits {
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + MsgTrait,
+        T: MsgTrait,
     {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
@@ -812,11 +812,14 @@ pub mod _puroro_traits {
         type Field5ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field5ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field5ScalarGetterType<'this>, &'this str>;
         fn string_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
+            self.as_ref().and_then(|msg| {
+                msg.string_unlabeled_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             todo!()
@@ -824,7 +827,7 @@ pub mod _puroro_traits {
         type Field6ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field6ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field6ScalarGetterType<'this>, &'this str>;
 
         type Field6RepeatedType<'this>
         where
@@ -838,7 +841,7 @@ pub mod _puroro_traits {
         type Field7ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field7ScalarGetterType<'this>>;
+        = T::Field7ScalarGetterType<'this>;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
@@ -850,7 +853,7 @@ pub mod _puroro_traits {
         type Field8ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field8ScalarGetterType<'this>>;
+        = T::Field8ScalarGetterType<'this>;
 
         type Field8RepeatedType<'this>
         where
@@ -1114,7 +1117,7 @@ pub mod _puroro_nested {
             impl SubmsgTrait for () {}
             impl<T> SubmsgTrait for ::std::option::Option<T>
             where
-                T: ::std::default::Default + SubmsgTrait,
+                T: SubmsgTrait,
             {
                 fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())

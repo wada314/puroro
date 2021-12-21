@@ -2507,7 +2507,7 @@ pub mod _puroro_traits {
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + MsgTrait,
+        T: MsgTrait,
     {
         fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_required_opt())
@@ -2544,11 +2544,14 @@ pub mod _puroro_traits {
         type Field21ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field21ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field21ScalarGetterType<'this>, &'this [u8]>;
         fn bytes_required_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.bytes_required_opt())
+            self.as_ref().and_then(|msg| {
+                msg.bytes_required_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
             todo!()
@@ -2556,11 +2559,14 @@ pub mod _puroro_traits {
         type Field22ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field22ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field22ScalarGetterType<'this>, &'this [u8]>;
         fn bytes_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.bytes_optional_opt())
+            self.as_ref().and_then(|msg| {
+                msg.bytes_optional_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
             todo!()
@@ -2568,7 +2574,7 @@ pub mod _puroro_traits {
         type Field23ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field23ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field23ScalarGetterType<'this>, &'this [u8]>;
 
         type Field23RepeatedType<'this>
         where
@@ -2582,11 +2588,14 @@ pub mod _puroro_traits {
         type Field31ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field31ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field31ScalarGetterType<'this>, &'this str>;
         fn string_required_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.string_required_opt())
+            self.as_ref().and_then(|msg| {
+                msg.string_required_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
             todo!()
@@ -2594,11 +2603,14 @@ pub mod _puroro_traits {
         type Field32ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field32ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field32ScalarGetterType<'this>, &'this str>;
         fn string_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.string_optional_opt())
+            self.as_ref().and_then(|msg| {
+                msg.string_optional_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
             todo!()
@@ -2606,7 +2618,7 @@ pub mod _puroro_traits {
         type Field33ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field33ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field33ScalarGetterType<'this>, &'this str>;
 
         type Field33RepeatedType<'this>
         where
@@ -2640,7 +2652,7 @@ pub mod _puroro_traits {
         type Field51ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field51ScalarGetterType<'this>>;
+        = T::Field51ScalarGetterType<'this>;
         fn submsg_required_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
@@ -2652,7 +2664,7 @@ pub mod _puroro_traits {
         type Field52ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field52ScalarGetterType<'this>>;
+        = T::Field52ScalarGetterType<'this>;
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
@@ -2664,7 +2676,7 @@ pub mod _puroro_traits {
         type Field53ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field53ScalarGetterType<'this>>;
+        = T::Field53ScalarGetterType<'this>;
 
         type Field53RepeatedType<'this>
         where
@@ -3106,7 +3118,7 @@ pub mod _puroro_nested {
             impl SubmsgTrait for () {}
             impl<T> SubmsgTrait for ::std::option::Option<T>
             where
-                T: ::std::default::Default + SubmsgTrait,
+                T: SubmsgTrait,
             {
                 fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().and_then(|msg| msg.i32_required_opt())

@@ -798,32 +798,32 @@ pub mod _puroro_traits {
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + MsgTrait,
+        T: MsgTrait,
     {
         type Field2ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field2ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field2ScalarGetterType<'this>, &'this str>;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             todo!()
         }
         type Field4ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field4ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field4ScalarGetterType<'this>, &'this str>;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
             todo!()
         }
         type Field5ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field5ScalarGetterType<'this>>;
+        = T::Field5ScalarGetterType<'this>;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             todo!()
         }
         fn group_one<'this>(
             &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.as_ref().and_then(|msg| {
                 msg.group_one().map(|oneof| match oneof {
@@ -915,7 +915,7 @@ pub mod _puroro_traits {
     impl SubmsgTrait for () {}
     impl<T> SubmsgTrait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + SubmsgTrait,
+        T: SubmsgTrait,
     {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())

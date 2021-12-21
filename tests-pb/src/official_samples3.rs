@@ -518,7 +518,7 @@ pub mod _puroro_traits {
     impl Test1Trait for () {}
     impl<T> Test1Trait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + Test1Trait,
+        T: Test1Trait,
     {
         fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.a_opt())
@@ -602,14 +602,15 @@ pub mod _puroro_traits {
     }
     impl<T> Test2Trait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + Test2Trait,
+        T: Test2Trait,
     {
         type Field2ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field2ScalarGetterType<'this>>;
+        = ::puroro::Either<T::Field2ScalarGetterType<'this>, &'this str>;
         fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.b_opt())
+            self.as_ref()
+                .and_then(|msg| msg.b_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             todo!()
@@ -692,12 +693,12 @@ pub mod _puroro_traits {
     }
     impl<T> Test3Trait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + Test3Trait,
+        T: Test3Trait,
     {
         type Field3ScalarGetterType<'this>
         where
             Self: 'this,
-        = ::std::option::Option<T::Field3ScalarGetterType<'this>>;
+        = T::Field3ScalarGetterType<'this>;
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             self.as_ref().and_then(|msg| msg.c_opt())
         }
@@ -771,7 +772,7 @@ pub mod _puroro_traits {
     }
     impl<T> Test4Trait for ::std::option::Option<T>
     where
-        T: ::std::default::Default + Test4Trait,
+        T: Test4Trait,
     {
         type Field4RepeatedType<'this>
         where
