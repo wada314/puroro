@@ -12,11 +12,7 @@ where
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
             <'this, Self>
-            {%- else %}
-            <'this>
-            {%- endif %}
             {%- endif %}
         >
     {
@@ -29,31 +25,43 @@ where
                 Some(E::{{ field.ident }}({% if field.is_message %}left{% else %}_{% endif %})),
                 Some(E::{{ field.ident }}(right))
             ) => {
+                {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
                 E::{{ field.ident }}((Some(left), Some(right)))
-                {%- else %}
+                {%- else %} {#- if field.is_message #}
+                E::{{ field.ident }}(::puroro::Either::Right(right))
+                {%- endif %} {#- if field.is_message #}
+                {%- else %} {#- if field.is_length_delimited #}
                 E::{{ field.ident }}(right)
-                {%- endif %}
+                {%- endif %} {#- if field.is_length_delimited #}
             }
             {%- endfor %}
 
             {%- for field in oneof.fields %}
             (_, Some(E::{{ field.ident }}(right))) => {
+                {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
                 E::{{ field.ident }}((None, Some(right)))
-                {%- else %}
+                {%- else %} {#- if field.is_message #}
+                E::{{ field.ident }}(::puroro::Either::Right(right))
+                {%- endif %} {#- if field.is_message #}
+                {%- else %} {#- if field.is_length_delimited #}
                 E::{{ field.ident }}(right)
-                {%- endif %}
+                {%- endif %} {#- if field.is_length_delimited #}
             }
             {%- endfor %}
 
             {%- for field in oneof.fields %}
             (Some(E::{{ field.ident }}(left)), None) => {
+                {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
                 E::{{ field.ident }}((Some(left), None))
-                {%- else %}
+                {%- else %} {#- if field.is_message #}
+                E::{{ field.ident }}(::puroro::Either::Left(left))
+                {%- endif %} {#- if field.is_message #}
+                {%- else %} {#- if field.is_length_delimited #}
                 E::{{ field.ident }}(left)
-                {%- endif %}
+                {%- endif %} {#- if field.is_length_delimited #}
             }
             {%- endfor %}
         })

@@ -3411,6 +3411,813 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| msg.enum_fourty_two_opt())
         }
     }
+    impl<T, U> MsgTrait for (T, U)
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        fn i32_default_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_default_opt(&self.0))
+        }
+        fn i32_0_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_0_opt(&self.1).or_else(|| <T as MsgTrait>::i32_0_opt(&self.0))
+        }
+        fn i32_42_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_42_opt(&self.1).or_else(|| <T as MsgTrait>::i32_42_opt(&self.0))
+        }
+        fn i32_m42_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_m42_opt(&self.1).or_else(|| <T as MsgTrait>::i32_m42_opt(&self.0))
+        }
+        fn i32_2147483647_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_2147483647_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_2147483647_opt(&self.0))
+        }
+        fn i32_m2147483648_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_m2147483648_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_m2147483648_opt(&self.0))
+        }
+        fn i32_0123_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_0123_opt(&self.0))
+        }
+        fn i32_0x123_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_0x123_opt(&self.0))
+        }
+        fn u32_default_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_default_opt(&self.0))
+        }
+        fn u32_0_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_0_opt(&self.1).or_else(|| <T as MsgTrait>::u32_0_opt(&self.0))
+        }
+        fn u32_42_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_42_opt(&self.1).or_else(|| <T as MsgTrait>::u32_42_opt(&self.0))
+        }
+        fn u32_4294967295_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_4294967295_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_4294967295_opt(&self.0))
+        }
+        fn u32_0123_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_0123_opt(&self.0))
+        }
+        fn u32_0x123_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_0x123_opt(&self.0))
+        }
+        fn i64_default_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_default_opt(&self.0))
+        }
+        fn i64_0_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_0_opt(&self.1).or_else(|| <T as MsgTrait>::i64_0_opt(&self.0))
+        }
+        fn i64_42_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_42_opt(&self.1).or_else(|| <T as MsgTrait>::i64_42_opt(&self.0))
+        }
+        fn i64_m42_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_m42_opt(&self.1).or_else(|| <T as MsgTrait>::i64_m42_opt(&self.0))
+        }
+        fn i64_9223372036854775807_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_9223372036854775807_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_9223372036854775807_opt(&self.0))
+        }
+        fn i64_m9223372036854775808_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_m9223372036854775808_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_m9223372036854775808_opt(&self.0))
+        }
+        fn i64_0123_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_0123_opt(&self.0))
+        }
+        fn i64_0x123_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_0x123_opt(&self.0))
+        }
+        fn u64_default_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_default_opt(&self.0))
+        }
+        fn u64_0_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_0_opt(&self.1).or_else(|| <T as MsgTrait>::u64_0_opt(&self.0))
+        }
+        fn u64_42_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_42_opt(&self.1).or_else(|| <T as MsgTrait>::u64_42_opt(&self.0))
+        }
+        fn u64_18446744073709551615_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_18446744073709551615_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_18446744073709551615_opt(&self.0))
+        }
+        fn u64_0123_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_0123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_0123_opt(&self.0))
+        }
+        fn u64_0x123_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_0x123_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_0x123_opt(&self.0))
+        }
+        fn f32_default_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_default_opt(&self.0))
+        }
+        fn f32_0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0_opt(&self.0))
+        }
+        fn f32_m0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_m0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_m0_opt(&self.0))
+        }
+        fn f32_0p_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0p_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0p_opt(&self.0))
+        }
+        fn f32_p0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_p0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_p0_opt(&self.0))
+        }
+        fn f32_0p0_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0p0_opt(&self.1).or_else(|| <T as MsgTrait>::f32_0p0_opt(&self.0))
+        }
+        fn f32_42_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_42_opt(&self.1).or_else(|| <T as MsgTrait>::f32_42_opt(&self.0))
+        }
+        fn f32_m42_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_m42_opt(&self.1).or_else(|| <T as MsgTrait>::f32_m42_opt(&self.0))
+        }
+        fn f32_0p25_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_0p25_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_0p25_opt(&self.0))
+        }
+        fn f32_1p5e2_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_1p5e2_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_1p5e2_opt(&self.0))
+        }
+        fn f32_inf_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_inf_opt(&self.1).or_else(|| <T as MsgTrait>::f32_inf_opt(&self.0))
+        }
+        fn f32_minf_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_minf_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_minf_opt(&self.0))
+        }
+        fn f32_nan_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_nan_opt(&self.1).or_else(|| <T as MsgTrait>::f32_nan_opt(&self.0))
+        }
+        fn f32_mnan_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::f32_mnan_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f32_mnan_opt(&self.0))
+        }
+        fn bool_default_opt<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bool_default_opt(&self.0))
+        }
+        fn bool_true_opt<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_true_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bool_true_opt(&self.0))
+        }
+        fn bool_false_opt<'this>(&'this self) -> Option<bool> {
+            <U as MsgTrait>::bool_false_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::bool_false_opt(&self.0))
+        }
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field71ScalarGetterType<'this>,
+            <U as MsgTrait>::Field71ScalarGetterType<'this>,
+        >;
+        fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_default_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_default_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field72ScalarGetterType<'this>,
+            <U as MsgTrait>::Field72ScalarGetterType<'this>,
+        >;
+        fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_empty_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_empty_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field73ScalarGetterType<'this>,
+            <U as MsgTrait>::Field73ScalarGetterType<'this>,
+        >;
+        fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_abc_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_abc_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field74ScalarGetterType<'this>,
+            <U as MsgTrait>::Field74ScalarGetterType<'this>,
+        >;
+        fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_aiu_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_aiu_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field75ScalarGetterType<'this>,
+            <U as MsgTrait>::Field75ScalarGetterType<'this>,
+        >;
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field75ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_backslash_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_backslash_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field76ScalarGetterType<'this>,
+            <U as MsgTrait>::Field76ScalarGetterType<'this>,
+        >;
+        fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_tab_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_tab_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field77ScalarGetterType<'this>,
+            <U as MsgTrait>::Field77ScalarGetterType<'this>,
+        >;
+        fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_crlf_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_crlf_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field81ScalarGetterType<'this>,
+            <U as MsgTrait>::Field81ScalarGetterType<'this>,
+        >;
+        fn bytes_default_opt<'this>(&'this self) -> Option<Self::Field81ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_default_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_default_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field82ScalarGetterType<'this>,
+            <U as MsgTrait>::Field82ScalarGetterType<'this>,
+        >;
+        fn bytes_empty_opt<'this>(&'this self) -> Option<Self::Field82ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_empty_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_empty_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field83ScalarGetterType<'this>,
+            <U as MsgTrait>::Field83ScalarGetterType<'this>,
+        >;
+        fn bytes_abc_opt<'this>(&'this self) -> Option<Self::Field83ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_abc_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_abc_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field84ScalarGetterType<'this>,
+            <U as MsgTrait>::Field84ScalarGetterType<'this>,
+        >;
+        fn bytes_aiu_opt<'this>(&'this self) -> Option<Self::Field84ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_aiu_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_aiu_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field85ScalarGetterType<'this>,
+            <U as MsgTrait>::Field85ScalarGetterType<'this>,
+        >;
+        fn bytes_backslash_opt<'this>(&'this self) -> Option<Self::Field85ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_backslash_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_backslash_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field86ScalarGetterType<'this>,
+            <U as MsgTrait>::Field86ScalarGetterType<'this>,
+        >;
+        fn bytes_tab_opt<'this>(&'this self) -> Option<Self::Field86ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_tab_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_tab_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field87ScalarGetterType<'this>,
+            <U as MsgTrait>::Field87ScalarGetterType<'this>,
+        >;
+        fn bytes_crlf_opt<'this>(&'this self) -> Option<Self::Field87ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_crlf_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_crlf_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        fn enum_default_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_default_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_default_opt(&self.0))
+        }
+        fn enum_one_opt<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_one_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_one_opt(&self.0))
+        }
+        fn enum_fourty_two_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            <U as MsgTrait>::enum_fourty_two_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_fourty_two_opt(&self.0))
+        }
+    }
+    impl<T, U> MsgTrait for ::puroro::Either<T, U>
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_default_opt(t),
+                |u| <U as MsgTrait>::i32_default_opt(u),
+            )
+        }
+        fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_0_opt(t),
+                |u| <U as MsgTrait>::i32_0_opt(u),
+            )
+        }
+        fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_42_opt(t),
+                |u| <U as MsgTrait>::i32_42_opt(u),
+            )
+        }
+        fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_m42_opt(t),
+                |u| <U as MsgTrait>::i32_m42_opt(u),
+            )
+        }
+        fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_2147483647_opt(t),
+                |u| <U as MsgTrait>::i32_2147483647_opt(u),
+            )
+        }
+        fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_m2147483648_opt(t),
+                |u| <U as MsgTrait>::i32_m2147483648_opt(u),
+            )
+        }
+        fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_0123_opt(t),
+                |u| <U as MsgTrait>::i32_0123_opt(u),
+            )
+        }
+        fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_0x123_opt(t),
+                |u| <U as MsgTrait>::i32_0x123_opt(u),
+            )
+        }
+        fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_default_opt(t),
+                |u| <U as MsgTrait>::u32_default_opt(u),
+            )
+        }
+        fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_0_opt(t),
+                |u| <U as MsgTrait>::u32_0_opt(u),
+            )
+        }
+        fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_42_opt(t),
+                |u| <U as MsgTrait>::u32_42_opt(u),
+            )
+        }
+        fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_4294967295_opt(t),
+                |u| <U as MsgTrait>::u32_4294967295_opt(u),
+            )
+        }
+        fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_0123_opt(t),
+                |u| <U as MsgTrait>::u32_0123_opt(u),
+            )
+        }
+        fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_0x123_opt(t),
+                |u| <U as MsgTrait>::u32_0x123_opt(u),
+            )
+        }
+        fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_default_opt(t),
+                |u| <U as MsgTrait>::i64_default_opt(u),
+            )
+        }
+        fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_0_opt(t),
+                |u| <U as MsgTrait>::i64_0_opt(u),
+            )
+        }
+        fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_42_opt(t),
+                |u| <U as MsgTrait>::i64_42_opt(u),
+            )
+        }
+        fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_m42_opt(t),
+                |u| <U as MsgTrait>::i64_m42_opt(u),
+            )
+        }
+        fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_9223372036854775807_opt(t),
+                |u| <U as MsgTrait>::i64_9223372036854775807_opt(u),
+            )
+        }
+        fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_m9223372036854775808_opt(t),
+                |u| <U as MsgTrait>::i64_m9223372036854775808_opt(u),
+            )
+        }
+        fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_0123_opt(t),
+                |u| <U as MsgTrait>::i64_0123_opt(u),
+            )
+        }
+        fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_0x123_opt(t),
+                |u| <U as MsgTrait>::i64_0x123_opt(u),
+            )
+        }
+        fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_default_opt(t),
+                |u| <U as MsgTrait>::u64_default_opt(u),
+            )
+        }
+        fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_0_opt(t),
+                |u| <U as MsgTrait>::u64_0_opt(u),
+            )
+        }
+        fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_42_opt(t),
+                |u| <U as MsgTrait>::u64_42_opt(u),
+            )
+        }
+        fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_18446744073709551615_opt(t),
+                |u| <U as MsgTrait>::u64_18446744073709551615_opt(u),
+            )
+        }
+        fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_0123_opt(t),
+                |u| <U as MsgTrait>::u64_0123_opt(u),
+            )
+        }
+        fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_0x123_opt(t),
+                |u| <U as MsgTrait>::u64_0x123_opt(u),
+            )
+        }
+        fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_default_opt(t),
+                |u| <U as MsgTrait>::f32_default_opt(u),
+            )
+        }
+        fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0_opt(t),
+                |u| <U as MsgTrait>::f32_0_opt(u),
+            )
+        }
+        fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_m0_opt(t),
+                |u| <U as MsgTrait>::f32_m0_opt(u),
+            )
+        }
+        fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0p_opt(t),
+                |u| <U as MsgTrait>::f32_0p_opt(u),
+            )
+        }
+        fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_p0_opt(t),
+                |u| <U as MsgTrait>::f32_p0_opt(u),
+            )
+        }
+        fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0p0_opt(t),
+                |u| <U as MsgTrait>::f32_0p0_opt(u),
+            )
+        }
+        fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_42_opt(t),
+                |u| <U as MsgTrait>::f32_42_opt(u),
+            )
+        }
+        fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_m42_opt(t),
+                |u| <U as MsgTrait>::f32_m42_opt(u),
+            )
+        }
+        fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_0p25_opt(t),
+                |u| <U as MsgTrait>::f32_0p25_opt(u),
+            )
+        }
+        fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_1p5e2_opt(t),
+                |u| <U as MsgTrait>::f32_1p5e2_opt(u),
+            )
+        }
+        fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_inf_opt(t),
+                |u| <U as MsgTrait>::f32_inf_opt(u),
+            )
+        }
+        fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_minf_opt(t),
+                |u| <U as MsgTrait>::f32_minf_opt(u),
+            )
+        }
+        fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_nan_opt(t),
+                |u| <U as MsgTrait>::f32_nan_opt(u),
+            )
+        }
+        fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_mnan_opt(t),
+                |u| <U as MsgTrait>::f32_mnan_opt(u),
+            )
+        }
+        fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_default_opt(t),
+                |u| <U as MsgTrait>::bool_default_opt(u),
+            )
+        }
+        fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_true_opt(t),
+                |u| <U as MsgTrait>::bool_true_opt(u),
+            )
+        }
+        fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bool_false_opt(t),
+                |u| <U as MsgTrait>::bool_false_opt(u),
+            )
+        }
+        fn string_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_default_opt(t),
+                |u| <U as MsgTrait>::string_default_opt(u),
+            )
+        }
+        fn string_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_empty_opt(t),
+                |u| <U as MsgTrait>::string_empty_opt(u),
+            )
+        }
+        fn string_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_abc_opt(t),
+                |u| <U as MsgTrait>::string_abc_opt(u),
+            )
+        }
+        fn string_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_aiu_opt(t),
+                |u| <U as MsgTrait>::string_aiu_opt(u),
+            )
+        }
+        fn string_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_backslash_opt(t),
+                |u| <U as MsgTrait>::string_backslash_opt(u),
+            )
+        }
+        fn string_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_tab_opt(t),
+                |u| <U as MsgTrait>::string_tab_opt(u),
+            )
+        }
+        fn string_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_crlf_opt(t),
+                |u| <U as MsgTrait>::string_crlf_opt(u),
+            )
+        }
+        fn bytes_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_default_opt(t),
+                |u| <U as MsgTrait>::bytes_default_opt(u),
+            )
+        }
+        fn bytes_empty_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_empty_opt(t),
+                |u| <U as MsgTrait>::bytes_empty_opt(u),
+            )
+        }
+        fn bytes_abc_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_abc_opt(t),
+                |u| <U as MsgTrait>::bytes_abc_opt(u),
+            )
+        }
+        fn bytes_aiu_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_aiu_opt(t),
+                |u| <U as MsgTrait>::bytes_aiu_opt(u),
+            )
+        }
+        fn bytes_backslash_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_backslash_opt(t),
+                |u| <U as MsgTrait>::bytes_backslash_opt(u),
+            )
+        }
+        fn bytes_tab_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_tab_opt(t),
+                |u| <U as MsgTrait>::bytes_tab_opt(u),
+            )
+        }
+        fn bytes_crlf_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_crlf_opt(t),
+                |u| <U as MsgTrait>::bytes_crlf_opt(u),
+            )
+        }
+        fn enum_default_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_default_opt(t),
+                |u| <U as MsgTrait>::enum_default_opt(u),
+            )
+        }
+        fn enum_one_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_one_opt(t),
+                |u| <U as MsgTrait>::enum_one_opt(u),
+            )
+        }
+        fn enum_fourty_two_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_fourty_two_opt(t),
+                |u| <U as MsgTrait>::enum_fourty_two_opt(u),
+            )
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
 pub enum MyEnum {

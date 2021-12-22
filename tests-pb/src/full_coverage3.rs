@@ -2931,6 +2931,956 @@ pub mod _puroro_traits {
                 .flatten()
         }
     }
+    impl<T, U> MsgTrait for (T, U)
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_unlabeled_opt(&self.0))
+        }
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::i32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
+        }
+
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field3RepeatedType<'this>,
+            <U as MsgTrait>::Field3RepeatedType<'this>,
+        >;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::i32_repeated(&self.0),
+                <U as MsgTrait>::i32_repeated(&self.1),
+            )
+        }
+        fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::float_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::float_unlabeled_opt(&self.0))
+        }
+        fn float_optional_opt<'this>(&'this self) -> Option<f32> {
+            <U as MsgTrait>::float_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::float_optional_opt(&self.0))
+        }
+
+        type Field13RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field13RepeatedType<'this>,
+            <U as MsgTrait>::Field13RepeatedType<'this>,
+        >;
+
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::float_repeated(&self.0),
+                <U as MsgTrait>::float_repeated(&self.1),
+            )
+        }
+        type Field21ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field21ScalarGetterType<'this>,
+            <U as MsgTrait>::Field21ScalarGetterType<'this>,
+        >;
+        fn bytes_unlabeled_opt<'this>(&'this self) -> Option<Self::Field21ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_unlabeled_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_unlabeled_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field22ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field22ScalarGetterType<'this>,
+            <U as MsgTrait>::Field22ScalarGetterType<'this>,
+        >;
+        fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
+            <U as MsgTrait>::bytes_optional_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::bytes_optional_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field23ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field23ScalarGetterType<'this>,
+            <U as MsgTrait>::Field23ScalarGetterType<'this>,
+        >;
+
+        type Field23RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedLDField<
+            <T as MsgTrait>::Field23RepeatedType<'this>,
+            <U as MsgTrait>::Field23RepeatedType<'this>,
+        >;
+
+        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedLDField::new(
+                <T as MsgTrait>::bytes_repeated(&self.0),
+                <U as MsgTrait>::bytes_repeated(&self.1),
+            )
+        }
+        type Field31ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field31ScalarGetterType<'this>,
+            <U as MsgTrait>::Field31ScalarGetterType<'this>,
+        >;
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field31ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_unlabeled_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_unlabeled_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field32ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field32ScalarGetterType<'this>,
+            <U as MsgTrait>::Field32ScalarGetterType<'this>,
+        >;
+        fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
+            <U as MsgTrait>::string_optional_opt(&self.1)
+                .map(|left| ::puroro::Either::Left(left))
+                .or_else(|| {
+                    <T as MsgTrait>::string_optional_opt(&self.0)
+                        .map(|right| ::puroro::Either::Right(right))
+                })
+        }
+        type Field33ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field33ScalarGetterType<'this>,
+            <U as MsgTrait>::Field33ScalarGetterType<'this>,
+        >;
+
+        type Field33RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedLDField<
+            <T as MsgTrait>::Field33RepeatedType<'this>,
+            <U as MsgTrait>::Field33RepeatedType<'this>,
+        >;
+
+        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedLDField::new(
+                <T as MsgTrait>::string_repeated(&self.0),
+                <U as MsgTrait>::string_repeated(&self.1),
+            )
+        }
+        fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage3::Enum> {
+            <U as MsgTrait>::enum_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_unlabeled_opt(&self.0))
+        }
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> Option<self::_puroro_root::full_coverage3::Enum> {
+            <U as MsgTrait>::enum_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::enum_optional_opt(&self.0))
+        }
+
+        type Field43RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field43RepeatedType<'this>,
+            <U as MsgTrait>::Field43RepeatedType<'this>,
+        >;
+
+        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::enum_repeated(&self.0),
+                <U as MsgTrait>::enum_repeated(&self.1),
+            )
+        }
+        type Field51ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = (
+            ::std::option::Option<<T as MsgTrait>::Field51ScalarGetterType<'this>>,
+            ::std::option::Option<<U as MsgTrait>::Field51ScalarGetterType<'this>>,
+        );
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field51ScalarGetterType<'this>> {
+            match (
+                <T as MsgTrait>::submsg_unlabeled_opt(&self.0),
+                <U as MsgTrait>::submsg_unlabeled_opt(&self.1),
+            ) {
+                (None, None) => None,
+                (Some(t), None) => Some((Some(t), None)),
+                (None, Some(u)) => Some((None, Some(u))),
+                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+            }
+        }
+        type Field52ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = (
+            ::std::option::Option<<T as MsgTrait>::Field52ScalarGetterType<'this>>,
+            ::std::option::Option<<U as MsgTrait>::Field52ScalarGetterType<'this>>,
+        );
+        fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52ScalarGetterType<'this>> {
+            match (
+                <T as MsgTrait>::submsg_optional_opt(&self.0),
+                <U as MsgTrait>::submsg_optional_opt(&self.1),
+            ) {
+                (None, None) => None,
+                (Some(t), None) => Some((Some(t), None)),
+                (None, Some(u)) => Some((None, Some(u))),
+                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+            }
+        }
+        type Field53ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field53ScalarGetterType<'this>,
+            <U as MsgTrait>::Field53ScalarGetterType<'this>,
+        >;
+
+        type Field53RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedLDField<
+            <T as MsgTrait>::Field53RepeatedType<'this>,
+            <U as MsgTrait>::Field53RepeatedType<'this>,
+        >;
+
+        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedLDField::new(
+                <T as MsgTrait>::submsg_repeated(&self.0),
+                <U as MsgTrait>::submsg_repeated(&self.1),
+            )
+        }
+        fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_unlabeled_opt(&self.0))
+        }
+        fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::i64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::i64_optional_opt(&self.0))
+        }
+
+        type Field103RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field103RepeatedType<'this>,
+            <U as MsgTrait>::Field103RepeatedType<'this>,
+        >;
+
+        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::i64_repeated(&self.0),
+                <U as MsgTrait>::i64_repeated(&self.1),
+            )
+        }
+        fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_unlabeled_opt(&self.0))
+        }
+        fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::u32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u32_optional_opt(&self.0))
+        }
+
+        type Field113RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field113RepeatedType<'this>,
+            <U as MsgTrait>::Field113RepeatedType<'this>,
+        >;
+
+        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::u32_repeated(&self.0),
+                <U as MsgTrait>::u32_repeated(&self.1),
+            )
+        }
+        fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_unlabeled_opt(&self.0))
+        }
+        fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::u64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::u64_optional_opt(&self.0))
+        }
+
+        type Field123RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field123RepeatedType<'this>,
+            <U as MsgTrait>::Field123RepeatedType<'this>,
+        >;
+
+        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::u64_repeated(&self.0),
+                <U as MsgTrait>::u64_repeated(&self.1),
+            )
+        }
+        fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::s32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s32_unlabeled_opt(&self.0))
+        }
+        fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::s32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s32_optional_opt(&self.0))
+        }
+
+        type Field133RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field133RepeatedType<'this>,
+            <U as MsgTrait>::Field133RepeatedType<'this>,
+        >;
+
+        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::s32_repeated(&self.0),
+                <U as MsgTrait>::s32_repeated(&self.1),
+            )
+        }
+        fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::s64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s64_unlabeled_opt(&self.0))
+        }
+        fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::s64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::s64_optional_opt(&self.0))
+        }
+
+        type Field143RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field143RepeatedType<'this>,
+            <U as MsgTrait>::Field143RepeatedType<'this>,
+        >;
+
+        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::s64_repeated(&self.0),
+                <U as MsgTrait>::s64_repeated(&self.1),
+            )
+        }
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::fixed32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed32_unlabeled_opt(&self.0))
+        }
+        fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
+            <U as MsgTrait>::fixed32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed32_optional_opt(&self.0))
+        }
+
+        type Field153RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field153RepeatedType<'this>,
+            <U as MsgTrait>::Field153RepeatedType<'this>,
+        >;
+
+        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::fixed32_repeated(&self.0),
+                <U as MsgTrait>::fixed32_repeated(&self.1),
+            )
+        }
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::fixed64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed64_unlabeled_opt(&self.0))
+        }
+        fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
+            <U as MsgTrait>::fixed64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::fixed64_optional_opt(&self.0))
+        }
+
+        type Field163RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field163RepeatedType<'this>,
+            <U as MsgTrait>::Field163RepeatedType<'this>,
+        >;
+
+        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::fixed64_repeated(&self.0),
+                <U as MsgTrait>::fixed64_repeated(&self.1),
+            )
+        }
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::sfixed32_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed32_unlabeled_opt(&self.0))
+        }
+        fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <U as MsgTrait>::sfixed32_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed32_optional_opt(&self.0))
+        }
+
+        type Field173RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field173RepeatedType<'this>,
+            <U as MsgTrait>::Field173RepeatedType<'this>,
+        >;
+
+        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::sfixed32_repeated(&self.0),
+                <U as MsgTrait>::sfixed32_repeated(&self.1),
+            )
+        }
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::sfixed64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed64_unlabeled_opt(&self.0))
+        }
+        fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
+            <U as MsgTrait>::sfixed64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::sfixed64_optional_opt(&self.0))
+        }
+
+        type Field183RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field183RepeatedType<'this>,
+            <U as MsgTrait>::Field183RepeatedType<'this>,
+        >;
+
+        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::sfixed64_repeated(&self.0),
+                <U as MsgTrait>::sfixed64_repeated(&self.1),
+            )
+        }
+        fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
+            <U as MsgTrait>::f64_unlabeled_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f64_unlabeled_opt(&self.0))
+        }
+        fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
+            <U as MsgTrait>::f64_optional_opt(&self.1)
+                .or_else(|| <T as MsgTrait>::f64_optional_opt(&self.0))
+        }
+
+        type Field193RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::Field193RepeatedType<'this>,
+            <U as MsgTrait>::Field193RepeatedType<'this>,
+        >;
+
+        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
+                <T as MsgTrait>::f64_repeated(&self.0),
+                <U as MsgTrait>::f64_repeated(&self.1),
+            )
+        }
+    }
+    impl<T, U> MsgTrait for ::puroro::Either<T, U>
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::i32_unlabeled_opt(u),
+            )
+        }
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_optional_opt(t),
+                |u| <U as MsgTrait>::i32_optional_opt(u),
+            )
+        }
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field3RepeatedType<'this>,
+            <U as MsgTrait>::Field3RepeatedType<'this>,
+        >;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::i32_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::i32_repeated(u)),
+            )
+        }
+        fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::float_unlabeled_opt(t),
+                |u| <U as MsgTrait>::float_unlabeled_opt(u),
+            )
+        }
+        fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::float_optional_opt(t),
+                |u| <U as MsgTrait>::float_optional_opt(u),
+            )
+        }
+        type Field13RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field13RepeatedType<'this>,
+            <U as MsgTrait>::Field13RepeatedType<'this>,
+        >;
+
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::float_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::float_repeated(u)),
+            )
+        }
+        fn bytes_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_unlabeled_opt(t),
+                |u| <U as MsgTrait>::bytes_unlabeled_opt(u),
+            )
+        }
+        fn bytes_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::bytes_optional_opt(t),
+                |u| <U as MsgTrait>::bytes_optional_opt(u),
+            )
+        }
+        type Field23RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field23RepeatedType<'this>,
+            <U as MsgTrait>::Field23RepeatedType<'this>,
+        >;
+
+        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::bytes_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::bytes_repeated(u)),
+            )
+        }
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_unlabeled_opt(t),
+                |u| <U as MsgTrait>::string_unlabeled_opt(u),
+            )
+        }
+        fn string_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_optional_opt(t),
+                |u| <U as MsgTrait>::string_optional_opt(u),
+            )
+        }
+        type Field33RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field33RepeatedType<'this>,
+            <U as MsgTrait>::Field33RepeatedType<'this>,
+        >;
+
+        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::string_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::string_repeated(u)),
+            )
+        }
+        fn enum_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_unlabeled_opt(t),
+                |u| <U as MsgTrait>::enum_unlabeled_opt(u),
+            )
+        }
+        fn enum_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_optional_opt(t),
+                |u| <U as MsgTrait>::enum_optional_opt(u),
+            )
+        }
+        type Field43RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field43RepeatedType<'this>,
+            <U as MsgTrait>::Field43RepeatedType<'this>,
+        >;
+
+        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::enum_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::enum_repeated(u)),
+            )
+        }
+        type Field51MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field51MessageType<'this>,
+            <U as MsgTrait>::Field51MessageType<'this>,
+        >;
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
+        type Field52MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field52MessageType<'this>,
+            <U as MsgTrait>::Field52MessageType<'this>,
+        >;
+        fn submsg_optional_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::submsg_optional_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::submsg_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
+        type Field53MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field53MessageType<'this>,
+            <U as MsgTrait>::Field53MessageType<'this>,
+        >;
+        type Field53RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+            <T as MsgTrait>::Field53RepeatedType<'this>,
+            <U as MsgTrait>::Field53RepeatedType<'this>,
+        >;
+
+        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::submsg_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::submsg_repeated(u)),
+            )
+        }
+        fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::i64_unlabeled_opt(u),
+            )
+        }
+        fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i64_optional_opt(t),
+                |u| <U as MsgTrait>::i64_optional_opt(u),
+            )
+        }
+        type Field103RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field103RepeatedType<'this>,
+            <U as MsgTrait>::Field103RepeatedType<'this>,
+        >;
+
+        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::i64_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::i64_repeated(u)),
+            )
+        }
+        fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::u32_unlabeled_opt(u),
+            )
+        }
+        fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u32_optional_opt(t),
+                |u| <U as MsgTrait>::u32_optional_opt(u),
+            )
+        }
+        type Field113RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field113RepeatedType<'this>,
+            <U as MsgTrait>::Field113RepeatedType<'this>,
+        >;
+
+        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::u32_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::u32_repeated(u)),
+            )
+        }
+        fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::u64_unlabeled_opt(u),
+            )
+        }
+        fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::u64_optional_opt(t),
+                |u| <U as MsgTrait>::u64_optional_opt(u),
+            )
+        }
+        type Field123RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field123RepeatedType<'this>,
+            <U as MsgTrait>::Field123RepeatedType<'this>,
+        >;
+
+        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::u64_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::u64_repeated(u)),
+            )
+        }
+        fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::s32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::s32_unlabeled_opt(u),
+            )
+        }
+        fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::s32_optional_opt(t),
+                |u| <U as MsgTrait>::s32_optional_opt(u),
+            )
+        }
+        type Field133RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field133RepeatedType<'this>,
+            <U as MsgTrait>::Field133RepeatedType<'this>,
+        >;
+
+        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::s32_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::s32_repeated(u)),
+            )
+        }
+        fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::s64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::s64_unlabeled_opt(u),
+            )
+        }
+        fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::s64_optional_opt(t),
+                |u| <U as MsgTrait>::s64_optional_opt(u),
+            )
+        }
+        type Field143RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field143RepeatedType<'this>,
+            <U as MsgTrait>::Field143RepeatedType<'this>,
+        >;
+
+        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::s64_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::s64_repeated(u)),
+            )
+        }
+        fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::fixed32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::fixed32_unlabeled_opt(u),
+            )
+        }
+        fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::fixed32_optional_opt(t),
+                |u| <U as MsgTrait>::fixed32_optional_opt(u),
+            )
+        }
+        type Field153RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field153RepeatedType<'this>,
+            <U as MsgTrait>::Field153RepeatedType<'this>,
+        >;
+
+        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::fixed32_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::fixed32_repeated(u)),
+            )
+        }
+        fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::fixed64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::fixed64_unlabeled_opt(u),
+            )
+        }
+        fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::fixed64_optional_opt(t),
+                |u| <U as MsgTrait>::fixed64_optional_opt(u),
+            )
+        }
+        type Field163RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field163RepeatedType<'this>,
+            <U as MsgTrait>::Field163RepeatedType<'this>,
+        >;
+
+        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::fixed64_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::fixed64_repeated(u)),
+            )
+        }
+        fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::sfixed32_unlabeled_opt(t),
+                |u| <U as MsgTrait>::sfixed32_unlabeled_opt(u),
+            )
+        }
+        fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::sfixed32_optional_opt(t),
+                |u| <U as MsgTrait>::sfixed32_optional_opt(u),
+            )
+        }
+        type Field173RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field173RepeatedType<'this>,
+            <U as MsgTrait>::Field173RepeatedType<'this>,
+        >;
+
+        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::sfixed32_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::sfixed32_repeated(u)),
+            )
+        }
+        fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::sfixed64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::sfixed64_unlabeled_opt(u),
+            )
+        }
+        fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::sfixed64_optional_opt(t),
+                |u| <U as MsgTrait>::sfixed64_optional_opt(u),
+            )
+        }
+        type Field183RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field183RepeatedType<'this>,
+            <U as MsgTrait>::Field183RepeatedType<'this>,
+        >;
+
+        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::sfixed64_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::sfixed64_repeated(u)),
+            )
+        }
+        fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f64_unlabeled_opt(t),
+                |u| <U as MsgTrait>::f64_unlabeled_opt(u),
+            )
+        }
+        fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f64_optional_opt(t),
+                |u| <U as MsgTrait>::f64_optional_opt(u),
+            )
+        }
+        type Field193RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::Field193RepeatedType<'this>,
+            <U as MsgTrait>::Field193RepeatedType<'this>,
+        >;
+
+        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::f64_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::f64_repeated(u)),
+            )
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::marker::Copy, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -3217,6 +4167,38 @@ pub mod _puroro_nested {
                 }
                 fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     self.as_ref().and_then(|msg| msg.i64_unlabeled_opt())
+                }
+            }
+            impl<T, U> SubmsgTrait for (T, U)
+            where
+                T: SubmsgTrait,
+                U: SubmsgTrait,
+            {
+                fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+                    <U as SubmsgTrait>::i32_unlabeled_opt(&self.1)
+                        .or_else(|| <T as SubmsgTrait>::i32_unlabeled_opt(&self.0))
+                }
+                fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
+                    <U as SubmsgTrait>::i64_unlabeled_opt(&self.1)
+                        .or_else(|| <T as SubmsgTrait>::i64_unlabeled_opt(&self.0))
+                }
+            }
+            impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
+            where
+                T: SubmsgTrait,
+                U: SubmsgTrait,
+            {
+                fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    self.as_ref().either(
+                        |t| <T as SubmsgTrait>::i32_unlabeled_opt(t),
+                        |u| <U as SubmsgTrait>::i32_unlabeled_opt(u),
+                    )
+                }
+                fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
+                    self.as_ref().either(
+                        |t| <T as SubmsgTrait>::i64_unlabeled_opt(t),
+                        |u| <U as SubmsgTrait>::i64_unlabeled_opt(u),
+                    )
                 }
             }
         }

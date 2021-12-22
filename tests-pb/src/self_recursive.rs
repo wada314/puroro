@@ -249,6 +249,53 @@ pub mod _puroro_traits {
             ::puroro::Either::Right(::std::default::Default::default())
         }
     }
+    impl<T, U> MsgTrait for (T, U)
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        type Field1ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = (
+            ::std::option::Option<<T as MsgTrait>::Field1ScalarGetterType<'this>>,
+            ::std::option::Option<<U as MsgTrait>::Field1ScalarGetterType<'this>>,
+        );
+        fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::Field1ScalarGetterType<'this>> {
+            match (
+                <T as MsgTrait>::recursive_unlabeled_opt(&self.0),
+                <U as MsgTrait>::recursive_unlabeled_opt(&self.1),
+            ) {
+                (None, None) => None,
+                (Some(t), None) => Some((Some(t), None)),
+                (None, Some(u)) => Some((None, Some(u))),
+                (Some(t), Some(u)) => Some((Some(t), Some(u))),
+            }
+        }
+    }
+    impl<T, U> MsgTrait for ::puroro::Either<T, U>
+    where
+        T: MsgTrait,
+        U: MsgTrait,
+    {
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field1MessageType<'this>,
+            <U as MsgTrait>::Field1MessageType<'this>,
+        >;
+        fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::recursive_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::recursive_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
+    }
 }
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
