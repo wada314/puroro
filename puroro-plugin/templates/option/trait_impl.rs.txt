@@ -17,11 +17,33 @@ where
 
     {%- if f.is_repeated %}
 
+    {%- if f.is_string || f.is_bytes %}
     type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-        ::puroro::internal::impls::option::OptionRepeatedField<T::Field{{ f.number }}RepeatedType<'this>>;
+        ::puroro::internal::impls::option::EitherLeftRepeatedField<
+            ::std::iter::Flatten<
+                ::std::option::IntoIter<
+                    T::Field{{ f.number }}RepeatedType<'this>
+                >
+            >,
+            {%- if f.is_string %}&'this str{%- endif %}
+            {%- if f.is_bytes %}&'this [u8]{%- endif %}
+        >;
     fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
-        ::puroro::internal::impls::option::OptionRepeatedField::new(self.as_ref().map(|msg| msg.{{ f.ident }}()))
+        ::puroro::internal::impls::option::EitherLeftRepeatedField::new(
+            self.as_ref().map(|msg| msg.{{ f.ident }}()).into_iter().flatten()
+        )
     }
+    {%- else %} {#- if f.is_string || f.is_bytes #}
+    type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
+        ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                T::Field{{ f.number }}RepeatedType<'this>
+            >
+        >;
+    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+        self.as_ref().map(|msg| msg.{{ f.ident }}()).into_iter().flatten()
+    }
+    {%- endif %} {#- if f.is_string || f.is_bytes #}
 
     {%- else %} {#- if f.is_repeated #}
 

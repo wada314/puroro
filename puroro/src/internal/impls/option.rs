@@ -14,6 +14,7 @@
 
 use crate::RepeatedField;
 use ::std::iter;
+use ::std::marker::PhantomData;
 use ::std::option;
 
 pub struct OptionRepeatedField<R>(Option<R>);
@@ -31,5 +32,39 @@ where
     type IntoIter = iter::Flatten<option::IntoIter<R>>;
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter().flatten()
+    }
+}
+
+pub struct EitherLeftRepeatedField<T, Right>(T, PhantomData<Right>);
+impl<T, Right> EitherLeftRepeatedField<T, Right> {
+    pub fn new(inner_repeated_field: T) -> Self {
+        Self(inner_repeated_field, PhantomData)
+    }
+}
+impl<T, Right> IntoIterator for EitherLeftRepeatedField<T, Right>
+where
+    T: IntoIterator,
+{
+    type Item = crate::Either<<T as IntoIterator>::Item, Right>;
+    type IntoIter = EitherLeftIter<<T as IntoIterator>::IntoIter, Right>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        EitherLeftIter::new(self.0.into_iter())
+    }
+}
+
+pub struct EitherLeftIter<Iter, Right>(Iter, PhantomData<Right>);
+impl<Iter, Right> EitherLeftIter<Iter, Right> {
+    pub fn new(iter: Iter) -> Self {
+        Self(iter, PhantomData)
+    }
+}
+impl<Iter, Right> Iterator for EitherLeftIter<Iter, Right>
+where
+    Iter: Iterator,
+{
+    type Item = crate::Either<<Iter as Iterator>::Item, Right>;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next().map(|val| crate::Either::Left(val))
     }
 }

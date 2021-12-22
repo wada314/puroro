@@ -594,15 +594,15 @@ pub mod _puroro_traits {
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_optional_opt())
         }
-
         type Field3RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field3RepeatedType<'this>>;
+        = ::std::iter::Flatten<::std::option::IntoIter<T::Field3RepeatedType<'this>>>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::internal::impls::option::OptionRepeatedField::new(
-                self.as_ref().map(|msg| msg.i32_repeated()),
-            )
+            self.as_ref()
+                .map(|msg| msg.i32_repeated())
+                .into_iter()
+                .flatten()
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.f32_unlabeled_opt())
