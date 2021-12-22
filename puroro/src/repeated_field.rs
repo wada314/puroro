@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ::std::iter;
 use ::std::marker::PhantomData;
+use ::std::option;
 
 /// A trait for repeated field value returned from message traits getter methods.
 ///
 /// Currently this trait is just an analogous of [`std::iter::IntoIterator`].
 pub trait RepeatedField<'msg>: IntoIterator {}
 
+// Not using a blanket impl (like `impl<T: IntoIterator> RepeatedField for T`) because
+// we might want to add a method (e.g. `len()`) for RepeatedField trait in future.
 impl<'msg, T> RepeatedField<'msg> for &'msg [T] {}
 impl<'msg, T> RepeatedField<'msg> for &'msg Vec<T> {}
 impl<'msg, T, const LEN: usize> RepeatedField<'msg> for &'msg [T; LEN] {}
 impl<'msg, T> RepeatedField<'msg> for &'msg crate::internal::NoAllocBumpVec<T> {}
+// Used by Option<Message> type.
+impl<'msg, T> RepeatedField<'msg> for iter::Flatten<option::IntoIter<T>> where T: RepeatedField<'msg>
+{}
 
 pub struct MappedRepeatedField<T, F> {
     inner: T,

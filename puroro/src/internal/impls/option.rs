@@ -52,6 +52,10 @@ where
         EitherLeftIter::new(self.0.into_iter())
     }
 }
+impl<'msg, T, Right> RepeatedField<'msg> for EitherLeftRepeatedField<T, Right> where
+    T: RepeatedField<'msg>
+{
+}
 
 pub struct EitherLeftIter<Iter, Right>(Iter, PhantomData<Right>);
 impl<Iter, Right> EitherLeftIter<Iter, Right> {
