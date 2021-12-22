@@ -707,7 +707,7 @@ pub mod _puroro_traits {
             }
         }
         fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            ::puroro::Either::Right(self.1.submsg_unlabeled_default_value())
+            (::std::option::Option::None, ::std::option::Option::None)
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>

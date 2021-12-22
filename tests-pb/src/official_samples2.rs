@@ -795,7 +795,7 @@ pub mod _puroro_traits {
             }
         }
         fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            ::puroro::Either::Right(self.1.c_default_value())
+            (::std::option::Option::None, ::std::option::Option::None)
         }
     }
     impl<T, U> Test3Trait for ::puroro::Either<T, U>

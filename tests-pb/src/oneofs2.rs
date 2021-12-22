@@ -884,7 +884,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<U as MsgTrait>::Field5ScalarGetterType<'this>>,
         );
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            ::puroro::Either::Right(self.1.g2_submsg_default_value())
+            (::std::option::Option::None, ::std::option::Option::None)
         }
         fn group_one<'this>(
             &'this self,

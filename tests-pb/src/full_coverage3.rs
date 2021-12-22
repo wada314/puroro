@@ -3145,7 +3145,7 @@ pub mod _puroro_traits {
             }
         }
         fn submsg_unlabeled_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
-            ::puroro::Either::Right(self.1.submsg_unlabeled_default_value())
+            (::std::option::Option::None, ::std::option::Option::None)
         }
         type Field52ScalarGetterType<'this>
         where
@@ -3166,7 +3166,7 @@ pub mod _puroro_traits {
             }
         }
         fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
-            ::puroro::Either::Right(self.1.submsg_optional_default_value())
+            (::std::option::Option::None, ::std::option::Option::None)
         }
         type Field53ScalarGetterType<'this>
         where

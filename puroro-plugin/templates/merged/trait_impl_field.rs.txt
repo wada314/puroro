@@ -72,7 +72,11 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
 
 {%- if field.is_length_delimited %}
 fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
+    {%- if f.is_message && !f.is_repeated %}
+    (::std::option::Option::None, ::std::option::Option::None)
+    {%- else %} {#- if f.is_message && !f.is_repeated #}
     ::puroro::Either::Right(self.1.{{ field.ident_unesc }}_default_value())
+    {%- endif %} {#- if f.is_message && !f.is_repeated #}
 }
 {%- endif %} {#- if field.is_length_delimited #}
 

@@ -275,7 +275,7 @@ pub mod _puroro_traits {
             }
         }
         fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            ::puroro::Either::Right(self.1.recursive_unlabeled_default_value())
+            (::std::option::Option::None, ::std::option::Option::None)
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
