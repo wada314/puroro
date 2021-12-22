@@ -198,11 +198,4 @@ where
 {%- include "merged/trait_impl.rs.txt" %}
 {%- include "either/trait_impl.rs.txt" %}
 
-{%- macro either_trait_impl_field(f) -%}
-{%- include "either/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro merged_trait_impl_field(f) -%}
-{%- include "merged/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
 
