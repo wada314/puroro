@@ -613,7 +613,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.b_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
     }
 
@@ -698,12 +698,13 @@ pub mod _puroro_traits {
         type Field3ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field3ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field3ScalarGetterType<'this>, ()>;
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.c_opt())
+            self.as_ref()
+                .and_then(|msg| msg.c_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
     }
 

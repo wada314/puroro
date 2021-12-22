@@ -620,19 +620,22 @@ pub mod _puroro_traits {
             })
         }
         fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field6ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field6ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field6ScalarGetterType<'this>, ()>;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.submsg_unlabeled_opt())
+            self.as_ref().and_then(|msg| {
+                msg.submsg_unlabeled_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
     }
 

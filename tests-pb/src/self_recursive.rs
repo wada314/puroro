@@ -236,14 +236,17 @@ pub mod _puroro_traits {
         type Field1ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field1ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field1ScalarGetterType<'this>, ()>;
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.recursive_unlabeled_opt())
+            self.as_ref().and_then(|msg| {
+                msg.recursive_unlabeled_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
     }
 }

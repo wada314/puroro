@@ -437,6 +437,8 @@ struct OneofField {
     number: i32,
     is_length_delimited: bool,
     is_message: bool,
+    is_string: bool,
+    is_bytes: bool,
     field_type: String,
     simple_field_type: String,
     bumpalo_field_type: String,
@@ -459,6 +461,8 @@ impl OneofField {
                     | wrappers::FieldType::Message(_)
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_string: matches!(f.field_type()?, wrappers::FieldType::String),
+            is_bytes: matches!(f.field_type()?, wrappers::FieldType::Bytes),
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
             simple_field_type: f.simple_oneof_field_type()?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),

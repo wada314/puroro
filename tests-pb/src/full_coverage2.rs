@@ -2554,7 +2554,7 @@ pub mod _puroro_traits {
             })
         }
         fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field22ScalarGetterType<'this>
         where
@@ -2569,7 +2569,7 @@ pub mod _puroro_traits {
             })
         }
         fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field23ScalarGetterType<'this>
         where
@@ -2603,7 +2603,7 @@ pub mod _puroro_traits {
             })
         }
         fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field32ScalarGetterType<'this>
         where
@@ -2618,7 +2618,7 @@ pub mod _puroro_traits {
             })
         }
         fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field33ScalarGetterType<'this>
         where
@@ -2662,40 +2662,51 @@ pub mod _puroro_traits {
         type Field51ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field51ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field51ScalarGetterType<'this>, ()>;
         fn submsg_required_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field51ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.submsg_required_opt())
+            self.as_ref().and_then(|msg| {
+                msg.submsg_required_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn submsg_required_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field52ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field52ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field52ScalarGetterType<'this>, ()>;
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field52ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.submsg_optional_opt())
+            self.as_ref().and_then(|msg| {
+                msg.submsg_optional_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field53ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field53ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field53ScalarGetterType<'this>, ()>;
         type Field53RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<::std::option::IntoIter<T::Field53RepeatedType<'this>>>;
+        = ::puroro::internal::impls::option::EitherLeftRepeatedField<
+            ::std::iter::Flatten<::std::option::IntoIter<T::Field53RepeatedType<'this>>>,
+            (),
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.submsg_repeated())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::EitherLeftRepeatedField::new(
+                self.as_ref()
+                    .map(|msg| msg.submsg_repeated())
+                    .into_iter()
+                    .flatten(),
+            )
         }
         fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             self.as_ref().and_then(|msg| msg.i64_required_opt())

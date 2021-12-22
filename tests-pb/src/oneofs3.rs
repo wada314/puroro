@@ -805,21 +805,21 @@ pub mod _puroro_traits {
             Self: 'this,
         = ::puroro::Either<T::Field2ScalarGetterType<'this>, &'this str>;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field4ScalarGetterType<'this>
         where
             Self: 'this,
         = ::puroro::Either<T::Field4ScalarGetterType<'this>, &'this str>;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field5ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field5ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field5ScalarGetterType<'this>, ()>;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         fn group_one<'this>(
             &'this self,
@@ -828,7 +828,7 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| {
                 msg.group_one().map(|oneof| match oneof {
                     E::G1Int32(v) => E::G1Int32(v),
-                    E::G1String(v) => E::G1String(v),
+                    E::G1String(v) => E::G1String(::puroro::Either::Left(v)),
                 })
             })
         }
@@ -839,8 +839,8 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| {
                 msg.group_two().map(|oneof| match oneof {
                     E::G2F32(v) => E::G2F32(v),
-                    E::G2String(v) => E::G2String(v),
-                    E::G2Submsg(v) => E::G2Submsg(v),
+                    E::G2String(v) => E::G2String(::puroro::Either::Left(v)),
+                    E::G2Submsg(v) => E::G2Submsg(::puroro::Either::Left(v)),
                 })
             })
         }

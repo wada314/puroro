@@ -3216,7 +3216,7 @@ pub mod _puroro_traits {
             })
         }
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field72ScalarGetterType<'this>
         where
@@ -3231,7 +3231,7 @@ pub mod _puroro_traits {
             })
         }
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right("")
         }
         type Field73ScalarGetterType<'this>
         where
@@ -3244,7 +3244,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.string_abc_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right("abc")
         }
         type Field74ScalarGetterType<'this>
         where
@@ -3257,7 +3257,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.string_aiu_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right("\u{3042}\u{3044}\u{3046}")
         }
         type Field75ScalarGetterType<'this>
         where
@@ -3272,7 +3272,7 @@ pub mod _puroro_traits {
             })
         }
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right("\\")
         }
         type Field76ScalarGetterType<'this>
         where
@@ -3285,7 +3285,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.string_tab_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right("\t")
         }
         type Field77ScalarGetterType<'this>
         where
@@ -3298,7 +3298,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.string_crlf_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right("\r\n")
         }
         type Field81ScalarGetterType<'this>
         where
@@ -3313,7 +3313,7 @@ pub mod _puroro_traits {
             })
         }
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field82ScalarGetterType<'this>
         where
@@ -3326,7 +3326,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.bytes_empty_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(b"")
         }
         type Field83ScalarGetterType<'this>
         where
@@ -3339,7 +3339,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.bytes_abc_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(b"\x61\x62\x63")
         }
         type Field84ScalarGetterType<'this>
         where
@@ -3352,7 +3352,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.bytes_aiu_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
         }
         type Field85ScalarGetterType<'this>
         where
@@ -3367,7 +3367,7 @@ pub mod _puroro_traits {
             })
         }
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(b"\x5c")
         }
         type Field86ScalarGetterType<'this>
         where
@@ -3380,7 +3380,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.bytes_tab_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(b"\x09")
         }
         type Field87ScalarGetterType<'this>
         where
@@ -3393,7 +3393,7 @@ pub mod _puroro_traits {
                 .and_then(|msg| msg.bytes_crlf_opt().map(|val| ::puroro::Either::Left(val)))
         }
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(b"\x0d\x0a")
         }
         fn enum_default_opt<'this>(
             &'this self,

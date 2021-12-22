@@ -804,7 +804,7 @@ pub mod _puroro_traits {
             })
         }
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field6ScalarGetterType<'this>
         where
@@ -828,28 +828,36 @@ pub mod _puroro_traits {
         type Field7ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field7ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field7ScalarGetterType<'this>, ()>;
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
-            self.as_ref().and_then(|msg| msg.submsg_optional_opt())
+            self.as_ref().and_then(|msg| {
+                msg.submsg_optional_opt()
+                    .map(|val| ::puroro::Either::Left(val))
+            })
         }
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
-            todo!()
+            ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field8ScalarGetterType<'this>
         where
             Self: 'this,
-        = T::Field8ScalarGetterType<'this>;
+        = ::puroro::Either<T::Field8ScalarGetterType<'this>, ()>;
         type Field8RepeatedType<'this>
         where
             Self: 'this,
-        = ::std::iter::Flatten<::std::option::IntoIter<T::Field8RepeatedType<'this>>>;
+        = ::puroro::internal::impls::option::EitherLeftRepeatedField<
+            ::std::iter::Flatten<::std::option::IntoIter<T::Field8RepeatedType<'this>>>,
+            (),
+        >;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            self.as_ref()
-                .map(|msg| msg.submsg_repeated())
-                .into_iter()
-                .flatten()
+            ::puroro::internal::impls::option::EitherLeftRepeatedField::new(
+                self.as_ref()
+                    .map(|msg| msg.submsg_repeated())
+                    .into_iter()
+                    .flatten(),
+            )
         }
         fn enum_optional_opt<'this>(
             &'this self,
