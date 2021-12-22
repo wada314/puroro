@@ -2991,11 +2991,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<Self::Field21ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_unlabeled_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_unlabeled_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_unlabeled_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_unlabeled_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_unlabeled_default_value())
         }
         type Field22ScalarGetterType<'this>
         where
@@ -3006,11 +3008,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_optional_opt<'this>(&'this self) -> Option<Self::Field22ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_optional_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_optional_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_optional_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_optional_default_value())
         }
         type Field23ScalarGetterType<'this>
         where
@@ -3045,11 +3049,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> Option<Self::Field31ScalarGetterType<'this>> {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
                     <T as MsgTrait>::string_unlabeled_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                        .map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_unlabeled_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_unlabeled_default_value())
         }
         type Field32ScalarGetterType<'this>
         where
@@ -3060,11 +3067,13 @@ pub mod _puroro_traits {
         >;
         fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
             <U as MsgTrait>::string_optional_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::string_optional_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::string_optional_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_optional_default_value())
         }
         type Field33ScalarGetterType<'this>
         where
@@ -3135,6 +3144,9 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
+        fn submsg_unlabeled_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.submsg_unlabeled_default_value())
+        }
         type Field52ScalarGetterType<'this>
         where
             Self: 'this,
@@ -3152,6 +3164,9 @@ pub mod _puroro_traits {
                 (None, Some(u)) => Some((None, Some(u))),
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
+        }
+        fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.submsg_optional_default_value())
         }
         type Field53ScalarGetterType<'this>
         where
@@ -3476,9 +3491,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field21ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_unlabeled_opt(t),
-                |u| <U as MsgTrait>::bytes_unlabeled_opt(u),
+                |t| <T as MsgTrait>::bytes_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_unlabeled_default_value(&self) -> Self::Field21ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_unlabeled_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_unlabeled_default_value(u))
         }
         type Field22ScalarGetterType<'this>
         where
@@ -3491,9 +3511,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field22ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_optional_opt(t),
-                |u| <U as MsgTrait>::bytes_optional_opt(u),
+                |t| <T as MsgTrait>::bytes_optional_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_optional_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_optional_default_value(u))
         }
         type Field23ScalarGetterType<'this>
         where
@@ -3528,9 +3553,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field31ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_unlabeled_opt(t),
-                |u| <U as MsgTrait>::string_unlabeled_opt(u),
+                |t| <T as MsgTrait>::string_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_unlabeled_default_value(&self) -> Self::Field31ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_unlabeled_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_unlabeled_default_value(u))
         }
         type Field32ScalarGetterType<'this>
         where
@@ -3543,9 +3573,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field32ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_optional_opt(t),
-                |u| <U as MsgTrait>::string_optional_opt(u),
+                |t| <T as MsgTrait>::string_optional_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_optional_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_optional_default_value(u))
         }
         type Field33ScalarGetterType<'this>
         where
@@ -3615,6 +3650,11 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
+        fn submsg_unlabeled_default_value(&self) -> Self::Field51ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::submsg_unlabeled_default_value(t))
+                .map_right(|u| <U as MsgTrait>::submsg_unlabeled_default_value(u))
+        }
         type Field52ScalarGetterType<'this>
         where
             Self: 'this,
@@ -3629,6 +3669,11 @@ pub mod _puroro_traits {
                 |t| <T as MsgTrait>::submsg_optional_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::submsg_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::submsg_optional_default_value(t))
+                .map_right(|u| <U as MsgTrait>::submsg_optional_default_value(u))
         }
         type Field53ScalarGetterType<'this>
         where

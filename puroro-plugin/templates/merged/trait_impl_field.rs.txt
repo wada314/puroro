@@ -59,9 +59,9 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
     }
     {%- else %} {#- if f.is_message #}
     <U as {{ m.trait_ident }}>::{{ f.ident_unesc }}_opt(&self.1)
-        .map(|left| ::puroro::Either::Left(left))
+        .map(|u| ::puroro::Either::Right(u))
         .or_else(|| <T as {{ m.trait_ident }}>::{{ f.ident_unesc }}_opt(&self.0)
-            .map(|right| ::puroro::Either::Right(right)))
+            .map(|t| ::puroro::Either::Left(t)))
     {%- endif %} {#- if f.is_message #}
     {%- else %} {#- if f.is_length_delimited #}
     <U as {{ m.trait_ident }}>::{{ f.ident_unesc }}_opt(&self.1)
@@ -69,5 +69,11 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
     {%- endif %} {#- if f.is_length_delimited #}
 }
 {%- endif %}
+
+{%- if field.is_length_delimited %}
+fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
+    ::puroro::Either::Right(self.1.{{ field.ident_unesc }}_default_value())
+}
+{%- endif %} {#- if field.is_length_delimited #}
 
 {%- endif %} {#- if field.is_repeated #}

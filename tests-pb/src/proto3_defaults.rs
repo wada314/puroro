@@ -679,11 +679,14 @@ pub mod _puroro_traits {
         >;
         fn string_unlabeled_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
                     <T as MsgTrait>::string_unlabeled_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                        .map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_unlabeled_default_value())
         }
         type Field6ScalarGetterType<'this>
         where
@@ -702,6 +705,9 @@ pub mod _puroro_traits {
                 (None, Some(u)) => Some((None, Some(u))),
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
+        }
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.submsg_unlabeled_default_value())
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -753,9 +759,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_unlabeled_opt(t),
-                |u| <U as MsgTrait>::string_unlabeled_opt(u),
+                |t| <T as MsgTrait>::string_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_unlabeled_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_unlabeled_default_value(u))
         }
         type Field6ScalarGetterType<'this>
         where
@@ -771,6 +782,11 @@ pub mod _puroro_traits {
                 |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::submsg_unlabeled_default_value(t))
+                .map_right(|u| <U as MsgTrait>::submsg_unlabeled_default_value(u))
         }
     }
 

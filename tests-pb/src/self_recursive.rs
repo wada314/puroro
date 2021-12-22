@@ -274,6 +274,9 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.recursive_unlabeled_default_value())
+        }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
     where
@@ -294,6 +297,11 @@ pub mod _puroro_traits {
                 |t| <T as MsgTrait>::recursive_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::recursive_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::recursive_unlabeled_default_value(t))
+                .map_right(|u| <U as MsgTrait>::recursive_unlabeled_default_value(u))
         }
     }
 }

@@ -863,6 +863,9 @@ pub mod _puroro_traits {
             <T as MsgTrait>::Field2ScalarGetterType<'this>,
             <U as MsgTrait>::Field2ScalarGetterType<'this>,
         >;
+        fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.g1_string_default_value())
+        }
         type Field4ScalarGetterType<'this>
         where
             Self: 'this,
@@ -870,6 +873,9 @@ pub mod _puroro_traits {
             <T as MsgTrait>::Field4ScalarGetterType<'this>,
             <U as MsgTrait>::Field4ScalarGetterType<'this>,
         >;
+        fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.g2_string_default_value())
+        }
         type Field5ScalarGetterType<'this>
         where
             Self: 'this,
@@ -877,6 +883,9 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::Field5ScalarGetterType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field5ScalarGetterType<'this>>,
         );
+        fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.g2_submsg_default_value())
+        }
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -944,6 +953,11 @@ pub mod _puroro_traits {
             <T as MsgTrait>::Field2ScalarGetterType<'this>,
             <U as MsgTrait>::Field2ScalarGetterType<'this>,
         >;
+        fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::g1_string_default_value(t))
+                .map_right(|u| <U as MsgTrait>::g1_string_default_value(u))
+        }
         type Field4ScalarGetterType<'this>
         where
             Self: 'this,
@@ -951,6 +965,11 @@ pub mod _puroro_traits {
             <T as MsgTrait>::Field4ScalarGetterType<'this>,
             <U as MsgTrait>::Field4ScalarGetterType<'this>,
         >;
+        fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::g2_string_default_value(t))
+                .map_right(|u| <U as MsgTrait>::g2_string_default_value(u))
+        }
         type Field5ScalarGetterType<'this>
         where
             Self: 'this,
@@ -958,6 +977,11 @@ pub mod _puroro_traits {
             <T as MsgTrait>::Field5ScalarGetterType<'this>,
             <U as MsgTrait>::Field5ScalarGetterType<'this>,
         >;
+        fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::g2_submsg_default_value(t))
+                .map_right(|u| <U as MsgTrait>::g2_submsg_default_value(u))
+        }
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {

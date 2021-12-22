@@ -3586,11 +3586,13 @@ pub mod _puroro_traits {
         >;
         fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
             <U as MsgTrait>::string_default_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::string_default_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::string_default_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_default_default_value())
         }
         type Field72ScalarGetterType<'this>
         where
@@ -3601,11 +3603,13 @@ pub mod _puroro_traits {
         >;
         fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
             <U as MsgTrait>::string_empty_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::string_empty_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::string_empty_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_empty_default_value())
         }
         type Field73ScalarGetterType<'this>
         where
@@ -3616,11 +3620,13 @@ pub mod _puroro_traits {
         >;
         fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
             <U as MsgTrait>::string_abc_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::string_abc_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::string_abc_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_abc_default_value())
         }
         type Field74ScalarGetterType<'this>
         where
@@ -3631,11 +3637,13 @@ pub mod _puroro_traits {
         >;
         fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
             <U as MsgTrait>::string_aiu_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::string_aiu_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::string_aiu_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_aiu_default_value())
         }
         type Field75ScalarGetterType<'this>
         where
@@ -3648,11 +3656,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> Option<Self::Field75ScalarGetterType<'this>> {
             <U as MsgTrait>::string_backslash_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
                     <T as MsgTrait>::string_backslash_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                        .map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_backslash_default_value())
         }
         type Field76ScalarGetterType<'this>
         where
@@ -3663,11 +3674,13 @@ pub mod _puroro_traits {
         >;
         fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
             <U as MsgTrait>::string_tab_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::string_tab_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::string_tab_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_tab_default_value())
         }
         type Field77ScalarGetterType<'this>
         where
@@ -3678,11 +3691,13 @@ pub mod _puroro_traits {
         >;
         fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
             <U as MsgTrait>::string_crlf_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::string_crlf_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::string_crlf_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.string_crlf_default_value())
         }
         type Field81ScalarGetterType<'this>
         where
@@ -3693,11 +3708,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_default_opt<'this>(&'this self) -> Option<Self::Field81ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_default_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_default_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_default_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_default_default_value())
         }
         type Field82ScalarGetterType<'this>
         where
@@ -3708,11 +3725,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_empty_opt<'this>(&'this self) -> Option<Self::Field82ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_empty_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_empty_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_empty_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_empty_default_value())
         }
         type Field83ScalarGetterType<'this>
         where
@@ -3723,11 +3742,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_abc_opt<'this>(&'this self) -> Option<Self::Field83ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_abc_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_abc_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_abc_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_abc_default_value())
         }
         type Field84ScalarGetterType<'this>
         where
@@ -3738,11 +3759,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_aiu_opt<'this>(&'this self) -> Option<Self::Field84ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_aiu_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_aiu_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_aiu_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_aiu_default_value())
         }
         type Field85ScalarGetterType<'this>
         where
@@ -3753,11 +3776,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_backslash_opt<'this>(&'this self) -> Option<Self::Field85ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_backslash_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_backslash_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_backslash_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_backslash_default_value())
         }
         type Field86ScalarGetterType<'this>
         where
@@ -3768,11 +3793,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_tab_opt<'this>(&'this self) -> Option<Self::Field86ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_tab_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_tab_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_tab_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_tab_default_value())
         }
         type Field87ScalarGetterType<'this>
         where
@@ -3783,11 +3810,13 @@ pub mod _puroro_traits {
         >;
         fn bytes_crlf_opt<'this>(&'this self) -> Option<Self::Field87ScalarGetterType<'this>> {
             <U as MsgTrait>::bytes_crlf_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
+                .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| {
-                    <T as MsgTrait>::bytes_crlf_opt(&self.0)
-                        .map(|right| ::puroro::Either::Right(right))
+                    <T as MsgTrait>::bytes_crlf_opt(&self.0).map(|t| ::puroro::Either::Left(t))
                 })
+        }
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.bytes_crlf_default_value())
         }
         fn enum_default_opt<'this>(
             &'this self,
@@ -4092,9 +4121,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_default_opt(t),
-                |u| <U as MsgTrait>::string_default_opt(u),
+                |t| <T as MsgTrait>::string_default_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_default_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_default_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_default_default_value(u))
         }
         type Field72ScalarGetterType<'this>
         where
@@ -4107,9 +4141,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_empty_opt(t),
-                |u| <U as MsgTrait>::string_empty_opt(u),
+                |t| <T as MsgTrait>::string_empty_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_empty_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_empty_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_empty_default_value(u))
         }
         type Field73ScalarGetterType<'this>
         where
@@ -4122,9 +4161,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_abc_opt(t),
-                |u| <U as MsgTrait>::string_abc_opt(u),
+                |t| <T as MsgTrait>::string_abc_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_abc_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_abc_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_abc_default_value(u))
         }
         type Field74ScalarGetterType<'this>
         where
@@ -4137,9 +4181,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_aiu_opt(t),
-                |u| <U as MsgTrait>::string_aiu_opt(u),
+                |t| <T as MsgTrait>::string_aiu_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_aiu_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_aiu_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_aiu_default_value(u))
         }
         type Field75ScalarGetterType<'this>
         where
@@ -4152,9 +4201,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_backslash_opt(t),
-                |u| <U as MsgTrait>::string_backslash_opt(u),
+                |t| <T as MsgTrait>::string_backslash_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_backslash_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_backslash_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_backslash_default_value(u))
         }
         type Field76ScalarGetterType<'this>
         where
@@ -4167,9 +4221,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_tab_opt(t),
-                |u| <U as MsgTrait>::string_tab_opt(u),
+                |t| <T as MsgTrait>::string_tab_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_tab_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_tab_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_tab_default_value(u))
         }
         type Field77ScalarGetterType<'this>
         where
@@ -4182,9 +4241,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::string_crlf_opt(t),
-                |u| <U as MsgTrait>::string_crlf_opt(u),
+                |t| <T as MsgTrait>::string_crlf_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::string_crlf_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::string_crlf_default_value(t))
+                .map_right(|u| <U as MsgTrait>::string_crlf_default_value(u))
         }
         type Field81ScalarGetterType<'this>
         where
@@ -4197,9 +4261,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_default_opt(t),
-                |u| <U as MsgTrait>::bytes_default_opt(u),
+                |t| <T as MsgTrait>::bytes_default_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_default_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_default_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_default_default_value(u))
         }
         type Field82ScalarGetterType<'this>
         where
@@ -4212,9 +4281,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_empty_opt(t),
-                |u| <U as MsgTrait>::bytes_empty_opt(u),
+                |t| <T as MsgTrait>::bytes_empty_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_empty_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_empty_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_empty_default_value(u))
         }
         type Field83ScalarGetterType<'this>
         where
@@ -4227,9 +4301,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_abc_opt(t),
-                |u| <U as MsgTrait>::bytes_abc_opt(u),
+                |t| <T as MsgTrait>::bytes_abc_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_abc_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_abc_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_abc_default_value(u))
         }
         type Field84ScalarGetterType<'this>
         where
@@ -4242,9 +4321,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_aiu_opt(t),
-                |u| <U as MsgTrait>::bytes_aiu_opt(u),
+                |t| <T as MsgTrait>::bytes_aiu_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_aiu_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_aiu_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_aiu_default_value(u))
         }
         type Field85ScalarGetterType<'this>
         where
@@ -4257,9 +4341,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_backslash_opt(t),
-                |u| <U as MsgTrait>::bytes_backslash_opt(u),
+                |t| <T as MsgTrait>::bytes_backslash_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_backslash_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_backslash_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_backslash_default_value(u))
         }
         type Field86ScalarGetterType<'this>
         where
@@ -4272,9 +4361,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_tab_opt(t),
-                |u| <U as MsgTrait>::bytes_tab_opt(u),
+                |t| <T as MsgTrait>::bytes_tab_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_tab_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_tab_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_tab_default_value(u))
         }
         type Field87ScalarGetterType<'this>
         where
@@ -4287,9 +4381,14 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::bytes_crlf_opt(t),
-                |u| <U as MsgTrait>::bytes_crlf_opt(u),
+                |t| <T as MsgTrait>::bytes_crlf_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::bytes_crlf_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as MsgTrait>::bytes_crlf_default_value(t))
+                .map_right(|u| <U as MsgTrait>::bytes_crlf_default_value(u))
         }
         fn enum_default_opt<'this>(
             &'this self,

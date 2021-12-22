@@ -649,10 +649,11 @@ pub mod _puroro_traits {
         >;
         fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
             <U as Test2Trait>::b_opt(&self.1)
-                .map(|left| ::puroro::Either::Left(left))
-                .or_else(|| {
-                    <T as Test2Trait>::b_opt(&self.0).map(|right| ::puroro::Either::Right(right))
-                })
+                .map(|u| ::puroro::Either::Right(u))
+                .or_else(|| <T as Test2Trait>::b_opt(&self.0).map(|t| ::puroro::Either::Left(t)))
+        }
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.b_default_value())
         }
     }
     impl<T, U> Test2Trait for ::puroro::Either<T, U>
@@ -669,9 +670,14 @@ pub mod _puroro_traits {
         >;
         fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             self.as_ref().either(
-                |t| <T as Test2Trait>::b_opt(t),
-                |u| <U as Test2Trait>::b_opt(u),
+                |t| <T as Test2Trait>::b_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as Test2Trait>::b_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as Test2Trait>::b_default_value(t))
+                .map_right(|u| <U as Test2Trait>::b_default_value(u))
         }
     }
 
@@ -788,6 +794,9 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+            ::puroro::Either::Right(self.1.c_default_value())
+        }
     }
     impl<T, U> Test3Trait for ::puroro::Either<T, U>
     where
@@ -806,6 +815,11 @@ pub mod _puroro_traits {
                 |t| <T as Test3Trait>::c_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as Test3Trait>::c_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
+        }
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+            self.as_ref()
+                .map_left(|t| <T as Test3Trait>::c_default_value(t))
+                .map_right(|u| <U as Test3Trait>::c_default_value(u))
         }
     }
 
