@@ -662,6 +662,13 @@ pub mod _puroro_traits {
         T: Test2Trait,
         U: Test2Trait,
     {
+        type Field2ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as Test2Trait>::Field2ScalarGetterType<'this>,
+            <U as Test2Trait>::Field2ScalarGetterType<'this>,
+        >;
         fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             self.as_ref().either(
                 |t| <T as Test2Trait>::b_opt(t),
@@ -789,12 +796,12 @@ pub mod _puroro_traits {
         T: Test3Trait,
         U: Test3Trait,
     {
-        type Field3MessageType<'this>
+        type Field3ScalarGetterType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as Test3Trait>::Field3MessageType<'this>,
-            <U as Test3Trait>::Field3MessageType<'this>,
+            <T as Test3Trait>::Field3ScalarGetterType<'this>,
+            <U as Test3Trait>::Field3ScalarGetterType<'this>,
         >;
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             self.as_ref().either(

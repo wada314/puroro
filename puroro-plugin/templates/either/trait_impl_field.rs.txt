@@ -1,16 +1,16 @@
 
-{%- if f.is_message %}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
-    <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
-    <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
+{%- if f.is_length_delimited %}
+type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = ::puroro::Either<
+    <T as {{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <U as {{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
 >;
 {%- endif %}
 
 {%- if f.is_repeated %}
 
 {%- let either_repeated_field_type %}
-{%- if f.is_message %}
-{%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
+{%- if f.is_length_delimited %}
+{%- let either_repeated_field_type = "EitherRepeatedLDField" %}
 {%- else %}
 {%- let either_repeated_field_type = "EitherRepeatedField" %}
 {%- endif %}

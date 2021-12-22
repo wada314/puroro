@@ -280,12 +280,12 @@ pub mod _puroro_traits {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field1MessageType<'this>
+        type Field1ScalarGetterType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field1MessageType<'this>,
-            <U as MsgTrait>::Field1MessageType<'this>,
+            <T as MsgTrait>::Field1ScalarGetterType<'this>,
+            <U as MsgTrait>::Field1ScalarGetterType<'this>,
         >;
         fn recursive_unlabeled_opt<'this>(
             &'this self,

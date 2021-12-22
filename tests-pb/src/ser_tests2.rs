@@ -1070,6 +1070,13 @@ pub mod _puroro_traits {
                     .map_right(|u| <U as MsgTrait>::float_repeated(u)),
             )
         }
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field5ScalarGetterType<'this>,
+            <U as MsgTrait>::Field5ScalarGetterType<'this>,
+        >;
         fn string_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
@@ -1078,27 +1085,34 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::string_optional_opt(u),
             )
         }
+        type Field6ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field6ScalarGetterType<'this>,
+            <U as MsgTrait>::Field6ScalarGetterType<'this>,
+        >;
         type Field6RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedField<
+        = ::puroro::internal::impls::either::EitherRepeatedLDField<
             <T as MsgTrait>::Field6RepeatedType<'this>,
             <U as MsgTrait>::Field6RepeatedType<'this>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedLDField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::string_repeated(t))
                     .map_right(|u| <U as MsgTrait>::string_repeated(u)),
             )
         }
-        type Field7MessageType<'this>
+        type Field7ScalarGetterType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field7MessageType<'this>,
-            <U as MsgTrait>::Field7MessageType<'this>,
+            <T as MsgTrait>::Field7ScalarGetterType<'this>,
+            <U as MsgTrait>::Field7ScalarGetterType<'this>,
         >;
         fn submsg_optional_opt<'this>(
             &'this self,
@@ -1108,23 +1122,23 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::submsg_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        type Field8MessageType<'this>
+        type Field8ScalarGetterType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field8MessageType<'this>,
-            <U as MsgTrait>::Field8MessageType<'this>,
+            <T as MsgTrait>::Field8ScalarGetterType<'this>,
+            <U as MsgTrait>::Field8ScalarGetterType<'this>,
         >;
         type Field8RepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::either::EitherRepeatedMessageField<
+        = ::puroro::internal::impls::either::EitherRepeatedLDField<
             <T as MsgTrait>::Field8RepeatedType<'this>,
             <U as MsgTrait>::Field8RepeatedType<'this>,
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
+            ::puroro::internal::impls::either::EitherRepeatedLDField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::submsg_repeated(t))
                     .map_right(|u| <U as MsgTrait>::submsg_repeated(u)),

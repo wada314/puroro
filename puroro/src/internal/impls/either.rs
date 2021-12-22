@@ -51,42 +51,9 @@ impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedLDField<T, U>
 where
     T: RepeatedField<'msg> + IntoIterator,
     U: RepeatedField<'msg> + IntoIterator,
-    <T as IntoIterator>::Item: Deref<Target = <<U as IntoIterator>::Item as Deref>::Target>,
-    <U as IntoIterator>::Item: Deref,
 {
 }
 impl<'msg, T, U> IntoIterator for EitherRepeatedLDField<T, U>
-where
-    T: RepeatedField<'msg> + IntoIterator,
-    U: RepeatedField<'msg> + IntoIterator,
-    <T as IntoIterator>::Item: Deref<Target = <<U as IntoIterator>::Item as Deref>::Target>,
-    <U as IntoIterator>::Item: Deref,
-{
-    type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
-    type IntoIter =
-        IndependentEitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
-    fn into_iter(self) -> Self::IntoIter {
-        IndependentEitherIter(
-            self.0
-                .map_left(|t| t.into_iter())
-                .map_right(|u| u.into_iter()),
-        )
-    }
-}
-
-pub struct EitherRepeatedMessageField<T, U>(Either<T, U>);
-impl<T, U> EitherRepeatedMessageField<T, U> {
-    pub fn new(from: Either<T, U>) -> Self {
-        Self(from)
-    }
-}
-impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedMessageField<T, U>
-where
-    T: RepeatedField<'msg> + IntoIterator,
-    U: RepeatedField<'msg> + IntoIterator,
-{
-}
-impl<'msg, T, U> IntoIterator for EitherRepeatedMessageField<T, U>
 where
     T: RepeatedField<'msg> + IntoIterator,
     U: RepeatedField<'msg> + IntoIterator,

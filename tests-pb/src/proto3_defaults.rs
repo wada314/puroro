@@ -742,6 +742,13 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::f32_unlabeled_opt(u),
             )
         }
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field5ScalarGetterType<'this>,
+            <U as MsgTrait>::Field5ScalarGetterType<'this>,
+        >;
         fn string_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
@@ -750,12 +757,12 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::string_unlabeled_opt(u),
             )
         }
-        type Field6MessageType<'this>
+        type Field6ScalarGetterType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field6MessageType<'this>,
-            <U as MsgTrait>::Field6MessageType<'this>,
+            <T as MsgTrait>::Field6ScalarGetterType<'this>,
+            <U as MsgTrait>::Field6ScalarGetterType<'this>,
         >;
         fn submsg_unlabeled_opt<'this>(
             &'this self,

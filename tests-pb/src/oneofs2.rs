@@ -879,18 +879,20 @@ pub mod _puroro_traits {
         );
         fn group_one<'this>(
             &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             Some(match (self.0.group_one(), self.1.group_one()) {
                 (None, None) => {
                     return None;
                 }
                 (Some(E::G1Int32(_)), Some(E::G1Int32(right))) => E::G1Int32(right),
-                (Some(E::G1String(_)), Some(E::G1String(right))) => E::G1String(right),
+                (Some(E::G1String(_)), Some(E::G1String(right))) => {
+                    E::G1String(::puroro::Either::Right(right))
+                }
                 (_, Some(E::G1Int32(right))) => E::G1Int32(right),
-                (_, Some(E::G1String(right))) => E::G1String(right),
+                (_, Some(E::G1String(right))) => E::G1String(::puroro::Either::Right(right)),
                 (Some(E::G1Int32(left)), None) => E::G1Int32(left),
-                (Some(E::G1String(left)), None) => E::G1String(left),
+                (Some(E::G1String(left)), None) => E::G1String(::puroro::Either::Left(left)),
             })
         }
         fn group_two<'this>(
@@ -902,15 +904,17 @@ pub mod _puroro_traits {
                     return None;
                 }
                 (Some(E::G2F32(_)), Some(E::G2F32(right))) => E::G2F32(right),
-                (Some(E::G2String(_)), Some(E::G2String(right))) => E::G2String(right),
+                (Some(E::G2String(_)), Some(E::G2String(right))) => {
+                    E::G2String(::puroro::Either::Right(right))
+                }
                 (Some(E::G2Submsg(left)), Some(E::G2Submsg(right))) => {
                     E::G2Submsg((Some(left), Some(right)))
                 }
                 (_, Some(E::G2F32(right))) => E::G2F32(right),
-                (_, Some(E::G2String(right))) => E::G2String(right),
+                (_, Some(E::G2String(right))) => E::G2String(::puroro::Either::Right(right)),
                 (_, Some(E::G2Submsg(right))) => E::G2Submsg((None, Some(right))),
                 (Some(E::G2F32(left)), None) => E::G2F32(left),
-                (Some(E::G2String(left)), None) => E::G2String(left),
+                (Some(E::G2String(left)), None) => E::G2String(::puroro::Either::Left(left)),
                 (Some(E::G2Submsg(left)), None) => E::G2Submsg((Some(left), None)),
             })
         }
@@ -933,16 +937,30 @@ pub mod _puroro_traits {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field5MessageType<'this>
+        type Field2ScalarGetterType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field5MessageType<'this>,
-            <U as MsgTrait>::Field5MessageType<'this>,
+            <T as MsgTrait>::Field2ScalarGetterType<'this>,
+            <U as MsgTrait>::Field2ScalarGetterType<'this>,
+        >;
+        type Field4ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field4ScalarGetterType<'this>,
+            <U as MsgTrait>::Field4ScalarGetterType<'this>,
+        >;
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
+            <T as MsgTrait>::Field5ScalarGetterType<'this>,
+            <U as MsgTrait>::Field5ScalarGetterType<'this>,
         >;
         fn group_one<'this>(
             &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             match self.as_ref().either(
                 |t| t.group_one().map(|t| ::puroro::Either::Left(t)),
@@ -950,8 +968,12 @@ pub mod _puroro_traits {
             ) {
                 Some(::puroro::Either::Left(E::G1Int32(v))) => Some(E::G1Int32(v)),
                 Some(::puroro::Either::Right(E::G1Int32(v))) => Some(E::G1Int32(v)),
-                Some(::puroro::Either::Left(E::G1String(v))) => Some(E::G1String(v)),
-                Some(::puroro::Either::Right(E::G1String(v))) => Some(E::G1String(v)),
+                Some(::puroro::Either::Left(E::G1String(v))) => {
+                    Some(E::G1String(::puroro::Either::Left(v)))
+                }
+                Some(::puroro::Either::Right(E::G1String(v))) => {
+                    Some(E::G1String(::puroro::Either::Right(v)))
+                }
                 None => None,
             }
         }
@@ -965,8 +987,12 @@ pub mod _puroro_traits {
             ) {
                 Some(::puroro::Either::Left(E::G2F32(v))) => Some(E::G2F32(v)),
                 Some(::puroro::Either::Right(E::G2F32(v))) => Some(E::G2F32(v)),
-                Some(::puroro::Either::Left(E::G2String(v))) => Some(E::G2String(v)),
-                Some(::puroro::Either::Right(E::G2String(v))) => Some(E::G2String(v)),
+                Some(::puroro::Either::Left(E::G2String(v))) => {
+                    Some(E::G2String(::puroro::Either::Left(v)))
+                }
+                Some(::puroro::Either::Right(E::G2String(v))) => {
+                    Some(E::G2String(::puroro::Either::Right(v)))
+                }
                 Some(::puroro::Either::Left(E::G2Submsg(v))) => {
                     Some(E::G2Submsg(::puroro::Either::Left(v)))
                 }
