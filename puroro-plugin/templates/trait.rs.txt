@@ -195,10 +195,8 @@ where
 
 {%- include "empty/trait_impl.rs.txt" %}
 {%- include "option/trait_impl.rs.txt" %}
-{#
 {%- include "merged/trait_impl.rs.txt" %}
 {%- include "either/trait_impl.rs.txt" %}
-#}
 
 {%- macro either_trait_impl_field(f) -%}
 {%- include "either/trait_impl_field.rs.txt" %}
