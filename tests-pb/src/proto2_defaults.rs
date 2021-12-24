@@ -12280,6 +12280,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn i32_default_default_value<'this>(&'this self) -> i32;
+
         fn has_i32_default<'this>(&'this self) -> bool {
             self.i32_default_opt().is_some()
         }
@@ -12290,6 +12292,8 @@ pub mod _puroro_traits {
         fn i32_0<'this>(&'this self) -> i32 {
             self.i32_0_opt().unwrap_or(0)
         }
+
+        fn i32_0_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_0<'this>(&'this self) -> bool {
             self.i32_0_opt().is_some()
@@ -12302,6 +12306,8 @@ pub mod _puroro_traits {
             self.i32_42_opt().unwrap_or(42)
         }
 
+        fn i32_42_default_value<'this>(&'this self) -> i32;
+
         fn has_i32_42<'this>(&'this self) -> bool {
             self.i32_42_opt().is_some()
         }
@@ -12312,6 +12318,8 @@ pub mod _puroro_traits {
         fn i32_m42<'this>(&'this self) -> i32 {
             self.i32_m42_opt().unwrap_or(-42)
         }
+
+        fn i32_m42_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_m42<'this>(&'this self) -> bool {
             self.i32_m42_opt().is_some()
@@ -12324,6 +12332,8 @@ pub mod _puroro_traits {
             self.i32_2147483647_opt().unwrap_or(2147483647)
         }
 
+        fn i32_2147483647_default_value<'this>(&'this self) -> i32;
+
         fn has_i32_2147483647<'this>(&'this self) -> bool {
             self.i32_2147483647_opt().is_some()
         }
@@ -12334,6 +12344,8 @@ pub mod _puroro_traits {
         fn i32_m2147483648<'this>(&'this self) -> i32 {
             self.i32_m2147483648_opt().unwrap_or(-2147483648)
         }
+
+        fn i32_m2147483648_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_m2147483648<'this>(&'this self) -> bool {
             self.i32_m2147483648_opt().is_some()
@@ -12346,6 +12358,8 @@ pub mod _puroro_traits {
             self.i32_0123_opt().unwrap_or(83)
         }
 
+        fn i32_0123_default_value<'this>(&'this self) -> i32;
+
         fn has_i32_0123<'this>(&'this self) -> bool {
             self.i32_0123_opt().is_some()
         }
@@ -12356,6 +12370,8 @@ pub mod _puroro_traits {
         fn i32_0x123<'this>(&'this self) -> i32 {
             self.i32_0x123_opt().unwrap_or(291)
         }
+
+        fn i32_0x123_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_0x123<'this>(&'this self) -> bool {
             self.i32_0x123_opt().is_some()
@@ -12369,6 +12385,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn u32_default_default_value<'this>(&'this self) -> u32;
+
         fn has_u32_default<'this>(&'this self) -> bool {
             self.u32_default_opt().is_some()
         }
@@ -12379,6 +12397,8 @@ pub mod _puroro_traits {
         fn u32_0<'this>(&'this self) -> u32 {
             self.u32_0_opt().unwrap_or(0)
         }
+
+        fn u32_0_default_value<'this>(&'this self) -> u32;
 
         fn has_u32_0<'this>(&'this self) -> bool {
             self.u32_0_opt().is_some()
@@ -12391,6 +12411,8 @@ pub mod _puroro_traits {
             self.u32_42_opt().unwrap_or(42)
         }
 
+        fn u32_42_default_value<'this>(&'this self) -> u32;
+
         fn has_u32_42<'this>(&'this self) -> bool {
             self.u32_42_opt().is_some()
         }
@@ -12401,6 +12423,8 @@ pub mod _puroro_traits {
         fn u32_4294967295<'this>(&'this self) -> u32 {
             self.u32_4294967295_opt().unwrap_or(4294967295)
         }
+
+        fn u32_4294967295_default_value<'this>(&'this self) -> u32;
 
         fn has_u32_4294967295<'this>(&'this self) -> bool {
             self.u32_4294967295_opt().is_some()
@@ -12413,6 +12437,8 @@ pub mod _puroro_traits {
             self.u32_0123_opt().unwrap_or(83)
         }
 
+        fn u32_0123_default_value<'this>(&'this self) -> u32;
+
         fn has_u32_0123<'this>(&'this self) -> bool {
             self.u32_0123_opt().is_some()
         }
@@ -12423,6 +12449,8 @@ pub mod _puroro_traits {
         fn u32_0x123<'this>(&'this self) -> u32 {
             self.u32_0x123_opt().unwrap_or(291)
         }
+
+        fn u32_0x123_default_value<'this>(&'this self) -> u32;
 
         fn has_u32_0x123<'this>(&'this self) -> bool {
             self.u32_0x123_opt().is_some()
@@ -12436,6 +12464,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn i64_default_default_value<'this>(&'this self) -> i64;
+
         fn has_i64_default<'this>(&'this self) -> bool {
             self.i64_default_opt().is_some()
         }
@@ -12446,6 +12476,8 @@ pub mod _puroro_traits {
         fn i64_0<'this>(&'this self) -> i64 {
             self.i64_0_opt().unwrap_or(0)
         }
+
+        fn i64_0_default_value<'this>(&'this self) -> i64;
 
         fn has_i64_0<'this>(&'this self) -> bool {
             self.i64_0_opt().is_some()
@@ -12458,6 +12490,8 @@ pub mod _puroro_traits {
             self.i64_42_opt().unwrap_or(42)
         }
 
+        fn i64_42_default_value<'this>(&'this self) -> i64;
+
         fn has_i64_42<'this>(&'this self) -> bool {
             self.i64_42_opt().is_some()
         }
@@ -12468,6 +12502,8 @@ pub mod _puroro_traits {
         fn i64_m42<'this>(&'this self) -> i64 {
             self.i64_m42_opt().unwrap_or(-42)
         }
+
+        fn i64_m42_default_value<'this>(&'this self) -> i64;
 
         fn has_i64_m42<'this>(&'this self) -> bool {
             self.i64_m42_opt().is_some()
@@ -12481,6 +12517,8 @@ pub mod _puroro_traits {
                 .unwrap_or(9223372036854775807)
         }
 
+        fn i64_9223372036854775807_default_value<'this>(&'this self) -> i64;
+
         fn has_i64_9223372036854775807<'this>(&'this self) -> bool {
             self.i64_9223372036854775807_opt().is_some()
         }
@@ -12493,6 +12531,8 @@ pub mod _puroro_traits {
                 .unwrap_or(-9223372036854775808)
         }
 
+        fn i64_m9223372036854775808_default_value<'this>(&'this self) -> i64;
+
         fn has_i64_m9223372036854775808<'this>(&'this self) -> bool {
             self.i64_m9223372036854775808_opt().is_some()
         }
@@ -12504,6 +12544,8 @@ pub mod _puroro_traits {
             self.i64_0123_opt().unwrap_or(83)
         }
 
+        fn i64_0123_default_value<'this>(&'this self) -> i64;
+
         fn has_i64_0123<'this>(&'this self) -> bool {
             self.i64_0123_opt().is_some()
         }
@@ -12514,6 +12556,8 @@ pub mod _puroro_traits {
         fn i64_0x123<'this>(&'this self) -> i64 {
             self.i64_0x123_opt().unwrap_or(291)
         }
+
+        fn i64_0x123_default_value<'this>(&'this self) -> i64;
 
         fn has_i64_0x123<'this>(&'this self) -> bool {
             self.i64_0x123_opt().is_some()
@@ -12527,6 +12571,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn u64_default_default_value<'this>(&'this self) -> u64;
+
         fn has_u64_default<'this>(&'this self) -> bool {
             self.u64_default_opt().is_some()
         }
@@ -12538,6 +12584,8 @@ pub mod _puroro_traits {
             self.u64_0_opt().unwrap_or(0)
         }
 
+        fn u64_0_default_value<'this>(&'this self) -> u64;
+
         fn has_u64_0<'this>(&'this self) -> bool {
             self.u64_0_opt().is_some()
         }
@@ -12548,6 +12596,8 @@ pub mod _puroro_traits {
         fn u64_42<'this>(&'this self) -> u64 {
             self.u64_42_opt().unwrap_or(42)
         }
+
+        fn u64_42_default_value<'this>(&'this self) -> u64;
 
         fn has_u64_42<'this>(&'this self) -> bool {
             self.u64_42_opt().is_some()
@@ -12561,6 +12611,8 @@ pub mod _puroro_traits {
                 .unwrap_or(18446744073709551615)
         }
 
+        fn u64_18446744073709551615_default_value<'this>(&'this self) -> u64;
+
         fn has_u64_18446744073709551615<'this>(&'this self) -> bool {
             self.u64_18446744073709551615_opt().is_some()
         }
@@ -12572,6 +12624,8 @@ pub mod _puroro_traits {
             self.u64_0123_opt().unwrap_or(83)
         }
 
+        fn u64_0123_default_value<'this>(&'this self) -> u64;
+
         fn has_u64_0123<'this>(&'this self) -> bool {
             self.u64_0123_opt().is_some()
         }
@@ -12582,6 +12636,8 @@ pub mod _puroro_traits {
         fn u64_0x123<'this>(&'this self) -> u64 {
             self.u64_0x123_opt().unwrap_or(291)
         }
+
+        fn u64_0x123_default_value<'this>(&'this self) -> u64;
 
         fn has_u64_0x123<'this>(&'this self) -> bool {
             self.u64_0x123_opt().is_some()
@@ -12595,6 +12651,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn f32_default_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_default<'this>(&'this self) -> bool {
             self.f32_default_opt().is_some()
         }
@@ -12605,6 +12663,8 @@ pub mod _puroro_traits {
         fn f32_0<'this>(&'this self) -> f32 {
             self.f32_0_opt().unwrap_or(0f32)
         }
+
+        fn f32_0_default_value<'this>(&'this self) -> f32;
 
         fn has_f32_0<'this>(&'this self) -> bool {
             self.f32_0_opt().is_some()
@@ -12617,6 +12677,8 @@ pub mod _puroro_traits {
             self.f32_m0_opt().unwrap_or(-0f32)
         }
 
+        fn f32_m0_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_m0<'this>(&'this self) -> bool {
             self.f32_m0_opt().is_some()
         }
@@ -12627,6 +12689,8 @@ pub mod _puroro_traits {
         fn f32_0p<'this>(&'this self) -> f32 {
             self.f32_0p_opt().unwrap_or(0f32)
         }
+
+        fn f32_0p_default_value<'this>(&'this self) -> f32;
 
         fn has_f32_0p<'this>(&'this self) -> bool {
             self.f32_0p_opt().is_some()
@@ -12639,6 +12703,8 @@ pub mod _puroro_traits {
             self.f32_p0_opt().unwrap_or(0f32)
         }
 
+        fn f32_p0_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_p0<'this>(&'this self) -> bool {
             self.f32_p0_opt().is_some()
         }
@@ -12649,6 +12715,8 @@ pub mod _puroro_traits {
         fn f32_0p0<'this>(&'this self) -> f32 {
             self.f32_0p0_opt().unwrap_or(0f32)
         }
+
+        fn f32_0p0_default_value<'this>(&'this self) -> f32;
 
         fn has_f32_0p0<'this>(&'this self) -> bool {
             self.f32_0p0_opt().is_some()
@@ -12661,6 +12729,8 @@ pub mod _puroro_traits {
             self.f32_42_opt().unwrap_or(42f32)
         }
 
+        fn f32_42_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_42<'this>(&'this self) -> bool {
             self.f32_42_opt().is_some()
         }
@@ -12671,6 +12741,8 @@ pub mod _puroro_traits {
         fn f32_m42<'this>(&'this self) -> f32 {
             self.f32_m42_opt().unwrap_or(-42f32)
         }
+
+        fn f32_m42_default_value<'this>(&'this self) -> f32;
 
         fn has_f32_m42<'this>(&'this self) -> bool {
             self.f32_m42_opt().is_some()
@@ -12683,6 +12755,8 @@ pub mod _puroro_traits {
             self.f32_0p25_opt().unwrap_or(0.25f32)
         }
 
+        fn f32_0p25_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_0p25<'this>(&'this self) -> bool {
             self.f32_0p25_opt().is_some()
         }
@@ -12693,6 +12767,8 @@ pub mod _puroro_traits {
         fn f32_1p5e2<'this>(&'this self) -> f32 {
             self.f32_1p5e2_opt().unwrap_or(150f32)
         }
+
+        fn f32_1p5e2_default_value<'this>(&'this self) -> f32;
 
         fn has_f32_1p5e2<'this>(&'this self) -> bool {
             self.f32_1p5e2_opt().is_some()
@@ -12705,6 +12781,8 @@ pub mod _puroro_traits {
             self.f32_inf_opt().unwrap_or(f32::INFINITY)
         }
 
+        fn f32_inf_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_inf<'this>(&'this self) -> bool {
             self.f32_inf_opt().is_some()
         }
@@ -12715,6 +12793,8 @@ pub mod _puroro_traits {
         fn f32_minf<'this>(&'this self) -> f32 {
             self.f32_minf_opt().unwrap_or(f32::NEG_INFINITY)
         }
+
+        fn f32_minf_default_value<'this>(&'this self) -> f32;
 
         fn has_f32_minf<'this>(&'this self) -> bool {
             self.f32_minf_opt().is_some()
@@ -12727,6 +12807,8 @@ pub mod _puroro_traits {
             self.f32_nan_opt().unwrap_or(f32::NAN)
         }
 
+        fn f32_nan_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_nan<'this>(&'this self) -> bool {
             self.f32_nan_opt().is_some()
         }
@@ -12737,6 +12819,8 @@ pub mod _puroro_traits {
         fn f32_mnan<'this>(&'this self) -> f32 {
             self.f32_mnan_opt().unwrap_or(f32::NAN)
         }
+
+        fn f32_mnan_default_value<'this>(&'this self) -> f32;
 
         fn has_f32_mnan<'this>(&'this self) -> bool {
             self.f32_mnan_opt().is_some()
@@ -12750,6 +12834,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn bool_default_default_value<'this>(&'this self) -> bool;
+
         fn has_bool_default<'this>(&'this self) -> bool {
             self.bool_default_opt().is_some()
         }
@@ -12761,6 +12847,8 @@ pub mod _puroro_traits {
             self.bool_true_opt().unwrap_or(true)
         }
 
+        fn bool_true_default_value<'this>(&'this self) -> bool;
+
         fn has_bool_true<'this>(&'this self) -> bool {
             self.bool_true_opt().is_some()
         }
@@ -12771,6 +12859,8 @@ pub mod _puroro_traits {
         fn bool_false<'this>(&'this self) -> bool {
             self.bool_false_opt().unwrap_or(false)
         }
+
+        fn bool_false_default_value<'this>(&'this self) -> bool;
 
         fn has_bool_false<'this>(&'this self) -> bool {
             self.bool_false_opt().is_some()
@@ -12787,7 +12877,9 @@ pub mod _puroro_traits {
             self.string_default_opt()
                 .unwrap_or(self.string_default_default_value())
         }
-        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_>;
+
+        fn string_default_default_value<'this>(&'this self)
+        -> Self::Field71ScalarGetterType<'this>;
 
         fn has_string_default<'this>(&'this self) -> bool {
             self.string_default_opt().is_some()
@@ -12806,7 +12898,8 @@ pub mod _puroro_traits {
             self.string_empty_opt()
                 .unwrap_or(self.string_empty_default_value())
         }
-        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_>;
+
+        fn string_empty_default_value<'this>(&'this self) -> Self::Field72ScalarGetterType<'this>;
 
         fn has_string_empty<'this>(&'this self) -> bool {
             self.string_empty_opt().is_some()
@@ -12825,7 +12918,8 @@ pub mod _puroro_traits {
             self.string_abc_opt()
                 .unwrap_or(self.string_abc_default_value())
         }
-        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_>;
+
+        fn string_abc_default_value<'this>(&'this self) -> Self::Field73ScalarGetterType<'this>;
 
         fn has_string_abc<'this>(&'this self) -> bool {
             self.string_abc_opt().is_some()
@@ -12844,7 +12938,8 @@ pub mod _puroro_traits {
             self.string_aiu_opt()
                 .unwrap_or(self.string_aiu_default_value())
         }
-        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_>;
+
+        fn string_aiu_default_value<'this>(&'this self) -> Self::Field74ScalarGetterType<'this>;
 
         fn has_string_aiu<'this>(&'this self) -> bool {
             self.string_aiu_opt().is_some()
@@ -12863,7 +12958,10 @@ pub mod _puroro_traits {
             self.string_backslash_opt()
                 .unwrap_or(self.string_backslash_default_value())
         }
-        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_>;
+
+        fn string_backslash_default_value<'this>(
+            &'this self,
+        ) -> Self::Field75ScalarGetterType<'this>;
 
         fn has_string_backslash<'this>(&'this self) -> bool {
             self.string_backslash_opt().is_some()
@@ -12882,7 +12980,8 @@ pub mod _puroro_traits {
             self.string_tab_opt()
                 .unwrap_or(self.string_tab_default_value())
         }
-        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_>;
+
+        fn string_tab_default_value<'this>(&'this self) -> Self::Field76ScalarGetterType<'this>;
 
         fn has_string_tab<'this>(&'this self) -> bool {
             self.string_tab_opt().is_some()
@@ -12901,7 +13000,8 @@ pub mod _puroro_traits {
             self.string_crlf_opt()
                 .unwrap_or(self.string_crlf_default_value())
         }
-        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_>;
+
+        fn string_crlf_default_value<'this>(&'this self) -> Self::Field77ScalarGetterType<'this>;
 
         fn has_string_crlf<'this>(&'this self) -> bool {
             self.string_crlf_opt().is_some()
@@ -12920,7 +13020,8 @@ pub mod _puroro_traits {
             self.bytes_default_opt()
                 .unwrap_or(self.bytes_default_default_value())
         }
-        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_>;
+
+        fn bytes_default_default_value<'this>(&'this self) -> Self::Field81ScalarGetterType<'this>;
 
         fn has_bytes_default<'this>(&'this self) -> bool {
             self.bytes_default_opt().is_some()
@@ -12939,7 +13040,8 @@ pub mod _puroro_traits {
             self.bytes_empty_opt()
                 .unwrap_or(self.bytes_empty_default_value())
         }
-        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_>;
+
+        fn bytes_empty_default_value<'this>(&'this self) -> Self::Field82ScalarGetterType<'this>;
 
         fn has_bytes_empty<'this>(&'this self) -> bool {
             self.bytes_empty_opt().is_some()
@@ -12958,7 +13060,8 @@ pub mod _puroro_traits {
             self.bytes_abc_opt()
                 .unwrap_or(self.bytes_abc_default_value())
         }
-        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_>;
+
+        fn bytes_abc_default_value<'this>(&'this self) -> Self::Field83ScalarGetterType<'this>;
 
         fn has_bytes_abc<'this>(&'this self) -> bool {
             self.bytes_abc_opt().is_some()
@@ -12977,7 +13080,8 @@ pub mod _puroro_traits {
             self.bytes_aiu_opt()
                 .unwrap_or(self.bytes_aiu_default_value())
         }
-        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_>;
+
+        fn bytes_aiu_default_value<'this>(&'this self) -> Self::Field84ScalarGetterType<'this>;
 
         fn has_bytes_aiu<'this>(&'this self) -> bool {
             self.bytes_aiu_opt().is_some()
@@ -12996,7 +13100,10 @@ pub mod _puroro_traits {
             self.bytes_backslash_opt()
                 .unwrap_or(self.bytes_backslash_default_value())
         }
-        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_>;
+
+        fn bytes_backslash_default_value<'this>(
+            &'this self,
+        ) -> Self::Field85ScalarGetterType<'this>;
 
         fn has_bytes_backslash<'this>(&'this self) -> bool {
             self.bytes_backslash_opt().is_some()
@@ -13015,7 +13122,8 @@ pub mod _puroro_traits {
             self.bytes_tab_opt()
                 .unwrap_or(self.bytes_tab_default_value())
         }
-        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_>;
+
+        fn bytes_tab_default_value<'this>(&'this self) -> Self::Field86ScalarGetterType<'this>;
 
         fn has_bytes_tab<'this>(&'this self) -> bool {
             self.bytes_tab_opt().is_some()
@@ -13034,7 +13142,8 @@ pub mod _puroro_traits {
             self.bytes_crlf_opt()
                 .unwrap_or(self.bytes_crlf_default_value())
         }
-        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_>;
+
+        fn bytes_crlf_default_value<'this>(&'this self) -> Self::Field87ScalarGetterType<'this>;
 
         fn has_bytes_crlf<'this>(&'this self) -> bool {
             self.bytes_crlf_opt().is_some()
@@ -13050,6 +13159,10 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn enum_default_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::proto2_defaults::MyEnum;
+
         fn has_enum_default<'this>(&'this self) -> bool {
             self.enum_default_opt().is_some()
         }
@@ -13064,6 +13177,10 @@ pub mod _puroro_traits {
                 .unwrap_or(self::_puroro_root::proto2_defaults::MyEnum::One)
         }
 
+        fn enum_one_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::proto2_defaults::MyEnum;
+
         fn has_enum_one<'this>(&'this self) -> bool {
             self.enum_one_opt().is_some()
         }
@@ -13077,6 +13194,10 @@ pub mod _puroro_traits {
             self.enum_fourty_two_opt()
                 .unwrap_or(self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo)
         }
+
+        fn enum_fourty_two_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::proto2_defaults::MyEnum;
 
         fn has_enum_fourty_two<'this>(&'this self) -> bool {
             self.enum_fourty_two_opt().is_some()

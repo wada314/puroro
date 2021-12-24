@@ -1053,6 +1053,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32;
+
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
@@ -1064,6 +1066,8 @@ pub mod _puroro_traits {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn i32_optional_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
@@ -1083,6 +1087,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn f32_unlabeled_default_value<'this>(&'this self) -> f32;
+
         fn has_f32_unlabeled<'this>(&'this self) -> bool {
             self.f32_unlabeled_opt().is_some()
         }
@@ -1098,7 +1104,10 @@ pub mod _puroro_traits {
             self.string_unlabeled_opt()
                 .unwrap_or(self.string_unlabeled_default_value())
         }
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_>;
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this>;
 
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
@@ -1116,7 +1125,10 @@ pub mod _puroro_traits {
             self.submsg_unlabeled_opt()
                 .unwrap_or(self.submsg_unlabeled_default_value())
         }
-        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_>;
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field6ScalarGetterType<'this>;
 
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
@@ -1440,6 +1452,8 @@ pub mod _puroro_traits {
             self.i32_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()

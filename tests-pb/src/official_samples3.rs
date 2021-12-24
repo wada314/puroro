@@ -773,6 +773,8 @@ pub mod _puroro_traits {
             self.a_opt().unwrap_or(::std::default::Default::default())
         }
 
+        fn a_default_value<'this>(&'this self) -> i32;
+
         fn has_a<'this>(&'this self) -> bool {
             self.a_opt().is_some()
         }
@@ -862,7 +864,8 @@ pub mod _puroro_traits {
         fn b<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             self.b_opt().unwrap_or(self.b_default_value())
         }
-        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_>;
+
+        fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this>;
 
         fn has_b<'this>(&'this self) -> bool {
             self.b_opt().is_some()
@@ -998,7 +1001,8 @@ pub mod _puroro_traits {
         fn c<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             self.c_opt().unwrap_or(self.c_default_value())
         }
-        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_>;
+
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this>;
 
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()

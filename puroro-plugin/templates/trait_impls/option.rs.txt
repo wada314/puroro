@@ -57,11 +57,13 @@ where
     }
     {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
-    {%- if f.is_length_delimited %}
-    fn {{ f.ident_unesc }}_default_value(&self) -> Self::Field{{ f.number }}ScalarGetterType<'_> {
+    fn {{ f.ident_unesc }}_default_value<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        {%- if f.is_length_delimited %}
         ::puroro::Either::Right({{ f.default_value }})
+        {%- else %} {#- if f.is_length_delimited #}
+        {{ f.default_value }}
+        {%- endif %} {#- if f.is_length_delimited #}
     }
-    {%- endif %} {#- if f.is_length_delimited #}
 
     {%- endif %} {#- if f.is_repeated #}
     {%- endfor %} {#- for field in m.fields #}

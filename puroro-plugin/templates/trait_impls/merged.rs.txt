@@ -76,15 +76,17 @@ where
     }
     {%- endif %}
 
-    {%- if f.is_length_delimited %}
-    fn {{ f.ident_unesc }}_default_value(&self) -> Self::Field{{ f.number }}ScalarGetterType<'_> {
+    fn {{ f.ident_unesc }}_default_value<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        {%- if f.is_length_delimited %}
         {%- if f.is_message && !f.is_repeated %}
         (::std::option::Option::None, ::std::option::Option::None)
         {%- else %} {#- if f.is_message && !f.is_repeated #}
         ::puroro::Either::Right(self.1.{{ f.ident_unesc }}_default_value())
         {%- endif %} {#- if f.is_message && !f.is_repeated #}
+        {%- else %} {#- if f.is_length_delimited #}
+        self.1.{{ f.ident_unesc }}_default_value()
+        {%- endif %} {#- if f.is_length_delimited #}
     }
-    {%- endif %} {#- if f.is_length_delimited #}
 
     {%- endif %} {#- if f.is_repeated #}
 

@@ -72,12 +72,10 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     }
     {%- endif %} {#- !f.is_explicit_oneof_field #}
 
-    {%- if f.is_length_delimited %}
     {#- This method is never called. The single field struct's field always exists. #}
-    fn {{ f.ident_unesc }}_default_value(&self) -> Self::Field{{ f.number }}ScalarGetterType<'_> {
+    fn {{ f.ident_unesc }}_default_value<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
         unreachable!()
     }
-    {%- endif %} {#- if f.is_length_delimited #}
 
     {%- endif %} {#- f.is_repeated #}
 

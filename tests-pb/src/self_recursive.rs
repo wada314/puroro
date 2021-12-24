@@ -241,7 +241,10 @@ pub mod _puroro_traits {
             self.recursive_unlabeled_opt()
                 .unwrap_or(self.recursive_unlabeled_default_value())
         }
-        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_>;
+
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this>;
 
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
             self.recursive_unlabeled_opt().is_some()

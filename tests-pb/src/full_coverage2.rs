@@ -13116,6 +13116,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn i32_required_default_value<'this>(&'this self) -> i32;
+
         fn has_i32_required<'this>(&'this self) -> bool {
             self.i32_required_opt().is_some()
         }
@@ -13127,6 +13129,8 @@ pub mod _puroro_traits {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn i32_optional_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
@@ -13146,6 +13150,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn float_required_default_value<'this>(&'this self) -> f32;
+
         fn has_float_required<'this>(&'this self) -> bool {
             self.float_required_opt().is_some()
         }
@@ -13157,6 +13163,8 @@ pub mod _puroro_traits {
             self.float_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn float_optional_default_value<'this>(&'this self) -> f32;
 
         fn has_float_optional<'this>(&'this self) -> bool {
             self.float_optional_opt().is_some()
@@ -13179,7 +13187,9 @@ pub mod _puroro_traits {
             self.bytes_required_opt()
                 .unwrap_or(self.bytes_required_default_value())
         }
-        fn bytes_required_default_value(&self) -> Self::Field21ScalarGetterType<'_>;
+
+        fn bytes_required_default_value<'this>(&'this self)
+        -> Self::Field21ScalarGetterType<'this>;
 
         fn has_bytes_required<'this>(&'this self) -> bool {
             self.bytes_required_opt().is_some()
@@ -13198,7 +13208,9 @@ pub mod _puroro_traits {
             self.bytes_optional_opt()
                 .unwrap_or(self.bytes_optional_default_value())
         }
-        fn bytes_optional_default_value(&self) -> Self::Field22ScalarGetterType<'_>;
+
+        fn bytes_optional_default_value<'this>(&'this self)
+        -> Self::Field22ScalarGetterType<'this>;
 
         fn has_bytes_optional<'this>(&'this self) -> bool {
             self.bytes_optional_opt().is_some()
@@ -13227,7 +13239,10 @@ pub mod _puroro_traits {
             self.string_required_opt()
                 .unwrap_or(self.string_required_default_value())
         }
-        fn string_required_default_value(&self) -> Self::Field31ScalarGetterType<'_>;
+
+        fn string_required_default_value<'this>(
+            &'this self,
+        ) -> Self::Field31ScalarGetterType<'this>;
 
         fn has_string_required<'this>(&'this self) -> bool {
             self.string_required_opt().is_some()
@@ -13246,7 +13261,10 @@ pub mod _puroro_traits {
             self.string_optional_opt()
                 .unwrap_or(self.string_optional_default_value())
         }
-        fn string_optional_default_value(&self) -> Self::Field32ScalarGetterType<'_>;
+
+        fn string_optional_default_value<'this>(
+            &'this self,
+        ) -> Self::Field32ScalarGetterType<'this>;
 
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
@@ -13272,6 +13290,10 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn enum_required_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::full_coverage2::Enum;
+
         fn has_enum_required<'this>(&'this self) -> bool {
             self.enum_required_opt().is_some()
         }
@@ -13285,6 +13307,10 @@ pub mod _puroro_traits {
             self.enum_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn enum_optional_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::full_coverage2::Enum;
 
         fn has_enum_optional<'this>(&'this self) -> bool {
             self.enum_optional_opt().is_some()
@@ -13308,7 +13334,10 @@ pub mod _puroro_traits {
             self.submsg_required_opt()
                 .unwrap_or(self.submsg_required_default_value())
         }
-        fn submsg_required_default_value(&self) -> Self::Field51ScalarGetterType<'_>;
+
+        fn submsg_required_default_value<'this>(
+            &'this self,
+        ) -> Self::Field51ScalarGetterType<'this>;
 
         fn has_submsg_required<'this>(&'this self) -> bool {
             self.submsg_required_opt().is_some()
@@ -13326,7 +13355,10 @@ pub mod _puroro_traits {
             self.submsg_optional_opt()
                 .unwrap_or(self.submsg_optional_default_value())
         }
-        fn submsg_optional_default_value(&self) -> Self::Field52ScalarGetterType<'_>;
+
+        fn submsg_optional_default_value<'this>(
+            &'this self,
+        ) -> Self::Field52ScalarGetterType<'this>;
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -13351,6 +13383,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn i64_required_default_value<'this>(&'this self) -> i64;
+
         fn has_i64_required<'this>(&'this self) -> bool {
             self.i64_required_opt().is_some()
         }
@@ -13362,6 +13396,8 @@ pub mod _puroro_traits {
             self.i64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn i64_optional_default_value<'this>(&'this self) -> i64;
 
         fn has_i64_optional<'this>(&'this self) -> bool {
             self.i64_optional_opt().is_some()
@@ -13381,6 +13417,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn u32_required_default_value<'this>(&'this self) -> u32;
+
         fn has_u32_required<'this>(&'this self) -> bool {
             self.u32_required_opt().is_some()
         }
@@ -13392,6 +13430,8 @@ pub mod _puroro_traits {
             self.u32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn u32_optional_default_value<'this>(&'this self) -> u32;
 
         fn has_u32_optional<'this>(&'this self) -> bool {
             self.u32_optional_opt().is_some()
@@ -13411,6 +13451,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn u64_required_default_value<'this>(&'this self) -> u64;
+
         fn has_u64_required<'this>(&'this self) -> bool {
             self.u64_required_opt().is_some()
         }
@@ -13422,6 +13464,8 @@ pub mod _puroro_traits {
             self.u64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn u64_optional_default_value<'this>(&'this self) -> u64;
 
         fn has_u64_optional<'this>(&'this self) -> bool {
             self.u64_optional_opt().is_some()
@@ -13441,6 +13485,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn s32_required_default_value<'this>(&'this self) -> i32;
+
         fn has_s32_required<'this>(&'this self) -> bool {
             self.s32_required_opt().is_some()
         }
@@ -13452,6 +13498,8 @@ pub mod _puroro_traits {
             self.s32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn s32_optional_default_value<'this>(&'this self) -> i32;
 
         fn has_s32_optional<'this>(&'this self) -> bool {
             self.s32_optional_opt().is_some()
@@ -13471,6 +13519,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn s64_required_default_value<'this>(&'this self) -> i64;
+
         fn has_s64_required<'this>(&'this self) -> bool {
             self.s64_required_opt().is_some()
         }
@@ -13482,6 +13532,8 @@ pub mod _puroro_traits {
             self.s64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn s64_optional_default_value<'this>(&'this self) -> i64;
 
         fn has_s64_optional<'this>(&'this self) -> bool {
             self.s64_optional_opt().is_some()
@@ -13501,6 +13553,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn fixed32_required_default_value<'this>(&'this self) -> u32;
+
         fn has_fixed32_required<'this>(&'this self) -> bool {
             self.fixed32_required_opt().is_some()
         }
@@ -13512,6 +13566,8 @@ pub mod _puroro_traits {
             self.fixed32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn fixed32_optional_default_value<'this>(&'this self) -> u32;
 
         fn has_fixed32_optional<'this>(&'this self) -> bool {
             self.fixed32_optional_opt().is_some()
@@ -13531,6 +13587,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn fixed64_required_default_value<'this>(&'this self) -> u64;
+
         fn has_fixed64_required<'this>(&'this self) -> bool {
             self.fixed64_required_opt().is_some()
         }
@@ -13542,6 +13600,8 @@ pub mod _puroro_traits {
             self.fixed64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn fixed64_optional_default_value<'this>(&'this self) -> u64;
 
         fn has_fixed64_optional<'this>(&'this self) -> bool {
             self.fixed64_optional_opt().is_some()
@@ -13561,6 +13621,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn sfixed32_required_default_value<'this>(&'this self) -> i32;
+
         fn has_sfixed32_required<'this>(&'this self) -> bool {
             self.sfixed32_required_opt().is_some()
         }
@@ -13572,6 +13634,8 @@ pub mod _puroro_traits {
             self.sfixed32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn sfixed32_optional_default_value<'this>(&'this self) -> i32;
 
         fn has_sfixed32_optional<'this>(&'this self) -> bool {
             self.sfixed32_optional_opt().is_some()
@@ -13591,6 +13655,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn sfixed64_required_default_value<'this>(&'this self) -> i64;
+
         fn has_sfixed64_required<'this>(&'this self) -> bool {
             self.sfixed64_required_opt().is_some()
         }
@@ -13602,6 +13668,8 @@ pub mod _puroro_traits {
             self.sfixed64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn sfixed64_optional_default_value<'this>(&'this self) -> i64;
 
         fn has_sfixed64_optional<'this>(&'this self) -> bool {
             self.sfixed64_optional_opt().is_some()
@@ -13621,6 +13689,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn f64_required_default_value<'this>(&'this self) -> f64;
+
         fn has_f64_required<'this>(&'this self) -> bool {
             self.f64_required_opt().is_some()
         }
@@ -13632,6 +13702,8 @@ pub mod _puroro_traits {
             self.f64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn f64_optional_default_value<'this>(&'this self) -> f64;
 
         fn has_f64_optional<'this>(&'this self) -> bool {
             self.f64_optional_opt().is_some()
@@ -15883,6 +15955,8 @@ pub mod _puroro_nested {
                         .unwrap_or(::std::default::Default::default())
                 }
 
+                fn i32_required_default_value<'this>(&'this self) -> i32;
+
                 fn has_i32_required<'this>(&'this self) -> bool {
                     self.i32_required_opt().is_some()
                 }
@@ -15894,6 +15968,8 @@ pub mod _puroro_nested {
                     self.i64_required_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
+
+                fn i64_required_default_value<'this>(&'this self) -> i64;
 
                 fn has_i64_required<'this>(&'this self) -> bool {
                     self.i64_required_opt().is_some()

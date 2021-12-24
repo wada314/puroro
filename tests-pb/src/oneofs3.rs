@@ -1228,6 +1228,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn g1_int32_default_value<'this>(&'this self) -> i32;
+
         fn has_g1_int32<'this>(&'this self) -> bool {
             self.g1_int32_opt().is_some()
         }
@@ -1240,7 +1242,8 @@ pub mod _puroro_traits {
             self.g1_string_opt()
                 .unwrap_or(self.g1_string_default_value())
         }
-        fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_>;
+
+        fn g1_string_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this>;
 
         fn has_g1_string<'this>(&'this self) -> bool {
             self.g1_string_opt().is_some()
@@ -1250,6 +1253,8 @@ pub mod _puroro_traits {
             self.g2_f32_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn g2_f32_default_value<'this>(&'this self) -> f32;
 
         fn has_g2_f32<'this>(&'this self) -> bool {
             self.g2_f32_opt().is_some()
@@ -1263,7 +1268,8 @@ pub mod _puroro_traits {
             self.g2_string_opt()
                 .unwrap_or(self.g2_string_default_value())
         }
-        fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_>;
+
+        fn g2_string_default_value<'this>(&'this self) -> Self::Field4ScalarGetterType<'this>;
 
         fn has_g2_string<'this>(&'this self) -> bool {
             self.g2_string_opt().is_some()
@@ -1277,7 +1283,8 @@ pub mod _puroro_traits {
             self.g2_submsg_opt()
                 .unwrap_or(self.g2_submsg_default_value())
         }
-        fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_>;
+
+        fn g2_submsg_default_value<'this>(&'this self) -> Self::Field5ScalarGetterType<'this>;
 
         fn has_g2_submsg<'this>(&'this self) -> bool {
             self.g2_submsg_opt().is_some()
@@ -1287,6 +1294,8 @@ pub mod _puroro_traits {
             self.g3_int32_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn g3_int32_default_value<'this>(&'this self) -> i32;
 
         fn has_g3_int32<'this>(&'this self) -> bool {
             self.g3_int32_opt().is_some()
@@ -1756,6 +1765,8 @@ pub mod _puroro_traits {
             self.i32_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32;
 
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()

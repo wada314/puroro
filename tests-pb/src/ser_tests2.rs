@@ -1962,6 +1962,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn i32_optional_default_value<'this>(&'this self) -> i32;
+
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
         }
@@ -1979,6 +1981,8 @@ pub mod _puroro_traits {
             self.float_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn float_optional_default_value<'this>(&'this self) -> f32;
 
         fn has_float_optional<'this>(&'this self) -> bool {
             self.float_optional_opt().is_some()
@@ -2001,7 +2005,9 @@ pub mod _puroro_traits {
             self.string_optional_opt()
                 .unwrap_or(self.string_optional_default_value())
         }
-        fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_>;
+
+        fn string_optional_default_value<'this>(&'this self)
+        -> Self::Field5ScalarGetterType<'this>;
 
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
@@ -2029,7 +2035,9 @@ pub mod _puroro_traits {
             self.submsg_optional_opt()
                 .unwrap_or(self.submsg_optional_default_value())
         }
-        fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_>;
+
+        fn submsg_optional_default_value<'this>(&'this self)
+        -> Self::Field7ScalarGetterType<'this>;
 
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -2054,6 +2062,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn enum_optional_default_value<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum;
+
         fn has_enum_optional<'this>(&'this self) -> bool {
             self.enum_optional_opt().is_some()
         }
@@ -2073,6 +2083,8 @@ pub mod _puroro_traits {
             self.very_large_field_number_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32;
 
         fn has_very_large_field_number<'this>(&'this self) -> bool {
             self.very_large_field_number_opt().is_some()
@@ -2934,6 +2946,8 @@ pub mod _puroro_nested {
                     self.i32_optional_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
+
+                fn i32_optional_default_value<'this>(&'this self) -> i32;
 
                 fn has_i32_optional<'this>(&'this self) -> bool {
                     self.i32_optional_opt().is_some()

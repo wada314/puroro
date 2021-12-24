@@ -200,6 +200,8 @@ pub mod _puroro_traits {
                 .unwrap_or(::std::default::Default::default())
         }
 
+        fn type_default_value<'this>(&'this self) -> i32;
+
         fn has_type<'this>(&'this self) -> bool {
             self.type_opt().is_some()
         }

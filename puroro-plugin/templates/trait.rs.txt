@@ -57,10 +57,8 @@ pub trait {{ m.trait_ident }} {
         self.{{ field.ident_unesc }}_opt().unwrap_or({{ field.default_value }})
         {%- endif %} {#- if field.is_length_delimited #}
     }
-    
-    {%- if field.is_length_delimited %}
-    fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_>;
-    {%- endif %} {#- if field.is_length_delimited #}
+
+    fn {{ field.ident_unesc }}_default_value<'this>(&'this self) -> {{ field.trait_scalar_getter_type }};
 
     fn has_{{ field.ident_unesc }}<'this>(&'this self) -> bool {
         self.{{ field.ident_unesc }}_opt().is_some()
@@ -131,13 +129,10 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
         }
         {%- endif %}
 
-        {%- if field.is_length_delimited %}
-        fn {{ field.ident_unesc }}_default_value(&self) -> 
-            <$ty as {{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'_>
+        fn {{ field.ident_unesc }}_default_value<'this>(&'this self) -> {{ field.trait_scalar_getter_type }}
         {
             <$ty as {{ m.trait_ident }}>::{{ field.ident_unesc }}_default_value(self)
         }
-        {%- endif %} {#- if field.is_length_delimited #}
 
         {%- endif %} {#- if field.is_repeated #}
 
