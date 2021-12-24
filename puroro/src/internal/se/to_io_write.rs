@@ -132,14 +132,14 @@ impl<L> SerFieldToIoWrite<L, tags::Bytes>
 where
     L: tags::FieldLabelTag,
 {
-    pub fn ser_field<'a, FieldType, W, ItemType>(
+    pub fn ser_field<FieldType, W, ItemType>(
         field: FieldType,
         number: i32,
         out: &mut W,
     ) -> Result<()>
     where
-        FieldType: 'a + IntoIterator<Item = &'a ItemType>,
-        ItemType: 'a + AsRef<[u8]>,
+        FieldType: IntoIterator<Item = ItemType>,
+        ItemType: AsRef<[u8]>,
         W: Write,
     {
         for item in field.into_iter() {
@@ -160,14 +160,14 @@ impl<L> SerFieldToIoWrite<L, tags::String>
 where
     L: tags::FieldLabelTag,
 {
-    pub fn ser_field<'a, FieldType, W, ItemType>(
+    pub fn ser_field<FieldType, W, ItemType>(
         field: FieldType,
         number: i32,
         out: &mut W,
     ) -> Result<()>
     where
-        FieldType: 'a + IntoIterator<Item = &'a ItemType>,
-        ItemType: 'a + AsRef<str>,
+        FieldType: IntoIterator<Item = ItemType>,
+        ItemType: AsRef<str>,
         W: Write,
     {
         for item in field.into_iter() {
