@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use crate::{Either, RepeatedField};
-use ::std::ops::Deref;
 
 pub struct EitherRepeatedField<T, U>(Either<T, U>);
 impl<T, U> EitherRepeatedField<T, U> {

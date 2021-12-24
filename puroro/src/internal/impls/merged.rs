@@ -14,7 +14,6 @@
 
 use crate::{Either, RepeatedField};
 use ::std::iter::Chain;
-use ::std::ops::Deref;
 
 pub struct MergedRepeatedField<T, U>(T, U);
 impl<T, U> MergedRepeatedField<T, U> {

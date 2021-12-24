@@ -143,6 +143,87 @@ pub mod _puroro_impls {
         pub use super::super::_puroro_root::*;
     }
     use super::_puroro_traits::*;
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub recursive_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        type Field1MessageType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
+
+        fn recursive_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            ::std::option::Option::Some(&self.recursive_unlabeled)
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField1<ScalarType>
+    where
+        ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                recursive_unlabeled: value,
+            }
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

@@ -13,9 +13,7 @@
 // limitations under the License.
 
 use crate::RepeatedField;
-use ::std::iter;
 use ::std::marker::PhantomData;
-use ::std::option;
 
 pub struct EitherLeftRepeatedField<T, Right>(T, PhantomData<Right>);
 impl<T, Right> EitherLeftRepeatedField<T, Right> {

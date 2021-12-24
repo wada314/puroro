@@ -26,11 +26,27 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {
     {%- for field in m.fields %}
     {%- if field.number == sfield.number %}
+
     {%- call single_field_trait_impl_field(field) %}
-    {%- else %}
-    {%- call empty_trait_impl_field(field) %}
-    {%- endif %}
-    {%- endfor %}
+
+    {%- else %} {#- if field.number == sfield.number #}
+
+    {#- Not present field. Just copy `()`'s types. #}
+    {%- if field.is_length_delimited %}
+    type Field{{ field.number }}ScalarGetterType<'this> =
+        <() as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ field.number }}ScallerGetterType<'this>;
+    {%- endif %} {#- if field.is_length_delimited #}
+    {%- if field.is_repeated %}
+    type Field{{ field.number }}RepeatedType<'this> =
+        <() as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ field.number }}RepeatedType<'this>;
+    {%- else %} {#- if field.is_repeated #}
+    fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
+        <() as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_default_value(self)
+    }
+    {%- endif %} {#- if field.is_repeated #}
+
+    {%- endif %} {#- if field.number == sfield.number #}
+    {%- endfor %} {#- for field in m.fields #}
 
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->

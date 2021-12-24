@@ -395,6 +395,645 @@ pub mod _puroro_impls {
         pub use super::super::_puroro_root::*;
     }
     use super::_puroro_traits::*;
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub i32_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.i32_unlabeled,
+            )))
+        }
+        fn i32_optional_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
+        }
+        type Field3RepeatedType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn f32_unlabeled_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::f32_unlabeled_default_value(self)
+        }
+        type Field5ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        }
+        type Field6ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                i32_unlabeled: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub i32_optional: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField2<ScalarType> where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn i32_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(self)
+        }
+
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.i32_optional,
+            )))
+        }
+        type Field3RepeatedType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn f32_unlabeled_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::f32_unlabeled_default_value(self)
+        }
+        type Field5ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        }
+        type Field6ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                2,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                i32_optional: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
+        pub i32_repeated: RepeatedType,
+    }
+
+    impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
+    }
+
+    impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
+        fn i32_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(self)
+        }
+        fn i32_optional_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
+        }
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
+        }
+        fn f32_unlabeled_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::f32_unlabeled_default_value(self)
+        }
+        type Field5ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        }
+        type Field6ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+        }
+    }
+
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                3,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
+        fn from(value: RepeatedType) -> Self {
+            Self {
+                i32_repeated: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub f32_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField4<ScalarType> where
+        ScalarType: ::std::convert::Into<f32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn i32_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(self)
+        }
+        fn i32_optional_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
+        }
+        type Field3RepeatedType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+
+        fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.f32_unlabeled,
+            )))
+        }
+        type Field5ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        }
+        type Field6ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
+                4,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                f32_unlabeled: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub string_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField5<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn i32_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(self)
+        }
+        fn i32_optional_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
+        }
+        type Field3RepeatedType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn f32_unlabeled_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::f32_unlabeled_default_value(self)
+        }
+
+        fn string_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
+            ::std::option::Option::Some(self.string_unlabeled.as_ref())
+        }
+        type Field6ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
+                5,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                string_unlabeled: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub submsg_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField6<ScalarType> where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn i32_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(self)
+        }
+        fn i32_optional_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
+        }
+        type Field3RepeatedType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn f32_unlabeled_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::f32_unlabeled_default_value(self)
+        }
+        type Field5ScalarGetterType<'this> =
+            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        }
+        type Field6MessageType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
+
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
+            ::std::option::Option::Some(&self.submsg_unlabeled)
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field6MessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
+                6,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                submsg_unlabeled: value,
+            }
+        }
+    }
+
+    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
+    pub struct SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        pub i32_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Submsg> for SubmsgSingleField1<ScalarType> where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::SubmsgTrait for SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.i32_unlabeled,
+            )))
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32>
+            + ::std::clone::Clone
+            + ::std::cmp::PartialEq
+            + ::std::fmt::Debug,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                i32_unlabeled: value,
+            }
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
