@@ -1,9 +1,11 @@
 
-{%- match f.bumpalo_maybe_field_message_path %}
-{%- when Some with (struct_path) %}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }};
-{%- else %}
-{%- endmatch %}
+{%- if f.is_length_delimited %}
+type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = 
+    {%- if f.is_message %} &'this {{ f.bumpalo_field_message_path }} {%- endif %}
+    {%- if f.is_string %}  {%- endif %}
+;
+{%- endif %} {#- if f.is_length_delimited #}
+
 
 {%- if f.is_repeated %}
 

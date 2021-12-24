@@ -31,6 +31,7 @@ use ::std::ptr;
 use ::std::ptr::NonNull;
 use ::std::slice;
 use ::std::str::Utf8Error;
+use std::marker::PhantomData;
 
 pub trait BumpDefault<'bump> {
     fn default_in(bump: &'bump Bump) -> Self;
@@ -495,5 +496,44 @@ where
     pub fn push_default(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
         self.vec.push(Default::default());
         <T as AddBump>::add_bump_mut(self.vec.last_mut().unwrap(), self.bump)
+    }
+}
+impl<'bump, 'vec, T> IntoIterator for AddBumpVecView<'bump, 'vec, T>
+where
+    T: AddBump,
+    'bump: 'vec,
+{
+    type Item = <T as AddBump>::AddToRef<'bump, 'vec>;
+    type IntoIter = AddBumpIterator<'bump, slice::Iter<'vec, T>, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        AddBumpIterator::new(self.vec.into_iter(), self.bump)
+    }
+}
+
+pub struct AddBumpIterator<'bump, I, T> {
+    iter: I,
+    bump: &'bump Bump,
+    phantom: PhantomData<T>,
+}
+impl<'bump, I, T> AddBumpIterator<'bump, I, T> {
+    pub fn new(iter: I, bump: &'bump Bump) -> Self {
+        Self {
+            iter,
+            bump,
+            phantom: PhantomData,
+        }
+    }
+}
+impl<'bump, I, T> Iterator for AddBumpIterator<'bump, I, T>
+where
+    I: Iterator,
+    <I as Iterator>::Item: 'bump + AddBump,
+{
+    type Item = <<I as Iterator>::Item as AddBump>::AddToRef<'bump, 'collection>;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter
+            .next()
+            .map(|val| <T as AddBump>::add_bump(val, self.bump))
     }
 }
