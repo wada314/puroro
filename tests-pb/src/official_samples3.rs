@@ -37,6 +37,10 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.a.clone())
             }
         }
+
+        fn a_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
 
     impl ::puroro::MessageRepresentativeImpl for Test1 {}
@@ -141,7 +145,8 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(&self.b)
             }
         }
-        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+
+        fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
                 ::puroro::once_cell::sync::Lazy::new(|| {
                     ::std::convert::From::<&str>::from(::std::default::Default::default())
@@ -255,7 +260,8 @@ pub mod _puroro_simple_impl {
         fn c_opt<'this>(&'this self) -> Option<Self::Field3ScalarGetterType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
         }
-        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
                 self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
             > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
@@ -486,6 +492,9 @@ pub mod _puroro_impls {
                 &self.a,
             )))
         }
+        fn a_default_value<'this>(&'this self) -> i32 {
+            unreachable!()
+        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test1SingleField1<ScalarType>
@@ -523,6 +532,35 @@ pub mod _puroro_impls {
             Self { a: value }
         }
     }
+    pub struct Test1Builder<T>(T);
+
+    impl<T> Test1Builder<T>
+    where
+        T: Test1Trait,
+    {
+        pub fn append_a<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> Test1Builder<(T, Test1SingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            Test1Builder((self.0, Test1SingleField1 { a: value }))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl Test1Builder<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -558,7 +596,7 @@ pub mod _puroro_impls {
         fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.b)
         }
-        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+        fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             unreachable!()
         }
     }
@@ -598,6 +636,35 @@ pub mod _puroro_impls {
             Self { b: value }
         }
     }
+    pub struct Test2Builder<T>(T);
+
+    impl<T> Test2Builder<T>
+    where
+        T: Test2Trait,
+    {
+        pub fn append_b<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> Test2Builder<(T, Test2SingleField2<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            Test2Builder((self.0, Test2SingleField2 { b: value }))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl Test2Builder<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -633,7 +700,7 @@ pub mod _puroro_impls {
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.c)
         }
-        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             unreachable!()
         }
     }
@@ -675,6 +742,35 @@ pub mod _puroro_impls {
     {
         fn from(value: ScalarType) -> Self {
             Self { c: value }
+        }
+    }
+    pub struct Test3Builder<T>(T);
+
+    impl<T> Test3Builder<T>
+    where
+        T: Test3Trait,
+    {
+        pub fn append_c<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> Test3Builder<(T, Test3SingleField3<ScalarType>)>
+        where
+            ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            Test3Builder((self.0, Test3SingleField3 { c: value }))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl Test3Builder<()> {
+        pub fn new() -> Self {
+            Self(())
         }
     }
 
@@ -761,6 +857,37 @@ pub mod _puroro_impls {
             Self { d: value }
         }
     }
+    pub struct Test4Builder<T>(T);
+
+    impl<T> Test4Builder<T>
+    where
+        T: Test4Trait,
+    {
+        pub fn append_d<ScalarType, RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> Test4Builder<(T, Test4SingleField4<ScalarType, RepeatedType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        {
+            Test4Builder((self.0, Test4SingleField4 { d: value }))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl Test4Builder<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -787,6 +914,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).a_opt()
+            }
+
+            fn a_default_value<'this>(&'this self) -> i32 {
+                <$ty as Test1Trait>::a_default_value(self)
             }
         };
     }
@@ -825,13 +956,21 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
-    impl Test1Trait for () {}
+    impl Test1Trait for () {
+        fn a_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+    }
     impl<T> Test1Trait for ::std::option::Option<T>
     where
         T: Test1Trait,
     {
         fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.a_opt())
+        }
+
+        fn a_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
         }
     }
     impl<T, U> Test1Trait for (T, U)
@@ -841,6 +980,10 @@ pub mod _puroro_traits {
     {
         fn a_opt<'this>(&'this self) -> Option<i32> {
             <U as Test1Trait>::a_opt(&self.1).or_else(|| <T as Test1Trait>::a_opt(&self.0))
+        }
+
+        fn a_default_value<'this>(&'this self) -> i32 {
+            self.1.a_default_value()
         }
     }
     impl<T, U> Test1Trait for ::puroro::Either<T, U>
@@ -852,6 +995,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as Test1Trait>::a_opt(t),
                 |u| <U as Test1Trait>::a_opt(u),
+            )
+        }
+
+        fn a_default_value<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as Test1Trait>::a_default_value(t),
+                |u| <U as Test1Trait>::a_default_value(u),
             )
         }
     }
@@ -886,7 +1036,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
                 (**self).b_opt()
             }
-            fn b_default_value(&self) -> <$ty as Test2Trait>::Field2ScalarGetterType<'_> {
+
+            fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
                 <$ty as Test2Trait>::b_default_value(self)
             }
         };
@@ -928,7 +1079,8 @@ pub mod _puroro_traits {
     }
     impl Test2Trait for () {
         type Field2ScalarGetterType<'this> = &'this str;
-        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+
+        fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             ::std::default::Default::default()
         }
     }
@@ -944,7 +1096,8 @@ pub mod _puroro_traits {
             self.as_ref()
                 .and_then(|msg| msg.b_opt().map(|val| ::puroro::Either::Left(val)))
         }
-        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+
+        fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             ::puroro::Either::Right(::std::default::Default::default())
         }
     }
@@ -965,7 +1118,8 @@ pub mod _puroro_traits {
                 .map(|u| ::puroro::Either::Right(u))
                 .or_else(|| <T as Test2Trait>::b_opt(&self.0).map(|t| ::puroro::Either::Left(t)))
         }
-        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+
+        fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             ::puroro::Either::Right(self.1.b_default_value())
         }
     }
@@ -987,7 +1141,8 @@ pub mod _puroro_traits {
                 |u| <U as Test2Trait>::b_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+
+        fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
             self.as_ref()
                 .map_left(|t| <T as Test2Trait>::b_default_value(t))
                 .map_right(|u| <U as Test2Trait>::b_default_value(u))
@@ -1023,7 +1178,8 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
                 (**self).c_opt()
             }
-            fn c_default_value(&self) -> <$ty as Test3Trait>::Field3ScalarGetterType<'_> {
+
+            fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
                 <$ty as Test3Trait>::c_default_value(self)
             }
         };
@@ -1065,7 +1221,8 @@ pub mod _puroro_traits {
     }
     impl Test3Trait for () {
         type Field3ScalarGetterType<'this> = ();
-        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             ::std::default::Default::default()
         }
     }
@@ -1081,7 +1238,8 @@ pub mod _puroro_traits {
             self.as_ref()
                 .and_then(|msg| msg.c_opt().map(|val| ::puroro::Either::Left(val)))
         }
-        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             ::puroro::Either::Right(::std::default::Default::default())
         }
     }
@@ -1108,7 +1266,8 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             (::std::option::Option::None, ::std::option::Option::None)
         }
     }
@@ -1130,7 +1289,8 @@ pub mod _puroro_traits {
                 |u| <U as Test3Trait>::c_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
             self.as_ref()
                 .map_left(|t| <T as Test3Trait>::c_default_value(t))
                 .map_right(|u| <U as Test3Trait>::c_default_value(u))

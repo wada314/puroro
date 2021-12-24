@@ -102,6 +102,10 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.i32_unlabeled.clone())
             }
         }
+
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field2RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -114,6 +118,10 @@ pub mod _puroro_simple_impl {
             } else {
                 ::std::option::Option::Some(self.float_unlabeled.clone())
             }
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
         }
         type Field4RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
@@ -132,7 +140,10 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(&self.string_unlabeled)
             }
         }
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<::std::string::String> =
                 ::puroro::once_cell::sync::Lazy::new(|| {
                     ::std::convert::From::<&str>::from(::std::default::Default::default())
@@ -156,7 +167,10 @@ pub mod _puroro_simple_impl {
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7ScalarGetterType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
             > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
@@ -179,6 +193,12 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.enum_unlabeled.clone())
             }
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            ::std::default::Default::default()
+        }
         type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
             'this,
             ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
@@ -195,6 +215,10 @@ pub mod _puroro_simple_impl {
             } else {
                 ::std::option::Option::Some(self.very_large_field_number.clone())
             }
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
         }
     }
 
@@ -501,12 +525,19 @@ pub mod _puroro_impls {
                 &self.i32_unlabeled,
             )))
         }
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            unreachable!()
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -519,7 +550,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -537,7 +571,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -551,12 +588,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -634,6 +681,9 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -641,6 +691,10 @@ pub mod _puroro_impls {
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -653,7 +707,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -671,7 +728,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -685,12 +745,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -765,6 +835,9 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -777,6 +850,9 @@ pub mod _puroro_impls {
                 &self.float_unlabeled,
             )))
         }
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            unreachable!()
+        }
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -788,7 +864,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -806,7 +885,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -820,12 +902,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -903,12 +995,19 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -922,7 +1021,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -940,7 +1042,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -954,12 +1059,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -1034,12 +1149,19 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -1057,7 +1179,9 @@ pub mod _puroro_impls {
         ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.string_unlabeled)
         }
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             unreachable!()
         }
         type Field6ScalarGetterType<'this>
@@ -1075,7 +1199,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -1089,12 +1216,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -1172,12 +1309,19 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -1190,7 +1334,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -1209,7 +1356,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -1223,12 +1373,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -1306,12 +1466,19 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -1324,7 +1491,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -1347,7 +1517,9 @@ pub mod _puroro_impls {
         ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.submsg_unlabeled)
         }
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             unreachable!()
         }
         type Field8ScalarGetterType<'this>
@@ -1361,12 +1533,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -1453,12 +1635,19 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -1471,7 +1660,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -1489,7 +1681,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -1504,12 +1699,22 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             &self.submsg_repeated
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -1590,12 +1795,19 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -1608,7 +1820,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -1626,7 +1841,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -1647,12 +1865,21 @@ pub mod _puroro_impls {
                 &self.enum_unlabeled,
             )))
         }
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            unreachable!()
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::enum_repeated(&())
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -1730,12 +1957,19 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -1748,7 +1982,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -1766,7 +2003,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -1780,6 +2020,12 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -1792,6 +2038,10 @@ pub mod _puroro_impls {
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(&())
         }
     }
 
@@ -1866,12 +2116,19 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            <() as super::_puroro_traits::MsgTrait>::i32_unlabeled_default_value(&())
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            <() as super::_puroro_traits::MsgTrait>::float_unlabeled_default_value(&())
         }
         type Field4RepeatedType<'this>
         where
@@ -1884,7 +2141,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
         type Field6ScalarGetterType<'this>
@@ -1902,7 +2162,10 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
         type Field8ScalarGetterType<'this>
@@ -1916,6 +2179,12 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             <() as super::_puroro_traits::MsgTrait>::submsg_repeated(&())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            <() as super::_puroro_traits::MsgTrait>::enum_unlabeled_default_value(&())
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -1927,6 +2196,9 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
                 &self.very_large_field_number,
             )))
+        }
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            unreachable!()
         }
     }
 
@@ -1965,6 +2237,232 @@ pub mod _puroro_impls {
             Self {
                 very_large_field_number: value,
             }
+        }
+    }
+    pub struct MsgBuilder<T>(T);
+
+    impl<T> MsgBuilder<T>
+    where
+        T: MsgTrait,
+    {
+        pub fn append_i32_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField1 {
+                    i32_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn append_i32_repeated<ScalarType, RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> MsgBuilder<(T, MsgSingleField2<ScalarType, RepeatedType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField2 {
+                    i32_repeated: value,
+                },
+            ))
+        }
+
+        pub fn append_float_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField3<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<f32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField3 {
+                    float_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn append_float_repeated<ScalarType, RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> MsgBuilder<(T, MsgSingleField4<ScalarType, RepeatedType>)>
+        where
+            ScalarType: ::std::convert::Into<f32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField4 {
+                    float_repeated: value,
+                },
+            ))
+        }
+
+        pub fn append_string_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField5 {
+                    string_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn append_string_repeated<ScalarType, RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> MsgBuilder<(T, MsgSingleField6<ScalarType, RepeatedType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField6 {
+                    string_repeated: value,
+                },
+            ))
+        }
+
+        pub fn append_submsg_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField7<ScalarType>)>
+        where
+            ScalarType:
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField7 {
+                    submsg_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn append_submsg_repeated<ScalarType, RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> MsgBuilder<(T, MsgSingleField8<ScalarType, RepeatedType>)>
+        where
+            ScalarType:
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField8 {
+                    submsg_repeated: value,
+                },
+            ))
+        }
+
+        pub fn append_enum_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField9<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField9 {
+                    enum_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn append_enum_repeated<ScalarType, RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> MsgBuilder<(T, MsgSingleField10<ScalarType, RepeatedType>)>
+        where
+            ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField10 {
+                    enum_repeated: value,
+                },
+            ))
+        }
+
+        pub fn append_very_large_field_number<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField536870911<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField536870911 {
+                    very_large_field_number: value,
+                },
+            ))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl MsgBuilder<()> {
+        pub fn new() -> Self {
+            Self(())
         }
     }
 }
@@ -2121,6 +2619,10 @@ pub mod _puroro_traits {
                 (**self).i32_unlabeled_opt()
             }
 
+            fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                <$ty as MsgTrait>::i32_unlabeled_default_value(self)
+            }
+
             type Field2RepeatedType<'this>
             where
                 Self: 'this,
@@ -2130,6 +2632,10 @@ pub mod _puroro_traits {
             }
             fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).float_unlabeled_opt()
+            }
+
+            fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+                <$ty as MsgTrait>::float_unlabeled_default_value(self)
             }
 
             type Field4RepeatedType<'this>
@@ -2148,9 +2654,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
                 (**self).string_unlabeled_opt()
             }
-            fn string_unlabeled_default_value(
-                &self,
-            ) -> <$ty as MsgTrait>::Field5ScalarGetterType<'_> {
+
+            fn string_unlabeled_default_value<'this>(
+                &'this self,
+            ) -> Self::Field5ScalarGetterType<'this> {
                 <$ty as MsgTrait>::string_unlabeled_default_value(self)
             }
             type Field6ScalarGetterType<'this>
@@ -2174,9 +2681,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
-            fn submsg_unlabeled_default_value(
-                &self,
-            ) -> <$ty as MsgTrait>::Field7ScalarGetterType<'_> {
+
+            fn submsg_unlabeled_default_value<'this>(
+                &'this self,
+            ) -> Self::Field7ScalarGetterType<'this> {
                 <$ty as MsgTrait>::submsg_unlabeled_default_value(self)
             }
             type Field8ScalarGetterType<'this>
@@ -2197,6 +2705,12 @@ pub mod _puroro_traits {
                 (**self).enum_unlabeled_opt()
             }
 
+            fn enum_unlabeled_default_value<'this>(
+                &'this self,
+            ) -> self::_puroro_root::ser_tests3::Enum {
+                <$ty as MsgTrait>::enum_unlabeled_default_value(self)
+            }
+
             type Field10RepeatedType<'this>
             where
                 Self: 'this,
@@ -2206,6 +2720,10 @@ pub mod _puroro_traits {
             }
             fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).very_large_field_number_opt()
+            }
+
+            fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+                <$ty as MsgTrait>::very_large_field_number_default_value(self)
             }
         };
     }
@@ -2245,12 +2763,19 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
         }
         type Field4RepeatedType<'this>
         where
@@ -2260,7 +2785,10 @@ pub mod _puroro_traits {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field5ScalarGetterType<'this> = &'this str;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             ::std::default::Default::default()
         }
         type Field6ScalarGetterType<'this> = &'this str;
@@ -2272,7 +2800,10 @@ pub mod _puroro_traits {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field7ScalarGetterType<'this> = ();
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             ::std::default::Default::default()
         }
         type Field8ScalarGetterType<'this> = ();
@@ -2283,6 +2814,12 @@ pub mod _puroro_traits {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            ::std::default::Default::default()
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -2292,6 +2829,10 @@ pub mod _puroro_traits {
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
@@ -2299,6 +2840,10 @@ pub mod _puroro_traits {
     {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
+        }
+
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
         }
         type Field2RepeatedType<'this>
         where
@@ -2312,6 +2857,10 @@ pub mod _puroro_traits {
         }
         fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.float_unlabeled_opt())
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
         }
         type Field4RepeatedType<'this>
         where
@@ -2335,7 +2884,10 @@ pub mod _puroro_traits {
                     .map(|val| ::puroro::Either::Left(val))
             })
         }
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field6ScalarGetterType<'this>
@@ -2369,7 +2921,10 @@ pub mod _puroro_traits {
                     .map(|val| ::puroro::Either::Left(val))
             })
         }
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             ::puroro::Either::Right(::std::default::Default::default())
         }
         type Field8ScalarGetterType<'this>
@@ -2396,6 +2951,12 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
             self.as_ref().and_then(|msg| msg.enum_unlabeled_opt())
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            ::std::default::Default::default()
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -2410,6 +2971,10 @@ pub mod _puroro_traits {
             self.as_ref()
                 .and_then(|msg| msg.very_large_field_number_opt())
         }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
     impl<T, U> MsgTrait for (T, U)
     where
@@ -2419,6 +2984,10 @@ pub mod _puroro_traits {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::i32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_unlabeled_opt(&self.0))
+        }
+
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            self.1.i32_unlabeled_default_value()
         }
 
         type Field2RepeatedType<'this>
@@ -2438,6 +3007,10 @@ pub mod _puroro_traits {
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::float_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::float_unlabeled_opt(&self.0))
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            self.1.float_unlabeled_default_value()
         }
 
         type Field4RepeatedType<'this>
@@ -2469,7 +3042,10 @@ pub mod _puroro_traits {
                         .map(|t| ::puroro::Either::Left(t))
                 })
         }
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             ::puroro::Either::Right(self.1.string_unlabeled_default_value())
         }
         type Field6ScalarGetterType<'this>
@@ -2512,7 +3088,10 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             (::std::option::Option::None, ::std::option::Option::None)
         }
         type Field8ScalarGetterType<'this>
@@ -2542,6 +3121,12 @@ pub mod _puroro_traits {
                 .or_else(|| <T as MsgTrait>::enum_unlabeled_opt(&self.0))
         }
 
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            self.1.enum_unlabeled_default_value()
+        }
+
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -2560,6 +3145,10 @@ pub mod _puroro_traits {
             <U as MsgTrait>::very_large_field_number_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::very_large_field_number_opt(&self.0))
         }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            self.1.very_large_field_number_default_value()
+        }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
     where
@@ -2570,6 +3159,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::i32_unlabeled_opt(t),
                 |u| <U as MsgTrait>::i32_unlabeled_opt(u),
+            )
+        }
+
+        fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_unlabeled_default_value(t),
+                |u| <U as MsgTrait>::i32_unlabeled_default_value(u),
             )
         }
         type Field2RepeatedType<'this>
@@ -2591,6 +3187,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::float_unlabeled_opt(t),
                 |u| <U as MsgTrait>::float_unlabeled_opt(u),
+            )
+        }
+
+        fn float_unlabeled_default_value<'this>(&'this self) -> f32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::float_unlabeled_default_value(t),
+                |u| <U as MsgTrait>::float_unlabeled_default_value(u),
             )
         }
         type Field4RepeatedType<'this>
@@ -2623,7 +3226,10 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::string_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+
+        fn string_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field5ScalarGetterType<'this> {
             self.as_ref()
                 .map_left(|t| <T as MsgTrait>::string_unlabeled_default_value(t))
                 .map_right(|u| <U as MsgTrait>::string_unlabeled_default_value(u))
@@ -2665,7 +3271,10 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        fn submsg_unlabeled_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
+
+        fn submsg_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field7ScalarGetterType<'this> {
             self.as_ref()
                 .map_left(|t| <T as MsgTrait>::submsg_unlabeled_default_value(t))
                 .map_right(|u| <U as MsgTrait>::submsg_unlabeled_default_value(u))
@@ -2700,6 +3309,15 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::enum_unlabeled_opt(u),
             )
         }
+
+        fn enum_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> self::_puroro_root::ser_tests3::Enum {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_unlabeled_default_value(t),
+                |u| <U as MsgTrait>::enum_unlabeled_default_value(u),
+            )
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -2719,6 +3337,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::very_large_field_number_opt(t),
                 |u| <U as MsgTrait>::very_large_field_number_opt(u),
+            )
+        }
+
+        fn very_large_field_number_default_value<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::very_large_field_number_default_value(t),
+                |u| <U as MsgTrait>::very_large_field_number_default_value(u),
             )
         }
     }
@@ -2800,6 +3425,10 @@ pub mod _puroro_nested {
                     } else {
                         ::std::option::Option::Some(self.i32_unlabeled.clone())
                     }
+                }
+
+                fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                    ::std::default::Default::default()
                 }
             }
 
@@ -2922,6 +3551,9 @@ pub mod _puroro_nested {
                         ::std::clone::Clone::clone(&self.i32_unlabeled),
                     ))
                 }
+                fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                    unreachable!()
+                }
             }
 
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField1<ScalarType>
@@ -2961,6 +3593,40 @@ pub mod _puroro_nested {
                     }
                 }
             }
+            pub struct SubmsgBuilder<T>(T);
+
+            impl<T> SubmsgBuilder<T>
+            where
+                T: SubmsgTrait,
+            {
+                pub fn append_i32_unlabeled<ScalarType>(
+                    self,
+                    value: ScalarType,
+                ) -> SubmsgBuilder<(T, SubmsgSingleField1<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
+                    SubmsgBuilder((
+                        self.0,
+                        SubmsgSingleField1 {
+                            i32_unlabeled: value,
+                        },
+                    ))
+                }
+
+                pub fn build(self) -> T {
+                    self.0
+                }
+            }
+
+            impl SubmsgBuilder<()> {
+                pub fn new() -> Self {
+                    Self(())
+                }
+            }
         }
         pub use _puroro_traits::*;
         pub mod _puroro_traits {
@@ -2988,6 +3654,10 @@ pub mod _puroro_nested {
                 ($ty:ty) => {
                     fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).i32_unlabeled_opt()
+                    }
+
+                    fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                        <$ty as SubmsgTrait>::i32_unlabeled_default_value(self)
                     }
                 };
             }
@@ -3026,13 +3696,21 @@ pub mod _puroro_nested {
             {
                 submsg_delegate!(T);
             }
-            impl SubmsgTrait for () {}
+            impl SubmsgTrait for () {
+                fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                    ::std::default::Default::default()
+                }
+            }
             impl<T> SubmsgTrait for ::std::option::Option<T>
             where
                 T: SubmsgTrait,
             {
                 fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
+                }
+
+                fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                    ::std::default::Default::default()
                 }
             }
             impl<T, U> SubmsgTrait for (T, U)
@@ -3044,6 +3722,10 @@ pub mod _puroro_nested {
                     <U as SubmsgTrait>::i32_unlabeled_opt(&self.1)
                         .or_else(|| <T as SubmsgTrait>::i32_unlabeled_opt(&self.0))
                 }
+
+                fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                    self.1.i32_unlabeled_default_value()
+                }
             }
             impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
             where
@@ -3054,6 +3736,13 @@ pub mod _puroro_nested {
                     self.as_ref().either(
                         |t| <T as SubmsgTrait>::i32_unlabeled_opt(t),
                         |u| <U as SubmsgTrait>::i32_unlabeled_opt(u),
+                    )
+                }
+
+                fn i32_unlabeled_default_value<'this>(&'this self) -> i32 {
+                    self.as_ref().either(
+                        |t| <T as SubmsgTrait>::i32_unlabeled_default_value(t),
+                        |u| <U as SubmsgTrait>::i32_unlabeled_default_value(u),
                     )
                 }
             }

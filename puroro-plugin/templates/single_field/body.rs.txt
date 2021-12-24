@@ -93,11 +93,11 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         <() as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident }}(&())
     }
     {%- else %} {#- if f.is_repeated #}
-    {%- if f.is_length_delimited %}
-    fn {{ f.ident_unesc }}_default_value(&self) -> Self::Field{{ f.number }}ScalarGetterType<'_> {
+
+    fn {{ f.ident_unesc }}_default_value<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
         <() as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident_unesc }}_default_value(&())
     }
-    {%- endif %} {#- if f.is_length_delimited #}
+
     {%- endif %} {#- if f.is_repeated #}
 
     {%- endif %} {#- if f.number == sfield.number #}

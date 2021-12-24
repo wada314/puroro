@@ -30,6 +30,10 @@ pub mod _puroro_simple_impl {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.r#type)
         }
+
+        fn type_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
 
     impl ::puroro::MessageRepresentativeImpl for Msg {}
@@ -150,6 +154,9 @@ pub mod _puroro_impls {
                 &self.r#type,
             )))
         }
+        fn type_default_value<'this>(&'this self) -> i32 {
+            unreachable!()
+        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
@@ -187,6 +194,35 @@ pub mod _puroro_impls {
             Self { r#type: value }
         }
     }
+    pub struct MsgBuilder<T>(T);
+
+    impl<T> MsgBuilder<T>
+    where
+        T: MsgTrait,
+    {
+        pub fn append_type<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32>
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((self.0, MsgSingleField1 { r#type: value }))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl MsgBuilder<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -214,6 +250,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).type_opt()
+            }
+
+            fn type_default_value<'this>(&'this self) -> i32 {
+                <$ty as MsgTrait>::type_default_value(self)
             }
         };
     }
@@ -252,13 +292,21 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-    impl MsgTrait for () {}
+    impl MsgTrait for () {
+        fn type_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+    }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
         T: MsgTrait,
     {
         fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.type_opt())
+        }
+
+        fn type_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
         }
     }
     impl<T, U> MsgTrait for (T, U)
@@ -268,6 +316,10 @@ pub mod _puroro_traits {
     {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::type_opt(&self.1).or_else(|| <T as MsgTrait>::type_opt(&self.0))
+        }
+
+        fn type_default_value<'this>(&'this self) -> i32 {
+            self.1.type_default_value()
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
@@ -279,6 +331,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::type_opt(t),
                 |u| <U as MsgTrait>::type_opt(u),
+            )
+        }
+
+        fn type_default_value<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::type_default_value(t),
+                |u| <U as MsgTrait>::type_default_value(u),
             )
         }
     }

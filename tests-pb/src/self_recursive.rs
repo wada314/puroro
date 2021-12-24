@@ -42,7 +42,10 @@ pub mod _puroro_simple_impl {
         ) -> Option<Self::Field1ScalarGetterType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
-        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this> {
             static DEFAULT_VALUE: ::puroro::once_cell::sync::Lazy<
                 self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
             > = ::puroro::once_cell::sync::Lazy::new(|| ::std::default::Default::default());
@@ -180,7 +183,9 @@ pub mod _puroro_impls {
         ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.recursive_unlabeled)
         }
-        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this> {
             unreachable!()
         }
     }
@@ -226,6 +231,40 @@ pub mod _puroro_impls {
             }
         }
     }
+    pub struct MsgBuilder<T>(T);
+
+    impl<T> MsgBuilder<T>
+    where
+        T: MsgTrait,
+    {
+        pub fn append_recursive_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        where
+            ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+                + ::std::clone::Clone
+                + ::std::cmp::PartialEq
+                + ::std::fmt::Debug,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField1 {
+                    recursive_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl MsgBuilder<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -267,9 +306,10 @@ pub mod _puroro_traits {
             ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
                 (**self).recursive_unlabeled_opt()
             }
-            fn recursive_unlabeled_default_value(
-                &self,
-            ) -> <$ty as MsgTrait>::Field1ScalarGetterType<'_> {
+
+            fn recursive_unlabeled_default_value<'this>(
+                &'this self,
+            ) -> Self::Field1ScalarGetterType<'this> {
                 <$ty as MsgTrait>::recursive_unlabeled_default_value(self)
             }
         };
@@ -311,7 +351,10 @@ pub mod _puroro_traits {
     }
     impl MsgTrait for () {
         type Field1ScalarGetterType<'this> = ();
-        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this> {
             ::std::default::Default::default()
         }
     }
@@ -331,7 +374,10 @@ pub mod _puroro_traits {
                     .map(|val| ::puroro::Either::Left(val))
             })
         }
-        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this> {
             ::puroro::Either::Right(::std::default::Default::default())
         }
     }
@@ -360,7 +406,10 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this> {
             (::std::option::Option::None, ::std::option::Option::None)
         }
     }
@@ -384,7 +433,10 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::recursive_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this> {
             self.as_ref()
                 .map_left(|t| <T as MsgTrait>::recursive_unlabeled_default_value(t))
                 .map_right(|u| <U as MsgTrait>::recursive_unlabeled_default_value(u))

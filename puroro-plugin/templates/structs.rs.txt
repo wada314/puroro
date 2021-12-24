@@ -29,8 +29,8 @@ pub mod _puroro_impls {
     {%- include "single_field/body.rs.txt" %}
     {#
     {%- include "bumpalo/body.rs.txt" %}
-    {%- include "builder.rs.txt" %}
      #}
+    {%- include "builder.rs.txt" %}
     {%- endfor %}
 }
 
