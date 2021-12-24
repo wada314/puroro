@@ -428,17 +428,26 @@ pub mod _puroro_impls {
                 &self.i32_unlabeled,
             )))
         }
-        type Field3RepeatedType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
-        type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
         }
-        type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
+        }
+        type Field6ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
     }
 
@@ -512,17 +521,26 @@ pub mod _puroro_impls {
                 &self.i32_optional,
             )))
         }
-        type Field3RepeatedType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
-        type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
         }
-        type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
+        }
+        type Field6ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
     }
 
@@ -608,15 +626,19 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
-        type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
-        type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
+        type Field6ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
     }
 
@@ -691,23 +713,31 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field3RepeatedType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
-
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
                 &self.f32_unlabeled,
             )))
         }
-        type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
         }
-        type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
+        type Field6ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
     }
 
@@ -776,18 +806,31 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field3RepeatedType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
-
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
+        }
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_unlabeled.as_ref())
+            ::std::option::Option::Some(&self.string_unlabeled)
         }
-        type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field6ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::submsg_unlabeled_default_value(&())
         }
     }
 
@@ -856,22 +899,31 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field3RepeatedType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
-        type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
-        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(self)
+        type Field3RepeatedType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            <() as super::_puroro_traits::MsgTrait>::i32_repeated(&())
         }
-        type Field6MessageType<'this>
+        type Field5ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
+        fn string_unlabeled_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
+            <() as super::_puroro_traits::MsgTrait>::string_unlabeled_default_value(&())
+        }
+        type Field6ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ScalarType;
-
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.submsg_unlabeled)
+        }
+        fn submsg_unlabeled_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
+            unreachable!()
         }
     }
 
@@ -882,7 +934,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field6MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>

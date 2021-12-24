@@ -171,15 +171,17 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field1MessageType<'this>
+        type Field1ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ScalarType;
-
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.recursive_unlabeled)
+        }
+        fn recursive_unlabeled_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
+            unreachable!()
         }
     }
 
@@ -190,7 +192,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field1MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>

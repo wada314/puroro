@@ -1850,75 +1850,103 @@ pub mod _puroro_impls {
                 &self.i32_default,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -1990,75 +2018,103 @@ pub mod _puroro_impls {
                 &self.i32_0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -2130,75 +2186,103 @@ pub mod _puroro_impls {
                 &self.i32_42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -2270,75 +2354,103 @@ pub mod _puroro_impls {
                 &self.i32_m42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -2410,75 +2522,103 @@ pub mod _puroro_impls {
                 &self.i32_2147483647,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -2552,75 +2692,103 @@ pub mod _puroro_impls {
                 &self.i32_m2147483648,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -2694,75 +2862,103 @@ pub mod _puroro_impls {
                 &self.i32_0123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -2834,75 +3030,103 @@ pub mod _puroro_impls {
                 &self.i32_0x123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -2974,75 +3198,103 @@ pub mod _puroro_impls {
                 &self.u32_default,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -3114,75 +3366,103 @@ pub mod _puroro_impls {
                 &self.u32_0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -3254,75 +3534,103 @@ pub mod _puroro_impls {
                 &self.u32_42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -3394,75 +3702,103 @@ pub mod _puroro_impls {
                 &self.u32_4294967295,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -3536,75 +3872,103 @@ pub mod _puroro_impls {
                 &self.u32_0123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -3676,75 +4040,103 @@ pub mod _puroro_impls {
                 &self.u32_0x123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -3816,75 +4208,103 @@ pub mod _puroro_impls {
                 &self.i64_default,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -3956,75 +4376,103 @@ pub mod _puroro_impls {
                 &self.i64_0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -4096,75 +4544,103 @@ pub mod _puroro_impls {
                 &self.i64_42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -4236,75 +4712,103 @@ pub mod _puroro_impls {
                 &self.i64_m42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -4376,75 +4880,103 @@ pub mod _puroro_impls {
                 &self.i64_9223372036854775807,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -4518,75 +5050,103 @@ pub mod _puroro_impls {
                 &self.i64_m9223372036854775808,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -4660,75 +5220,103 @@ pub mod _puroro_impls {
                 &self.i64_0123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -4800,75 +5388,103 @@ pub mod _puroro_impls {
                 &self.i64_0x123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -4940,75 +5556,103 @@ pub mod _puroro_impls {
                 &self.u64_default,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -5080,75 +5724,103 @@ pub mod _puroro_impls {
                 &self.u64_0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -5220,75 +5892,103 @@ pub mod _puroro_impls {
                 &self.u64_42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -5360,75 +6060,103 @@ pub mod _puroro_impls {
                 &self.u64_18446744073709551615,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -5502,75 +6230,103 @@ pub mod _puroro_impls {
                 &self.u64_0123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -5642,75 +6398,103 @@ pub mod _puroro_impls {
                 &self.u64_0x123,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -5782,75 +6566,103 @@ pub mod _puroro_impls {
                 &self.f32_default,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -5922,75 +6734,103 @@ pub mod _puroro_impls {
                 &self.f32_0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -6062,75 +6902,103 @@ pub mod _puroro_impls {
                 &self.f32_m0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -6202,75 +7070,103 @@ pub mod _puroro_impls {
                 &self.f32_0p,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -6342,75 +7238,103 @@ pub mod _puroro_impls {
                 &self.f32_p0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -6482,75 +7406,103 @@ pub mod _puroro_impls {
                 &self.f32_0p0,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -6622,75 +7574,103 @@ pub mod _puroro_impls {
                 &self.f32_42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -6762,75 +7742,103 @@ pub mod _puroro_impls {
                 &self.f32_m42,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -6902,75 +7910,103 @@ pub mod _puroro_impls {
                 &self.f32_0p25,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -7042,75 +8078,103 @@ pub mod _puroro_impls {
                 &self.f32_1p5e2,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -7182,75 +8246,103 @@ pub mod _puroro_impls {
                 &self.f32_inf,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -7322,75 +8414,103 @@ pub mod _puroro_impls {
                 &self.f32_minf,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -7462,75 +8582,103 @@ pub mod _puroro_impls {
                 &self.f32_nan,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -7602,75 +8750,103 @@ pub mod _puroro_impls {
                 &self.f32_mnan,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -7742,75 +8918,103 @@ pub mod _puroro_impls {
                 &self.bool_default,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -7884,75 +9088,103 @@ pub mod _puroro_impls {
                 &self.bool_true,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8024,75 +9256,103 @@ pub mod _puroro_impls {
                 &self.bool_false,
             )))
         }
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8159,75 +9419,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_default_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field71ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_default.as_ref())
+            ::std::option::Option::Some(&self.string_default)
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8296,76 +9589,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_empty_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field72ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_empty.as_ref())
+            ::std::option::Option::Some(&self.string_empty)
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8434,76 +9759,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_abc_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field73ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_abc.as_ref())
+            ::std::option::Option::Some(&self.string_abc)
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8570,76 +9927,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_aiu_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field74ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_aiu.as_ref())
+            ::std::option::Option::Some(&self.string_aiu)
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8706,76 +10095,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_backslash_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field75ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_backslash.as_ref())
+            ::std::option::Option::Some(&self.string_backslash)
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8844,76 +10265,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_tab_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field76ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_tab.as_ref())
+            ::std::option::Option::Some(&self.string_tab)
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -8980,76 +10433,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn string_crlf_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field77ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.string_crlf.as_ref())
+            ::std::option::Option::Some(&self.string_crlf)
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -9116,76 +10601,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn bytes_default_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field81ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.bytes_default.as_ref())
+            ::std::option::Option::Some(&self.bytes_default)
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -9254,76 +10771,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn bytes_empty_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field82ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.bytes_empty.as_ref())
+            ::std::option::Option::Some(&self.bytes_empty)
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -9390,76 +10939,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn bytes_abc_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field83ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.bytes_abc.as_ref())
+            ::std::option::Option::Some(&self.bytes_abc)
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -9526,76 +11107,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn bytes_aiu_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field84ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.bytes_aiu.as_ref())
+            ::std::option::Option::Some(&self.bytes_aiu)
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -9662,76 +11275,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn bytes_backslash_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field85ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.bytes_backslash.as_ref())
+            ::std::option::Option::Some(&self.bytes_backslash)
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -9800,76 +11445,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn bytes_tab_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field86ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.bytes_tab.as_ref())
+            ::std::option::Option::Some(&self.bytes_tab)
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
+            unreachable!()
+        }
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
     }
 
@@ -9936,76 +11613,108 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn bytes_crlf_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field87ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.bytes_crlf.as_ref())
+            ::std::option::Option::Some(&self.bytes_crlf)
+        }
+        fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
+            unreachable!()
         }
     }
 
@@ -10072,77 +11781,104 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
-
         fn enum_default_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
@@ -10217,77 +11953,104 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
-
         fn enum_one_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
@@ -10360,77 +12123,104 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field71ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
+        type Field71ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field71ScalarGetterType<'this>;
         fn string_default_default_value(&self) -> Self::Field71ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_default_default_value(&())
         }
-        type Field72ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
+        type Field72ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field72ScalarGetterType<'this>;
         fn string_empty_default_value(&self) -> Self::Field72ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_empty_default_value(&())
         }
-        type Field73ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
+        type Field73ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field73ScalarGetterType<'this>;
         fn string_abc_default_value(&self) -> Self::Field73ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_abc_default_value(&())
         }
-        type Field74ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
+        type Field74ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field74ScalarGetterType<'this>;
         fn string_aiu_default_value(&self) -> Self::Field74ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_aiu_default_value(&())
         }
-        type Field75ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
+        type Field75ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field75ScalarGetterType<'this>;
         fn string_backslash_default_value(&self) -> Self::Field75ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_backslash_default_value(&())
         }
-        type Field76ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
+        type Field76ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field76ScalarGetterType<'this>;
         fn string_tab_default_value(&self) -> Self::Field76ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_tab_default_value(&())
         }
-        type Field77ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
+        type Field77ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field77ScalarGetterType<'this>;
         fn string_crlf_default_value(&self) -> Self::Field77ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::string_crlf_default_value(&())
         }
-        type Field81ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
+        type Field81ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field81ScalarGetterType<'this>;
         fn bytes_default_default_value(&self) -> Self::Field81ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_default_default_value(&())
         }
-        type Field82ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
+        type Field82ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field82ScalarGetterType<'this>;
         fn bytes_empty_default_value(&self) -> Self::Field82ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_empty_default_value(&())
         }
-        type Field83ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
+        type Field83ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field83ScalarGetterType<'this>;
         fn bytes_abc_default_value(&self) -> Self::Field83ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_abc_default_value(&())
         }
-        type Field84ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
+        type Field84ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field84ScalarGetterType<'this>;
         fn bytes_aiu_default_value(&self) -> Self::Field84ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_aiu_default_value(&())
         }
-        type Field85ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
+        type Field85ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field85ScalarGetterType<'this>;
         fn bytes_backslash_default_value(&self) -> Self::Field85ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_backslash_default_value(&())
         }
-        type Field86ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
+        type Field86ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field86ScalarGetterType<'this>;
         fn bytes_tab_default_value(&self) -> Self::Field86ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_tab_default_value(&())
         }
-        type Field87ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
+        type Field87ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = <() as super::_puroro_traits::MsgTrait>::Field87ScalarGetterType<'this>;
         fn bytes_crlf_default_value(&self) -> Self::Field87ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(self)
+            <() as super::_puroro_traits::MsgTrait>::bytes_crlf_default_value(&())
         }
-
         fn enum_fourty_two_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {

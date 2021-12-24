@@ -551,8 +551,15 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        type Field2ScalarGetterType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
         fn b_opt<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
-            ::std::option::Option::Some(self.b.as_ref())
+            ::std::option::Option::Some(&self.b)
+        }
+        fn b_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
+            unreachable!()
         }
     }
 
@@ -619,13 +626,15 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        type Field3MessageType<'this>
+        type Field3ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this ScalarType;
-
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             ::std::option::Option::Some(&self.c)
+        }
+        fn c_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
+            unreachable!()
         }
     }
 
@@ -636,7 +645,7 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
         Self: super::_puroro_traits::Test3Trait,
-        for<'a> <Self as super::_puroro_traits::Test3Trait>::Field3MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>

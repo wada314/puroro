@@ -24,42 +24,93 @@ impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield) %}
 {
-    {%- for field in m.fields %}
-    {%- if field.number == sfield.number %}
+    {%- for f in m.fields %}
+    {%- if f.number == sfield.number %}
 
-    {%- call single_field_trait_impl_field(field) %}
+    {#- Present field. For length delimited types, just return a reference. #}
+    {#- For other numerical types, `Clone` it, `Into` it and then return. #}
 
-    {%- else %} {#- if field.number == sfield.number #}
+    {%- if f.is_length_delimited %}
+    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = &'this ScalarType;
+    {%- endif %} {#- if f.is_length_delimited #}
+
+    {%- if f.is_repeated %}
+
+    {%- if f.is_length_delimited %}
+    type Field{{ f.number }}RepeatedType<'this> where Self: 'this = &'this RepeatedType;
+    {%- else %} {#- if f.is_length_delimited #}
+    type Field{{ f.number }}RepeatedType<'this> where Self: 'this
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            RepeatedType,
+            ScalarType,
+            {{ f.single_numerical_rust_type }}
+        >;
+    {%- endif %} {#- if f.is_length_delimited #}
+
+    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+        {%- if f.is_length_delimited %}
+        &self.{{ f.ident }}
+        {%- else %} {#- if f.is_length_delimited #}
+        ::puroro::CloneThenIntoRepeatedField::new(
+            &self.{{ f.ident }}
+        )
+        {%- endif %} {#- if f.is_length_delimited #}
+    }
+
+    {%- else %} {#- f.is_repeated #}
+
+    {%- if !f.is_explicit_oneof_field %}
+    fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
+        {%- if f.is_length_delimited %}
+        ::std::option::Option::Some(&self.{{ f.ident }})
+        {%- else %} {#- if f.is_length_delimited #}
+        ::std::option::Option::Some(
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.{{ f.ident }}))
+        )
+        {%- endif %} {#- if f.is_length_delimited #}
+    }
+    {%- endif %} {#- !f.is_explicit_oneof_field #}
+
+    {%- if f.is_length_delimited %}
+    {#- This method is never called. The single field struct's field always exists. #}
+    fn {{ f.ident_unesc }}_default_value(&self) -> Self::Field{{ f.number }}ScalarGetterType<'_> {
+        unreachable!()
+    }
+    {%- endif %} {#- if f.is_length_delimited #}
+
+    {%- endif %} {#- f.is_repeated #}
+
+    {%- else %} {#- if f.number == sfield.number #}
 
     {#- Not present field. Just copy `()`'s types. #}
-    {%- if field.is_length_delimited %}
-    type Field{{ field.number }}ScalarGetterType<'this> =
-        <() as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ field.number }}ScalarGetterType<'this>;
-    {%- endif %} {#- if field.is_length_delimited #}
-    {%- if field.is_repeated %}
-    type Field{{ field.number }}RepeatedType<'this> =
-        <() as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ field.number }}RepeatedType<'this>;
-    {%- else %} {#- if field.is_repeated #}
-    {%- if field.is_length_delimited %}
-    fn {{ field.ident_unesc }}_default_value(&self) -> Self::Field{{ field.number }}ScalarGetterType<'_> {
-        <() as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_default_value(self)
+    {%- if f.is_length_delimited %}
+    type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this =
+        <() as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ f.number }}ScalarGetterType<'this>;
+    {%- endif %} {#- if f.is_length_delimited #}
+    {%- if f.is_repeated %}
+    type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
+        <() as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ f.number }}RepeatedType<'this>;
+    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+        <() as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident }}(&())
     }
-    {%- endif %} {#- if field.is_length_delimited #}
-    {%- endif %} {#- if field.is_repeated #}
+    {%- else %} {#- if f.is_repeated #}
+    {%- if f.is_length_delimited %}
+    fn {{ f.ident_unesc }}_default_value(&self) -> Self::Field{{ f.number }}ScalarGetterType<'_> {
+        <() as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident_unesc }}_default_value(&())
+    }
+    {%- endif %} {#- if f.is_length_delimited #}
+    {%- endif %} {#- if f.is_repeated #}
 
-    {%- endif %} {#- if field.number == sfield.number #}
-    {%- endfor %} {#- for field in m.fields #}
+    {%- endif %} {#- if f.number == sfield.number #}
+    {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
             <'this, Self>
-            {%- else %}
-            <'this>
-            {%- endif %}
             {%- endif %}
         >
     {
@@ -68,11 +119,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         ::std::option::Option::Some(
             E::{{ sfield.oneof_enum_value_ident }}(
                 {%- if sfield.is_length_delimited %}
-                {%- if sfield.is_message %}
                 &self.{{ sfield.ident }}
-                {%- else %}
-                self.{{ sfield.ident }}.as_ref()
-                {%- endif %}
                 {%- else %}
                 ::std::convert::Into::into(
                     ::std::clone::Clone::clone(&self.{{ sfield.ident }})
@@ -93,7 +140,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield) %}
     Self: super::_puroro_traits::{{ m.ident }}Trait,
 {%- if sfield.is_message %}
-    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ sfield.number }}MessageType<'a> :
+    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ sfield.number }}ScalarGetterType<'a> :
         ::puroro::internal::se::SerMessageToIoWrite,
 {%- endif %}
 {
