@@ -534,25 +534,19 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         type Field2ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field2ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g1_string_default_value(self)
         }
-        fn g2_f32_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g2_f32_default_value(self)
-        }
         type Field4ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field4ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_string_default_value(self)
         }
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_submsg_default_value(self)
-        }
-        fn g3_int32_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g3_int32_default_value(self)
         }
         fn group_one<'this>(
             &'this self,
@@ -639,24 +633,15 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn g1_int32_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g1_int32_default_value(self)
-        }
-        fn g2_f32_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g2_f32_default_value(self)
-        }
         type Field4ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field4ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_string_default_value(self)
         }
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_submsg_default_value(self)
-        }
-        fn g3_int32_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g3_int32_default_value(self)
         }
         fn group_one<'this>(
             &'this self,
@@ -741,26 +726,20 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn g1_int32_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g1_int32_default_value(self)
-        }
         type Field2ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field2ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g1_string_default_value(self)
         }
         type Field4ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field4ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_string_default_value(self)
         }
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_submsg_default_value(self)
-        }
-        fn g3_int32_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g3_int32_default_value(self)
         }
         fn group_one<'this>(
             &'this self,
@@ -847,24 +826,15 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn g1_int32_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g1_int32_default_value(self)
-        }
         type Field2ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field2ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g1_string_default_value(self)
         }
-        fn g2_f32_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g2_f32_default_value(self)
-        }
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_submsg_default_value(self)
-        }
-        fn g3_int32_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g3_int32_default_value(self)
         }
         fn group_one<'this>(
             &'this self,
@@ -949,19 +919,13 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn g1_int32_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g1_int32_default_value(self)
-        }
         type Field2ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field2ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g1_string_default_value(self)
         }
-        fn g2_f32_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g2_f32_default_value(self)
-        }
         type Field4ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field4ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_string_default_value(self)
         }
@@ -969,9 +933,6 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
-        fn g3_int32_default_value(&self) -> Self::Field6ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g3_int32_default_value(self)
-        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -1059,24 +1020,18 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn g1_int32_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g1_int32_default_value(self)
-        }
         type Field2ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field2ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>;
         fn g1_string_default_value(&self) -> Self::Field2ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g1_string_default_value(self)
         }
-        fn g2_f32_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::g2_f32_default_value(self)
-        }
         type Field4ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field4ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>;
         fn g2_string_default_value(&self) -> Self::Field4ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_string_default_value(self)
         }
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn g2_submsg_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::g2_submsg_default_value(self)
         }

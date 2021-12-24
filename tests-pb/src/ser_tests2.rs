@@ -485,39 +485,28 @@ pub mod _puroro_impls {
         }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
@@ -594,9 +583,6 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -605,39 +591,28 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -711,9 +686,6 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
 
@@ -725,33 +697,25 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField3<ScalarType>
@@ -828,14 +792,8 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -845,33 +803,25 @@ pub mod _puroro_impls {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -945,14 +895,8 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
 
@@ -962,28 +906,20 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(self.string_optional.as_ref())
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
@@ -1060,18 +996,12 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
@@ -1084,24 +1014,16 @@ pub mod _puroro_impls {
             ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -1178,23 +1100,17 @@ pub mod _puroro_impls {
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7MessageType<'this>
@@ -1208,19 +1124,11 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(&self.submsg_optional)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField7<ScalarType>
@@ -1306,27 +1214,21 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
@@ -1342,16 +1244,8 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             &self.submsg_repeated
         }
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -1431,32 +1325,26 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
 
@@ -1469,11 +1357,6 @@ pub mod _puroro_impls {
         }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
-        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField9<ScalarType>
@@ -1550,37 +1433,28 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -1593,11 +1467,6 @@ pub mod _puroro_impls {
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
-        }
-        fn very_large_field_number_default_value(
-            &self,
-        ) -> Self::Field536870911ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::very_large_field_number_default_value(self)
         }
     }
 
@@ -1672,37 +1541,28 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
-        fn i32_optional_default_value(&self) -> Self::Field1ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::i32_optional_default_value(self)
-        }
         type Field2RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>;
-        fn float_optional_default_value(&self) -> Self::Field3ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::float_optional_default_value(self)
-        }
         type Field4RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>;
         type Field5ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field5ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>;
         fn string_optional_default_value(&self) -> Self::Field5ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::string_optional_default_value(self)
         }
         type Field6ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field6ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>;
         type Field6RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>;
         type Field7ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field7ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>;
         fn submsg_optional_default_value(&self) -> Self::Field7ScalarGetterType<'_> {
             <() as super::_puroro_traits::MsgTrait>::submsg_optional_default_value(self)
         }
         type Field8ScalarGetterType<'this> =
-            <() as super::_puroro_traits::MsgTrait>::Field8ScallerGetterType<'this>;
+            <() as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>;
         type Field8RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>;
-        fn enum_optional_default_value(&self) -> Self::Field9ScalarGetterType<'_> {
-            <() as super::_puroro_traits::MsgTrait>::enum_optional_default_value(self)
-        }
         type Field10RepeatedType<'this> =
             <() as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>;
 
