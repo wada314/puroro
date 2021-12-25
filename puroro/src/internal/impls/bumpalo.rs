@@ -392,10 +392,9 @@ impl NoAllocString {
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    /// Also, if the `ManuallyDrop` inner value has been taken then it's also unsafe.
-    unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<String<'bump>> {
-        ManuallyDrop::new(String::from_utf8_unchecked(ManuallyDrop::into_inner(
-            self.vec.as_vec_in(bump),
+    pub unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> RefString<'bump, '_> {
+        RefString::new(ManuallyDrop::new(String::from_utf8_unchecked(
+            ManuallyDrop::into_inner(self.vec.as_vec_in(bump)),
         )))
     }
 
@@ -462,6 +461,25 @@ impl Default for NoAllocString {
         Self {
             vec: Default::default(),
         }
+    }
+}
+
+pub struct RefString<'bump, 'string> {
+    temp_string: ManuallyDrop<String<'bump>>,
+    phantom: PhantomData<&'string ()>,
+}
+impl<'bump, 'string> RefString<'bump, 'string> {
+    pub fn new(temp_string: ManuallyDrop<String<'bump>>) -> Self {
+        Self {
+            temp_string,
+            phantom: PhantomData,
+        }
+    }
+}
+impl<'bump, 'string> Deref for RefString<'bump, 'string> {
+    type Target = String<'bump>;
+    fn deref(&self) -> &Self::Target {
+        &self.temp_string
     }
 }
 
