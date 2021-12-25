@@ -619,3 +619,7 @@ where
             .map(|val| <T as AddBump>::add_bump(&val, self.bump))
     }
 }
+
+pub fn create_ref_vec_for_default_value(value: &'static [u8]) -> RefVec<'static, 'static, u8> {
+    todo!()
+}

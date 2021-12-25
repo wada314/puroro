@@ -259,6 +259,10 @@ pub mod _puroro_impls {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             <Self>::type_opt(self)
         }
+
+        fn type_default_value<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {

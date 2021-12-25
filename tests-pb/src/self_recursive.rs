@@ -317,6 +317,12 @@ pub mod _puroro_impls {
         ) -> Option<Self::Field1ScalarGetterType<'this>> {
             <Self>::recursive_unlabeled_opt(self)
         }
+
+        fn recursive_unlabeled_default_value<'this>(
+            &'this self,
+        ) -> Self::Field1ScalarGetterType<'this> {
+            todo!()
+        }
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
