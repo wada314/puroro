@@ -784,7 +784,7 @@ impl<'bump> ::puroro::internal::BumpDefault<'bump> for Test2Bumpalo<'bump> {
 }
 
 impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
-type Field2ScalarGetterType<'this> where Self: 'this =
+type Field2ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn b_opt<'this>(&'this self) -> Option<Self::Field2ScalarGetterType<'this>> {
     <Self>::b_opt(self)

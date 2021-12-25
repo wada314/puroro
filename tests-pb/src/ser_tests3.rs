@@ -2113,12 +2113,12 @@ type Field4RepeatedType<'this> where Self: 'this =
 fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
     ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
 }
-type Field5ScalarGetterType<'this> where Self: 'this =
+type Field5ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_unlabeled_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
     <Self>::string_unlabeled_opt(self)
 }
-type Field6ScalarGetterType<'this> where Self: 'this =
+type Field6ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 
 type Field6RepeatedType<'this> where Self: 'this =

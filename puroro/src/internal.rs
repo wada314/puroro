@@ -26,6 +26,8 @@ pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
 pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
 pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
+pub use impls::bumpalo::RefString as RefBumpString;
+pub use impls::bumpalo::RefVec as RefBumpVec;
 pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
 
 use ::bitvec::order::BitOrder;

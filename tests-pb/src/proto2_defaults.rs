@@ -25310,37 +25310,37 @@ fn bool_true_opt<'this>(&'this self) -> Option<bool> {
 fn bool_false_opt<'this>(&'this self) -> Option<bool> {
     <Self>::bool_false_opt(self)
 }
-type Field71ScalarGetterType<'this> where Self: 'this =
+type Field71ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_default_opt<'this>(&'this self) -> Option<Self::Field71ScalarGetterType<'this>> {
     <Self>::string_default_opt(self)
 }
-type Field72ScalarGetterType<'this> where Self: 'this =
+type Field72ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_empty_opt<'this>(&'this self) -> Option<Self::Field72ScalarGetterType<'this>> {
     <Self>::string_empty_opt(self)
 }
-type Field73ScalarGetterType<'this> where Self: 'this =
+type Field73ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_abc_opt<'this>(&'this self) -> Option<Self::Field73ScalarGetterType<'this>> {
     <Self>::string_abc_opt(self)
 }
-type Field74ScalarGetterType<'this> where Self: 'this =
+type Field74ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_aiu_opt<'this>(&'this self) -> Option<Self::Field74ScalarGetterType<'this>> {
     <Self>::string_aiu_opt(self)
 }
-type Field75ScalarGetterType<'this> where Self: 'this =
+type Field75ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_backslash_opt<'this>(&'this self) -> Option<Self::Field75ScalarGetterType<'this>> {
     <Self>::string_backslash_opt(self)
 }
-type Field76ScalarGetterType<'this> where Self: 'this =
+type Field76ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_tab_opt<'this>(&'this self) -> Option<Self::Field76ScalarGetterType<'this>> {
     <Self>::string_tab_opt(self)
 }
-type Field77ScalarGetterType<'this> where Self: 'this =
+type Field77ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_crlf_opt<'this>(&'this self) -> Option<Self::Field77ScalarGetterType<'this>> {
     <Self>::string_crlf_opt(self)

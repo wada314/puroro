@@ -1348,9 +1348,9 @@ impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
 }
 
 impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
-type Field2ScalarGetterType<'this> where Self: 'this =
+type Field2ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
-type Field4ScalarGetterType<'this> where Self: 'this =
+type Field4ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 type Field5ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'this>
 ;

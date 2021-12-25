@@ -17001,17 +17001,17 @@ type Field23RepeatedType<'this> where Self: 'this =
 fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
     ::puroro::AsRefRepeatedField::new(&self.bytes_repeated)
 }
-type Field31ScalarGetterType<'this> where Self: 'this =
+type Field31ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_required_opt<'this>(&'this self) -> Option<Self::Field31ScalarGetterType<'this>> {
     <Self>::string_required_opt(self)
 }
-type Field32ScalarGetterType<'this> where Self: 'this =
+type Field32ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_optional_opt<'this>(&'this self) -> Option<Self::Field32ScalarGetterType<'this>> {
     <Self>::string_optional_opt(self)
 }
-type Field33ScalarGetterType<'this> where Self: 'this =
+type Field33ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 
 type Field33RepeatedType<'this> where Self: 'this =

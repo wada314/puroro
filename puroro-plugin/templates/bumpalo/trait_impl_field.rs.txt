@@ -2,36 +2,40 @@
 {%- if f.is_length_delimited %}
 type Field{{ f.number }}ScalarGetterType<'this> where Self: 'this = 
     {%- if f.is_message %} &'this {{ f.bumpalo_field_message_path }} {%- endif %}
-    {%- if f.is_string %}  {%- endif %}
+    {%- if f.is_string %} ::puroro::internal::RefBumpString<'bump, 'this>{%- endif %}
+    {%- if f.is_bytes %} ::puroro::internal::RefBumpVec<'bump, 'this, u8>{%- endif %}
 ;
 {%- endif %} {#- if f.is_length_delimited #}
-
 
 {%- if f.is_repeated %}
 
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-{%- match f.bumpalo_maybe_borrowed_field_type %}
-{%- when Some with (borrowed) %}
+{%- if f.is_length_delimited %}
 {%- if f.is_message %}
-    &'this [{{ borrowed }}];
+    &'this [{{ f.bumpalo_field_message_path }}];
 {%- else %} {#- if f.is_message #}
-    ::puroro::AsRefRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.bumpalo_field_rep_item_type }}, {{ borrowed }}>;
+{%- if f.is_string %}
+    ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocString>;
+{%- endif %} {#- if f.is_string #}
+{%- if f.is_bytes %}
+    ::puroro::internal::AddBumpVecView<'bump, 'this, ::puroro::internal::NoAllocVec<u8>>;
+{%- endif %} {#- if f.is_bytes #}
 {%- endif %} {#- if f.is_message #}
-{%- else %}
+{%- else %} {#- if f.is_length_delimited #}
     ::puroro::CloneThenIntoRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.trait_scalar_getter_type }}, {{ f.trait_scalar_getter_type }}>;
-{%- endmatch %}
+{%- endif %} {#- if f.is_length_delimited #}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
-    {%- match f.bumpalo_maybe_borrowed_field_type %}
-    {%- when Some with (borrowed) %}
+    {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     unsafe { self.{{ f.ident }}.cast_item_unchecked() }
     {%- else %} {#- if f.is_message #}
-    ::puroro::AsRefRepeatedField::new(&self.{{ f.ident }})
+    unsafe { self.{{ f.ident }}.as_add_bump_vec_view_in(&self._bump) }
     {%- endif %} {#- if f.is_message #}
-    {%- else %}
+    {%- else %} {#- if f.is_length_delimited #}
     ::puroro::CloneThenIntoRepeatedField::new(&self.{{ f.ident }})
-    {%- endmatch %}
+    {%- endif %} {#- if f.is_length_delimited #}
+    
 }
 
 {%- else %} {#- if f.is_repeated #}
@@ -41,5 +45,20 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
     <Self>::{{ f.ident_unesc }}_opt(self)
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
+
+fn {{ field.ident_unesc }}_default_value<'this>(&'this self) ->
+    {{ field.trait_scalar_getter_type }}
+{
+    {%- if field.is_length_delimited %}
+
+    {#- TODO!!! #}
+    todo!()
+
+    {%- else %} {#- if field.is_length_delimited #}
+
+    {{ field.default_value}}
+
+    {%- endif %} {#- if field.is_length_delimited #}
+}
 
 {%- endif %} {#- if f.is_repeated #}

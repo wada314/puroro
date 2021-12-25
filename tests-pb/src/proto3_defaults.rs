@@ -1182,7 +1182,7 @@ fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
 fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
     <Self>::f32_unlabeled_opt(self)
 }
-type Field5ScalarGetterType<'this> where Self: 'this =
+type Field5ScalarGetterType<'this> where Self: 'this = ::puroro::internal::
 ;
 fn string_unlabeled_opt<'this>(&'this self) -> Option<Self::Field5ScalarGetterType<'this>> {
     <Self>::string_unlabeled_opt(self)
