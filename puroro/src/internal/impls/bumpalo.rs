@@ -20,7 +20,7 @@
 
 pub mod de;
 
-use crate::bumpalo::collections::{vec, String, Vec};
+use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
 use crate::internal::Bare;
 use ::std::borrow::Borrow;
@@ -296,19 +296,28 @@ pub struct RefVec<'bump, 'vec, T> {
     temp_vec: ManuallyDrop<Vec<'bump, T>>,
     phantom: PhantomData<&'vec ()>,
 }
-
 impl<'bump, 'vec, T> RefVec<'bump, 'vec, T> {
-    pub fn new(temp_vec: ManuallyDrop<Vec<'bump, T>>) -> Self {
+    fn new(temp_vec: ManuallyDrop<Vec<'bump, T>>) -> Self {
         Self {
             temp_vec,
             phantom: PhantomData,
         }
+    }
+    fn as_slice(&self) -> &'vec [T] {
+        unsafe { mem::transmute(self.temp_vec.as_slice()) }
     }
 }
 impl<'bump, 'vec, T: 'bump> Deref for RefVec<'bump, 'vec, T> {
     type Target = Vec<'bump, T>;
     fn deref(&self) -> &Self::Target {
         &self.temp_vec
+    }
+}
+impl<'bump, 'vec, T: 'vec> IntoIterator for RefVec<'bump, 'vec, T> {
+    type Item = &'vec T;
+    type IntoIter = slice::Iter<'vec, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_slice().into_iter()
     }
 }
 
@@ -536,7 +545,7 @@ where
     'bump: 'vec,
 {
     type Item = <T as AddBump>::AddToRef<'bump, 'vec>;
-    type IntoIter = AddBumpIterator<'bump, 'vec, vec::IntoIter<T>>;
+    type IntoIter = AddBumpIterator<'bump, 'vec, slice::Iter<'vec, T>, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         AddBumpIterator::new(self.vec.into_iter(), self.bump)
@@ -584,12 +593,12 @@ where
     }
 }
 
-pub struct AddBumpIterator<'bump, 'vec, I> {
+pub struct AddBumpIterator<'bump, 'vec, I, T> {
     iter: I,
     bump: &'bump Bump,
-    phantom: PhantomData<&'vec ()>,
+    phantom: PhantomData<&'vec T>,
 }
-impl<'bump, 'vec, I> AddBumpIterator<'bump, 'vec, I> {
+impl<'bump, 'vec, I, T> AddBumpIterator<'bump, 'vec, I, T> {
     pub fn new(iter: I, bump: &'bump Bump) -> Self {
         Self {
             iter,
@@ -598,15 +607,15 @@ impl<'bump, 'vec, I> AddBumpIterator<'bump, 'vec, I> {
         }
     }
 }
-impl<'bump, 'vec, I> Iterator for AddBumpIterator<'bump, 'vec, I>
+impl<'bump, 'vec, I, T> Iterator for AddBumpIterator<'bump, 'vec, I, T>
 where
-    I: Iterator,
-    <I as Iterator>::Item: 'bump + 'vec + AddBump,
+    I: Iterator<Item = &'vec T>,
+    T: 'bump + 'vec + AddBump,
 {
-    type Item = <<I as Iterator>::Item as AddBump>::AddToRef<'bump, 'vec>;
+    type Item = <T as AddBump>::AddToRef<'bump, 'vec>;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter
             .next()
-            .map(|val| <<I as Iterator>::Item as AddBump>::add_bump(&val, self.bump))
+            .map(|val| <T as AddBump>::add_bump(&val, self.bump))
     }
 }
