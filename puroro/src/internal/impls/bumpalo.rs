@@ -20,7 +20,7 @@
 
 pub mod de;
 
-use crate::bumpalo::collections::{String, Vec};
+use crate::bumpalo::collections::{vec, String, Vec};
 use crate::bumpalo::Bump;
 use crate::internal::Bare;
 use ::std::borrow::Borrow;
@@ -119,7 +119,7 @@ pub trait AddBump {
     type AddToRef<'bump, 'this>
     where
         Self: 'bump + 'this;
-    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this>;
+    fn add_bump<'bump>(&self, bump: &'bump Bump) -> Self::AddToRef<'bump, '_>;
     type AddToMutRef<'bump, 'this>
     where
         Self: 'bump + 'this;
@@ -185,14 +185,13 @@ impl<T> NoAllocVec<T> {
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    /// Also, if the `ManuallyDrop` inner value has been taken then it's also unsafe.
-    unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<Vec<'bump, T>> {
-        ManuallyDrop::new(Vec::from_raw_parts_in(
+    pub unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> RefVec<'bump, '_, T> {
+        RefVec::new(ManuallyDrop::new(Vec::from_raw_parts_in(
             self.ptr,
             self.length,
             self.capacity,
             bump,
-        ))
+        )))
     }
 
     /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
@@ -203,7 +202,12 @@ impl<T> NoAllocVec<T> {
     /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_mut_vec_in<'bump>(&mut self, bump: &'bump Bump) -> RefMutVec<'bump, '_, T> {
         RefMutVec {
-            temp_vec: self.as_vec_in(bump),
+            temp_vec: ManuallyDrop::new(Vec::from_raw_parts_in(
+                self.ptr,
+                self.length,
+                self.capacity,
+                bump,
+            )),
             ref_vec: self,
         }
     }
@@ -212,15 +216,15 @@ impl<T> NoAllocVec<T> {
         &mut self,
         bump: &'bump Bump,
     ) -> AddBumpVecView<'bump, '_, T> {
-        AddBumpVecView::new(self.as_mut_vec_in(bump), bump)
+        AddBumpVecView::new(self.as_vec_in(bump), bump)
     }
 }
 impl<T> AddBump for NoAllocVec<T> {
     type AddToRef<'bump, 'this>
     where
         Self: 'bump + 'this,
-    = ManuallyDrop<Vec<'bump, T>>;
-    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
+    = RefVec<'bump, 'this, T>;
+    fn add_bump<'bump>(&self, bump: &'bump Bump) -> Self::AddToRef<'bump, '_> {
         unsafe { self.as_vec_in(bump) }
     }
     type AddToMutRef<'bump, 'this>
@@ -278,6 +282,34 @@ impl<'a, T> IntoIterator for &'a NoAllocVec<T> {
     type IntoIter = slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
         self.deref().into_iter()
+    }
+}
+
+/// An immutable `Deref`able reference to `Vec<'bump, T>`.
+///
+/// # 'bump` - a lifetime PhantomData bumpalo allocator.
+/// * `'vec` - a lifetime of the referenced vector.
+/// Even though the lifetime param is not actually used in the struct's
+/// actual members, we need this because if the original `Vec` is dropped
+/// then the bumpalo have a chance to re-use that area (only when the area
+/// is a latest allocated area of that bumpalo instance though)
+pub struct RefVec<'bump, 'vec, T> {
+    temp_vec: ManuallyDrop<Vec<'bump, T>>,
+    phantom: PhantomData<&'vec ()>,
+}
+
+impl<'bump, 'vec, T> RefVec<'bump, 'vec, T> {
+    pub fn new(temp_vec: ManuallyDrop<Vec<'bump, T>>) -> Self {
+        Self {
+            temp_vec,
+            phantom: PhantomData,
+        }
+    }
+}
+impl<'bump, 'vec, T: 'bump> Deref for RefVec<'bump, 'vec, T> {
+    type Target = Vec<'bump, T>;
+    fn deref(&self) -> &Self::Target {
+        &self.temp_vec
     }
 }
 
@@ -384,11 +416,11 @@ impl NoAllocString {
     }
 }
 impl AddBump for NoAllocString {
-    type AddToRef<'bump, 'this>
+    type AddToRef<'bump, 'vec>
     where
-        Self: 'bump + 'this,
+        Self: 'bump,
     = ManuallyDrop<String<'bump>>;
-    fn add_bump<'bump, 'this>(&'this self, bump: &'bump Bump) -> Self::AddToRef<'bump, 'this> {
+    fn add_bump<'bump>(&self, bump: &'bump Bump) -> Self::AddToRef<'bump, '_> {
         unsafe { self.as_string_in(bump) }
     }
     type AddToMutRef<'bump, 'this>
@@ -459,10 +491,42 @@ impl<'bump, 'string> Drop for RefMutString<'bump, 'string> {
 }
 
 pub struct AddBumpVecView<'bump, 'vec, T> {
-    vec: RefMutVec<'bump, 'vec, T>,
+    vec: RefVec<'bump, 'vec, T>,
     bump: &'bump Bump,
 }
 impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
+    unsafe fn new(vec: RefVec<'bump, 'vec, T>, bump: &'bump Bump) -> Self {
+        Self { vec, bump }
+    }
+}
+impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
+where
+    T: AddBump,
+{
+    pub fn get(&self, index: usize) -> Option<<T as AddBump>::AddToRef<'bump, '_>> {
+        self.vec
+            .get(index)
+            .map(|v| <T as AddBump>::add_bump(v, self.bump))
+    }
+}
+impl<'bump, 'vec, T> IntoIterator for AddBumpVecView<'bump, 'vec, T>
+where
+    T: AddBump,
+    'bump: 'vec,
+{
+    type Item = <T as AddBump>::AddToRef<'bump, 'vec>;
+    type IntoIter = AddBumpIterator<'bump, 'vec, vec::IntoIter<T>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        AddBumpIterator::new(self.vec.into_iter(), self.bump)
+    }
+}
+
+pub struct AddBumpMutVecView<'bump, 'vec, T> {
+    vec: RefMutVec<'bump, 'vec, T>,
+    bump: &'bump Bump,
+}
+impl<'bump, 'vec, T> AddBumpMutVecView<'bump, 'vec, T> {
     unsafe fn new(vec: RefMutVec<'bump, 'vec, T>, bump: &'bump Bump) -> Self {
         Self { vec, bump }
     }
@@ -474,7 +538,7 @@ impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T> {
         self.vec.push(<U as RemoveBump>::remove_bump(val));
     }
 }
-impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
+impl<'bump, 'vec, T> AddBumpMutVecView<'bump, 'vec, T>
 where
     T: AddBump,
 {
@@ -489,34 +553,22 @@ where
             .map(|v| <T as AddBump>::add_bump_mut(v, self.bump))
     }
 }
-impl<'bump, 'vec, T> AddBumpVecView<'bump, 'vec, T>
+impl<'bump, 'vec, T> AddBumpMutVecView<'bump, 'vec, T>
 where
     T: AddBump + Default,
 {
-    pub fn push_default(&mut self) -> <T as AddBump>::AddToMutRef<'bump, '_> {
+    pub fn push_default(&'vec mut self) -> <T as AddBump>::AddToMutRef<'bump, 'vec> {
         self.vec.push(Default::default());
         <T as AddBump>::add_bump_mut(self.vec.last_mut().unwrap(), self.bump)
     }
 }
-impl<'bump, 'vec, T> IntoIterator for AddBumpVecView<'bump, 'vec, T>
-where
-    T: AddBump,
-    'bump: 'vec,
-{
-    type Item = <T as AddBump>::AddToRef<'bump, 'vec>;
-    type IntoIter = AddBumpIterator<'bump, slice::Iter<'vec, T>, T>;
 
-    fn into_iter(self) -> Self::IntoIter {
-        AddBumpIterator::new(self.vec.into_iter(), self.bump)
-    }
-}
-
-pub struct AddBumpIterator<'bump, I, T> {
+pub struct AddBumpIterator<'bump, 'vec, I> {
     iter: I,
     bump: &'bump Bump,
-    phantom: PhantomData<T>,
+    phantom: PhantomData<&'vec ()>,
 }
-impl<'bump, I, T> AddBumpIterator<'bump, I, T> {
+impl<'bump, 'vec, I> AddBumpIterator<'bump, 'vec, I> {
     pub fn new(iter: I, bump: &'bump Bump) -> Self {
         Self {
             iter,
@@ -525,15 +577,15 @@ impl<'bump, I, T> AddBumpIterator<'bump, I, T> {
         }
     }
 }
-impl<'bump, I, T> Iterator for AddBumpIterator<'bump, I, T>
+impl<'bump, 'vec, I> Iterator for AddBumpIterator<'bump, 'vec, I>
 where
     I: Iterator,
-    <I as Iterator>::Item: 'bump + AddBump,
+    <I as Iterator>::Item: 'bump + 'vec + AddBump,
 {
-    type Item = <<I as Iterator>::Item as AddBump>::AddToRef<'bump, 'collection>;
+    type Item = <<I as Iterator>::Item as AddBump>::AddToRef<'bump, 'vec>;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter
             .next()
-            .map(|val| <T as AddBump>::add_bump(val, self.bump))
+            .map(|val| <<I as Iterator>::Item as AddBump>::add_bump(&val, self.bump))
     }
 }
