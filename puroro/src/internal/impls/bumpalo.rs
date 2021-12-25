@@ -179,19 +179,23 @@ impl<T> NoAllocVec<T> {
         mem::transmute(self)
     }
 
+    unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<Vec<'bump, T>> {
+        ManuallyDrop::new(Vec::from_raw_parts_in(
+            self.ptr,
+            self.length,
+            self.capacity,
+            bump,
+        ))
+    }
+
     /// Construct an immutable [`Vec`](bumpalo::collections::Vec) by adding bump ptr.
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_vec_in<'bump>(&self, bump: &'bump Bump) -> RefVec<'bump, '_, T> {
-        RefVec::new(ManuallyDrop::new(Vec::from_raw_parts_in(
-            self.ptr,
-            self.length,
-            self.capacity,
-            bump,
-        )))
+    pub unsafe fn as_ref_vec_in<'bump>(&self, bump: &'bump Bump) -> RefVec<'bump, '_, T> {
+        RefVec::new(self.as_vec_in(bump))
     }
 
     /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
@@ -202,12 +206,7 @@ impl<T> NoAllocVec<T> {
     /// given `bump` is the same instance with the one given at construction time.
     pub unsafe fn as_mut_vec_in<'bump>(&mut self, bump: &'bump Bump) -> RefMutVec<'bump, '_, T> {
         RefMutVec {
-            temp_vec: ManuallyDrop::new(Vec::from_raw_parts_in(
-                self.ptr,
-                self.length,
-                self.capacity,
-                bump,
-            )),
+            temp_vec: self.as_vec_in(bump),
             ref_vec: self,
         }
     }
@@ -216,7 +215,7 @@ impl<T> NoAllocVec<T> {
         &mut self,
         bump: &'bump Bump,
     ) -> AddBumpVecView<'bump, '_, T> {
-        AddBumpVecView::new(self.as_vec_in(bump), bump)
+        AddBumpVecView::new(self.as_ref_vec_in(bump), bump)
     }
 }
 impl<T> AddBump for NoAllocVec<T> {
@@ -225,7 +224,7 @@ impl<T> AddBump for NoAllocVec<T> {
         Self: 'bump + 'this,
     = RefVec<'bump, 'this, T>;
     fn add_bump<'bump>(&self, bump: &'bump Bump) -> Self::AddToRef<'bump, '_> {
-        unsafe { self.as_vec_in(bump) }
+        unsafe { self.as_ref_vec_in(bump) }
     }
     type AddToMutRef<'bump, 'this>
     where
@@ -386,16 +385,20 @@ impl NoAllocString {
         Self { vec }
     }
 
+    unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> ManuallyDrop<String<'bump>> {
+        ManuallyDrop::new(String::from_utf8_unchecked(ManuallyDrop::into_inner(
+            self.vec.as_vec_in(bump),
+        )))
+    }
+
     /// Construct an immutable [`String`](bumpalo::collections::String) by adding bump ptr.
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
     /// This function is unsafe because there are no guarantee that the
     /// given `bump` is the same instance with the one given at construction time.
-    pub unsafe fn as_string_in<'bump>(&self, bump: &'bump Bump) -> RefString<'bump, '_> {
-        RefString::new(ManuallyDrop::new(String::from_utf8_unchecked(
-            ManuallyDrop::into_inner(self.vec.as_vec_in(bump)),
-        )))
+    pub unsafe fn as_ref_string_in<'bump>(&self, bump: &'bump Bump) -> RefString<'bump, '_> {
+        RefString::new(self.as_string_in(bump))
     }
 
     /// Construct a mutable [`String`](bumpalo::collections::String) by adding bump ptr.
@@ -418,9 +421,9 @@ impl AddBump for NoAllocString {
     type AddToRef<'bump, 'vec>
     where
         Self: 'bump,
-    = ManuallyDrop<String<'bump>>;
+    = RefString<'bump, 'vec>;
     fn add_bump<'bump>(&self, bump: &'bump Bump) -> Self::AddToRef<'bump, '_> {
-        unsafe { self.as_string_in(bump) }
+        unsafe { self.as_ref_string_in(bump) }
     }
     type AddToMutRef<'bump, 'this>
     where
