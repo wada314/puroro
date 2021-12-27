@@ -336,15 +336,13 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
-        fn r#type<'this>(&'this self) -> i32 {
-            self.type_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_type<'this>(&'this self) -> bool {
-            self.type_opt().is_some()
-        }
         fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
+        }
+
+        fn r#type<'this>(&'this self) -> i32;
+        fn has_type<'this>(&'this self) -> bool {
+            self.type_opt().is_some()
         }
     }
 
@@ -352,6 +350,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).type_opt()
+            }
+
+            fn r#type<'this>(&'this self) -> i32 {
+                (**self).r#type()
             }
         };
     }
@@ -390,7 +392,9 @@ pub mod _puroro_traits {
     {
         msg_delegate!(T);
     }
-    impl MsgTrait for () {}
+    impl MsgTrait for () {
+        fn r#type<'this>(&'this self) -> i32 {}
+    }
     impl<T, U> MsgTrait for (T, U)
     where
         T: MsgTrait,
@@ -409,6 +413,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::type_opt(t),
                 |u| <U as MsgTrait>::type_opt(u),
+            )
+        }
+
+        fn r#type<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::r#type(t),
+                |u| <U as MsgTrait>::r#type(u),
             )
         }
     }

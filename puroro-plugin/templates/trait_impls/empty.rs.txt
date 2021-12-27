@@ -9,6 +9,16 @@ impl {{ m.ident }}Trait for () {
     fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
+    {%- else %}
+    
+    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        {%- if f.has_default_value %}
+        {{ f.default_value }}
+        {%- else %} {#- if f.has_default_value #}
+        ::std::default::Default::default()
+        {%- endif %} {#- if f.has_default_value #}
+    }
+
     {%- endif %}
     {%- endfor %} {#- for f in m.fields #}
 

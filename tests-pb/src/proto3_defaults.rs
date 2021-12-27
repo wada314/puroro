@@ -1590,26 +1590,21 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.i32_unlabeled_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_i32_unlabeled<'this>(&'this self) -> bool {
-            self.i32_unlabeled_opt().is_some()
-        }
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
 
-        fn i32_optional<'this>(&'this self) -> i32 {
-            self.i32_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_i32_optional<'this>(&'this self) -> bool {
-            self.i32_optional_opt().is_some()
+        fn i32_unlabeled<'this>(&'this self) -> i32;
+        fn has_i32_unlabeled<'this>(&'this self) -> bool {
+            self.i32_unlabeled_opt().is_some()
         }
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
+        }
+
+        fn i32_optional<'this>(&'this self) -> i32;
+        fn has_i32_optional<'this>(&'this self) -> bool {
+            self.i32_optional_opt().is_some()
         }
 
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -1617,46 +1612,34 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
-
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            self.f32_unlabeled_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_f32_unlabeled<'this>(&'this self) -> bool {
-            self.f32_unlabeled_opt().is_some()
-        }
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
 
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
-            self.string_unlabeled_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_string_unlabeled<'this>(&'this self) -> bool {
-            self.string_unlabeled_opt().is_some()
+        fn f32_unlabeled<'this>(&'this self) -> f32;
+        fn has_f32_unlabeled<'this>(&'this self) -> bool {
+            self.f32_unlabeled_opt().is_some()
         }
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
+
+        fn string_unlabeled<'this>(&'this self) -> &'this str;
+        fn has_string_unlabeled<'this>(&'this self) -> bool {
+            self.string_unlabeled_opt().is_some()
+        }
         type Field6MessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait +
             ::puroro::Message<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>
             where Self: 'this;
-
-        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
-            self.submsg_unlabeled_opt().unwrap_or_else(
-                <Self::Field6MessageType<'this> as ::puroro::Message<
-                    self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
-                >>::default_value(),
-            )
-        }
-        fn has_submsg_unlabeled<'this>(&'this self) -> bool {
-            self.submsg_unlabeled_opt().is_some()
-        }
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
             ::std::option::Option::None
+        }
+
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this>;
+        fn has_submsg_unlabeled<'this>(&'this self) -> bool {
+            self.submsg_unlabeled_opt().is_some()
         }
     }
 
@@ -1665,8 +1648,16 @@ pub mod _puroro_traits {
             fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_unlabeled_opt()
             }
+
+            fn i32_unlabeled<'this>(&'this self) -> i32 {
+                (**self).i32_unlabeled()
+            }
             fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_optional_opt()
+            }
+
+            fn i32_optional<'this>(&'this self) -> i32 {
+                (**self).i32_optional()
             }
 
             type Field3RepeatedType<'this>
@@ -1679,8 +1670,16 @@ pub mod _puroro_traits {
             fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_unlabeled_opt()
             }
+
+            fn f32_unlabeled<'this>(&'this self) -> f32 {
+                (**self).f32_unlabeled()
+            }
             fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_unlabeled_opt()
+            }
+
+            fn string_unlabeled<'this>(&'this self) -> &'this str {
+                (**self).string_unlabeled()
             }
             type Field6MessageType<'this>
             where
@@ -1690,6 +1689,10 @@ pub mod _puroro_traits {
                 &'this self,
             ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
                 (**self).submsg_unlabeled_opt()
+            }
+
+            fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+                (**self).submsg_unlabeled()
             }
         };
     }
@@ -1729,6 +1732,9 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {}
+
+        fn i32_optional<'this>(&'this self) -> i32 {}
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -1736,10 +1742,16 @@ pub mod _puroro_traits {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
+        fn f32_unlabeled<'this>(&'this self) -> f32 {}
+
+        fn string_unlabeled<'this>(&'this self) -> &'this str {}
         type Field6MessageType<'this>
         where
             Self: 'this,
         = ();
+
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {}
     }
     impl<T, U> MsgTrait for (T, U)
     where
@@ -1806,10 +1818,24 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::i32_unlabeled_opt(u),
             )
         }
+
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_unlabeled(t),
+                |u| <U as MsgTrait>::i32_unlabeled(u),
+            )
+        }
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::i32_optional_opt(t),
                 |u| <U as MsgTrait>::i32_optional_opt(u),
+            )
+        }
+
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_optional(t),
+                |u| <U as MsgTrait>::i32_optional(u),
             )
         }
         type Field3RepeatedType<'this>
@@ -1833,10 +1859,24 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::f32_unlabeled_opt(u),
             )
         }
+
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::f32_unlabeled(t),
+                |u| <U as MsgTrait>::f32_unlabeled(u),
+            )
+        }
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_unlabeled_opt(t),
                 |u| <U as MsgTrait>::string_unlabeled_opt(u),
+            )
+        }
+
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_unlabeled(t),
+                |u| <U as MsgTrait>::string_unlabeled(u),
             )
         }
         type Field6MessageType<'this>
@@ -1852,6 +1892,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
+
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::submsg_unlabeled(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::submsg_unlabeled(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
     }
@@ -1893,15 +1940,13 @@ pub mod _puroro_traits {
     }
 
     pub trait SubmsgTrait {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.i32_unlabeled_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_i32_unlabeled<'this>(&'this self) -> bool {
-            self.i32_unlabeled_opt().is_some()
-        }
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
+        }
+
+        fn i32_unlabeled<'this>(&'this self) -> i32;
+        fn has_i32_unlabeled<'this>(&'this self) -> bool {
+            self.i32_unlabeled_opt().is_some()
         }
     }
 
@@ -1909,6 +1954,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_unlabeled_opt()
+            }
+
+            fn i32_unlabeled<'this>(&'this self) -> i32 {
+                (**self).i32_unlabeled()
             }
         };
     }
@@ -1947,7 +1996,9 @@ pub mod _puroro_traits {
     {
         submsg_delegate!(T);
     }
-    impl SubmsgTrait for () {}
+    impl SubmsgTrait for () {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {}
+    }
     impl<T, U> SubmsgTrait for (T, U)
     where
         T: SubmsgTrait,
@@ -1967,6 +2018,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as SubmsgTrait>::i32_unlabeled_opt(t),
                 |u| <U as SubmsgTrait>::i32_unlabeled_opt(u),
+            )
+        }
+
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as SubmsgTrait>::i32_unlabeled(t),
+                |u| <U as SubmsgTrait>::i32_unlabeled(u),
             )
         }
     }

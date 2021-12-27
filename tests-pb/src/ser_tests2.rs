@@ -2594,15 +2594,13 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
-        fn i32_optional<'this>(&'this self) -> i32 {
-            self.i32_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_i32_optional<'this>(&'this self) -> bool {
-            self.i32_optional_opt().is_some()
-        }
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
+        }
+
+        fn i32_optional<'this>(&'this self) -> i32;
+        fn has_i32_optional<'this>(&'this self) -> bool {
+            self.i32_optional_opt().is_some()
         }
 
         type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -2610,16 +2608,13 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
-
-        fn float_optional<'this>(&'this self) -> f32 {
-            self.float_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_float_optional<'this>(&'this self) -> bool {
-            self.float_optional_opt().is_some()
-        }
         fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
+        }
+
+        fn float_optional<'this>(&'this self) -> f32;
+        fn has_float_optional<'this>(&'this self) -> bool {
+            self.float_optional_opt().is_some()
         }
 
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -2627,16 +2622,13 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
-
-        fn string_optional<'this>(&'this self) -> &'this str {
-            self.string_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_string_optional<'this>(&'this self) -> bool {
-            self.string_optional_opt().is_some()
-        }
         fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
+        }
+
+        fn string_optional<'this>(&'this self) -> &'this str;
+        fn has_string_optional<'this>(&'this self) -> bool {
+            self.string_optional_opt().is_some()
         }
 
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -2647,20 +2639,15 @@ pub mod _puroro_traits {
         type Field7MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
             ::puroro::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             where Self: 'this;
-
-        fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
-            self.submsg_optional_opt()
-                .unwrap_or_else(<Self::Field7MessageType<'this> as ::puroro::Message<
-                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            >>::default_value())
-        }
-        fn has_submsg_optional<'this>(&'this self) -> bool {
-            self.submsg_optional_opt().is_some()
-        }
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::option::Option::None
+        }
+
+        fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this>;
+        fn has_submsg_optional<'this>(&'this self) -> bool {
+            self.submsg_optional_opt().is_some()
         }
         type Field8MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
             ::puroro::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>
@@ -2671,18 +2658,15 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
-
-        fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
-            self.enum_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_enum_optional<'this>(&'this self) -> bool {
-            self.enum_optional_opt().is_some()
-        }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
             ::std::option::Option::None
+        }
+
+        fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum;
+        fn has_enum_optional<'this>(&'this self) -> bool {
+            self.enum_optional_opt().is_some()
         }
 
         type Field10RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -2690,16 +2674,13 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;
-
-        fn very_large_field_number<'this>(&'this self) -> i32 {
-            self.very_large_field_number_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_very_large_field_number<'this>(&'this self) -> bool {
-            self.very_large_field_number_opt().is_some()
-        }
         fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
+        }
+
+        fn very_large_field_number<'this>(&'this self) -> i32;
+        fn has_very_large_field_number<'this>(&'this self) -> bool {
+            self.very_large_field_number_opt().is_some()
         }
     }
 
@@ -2707,6 +2688,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_optional_opt()
+            }
+
+            fn i32_optional<'this>(&'this self) -> i32 {
+                (**self).i32_optional()
             }
 
             type Field2RepeatedType<'this>
@@ -2720,6 +2705,10 @@ pub mod _puroro_traits {
                 (**self).float_optional_opt()
             }
 
+            fn float_optional<'this>(&'this self) -> f32 {
+                (**self).float_optional()
+            }
+
             type Field4RepeatedType<'this>
             where
                 Self: 'this,
@@ -2729,6 +2718,10 @@ pub mod _puroro_traits {
             }
             fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_optional_opt()
+            }
+
+            fn string_optional<'this>(&'this self) -> &'this str {
+                (**self).string_optional()
             }
 
             type Field6RepeatedType<'this>
@@ -2746,6 +2739,10 @@ pub mod _puroro_traits {
                 &'this self,
             ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
                 (**self).submsg_optional_opt()
+            }
+
+            fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
+                (**self).submsg_optional()
             }
             type Field8MessageType<'this>
             where
@@ -2765,6 +2762,10 @@ pub mod _puroro_traits {
                 (**self).enum_optional_opt()
             }
 
+            fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
+                (**self).enum_optional()
+            }
+
             type Field10RepeatedType<'this>
             where
                 Self: 'this,
@@ -2774,6 +2775,10 @@ pub mod _puroro_traits {
             }
             fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).very_large_field_number_opt()
+            }
+
+            fn very_large_field_number<'this>(&'this self) -> i32 {
+                (**self).very_large_field_number()
             }
         };
     }
@@ -2813,6 +2818,7 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
+        fn i32_optional<'this>(&'this self) -> i32 {}
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -2820,6 +2826,8 @@ pub mod _puroro_traits {
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
+        fn float_optional<'this>(&'this self) -> f32 {}
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -2827,6 +2835,8 @@ pub mod _puroro_traits {
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
+        fn string_optional<'this>(&'this self) -> &'this str {}
         type Field6RepeatedType<'this>
         where
             Self: 'this,
@@ -2838,6 +2848,8 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
+
+        fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {}
         type Field8MessageType<'this>
         where
             Self: 'this,
@@ -2849,6 +2861,8 @@ pub mod _puroro_traits {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
+        fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {}
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -2858,6 +2872,8 @@ pub mod _puroro_traits {
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
+        fn very_large_field_number<'this>(&'this self) -> i32 {}
     }
     impl<T, U> MsgTrait for (T, U)
     where
@@ -2991,6 +3007,13 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::i32_optional_opt(u),
             )
         }
+
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::i32_optional(t),
+                |u| <U as MsgTrait>::i32_optional(u),
+            )
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -3012,6 +3035,13 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::float_optional_opt(u),
             )
         }
+
+        fn float_optional<'this>(&'this self) -> f32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::float_optional(t),
+                |u| <U as MsgTrait>::float_optional(u),
+            )
+        }
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -3031,6 +3061,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_optional_opt(t),
                 |u| <U as MsgTrait>::string_optional_opt(u),
+            )
+        }
+
+        fn string_optional<'this>(&'this self) -> &'this str {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::string_optional(t),
+                |u| <U as MsgTrait>::string_optional(u),
             )
         }
         type Field6RepeatedType<'this>
@@ -3063,6 +3100,13 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::submsg_optional_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
+
+        fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::submsg_optional(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::submsg_optional(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
         type Field8MessageType<'this>
         where
             Self: 'this,
@@ -3093,6 +3137,13 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::enum_optional_opt(u),
             )
         }
+
+        fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::enum_optional(t),
+                |u| <U as MsgTrait>::enum_optional(u),
+            )
+        }
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -3112,6 +3163,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as MsgTrait>::very_large_field_number_opt(t),
                 |u| <U as MsgTrait>::very_large_field_number_opt(u),
+            )
+        }
+
+        fn very_large_field_number<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::very_large_field_number(t),
+                |u| <U as MsgTrait>::very_large_field_number(u),
             )
         }
     }
@@ -3591,15 +3649,13 @@ pub mod _puroro_nested {
             }
 
             pub trait SubmsgTrait {
-                fn i32_optional<'this>(&'this self) -> i32 {
-                    self.i32_optional_opt()
-                        .unwrap_or_else(::std::default::Default::default)
-                }
-                fn has_i32_optional<'this>(&'this self) -> bool {
-                    self.i32_optional_opt().is_some()
-                }
                 fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
+                }
+
+                fn i32_optional<'this>(&'this self) -> i32;
+                fn has_i32_optional<'this>(&'this self) -> bool {
+                    self.i32_optional_opt().is_some()
                 }
             }
 
@@ -3607,6 +3663,10 @@ pub mod _puroro_nested {
                 ($ty:ty) => {
                     fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).i32_optional_opt()
+                    }
+
+                    fn i32_optional<'this>(&'this self) -> i32 {
+                        (**self).i32_optional()
                     }
                 };
             }
@@ -3645,7 +3705,9 @@ pub mod _puroro_nested {
             {
                 submsg_delegate!(T);
             }
-            impl SubmsgTrait for () {}
+            impl SubmsgTrait for () {
+                fn i32_optional<'this>(&'this self) -> i32 {}
+            }
             impl<T, U> SubmsgTrait for (T, U)
             where
                 T: SubmsgTrait,
@@ -3665,6 +3727,13 @@ pub mod _puroro_nested {
                     self.as_ref().either(
                         |t| <T as SubmsgTrait>::i32_optional_opt(t),
                         |u| <U as SubmsgTrait>::i32_optional_opt(u),
+                    )
+                }
+
+                fn i32_optional<'this>(&'this self) -> i32 {
+                    self.as_ref().either(
+                        |t| <T as SubmsgTrait>::i32_optional(t),
+                        |u| <U as SubmsgTrait>::i32_optional(u),
                     )
                 }
             }

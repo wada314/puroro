@@ -65,6 +65,10 @@ where
         {%- endif %}
     }
     {%- endif %}
+    
+    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        todo!()
+    }
 
     {%- endif %} {#- if f.is_repeated #}
 

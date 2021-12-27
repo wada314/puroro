@@ -248,7 +248,7 @@ impl Field {
                 .default_value()
                 .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
                 .transpose()?
-                .unwrap_or(Default::default()),
+                .unwrap_or_default(),
             has_optional_bit,
             bitfield_index: {
                 if has_optional_bit {

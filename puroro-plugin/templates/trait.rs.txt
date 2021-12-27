@@ -17,26 +17,7 @@ pub trait {{ m.trait_ident }} {
     fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>;
 
     {%- else %} {#- if f.is_repeated #}
-
-    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
-        {%- if f.is_message %}
-        self.{{ f.ident_unesc }}_opt().unwrap_or_else(
-            <
-                Self::Field{{ f.number }}MessageType<'this> as
-                ::puroro::Message<{{ f.trait_field_message_repr_path }}>
-            >::default_value()
-        )
-        {%- else %} {#- if f.is_message #}
-        {%- if f.has_default_value %}
-        self.{{ f.ident_unesc }}_opt().unwrap_or({{ f.default_value }})
-        {%- else %} {#- if f.has_default_value #}
-        self.{{ f.ident_unesc }}_opt().unwrap_or_else(::std::default::Default::default)
-        {%- endif %} {#- if f.has_default_value #}
-        {%- endif %} {#- if f.is_message #}
-    }
-    fn has_{{ f.ident_unesc }}<'this>(&'this self) -> bool {
-        self.{{ f.ident_unesc }}_opt().is_some()
-    }
+    
     {#-
      # Oneof items will have same interfaces with the scalar fields, but its default implementation 
      # can depend on the oneof field getter's return value so skip it for now and define those at below.
@@ -46,6 +27,11 @@ pub trait {{ m.trait_ident }} {
         ::std::option::Option::None
     }
     {%- endif %}
+
+    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }};
+    fn has_{{ f.ident_unesc }}<'this>(&'this self) -> bool {
+        self.{{ f.ident_unesc }}_opt().is_some()
+    }
 
     {%- endif %} {#- if f.is_repeated #}
     {%- endfor %}
@@ -103,6 +89,10 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
             (**self).{{ f.ident_unesc }}_opt()
         }
         {%- endif %}
+        
+        fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+            (**self).{{ f.ident }}()
+        }
 
         {%- endif %} {#- if f.is_repeated #}
 

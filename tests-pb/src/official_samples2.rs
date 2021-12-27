@@ -1318,15 +1318,13 @@ pub mod _puroro_traits {
     }
 
     pub trait Test1Trait {
-        fn a<'this>(&'this self) -> i32 {
-            self.a_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_a<'this>(&'this self) -> bool {
-            self.a_opt().is_some()
-        }
         fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
+        }
+
+        fn a<'this>(&'this self) -> i32;
+        fn has_a<'this>(&'this self) -> bool {
+            self.a_opt().is_some()
         }
     }
 
@@ -1334,6 +1332,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).a_opt()
+            }
+
+            fn a<'this>(&'this self) -> i32 {
+                (**self).a()
             }
         };
     }
@@ -1372,7 +1374,9 @@ pub mod _puroro_traits {
     {
         test1_delegate!(T);
     }
-    impl Test1Trait for () {}
+    impl Test1Trait for () {
+        fn a<'this>(&'this self) -> i32 {}
+    }
     impl<T, U> Test1Trait for (T, U)
     where
         T: Test1Trait,
@@ -1393,6 +1397,11 @@ pub mod _puroro_traits {
                 |u| <U as Test1Trait>::a_opt(u),
             )
         }
+
+        fn a<'this>(&'this self) -> i32 {
+            self.as_ref()
+                .either(|t| <T as Test1Trait>::a(t), |u| <U as Test1Trait>::a(u))
+        }
     }
     impl<T> Test1Trait for ::std::option::Option<T>
     where
@@ -1404,15 +1413,13 @@ pub mod _puroro_traits {
     }
 
     pub trait Test2Trait {
-        fn b<'this>(&'this self) -> &'this str {
-            self.b_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_b<'this>(&'this self) -> bool {
-            self.b_opt().is_some()
-        }
         fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
+        }
+
+        fn b<'this>(&'this self) -> &'this str;
+        fn has_b<'this>(&'this self) -> bool {
+            self.b_opt().is_some()
         }
     }
 
@@ -1420,6 +1427,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).b_opt()
+            }
+
+            fn b<'this>(&'this self) -> &'this str {
+                (**self).b()
             }
         };
     }
@@ -1458,7 +1469,9 @@ pub mod _puroro_traits {
     {
         test2_delegate!(T);
     }
-    impl Test2Trait for () {}
+    impl Test2Trait for () {
+        fn b<'this>(&'this self) -> &'this str {}
+    }
     impl<T, U> Test2Trait for (T, U)
     where
         T: Test2Trait,
@@ -1479,6 +1492,11 @@ pub mod _puroro_traits {
                 |u| <U as Test2Trait>::b_opt(u),
             )
         }
+
+        fn b<'this>(&'this self) -> &'this str {
+            self.as_ref()
+                .either(|t| <T as Test2Trait>::b(t), |u| <U as Test2Trait>::b(u))
+        }
     }
     impl<T> Test2Trait for ::std::option::Option<T>
     where
@@ -1493,18 +1511,13 @@ pub mod _puroro_traits {
         type Field3MessageType<'this>: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait +
             ::puroro::Message<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>
             where Self: 'this;
-
-        fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
-            self.c_opt()
-                .unwrap_or_else(<Self::Field3MessageType<'this> as ::puroro::Message<
-                    self::_puroro_root::official_samples2::_puroro_simple_impl::Test1,
-                >>::default_value())
-        }
-        fn has_c<'this>(&'this self) -> bool {
-            self.c_opt().is_some()
-        }
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             ::std::option::Option::None
+        }
+
+        fn c<'this>(&'this self) -> Self::Field3MessageType<'this>;
+        fn has_c<'this>(&'this self) -> bool {
+            self.c_opt().is_some()
         }
     }
 
@@ -1516,6 +1529,10 @@ pub mod _puroro_traits {
             = <$ty>::Field3MessageType<'this>;
             fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
                 (**self).c_opt()
+            }
+
+            fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
+                (**self).c()
             }
         };
     }
@@ -1559,6 +1576,8 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
+
+        fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {}
     }
     impl<T, U> Test3Trait for (T, U)
     where
@@ -1600,6 +1619,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as Test3Trait>::c_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as Test3Trait>::c_opt(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
+
+        fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
+            self.as_ref().either(
+                |t| <T as Test3Trait>::c(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as Test3Trait>::c(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
     }

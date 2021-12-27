@@ -1582,34 +1582,22 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
-        fn g1_int32<'this>(&'this self) -> i32 {
-            self.g1_int32_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
+        fn g1_int32<'this>(&'this self) -> i32;
         fn has_g1_int32<'this>(&'this self) -> bool {
             self.g1_int32_opt().is_some()
         }
 
-        fn g1_string<'this>(&'this self) -> &'this str {
-            self.g1_string_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
+        fn g1_string<'this>(&'this self) -> &'this str;
         fn has_g1_string<'this>(&'this self) -> bool {
             self.g1_string_opt().is_some()
         }
 
-        fn g2_f32<'this>(&'this self) -> f32 {
-            self.g2_f32_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
+        fn g2_f32<'this>(&'this self) -> f32;
         fn has_g2_f32<'this>(&'this self) -> bool {
             self.g2_f32_opt().is_some()
         }
 
-        fn g2_string<'this>(&'this self) -> &'this str {
-            self.g2_string_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
+        fn g2_string<'this>(&'this self) -> &'this str;
         fn has_g2_string<'this>(&'this self) -> bool {
             self.g2_string_opt().is_some()
         }
@@ -1618,21 +1606,12 @@ pub mod _puroro_traits {
         where
             Self: 'this;
 
-        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
-            self.g2_submsg_opt().unwrap_or_else(
-                <Self::Field5MessageType<'this> as ::puroro::Message<
-                    self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
-                >>::default_value(),
-            )
-        }
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this>;
         fn has_g2_submsg<'this>(&'this self) -> bool {
             self.g2_submsg_opt().is_some()
         }
 
-        fn g3_int32<'this>(&'this self) -> i32 {
-            self.g3_int32_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
+        fn g3_int32<'this>(&'this self) -> i32;
         fn has_g3_int32<'this>(&'this self) -> bool {
             self.g3_int32_opt().is_some()
         }
@@ -1729,10 +1708,33 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
+            fn g1_int32<'this>(&'this self) -> i32 {
+                (**self).g1_int32()
+            }
+
+            fn g1_string<'this>(&'this self) -> &'this str {
+                (**self).g1_string()
+            }
+
+            fn g2_f32<'this>(&'this self) -> f32 {
+                (**self).g2_f32()
+            }
+
+            fn g2_string<'this>(&'this self) -> &'this str {
+                (**self).g2_string()
+            }
             type Field5MessageType<'this>
             where
                 Self: 'this,
             = <$ty>::Field5MessageType<'this>;
+
+            fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+                (**self).g2_submsg()
+            }
+
+            fn g3_int32<'this>(&'this self) -> i32 {
+                (**self).g3_int32()
+            }
             fn group_one<'this>(
                 &'this self,
             ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -1789,10 +1791,21 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
+        fn g1_int32<'this>(&'this self) -> i32 {}
+
+        fn g1_string<'this>(&'this self) -> &'this str {}
+
+        fn g2_f32<'this>(&'this self) -> f32 {}
+
+        fn g2_string<'this>(&'this self) -> &'this str {}
         type Field5MessageType<'this>
         where
             Self: 'this,
         = ();
+
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {}
+
+        fn g3_int32<'this>(&'this self) -> i32 {}
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
@@ -1877,6 +1890,33 @@ pub mod _puroro_traits {
         T: MsgTrait,
         U: MsgTrait,
     {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::g1_int32(t),
+                |u| <U as MsgTrait>::g1_int32(u),
+            )
+        }
+
+        fn g1_string<'this>(&'this self) -> &'this str {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::g1_string(t),
+                |u| <U as MsgTrait>::g1_string(u),
+            )
+        }
+
+        fn g2_f32<'this>(&'this self) -> f32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::g2_f32(t),
+                |u| <U as MsgTrait>::g2_f32(u),
+            )
+        }
+
+        fn g2_string<'this>(&'this self) -> &'this str {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::g2_string(t),
+                |u| <U as MsgTrait>::g2_string(u),
+            )
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
@@ -1884,6 +1924,20 @@ pub mod _puroro_traits {
             <T as MsgTrait>::Field5MessageType<'this>,
             <U as MsgTrait>::Field5MessageType<'this>,
         >;
+
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::g2_submsg(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::g2_submsg(u).map(|u| ::puroro::Either::Right(u)),
+            )
+        }
+
+        fn g3_int32<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as MsgTrait>::g3_int32(t),
+                |u| <U as MsgTrait>::g3_int32(u),
+            )
+        }
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
@@ -1978,15 +2032,13 @@ pub mod _puroro_traits {
     }
 
     pub trait SubmsgTrait {
-        fn i32_optional<'this>(&'this self) -> i32 {
-            self.i32_optional_opt()
-                .unwrap_or_else(::std::default::Default::default)
-        }
-        fn has_i32_optional<'this>(&'this self) -> bool {
-            self.i32_optional_opt().is_some()
-        }
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
+        }
+
+        fn i32_optional<'this>(&'this self) -> i32;
+        fn has_i32_optional<'this>(&'this self) -> bool {
+            self.i32_optional_opt().is_some()
         }
     }
 
@@ -1994,6 +2046,10 @@ pub mod _puroro_traits {
         ($ty:ty) => {
             fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_optional_opt()
+            }
+
+            fn i32_optional<'this>(&'this self) -> i32 {
+                (**self).i32_optional()
             }
         };
     }
@@ -2032,7 +2088,9 @@ pub mod _puroro_traits {
     {
         submsg_delegate!(T);
     }
-    impl SubmsgTrait for () {}
+    impl SubmsgTrait for () {
+        fn i32_optional<'this>(&'this self) -> i32 {}
+    }
     impl<T, U> SubmsgTrait for (T, U)
     where
         T: SubmsgTrait,
@@ -2052,6 +2110,13 @@ pub mod _puroro_traits {
             self.as_ref().either(
                 |t| <T as SubmsgTrait>::i32_optional_opt(t),
                 |u| <U as SubmsgTrait>::i32_optional_opt(u),
+            )
+        }
+
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                |t| <T as SubmsgTrait>::i32_optional(t),
+                |u| <U as SubmsgTrait>::i32_optional(u),
             )
         }
     }
