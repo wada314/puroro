@@ -66,6 +66,14 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         }
     }
 
+    pub fn default_instance() -> &'static Self {
+        use ::puroro::once_cell::sync::Lazy;
+        use ::puroro::bumpalo::Bump;
+        static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+        static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+        &DEFAULT_INSTANCE
+    }
+
     {#- ######## getters ######## #}
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}

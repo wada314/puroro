@@ -11317,6 +11317,14 @@ pub mod _puroro_impls {
                 f64_repeated: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
                 ::std::option::Option::Some(self.i32_unlabeled.inner())
@@ -12344,8 +12352,14 @@ pub mod _puroro_impls {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_unlabeled_opt(self)
         }
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or_default()
+        }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.i32_optional_opt().unwrap_or_default()
         }
         type Field3RepeatedType<'this>
         where
@@ -12363,8 +12377,14 @@ pub mod _puroro_impls {
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_unlabeled_opt(self)
         }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            self.float_unlabeled_opt().unwrap_or_default()
+        }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_optional_opt(self)
+        }
+        fn float_optional<'this>(&'this self) -> f32 {
+            self.float_optional_opt().unwrap_or_default()
         }
         type Field13RepeatedType<'this>
         where
@@ -12382,8 +12402,14 @@ pub mod _puroro_impls {
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_unlabeled_opt(self)
         }
+        fn bytes_unlabeled<'this>(&'this self) -> &'this [u8] {
+            self.bytes_unlabeled_opt().unwrap_or_default()
+        }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_optional_opt(self)
+        }
+        fn bytes_optional<'this>(&'this self) -> &'this [u8] {
+            self.bytes_optional_opt().unwrap_or_default()
         }
         type Field23RepeatedType<'this>
         where
@@ -12401,8 +12427,14 @@ pub mod _puroro_impls {
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_unlabeled_opt(self)
         }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            self.string_unlabeled_opt().unwrap_or_default()
+        }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_optional_opt(self)
+        }
+        fn string_optional<'this>(&'this self) -> &'this str {
+            self.string_optional_opt().unwrap_or_default()
         }
         type Field33RepeatedType<'this>
         where
@@ -12422,10 +12454,16 @@ pub mod _puroro_impls {
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             <Self>::enum_unlabeled_opt(self)
         }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+            self.enum_unlabeled_opt().unwrap_or_default()
+        }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             <Self>::enum_optional_opt(self)
+        }
+        fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+            self.enum_optional_opt().unwrap_or_default()
         }
         type Field43RepeatedType<'this>
         where
@@ -12444,9 +12482,31 @@ pub mod _puroro_impls {
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             <Self>::submsg_unlabeled_opt(self)
         }
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field51MessageType<'this> {
+            <self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >>::default_instance()
+            /*
+            use ::puroro::once_cell::unsync::Lazy;
+            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
+            static DEFAULT_VALUE: Lazy<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> =
+                Lazy::new(|| self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
+            &DEFAULT_VALUE*/
+        }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             <Self>::submsg_optional_opt(self)
+        }
+        fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
+            <self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                'this,
+            >>::default_instance()
+            /*
+            use ::puroro::once_cell::unsync::Lazy;
+            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
+            static DEFAULT_VALUE: Lazy<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> =
+                Lazy::new(|| self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
+            &DEFAULT_VALUE*/
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         type Field53RepeatedType<'this> where Self: 'this =
@@ -12458,8 +12518,14 @@ pub mod _puroro_impls {
         fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_unlabeled_opt(self)
         }
+        fn i64_unlabeled<'this>(&'this self) -> i64 {
+            self.i64_unlabeled_opt().unwrap_or_default()
+        }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_optional_opt(self)
+        }
+        fn i64_optional<'this>(&'this self) -> i64 {
+            self.i64_optional_opt().unwrap_or_default()
         }
         type Field103RepeatedType<'this>
         where
@@ -12477,8 +12543,14 @@ pub mod _puroro_impls {
         fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_unlabeled_opt(self)
         }
+        fn u32_unlabeled<'this>(&'this self) -> u32 {
+            self.u32_unlabeled_opt().unwrap_or_default()
+        }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_optional_opt(self)
+        }
+        fn u32_optional<'this>(&'this self) -> u32 {
+            self.u32_optional_opt().unwrap_or_default()
         }
         type Field113RepeatedType<'this>
         where
@@ -12496,8 +12568,14 @@ pub mod _puroro_impls {
         fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_unlabeled_opt(self)
         }
+        fn u64_unlabeled<'this>(&'this self) -> u64 {
+            self.u64_unlabeled_opt().unwrap_or_default()
+        }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_optional_opt(self)
+        }
+        fn u64_optional<'this>(&'this self) -> u64 {
+            self.u64_optional_opt().unwrap_or_default()
         }
         type Field123RepeatedType<'this>
         where
@@ -12515,8 +12593,14 @@ pub mod _puroro_impls {
         fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::s32_unlabeled_opt(self)
         }
+        fn s32_unlabeled<'this>(&'this self) -> i32 {
+            self.s32_unlabeled_opt().unwrap_or_default()
+        }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::s32_optional_opt(self)
+        }
+        fn s32_optional<'this>(&'this self) -> i32 {
+            self.s32_optional_opt().unwrap_or_default()
         }
         type Field133RepeatedType<'this>
         where
@@ -12534,8 +12618,14 @@ pub mod _puroro_impls {
         fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <Self>::s64_unlabeled_opt(self)
         }
+        fn s64_unlabeled<'this>(&'this self) -> i64 {
+            self.s64_unlabeled_opt().unwrap_or_default()
+        }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::s64_optional_opt(self)
+        }
+        fn s64_optional<'this>(&'this self) -> i64 {
+            self.s64_optional_opt().unwrap_or_default()
         }
         type Field143RepeatedType<'this>
         where
@@ -12553,8 +12643,14 @@ pub mod _puroro_impls {
         fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             <Self>::fixed32_unlabeled_opt(self)
         }
+        fn fixed32_unlabeled<'this>(&'this self) -> u32 {
+            self.fixed32_unlabeled_opt().unwrap_or_default()
+        }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             <Self>::fixed32_optional_opt(self)
+        }
+        fn fixed32_optional<'this>(&'this self) -> u32 {
+            self.fixed32_optional_opt().unwrap_or_default()
         }
         type Field153RepeatedType<'this>
         where
@@ -12572,8 +12668,14 @@ pub mod _puroro_impls {
         fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             <Self>::fixed64_unlabeled_opt(self)
         }
+        fn fixed64_unlabeled<'this>(&'this self) -> u64 {
+            self.fixed64_unlabeled_opt().unwrap_or_default()
+        }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             <Self>::fixed64_optional_opt(self)
+        }
+        fn fixed64_optional<'this>(&'this self) -> u64 {
+            self.fixed64_optional_opt().unwrap_or_default()
         }
         type Field163RepeatedType<'this>
         where
@@ -12591,8 +12693,14 @@ pub mod _puroro_impls {
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::sfixed32_unlabeled_opt(self)
         }
+        fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
+            self.sfixed32_unlabeled_opt().unwrap_or_default()
+        }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::sfixed32_optional_opt(self)
+        }
+        fn sfixed32_optional<'this>(&'this self) -> i32 {
+            self.sfixed32_optional_opt().unwrap_or_default()
         }
         type Field173RepeatedType<'this>
         where
@@ -12610,8 +12718,14 @@ pub mod _puroro_impls {
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <Self>::sfixed64_unlabeled_opt(self)
         }
+        fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
+            self.sfixed64_unlabeled_opt().unwrap_or_default()
+        }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::sfixed64_optional_opt(self)
+        }
+        fn sfixed64_optional<'this>(&'this self) -> i64 {
+            self.sfixed64_optional_opt().unwrap_or_default()
         }
         type Field183RepeatedType<'this>
         where
@@ -12629,8 +12743,14 @@ pub mod _puroro_impls {
         fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
             <Self>::f64_unlabeled_opt(self)
         }
+        fn f64_unlabeled<'this>(&'this self) -> f64 {
+            self.f64_unlabeled_opt().unwrap_or_default()
+        }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             <Self>::f64_optional_opt(self)
+        }
+        fn f64_optional<'this>(&'this self) -> f64 {
+            self.f64_optional_opt().unwrap_or_default()
         }
         type Field193RepeatedType<'this>
         where
@@ -17347,6 +17467,14 @@ pub mod _puroro_nested {
                         i64_unlabeled: ::std::default::Default::default(),
                     }
                 }
+
+                pub fn default_instance() -> &'static Self {
+                    use ::puroro::bumpalo::Bump;
+                    use ::puroro::once_cell::sync::Lazy;
+                    static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+                    static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+                    &DEFAULT_INSTANCE
+                }
                 pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
                         ::std::option::Option::Some(self.i32_unlabeled.inner())
@@ -17418,8 +17546,14 @@ pub mod _puroro_nested {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
                     <Self>::i32_unlabeled_opt(self)
                 }
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    self.i32_unlabeled_opt().unwrap_or_default()
+                }
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
                     <Self>::i64_unlabeled_opt(self)
+                }
+                fn i64_unlabeled<'this>(&'this self) -> i64 {
+                    self.i64_unlabeled_opt().unwrap_or_default()
                 }
             }
 

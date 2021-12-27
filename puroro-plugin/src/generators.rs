@@ -202,6 +202,7 @@ struct Field {
     bumpalo_getter_type: String,
     bumpalo_getter_opt_type: String,
     bumpalo_getter_mut_type: String,
+    bumpalo_field_message_path: String,
     bumpalo_maybe_field_message_path: Option<String>,
     bumpalo_maybe_borrowed_field_type: Option<String>,
     bumpalo_label_and_type_tags: String,
@@ -313,6 +314,10 @@ impl Field {
             } else {
                 f.bumpalo_getter_mut_type("'bump", "'this")?
             },
+            bumpalo_field_message_path: maybe_message
+                .as_ref()
+                .map(|m| m.rust_impl_path("Bumpalo", &["'this"]))
+                .unwrap_or_default(),
             bumpalo_maybe_field_message_path,
             bumpalo_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'this"])?,

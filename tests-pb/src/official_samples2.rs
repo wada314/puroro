@@ -522,6 +522,14 @@ pub mod _puroro_impls {
                 a: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.a.inner())
@@ -567,6 +575,9 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
             <Self>::a_opt(self)
+        }
+        fn a<'this>(&'this self) -> i32 {
+            self.a_opt().unwrap_or_default()
         }
     }
 
@@ -731,6 +742,14 @@ pub mod _puroro_impls {
                 b: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(&self.b)
@@ -776,6 +795,9 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::b_opt(self)
+        }
+        fn b<'this>(&'this self) -> &'this str {
+            self.b_opt().unwrap_or_default()
         }
     }
 
@@ -953,6 +975,14 @@ pub mod _puroro_impls {
                 c: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn c_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -1013,6 +1043,15 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             <Self>::c_opt(self)
+        }
+        fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
+            <self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>>::default_instance()
+            /*
+            use ::puroro::once_cell::unsync::Lazy;
+            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
+            static DEFAULT_VALUE: Lazy<self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>> =
+                Lazy::new(|| self::_puroro_root::official_samples2::_puroro_impls::Test1Bumpalo<'this>::new_in(&BUMP));
+            &DEFAULT_VALUE*/
         }
     }
 
@@ -1200,6 +1239,14 @@ pub mod _puroro_impls {
                 _bitfield: ::std::default::Default::default(),
                 d: ::std::default::Default::default(),
             }
+        }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
         }
         pub fn d<'this>(&'this self) -> &'this [i32] {
             &self.d

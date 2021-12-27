@@ -47,4 +47,23 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
+{#- [optional] int32 => i32 #}
+{#- [optional] String => &'this str #}
+{#- [optional] MyMessage => &'this MyMessageBumpalo<'this> #}
+fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+    {%- if f.is_message %}
+    use ::puroro::once_cell::unsync::Lazy;
+    static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
+    static DEFAULT_VALUE: Lazy<{{ f.bumpalo_field_message_path }}> = 
+        Lazy::new(|| {{ f.bumpalo_field_message_path }}::new_in(&BUMP));
+    &DEFAULT_VALUE
+    {%- else %} {#- if f.is_message #}
+    {%- if f.has_default_value %}
+    self.{{ f.ident_unesc }}_opt().unwrap_or({{ f.default_value }})
+    {%- else %} {#- if f.has_default_value #}
+    self.{{ f.ident_unesc }}_opt().unwrap_or_default()
+    {%- endif %} {#- if f.has_default_value #}
+    {%- endif %} {#- if f.is_message #}
+}
+
 {%- endif %} {#- if f.is_repeated #}

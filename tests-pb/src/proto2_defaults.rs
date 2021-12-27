@@ -6153,6 +6153,14 @@ pub mod _puroro_impls {
                 enum_fourty_two: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.i32_default.inner())
@@ -7886,192 +7894,384 @@ pub mod _puroro_impls {
         fn i32_default_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_default_opt(self)
         }
+        fn i32_default<'this>(&'this self) -> i32 {
+            self.i32_default_opt().unwrap_or_default()
+        }
         fn i32_0_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_0_opt(self)
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            self.i32_0_opt().unwrap_or(0)
         }
         fn i32_42_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_42_opt(self)
         }
+        fn i32_42<'this>(&'this self) -> i32 {
+            self.i32_42_opt().unwrap_or(42)
+        }
         fn i32_m42_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_m42_opt(self)
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            self.i32_m42_opt().unwrap_or(-42)
         }
         fn i32_2147483647_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_2147483647_opt(self)
         }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            self.i32_2147483647_opt().unwrap_or(2147483647)
+        }
         fn i32_m2147483648_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_m2147483648_opt(self)
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            self.i32_m2147483648_opt().unwrap_or(-2147483648)
         }
         fn i32_0123_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_0123_opt(self)
         }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            self.i32_0123_opt().unwrap_or(83)
+        }
         fn i32_0x123_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_0x123_opt(self)
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            self.i32_0x123_opt().unwrap_or(291)
         }
         fn u32_default_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_default_opt(self)
         }
+        fn u32_default<'this>(&'this self) -> u32 {
+            self.u32_default_opt().unwrap_or_default()
+        }
         fn u32_0_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_0_opt(self)
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            self.u32_0_opt().unwrap_or(0)
         }
         fn u32_42_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_42_opt(self)
         }
+        fn u32_42<'this>(&'this self) -> u32 {
+            self.u32_42_opt().unwrap_or(42)
+        }
         fn u32_4294967295_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_4294967295_opt(self)
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            self.u32_4294967295_opt().unwrap_or(4294967295)
         }
         fn u32_0123_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_0123_opt(self)
         }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            self.u32_0123_opt().unwrap_or(83)
+        }
         fn u32_0x123_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_0x123_opt(self)
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            self.u32_0x123_opt().unwrap_or(291)
         }
         fn i64_default_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_default_opt(self)
         }
+        fn i64_default<'this>(&'this self) -> i64 {
+            self.i64_default_opt().unwrap_or_default()
+        }
         fn i64_0_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_0_opt(self)
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            self.i64_0_opt().unwrap_or(0)
         }
         fn i64_42_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_42_opt(self)
         }
+        fn i64_42<'this>(&'this self) -> i64 {
+            self.i64_42_opt().unwrap_or(42)
+        }
         fn i64_m42_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_m42_opt(self)
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            self.i64_m42_opt().unwrap_or(-42)
         }
         fn i64_9223372036854775807_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_9223372036854775807_opt(self)
         }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            self.i64_9223372036854775807_opt()
+                .unwrap_or(9223372036854775807)
+        }
         fn i64_m9223372036854775808_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_m9223372036854775808_opt(self)
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            self.i64_m9223372036854775808_opt()
+                .unwrap_or(-9223372036854775808)
         }
         fn i64_0123_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_0123_opt(self)
         }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            self.i64_0123_opt().unwrap_or(83)
+        }
         fn i64_0x123_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_0x123_opt(self)
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            self.i64_0x123_opt().unwrap_or(291)
         }
         fn u64_default_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_default_opt(self)
         }
+        fn u64_default<'this>(&'this self) -> u64 {
+            self.u64_default_opt().unwrap_or_default()
+        }
         fn u64_0_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_0_opt(self)
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            self.u64_0_opt().unwrap_or(0)
         }
         fn u64_42_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_42_opt(self)
         }
+        fn u64_42<'this>(&'this self) -> u64 {
+            self.u64_42_opt().unwrap_or(42)
+        }
         fn u64_18446744073709551615_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_18446744073709551615_opt(self)
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            self.u64_18446744073709551615_opt()
+                .unwrap_or(18446744073709551615)
         }
         fn u64_0123_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_0123_opt(self)
         }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            self.u64_0123_opt().unwrap_or(83)
+        }
         fn u64_0x123_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_0x123_opt(self)
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            self.u64_0x123_opt().unwrap_or(291)
         }
         fn f32_default_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_default_opt(self)
         }
+        fn f32_default<'this>(&'this self) -> f32 {
+            self.f32_default_opt().unwrap_or_default()
+        }
         fn f32_0_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_0_opt(self)
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            self.f32_0_opt().unwrap_or(0f32)
         }
         fn f32_m0_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_m0_opt(self)
         }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            self.f32_m0_opt().unwrap_or(-0f32)
+        }
         fn f32_0p_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_0p_opt(self)
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            self.f32_0p_opt().unwrap_or(0f32)
         }
         fn f32_p0_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_p0_opt(self)
         }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            self.f32_p0_opt().unwrap_or(0f32)
+        }
         fn f32_0p0_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_0p0_opt(self)
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            self.f32_0p0_opt().unwrap_or(0f32)
         }
         fn f32_42_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_42_opt(self)
         }
+        fn f32_42<'this>(&'this self) -> f32 {
+            self.f32_42_opt().unwrap_or(42f32)
+        }
         fn f32_m42_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_m42_opt(self)
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            self.f32_m42_opt().unwrap_or(-42f32)
         }
         fn f32_0p25_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_0p25_opt(self)
         }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            self.f32_0p25_opt().unwrap_or(0.25f32)
+        }
         fn f32_1p5e2_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_1p5e2_opt(self)
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            self.f32_1p5e2_opt().unwrap_or(150f32)
         }
         fn f32_inf_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_inf_opt(self)
         }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            self.f32_inf_opt().unwrap_or(f32::INFINITY)
+        }
         fn f32_minf_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_minf_opt(self)
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            self.f32_minf_opt().unwrap_or(f32::NEG_INFINITY)
         }
         fn f32_nan_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_nan_opt(self)
         }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            self.f32_nan_opt().unwrap_or(f32::NAN)
+        }
         fn f32_mnan_opt<'this>(&'this self) -> Option<f32> {
             <Self>::f32_mnan_opt(self)
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            self.f32_mnan_opt().unwrap_or(f32::NAN)
         }
         fn bool_default_opt<'this>(&'this self) -> Option<bool> {
             <Self>::bool_default_opt(self)
         }
+        fn bool_default<'this>(&'this self) -> bool {
+            self.bool_default_opt().unwrap_or_default()
+        }
         fn bool_true_opt<'this>(&'this self) -> Option<bool> {
             <Self>::bool_true_opt(self)
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            self.bool_true_opt().unwrap_or(true)
         }
         fn bool_false_opt<'this>(&'this self) -> Option<bool> {
             <Self>::bool_false_opt(self)
         }
+        fn bool_false<'this>(&'this self) -> bool {
+            self.bool_false_opt().unwrap_or(false)
+        }
         fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_default_opt(self)
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            self.string_default_opt().unwrap_or_default()
         }
         fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_empty_opt(self)
         }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            self.string_empty_opt().unwrap_or("")
+        }
         fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_abc_opt(self)
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            self.string_abc_opt().unwrap_or("abc")
         }
         fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_aiu_opt(self)
         }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            self.string_aiu_opt().unwrap_or("\u{3042}\u{3044}\u{3046}")
+        }
         fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_backslash_opt(self)
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            self.string_backslash_opt().unwrap_or("\\")
         }
         fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_tab_opt(self)
         }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            self.string_tab_opt().unwrap_or("\t")
+        }
         fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_crlf_opt(self)
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            self.string_crlf_opt().unwrap_or("\r\n")
         }
         fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_default_opt(self)
         }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            self.bytes_default_opt().unwrap_or_default()
+        }
         fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_empty_opt(self)
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            self.bytes_empty_opt().unwrap_or(b"")
         }
         fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_abc_opt(self)
         }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            self.bytes_abc_opt().unwrap_or(b"\x61\x62\x63")
+        }
         fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_aiu_opt(self)
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            self.bytes_aiu_opt()
+                .unwrap_or(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
         }
         fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_backslash_opt(self)
         }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            self.bytes_backslash_opt().unwrap_or(b"\x5c")
+        }
         fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_tab_opt(self)
         }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            self.bytes_tab_opt().unwrap_or(b"\x09")
+        }
         fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_crlf_opt(self)
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            self.bytes_crlf_opt().unwrap_or(b"\x0d\x0a")
         }
         fn enum_default_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
             <Self>::enum_default_opt(self)
         }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self.enum_default_opt().unwrap_or_default()
+        }
         fn enum_one_opt<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
             <Self>::enum_one_opt(self)
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self.enum_one_opt()
+                .unwrap_or(self::_puroro_root::proto2_defaults::MyEnum::One)
         }
         fn enum_fourty_two_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
             <Self>::enum_fourty_two_opt(self)
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self.enum_fourty_two_opt()
+                .unwrap_or(self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo)
         }
     }
 

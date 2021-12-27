@@ -207,6 +207,14 @@ pub mod _puroro_impls {
                 r#type: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if self._bitfield.get(0).map_or(false, |v| *v) {
                 ::std::option::Option::Some(self.r#type.inner())
@@ -252,6 +260,9 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             <Self>::type_opt(self)
+        }
+        fn r#type<'this>(&'this self) -> i32 {
+            self.type_opt().unwrap_or_default()
         }
     }
 

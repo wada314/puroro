@@ -1868,6 +1868,14 @@ pub mod _puroro_impls {
                 very_large_field_number: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
                 ::std::option::Option::Some(self.i32_unlabeled.inner())
@@ -2100,6 +2108,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_unlabeled_opt(self)
         }
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or_default()
+        }
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -2116,6 +2127,9 @@ pub mod _puroro_impls {
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_unlabeled_opt(self)
         }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            self.float_unlabeled_opt().unwrap_or_default()
+        }
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -2131,6 +2145,9 @@ pub mod _puroro_impls {
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_unlabeled_opt(self)
+        }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            self.string_unlabeled_opt().unwrap_or_default()
         }
         type Field6RepeatedType<'this>
         where
@@ -2154,6 +2171,15 @@ pub mod _puroro_impls {
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             <Self>::submsg_unlabeled_opt(self)
         }
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field7MessageType<'this> {
+            <self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
+            /*
+            use ::puroro::once_cell::unsync::Lazy;
+            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
+            static DEFAULT_VALUE: Lazy<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> =
+                Lazy::new(|| self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
+            &DEFAULT_VALUE*/
+        }
         type Field8MessageType<'this>
         where
             Self: 'this,
@@ -2168,6 +2194,9 @@ pub mod _puroro_impls {
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             <Self>::enum_unlabeled_opt(self)
+        }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
+            self.enum_unlabeled_opt().unwrap_or_default()
         }
         type Field10RepeatedType<'this>
         where
@@ -2184,6 +2213,9 @@ pub mod _puroro_impls {
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             <Self>::very_large_field_number_opt(self)
+        }
+        fn very_large_field_number<'this>(&'this self) -> i32 {
+            self.very_large_field_number_opt().unwrap_or_default()
         }
     }
 
@@ -3608,6 +3640,14 @@ pub mod _puroro_nested {
                         i32_unlabeled: ::std::default::Default::default(),
                     }
                 }
+
+                pub fn default_instance() -> &'static Self {
+                    use ::puroro::bumpalo::Bump;
+                    use ::puroro::once_cell::sync::Lazy;
+                    static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+                    static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+                    &DEFAULT_INSTANCE
+                }
                 pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
                         ::std::option::Option::Some(self.i32_unlabeled.inner())
@@ -3652,6 +3692,9 @@ pub mod _puroro_nested {
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
                     <Self>::i32_unlabeled_opt(self)
+                }
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    self.i32_unlabeled_opt().unwrap_or_default()
                 }
             }
 

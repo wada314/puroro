@@ -1037,6 +1037,14 @@ pub mod _puroro_impls {
                 group_three: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
     }
     impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
@@ -1053,10 +1061,34 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            self.g1_int32_opt().unwrap_or_default()
+        }
+        fn g1_string<'this>(&'this self) -> &'this str {
+            self.g1_string_opt().unwrap_or_default()
+        }
+        fn g2_f32<'this>(&'this self) -> f32 {
+            self.g2_f32_opt().unwrap_or_default()
+        }
+        fn g2_string<'this>(&'this self) -> &'this str {
+            self.g2_string_opt().unwrap_or_default()
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this>;
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            <self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
+            /*
+            use ::puroro::once_cell::unsync::Lazy;
+            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
+            static DEFAULT_VALUE: Lazy<self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this>> =
+                Lazy::new(|| self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
+            &DEFAULT_VALUE*/
+        }
+        fn g3_int32<'this>(&'this self) -> i32 {
+            self.g3_int32_opt().unwrap_or_default()
+        }
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
@@ -1452,6 +1484,14 @@ pub mod _puroro_impls {
                 i32_unlabeled: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
                 ::std::option::Option::Some(self.i32_unlabeled.inner())
@@ -1496,6 +1536,9 @@ pub mod _puroro_impls {
     impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_unlabeled_opt(self)
+        }
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or_default()
         }
     }
 

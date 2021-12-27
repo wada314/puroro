@@ -239,6 +239,14 @@ pub mod _puroro_impls {
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::bumpalo::Bump;
+            use ::puroro::once_cell::sync::Lazy;
+            static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            &DEFAULT_INSTANCE
+        }
         pub fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -299,6 +307,16 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             <Self>::recursive_unlabeled_opt(self)
+        }
+        fn recursive_unlabeled<'this>(&'this self) -> Self::Field1MessageType<'this> {
+            <self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>>::default_instance(
+            )
+            /*
+            use ::puroro::once_cell::unsync::Lazy;
+            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
+            static DEFAULT_VALUE: Lazy<self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>> =
+                Lazy::new(|| self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>::new_in(&BUMP));
+            &DEFAULT_VALUE*/
         }
     }
 
