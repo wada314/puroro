@@ -255,6 +255,7 @@ pub mod _puroro_impls {
         > {
             self.recursive_unlabeled_opt()
         }
+
         pub fn has_recursive_unlabeled(&self) -> bool {
             self.recursive_unlabeled_opt().is_some()
         }

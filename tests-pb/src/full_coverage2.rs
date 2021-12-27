@@ -11272,6 +11272,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i32_required(&self) -> bool {
             self.i32_required_opt().is_some()
         }
@@ -11288,6 +11289,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
@@ -11307,6 +11309,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_float_required(&self) -> bool {
             self.float_required_opt().is_some()
         }
@@ -11323,6 +11326,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_float_optional(&self) -> bool {
             self.float_optional_opt().is_some()
         }
@@ -11342,6 +11346,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_bytes_required(&self) -> bool {
             self.bytes_required_opt().is_some()
         }
@@ -11358,6 +11363,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_bytes_optional(&self) -> bool {
             self.bytes_optional_opt().is_some()
         }
@@ -11379,6 +11385,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_string_required(&self) -> bool {
             self.string_required_opt().is_some()
         }
@@ -11395,6 +11402,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_string_optional(&self) -> bool {
             self.string_optional_opt().is_some()
         }
@@ -11418,6 +11426,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_enum_required(&self) -> bool {
             self.enum_required_opt().is_some()
         }
@@ -11436,6 +11445,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_enum_optional(&self) -> bool {
             self.enum_optional_opt().is_some()
         }
@@ -11452,6 +11462,7 @@ pub mod _puroro_impls {
         pub fn submsg_required<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
             self.submsg_required_opt()
         }
+
         pub fn has_submsg_required(&self) -> bool {
             self.submsg_required_opt().is_some()
         }
@@ -11463,6 +11474,7 @@ pub mod _puroro_impls {
         pub fn submsg_optional<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
             self.submsg_optional_opt()
         }
+
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
@@ -11482,6 +11494,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i64_required(&self) -> bool {
             self.i64_required_opt().is_some()
         }
@@ -11498,6 +11511,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i64_optional(&self) -> bool {
             self.i64_optional_opt().is_some()
         }
@@ -11517,6 +11531,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_u32_required(&self) -> bool {
             self.u32_required_opt().is_some()
         }
@@ -11533,6 +11548,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_u32_optional(&self) -> bool {
             self.u32_optional_opt().is_some()
         }
@@ -11552,6 +11568,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_u64_required(&self) -> bool {
             self.u64_required_opt().is_some()
         }
@@ -11568,6 +11585,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_u64_optional(&self) -> bool {
             self.u64_optional_opt().is_some()
         }
@@ -11587,6 +11605,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_s32_required(&self) -> bool {
             self.s32_required_opt().is_some()
         }
@@ -11603,6 +11622,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_s32_optional(&self) -> bool {
             self.s32_optional_opt().is_some()
         }
@@ -11622,6 +11642,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_s64_required(&self) -> bool {
             self.s64_required_opt().is_some()
         }
@@ -11638,6 +11659,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_s64_optional(&self) -> bool {
             self.s64_optional_opt().is_some()
         }
@@ -11657,6 +11679,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_fixed32_required(&self) -> bool {
             self.fixed32_required_opt().is_some()
         }
@@ -11673,6 +11696,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_fixed32_optional(&self) -> bool {
             self.fixed32_optional_opt().is_some()
         }
@@ -11692,6 +11716,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_fixed64_required(&self) -> bool {
             self.fixed64_required_opt().is_some()
         }
@@ -11708,6 +11733,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_fixed64_optional(&self) -> bool {
             self.fixed64_optional_opt().is_some()
         }
@@ -11727,6 +11753,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_sfixed32_required(&self) -> bool {
             self.sfixed32_required_opt().is_some()
         }
@@ -11743,6 +11770,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_sfixed32_optional(&self) -> bool {
             self.sfixed32_optional_opt().is_some()
         }
@@ -11762,6 +11790,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_sfixed64_required(&self) -> bool {
             self.sfixed64_required_opt().is_some()
         }
@@ -11778,6 +11807,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_sfixed64_optional(&self) -> bool {
             self.sfixed64_optional_opt().is_some()
         }
@@ -11797,6 +11827,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_f64_required(&self) -> bool {
             self.f64_required_opt().is_some()
         }
@@ -11813,6 +11844,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_f64_optional(&self) -> bool {
             self.f64_optional_opt().is_some()
         }
@@ -12272,7 +12304,6 @@ pub mod _puroro_impls {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
         }
-
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -12292,7 +12323,6 @@ pub mod _puroro_impls {
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_optional_opt(self)
         }
-
         type Field13RepeatedType<'this>
         where
             Self: 'this,
@@ -12312,7 +12342,6 @@ pub mod _puroro_impls {
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <Self>::bytes_optional_opt(self)
         }
-
         type Field23RepeatedType<'this>
         where
             Self: 'this,
@@ -12332,7 +12361,6 @@ pub mod _puroro_impls {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_optional_opt(self)
         }
-
         type Field33RepeatedType<'this>
         where
             Self: 'this,
@@ -12356,7 +12384,6 @@ pub mod _puroro_impls {
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
             <Self>::enum_optional_opt(self)
         }
-
         type Field43RepeatedType<'this>
         where
             Self: 'this,
@@ -12379,7 +12406,6 @@ pub mod _puroro_impls {
             <Self>::submsg_optional_opt(self)
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
-
         type Field53RepeatedType<'this> where Self: 'this =
     &'this [self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>];
 
@@ -12392,7 +12418,6 @@ pub mod _puroro_impls {
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::i64_optional_opt(self)
         }
-
         type Field103RepeatedType<'this>
         where
             Self: 'this,
@@ -12412,7 +12437,6 @@ pub mod _puroro_impls {
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             <Self>::u32_optional_opt(self)
         }
-
         type Field113RepeatedType<'this>
         where
             Self: 'this,
@@ -12432,7 +12456,6 @@ pub mod _puroro_impls {
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             <Self>::u64_optional_opt(self)
         }
-
         type Field123RepeatedType<'this>
         where
             Self: 'this,
@@ -12452,7 +12475,6 @@ pub mod _puroro_impls {
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::s32_optional_opt(self)
         }
-
         type Field133RepeatedType<'this>
         where
             Self: 'this,
@@ -12472,7 +12494,6 @@ pub mod _puroro_impls {
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::s64_optional_opt(self)
         }
-
         type Field143RepeatedType<'this>
         where
             Self: 'this,
@@ -12492,7 +12513,6 @@ pub mod _puroro_impls {
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             <Self>::fixed32_optional_opt(self)
         }
-
         type Field153RepeatedType<'this>
         where
             Self: 'this,
@@ -12512,7 +12532,6 @@ pub mod _puroro_impls {
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             <Self>::fixed64_optional_opt(self)
         }
-
         type Field163RepeatedType<'this>
         where
             Self: 'this,
@@ -12532,7 +12551,6 @@ pub mod _puroro_impls {
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::sfixed32_optional_opt(self)
         }
-
         type Field173RepeatedType<'this>
         where
             Self: 'this,
@@ -12552,7 +12570,6 @@ pub mod _puroro_impls {
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             <Self>::sfixed64_optional_opt(self)
         }
-
         type Field183RepeatedType<'this>
         where
             Self: 'this,
@@ -12572,7 +12589,6 @@ pub mod _puroro_impls {
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             <Self>::f64_optional_opt(self)
         }
-
         type Field193RepeatedType<'this>
         where
             Self: 'this,
@@ -16549,6 +16565,7 @@ pub mod _puroro_nested {
                         _ => ::std::default::Default::default(),
                     }
                 }
+
                 pub fn has_i32_required(&self) -> bool {
                     self.i32_required_opt().is_some()
                 }
@@ -16565,6 +16582,7 @@ pub mod _puroro_nested {
                         _ => ::std::default::Default::default(),
                     }
                 }
+
                 pub fn has_i64_required(&self) -> bool {
                     self.i64_required_opt().is_some()
                 }

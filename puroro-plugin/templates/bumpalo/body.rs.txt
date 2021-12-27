@@ -66,12 +66,13 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         }
     }
 
-    {#- ######## getter ######## #}
+    {#- ######## getters ######## #}
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
     {%- if f.is_repeated %}
     
     {#- ######## repeated getter ######## #}
+
     {#- repeated int32 => &'this [i32] #}
     {#- repeated String => &'this [impl Deref<Target=str>] #}
     {#- repeated MyMessage => &'this [MyMessageBumpalo<'this>] #}
@@ -85,9 +86,11 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 
     {%- else %} {#- if f.is_repeated #}
 
-    {#- ######## non-repeated getter ######## #}
+    {#- ######## non-repeated getters ######## #}
 
-    {#- optional getter #}
+    {#- [optional] int32 => Option<i32> #}
+    {#- [optional] String => Option<&'this str> #}
+    {#- [optional] MyMessage => Option<&'this MyMessageBumpalo<'this>> #}
     pub fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> {{ f.bumpalo_getter_opt_type }} {
         {%- if f.is_message %}
         {#- Non-repeated message f. Field type is always `Optional<NoAllocBox<T>>`.#}
@@ -125,7 +128,9 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         {%- endif %} {#- if f.is_message #}
     }
 
-    {#- normal getter, has_ getter #}
+    {#- [optional] int32 => i32 #}
+    {#- [optional] String => &'this str #}
+    {#- [optional] MyMessage => Option<&'this MyMessageBumpalo<'this>> #}
     pub fn {{ f.ident }}<'this>(&'this self) -> {{ f.bumpalo_getter_type }} {
         {%- if f.is_message %}
         {#- For message, we return `Option` value even in normal getter method. #}
@@ -143,6 +148,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         }
         {%- endif %} {#- if f.is_message #}
     }
+
     pub fn has_{{ f.ident_unesc }}(&self) -> bool {
         self.{{ f.ident_unesc }}_opt().is_some()
     }
@@ -159,6 +165,10 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {%- if f.is_repeated %}
 
     {#- mut get repeated field #}
+    
+    {#- repeated int32 => RefMutBumpVec<'bump, 'this, i32> #}
+    {#- repeated String => AddBumpVecView<'bump, 'this, NoAllocBumpString> #}
+    {#- repeated MyMessage => RefMutBumpVec<'bump, 'this, MyMessageBumpalo<'bump>> #}
     pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.bumpalo_getter_mut_type }} {
         {%- if f.is_length_delimited %}
         {%- if f.is_message %}
@@ -186,6 +196,9 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 
     {#- mut get scalar field #}
     {#- always returns an option-unwrapped mut reference. The value is initialized if it's not present. #}
+    {#- [optional] int32 => &'this mut i32 #}
+    {#- [optional] String => RefMutBumpString<'bump, 'this> #}
+    {#- [optional] MyMessage => &'this mut MyMessageBumpalo<'bump> #}
     pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.bumpalo_getter_mut_type }} {
         if !self.has_{{ f.ident_unesc }}() {
             {#- field is not set so we need to initialize it. #}

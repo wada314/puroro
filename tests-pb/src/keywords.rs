@@ -220,6 +220,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_type(&self) -> bool {
             self.type_opt().is_some()
         }
