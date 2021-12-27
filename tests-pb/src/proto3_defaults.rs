@@ -435,9 +435,16 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_unlabeled,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_unlabeled(
+                self,
+            ))
+        }
+
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_unlabeled))
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
         }
         type Field3RepeatedType<'this>
         where
@@ -446,10 +453,19 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            ::std::default::Default::default()
+        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
@@ -517,10 +533,18 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_optional,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_optional(
+                self,
+            ))
+        }
+
+        fn i32_optional<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_optional))
         }
         type Field3RepeatedType<'this>
         where
@@ -529,10 +553,19 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            ::std::default::Default::default()
+        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField2<ScalarType>
@@ -609,6 +642,12 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -617,10 +656,19 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            ::std::default::Default::default()
+        }
     }
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
@@ -694,6 +742,12 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -703,14 +757,24 @@ pub mod _puroro_impls {
         }
 
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_unlabeled,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_unlabeled(
+                self,
+            ))
+        }
+
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_unlabeled))
+        }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
         }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            ::std::default::Default::default()
+        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField4<ScalarType>
@@ -778,6 +842,12 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -785,14 +855,26 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
 
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_unlabeled.as_ref())
+            ::std::option::Option::Some(
+                <Self as super::_puroro_traits::MsgTrait>::string_unlabeled(self),
+            )
+        }
+
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            self.string_unlabeled.as_ref()
         }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            ::std::default::Default::default()
+        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
@@ -860,12 +942,24 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
         }
         type Field6MessageType<'this>
         where
@@ -875,7 +969,13 @@ pub mod _puroro_impls {
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
-            ::std::option::Option::Some(&self.submsg_unlabeled)
+            ::std::option::Option::Some(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self),
+            )
+        }
+
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            &self.submsg_unlabeled
         }
     }
 
@@ -1449,9 +1549,13 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_unlabeled,
-            )))
+            ::std::option::Option::Some(
+                <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
+            )
+        }
+
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
     }
 

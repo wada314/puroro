@@ -1892,9 +1892,196 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_default,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_default(
+                self,
+            ))
+        }
+
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_default))
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -1961,10 +2148,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+
         fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_0(self))
+        }
+
+        fn i32_0<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_0))
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2031,10 +2404,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+
         fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_42(self))
+        }
+
+        fn i32_42<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_42))
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2101,10 +2660,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+
         fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_m42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_m42(self))
+        }
+
+        fn i32_m42<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_m42))
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2171,10 +2916,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+
         fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_2147483647,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_2147483647(
+                self,
+            ))
+        }
+
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_2147483647))
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2243,10 +3176,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+
         fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_m2147483648,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_m2147483648(
+                self,
+            ))
+        }
+
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_m2147483648))
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2315,10 +3436,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+
         fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_0123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_0123(self))
+        }
+
+        fn i32_0123<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_0123))
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2385,10 +3692,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+
         fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_0x123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i32_0x123(self))
+        }
+
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_0x123))
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2455,10 +3948,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+
         fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u32_default,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u32_default(
+                self,
+            ))
+        }
+
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u32_default))
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2525,10 +4206,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+
         fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u32_0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u32_0(self))
+        }
+
+        fn u32_0<'this>(&'this self) -> u32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u32_0))
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2595,10 +4462,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+
         fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u32_42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u32_42(self))
+        }
+
+        fn u32_42<'this>(&'this self) -> u32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u32_42))
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2665,10 +4718,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+
         fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u32_4294967295,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u32_4294967295(
+                self,
+            ))
+        }
+
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u32_4294967295))
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2737,10 +4978,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+
         fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u32_0123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u32_0123(self))
+        }
+
+        fn u32_0123<'this>(&'this self) -> u32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u32_0123))
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2807,10 +5234,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+
         fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u32_0x123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u32_0x123(self))
+        }
+
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u32_0x123))
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2877,10 +5490,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+
         fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_default,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i64_default(
+                self,
+            ))
+        }
+
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_default))
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -2947,10 +5748,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+
         fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i64_0(self))
+        }
+
+        fn i64_0<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_0))
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3017,10 +6004,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+
         fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i64_42(self))
+        }
+
+        fn i64_42<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_42))
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3087,10 +6260,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+
         fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_m42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i64_m42(self))
+        }
+
+        fn i64_m42<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_m42))
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3157,10 +6516,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+
         fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_9223372036854775807,
-            )))
+            ::std::option::Option::Some(
+                <Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807(self),
+            )
+        }
+
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_9223372036854775807))
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3229,10 +6776,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+
         fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_m9223372036854775808,
-            )))
+            ::std::option::Option::Some(
+                <Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808(self),
+            )
+        }
+
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_m9223372036854775808))
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3301,10 +7036,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+
         fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_0123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i64_0123(self))
+        }
+
+        fn i64_0123<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_0123))
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3371,10 +7292,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+
         fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i64_0x123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::i64_0x123(self))
+        }
+
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i64_0x123))
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3441,10 +7548,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+
         fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u64_default,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u64_default(
+                self,
+            ))
+        }
+
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u64_default))
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3511,10 +7806,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+
         fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u64_0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u64_0(self))
+        }
+
+        fn u64_0<'this>(&'this self) -> u64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u64_0))
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3581,10 +8062,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+
         fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u64_42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u64_42(self))
+        }
+
+        fn u64_42<'this>(&'this self) -> u64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u64_42))
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3651,10 +8318,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+
         fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u64_18446744073709551615,
-            )))
+            ::std::option::Option::Some(
+                <Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615(self),
+            )
+        }
+
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u64_18446744073709551615))
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3723,10 +8578,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+
         fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u64_0123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u64_0123(self))
+        }
+
+        fn u64_0123<'this>(&'this self) -> u64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u64_0123))
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3793,10 +8834,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+
         fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.u64_0x123,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::u64_0x123(self))
+        }
+
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.u64_0x123))
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3863,10 +9090,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+
         fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_default,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_default(
+                self,
+            ))
+        }
+
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_default))
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -3933,10 +9348,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+
         fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_0(self))
+        }
+
+        fn f32_0<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_0))
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4003,10 +9604,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+
         fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_m0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_m0(self))
+        }
+
+        fn f32_m0<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_m0))
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4073,10 +9860,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+
         fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_0p,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_0p(self))
+        }
+
+        fn f32_0p<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_0p))
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4143,10 +10116,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+
         fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_p0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_p0(self))
+        }
+
+        fn f32_p0<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_p0))
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4213,10 +10372,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+
         fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_0p0,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_0p0(self))
+        }
+
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_0p0))
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4283,10 +10628,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+
         fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_42(self))
+        }
+
+        fn f32_42<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_42))
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4353,10 +10884,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+
         fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_m42,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_m42(self))
+        }
+
+        fn f32_m42<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_m42))
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4423,10 +11140,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+
         fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_0p25,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_0p25(self))
+        }
+
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_0p25))
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4493,10 +11396,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+
         fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_1p5e2,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_1p5e2(self))
+        }
+
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_1p5e2))
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4563,10 +11652,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+
         fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_inf,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_inf(self))
+        }
+
+        fn f32_inf<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_inf))
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4633,10 +11908,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+
         fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_minf,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_minf(self))
+        }
+
+        fn f32_minf<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_minf))
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4703,10 +12164,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+
         fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_nan,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_nan(self))
+        }
+
+        fn f32_nan<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_nan))
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4773,10 +12420,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+
         fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.f32_mnan,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::f32_mnan(self))
+        }
+
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_mnan))
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4843,10 +12676,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+
         fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.bool_default,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bool_default(
+                self,
+            ))
+        }
+
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.bool_default))
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4915,10 +12936,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+
         fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.bool_true,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bool_true(self))
+        }
+
+        fn bool_true<'this>(&'this self) -> bool {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.bool_true))
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -4985,10 +13192,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+
         fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.bool_false,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bool_false(self))
+        }
+
+        fn bool_false<'this>(&'this self) -> bool {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.bool_false))
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5055,8 +13448,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+
         fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_default.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::string_default(
+                self,
+            ))
+        }
+
+        fn string_default<'this>(&'this self) -> &'this str {
+            self.string_default.as_ref()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5125,8 +13708,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+
         fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_empty.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::string_empty(
+                self,
+            ))
+        }
+
+        fn string_empty<'this>(&'this self) -> &'this str {
+            self.string_empty.as_ref()
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5195,8 +13968,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+
         fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_abc.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::string_abc(self))
+        }
+
+        fn string_abc<'this>(&'this self) -> &'this str {
+            self.string_abc.as_ref()
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5263,8 +14224,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+
         fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_aiu.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::string_aiu(self))
+        }
+
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            self.string_aiu.as_ref()
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5331,8 +14480,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+
         fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_backslash.as_ref())
+            ::std::option::Option::Some(
+                <Self as super::_puroro_traits::MsgTrait>::string_backslash(self),
+            )
+        }
+
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            self.string_backslash.as_ref()
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5401,8 +14740,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+
         fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_tab.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::string_tab(self))
+        }
+
+        fn string_tab<'this>(&'this self) -> &'this str {
+            self.string_tab.as_ref()
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5469,8 +14996,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+
         fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.string_crlf.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::string_crlf(
+                self,
+            ))
+        }
+
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            self.string_crlf.as_ref()
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5537,8 +15254,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+
         fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::option::Option::Some(self.bytes_default.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bytes_default(
+                self,
+            ))
+        }
+
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            self.bytes_default.as_ref()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5607,8 +15514,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+
         fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::option::Option::Some(self.bytes_empty.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bytes_empty(
+                self,
+            ))
+        }
+
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            self.bytes_empty.as_ref()
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5675,8 +15772,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+
         fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::option::Option::Some(self.bytes_abc.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bytes_abc(self))
+        }
+
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            self.bytes_abc.as_ref()
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5743,8 +16028,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+
         fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::option::Option::Some(self.bytes_aiu.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bytes_aiu(self))
+        }
+
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            self.bytes_aiu.as_ref()
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5811,8 +16284,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+
         fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::option::Option::Some(self.bytes_backslash.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bytes_backslash(
+                self,
+            ))
+        }
+
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            self.bytes_backslash.as_ref()
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5881,8 +16544,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+
         fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::option::Option::Some(self.bytes_tab.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bytes_tab(self))
+        }
+
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            self.bytes_tab.as_ref()
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -5949,8 +16800,196 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+
         fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
-            ::std::option::Option::Some(self.bytes_crlf.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::bytes_crlf(self))
+        }
+
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            self.bytes_crlf.as_ref()
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -6017,12 +17056,200 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+
         fn enum_default_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.enum_default,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::enum_default(
+                self,
+            ))
+        }
+
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.enum_default))
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -6091,12 +17318,198 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+
         fn enum_one_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.enum_one,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::enum_one(self))
+        }
+
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.enum_one))
+        }
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo
         }
     }
 
@@ -6163,12 +17576,200 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn i32_default<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_0<'this>(&'this self) -> i32 {
+            0
+        }
+        fn i32_42<'this>(&'this self) -> i32 {
+            42
+        }
+        fn i32_m42<'this>(&'this self) -> i32 {
+            -42
+        }
+        fn i32_2147483647<'this>(&'this self) -> i32 {
+            2147483647
+        }
+        fn i32_m2147483648<'this>(&'this self) -> i32 {
+            -2147483648
+        }
+        fn i32_0123<'this>(&'this self) -> i32 {
+            83
+        }
+        fn i32_0x123<'this>(&'this self) -> i32 {
+            291
+        }
+        fn u32_default<'this>(&'this self) -> u32 {
+            ::std::default::Default::default()
+        }
+        fn u32_0<'this>(&'this self) -> u32 {
+            0
+        }
+        fn u32_42<'this>(&'this self) -> u32 {
+            42
+        }
+        fn u32_4294967295<'this>(&'this self) -> u32 {
+            4294967295
+        }
+        fn u32_0123<'this>(&'this self) -> u32 {
+            83
+        }
+        fn u32_0x123<'this>(&'this self) -> u32 {
+            291
+        }
+        fn i64_default<'this>(&'this self) -> i64 {
+            ::std::default::Default::default()
+        }
+        fn i64_0<'this>(&'this self) -> i64 {
+            0
+        }
+        fn i64_42<'this>(&'this self) -> i64 {
+            42
+        }
+        fn i64_m42<'this>(&'this self) -> i64 {
+            -42
+        }
+        fn i64_9223372036854775807<'this>(&'this self) -> i64 {
+            9223372036854775807
+        }
+        fn i64_m9223372036854775808<'this>(&'this self) -> i64 {
+            -9223372036854775808
+        }
+        fn i64_0123<'this>(&'this self) -> i64 {
+            83
+        }
+        fn i64_0x123<'this>(&'this self) -> i64 {
+            291
+        }
+        fn u64_default<'this>(&'this self) -> u64 {
+            ::std::default::Default::default()
+        }
+        fn u64_0<'this>(&'this self) -> u64 {
+            0
+        }
+        fn u64_42<'this>(&'this self) -> u64 {
+            42
+        }
+        fn u64_18446744073709551615<'this>(&'this self) -> u64 {
+            18446744073709551615
+        }
+        fn u64_0123<'this>(&'this self) -> u64 {
+            83
+        }
+        fn u64_0x123<'this>(&'this self) -> u64 {
+            291
+        }
+        fn f32_default<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn f32_0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_m0<'this>(&'this self) -> f32 {
+            -0f32
+        }
+        fn f32_0p<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_0p0<'this>(&'this self) -> f32 {
+            0f32
+        }
+        fn f32_42<'this>(&'this self) -> f32 {
+            42f32
+        }
+        fn f32_m42<'this>(&'this self) -> f32 {
+            -42f32
+        }
+        fn f32_0p25<'this>(&'this self) -> f32 {
+            0.25f32
+        }
+        fn f32_1p5e2<'this>(&'this self) -> f32 {
+            150f32
+        }
+        fn f32_inf<'this>(&'this self) -> f32 {
+            f32::INFINITY
+        }
+        fn f32_minf<'this>(&'this self) -> f32 {
+            f32::NEG_INFINITY
+        }
+        fn f32_nan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn f32_mnan<'this>(&'this self) -> f32 {
+            f32::NAN
+        }
+        fn bool_default<'this>(&'this self) -> bool {
+            ::std::default::Default::default()
+        }
+        fn bool_true<'this>(&'this self) -> bool {
+            true
+        }
+        fn bool_false<'this>(&'this self) -> bool {
+            false
+        }
+        fn string_default<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn string_empty<'this>(&'this self) -> &'this str {
+            ""
+        }
+        fn string_abc<'this>(&'this self) -> &'this str {
+            "abc"
+        }
+        fn string_aiu<'this>(&'this self) -> &'this str {
+            "\u{3042}\u{3044}\u{3046}"
+        }
+        fn string_backslash<'this>(&'this self) -> &'this str {
+            "\\"
+        }
+        fn string_tab<'this>(&'this self) -> &'this str {
+            "\t"
+        }
+        fn string_crlf<'this>(&'this self) -> &'this str {
+            "\r\n"
+        }
+        fn bytes_default<'this>(&'this self) -> &'this [u8] {
+            ::std::default::Default::default()
+        }
+        fn bytes_empty<'this>(&'this self) -> &'this [u8] {
+            b""
+        }
+        fn bytes_abc<'this>(&'this self) -> &'this [u8] {
+            b"\x61\x62\x63"
+        }
+        fn bytes_aiu<'this>(&'this self) -> &'this [u8] {
+            b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86"
+        }
+        fn bytes_backslash<'this>(&'this self) -> &'this [u8] {
+            b"\x5c"
+        }
+        fn bytes_tab<'this>(&'this self) -> &'this [u8] {
+            b"\x09"
+        }
+        fn bytes_crlf<'this>(&'this self) -> &'this [u8] {
+            b"\x0d\x0a"
+        }
+        fn enum_default<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::default::Default::default()
+        }
+        fn enum_one<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            self::_puroro_root::proto2_defaults::MyEnum::One
+        }
+
         fn enum_fourty_two_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.enum_fourty_two,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::enum_fourty_two(
+                self,
+            ))
+        }
+
+        fn enum_fourty_two<'this>(&'this self) -> self::_puroro_root::proto2_defaults::MyEnum {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.enum_fourty_two))
         }
     }
 

@@ -155,9 +155,11 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.r#type,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::r#type(self))
+        }
+
+        fn r#type<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.r#type))
         }
     }
 

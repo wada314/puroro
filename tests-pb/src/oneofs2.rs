@@ -538,10 +538,28 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.g1_int32))
+        }
+        fn g1_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn g2_f32<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn g2_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            ::std::default::Default::default()
+        }
+        fn g3_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -627,10 +645,29 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+
+        fn g1_string<'this>(&'this self) -> &'this str {
+            self.g1_string.as_ref()
+        }
+        fn g2_f32<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn g2_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            ::std::default::Default::default()
+        }
+        fn g3_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -714,10 +751,29 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn g1_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+
+        fn g2_f32<'this>(&'this self) -> f32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.g2_f32))
+        }
+        fn g2_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            ::std::default::Default::default()
+        }
+        fn g3_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -803,10 +859,29 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn g1_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn g2_f32<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+
+        fn g2_string<'this>(&'this self) -> &'this str {
+            self.g2_string.as_ref()
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            ::std::default::Default::default()
+        }
+        fn g3_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -890,10 +965,29 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn g1_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn g2_f32<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn g2_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
         = &'this ScalarType;
+
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            &self.g2_submsg
+        }
+        fn g3_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -981,10 +1075,29 @@ pub mod _puroro_impls {
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
     {
+        fn g1_int32<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn g1_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
+        fn g2_f32<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn g2_string<'this>(&'this self) -> &'this str {
+            ::std::default::Default::default()
+        }
         type Field5MessageType<'this>
         where
             Self: 'this,
         = ();
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
+            ::std::default::Default::default()
+        }
+
+        fn g3_int32<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.g3_int32))
+        }
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -1445,9 +1558,13 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.i32_optional,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::SubmsgTrait>::i32_optional(
+                self,
+            ))
+        }
+
+        fn i32_optional<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_optional))
         }
     }
 

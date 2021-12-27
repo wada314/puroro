@@ -20,7 +20,7 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
 {}
 
-impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait
+impl{{ maybe_gp }} super::_puroro_traits::{{ m.trait_ident }}
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
 {
@@ -38,7 +38,15 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
-    {%- endif %}
+    {%- else %} {#- if f.is_repeated #}
+    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        {%- if f.has_default_value %}
+        {{ f.default_value }}
+        {%- else %} {#- if f.has_default_value #}
+        ::std::default::Default::default()
+        {%- endif %} {#- if f.has_default_value #}
+    }
+    {%- endif %} {#- if f.is_repeated #}
 
     {%- endif %} {#- if f.number == target_f.number #}
     {%- endfor %} {#- for f in m.fields #}

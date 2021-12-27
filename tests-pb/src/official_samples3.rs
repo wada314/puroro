@@ -496,9 +496,11 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
-                &self.a,
-            )))
+            ::std::option::Option::Some(<Self as super::_puroro_traits::Test1Trait>::a(self))
+        }
+
+        fn a<'this>(&'this self) -> i32 {
+            ::std::convert::Into::into(::std::clone::Clone::clone(&self.a))
         }
     }
 
@@ -717,7 +719,11 @@ pub mod _puroro_impls {
             + ::std::fmt::Debug,
     {
         fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-            ::std::option::Option::Some(self.b.as_ref())
+            ::std::option::Option::Some(<Self as super::_puroro_traits::Test2Trait>::b(self))
+        }
+
+        fn b<'this>(&'this self) -> &'this str {
+            self.b.as_ref()
         }
     }
 
@@ -941,7 +947,11 @@ pub mod _puroro_impls {
         = &'this ScalarType;
 
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            ::std::option::Option::Some(&self.c)
+            ::std::option::Option::Some(<Self as super::_puroro_traits::Test3Trait>::c(self))
+        }
+
+        fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
+            &self.c
         }
     }
 
