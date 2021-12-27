@@ -11,6 +11,15 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
 
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
+    {#- optional int32 => Bare<i32> #}
+    {#- optional String => Bare<NoAllocBumpString> #}
+    {#- optional MyMessage => Option<NoAllocBumpBox<MyMessageBumpalo<'bump>>> #}
+    {#- int32 => Bare<i32> #}
+    {#- String => Bare<NoAllocBumpString >#}
+    {#- MyMessage => Option<NoAllocBumpBox<MyMessageBumpalo<'bump>>> #}
+    {#- repeated int32 => NoAllocBumpVec<i32> #}
+    {#- repeated String => NoAllocBumpVec<NoAllocBumpString> #}
+    {#- repeated MyMessage => NoAllocBumpVec<MyMessageBumpalo<'bump>> #}
     {{ f.ident }}: {{ f.bumpalo_field_type }},
     {%- endif %}
     {%- endfor %}
@@ -63,6 +72,9 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {%- if f.is_repeated %}
     
     {#- ######## repeated getter ######## #}
+    {#- repeated int32 => &'this [i32] #}
+    {#- repeated String => &'this [impl Deref<Target=str>] #}
+    {#- repeated MyMessage => &'this [MyMessageBumpalo<'this>] #}
     pub fn {{ f.ident }}<'this>(&'this self) -> {{ f.bumpalo_getter_type }} {
         {%- if f.is_message %}
         unsafe { self.{{ f.ident }}.cast_item_unchecked() }
