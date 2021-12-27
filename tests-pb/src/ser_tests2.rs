@@ -151,7 +151,9 @@ pub mod _puroro_simple_impl {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
-            <self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+            self.submsg_optional_opt().unwrap_or(
+        <self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+    )
         }
         type Field8MessageType<'this>
         where
@@ -2012,7 +2014,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::MsgBumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
@@ -2321,7 +2323,11 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
             <Self>::submsg_optional_opt(self)
         }
         fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
-            <self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
+            self.submsg_optional_opt().unwrap_or(
+                <self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
+                    'this,
+                >>::default_instance(),
+            )
         }
         type Field8MessageType<'this>
         where
@@ -3787,7 +3793,7 @@ pub mod _puroro_nested {
                     }
                 }
 
-                pub fn default_instance() -> &'static Self {
+                pub fn default_instance() -> &'static self::SubmsgBumpalo<'static> {
                     use ::puroro::bumpalo::Bump;
                     use ::puroro::once_cell::unsync::Lazy;
                     static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());

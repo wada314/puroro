@@ -115,7 +115,9 @@ pub mod _puroro_simple_impl {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
         fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
-            <self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>::default_instance()
+            self.submsg_unlabeled_opt().unwrap_or(
+        <self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>::default_instance()
+    )
         }
     }
 
@@ -1060,7 +1062,7 @@ pub mod _puroro_impls {
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::MsgBumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
@@ -1282,7 +1284,9 @@ pub mod _puroro_impls {
             <Self>::submsg_unlabeled_opt(self)
         }
         fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
-            <self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
+            self.submsg_unlabeled_opt().unwrap_or(
+        <self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
+    )
         }
     }
 
@@ -1623,7 +1627,7 @@ pub mod _puroro_impls {
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::SubmsgBumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());

@@ -93,7 +93,9 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_gette
 {#- [optional] MyMessage => &'this MyMessage #}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
     {%- if f.is_message %}
-    <{{ f.simple_field_message_path }}>::default_instance()
+    self.{{ f.ident_unesc }}_opt().unwrap_or(
+        <{{ f.simple_field_message_path }}>::default_instance()
+    )
     {%- else %} {#- if f.is_message #}
     {%- if f.has_default_value %}
     self.{{ f.ident_unesc }}_opt().unwrap_or({{ f.default_value }})

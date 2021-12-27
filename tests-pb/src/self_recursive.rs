@@ -47,7 +47,9 @@ pub mod _puroro_simple_impl {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
         fn recursive_unlabeled<'this>(&'this self) -> Self::Field1MessageType<'this> {
-            <self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>::default_instance()
+            self.recursive_unlabeled_opt().unwrap_or(
+                <self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>::default_instance(),
+            )
         }
     }
 
@@ -260,7 +262,7 @@ pub mod _puroro_impls {
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::MsgBumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
@@ -330,8 +332,9 @@ pub mod _puroro_impls {
             <Self>::recursive_unlabeled_opt(self)
         }
         fn recursive_unlabeled<'this>(&'this self) -> Self::Field1MessageType<'this> {
-            <self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>>::default_instance(
-            )
+            self.recursive_unlabeled_opt().unwrap_or(
+        <self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>>::default_instance()
+    )
         }
     }
 

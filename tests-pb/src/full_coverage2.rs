@@ -389,14 +389,18 @@ pub mod _puroro_simple_impl {
             self.submsg_required.as_ref().map(|v| v.as_ref())
         }
         fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
-            <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+            self.submsg_required_opt().unwrap_or(
+        <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+    )
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
-            <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+            self.submsg_optional_opt().unwrap_or(
+        <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+    )
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         type Field53RepeatedType<'this> = &'this [self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg];
@@ -15802,7 +15806,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::MsgBumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
@@ -16983,18 +16987,18 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
             <Self>::submsg_required_opt(self)
         }
         fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
-            <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                'this,
-            >>::default_instance()
+            self.submsg_required_opt().unwrap_or(
+        <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
+    )
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             <Self>::submsg_optional_opt(self)
         }
         fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
-            <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
-                'this,
-            >>::default_instance()
+            self.submsg_optional_opt().unwrap_or(
+        <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
+    )
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         type Field53RepeatedType<'this> where Self: 'this =
@@ -21981,7 +21985,7 @@ pub mod _puroro_nested {
                     }
                 }
 
-                pub fn default_instance() -> &'static Self {
+                pub fn default_instance() -> &'static self::SubmsgBumpalo<'static> {
                     use ::puroro::bumpalo::Bump;
                     use ::puroro::once_cell::unsync::Lazy;
                     static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());

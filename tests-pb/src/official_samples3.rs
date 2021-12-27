@@ -268,7 +268,9 @@ pub mod _puroro_simple_impl {
             self.c.as_ref().map(|v| v.as_ref())
         }
         fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
-            <self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>::default_instance()
+            self.c_opt().unwrap_or(
+        <self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>::default_instance()
+    )
         }
     }
 
@@ -560,7 +562,7 @@ pub mod _puroro_impls {
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::Test1Bumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
@@ -783,7 +785,7 @@ pub mod _puroro_impls {
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::Test2Bumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
@@ -1024,7 +1026,7 @@ pub mod _puroro_impls {
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::Test3Bumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
@@ -1094,7 +1096,9 @@ pub mod _puroro_impls {
             <Self>::c_opt(self)
         }
         fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
-            <self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'this>>::default_instance()
+            self.c_opt().unwrap_or(
+        <self::_puroro_root::official_samples3::_puroro_impls::Test1Bumpalo<'this>>::default_instance()
+    )
         }
     }
 
@@ -1285,7 +1289,7 @@ pub mod _puroro_impls {
             }
         }
 
-        pub fn default_instance() -> &'static Self {
+        pub fn default_instance() -> &'static self::Test4Bumpalo<'static> {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());

@@ -66,7 +66,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         }
     }
 
-    pub fn default_instance() -> &'static Self {
+    pub fn default_instance() -> &'static self::{{ m.bumpalo_ident }}<'static> {
         use ::puroro::once_cell::unsync::Lazy;
         use ::puroro::bumpalo::Bump;
         static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
