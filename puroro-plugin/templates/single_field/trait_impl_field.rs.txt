@@ -25,7 +25,7 @@ type Field{{ f.number }}RepeatedType<'this> where Self: 'this
         'this,
         RepeatedType,
         ScalarType,
-        {{ field.single_numerical_rust_type }}
+        {{ f.single_numerical_rust_type }}
     >;
 {%- endif %}
 
