@@ -28014,7 +28014,9 @@ pub mod _puroro_impls {
         fn string_default_default_value<'this>(
             &'this self,
         ) -> Self::Field71ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field72ScalarGetterType<'this>
         where
@@ -28025,7 +28027,7 @@ pub mod _puroro_impls {
         }
 
         fn string_empty_default_value<'this>(&'this self) -> Self::Field72ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value("")
         }
         type Field73ScalarGetterType<'this>
         where
@@ -28036,7 +28038,7 @@ pub mod _puroro_impls {
         }
 
         fn string_abc_default_value<'this>(&'this self) -> Self::Field73ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value("abc")
         }
         type Field74ScalarGetterType<'this>
         where
@@ -28047,7 +28049,9 @@ pub mod _puroro_impls {
         }
 
         fn string_aiu_default_value<'this>(&'this self) -> Self::Field74ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                "\u{3042}\u{3044}\u{3046}",
+            )
         }
         type Field75ScalarGetterType<'this>
         where
@@ -28062,7 +28066,7 @@ pub mod _puroro_impls {
         fn string_backslash_default_value<'this>(
             &'this self,
         ) -> Self::Field75ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value("\\")
         }
         type Field76ScalarGetterType<'this>
         where
@@ -28073,7 +28077,7 @@ pub mod _puroro_impls {
         }
 
         fn string_tab_default_value<'this>(&'this self) -> Self::Field76ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value("\t")
         }
         type Field77ScalarGetterType<'this>
         where
@@ -28084,7 +28088,7 @@ pub mod _puroro_impls {
         }
 
         fn string_crlf_default_value<'this>(&'this self) -> Self::Field77ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value("\r\n")
         }
         type Field81ScalarGetterType<'this>
         where
@@ -28095,7 +28099,9 @@ pub mod _puroro_impls {
         }
 
         fn bytes_default_default_value<'this>(&'this self) -> Self::Field81ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field82ScalarGetterType<'this>
         where
@@ -28106,7 +28112,7 @@ pub mod _puroro_impls {
         }
 
         fn bytes_empty_default_value<'this>(&'this self) -> Self::Field82ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(b"")
         }
         type Field83ScalarGetterType<'this>
         where
@@ -28117,7 +28123,7 @@ pub mod _puroro_impls {
         }
 
         fn bytes_abc_default_value<'this>(&'this self) -> Self::Field83ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(b"\x61\x62\x63")
         }
         type Field84ScalarGetterType<'this>
         where
@@ -28128,7 +28134,9 @@ pub mod _puroro_impls {
         }
 
         fn bytes_aiu_default_value<'this>(&'this self) -> Self::Field84ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(
+                b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86",
+            )
         }
         type Field85ScalarGetterType<'this>
         where
@@ -28141,7 +28149,7 @@ pub mod _puroro_impls {
         fn bytes_backslash_default_value<'this>(
             &'this self,
         ) -> Self::Field85ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(b"\x5c")
         }
         type Field86ScalarGetterType<'this>
         where
@@ -28152,7 +28160,7 @@ pub mod _puroro_impls {
         }
 
         fn bytes_tab_default_value<'this>(&'this self) -> Self::Field86ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(b"\x09")
         }
         type Field87ScalarGetterType<'this>
         where
@@ -28163,7 +28171,7 @@ pub mod _puroro_impls {
         }
 
         fn bytes_crlf_default_value<'this>(&'this self) -> Self::Field87ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(b"\x0d\x0a")
         }
         fn enum_default_opt<'this>(
             &'this self,

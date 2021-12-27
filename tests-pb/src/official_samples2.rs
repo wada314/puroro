@@ -820,7 +820,9 @@ pub mod _puroro_impls {
         }
 
         fn b_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
     }
 
@@ -1061,9 +1063,7 @@ pub mod _puroro_impls {
             <Self>::c_opt(self)
         }
 
-        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {
-            todo!()
-        }
+        fn c_default_value<'this>(&'this self) -> Self::Field3ScalarGetterType<'this> {}
     }
 
     impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for Test3Bumpalo<'bump> {

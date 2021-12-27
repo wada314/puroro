@@ -51,8 +51,14 @@ fn {{ field.ident_unesc }}_default_value<'this>(&'this self) ->
 {
     {%- if field.is_length_delimited %}
 
-    {#- TODO!!! #}
-    todo!()
+    {%- if field.is_message %}
+    {%- endif %} {#- if field.is_message #}
+    {%- if field.is_string %}
+    ::puroro::internal::bumpalo::create_ref_string_for_default_value({{ field.default_value }})
+    {%- endif %} {#- if field.is_string #}
+    {%- if field.is_bytes %}
+    ::puroro::internal::bumpalo::create_ref_vec_for_default_value({{ field.default_value }})
+    {%- endif %} {#- if field.is_bytes #}
 
     {%- else %} {#- if field.is_length_delimited #}
 

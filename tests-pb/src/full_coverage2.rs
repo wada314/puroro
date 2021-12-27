@@ -20388,7 +20388,9 @@ pub mod _puroro_impls {
         fn bytes_required_default_value<'this>(
             &'this self,
         ) -> Self::Field21ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field22ScalarGetterType<'this>
         where
@@ -20401,7 +20403,9 @@ pub mod _puroro_impls {
         fn bytes_optional_default_value<'this>(
             &'this self,
         ) -> Self::Field22ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_vec_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field23ScalarGetterType<'this>
         where
@@ -20427,7 +20431,9 @@ pub mod _puroro_impls {
         fn string_required_default_value<'this>(
             &'this self,
         ) -> Self::Field31ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field32ScalarGetterType<'this>
         where
@@ -20440,7 +20446,9 @@ pub mod _puroro_impls {
         fn string_optional_default_value<'this>(
             &'this self,
         ) -> Self::Field32ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field33ScalarGetterType<'this>
         where
@@ -20500,7 +20508,6 @@ pub mod _puroro_impls {
         fn submsg_required_default_value<'this>(
             &'this self,
         ) -> Self::Field51ScalarGetterType<'this> {
-            todo!()
         }
         type Field52ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>
 ;
@@ -20511,7 +20518,6 @@ pub mod _puroro_impls {
         fn submsg_optional_default_value<'this>(
             &'this self,
         ) -> Self::Field52ScalarGetterType<'this> {
-            todo!()
         }
         type Field53ScalarGetterType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>
 ;

@@ -321,7 +321,6 @@ pub mod _puroro_impls {
         fn recursive_unlabeled_default_value<'this>(
             &'this self,
         ) -> Self::Field1ScalarGetterType<'this> {
-            todo!()
         }
     }
 

@@ -2565,7 +2565,9 @@ pub mod _puroro_impls {
         fn string_unlabeled_default_value<'this>(
             &'this self,
         ) -> Self::Field5ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field6ScalarGetterType<'this>
         where
@@ -2593,7 +2595,6 @@ pub mod _puroro_impls {
         fn submsg_unlabeled_default_value<'this>(
             &'this self,
         ) -> Self::Field7ScalarGetterType<'this> {
-            todo!()
         }
         type Field8ScalarGetterType<'this>
         where

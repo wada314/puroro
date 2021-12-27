@@ -23,6 +23,7 @@ pub mod de;
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
 use crate::internal::Bare;
+use ::once_cell::unsync::Lazy;
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
@@ -621,5 +622,20 @@ where
 }
 
 pub fn create_ref_vec_for_default_value(value: &'static [u8]) -> RefVec<'static, 'static, u8> {
-    todo!()
+    static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+    let mut vec = Vec::with_capacity_in(value.len(), &BUMP);
+    vec.extend_from_slice(value);
+    RefVec::new(ManuallyDrop::new(vec))
+}
+
+pub fn create_ref_string_for_default_value(value: &'static str) -> RefString<'static, 'static> {
+    static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+    let mut string = String::from_str_in(value, &BUMP);
+    RefString::new(ManuallyDrop::new(string))
+}
+
+pub fn create_ref_for_bump_default_value<'a, T: BumpDefault<'a>>() -> &'static T {
+    static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+    static DEFAULT_VALUE: Lazy<T> = Lazy::new(|| T::new_in(&BUMP));
+    &DEFAULT_VALUE
 }

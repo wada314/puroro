@@ -1285,7 +1285,9 @@ pub mod _puroro_impls {
         = ::puroro::internal::RefBumpString<'bump, 'this>;
 
         fn g1_string_default_value<'this>(&'this self) -> Self::Field2ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
 
         fn g2_f32_default_value<'this>(&'this self) -> f32 {
@@ -1297,16 +1299,16 @@ pub mod _puroro_impls {
         = ::puroro::internal::RefBumpString<'bump, 'this>;
 
         fn g2_string_default_value<'this>(&'this self) -> Self::Field4ScalarGetterType<'this> {
-            todo!()
+            ::puroro::internal::bumpalo::create_ref_string_for_default_value(
+                ::std::default::Default::default(),
+            )
         }
         type Field5ScalarGetterType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'this>;
 
-        fn g2_submsg_default_value<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
-            todo!()
-        }
+        fn g2_submsg_default_value<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {}
 
         fn g3_int32_default_value<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
