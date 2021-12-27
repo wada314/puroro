@@ -113,6 +113,12 @@ impl<T> Drop for NoAllocBox<T> {
         unsafe { ptr::drop_in_place(self.0.as_ptr()) }
     }
 }
+/// This type is `Sync` because it is guaranteed that the
+/// internal pointer is unique.
+unsafe impl<T: Sync> Sync for NoAllocBox<T> {}
+/// This type is `Send` because it is guaranteed that the
+/// internal pointer is unique.
+unsafe impl<T: Send> Send for NoAllocBox<T> {}
 
 pub trait AddBump {
     type AddToRef<'bump, 'this>
@@ -279,6 +285,12 @@ impl<'a, T> IntoIterator for &'a NoAllocVec<T> {
         self.deref().into_iter()
     }
 }
+/// This type is `Sync` because it is guaranteed that the
+/// internal pointer is unique.
+unsafe impl<T: Sync> Sync for NoAllocVec<T> {}
+/// This type is `Send` because it is guaranteed that the
+/// internal pointer is unique.
+unsafe impl<T: Send> Send for NoAllocVec<T> {}
 
 pub struct RefMutVec<'bump, 'vec, T> {
     temp_vec: ManuallyDrop<Vec<'bump, T>>,
@@ -431,6 +443,12 @@ impl Default for NoAllocString {
         }
     }
 }
+/// This type is `Sync` because it is guaranteed that the
+/// internal pointer is unique.
+unsafe impl Sync for NoAllocString {}
+/// This type is `Send` because it is guaranteed that the
+/// internal pointer is unique.
+unsafe impl Send for NoAllocString {}
 
 pub struct RefMutString<'bump, 'string> {
     temp_string: ManuallyDrop<String<'bump>>,
