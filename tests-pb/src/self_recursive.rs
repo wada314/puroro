@@ -395,12 +395,16 @@ pub mod _puroro_traits {
 
     pub trait MsgTrait {
         type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::puroro::Message<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>
         where
             Self: 'this;
 
         fn recursive_unlabeled<'this>(&'this self) -> Self::Field1MessageType<'this> {
-            self.recursive_unlabeled_opt()
-                .unwrap_or_else(Self::field_1_default_value)
+            self.recursive_unlabeled_opt().unwrap_or_else(
+                <Self::Field1MessageType<'this> as ::puroro::Message<
+                    self::_puroro_root::self_recursive::_puroro_simple_impl::Msg,
+                >>::default_value(),
+            )
         }
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
             self.recursive_unlabeled_opt().is_some()

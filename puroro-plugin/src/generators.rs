@@ -187,6 +187,7 @@ struct Field {
     bitfield_index: i32,
     trait_scalar_getter_type: String,
     trait_field_message_trait_path: String,
+    trait_field_message_repr_path: String,
     trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
     simple_field_type: String,
@@ -208,24 +209,17 @@ struct Field {
 
 impl Field {
     fn try_new(f: &wrappers::Field, bitfield_index: &mut i32) -> Result<Self> {
-        let trait_field_message_trait_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                upgrade(&m)?.rust_trait_path()
-            } else {
-                "".to_string()
-            };
-        let simple_maybe_field_message_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Simple", &[]))
-            } else {
-                None
-            };
-        let bumpalo_maybe_field_message_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'this"]))
-            } else {
-                None
-            };
+        let maybe_message = if let wrappers::FieldType::Message(m) = f.field_type()? {
+            Some(upgrade(&m)?)
+        } else {
+            None
+        };
+        let simple_maybe_field_message_path = maybe_message
+            .as_ref()
+            .map(|m| m.rust_impl_path("Simple", &[]));
+        let bumpalo_maybe_field_message_path = maybe_message
+            .as_ref()
+            .map(|m| m.rust_impl_path("Bumpalo", &["'this"]));
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
         let is_repeated = matches!(f.field_label()?, wrappers::FieldLabel::Repeated);
         let is_unlabeled = matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled);
@@ -266,7 +260,14 @@ impl Field {
                 }
             },
             trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
-            trait_field_message_trait_path,
+            trait_field_message_trait_path: maybe_message
+                .as_ref()
+                .map(|m| m.rust_trait_path())
+                .unwrap_or_default(),
+            trait_field_message_repr_path: maybe_message
+                .as_ref()
+                .map(|m| m.rust_impl_path("Simple", &[]))
+                .unwrap_or_default(),
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
                     "<Self as super::_puroro_traits::{trait_ident}>::Field{number}MessageType<'_>",

@@ -2652,12 +2652,15 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
-        type Field7MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field7MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+            ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             where Self: 'this;
 
         fn submsg_unlabeled<'this>(&'this self) -> Self::Field7MessageType<'this> {
             self.submsg_unlabeled_opt()
-                .unwrap_or_else(Self::field_7_default_value)
+                .unwrap_or_else(<Self::Field7MessageType<'this> as ::puroro::Message<
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+            >>::default_value())
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
@@ -2667,7 +2670,8 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field8MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field8MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+            ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             where Self: 'this;
 
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>

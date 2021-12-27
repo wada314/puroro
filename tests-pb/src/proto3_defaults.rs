@@ -1639,12 +1639,16 @@ pub mod _puroro_traits {
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
-        type Field6MessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+        type Field6MessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait +
+            ::puroro::Message<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>
             where Self: 'this;
 
         fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
-            self.submsg_unlabeled_opt()
-                .unwrap_or_else(Self::field_6_default_value)
+            self.submsg_unlabeled_opt().unwrap_or_else(
+                <Self::Field6MessageType<'this> as ::puroro::Message<
+                    self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+                >>::default_value(),
+            )
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()

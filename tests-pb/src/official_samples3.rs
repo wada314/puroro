@@ -1488,11 +1488,15 @@ pub mod _puroro_traits {
     }
 
     pub trait Test3Trait {
-        type Field3MessageType<'this>: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+        type Field3MessageType<'this>: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait +
+            ::puroro::Message<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>
             where Self: 'this;
 
         fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
-            self.c_opt().unwrap_or_else(Self::field_3_default_value)
+            self.c_opt()
+                .unwrap_or_else(<Self::Field3MessageType<'this> as ::puroro::Message<
+                    self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
+                >>::default_value())
         }
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()

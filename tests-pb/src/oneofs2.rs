@@ -1614,12 +1614,16 @@ pub mod _puroro_traits {
             self.g2_string_opt().is_some()
         }
         type Field5MessageType<'this>: self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait
+            + ::puroro::Message<self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>
         where
             Self: 'this;
 
         fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
-            self.g2_submsg_opt()
-                .unwrap_or_else(Self::field_5_default_value)
+            self.g2_submsg_opt().unwrap_or_else(
+                <Self::Field5MessageType<'this> as ::puroro::Message<
+                    self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
+                >>::default_value(),
+            )
         }
         fn has_g2_submsg<'this>(&'this self) -> bool {
             self.g2_submsg_opt().is_some()

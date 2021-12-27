@@ -14376,12 +14376,17 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this>;
-        type Field51MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field51MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+            ::puroro::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             where Self: 'this;
 
         fn submsg_unlabeled<'this>(&'this self) -> Self::Field51MessageType<'this> {
-            self.submsg_unlabeled_opt()
-                .unwrap_or_else(Self::field_51_default_value)
+            self.submsg_unlabeled_opt().unwrap_or_else(
+                <
+                    Self::Field51MessageType<'this> as
+                    ::puroro::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+                >::default_value()
+            )
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
@@ -14391,12 +14396,17 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field52MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field52MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+            ::puroro::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             where Self: 'this;
 
         fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
-            self.submsg_optional_opt()
-                .unwrap_or_else(Self::field_52_default_value)
+            self.submsg_optional_opt().unwrap_or_else(
+                <
+                    Self::Field52MessageType<'this> as
+                    ::puroro::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+                >::default_value()
+            )
         }
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -14406,7 +14416,8 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field53MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type Field53MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+            ::puroro::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             where Self: 'this;
 
         type Field53RepeatedType<'this>: ::puroro::RepeatedField<'this>

@@ -4,6 +4,7 @@ pub trait {{ m.trait_ident }} {
 
     {%- if f.is_message %}
     type Field{{ f.number }}MessageType<'this>: {{ f.trait_field_message_trait_path }} +
+        ::puroro::Message<{{ f.trait_field_message_repr_path }}>
         where Self: 'this;
     {%- endif %} {#- if f.is_message #}
 
@@ -19,7 +20,12 @@ pub trait {{ m.trait_ident }} {
 
     fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
         {%- if f.is_message %}
-        self.{{ f.ident_unesc }}_opt().unwrap_or_else(Self::field_{{ f.number }}_default_value)
+        self.{{ f.ident_unesc }}_opt().unwrap_or_else(
+            <
+                Self::Field{{ f.number }}MessageType<'this> as
+                ::puroro::Message<{{ f.trait_field_message_repr_path }}>
+            >::default_value()
+        )
         {%- else %} {#- if f.is_message #}
         {%- if f.has_default_value %}
         self.{{ f.ident_unesc }}_opt().unwrap_or({{ f.default_value }})
