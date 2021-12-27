@@ -41,7 +41,14 @@ where
         {%- if f.is_message %}
         self.as_ref().and_then(|msg| msg.{{ f.ident_unesc}}_opt())
         {%- else %} {#- if f.is_message #}
-        self.as_ref().map_or({{ f.default_value }}, |msg| msg.{{ f.ident }}())
+        self.as_ref().map_or(
+            {%- if f.has_default_value %}
+            {{ f.default_value }},
+            {%- else %} {#- if f.has_default_value #}
+            ::std::default::Default::default(),
+            {%- endif %} {#- if f.has_default_value #}
+            |msg| msg.{{ f.ident }}()
+        )
         {%- endif %} {#- if f.is_message #}
     }
 
