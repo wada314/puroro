@@ -1326,305 +1326,234 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField7<ScalarType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    pub submsg_unlabeled: ScalarType,
+}
+
+    impl<ScalarType> ::puroro::Message<super::Msg>
+for MsgSingleField7<ScalarType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{}
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait
+for MsgSingleField7<ScalarType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn i32_unlabeled<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field2RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn float_unlabeled<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    type Field4RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+    fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn string_unlabeled<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    type Field6RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+type Field7MessageType<'this> where Self: 'this = &'this ScalarType;
+
+fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+    ::std::option::Option::Some(
+        <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self)
+    )
+}
+
+fn submsg_unlabeled<'this>(&'this self) -> Self::Field7MessageType<'this> {
+    &self.submsg_unlabeled
+}
+    type Field8MessageType<'this> where Self: 'this = ();
+    type Field8RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
+    fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
+        ::std::default::Default::default()
+    }
+    type Field10RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<self::_puroro_root::ser_tests3::Enum>;
+    fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn very_large_field_number<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+}
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
+for MsgSingleField7<ScalarType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    Self: super::_puroro_traits::MsgTrait,
+    for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a> :
+        ::puroro::internal::se::SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+        W: ::std::io::Write,
     {
-        pub submsg_unlabeled: ScalarType,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
+            7,
+            out
+        )?;
+        ::std::result::Result::Ok(())
     }
+}
 
-    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField7<ScalarType> where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug
-    {
-    }
-
-    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField7<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field2RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        type Field4RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        type Field6RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        type Field7MessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
-
-        fn submsg_unlabeled_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
-            ::std::option::Option::Some(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self),
-            )
-        }
-
-        fn submsg_unlabeled<'this>(&'this self) -> Self::Field7MessageType<'this> {
-            &self.submsg_unlabeled
-        }
-        type Field8MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type Field8RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
-            ::std::default::Default::default()
-        }
-        type Field10RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            self::_puroro_root::ser_tests3::Enum,
-        >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn very_large_field_number<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
+    impl<ScalarType> ::std::convert::From<ScalarType>
+for MsgSingleField7<ScalarType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn from(value: ScalarType) -> Self {
+        Self {
+            submsg_unlabeled: value,
         }
     }
-
-    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField7<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
-    {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::puroro::internal::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
-                >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
-                7,
-                out,
-            )?;
-            ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField7<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-    {
-        fn from(value: ScalarType) -> Self {
-            Self {
-                submsg_unlabeled: value,
-            }
-        }
-    }
+}
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField8<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-        pub submsg_repeated: RepeatedType,
-    }
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{
+    pub submsg_repeated: RepeatedType,
+}
 
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
-        for MsgSingleField8<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-    }
+for MsgSingleField8<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{}
 
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
-        for MsgSingleField8<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field2RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        type Field4RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn string_unlabeled<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        type Field6RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        type Field7MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        fn submsg_unlabeled<'this>(&'this self) -> Self::Field7MessageType<'this> {
-            ::std::default::Default::default()
-        }
-        type Field8MessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
-        type Field8RepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
-
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            &self.submsg_repeated
-        }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
-            ::std::default::Default::default()
-        }
-        type Field10RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            self::_puroro_root::ser_tests3::Enum,
-        >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn very_large_field_number<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
+for MsgSingleField8<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{
+    fn i32_unlabeled<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
     }
+    type Field2RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn float_unlabeled<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    type Field4RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+    fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn string_unlabeled<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    type Field6RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    type Field7MessageType<'this> where Self: 'this = ();
+    fn submsg_unlabeled<'this>(&'this self) -> Self::Field7MessageType<'this> {
+        ::std::default::Default::default()
+    }
+type Field8MessageType<'this> where Self: 'this = &'this ScalarType;
+type Field8RepeatedType<'this> where Self: 'this = &'this RepeatedType;
+
+fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+    &self.submsg_repeated
+}
+    fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
+        ::std::default::Default::default()
+    }
+    type Field10RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<self::_puroro_root::ser_tests3::Enum>;
+    fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn very_large_field_number<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+}
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
-        for MsgSingleField8<ScalarType, RepeatedType>
+for MsgSingleField8<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    Self: super::_puroro_traits::MsgTrait,
+    for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a> :
+        ::puroro::internal::se::SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
+        W: ::std::io::Write,
     {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::puroro::internal::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
-                >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
-                8,
-                out,
-            )?;
-            ::std::result::Result::Ok(())
-        }
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
+            8,
+            out
+        )?;
+        ::std::result::Result::Ok(())
     }
+}
 
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
-        for MsgSingleField8<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-        fn from(value: RepeatedType) -> Self {
-            Self {
-                submsg_repeated: value,
-            }
+for MsgSingleField8<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{
+    fn from(value: RepeatedType) -> Self {
+        Self {
+            submsg_repeated: value,
         }
     }
+}
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -2747,17 +2676,13 @@ pub mod _puroro_impls {
             ))
         }
 
-        pub fn append_submsg_unlabeled<ScalarType>(
-            self,
-            value: ScalarType,
-        ) -> MsgBuilder<(T, MsgSingleField7<ScalarType>)>
-        where
-            ScalarType:
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
-        {
+    pub fn append_submsg_unlabeled<ScalarType>(self, value: ScalarType)
+        -> MsgBuilder<(T, MsgSingleField7<ScalarType>)>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    {
             MsgBuilder((
                 self.0,
                 MsgSingleField7 {
@@ -2766,19 +2691,15 @@ pub mod _puroro_impls {
             ))
         }
 
-        pub fn append_submsg_repeated<ScalarType, RepeatedType>(
-            self,
-            value: RepeatedType,
-        ) -> MsgBuilder<(T, MsgSingleField8<ScalarType, RepeatedType>)>
-        where
-            ScalarType:
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
-            for<'a> &'a RepeatedType:
-                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        {
+    pub fn append_submsg_repeated<ScalarType, RepeatedType>(self, value: RepeatedType)
+        -> MsgBuilder<(T, MsgSingleField8<ScalarType, RepeatedType>)>
+where
+ScalarType: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
             MsgBuilder((
                 self.0,
                 MsgSingleField8 {

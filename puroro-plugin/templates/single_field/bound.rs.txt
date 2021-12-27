@@ -12,7 +12,9 @@ ScalarType: ::std::convert::AsRef<str> + ::std::clone::Clone + ::std::cmp::Parti
 {%- endif %}
 
 {%- if f.is_message %}
-ScalarType: {{ f.trait_field_message_trait_path }} + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: {{ f.trait_field_message_trait_path }} +
+    ::puroro::Message<{{ f.trait_field_message_repr_path }}> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 {%- endif %} {#- if f.is_message #}
 
 {%- else %} {#- if f.is_length_delimited #}

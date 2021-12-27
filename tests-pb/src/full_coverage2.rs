@@ -6004,930 +6004,717 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField51<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    pub submsg_required: ScalarType,
+}
+
+    impl<ScalarType> ::puroro::Message<super::Msg>
+for MsgSingleField51<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{}
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait
+for MsgSingleField51<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn i32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn i32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field3RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn float_required<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    fn float_optional<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    type Field13RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+    fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn bytes_required<'this>(&'this self) -> &'this [u8] {
+        ::std::default::Default::default()
+    }
+    fn bytes_optional<'this>(&'this self) -> &'this [u8] {
+        ::std::default::Default::default()
+    }
+    type Field23RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+    fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn string_required<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    fn string_optional<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    type Field33RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+        ::std::default::Default::default()
+    }
+    fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+        ::std::default::Default::default()
+    }
+    type Field43RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<self::_puroro_root::full_coverage2::Enum>;
+    fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+type Field51MessageType<'this> where Self: 'this = &'this ScalarType;
+
+fn submsg_required_opt<'this>(&'this self) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+    ::std::option::Option::Some(
+        <Self as super::_puroro_traits::MsgTrait>::submsg_required(self)
+    )
+}
+
+fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
+    &self.submsg_required
+}
+    type Field52MessageType<'this> where Self: 'this = ();
+    fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
+        ::std::default::Default::default()
+    }
+    type Field53MessageType<'this> where Self: 'this = ();
+    type Field53RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+    fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn i64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn i64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field103RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn u32_required<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    fn u32_optional<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    type Field113RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+    fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn u64_required<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    fn u64_optional<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    type Field123RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+    fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn s32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn s32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field133RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn s64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn s64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field143RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn fixed32_required<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    fn fixed32_optional<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    type Field153RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+    fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn fixed64_required<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    fn fixed64_optional<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    type Field163RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+    fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn sfixed32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn sfixed32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field173RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn sfixed64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn sfixed64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field183RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn f64_required<'this>(&'this self) -> f64 {
+        ::std::default::Default::default()
+    }
+    fn f64_optional<'this>(&'this self) -> f64 {
+        ::std::default::Default::default()
+    }
+    type Field193RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
+    fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+}
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
+for MsgSingleField51<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    Self: super::_puroro_traits::MsgTrait,
+    for<'a> <Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'a> :
+        ::puroro::internal::se::SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+        W: ::std::io::Write,
     {
-        pub submsg_required: ScalarType,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Required, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::MsgTrait>::submsg_required_opt(self),
+            51,
+            out
+        )?;
+        ::std::result::Result::Ok(())
     }
+}
 
-    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField51<ScalarType> where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug
-    {
-    }
-
-    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField51<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-    {
-        fn i32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field3RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn float_required<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn float_optional<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        type Field13RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn bytes_required<'this>(&'this self) -> &'this [u8] {
-            ::std::default::Default::default()
-        }
-        fn bytes_optional<'this>(&'this self) -> &'this [u8] {
-            ::std::default::Default::default()
-        }
-        type Field23RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
-        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn string_required<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        fn string_optional<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        type Field33RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
-            ::std::default::Default::default()
-        }
-        fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
-            ::std::default::Default::default()
-        }
-        type Field43RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            self::_puroro_root::full_coverage2::Enum,
-        >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        type Field51MessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
-
-        fn submsg_required_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
-            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::submsg_required(
-                self,
-            ))
-        }
-
-        fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
-            &self.submsg_required
-        }
-        type Field52MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
-            ::std::default::Default::default()
-        }
-        type Field53MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type Field53RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn i64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn i64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field103RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn u32_required<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        fn u32_optional<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        type Field113RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
-        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn u64_required<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        fn u64_optional<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        type Field123RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
-        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn s32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn s32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field133RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn s64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn s64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field143RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn fixed32_required<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        fn fixed32_optional<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        type Field153RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
-        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn fixed64_required<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        fn fixed64_optional<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        type Field163RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
-        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn sfixed32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn sfixed32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field173RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn sfixed64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn sfixed64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field183RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn f64_required<'this>(&'this self) -> f64 {
-            ::std::default::Default::default()
-        }
-        fn f64_optional<'this>(&'this self) -> f64 {
-            ::std::default::Default::default()
-        }
-        type Field193RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
-        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    impl<ScalarType> ::std::convert::From<ScalarType>
+for MsgSingleField51<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn from(value: ScalarType) -> Self {
+        Self {
+            submsg_required: value,
         }
     }
-
-    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField51<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
-    {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::puroro::internal::se::SerFieldToIoWrite::<
-                ::puroro::tags::Required,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field51MessageType<'_>,
-                >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_required_opt(self),
-                51,
-                out,
-            )?;
-            ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField51<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-    {
-        fn from(value: ScalarType) -> Self {
-            Self {
-                submsg_required: value,
-            }
-        }
-    }
+}
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField52<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    pub submsg_optional: ScalarType,
+}
+
+    impl<ScalarType> ::puroro::Message<super::Msg>
+for MsgSingleField52<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{}
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait
+for MsgSingleField52<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn i32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn i32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field3RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn float_required<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    fn float_optional<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    type Field13RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+    fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn bytes_required<'this>(&'this self) -> &'this [u8] {
+        ::std::default::Default::default()
+    }
+    fn bytes_optional<'this>(&'this self) -> &'this [u8] {
+        ::std::default::Default::default()
+    }
+    type Field23RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+    fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn string_required<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    fn string_optional<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    type Field33RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+        ::std::default::Default::default()
+    }
+    fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+        ::std::default::Default::default()
+    }
+    type Field43RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<self::_puroro_root::full_coverage2::Enum>;
+    fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    type Field51MessageType<'this> where Self: 'this = ();
+    fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
+        ::std::default::Default::default()
+    }
+type Field52MessageType<'this> where Self: 'this = &'this ScalarType;
+
+fn submsg_optional_opt<'this>(&'this self) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+    ::std::option::Option::Some(
+        <Self as super::_puroro_traits::MsgTrait>::submsg_optional(self)
+    )
+}
+
+fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
+    &self.submsg_optional
+}
+    type Field53MessageType<'this> where Self: 'this = ();
+    type Field53RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+    fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn i64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn i64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field103RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn u32_required<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    fn u32_optional<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    type Field113RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+    fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn u64_required<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    fn u64_optional<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    type Field123RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+    fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn s32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn s32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field133RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn s64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn s64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field143RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn fixed32_required<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    fn fixed32_optional<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    type Field153RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+    fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn fixed64_required<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    fn fixed64_optional<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    type Field163RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+    fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn sfixed32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn sfixed32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field173RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn sfixed64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn sfixed64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field183RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn f64_required<'this>(&'this self) -> f64 {
+        ::std::default::Default::default()
+    }
+    fn f64_optional<'this>(&'this self) -> f64 {
+        ::std::default::Default::default()
+    }
+    type Field193RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
+    fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+}
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
+for MsgSingleField52<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+    Self: super::_puroro_traits::MsgTrait,
+    for<'a> <Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'a> :
+        ::puroro::internal::se::SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+        W: ::std::io::Write,
     {
-        pub submsg_optional: ScalarType,
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
+            52,
+            out
+        )?;
+        ::std::result::Result::Ok(())
     }
+}
 
-    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField52<ScalarType> where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug
-    {
-    }
-
-    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField52<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-    {
-        fn i32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field3RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn float_required<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn float_optional<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        type Field13RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn bytes_required<'this>(&'this self) -> &'this [u8] {
-            ::std::default::Default::default()
-        }
-        fn bytes_optional<'this>(&'this self) -> &'this [u8] {
-            ::std::default::Default::default()
-        }
-        type Field23RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
-        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn string_required<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        fn string_optional<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        type Field33RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
-            ::std::default::Default::default()
-        }
-        fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
-            ::std::default::Default::default()
-        }
-        type Field43RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            self::_puroro_root::full_coverage2::Enum,
-        >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        type Field51MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
-            ::std::default::Default::default()
-        }
-        type Field52MessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
-
-        fn submsg_optional_opt<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
-            ::std::option::Option::Some(<Self as super::_puroro_traits::MsgTrait>::submsg_optional(
-                self,
-            ))
-        }
-
-        fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
-            &self.submsg_optional
-        }
-        type Field53MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        type Field53RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn i64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn i64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field103RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn u32_required<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        fn u32_optional<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        type Field113RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
-        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn u64_required<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        fn u64_optional<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        type Field123RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
-        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn s32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn s32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field133RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn s64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn s64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field143RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn fixed32_required<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        fn fixed32_optional<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        type Field153RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
-        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn fixed64_required<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        fn fixed64_optional<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        type Field163RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
-        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn sfixed32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn sfixed32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field173RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn sfixed64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn sfixed64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field183RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn f64_required<'this>(&'this self) -> f64 {
-            ::std::default::Default::default()
-        }
-        fn f64_optional<'this>(&'this self) -> f64 {
-            ::std::default::Default::default()
-        }
-        type Field193RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
-        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    impl<ScalarType> ::std::convert::From<ScalarType>
+for MsgSingleField52<ScalarType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+{
+    fn from(value: ScalarType) -> Self {
+        Self {
+            submsg_optional: value,
         }
     }
-
-    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField52<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
-    {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::puroro::internal::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field52MessageType<'_>,
-                >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
-                52,
-                out,
-            )?;
-            ::std::result::Result::Ok(())
-        }
-    }
-
-    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField52<ScalarType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-    {
-        fn from(value: ScalarType) -> Self {
-            Self {
-                submsg_optional: value,
-            }
-        }
-    }
+}
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
     pub struct MsgSingleField53<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-        pub submsg_repeated: RepeatedType,
-    }
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{
+    pub submsg_repeated: RepeatedType,
+}
 
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
-        for MsgSingleField53<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-    }
+for MsgSingleField53<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{}
 
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
-        for MsgSingleField53<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-        fn i32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field3RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn float_required<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn float_optional<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        type Field13RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn bytes_required<'this>(&'this self) -> &'this [u8] {
-            ::std::default::Default::default()
-        }
-        fn bytes_optional<'this>(&'this self) -> &'this [u8] {
-            ::std::default::Default::default()
-        }
-        type Field23RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
-        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn string_required<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        fn string_optional<'this>(&'this self) -> &'this str {
-            ::std::default::Default::default()
-        }
-        type Field33RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
-            ::std::default::Default::default()
-        }
-        fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
-            ::std::default::Default::default()
-        }
-        type Field43RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<
-            self::_puroro_root::full_coverage2::Enum,
-        >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        type Field51MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
-            ::std::default::Default::default()
-        }
-        type Field52MessageType<'this>
-        where
-            Self: 'this,
-        = ();
-        fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
-            ::std::default::Default::default()
-        }
-        type Field53MessageType<'this>
-        where
-            Self: 'this,
-        = &'this ScalarType;
-        type Field53RepeatedType<'this>
-        where
-            Self: 'this,
-        = &'this RepeatedType;
-
-        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            &self.submsg_repeated
-        }
-        fn i64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn i64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field103RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn u32_required<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        fn u32_optional<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        type Field113RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
-        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn u64_required<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        fn u64_optional<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        type Field123RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
-        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn s32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn s32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field133RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn s64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn s64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field143RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn fixed32_required<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        fn fixed32_optional<'this>(&'this self) -> u32 {
-            ::std::default::Default::default()
-        }
-        type Field153RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
-        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn fixed64_required<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        fn fixed64_optional<'this>(&'this self) -> u64 {
-            ::std::default::Default::default()
-        }
-        type Field163RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
-        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn sfixed32_required<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn sfixed32_optional<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        type Field173RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn sfixed64_required<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        fn sfixed64_optional<'this>(&'this self) -> i64 {
-            ::std::default::Default::default()
-        }
-        type Field183RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
-        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn f64_required<'this>(&'this self) -> f64 {
-            ::std::default::Default::default()
-        }
-        fn f64_optional<'this>(&'this self) -> f64 {
-            ::std::default::Default::default()
-        }
-        type Field193RepeatedType<'this>
-        where
-            Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
-        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-        }
+for MsgSingleField53<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{
+    fn i32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
     }
+    fn i32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field3RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn float_required<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    fn float_optional<'this>(&'this self) -> f32 {
+        ::std::default::Default::default()
+    }
+    type Field13RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
+    fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn bytes_required<'this>(&'this self) -> &'this [u8] {
+        ::std::default::Default::default()
+    }
+    fn bytes_optional<'this>(&'this self) -> &'this [u8] {
+        ::std::default::Default::default()
+    }
+    type Field23RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this [u8]>;
+    fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn string_required<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    fn string_optional<'this>(&'this self) -> &'this str {
+        ::std::default::Default::default()
+    }
+    type Field33RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
+    fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+        ::std::default::Default::default()
+    }
+    fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+        ::std::default::Default::default()
+    }
+    type Field43RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<self::_puroro_root::full_coverage2::Enum>;
+    fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    type Field51MessageType<'this> where Self: 'this = ();
+    fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
+        ::std::default::Default::default()
+    }
+    type Field52MessageType<'this> where Self: 'this = ();
+    fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
+        ::std::default::Default::default()
+    }
+type Field53MessageType<'this> where Self: 'this = &'this ScalarType;
+type Field53RepeatedType<'this> where Self: 'this = &'this RepeatedType;
+
+fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+    &self.submsg_repeated
+}
+    fn i64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn i64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field103RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn u32_required<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    fn u32_optional<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    type Field113RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+    fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn u64_required<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    fn u64_optional<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    type Field123RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+    fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn s32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn s32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field133RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn s64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn s64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field143RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn fixed32_required<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    fn fixed32_optional<'this>(&'this self) -> u32 {
+        ::std::default::Default::default()
+    }
+    type Field153RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
+    fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn fixed64_required<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    fn fixed64_optional<'this>(&'this self) -> u64 {
+        ::std::default::Default::default()
+    }
+    type Field163RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
+    fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn sfixed32_required<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    fn sfixed32_optional<'this>(&'this self) -> i32 {
+        ::std::default::Default::default()
+    }
+    type Field173RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn sfixed64_required<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    fn sfixed64_optional<'this>(&'this self) -> i64 {
+        ::std::default::Default::default()
+    }
+    type Field183RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
+    fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    fn f64_required<'this>(&'this self) -> f64 {
+        ::std::default::Default::default()
+    }
+    fn f64_optional<'this>(&'this self) -> f64 {
+        ::std::default::Default::default()
+    }
+    type Field193RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
+    fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+}
 
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
-        for MsgSingleField53<ScalarType, RepeatedType>
+for MsgSingleField53<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    Self: super::_puroro_traits::MsgTrait,
+    for<'a> <Self as super::_puroro_traits::MsgTrait>::Field53MessageType<'a> :
+        ::puroro::internal::se::SerMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-        Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field53MessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
+        W: ::std::io::Write,
     {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::puroro::internal::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field53MessageType<'_>,
-                >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
-                53,
-                out,
-            )?;
-            ::std::result::Result::Ok(())
-        }
+        ::puroro::internal::se::SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::Field53MessageType<'_>>
+        >::ser_field(
+            <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
+            53,
+            out
+        )?;
+        ::std::result::Result::Ok(())
     }
+}
 
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
-        for MsgSingleField53<ScalarType, RepeatedType>
-    where
-        ScalarType:
-            self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
-        for<'a> &'a RepeatedType:
-            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-        fn from(value: RepeatedType) -> Self {
-            Self {
-                submsg_repeated: value,
-            }
+for MsgSingleField53<ScalarType, RepeatedType>
+where
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
+    ::std::iter::IntoIterator<Item = &'a ScalarType>,
+{
+    fn from(value: RepeatedType) -> Self {
+        Self {
+            submsg_repeated: value,
         }
     }
+}
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
@@ -18453,7 +18240,9 @@ pub mod _puroro_impls {
     pub fn append_submsg_required<ScalarType>(self, value: ScalarType)
         -> MsgBuilder<(T, MsgSingleField51<ScalarType>)>
 where
-ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     {
             MsgBuilder((
                 self.0,
@@ -18466,7 +18255,9 @@ ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_tra
     pub fn append_submsg_optional<ScalarType>(self, value: ScalarType)
         -> MsgBuilder<(T, MsgSingleField52<ScalarType>)>
 where
-ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     {
             MsgBuilder((
                 self.0,
@@ -18479,7 +18270,9 @@ ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_tra
     pub fn append_submsg_repeated<ScalarType, RepeatedType>(self, value: RepeatedType)
         -> MsgBuilder<(T, MsgSingleField53<ScalarType, RepeatedType>)>
 where
-ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+ScalarType: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait +
+    ::puroro::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg> +
+    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {

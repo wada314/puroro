@@ -947,6 +947,7 @@ pub mod _puroro_impls {
     pub struct MsgSingleField5<ScalarType>
     where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+            + ::puroro::Message<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -956,6 +957,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField5<ScalarType> where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+            + ::puroro::Message<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
@@ -965,6 +967,7 @@ pub mod _puroro_impls {
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField5<ScalarType>
     where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+            + ::puroro::Message<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -1015,6 +1018,7 @@ pub mod _puroro_impls {
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
     where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+            + ::puroro::Message<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -1043,6 +1047,7 @@ pub mod _puroro_impls {
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField5<ScalarType>
     where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+            + ::puroro::Message<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -1503,6 +1508,7 @@ pub mod _puroro_impls {
         ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
         where
             ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+                + ::puroro::Message<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,

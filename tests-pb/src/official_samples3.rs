@@ -919,6 +919,7 @@ pub mod _puroro_impls {
     pub struct Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::puroro::Message<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -928,6 +929,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::Message<super::Test3> for Test3SingleField3<ScalarType> where
         ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::puroro::Message<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug
@@ -937,6 +939,7 @@ pub mod _puroro_impls {
     impl<ScalarType> super::_puroro_traits::Test3Trait for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::puroro::Message<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -958,6 +961,7 @@ pub mod _puroro_impls {
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::puroro::Message<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -986,6 +990,7 @@ pub mod _puroro_impls {
     impl<ScalarType> ::std::convert::From<ScalarType> for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+            + ::puroro::Message<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug,
@@ -1157,6 +1162,7 @@ pub mod _puroro_impls {
         ) -> Test3Builder<(T, Test3SingleField3<ScalarType>)>
         where
             ScalarType: self::_puroro_root::official_samples3::_puroro_traits::Test1Trait
+                + ::puroro::Message<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>
                 + ::std::clone::Clone
                 + ::std::cmp::PartialEq
                 + ::std::fmt::Debug,
