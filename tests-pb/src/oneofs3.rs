@@ -1042,7 +1042,8 @@ pub mod _puroro_impls {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::sync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
-            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            static DEFAULT_INSTANCE: Lazy<self::MsgBumpalo<'static>> =
+                Lazy::new(|| self::MsgBumpalo::new_in(&BUMP));
             &DEFAULT_INSTANCE
         }
     }
@@ -1489,7 +1490,8 @@ pub mod _puroro_impls {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::sync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
-            static DEFAULT_INSTANCE: Lazy<Self> = Lazy::new(|| Self::new_in(&BUMP));
+            static DEFAULT_INSTANCE: Lazy<self::SubmsgBumpalo<'static>> =
+                Lazy::new(|| self::SubmsgBumpalo::new_in(&BUMP));
             &DEFAULT_INSTANCE
         }
         pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
