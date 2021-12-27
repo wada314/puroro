@@ -1,12 +1,16 @@
 
 {%- match f.bumpalo_maybe_field_message_path %}
 {%- when Some with (struct_path) %}
+{#- [optional|repeated] MyMessage => &'this MyMessageBumpalo<'this> #}
 type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }};
 {%- else %}
 {%- endmatch %}
 
 {%- if f.is_repeated %}
 
+{#- repeated i32 =>  CloneThenIntoRepeatedField<'this, NoAllocBumpVec<i32>, i32, i32> #}
+{#- repeated String => AsRefRepeatedField<'this, NoAllocBumpVec<NoAllocBumpString>, NoAllocBumpString, str> #}
+{#- repeated MyMessage => &'this [MyMessageBumpalo<'this>] #}
 type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
 {%- match f.bumpalo_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
@@ -34,6 +38,9 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 
 {%- else %} {#- if f.is_repeated #}
 
+{#- [optional] int32 => Option<i32> #}
+{#- [optional] String => Option<&'this str> #}
+{#- [optional] MyMessage => Option<&'this MyMessageBumpalo<'this>> #}
 {%- if !f.is_explicit_oneof_field %}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     <Self>::{{ f.ident_unesc }}_opt(self)

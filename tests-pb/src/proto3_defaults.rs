@@ -937,6 +937,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i32_unlabeled(&self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
@@ -953,6 +954,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
@@ -972,6 +974,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_f32_unlabeled(&self) -> bool {
             self.f32_unlabeled_opt().is_some()
         }
@@ -988,6 +991,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_string_unlabeled(&self) -> bool {
             self.string_unlabeled_opt().is_some()
         }
@@ -1007,6 +1011,7 @@ pub mod _puroro_impls {
         > {
             self.submsg_unlabeled_opt()
         }
+
         pub fn has_submsg_unlabeled(&self) -> bool {
             self.submsg_unlabeled_opt().is_some()
         }
@@ -1094,7 +1099,6 @@ pub mod _puroro_impls {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
         }
-
         type Field3RepeatedType<'this>
         where
             Self: 'this,
@@ -1467,6 +1471,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i32_unlabeled(&self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }

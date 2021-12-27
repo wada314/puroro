@@ -6166,6 +6166,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i32_default(&self) -> bool {
             self.i32_default_opt().is_some()
         }
@@ -6182,6 +6183,7 @@ pub mod _puroro_impls {
                 _ => 0,
             }
         }
+
         pub fn has_i32_0(&self) -> bool {
             self.i32_0_opt().is_some()
         }
@@ -6198,6 +6200,7 @@ pub mod _puroro_impls {
                 _ => 42,
             }
         }
+
         pub fn has_i32_42(&self) -> bool {
             self.i32_42_opt().is_some()
         }
@@ -6214,6 +6217,7 @@ pub mod _puroro_impls {
                 _ => -42,
             }
         }
+
         pub fn has_i32_m42(&self) -> bool {
             self.i32_m42_opt().is_some()
         }
@@ -6230,6 +6234,7 @@ pub mod _puroro_impls {
                 _ => 2147483647,
             }
         }
+
         pub fn has_i32_2147483647(&self) -> bool {
             self.i32_2147483647_opt().is_some()
         }
@@ -6246,6 +6251,7 @@ pub mod _puroro_impls {
                 _ => -2147483648,
             }
         }
+
         pub fn has_i32_m2147483648(&self) -> bool {
             self.i32_m2147483648_opt().is_some()
         }
@@ -6262,6 +6268,7 @@ pub mod _puroro_impls {
                 _ => 83,
             }
         }
+
         pub fn has_i32_0123(&self) -> bool {
             self.i32_0123_opt().is_some()
         }
@@ -6278,6 +6285,7 @@ pub mod _puroro_impls {
                 _ => 291,
             }
         }
+
         pub fn has_i32_0x123(&self) -> bool {
             self.i32_0x123_opt().is_some()
         }
@@ -6294,6 +6302,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_u32_default(&self) -> bool {
             self.u32_default_opt().is_some()
         }
@@ -6310,6 +6319,7 @@ pub mod _puroro_impls {
                 _ => 0,
             }
         }
+
         pub fn has_u32_0(&self) -> bool {
             self.u32_0_opt().is_some()
         }
@@ -6326,6 +6336,7 @@ pub mod _puroro_impls {
                 _ => 42,
             }
         }
+
         pub fn has_u32_42(&self) -> bool {
             self.u32_42_opt().is_some()
         }
@@ -6342,6 +6353,7 @@ pub mod _puroro_impls {
                 _ => 4294967295,
             }
         }
+
         pub fn has_u32_4294967295(&self) -> bool {
             self.u32_4294967295_opt().is_some()
         }
@@ -6358,6 +6370,7 @@ pub mod _puroro_impls {
                 _ => 83,
             }
         }
+
         pub fn has_u32_0123(&self) -> bool {
             self.u32_0123_opt().is_some()
         }
@@ -6374,6 +6387,7 @@ pub mod _puroro_impls {
                 _ => 291,
             }
         }
+
         pub fn has_u32_0x123(&self) -> bool {
             self.u32_0x123_opt().is_some()
         }
@@ -6390,6 +6404,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i64_default(&self) -> bool {
             self.i64_default_opt().is_some()
         }
@@ -6406,6 +6421,7 @@ pub mod _puroro_impls {
                 _ => 0,
             }
         }
+
         pub fn has_i64_0(&self) -> bool {
             self.i64_0_opt().is_some()
         }
@@ -6422,6 +6438,7 @@ pub mod _puroro_impls {
                 _ => 42,
             }
         }
+
         pub fn has_i64_42(&self) -> bool {
             self.i64_42_opt().is_some()
         }
@@ -6438,6 +6455,7 @@ pub mod _puroro_impls {
                 _ => -42,
             }
         }
+
         pub fn has_i64_m42(&self) -> bool {
             self.i64_m42_opt().is_some()
         }
@@ -6454,6 +6472,7 @@ pub mod _puroro_impls {
                 _ => 9223372036854775807,
             }
         }
+
         pub fn has_i64_9223372036854775807(&self) -> bool {
             self.i64_9223372036854775807_opt().is_some()
         }
@@ -6470,6 +6489,7 @@ pub mod _puroro_impls {
                 _ => -9223372036854775808,
             }
         }
+
         pub fn has_i64_m9223372036854775808(&self) -> bool {
             self.i64_m9223372036854775808_opt().is_some()
         }
@@ -6486,6 +6506,7 @@ pub mod _puroro_impls {
                 _ => 83,
             }
         }
+
         pub fn has_i64_0123(&self) -> bool {
             self.i64_0123_opt().is_some()
         }
@@ -6502,6 +6523,7 @@ pub mod _puroro_impls {
                 _ => 291,
             }
         }
+
         pub fn has_i64_0x123(&self) -> bool {
             self.i64_0x123_opt().is_some()
         }
@@ -6518,6 +6540,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_u64_default(&self) -> bool {
             self.u64_default_opt().is_some()
         }
@@ -6534,6 +6557,7 @@ pub mod _puroro_impls {
                 _ => 0,
             }
         }
+
         pub fn has_u64_0(&self) -> bool {
             self.u64_0_opt().is_some()
         }
@@ -6550,6 +6574,7 @@ pub mod _puroro_impls {
                 _ => 42,
             }
         }
+
         pub fn has_u64_42(&self) -> bool {
             self.u64_42_opt().is_some()
         }
@@ -6566,6 +6591,7 @@ pub mod _puroro_impls {
                 _ => 18446744073709551615,
             }
         }
+
         pub fn has_u64_18446744073709551615(&self) -> bool {
             self.u64_18446744073709551615_opt().is_some()
         }
@@ -6582,6 +6608,7 @@ pub mod _puroro_impls {
                 _ => 83,
             }
         }
+
         pub fn has_u64_0123(&self) -> bool {
             self.u64_0123_opt().is_some()
         }
@@ -6598,6 +6625,7 @@ pub mod _puroro_impls {
                 _ => 291,
             }
         }
+
         pub fn has_u64_0x123(&self) -> bool {
             self.u64_0x123_opt().is_some()
         }
@@ -6614,6 +6642,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_f32_default(&self) -> bool {
             self.f32_default_opt().is_some()
         }
@@ -6630,6 +6659,7 @@ pub mod _puroro_impls {
                 _ => 0f32,
             }
         }
+
         pub fn has_f32_0(&self) -> bool {
             self.f32_0_opt().is_some()
         }
@@ -6646,6 +6676,7 @@ pub mod _puroro_impls {
                 _ => -0f32,
             }
         }
+
         pub fn has_f32_m0(&self) -> bool {
             self.f32_m0_opt().is_some()
         }
@@ -6662,6 +6693,7 @@ pub mod _puroro_impls {
                 _ => 0f32,
             }
         }
+
         pub fn has_f32_0p(&self) -> bool {
             self.f32_0p_opt().is_some()
         }
@@ -6678,6 +6710,7 @@ pub mod _puroro_impls {
                 _ => 0f32,
             }
         }
+
         pub fn has_f32_p0(&self) -> bool {
             self.f32_p0_opt().is_some()
         }
@@ -6694,6 +6727,7 @@ pub mod _puroro_impls {
                 _ => 0f32,
             }
         }
+
         pub fn has_f32_0p0(&self) -> bool {
             self.f32_0p0_opt().is_some()
         }
@@ -6710,6 +6744,7 @@ pub mod _puroro_impls {
                 _ => 42f32,
             }
         }
+
         pub fn has_f32_42(&self) -> bool {
             self.f32_42_opt().is_some()
         }
@@ -6726,6 +6761,7 @@ pub mod _puroro_impls {
                 _ => -42f32,
             }
         }
+
         pub fn has_f32_m42(&self) -> bool {
             self.f32_m42_opt().is_some()
         }
@@ -6742,6 +6778,7 @@ pub mod _puroro_impls {
                 _ => 0.25f32,
             }
         }
+
         pub fn has_f32_0p25(&self) -> bool {
             self.f32_0p25_opt().is_some()
         }
@@ -6758,6 +6795,7 @@ pub mod _puroro_impls {
                 _ => 150f32,
             }
         }
+
         pub fn has_f32_1p5e2(&self) -> bool {
             self.f32_1p5e2_opt().is_some()
         }
@@ -6774,6 +6812,7 @@ pub mod _puroro_impls {
                 _ => f32::INFINITY,
             }
         }
+
         pub fn has_f32_inf(&self) -> bool {
             self.f32_inf_opt().is_some()
         }
@@ -6790,6 +6829,7 @@ pub mod _puroro_impls {
                 _ => f32::NEG_INFINITY,
             }
         }
+
         pub fn has_f32_minf(&self) -> bool {
             self.f32_minf_opt().is_some()
         }
@@ -6806,6 +6846,7 @@ pub mod _puroro_impls {
                 _ => f32::NAN,
             }
         }
+
         pub fn has_f32_nan(&self) -> bool {
             self.f32_nan_opt().is_some()
         }
@@ -6822,6 +6863,7 @@ pub mod _puroro_impls {
                 _ => f32::NAN,
             }
         }
+
         pub fn has_f32_mnan(&self) -> bool {
             self.f32_mnan_opt().is_some()
         }
@@ -6838,6 +6880,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_bool_default(&self) -> bool {
             self.bool_default_opt().is_some()
         }
@@ -6854,6 +6897,7 @@ pub mod _puroro_impls {
                 _ => true,
             }
         }
+
         pub fn has_bool_true(&self) -> bool {
             self.bool_true_opt().is_some()
         }
@@ -6870,6 +6914,7 @@ pub mod _puroro_impls {
                 _ => false,
             }
         }
+
         pub fn has_bool_false(&self) -> bool {
             self.bool_false_opt().is_some()
         }
@@ -6886,6 +6931,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_string_default(&self) -> bool {
             self.string_default_opt().is_some()
         }
@@ -6902,6 +6948,7 @@ pub mod _puroro_impls {
                 _ => "",
             }
         }
+
         pub fn has_string_empty(&self) -> bool {
             self.string_empty_opt().is_some()
         }
@@ -6918,6 +6965,7 @@ pub mod _puroro_impls {
                 _ => "abc",
             }
         }
+
         pub fn has_string_abc(&self) -> bool {
             self.string_abc_opt().is_some()
         }
@@ -6934,6 +6982,7 @@ pub mod _puroro_impls {
                 _ => "\u{3042}\u{3044}\u{3046}",
             }
         }
+
         pub fn has_string_aiu(&self) -> bool {
             self.string_aiu_opt().is_some()
         }
@@ -6950,6 +6999,7 @@ pub mod _puroro_impls {
                 _ => "\\",
             }
         }
+
         pub fn has_string_backslash(&self) -> bool {
             self.string_backslash_opt().is_some()
         }
@@ -6966,6 +7016,7 @@ pub mod _puroro_impls {
                 _ => "\t",
             }
         }
+
         pub fn has_string_tab(&self) -> bool {
             self.string_tab_opt().is_some()
         }
@@ -6982,6 +7033,7 @@ pub mod _puroro_impls {
                 _ => "\r\n",
             }
         }
+
         pub fn has_string_crlf(&self) -> bool {
             self.string_crlf_opt().is_some()
         }
@@ -6998,6 +7050,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_bytes_default(&self) -> bool {
             self.bytes_default_opt().is_some()
         }
@@ -7014,6 +7067,7 @@ pub mod _puroro_impls {
                 _ => b"",
             }
         }
+
         pub fn has_bytes_empty(&self) -> bool {
             self.bytes_empty_opt().is_some()
         }
@@ -7030,6 +7084,7 @@ pub mod _puroro_impls {
                 _ => b"\x61\x62\x63",
             }
         }
+
         pub fn has_bytes_abc(&self) -> bool {
             self.bytes_abc_opt().is_some()
         }
@@ -7046,6 +7101,7 @@ pub mod _puroro_impls {
                 _ => b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86",
             }
         }
+
         pub fn has_bytes_aiu(&self) -> bool {
             self.bytes_aiu_opt().is_some()
         }
@@ -7062,6 +7118,7 @@ pub mod _puroro_impls {
                 _ => b"\x5c",
             }
         }
+
         pub fn has_bytes_backslash(&self) -> bool {
             self.bytes_backslash_opt().is_some()
         }
@@ -7078,6 +7135,7 @@ pub mod _puroro_impls {
                 _ => b"\x09",
             }
         }
+
         pub fn has_bytes_tab(&self) -> bool {
             self.bytes_tab_opt().is_some()
         }
@@ -7094,6 +7152,7 @@ pub mod _puroro_impls {
                 _ => b"\x0d\x0a",
             }
         }
+
         pub fn has_bytes_crlf(&self) -> bool {
             self.bytes_crlf_opt().is_some()
         }
@@ -7112,6 +7171,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_enum_default(&self) -> bool {
             self.enum_default_opt().is_some()
         }
@@ -7130,6 +7190,7 @@ pub mod _puroro_impls {
                 _ => self::_puroro_root::proto2_defaults::MyEnum::One,
             }
         }
+
         pub fn has_enum_one(&self) -> bool {
             self.enum_one_opt().is_some()
         }
@@ -7148,6 +7209,7 @@ pub mod _puroro_impls {
                 _ => self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo,
             }
         }
+
         pub fn has_enum_fourty_two(&self) -> bool {
             self.enum_fourty_two_opt().is_some()
         }

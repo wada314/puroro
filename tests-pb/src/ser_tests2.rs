@@ -1863,6 +1863,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
         }
@@ -1882,6 +1883,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_float_optional(&self) -> bool {
             self.float_optional_opt().is_some()
         }
@@ -1901,6 +1903,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_string_optional(&self) -> bool {
             self.string_optional_opt().is_some()
         }
@@ -1917,6 +1920,7 @@ pub mod _puroro_impls {
         pub fn submsg_optional<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>{
             self.submsg_optional_opt()
         }
+
         pub fn has_submsg_optional(&self) -> bool {
             self.submsg_optional_opt().is_some()
         }
@@ -1938,6 +1942,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_enum_optional(&self) -> bool {
             self.enum_optional_opt().is_some()
         }
@@ -1957,6 +1962,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_very_large_field_number(&self) -> bool {
             self.very_large_field_number_opt().is_some()
         }
@@ -2081,7 +2087,6 @@ pub mod _puroro_impls {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
         }
-
         type Field2RepeatedType<'this>
         where
             Self: 'this,
@@ -2098,7 +2103,6 @@ pub mod _puroro_impls {
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_optional_opt(self)
         }
-
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -2115,7 +2119,6 @@ pub mod _puroro_impls {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_optional_opt(self)
         }
-
         type Field6RepeatedType<'this>
         where
             Self: 'this,
@@ -2144,7 +2147,6 @@ pub mod _puroro_impls {
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
             'this,
         >;
-
         type Field8RepeatedType<'this> where Self: 'this =
     &'this [self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>];
 
@@ -2154,7 +2156,6 @@ pub mod _puroro_impls {
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             <Self>::enum_optional_opt(self)
         }
-
         type Field10RepeatedType<'this>
         where
             Self: 'this,
@@ -3461,6 +3462,7 @@ pub mod _puroro_nested {
                         _ => ::std::default::Default::default(),
                     }
                 }
+
                 pub fn has_i32_optional(&self) -> bool {
                     self.i32_optional_opt().is_some()
                 }

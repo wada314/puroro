@@ -2,6 +2,15 @@
 pub struct {{ m.simple_ident }} {
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
+    {#- optional i32 => Option<i32> #}
+    {#- optional String => Option<String> #}
+    {#- optional MyMessage => Option<Box<MyMessage>> #}
+    {#- i32 => i32 #}
+    {#- String => String #}
+    {#- MyMessage => Option<Box<MyMessage>> #}
+    {#- repeated i32 => Vec<i32> #}
+    {#- repeated String => Vec<String> #}
+    {#- repeated MyMessage => Option<MyMessage> #}
     {{ f.ident }}: {{ f.simple_field_type }},
     {%- endif %}
     {%- endfor %}
@@ -45,6 +54,15 @@ impl {{ m.simple_ident }} {
     {#- Tentative mutable interfaces. #}
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
+    {#- optional i32 => &mut Option<i32> #}
+    {#- optional String => &mut Option<String> #}
+    {#- optional MyMessage => &mut Option<Box<MyMessage>> #}
+    {#- i32 => &mut i32 #}
+    {#- String => &mut String #}
+    {#- MyMessage => &mut Option<Box<MyMessage>> #}
+    {#- repeated i32 => &mut Vec<i32> #}
+    {#- repeated String => &mut Vec<String> #}
+    {#- repeated MyMessage => &mut Option<MyMessage> #}
     pub fn {{ f.ident_unesc }}_mut(&mut self) -> &mut {{ f.simple_field_type }} {
         &mut self.{{ f.ident }}
     }

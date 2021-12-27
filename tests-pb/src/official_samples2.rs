@@ -535,6 +535,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_a(&self) -> bool {
             self.a_opt().is_some()
         }
@@ -743,6 +744,7 @@ pub mod _puroro_impls {
                 _ => ::std::default::Default::default(),
             }
         }
+
         pub fn has_b(&self) -> bool {
             self.b_opt().is_some()
         }
@@ -967,6 +969,7 @@ pub mod _puroro_impls {
         > {
             self.c_opt()
         }
+
         pub fn has_c(&self) -> bool {
             self.c_opt().is_some()
         }
