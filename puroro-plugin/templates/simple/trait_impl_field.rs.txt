@@ -1,6 +1,7 @@
 
 {%- match f.simple_maybe_field_message_path %}
 {%- when Some with (struct_path) %}
+{#- [optional|repeated] MyMessage => &'this MyMessage #}
 type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }};
 {%- else %}
 {%- endmatch %}
@@ -10,8 +11,10 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_
 {%- match f.simple_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
 {%- if f.is_message %}
+{#- repeated MyMessage => &'this [MyMessage] #}
 type Field{{ f.number }}RepeatedType<'this> = &'this [{{ f.simple_scalar_field_type }}];
 {%- else %} {#- if f.is_message #}
+{#- repeated String => AsRefRepeatedField<'this, Vec<String>, String, str> #}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro::AsRefRepeatedField<
     'this,
     {{ f.simple_field_type }},
@@ -20,6 +23,7 @@ type Field{{ f.number }}RepeatedType<'this> = ::puroro::AsRefRepeatedField<
 >;
 {%- endif %} {#- if f.is_message #}
 {%- else %}
+{#- repeated i32 => CloneThenIntoRepeatedField<'this, Vec<i32>, i32, i32> #}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
     'this,
     {{ f.simple_field_type }},
@@ -44,6 +48,9 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 {%- else %} {#- if f.is_repeated #}
 
 {%- if !f.is_explicit_oneof_field %}
+{#- [optional] i32 => Option<i32> #}
+{#- [optional] String => Option<&'this str> #}
+{#- [optional] MyMessage => Option<&'this MyMessage> #}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     {%- if f.is_unlabeled %}
 
