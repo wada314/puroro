@@ -115,6 +115,12 @@ pub mod _puroro_simple_impl {
                 f64_repeated: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::once_cell::unsync::Lazy;
+            static DEFAULT_INSTANCE: Lazy<self::Msg> = Lazy::new(|| self::Msg::new());
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_required_mut(&mut self) -> &mut ::std::option::Option<i32> {
             &mut self.i32_required
         }
@@ -275,8 +281,14 @@ pub mod _puroro_simple_impl {
         fn i32_required_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_required)
         }
+        fn i32_required<'this>(&'this self) -> i32 {
+            self.i32_required_opt().unwrap_or_default()
+        }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.i32_optional_opt().unwrap_or_default()
         }
         type Field3RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
@@ -287,8 +299,14 @@ pub mod _puroro_simple_impl {
         fn float_required_opt<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_required)
         }
+        fn float_required<'this>(&'this self) -> f32 {
+            self.float_required_opt().unwrap_or_default()
+        }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_optional)
+        }
+        fn float_optional<'this>(&'this self) -> f32 {
+            self.float_optional_opt().unwrap_or_default()
         }
         type Field13RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
@@ -299,8 +317,14 @@ pub mod _puroro_simple_impl {
         fn bytes_required_opt<'this>(&'this self) -> Option<&'this [u8]> {
             self.bytes_required.as_ref().map(|v| v.as_ref())
         }
+        fn bytes_required<'this>(&'this self) -> &'this [u8] {
+            self.bytes_required_opt().unwrap_or_default()
+        }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             self.bytes_optional.as_ref().map(|v| v.as_ref())
+        }
+        fn bytes_optional<'this>(&'this self) -> &'this [u8] {
+            self.bytes_optional_opt().unwrap_or_default()
         }
         type Field23RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
@@ -315,8 +339,14 @@ pub mod _puroro_simple_impl {
         fn string_required_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_required.as_ref().map(|v| v.as_ref())
         }
+        fn string_required<'this>(&'this self) -> &'this str {
+            self.string_required_opt().unwrap_or_default()
+        }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
+        }
+        fn string_optional<'this>(&'this self) -> &'this str {
+            self.string_optional_opt().unwrap_or_default()
         }
         type Field33RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
@@ -333,10 +363,16 @@ pub mod _puroro_simple_impl {
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
             Clone::clone(&self.enum_required)
         }
+        fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+            self.enum_required_opt().unwrap_or_default()
+        }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage2::Enum> {
             Clone::clone(&self.enum_optional)
+        }
+        fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
+            self.enum_optional_opt().unwrap_or_default()
         }
         type Field43RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
             'this,
@@ -352,9 +388,15 @@ pub mod _puroro_simple_impl {
         fn submsg_required_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_required.as_ref().map(|v| v.as_ref())
         }
+        fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
+            <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+        }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
+        }
+        fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
+            <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         type Field53RepeatedType<'this> = &'this [self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg];
@@ -365,8 +407,14 @@ pub mod _puroro_simple_impl {
         fn i64_required_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_required)
         }
+        fn i64_required<'this>(&'this self) -> i64 {
+            self.i64_required_opt().unwrap_or_default()
+        }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_optional)
+        }
+        fn i64_optional<'this>(&'this self) -> i64 {
+            self.i64_optional_opt().unwrap_or_default()
         }
         type Field103RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i64>, i64, i64>;
@@ -377,8 +425,14 @@ pub mod _puroro_simple_impl {
         fn u32_required_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.u32_required)
         }
+        fn u32_required<'this>(&'this self) -> u32 {
+            self.u32_required_opt().unwrap_or_default()
+        }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.u32_optional)
+        }
+        fn u32_optional<'this>(&'this self) -> u32 {
+            self.u32_optional_opt().unwrap_or_default()
         }
         type Field113RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u32>, u32, u32>;
@@ -389,8 +443,14 @@ pub mod _puroro_simple_impl {
         fn u64_required_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.u64_required)
         }
+        fn u64_required<'this>(&'this self) -> u64 {
+            self.u64_required_opt().unwrap_or_default()
+        }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.u64_optional)
+        }
+        fn u64_optional<'this>(&'this self) -> u64 {
+            self.u64_optional_opt().unwrap_or_default()
         }
         type Field123RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u64>, u64, u64>;
@@ -401,8 +461,14 @@ pub mod _puroro_simple_impl {
         fn s32_required_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.s32_required)
         }
+        fn s32_required<'this>(&'this self) -> i32 {
+            self.s32_required_opt().unwrap_or_default()
+        }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.s32_optional)
+        }
+        fn s32_optional<'this>(&'this self) -> i32 {
+            self.s32_optional_opt().unwrap_or_default()
         }
         type Field133RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
@@ -413,8 +479,14 @@ pub mod _puroro_simple_impl {
         fn s64_required_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.s64_required)
         }
+        fn s64_required<'this>(&'this self) -> i64 {
+            self.s64_required_opt().unwrap_or_default()
+        }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.s64_optional)
+        }
+        fn s64_optional<'this>(&'this self) -> i64 {
+            self.s64_optional_opt().unwrap_or_default()
         }
         type Field143RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i64>, i64, i64>;
@@ -425,8 +497,14 @@ pub mod _puroro_simple_impl {
         fn fixed32_required_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.fixed32_required)
         }
+        fn fixed32_required<'this>(&'this self) -> u32 {
+            self.fixed32_required_opt().unwrap_or_default()
+        }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.fixed32_optional)
+        }
+        fn fixed32_optional<'this>(&'this self) -> u32 {
+            self.fixed32_optional_opt().unwrap_or_default()
         }
         type Field153RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u32>, u32, u32>;
@@ -437,8 +515,14 @@ pub mod _puroro_simple_impl {
         fn fixed64_required_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.fixed64_required)
         }
+        fn fixed64_required<'this>(&'this self) -> u64 {
+            self.fixed64_required_opt().unwrap_or_default()
+        }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.fixed64_optional)
+        }
+        fn fixed64_optional<'this>(&'this self) -> u64 {
+            self.fixed64_optional_opt().unwrap_or_default()
         }
         type Field163RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u64>, u64, u64>;
@@ -449,8 +533,14 @@ pub mod _puroro_simple_impl {
         fn sfixed32_required_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.sfixed32_required)
         }
+        fn sfixed32_required<'this>(&'this self) -> i32 {
+            self.sfixed32_required_opt().unwrap_or_default()
+        }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.sfixed32_optional)
+        }
+        fn sfixed32_optional<'this>(&'this self) -> i32 {
+            self.sfixed32_optional_opt().unwrap_or_default()
         }
         type Field173RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
@@ -461,8 +551,14 @@ pub mod _puroro_simple_impl {
         fn sfixed64_required_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.sfixed64_required)
         }
+        fn sfixed64_required<'this>(&'this self) -> i64 {
+            self.sfixed64_required_opt().unwrap_or_default()
+        }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.sfixed64_optional)
+        }
+        fn sfixed64_optional<'this>(&'this self) -> i64 {
+            self.sfixed64_optional_opt().unwrap_or_default()
         }
         type Field183RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i64>, i64, i64>;
@@ -473,8 +569,14 @@ pub mod _puroro_simple_impl {
         fn f64_required_opt<'this>(&'this self) -> Option<f64> {
             Clone::clone(&self.f64_required)
         }
+        fn f64_required<'this>(&'this self) -> f64 {
+            self.f64_required_opt().unwrap_or_default()
+        }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             Clone::clone(&self.f64_optional)
+        }
+        fn f64_optional<'this>(&'this self) -> f64 {
+            self.f64_optional_opt().unwrap_or_default()
         }
         type Field193RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f64>, f64, f64>;
@@ -11262,7 +11364,7 @@ pub mod _puroro_impls {
 
         pub fn default_instance() -> &'static Self {
             use ::puroro::bumpalo::Bump;
-            use ::puroro::once_cell::sync::Lazy;
+            use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
             static DEFAULT_INSTANCE: Lazy<self::MsgBumpalo<'static>> =
                 Lazy::new(|| self::MsgBumpalo::new_in(&BUMP));
@@ -12444,12 +12546,6 @@ pub mod _puroro_impls {
             <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                 'this,
             >>::default_instance()
-            /*
-            use ::puroro::once_cell::unsync::Lazy;
-            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
-            static DEFAULT_VALUE: Lazy<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> =
-                Lazy::new(|| self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
-            &DEFAULT_VALUE*/
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
@@ -12459,12 +12555,6 @@ pub mod _puroro_impls {
             <self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
                 'this,
             >>::default_instance()
-            /*
-            use ::puroro::once_cell::unsync::Lazy;
-            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
-            static DEFAULT_VALUE: Lazy<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> =
-                Lazy::new(|| self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
-            &DEFAULT_VALUE*/
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>;
         type Field53RepeatedType<'this> where Self: 'this =
@@ -17127,6 +17217,12 @@ pub mod _puroro_nested {
                         i64_required: ::std::default::Default::default(),
                     }
                 }
+
+                pub fn default_instance() -> &'static Self {
+                    use ::puroro::once_cell::unsync::Lazy;
+                    static DEFAULT_INSTANCE: Lazy<self::Submsg> = Lazy::new(|| self::Submsg::new());
+                    &DEFAULT_INSTANCE
+                }
                 pub fn i32_required_mut(&mut self) -> &mut ::std::option::Option<i32> {
                     &mut self.i32_required
                 }
@@ -17139,8 +17235,14 @@ pub mod _puroro_nested {
                 fn i32_required_opt<'this>(&'this self) -> Option<i32> {
                     Clone::clone(&self.i32_required)
                 }
+                fn i32_required<'this>(&'this self) -> i32 {
+                    self.i32_required_opt().unwrap_or_default()
+                }
                 fn i64_required_opt<'this>(&'this self) -> Option<i64> {
                     Clone::clone(&self.i64_required)
+                }
+                fn i64_required<'this>(&'this self) -> i64 {
+                    self.i64_required_opt().unwrap_or_default()
                 }
             }
 
@@ -17420,7 +17522,7 @@ pub mod _puroro_nested {
 
                 pub fn default_instance() -> &'static Self {
                     use ::puroro::bumpalo::Bump;
-                    use ::puroro::once_cell::sync::Lazy;
+                    use ::puroro::once_cell::unsync::Lazy;
                     static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
                     static DEFAULT_INSTANCE: Lazy<self::SubmsgBumpalo<'static>> =
                         Lazy::new(|| self::SubmsgBumpalo::new_in(&BUMP));

@@ -51,6 +51,13 @@ impl {{ m.simple_ident }} {
         }
     }
 
+    pub fn default_instance() -> &'static Self {
+        use ::puroro::once_cell::unsync::Lazy;
+        static DEFAULT_INSTANCE: Lazy<self::{{ m.simple_ident }}> = 
+            Lazy::new(|| self::{{ m.simple_ident }}::new());
+        &DEFAULT_INSTANCE
+    }
+
     {#- Tentative mutable interfaces. #}
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}

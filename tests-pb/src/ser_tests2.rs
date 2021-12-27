@@ -47,6 +47,12 @@ pub mod _puroro_simple_impl {
                 very_large_field_number: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::once_cell::unsync::Lazy;
+            static DEFAULT_INSTANCE: Lazy<self::Msg> = Lazy::new(|| self::Msg::new());
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
             &mut self.i32_optional
         }
@@ -100,6 +106,9 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.i32_optional_opt().unwrap_or_default()
+        }
         type Field2RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -109,6 +118,9 @@ pub mod _puroro_simple_impl {
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_optional)
         }
+        fn float_optional<'this>(&'this self) -> f32 {
+            self.float_optional_opt().unwrap_or_default()
+        }
         type Field4RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
 
@@ -117,6 +129,9 @@ pub mod _puroro_simple_impl {
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             self.string_optional.as_ref().map(|v| v.as_ref())
+        }
+        fn string_optional<'this>(&'this self) -> &'this str {
+            self.string_optional_opt().unwrap_or_default()
         }
         type Field6RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
@@ -135,6 +150,9 @@ pub mod _puroro_simple_impl {
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
+        fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
+            <self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg>::default_instance()
+        }
         type Field8MessageType<'this>
         where
             Self: 'this,
@@ -146,6 +164,9 @@ pub mod _puroro_simple_impl {
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             Clone::clone(&self.enum_optional)
+        }
+        fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
+            self.enum_optional_opt().unwrap_or_default()
         }
         type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
             'this,
@@ -159,6 +180,9 @@ pub mod _puroro_simple_impl {
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.very_large_field_number)
+        }
+        fn very_large_field_number<'this>(&'this self) -> i32 {
+            self.very_large_field_number_opt().unwrap_or_default()
         }
     }
 
@@ -1853,7 +1877,7 @@ pub mod _puroro_impls {
 
         pub fn default_instance() -> &'static Self {
             use ::puroro::bumpalo::Bump;
-            use ::puroro::once_cell::sync::Lazy;
+            use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
             static DEFAULT_INSTANCE: Lazy<self::MsgBumpalo<'static>> =
                 Lazy::new(|| self::MsgBumpalo::new_in(&BUMP));
@@ -2161,12 +2185,6 @@ pub mod _puroro_impls {
         }
         fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
             <self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
-            /*
-            use ::puroro::once_cell::unsync::Lazy;
-            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
-            static DEFAULT_VALUE: Lazy<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>> =
-                Lazy::new(|| self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
-            &DEFAULT_VALUE*/
         }
         type Field8MessageType<'this>
         where
@@ -3435,6 +3453,12 @@ pub mod _puroro_nested {
                         i32_optional: ::std::default::Default::default(),
                     }
                 }
+
+                pub fn default_instance() -> &'static Self {
+                    use ::puroro::once_cell::unsync::Lazy;
+                    static DEFAULT_INSTANCE: Lazy<self::Submsg> = Lazy::new(|| self::Submsg::new());
+                    &DEFAULT_INSTANCE
+                }
                 pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
                     &mut self.i32_optional
                 }
@@ -3443,6 +3467,9 @@ pub mod _puroro_nested {
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
                     Clone::clone(&self.i32_optional)
+                }
+                fn i32_optional<'this>(&'this self) -> i32 {
+                    self.i32_optional_opt().unwrap_or_default()
                 }
             }
 
@@ -3629,7 +3656,7 @@ pub mod _puroro_nested {
 
                 pub fn default_instance() -> &'static Self {
                     use ::puroro::bumpalo::Bump;
-                    use ::puroro::once_cell::sync::Lazy;
+                    use ::puroro::once_cell::unsync::Lazy;
                     static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
                     static DEFAULT_INSTANCE: Lazy<self::SubmsgBumpalo<'static>> =
                         Lazy::new(|| self::SubmsgBumpalo::new_in(&BUMP));

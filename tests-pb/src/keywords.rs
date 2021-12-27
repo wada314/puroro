@@ -21,6 +21,12 @@ pub mod _puroro_simple_impl {
                 r#type: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::once_cell::unsync::Lazy;
+            static DEFAULT_INSTANCE: Lazy<self::Msg> = Lazy::new(|| self::Msg::new());
+            &DEFAULT_INSTANCE
+        }
         pub fn type_mut(&mut self) -> &mut ::std::option::Option<i32> {
             &mut self.r#type
         }
@@ -29,6 +35,9 @@ pub mod _puroro_simple_impl {
     impl super::_puroro_traits::MsgTrait for Msg {
         fn type_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.r#type)
+        }
+        fn r#type<'this>(&'this self) -> i32 {
+            self.type_opt().unwrap_or_default()
         }
     }
 
@@ -210,7 +219,7 @@ pub mod _puroro_impls {
 
         pub fn default_instance() -> &'static Self {
             use ::puroro::bumpalo::Bump;
-            use ::puroro::once_cell::sync::Lazy;
+            use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
             static DEFAULT_INSTANCE: Lazy<self::MsgBumpalo<'static>> =
                 Lazy::new(|| self::MsgBumpalo::new_in(&BUMP));

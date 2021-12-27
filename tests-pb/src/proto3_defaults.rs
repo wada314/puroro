@@ -34,6 +34,12 @@ pub mod _puroro_simple_impl {
                 submsg_unlabeled: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::once_cell::unsync::Lazy;
+            static DEFAULT_INSTANCE: Lazy<self::Msg> = Lazy::new(|| self::Msg::new());
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
             &mut self.i32_unlabeled
         }
@@ -66,8 +72,14 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.i32_unlabeled.clone())
             }
         }
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or_default()
+        }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
+        }
+        fn i32_optional<'this>(&'this self) -> i32 {
+            self.i32_optional_opt().unwrap_or_default()
         }
         type Field3RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
@@ -82,6 +94,9 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.f32_unlabeled.clone())
             }
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            self.f32_unlabeled_opt().unwrap_or_default()
+        }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             if self.string_unlabeled.is_empty() {
                 ::std::option::Option::None
@@ -89,12 +104,18 @@ pub mod _puroro_simple_impl {
                 ::std::option::Option::Some(self.string_unlabeled.as_ref())
             }
         }
+        fn string_unlabeled<'this>(&'this self) -> &'this str {
+            self.string_unlabeled_opt().unwrap_or_default()
+        }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+        }
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
+            <self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>::default_instance()
         }
     }
 
@@ -276,6 +297,12 @@ pub mod _puroro_simple_impl {
                 i32_unlabeled: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::once_cell::unsync::Lazy;
+            static DEFAULT_INSTANCE: Lazy<self::Submsg> = Lazy::new(|| self::Submsg::new());
+            &DEFAULT_INSTANCE
+        }
         pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
             &mut self.i32_unlabeled
         }
@@ -288,6 +315,9 @@ pub mod _puroro_simple_impl {
             } else {
                 ::std::option::Option::Some(self.i32_unlabeled.clone())
             }
+        }
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or_default()
         }
     }
 
@@ -927,7 +957,7 @@ pub mod _puroro_impls {
 
         pub fn default_instance() -> &'static Self {
             use ::puroro::bumpalo::Bump;
-            use ::puroro::once_cell::sync::Lazy;
+            use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
             static DEFAULT_INSTANCE: Lazy<self::MsgBumpalo<'static>> =
                 Lazy::new(|| self::MsgBumpalo::new_in(&BUMP));
@@ -1148,12 +1178,6 @@ pub mod _puroro_impls {
         }
         fn submsg_unlabeled<'this>(&'this self) -> Self::Field6MessageType<'this> {
             <self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>>::default_instance()
-            /*
-            use ::puroro::once_cell::unsync::Lazy;
-            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
-            static DEFAULT_VALUE: Lazy<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>> =
-                Lazy::new(|| self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>::new_in(&BUMP));
-            &DEFAULT_VALUE*/
         }
     }
 
@@ -1491,7 +1515,7 @@ pub mod _puroro_impls {
 
         pub fn default_instance() -> &'static Self {
             use ::puroro::bumpalo::Bump;
-            use ::puroro::once_cell::sync::Lazy;
+            use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
             static DEFAULT_INSTANCE: Lazy<self::SubmsgBumpalo<'static>> =
                 Lazy::new(|| self::SubmsgBumpalo::new_in(&BUMP));

@@ -23,6 +23,12 @@ pub mod _puroro_simple_impl {
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }
+
+        pub fn default_instance() -> &'static Self {
+            use ::puroro::once_cell::unsync::Lazy;
+            static DEFAULT_INSTANCE: Lazy<self::Msg> = Lazy::new(|| self::Msg::new());
+            &DEFAULT_INSTANCE
+        }
         pub fn recursive_unlabeled_mut(
             &mut self,
         ) -> &mut ::std::option::Option<
@@ -39,6 +45,9 @@ pub mod _puroro_simple_impl {
         = &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+        }
+        fn recursive_unlabeled<'this>(&'this self) -> Self::Field1MessageType<'this> {
+            <self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>::default_instance()
         }
     }
 
@@ -242,7 +251,7 @@ pub mod _puroro_impls {
 
         pub fn default_instance() -> &'static Self {
             use ::puroro::bumpalo::Bump;
-            use ::puroro::once_cell::sync::Lazy;
+            use ::puroro::once_cell::unsync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
             static DEFAULT_INSTANCE: Lazy<self::MsgBumpalo<'static>> =
                 Lazy::new(|| self::MsgBumpalo::new_in(&BUMP));
@@ -312,12 +321,6 @@ pub mod _puroro_impls {
         fn recursive_unlabeled<'this>(&'this self) -> Self::Field1MessageType<'this> {
             <self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>>::default_instance(
             )
-            /*
-            use ::puroro::once_cell::unsync::Lazy;
-            static BUMP: Lazy<::puroro::bumpalo::Bump> = Lazy::new(::puroro::bumpalo::Bump::new);
-            static DEFAULT_VALUE: Lazy<self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>> =
-                Lazy::new(|| self::_puroro_root::self_recursive::_puroro_impls::MsgBumpalo<'this>::new_in(&BUMP));
-            &DEFAULT_VALUE*/
         }
     }
 
