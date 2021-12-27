@@ -4,8 +4,12 @@ where
 {
     {%- for f in m.fields %}
     {%- if f.is_message %}
+    {%- if f.is_repeated %}
     type Field{{ f.number }}MessageType<'this> where Self: 'this = T::Field{{ f.number }}MessageType<'this>;
-    {%- endif %}
+    {%- else %} {#- if f.is_repeated #}
+    type Field{{ f.number }}MessageType<'this> where Self: 'this = ::std::option::Option<T::Field{{ f.number }}MessageType<'this>>;
+    {%- endif %} {#- if f.is_repeated #}
+    {%- endif %} {#- if f.is_message #}
 
     {%- if f.is_repeated %}
 
@@ -18,10 +22,28 @@ where
     {%- else %} {#- if f.is_repeated #}
 
     {%- if !f.is_explicit_oneof_field %}
+    {#- [optional] int32 => Option<i32> #}
+    {#- [optional] String => Option<&'this str> #}
+    {#- [optional] MyMessage => Option<Option<T::FieldNMessageType<'this>>> #}
+    {#- ↑ Strange, but I can't imagine the other choices... It's either `Some(Some(x))` or `None`.#}
     fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
         self.as_ref().and_then(|msg| msg.{{ f.ident_unesc }}_opt())
+        {%- if f.is_message %}
+            .map(|x| ::std::option::Option::Some(x))
+        {%- endif %} {#- if f.is_message #}
     }
     {%- endif %}
+
+    {#- [optional] int32 => i32 #}
+    {#- [optional] String => &'this str #}
+    {#- [optional] MyMessage => Option<T::FieldNMessageType<'this>> #}
+    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        {%- if f.is_message %}
+        self.as_ref().and_then(|msg| msg.{{ f.ident_unesc}}_opt())
+        {%- else %} {#- if f.is_message #}
+        self.as_ref().map_or({{ f.default_value }}, |msg| msg.{{ f.ident }}())
+        {%- endif %} {#- if f.is_message #}
+    }
 
     {%- endif %} {#- if f.is_repeated #}
     {%- endfor %} {#- for f in m.fields #}

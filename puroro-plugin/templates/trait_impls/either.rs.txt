@@ -65,12 +65,9 @@ where
     fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
         {%- if f.is_message %}
         self.as_ref().either(
-            |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t).map(
-                |t| ::puroro::Either::Left(t)
-            ),
-            |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u).map(
-                |u| ::puroro::Either::Right(u)
-            ),)
+            |t| ::puroro::Either::Left(<T as {{ m.trait_ident }}>::{{ f.ident }}(t)),
+            |u| ::puroro::Either::Right(<U as {{ m.trait_ident }}>::{{ f.ident }}(u)),
+        )
         {%- else %} {#- if f.is_message #}
         self.as_ref().either(
             |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t),
