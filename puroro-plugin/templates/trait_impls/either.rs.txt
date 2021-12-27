@@ -84,19 +84,19 @@ where
             |t| t.{{ oneof.field_ident }}().map(|t| ::puroro::Either::Left(t)),
             |u| u.{{ oneof.field_ident }}().map(|u| ::puroro::Either::Right(u)),
         ) {
-            {%- for field in oneof.fields %}
-            Some(::puroro::Either::Left(E::{{ field.ident }}(v))) => {
-                {%- if field.is_message %}
-                Some(E::{{ field.ident }}(::puroro::Either::Left(v)))
+            {%- for f in oneof.fields %}
+            Some(::puroro::Either::Left(E::{{ f.ident }}(v))) => {
+                {%- if f.is_message %}
+                Some(E::{{ f.ident }}(::puroro::Either::Left(v)))
                 {%- else %}
-                Some(E::{{ field.ident }}(v))
+                Some(E::{{ f.ident }}(v))
                 {%- endif %}
             }
-            Some(::puroro::Either::Right(E::{{ field.ident }}(v))) => {
-                {%- if field.is_message %}
-                Some(E::{{ field.ident }}(::puroro::Either::Right(v)))
+            Some(::puroro::Either::Right(E::{{ f.ident }}(v))) => {
+                {%- if f.is_message %}
+                Some(E::{{ f.ident }}(::puroro::Either::Right(v)))
                 {%- else %}
-                Some(E::{{ field.ident }}(v))
+                Some(E::{{ f.ident }}(v))
                 {%- endif %}
             }
             {%- endfor %}
