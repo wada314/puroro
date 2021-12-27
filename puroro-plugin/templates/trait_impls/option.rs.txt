@@ -72,7 +72,11 @@ where
         self.as_ref().and_then(|msg| msg.{{ oneof.field_ident }}().map(|oneof| {
             match oneof {
                 {%- for f in oneof.fields %}
+                {%- if f.is_message %}
+                E::{{ f.ident }}(v) => E::{{ f.ident }}(::std::option::Option::Some(v)),
+                {%- else %} {#- if f.is_message #}
                 E::{{ f.ident }}(v) => E::{{ f.ident }}(v),
+                {%- endif %} {#- if f.is_message #}
                 {%- endfor %}
             }
         }))

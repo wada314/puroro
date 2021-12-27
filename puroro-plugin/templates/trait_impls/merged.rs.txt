@@ -114,7 +114,7 @@ where
             {%- for f in oneof.fields %}
             (_, Some(E::{{ f.ident }}(right))) => {
                 {%- if f.is_message %}
-                E::{{ f.ident }}((self.0.{{ f.ident }}(), right))
+                E::{{ f.ident }}((self.0.{{ f.getter_ident }}(), right))
                 {%- else %}
                 E::{{ f.ident }}(right)
                 {%- endif %}
@@ -124,7 +124,7 @@ where
             {%- for f in oneof.fields %}
             (Some(E::{{ f.ident }}(left)), None) => {
                 {%- if f.is_message %}
-                E::{{ f.ident }}((left, self.1.{{ f.ident }}()))
+                E::{{ f.ident }}((left, self.1.{{ f.getter_ident }}()))
                 {%- else %}
                 E::{{ f.ident }}(left)
                 {%- endif %}

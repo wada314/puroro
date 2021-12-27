@@ -1901,10 +1901,10 @@ pub mod _puroro_traits {
                 (Some(E::G2Submsg(left)), Some(E::G2Submsg(right))) => E::G2Submsg((left, right)),
                 (_, Some(E::G2F32(right))) => E::G2F32(right),
                 (_, Some(E::G2String(right))) => E::G2String(right),
-                (_, Some(E::G2Submsg(right))) => E::G2Submsg((self.0.G2Submsg(), right)),
+                (_, Some(E::G2Submsg(right))) => E::G2Submsg((self.0.g2_submsg(), right)),
                 (Some(E::G2F32(left)), None) => E::G2F32(left),
                 (Some(E::G2String(left)), None) => E::G2String(left),
-                (Some(E::G2Submsg(left)), None) => E::G2Submsg((left, self.1.G2Submsg())),
+                (Some(E::G2Submsg(left)), None) => E::G2Submsg((left, self.1.g2_submsg())),
             })
         }
         fn group_three<'this>(
@@ -2074,7 +2074,7 @@ pub mod _puroro_traits {
                 msg.group_two().map(|oneof| match oneof {
                     E::G2F32(v) => E::G2F32(v),
                     E::G2String(v) => E::G2String(v),
-                    E::G2Submsg(v) => E::G2Submsg(v),
+                    E::G2Submsg(v) => E::G2Submsg(::std::option::Option::Some(v)),
                 })
             })
         }
