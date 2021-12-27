@@ -52,7 +52,7 @@ impl {{ m.simple_ident }} {
     }
 
     pub fn default_instance() -> &'static Self {
-        use ::puroro::once_cell::unsync::Lazy;
+        use ::puroro::once_cell::sync::Lazy;
         static DEFAULT_INSTANCE: Lazy<self::{{ m.simple_ident }}> = 
             Lazy::new(|| self::{{ m.simple_ident }}::new());
         &DEFAULT_INSTANCE

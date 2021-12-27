@@ -151,7 +151,7 @@ pub mod _puroro_simple_impl {
         }
 
         pub fn default_instance() -> &'static Self {
-            use ::puroro::once_cell::unsync::Lazy;
+            use ::puroro::once_cell::sync::Lazy;
             static DEFAULT_INSTANCE: Lazy<self::Msg> = Lazy::new(|| self::Msg::new());
             &DEFAULT_INSTANCE
         }

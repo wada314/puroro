@@ -26,7 +26,7 @@ pub mod _puroro_simple_impl {
         }
 
         pub fn default_instance() -> &'static Self {
-            use ::puroro::once_cell::unsync::Lazy;
+            use ::puroro::once_cell::sync::Lazy;
             static DEFAULT_INSTANCE: Lazy<self::Test1> = Lazy::new(|| self::Test1::new());
             &DEFAULT_INSTANCE
         }
@@ -134,7 +134,7 @@ pub mod _puroro_simple_impl {
         }
 
         pub fn default_instance() -> &'static Self {
-            use ::puroro::once_cell::unsync::Lazy;
+            use ::puroro::once_cell::sync::Lazy;
             static DEFAULT_INSTANCE: Lazy<self::Test2> = Lazy::new(|| self::Test2::new());
             &DEFAULT_INSTANCE
         }
@@ -244,7 +244,7 @@ pub mod _puroro_simple_impl {
         }
 
         pub fn default_instance() -> &'static Self {
-            use ::puroro::once_cell::unsync::Lazy;
+            use ::puroro::once_cell::sync::Lazy;
             static DEFAULT_INSTANCE: Lazy<self::Test3> = Lazy::new(|| self::Test3::new());
             &DEFAULT_INSTANCE
         }
@@ -366,7 +366,7 @@ pub mod _puroro_simple_impl {
         }
 
         pub fn default_instance() -> &'static Self {
-            use ::puroro::once_cell::unsync::Lazy;
+            use ::puroro::once_cell::sync::Lazy;
             static DEFAULT_INSTANCE: Lazy<self::Test4> = Lazy::new(|| self::Test4::new());
             &DEFAULT_INSTANCE
         }
