@@ -24,13 +24,24 @@ impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait
 for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 {%- call single_field_bound(sfield) %}
 {
-    {%- for field in m.fields %}
-    {%- if field.number == sfield.number %}
-    {%- call single_field_trait_impl_field(field) %}
-    {%- else %}
-    {%- call empty_trait_impl_field(field) %}
+    {%- for f in m.fields %}
+    {%- if f.number == sfield.number %}
+    {%- call single_field_trait_impl_field(f) %}
+    {%- else %} {#- if f.number == sfield.number #}
+
+    {%- if f.is_message %}
+    type Field{{ f.number }}MessageType<'this> where Self: 'this = ();
     {%- endif %}
-    {%- endfor %}
+
+    {%- if f.is_repeated %}
+    type Field{{ f.number }}RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
+    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+    }
+    {%- endif %}
+
+    {%- endif %} {#- if f.number == sfield.number #}
+    {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->

@@ -161,24 +161,7 @@ where
     {{ m.trait_delegate_macro_ident }}!(T);
 }
 
-{%- include "empty/trait_impl.rs.txt" %}
-{%- include "merged/trait_impl.rs.txt" %}
-{%- include "either/trait_impl.rs.txt" %}
-{%- include "option/trait_impl.rs.txt" %}
-
-{%- macro empty_trait_impl_field(f) -%}
-{%- include "empty/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro either_trait_impl_field(f) -%}
-{%- include "either/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro merged_trait_impl_field(f) -%}
-{%- include "merged/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
-{%- macro option_trait_impl_field(f) -%}
-{%- include "option/trait_impl_field.rs.txt" %}
-{%- endmacro -%}
-
+{%- include "trait_impls/empty.rs.txt" %}
+{%- include "trait_impls/merged.rs.txt" %}
+{%- include "trait_impls/either.rs.txt" %}
+{%- include "trait_impls/option.rs.txt" %}
