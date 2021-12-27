@@ -1,8 +1,8 @@
 
 pub(crate) enum {{ oneof.bumpalo_enum_ident }}<'bump> {
     _None(::std::marker::PhantomData<&'bump ()>),
-    {%- for field in oneof.fields %}
-    {{ field.ident }}({{ field.bumpalo_field_type }}),
+    {%- for f in oneof.fields %}
+    {{ f.ident }}({{ f.bumpalo_field_type }}),
     {%- endfor %}
 }
 
