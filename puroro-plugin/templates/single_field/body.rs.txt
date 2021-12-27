@@ -1,33 +1,33 @@
-{%- for sfield in m.fields %}
+{%- for target_f in m.fields %}
 
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
 {%- let maybe_gp %}
-{%- if sfield.is_repeated %}
+{%- if target_f.is_repeated %}
     {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
 {%- else %}
     {%- let maybe_gp = "<ScalarType>" %}
 {%- endif %}
 
-pub struct {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield) %}
+pub struct {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
+{%- call single_field_bound(target_f) %}
 {
-    pub {{ sfield.ident }}: {{ sfield.single_field_type }},
+    pub {{ target_f.ident }}: {{ target_f.single_field_type }},
 }
 
 impl{{ maybe_gp }} ::puroro::Message<super::{{ m.simple_ident }}>
-for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield) %}
+for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
+{%- call single_field_bound(target_f) %}
 {}
 
 impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait
-for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield) %}
+for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
+{%- call single_field_bound(target_f) %}
 {
     {%- for f in m.fields %}
-    {%- if f.number == sfield.number %}
+    {%- if f.number == target_f.number %}
     {%- call single_field_trait_impl_field(f) %}
-    {%- else %} {#- if f.number == sfield.number #}
+    {%- else %} {#- if f.number == target_f.number #}
 
     {%- if f.is_message %}
     type Field{{ f.number }}MessageType<'this> where Self: 'this = ();
@@ -40,7 +40,7 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
     }
     {%- endif %}
 
-    {%- endif %} {#- if f.number == sfield.number #}
+    {%- endif %} {#- if f.number == target_f.number #}
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
@@ -56,19 +56,19 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
             {%- endif %}
         >
     {
-        {%- if sfield.oneof_index == oneof.index %}
+        {%- if target_f.oneof_index == oneof.index %}
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
         ::std::option::Option::Some(
-            E::{{ sfield.oneof_enum_value_ident }}(
-                {%- if sfield.is_length_delimited %}
-                {%- if sfield.is_message %}
-                &self.{{ sfield.ident }}
+            E::{{ target_f.oneof_enum_value_ident }}(
+                {%- if target_f.is_length_delimited %}
+                {%- if target_f.is_message %}
+                &self.{{ target_f.ident }}
                 {%- else %}
-                self.{{ sfield.ident }}.as_ref()
+                self.{{ target_f.ident }}.as_ref()
                 {%- endif %}
                 {%- else %}
                 ::std::convert::Into::into(
-                    ::std::clone::Clone::clone(&self.{{ sfield.ident }})
+                    ::std::clone::Clone::clone(&self.{{ target_f.ident }})
                 )
                 {%- endif %}
             )
@@ -82,11 +82,11 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
 
 
 impl{{ maybe_gp }} ::puroro::internal::se::SerMessageToIoWrite
-for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield) %}
+for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
+{%- call single_field_bound(target_f) %}
     Self: super::_puroro_traits::{{ m.ident }}Trait,
-{%- if sfield.is_message %}
-    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ sfield.number }}MessageType<'a> :
+{%- if target_f.is_message %}
+    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ target_f.number }}MessageType<'a> :
         ::puroro::internal::se::SerMessageToIoWrite,
 {%- endif %}
 {
@@ -95,27 +95,27 @@ for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
         W: ::std::io::Write,
     {
         ::puroro::internal::se::SerFieldToIoWrite::<
-            {{ sfield.trait_label_and_type_tags }}
+            {{ target_f.trait_label_and_type_tags }}
         >::ser_field(
-            {%- if sfield.is_repeated %}
-            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ sfield.ident }}(self),
+            {%- if target_f.is_repeated %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ target_f.ident }}(self),
             {%- else %}
-            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ sfield.ident_unesc }}_opt(self),
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ target_f.ident_unesc }}_opt(self),
             {%- endif %}
-            {{ sfield.number }},
+            {{ target_f.number }},
             out
         )?;
         ::std::result::Result::Ok(())
     }
 }
 
-impl{{ maybe_gp }} ::std::convert::From<{{ sfield.single_field_type }}>
-for {{ m.single_field_ident }}{{ sfield.number }}{{ maybe_gp }}
-{%- call single_field_bound(sfield) %}
+impl{{ maybe_gp }} ::std::convert::From<{{ target_f.single_field_type }}>
+for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
+{%- call single_field_bound(target_f) %}
 {
-    fn from(value: {{ sfield.single_field_type }}) -> Self {
+    fn from(value: {{ target_f.single_field_type }}) -> Self {
         Self {
-            {{ sfield.ident }}: value,
+            {{ target_f.ident }}: value,
         }
     }
 }

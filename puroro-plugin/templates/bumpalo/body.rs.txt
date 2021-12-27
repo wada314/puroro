@@ -9,16 +9,16 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
         [u32; ({{ m.bitfield_len }} + 31) / 32],
     >,
 
-    {%- for field in m.fields %}
-    {%- if !field.is_explicit_oneof_field %}
-    {{ field.ident }}: {{ field.bumpalo_field_type }},
+    {%- for f in m.fields %}
+    {%- if !f.is_explicit_oneof_field %}
+    {{ f.ident }}: {{ f.bumpalo_field_type }},
     {%- endif %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
     {{ oneof.field_ident }}: 
         super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }}<'bump>,
-    {%- endfor %}
+    {%- endfor %} {#- for f in m.fields #}
 }
 
 pub type {{ m.bumpalo_owned_ident }} = ::puroro::BumpaloOwned<{{ m.bumpalo_ident }}<'static>>;
@@ -45,11 +45,11 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             _bump: bump,
             _bitfield: ::std::default::Default::default(),
 
-            {%- for field in m.fields %}
-            {%- if !field.is_explicit_oneof_field %}
-            {{ field.ident }}: ::std::default::Default::default(),
-            {%- endif %} {#- if !field.is_explicit_oneof_field #}
-            {%- endfor %} {#- for field in m.fields #}
+            {%- for f in m.fields %}
+            {%- if !f.is_explicit_oneof_field %}
+            {{ f.ident }}: ::std::default::Default::default(),
+            {%- endif %} {#- if !f.is_explicit_oneof_field #}
+            {%- endfor %} {#- for f in m.fields #}
 
             {%- for oneof in m.oneofs %}
             {{ oneof.field_ident }}: ::std::default::Default::default(),
@@ -58,155 +58,155 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     }
 
     {#- ######## getter ######## #}
-    {%- for field in m.fields %}
-    {%- if !field.is_explicit_oneof_field %}
-    {%- if field.is_repeated %}
+    {%- for f in m.fields %}
+    {%- if !f.is_explicit_oneof_field %}
+    {%- if f.is_repeated %}
     
     {#- ######## repeated getter ######## #}
-    pub fn {{ field.ident }}<'this>(&'this self) -> {{ field.bumpalo_getter_type }} {
-        {%- if field.is_message %}
-        unsafe { self.{{ field.ident }}.cast_item_unchecked() }
-        {%- else %} {#- if field.is_message #}
-        &self.{{ field.ident }}
-        {%- endif %} {#- if field.is_message #}
+    pub fn {{ f.ident }}<'this>(&'this self) -> {{ f.bumpalo_getter_type }} {
+        {%- if f.is_message %}
+        unsafe { self.{{ f.ident }}.cast_item_unchecked() }
+        {%- else %} {#- if f.is_message #}
+        &self.{{ f.ident }}
+        {%- endif %} {#- if f.is_message #}
     }
 
-    {%- else %} {#- if field.is_repeated #}
+    {%- else %} {#- if f.is_repeated #}
 
     {#- ######## non-repeated getter ######## #}
 
     {#- optional getter #}
-    pub fn {{ field.ident_unesc }}_opt<'this>(&'this self) -> {{ field.bumpalo_getter_opt_type }} {
-        {%- if field.is_message %}
-        {#- Non-repeated message field. Field type is always `Optional<NoAllocBox<T>>`.#}
+    pub fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> {{ f.bumpalo_getter_opt_type }} {
+        {%- if f.is_message %}
+        {#- Non-repeated message f. Field type is always `Optional<NoAllocBox<T>>`.#}
         {#- Need to cast the lifetime. #}
-        self.{{ field.ident }}.as_ref().map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        self.{{ f.ident }}.as_ref().map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
 
-        {%- else %} {#- if field.is_message #}
-        {%- if field.has_optional_bit %}
-        {#- Non-repeated, non-message, optional field. Optional bit is stored in the bitfield. #}
-        if self._bitfield.get({{ field.bitfield_index }}).map_or(false, |v| *v) {
+        {%- else %} {#- if f.is_message #}
+        {%- if f.has_optional_bit %}
+        {#- Non-repeated, non-message, optional f. Optional bit is stored in the bitfield. #}
+        if self._bitfield.get({{ f.bitfield_index }}).map_or(false, |v| *v) {
             ::std::option::Option::Some(
-                {%- if field.is_length_delimited %}
-                &self.{{ field.ident }}
-                {%- else %} {#- if field.is_length_delimited #}
-                self.{{ field.ident }}.inner()
-                {%- endif %} {#- if field.is_length_delimited #}
+                {%- if f.is_length_delimited %}
+                &self.{{ f.ident }}
+                {%- else %} {#- if f.is_length_delimited #}
+                self.{{ f.ident }}.inner()
+                {%- endif %} {#- if f.is_length_delimited #}
             )
         } else {
             ::std::option::Option::None
         }
-        {%- else %} {#- if field.has_optional_bit #}
-        {#- Non-repeated, non-message, unlabeled field. Treat as unexisting when it's default value. #}
-        if !::puroro::internal::IsDefault::is_default(&*self.{{ field.ident }}) {
+        {%- else %} {#- if f.has_optional_bit #}
+        {#- Non-repeated, non-message, unlabeled f. Treat as unexisting when it's default value. #}
+        if !::puroro::internal::IsDefault::is_default(&*self.{{ f.ident }}) {
             ::std::option::Option::Some(
-                {%- if field.is_length_delimited %}
-                &self.{{ field.ident }}
-                {%- else %} {#- if field.is_length_delimited #}
-                self.{{ field.ident }}.inner()
-                {%- endif %} {#- if field.is_length_delimited #}
+                {%- if f.is_length_delimited %}
+                &self.{{ f.ident }}
+                {%- else %} {#- if f.is_length_delimited #}
+                self.{{ f.ident }}.inner()
+                {%- endif %} {#- if f.is_length_delimited #}
             )
         } else {
             ::std::option::Option::None
         }
-        {%- endif %} {#- if field.has_optional_bit #}
-        {%- endif %} {#- if field.is_message #}
+        {%- endif %} {#- if f.has_optional_bit #}
+        {%- endif %} {#- if f.is_message #}
     }
 
     {#- normal getter, has_ getter #}
-    pub fn {{ field.ident }}<'this>(&'this self) -> {{ field.bumpalo_getter_type }} {
-        {%- if field.is_message %}
+    pub fn {{ f.ident }}<'this>(&'this self) -> {{ f.bumpalo_getter_type }} {
+        {%- if f.is_message %}
         {#- For message, we return `Option` value even in normal getter method. #}
-        self.{{ field.ident_unesc }}_opt()
-        {%- else %} {#- if field.is_message #}
-        match self.{{ field.ident_unesc }}_opt() {
+        self.{{ f.ident_unesc }}_opt()
+        {%- else %} {#- if f.is_message #}
+        match self.{{ f.ident_unesc }}_opt() {
             ::std::option::Option::Some(x) => x,
             _ => {
-                {%- if field.has_default_value %}
-                {{ field.default_value }}
-                {%- else %} {#- if field.has_default_value #}
+                {%- if f.has_default_value %}
+                {{ f.default_value }}
+                {%- else %} {#- if f.has_default_value #}
                 ::std::default::Default::default()
-                {%- endif %} {#- if field.has_default_value #}
+                {%- endif %} {#- if f.has_default_value #}
             }
         }
-        {%- endif %} {#- if field.is_message #}
+        {%- endif %} {#- if f.is_message #}
     }
-    pub fn has_{{ field.ident_unesc }}(&self) -> bool {
-        self.{{ field.ident_unesc }}_opt().is_some()
+    pub fn has_{{ f.ident_unesc }}(&self) -> bool {
+        self.{{ f.ident_unesc }}_opt().is_some()
     }
 
-    {%- endif %} {#- if field.is_repeated #}
-    {%- endif %} {#- if !field.is_explicit_oneof_field #}
-    {%- endfor %} {#- for field in m.fields #}
+    {%- endif %} {#- if f.is_repeated #}
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
+    {%- endfor %} {#- for f in m.fields #}
 
     {#- ######## mut getter ######## #}
 
-    {%- for field in m.fields %}
-    {%- if !field.is_explicit_oneof_field %}
+    {%- for f in m.fields %}
+    {%- if !f.is_explicit_oneof_field %}
 
-    {%- if field.is_repeated %}
+    {%- if f.is_repeated %}
 
     {#- mut get repeated field #}
-    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> {{ field.bumpalo_getter_mut_type }} {
-        {%- if field.is_length_delimited %}
-        {%- if field.is_message %}
-        unsafe { self.{{ field.ident }}.as_mut_vec_in(self._bump) }
-        {%- else %} {#- if field.is_message #}
-        unsafe { self.{{ field.ident }}.as_add_bump_vec_view_in(self._bump) }
-        {%- endif %} {#- if field.is_message #}
-        {%- else %} {#- if field.is_length_delimited #}
-        unsafe { self.{{ field.ident }}.as_mut_vec_in(self._bump) }
-        {%- endif %} {#- if field.is_length_delimited #}
+    pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.bumpalo_getter_mut_type }} {
+        {%- if f.is_length_delimited %}
+        {%- if f.is_message %}
+        unsafe { self.{{ f.ident }}.as_mut_vec_in(self._bump) }
+        {%- else %} {#- if f.is_message #}
+        unsafe { self.{{ f.ident }}.as_add_bump_vec_view_in(self._bump) }
+        {%- endif %} {#- if f.is_message #}
+        {%- else %} {#- if f.is_length_delimited #}
+        unsafe { self.{{ f.ident }}.as_mut_vec_in(self._bump) }
+        {%- endif %} {#- if f.is_length_delimited #}
     }
 
-    {%- else %} {#- if field.is_repeated #}
+    {%- else %} {#- if f.is_repeated #}
 
     {#- clear scalar field #}
-    pub fn clear_{{ field.ident_unesc }}(&mut self) {
-        {%- if field.has_optional_bit %}
-        self._bitfield.set({{ field.bitfield_index }}, false);
-        {#- Skip dropping the field. No need to do that unless it's a message field, #}
+    pub fn clear_{{ f.ident_unesc }}(&mut self) {
+        {%- if f.has_optional_bit %}
+        self._bitfield.set({{ f.bitfield_index }}, false);
+        {#- Skip dropping the f. No need to do that unless it's a message field, #}
         {#- and the message field will never have optional bitfield. #}
-        {%- else %} {#- if field.has_optional_bit #}
-        self.{{ field.ident }} = ::std::default::Default::default();
-        {%- endif %} {#- if field.has_optional_bit #}
+        {%- else %} {#- if f.has_optional_bit #}
+        self.{{ f.ident }} = ::std::default::Default::default();
+        {%- endif %} {#- if f.has_optional_bit #}
     }
 
     {#- mut get scalar field #}
     {#- always returns an option-unwrapped mut reference. The value is initialized if it's not present. #}
-    pub fn {{ field.ident_unesc }}_mut<'this>(&'this mut self) -> {{ field.bumpalo_getter_mut_type }} {
-        if !self.has_{{ field.ident_unesc }}() {
+    pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.bumpalo_getter_mut_type }} {
+        if !self.has_{{ f.ident_unesc }}() {
             {#- field is not set so we need to initialize it. #}
-            self.{{ field.ident }} = ::std::default::Default::default();
+            self.{{ f.ident }} = ::std::default::Default::default();
 
-            {%- if field.has_optional_bit %}
-            self._bitfield.set({{ field.bitfield_index }}, true);
-            {%- endif %} {#- if field.has_optional_bit #}
+            {%- if f.has_optional_bit %}
+            self._bitfield.set({{ f.bitfield_index }}, true);
+            {%- endif %} {#- if f.has_optional_bit #}
         }
         
-        {%- if field.is_length_delimited %}
-        {%- if field.is_message %}
-        {#- Non-repeated message field. Field type is always `Optional<NoAllocBox<T>>`.#}
+        {%- if f.is_length_delimited %}
+        {%- if f.is_message %}
+        {#- Non-repeated message f. Field type is always `Optional<NoAllocBox<T>>`.#}
         let bump = self._bump;
-        self.{{ field.ident }}.get_or_insert_with(|| ::puroro::internal::NoAllocBumpBox::new_in(
+        self.{{ f.ident }}.get_or_insert_with(|| ::puroro::internal::NoAllocBumpBox::new_in(
             ::puroro::internal::BumpDefault::default_in(bump),
             bump,
         ))
-        {%- endif %} {#- if field.is_message #}
-        {%- if field.is_string %}
-        unsafe { self.{{ field.ident }}.as_mut_string_in(self._bump) } 
-        {%- endif %} {#- if field.is_string #}
-        {%- if field.is_bytes %}
-        unsafe { self.{{ field.ident }}.as_mut_vec_in(self._bump) }
-        {%- endif %} {#- if field.is_bytes #}
-        {%- else %} {#- if field.is_length_delimited #}
-        &mut self.{{ field.ident }}
-        {%- endif %} {#- if field.is_length_delimited #}
+        {%- endif %} {#- if f.is_message #}
+        {%- if f.is_string %}
+        unsafe { self.{{ f.ident }}.as_mut_string_in(self._bump) } 
+        {%- endif %} {#- if f.is_string #}
+        {%- if f.is_bytes %}
+        unsafe { self.{{ f.ident }}.as_mut_vec_in(self._bump) }
+        {%- endif %} {#- if f.is_bytes #}
+        {%- else %} {#- if f.is_length_delimited #}
+        &mut self.{{ f.ident }}
+        {%- endif %} {#- if f.is_length_delimited #}
     }
 
-    {%- endif %} {#- if field.is_repeated #}
-    {%- endif %} {#- if !field.is_explicit_oneof_field #}
-    {%- endfor %} {#- for field in m.fields #}
+    {%- endif %} {#- if f.is_repeated #}
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
+    {%- endfor %} {#- for f in m.fields #}
 }
 
 
@@ -228,8 +228,8 @@ impl<'bump> ::puroro::internal::BumpDefault<'bump> for {{ m.bumpalo_ident }}<'bu
 }
 
 impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}<'bump> {
-    {%- for field in m.fields %}
-    {%- call bumpalo_trait_impl_field(field) %}
+    {%- for f in m.fields %}
+    {%- call bumpalo_trait_impl_field(f) %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
@@ -249,17 +249,17 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
         match &self.{{ oneof.field_ident }} {
             E::_None(_) => ::std::option::Option::None,
-            {%- for field in oneof.fields %}
-            E::{{ field.ident }}(val) => ::std::option::Option::Some(
-                {% if field.is_length_delimited %}
-                {%- if field.is_message %}
+            {%- for f in oneof.fields %}
+            E::{{ f.ident }}(val) => ::std::option::Option::Some(
+                {% if f.is_length_delimited %}
+                {%- if f.is_message %}
                 {#- message field need to be cast the lifetime param #}
-                F::{{ field.ident }}(unsafe { ::std::mem::transmute(val.as_ref()) })
-                {%- else %} {#- if field.is_message #}
-                F::{{ field.ident }}(val.as_ref())
-                {%- endif %} {#- if field.is_message #}
+                F::{{ f.ident }}(unsafe { ::std::mem::transmute(val.as_ref()) })
+                {%- else %} {#- if f.is_message #}
+                F::{{ f.ident }}(val.as_ref())
+                {%- endif %} {#- if f.is_message #}
                 {% else %}
-                F::{{ field.ident }}(val.inner().clone())
+                F::{{ f.ident }}(val.inner().clone())
                 {% endif %}
             ),
             {%- endfor %}
@@ -279,41 +279,41 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
     {
         use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
         match field_number {
-            {%- for field in m.fields %}
-            {%- if !field.is_explicit_oneof_field %}
-            {{ field.number }} => {
-                {%- if field.has_optional_bit %}
-                self._bitfield.set({{ field.bitfield_index }}, true);
+            {%- for f in m.fields %}
+            {%- if !f.is_explicit_oneof_field %}
+            {{ f.number }} => {
+                {%- if f.has_optional_bit %}
+                self._bitfield.set({{ f.bitfield_index }}, true);
                 {%- endif %}
                 DeserFieldFromBytesIter::<
-                    {{ field.bumpalo_label_and_type_tags }}
-                >::deser_field(&mut self.{{ field.ident }}, data, self._bump)
+                    {{ f.bumpalo_label_and_type_tags }}
+                >::deser_field(&mut self.{{ f.ident }}, data, self._bump)
             }
             {%- endif %}
             {%- endfor %}
 
             {%- for oneof in m.oneofs %}
-            {%- for field in oneof.fields %}
-            {{ field.number }} => {
+            {%- for f in oneof.fields %}
+            {{ f.number }} => {
                 use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
                 if !matches!(
                     &self.{{ oneof.field_ident }},
-                    E::{{ field.ident }}(_))
+                    E::{{ f.ident }}(_))
                 {
-                    self.{{ oneof.field_ident }} = E::{{ field.ident }}(
-                        {%- if field.is_message %}
+                    self.{{ oneof.field_ident }} = E::{{ f.ident }}(
+                        {%- if f.is_message %}
                         ::puroro::internal::Bare::new(::puroro::BumpaloMessage::new_in(self._bump))
-                        {%- else %} {#- if field.is_message #}
+                        {%- else %} {#- if f.is_message #}
                         ::puroro::internal::BumpDefault::default_in(self._bump)
-                        {%- endif %} {#- if field.is_message #}
+                        {%- endif %} {#- if f.is_message #}
                     );
                 }
                 let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
-                    E::{{ field.ident }}(v) => v,
+                    E::{{ f.ident }}(v) => v,
                     _ => unreachable!(),
                 };
                 DeserFieldFromBytesIter::<
-                    ::puroro::tags::OneofField, {{ field.bumpalo_field_type_tag }},
+                    ::puroro::tags::OneofField, {{ f.bumpalo_field_type_tag }},
                 >::deser_field(field_value_mut_ref, data, self._bump)
             }
             {%- endfor %}
@@ -327,9 +327,9 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
 impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for {{ m.bumpalo_ident }}<'bump>
 where
     Self: super::_puroro_traits::{{ m.ident }}Trait,
-{%- for field in m.fields %}
-{%- if field.is_message %}
-    for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'a> :
+{%- for f in m.fields %}
+{%- if f.is_message %}
+    for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'a> :
         ::puroro::internal::se::SerMessageToIoWrite,
 {%- endif %}
 {%- endfor %}
@@ -338,19 +338,19 @@ where
     where
         W: ::std::io::Write,
     {
-        {%- for field in m.fields %}
+        {%- for f in m.fields %}
         ::puroro::internal::se::SerFieldToIoWrite::<
-            {{ field.trait_label_and_type_tags }}
+            {{ f.trait_label_and_type_tags }}
         >::ser_field(
-            {%- if field.is_repeated %}
-            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident }}(self),
+            {%- if f.is_repeated %}
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident }}(self),
             {%- else %}
-            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ field.ident_unesc }}_opt(self),
+            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident_unesc }}_opt(self),
             {%- endif %}
-            {{ field.number }},
+            {{ f.number }},
             out
         )?;
-        {%- endfor %} {#- for field in m.fields #}
+        {%- endfor %} {#- for f in m.fields #}
         ::std::result::Result::Ok(())
     }
 }

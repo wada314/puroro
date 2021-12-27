@@ -42,8 +42,8 @@ where
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
         self.as_ref().and_then(|msg| msg.{{ oneof.field_ident }}().map(|oneof| {
             match oneof {
-                {%- for field in oneof.fields %}
-                E::{{ field.ident }}(v) => E::{{ field.ident }}(v),
+                {%- for f in oneof.fields %}
+                E::{{ f.ident }}(v) => E::{{ f.ident }}(v),
                 {%- endfor %}
             }
         }))

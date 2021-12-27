@@ -8,13 +8,13 @@ where
     {%- match f.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
     {%- if f.is_repeated %}
-    {#- For repeated message field, each message has either `T` or `U` type, never be merged. -#}
+    {#- For repeated message f, each message has either `T` or `U` type, never be merged. -#}
     type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
         <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
         <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
     >;
     {%- else %}
-    {#- For non-repeated message field, the message is `T` and `U` merged type. -#}
+    {#- For non-repeated message f, the message is `T` and `U` merged type. -#}
     {#- There are 3+1 cases: `T` and `U` both exist, only `T`, only `U`, (and none of them). -#}
     type Field{{ f.number }}MessageType<'this> where Self: 'this = (
         ::std::option::Option<<T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>>,
@@ -89,35 +89,35 @@ where
         Some(match (self.0.{{ oneof.field_ident }}(), self.1.{{ oneof.field_ident }}()) {
             (None, None) => { return None; },
 
-            {%- for field in oneof.fields %}
+            {%- for f in oneof.fields %}
             (
-                Some(E::{{ field.ident }}({% if field.is_message %}left{% else %}_{% endif %})),
-                Some(E::{{ field.ident }}(right))
+                Some(E::{{ f.ident }}({% if f.is_message %}left{% else %}_{% endif %})),
+                Some(E::{{ f.ident }}(right))
             ) => {
-                {%- if field.is_message %}
-                E::{{ field.ident }}((Some(left), Some(right)))
+                {%- if f.is_message %}
+                E::{{ f.ident }}((Some(left), Some(right)))
                 {%- else %}
-                E::{{ field.ident }}(right)
+                E::{{ f.ident }}(right)
                 {%- endif %}
             }
             {%- endfor %}
 
-            {%- for field in oneof.fields %}
-            (_, Some(E::{{ field.ident }}(right))) => {
-                {%- if field.is_message %}
-                E::{{ field.ident }}((None, Some(right)))
+            {%- for f in oneof.fields %}
+            (_, Some(E::{{ f.ident }}(right))) => {
+                {%- if f.is_message %}
+                E::{{ f.ident }}((None, Some(right)))
                 {%- else %}
-                E::{{ field.ident }}(right)
+                E::{{ f.ident }}(right)
                 {%- endif %}
             }
             {%- endfor %}
 
-            {%- for field in oneof.fields %}
-            (Some(E::{{ field.ident }}(left)), None) => {
-                {%- if field.is_message %}
-                E::{{ field.ident }}((Some(left), None))
+            {%- for f in oneof.fields %}
+            (Some(E::{{ f.ident }}(left)), None) => {
+                {%- if f.is_message %}
+                E::{{ f.ident }}((Some(left), None))
                 {%- else %}
-                E::{{ field.ident }}(left)
+                E::{{ f.ident }}(left)
                 {%- endif %}
             }
             {%- endfor %}
