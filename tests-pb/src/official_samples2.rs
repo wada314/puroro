@@ -1492,8 +1492,9 @@ pub mod _puroro_traits {
     pub trait Test3Trait {
         type Field3MessageType<'this>: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
             where Self: 'this;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            self.c_opt()
+
+        fn c<'this>(&'this self) -> Self::Field3MessageType<'this> {
+            self.c_opt().unwrap_or_else(Self::field_3_default_value)
         }
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()

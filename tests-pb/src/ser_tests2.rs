@@ -2610,6 +2610,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
+
         fn float_optional<'this>(&'this self) -> f32 {
             self.float_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2626,6 +2627,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
+
         fn string_optional<'this>(&'this self) -> &'this str {
             self.string_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2644,10 +2646,10 @@ pub mod _puroro_traits {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
         type Field7MessageType<'this>: self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
-        fn submsg_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+
+        fn submsg_optional<'this>(&'this self) -> Self::Field7MessageType<'this> {
             self.submsg_optional_opt()
+                .unwrap_or_else(Self::field_7_default_value)
         }
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -2665,6 +2667,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
+
         fn enum_optional<'this>(&'this self) -> self::_puroro_root::ser_tests2::Enum {
             self.enum_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2683,6 +2686,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;
+
         fn very_large_field_number<'this>(&'this self) -> i32 {
             self.very_large_field_number_opt()
                 .unwrap_or_else(::std::default::Default::default)

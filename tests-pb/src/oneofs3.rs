@@ -1591,6 +1591,7 @@ pub mod _puroro_traits {
         fn has_g1_int32<'this>(&'this self) -> bool {
             self.g1_int32_opt().is_some()
         }
+
         fn g1_string<'this>(&'this self) -> &'this str {
             self.g1_string_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -1598,6 +1599,7 @@ pub mod _puroro_traits {
         fn has_g1_string<'this>(&'this self) -> bool {
             self.g1_string_opt().is_some()
         }
+
         fn g2_f32<'this>(&'this self) -> f32 {
             self.g2_f32_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -1605,6 +1607,7 @@ pub mod _puroro_traits {
         fn has_g2_f32<'this>(&'this self) -> bool {
             self.g2_f32_opt().is_some()
         }
+
         fn g2_string<'this>(&'this self) -> &'this str {
             self.g2_string_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -1615,12 +1618,15 @@ pub mod _puroro_traits {
         type Field5MessageType<'this>: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
         where
             Self: 'this;
-        fn g2_submsg<'this>(&'this self) -> ::std::option::Option<Self::Field5MessageType<'this>> {
+
+        fn g2_submsg<'this>(&'this self) -> Self::Field5MessageType<'this> {
             self.g2_submsg_opt()
+                .unwrap_or_else(Self::field_5_default_value)
         }
         fn has_g2_submsg<'this>(&'this self) -> bool {
             self.g2_submsg_opt().is_some()
         }
+
         fn g3_int32<'this>(&'this self) -> i32 {
             self.g3_int32_opt()
                 .unwrap_or_else(::std::default::Default::default)

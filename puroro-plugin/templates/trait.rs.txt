@@ -2,12 +2,10 @@
 pub trait {{ m.trait_ident }} {
     {%- for f in m.fields %}
 
-    {%- match f.trait_maybe_field_message_trait_path %}
-    {%- when Some with (field_msg_path) %}
-    type Field{{ f.number }}MessageType<'this>: {{ field_msg_path }}
+    {%- if f.is_message %}
+    type Field{{ f.number }}MessageType<'this>: {{ f.trait_field_message_trait_path }} +
         where Self: 'this;
-    {%- else %}
-    {%- endmatch %}
+    {%- endif %} {#- if f.is_message #}
 
     {%- if f.is_repeated %}
 
@@ -19,20 +17,17 @@ pub trait {{ m.trait_ident }} {
 
     {%- else %} {#- if f.is_repeated #}
 
-    {%- if f.is_message %}
-    {#- the getter method returns Option<T> for message field #}
-    fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
-        self.{{ f.ident_unesc }}_opt()
-    }
-    {%- else %}
     fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        {%- if f.is_message %}
+        self.{{ f.ident_unesc }}_opt().unwrap_or_else(Self::field_{{ f.number }}_default_value)
+        {%- else %} {#- if f.is_message #}
         {%- if f.has_default_value %}
         self.{{ f.ident_unesc }}_opt().unwrap_or({{ f.default_value }})
-        {%- else %}
+        {%- else %} {#- if f.has_default_value #}
         self.{{ f.ident_unesc }}_opt().unwrap_or_else(::std::default::Default::default)
-        {%- endif %}
+        {%- endif %} {#- if f.has_default_value #}
+        {%- endif %} {#- if f.is_message #}
     }
-    {%- endif %}
     fn has_{{ f.ident_unesc }}<'this>(&'this self) -> bool {
         self.{{ f.ident_unesc }}_opt().is_some()
     }

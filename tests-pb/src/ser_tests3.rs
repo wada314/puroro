@@ -2618,6 +2618,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
+
         fn float_unlabeled<'this>(&'this self) -> f32 {
             self.float_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2634,6 +2635,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
+
         fn string_unlabeled<'this>(&'this self) -> &'this str {
             self.string_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2652,10 +2654,10 @@ pub mod _puroro_traits {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
         type Field7MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+
+        fn submsg_unlabeled<'this>(&'this self) -> Self::Field7MessageType<'this> {
             self.submsg_unlabeled_opt()
+                .unwrap_or_else(Self::field_7_default_value)
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
@@ -2673,6 +2675,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
+
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             self.enum_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2691,6 +2694,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;
+
         fn very_large_field_number<'this>(&'this self) -> i32 {
             self.very_large_field_number_opt()
                 .unwrap_or_else(::std::default::Default::default)

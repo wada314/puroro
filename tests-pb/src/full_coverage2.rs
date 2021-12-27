@@ -14215,6 +14215,7 @@ pub mod _puroro_traits {
         fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
+
         fn i32_optional<'this>(&'this self) -> i32 {
             self.i32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14231,6 +14232,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
+
         fn float_required<'this>(&'this self) -> f32 {
             self.float_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14241,6 +14243,7 @@ pub mod _puroro_traits {
         fn float_required_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
+
         fn float_optional<'this>(&'this self) -> f32 {
             self.float_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14257,6 +14260,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this>;
+
         fn bytes_required<'this>(&'this self) -> &'this [u8] {
             self.bytes_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14267,6 +14271,7 @@ pub mod _puroro_traits {
         fn bytes_required_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
+
         fn bytes_optional<'this>(&'this self) -> &'this [u8] {
             self.bytes_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14283,6 +14288,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this>;
+
         fn string_required<'this>(&'this self) -> &'this str {
             self.string_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14293,6 +14299,7 @@ pub mod _puroro_traits {
         fn string_required_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
+
         fn string_optional<'this>(&'this self) -> &'this str {
             self.string_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14309,6 +14316,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this>;
+
         fn enum_required<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
             self.enum_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14321,6 +14329,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<self::_puroro_root::full_coverage2::Enum> {
             ::std::option::Option::None
         }
+
         fn enum_optional<'this>(&'this self) -> self::_puroro_root::full_coverage2::Enum {
             self.enum_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14341,10 +14350,10 @@ pub mod _puroro_traits {
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this>;
         type Field51MessageType<'this>: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
-        fn submsg_required<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+
+        fn submsg_required<'this>(&'this self) -> Self::Field51MessageType<'this> {
             self.submsg_required_opt()
+                .unwrap_or_else(Self::field_51_default_value)
         }
         fn has_submsg_required<'this>(&'this self) -> bool {
             self.submsg_required_opt().is_some()
@@ -14356,10 +14365,10 @@ pub mod _puroro_traits {
         }
         type Field52MessageType<'this>: self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
-        fn submsg_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+
+        fn submsg_optional<'this>(&'this self) -> Self::Field52MessageType<'this> {
             self.submsg_optional_opt()
+                .unwrap_or_else(Self::field_52_default_value)
         }
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
@@ -14377,6 +14386,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this>;
+
         fn i64_required<'this>(&'this self) -> i64 {
             self.i64_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14387,6 +14397,7 @@ pub mod _puroro_traits {
         fn i64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
+
         fn i64_optional<'this>(&'this self) -> i64 {
             self.i64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14403,6 +14414,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this>;
+
         fn u32_required<'this>(&'this self) -> u32 {
             self.u32_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14413,6 +14425,7 @@ pub mod _puroro_traits {
         fn u32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
+
         fn u32_optional<'this>(&'this self) -> u32 {
             self.u32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14429,6 +14442,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this>;
+
         fn u64_required<'this>(&'this self) -> u64 {
             self.u64_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14439,6 +14453,7 @@ pub mod _puroro_traits {
         fn u64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
+
         fn u64_optional<'this>(&'this self) -> u64 {
             self.u64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14455,6 +14470,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this>;
+
         fn s32_required<'this>(&'this self) -> i32 {
             self.s32_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14465,6 +14481,7 @@ pub mod _puroro_traits {
         fn s32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
+
         fn s32_optional<'this>(&'this self) -> i32 {
             self.s32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14481,6 +14498,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this>;
+
         fn s64_required<'this>(&'this self) -> i64 {
             self.s64_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14491,6 +14509,7 @@ pub mod _puroro_traits {
         fn s64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
+
         fn s64_optional<'this>(&'this self) -> i64 {
             self.s64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14507,6 +14526,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this>;
+
         fn fixed32_required<'this>(&'this self) -> u32 {
             self.fixed32_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14517,6 +14537,7 @@ pub mod _puroro_traits {
         fn fixed32_required_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
+
         fn fixed32_optional<'this>(&'this self) -> u32 {
             self.fixed32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14533,6 +14554,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this>;
+
         fn fixed64_required<'this>(&'this self) -> u64 {
             self.fixed64_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14543,6 +14565,7 @@ pub mod _puroro_traits {
         fn fixed64_required_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
+
         fn fixed64_optional<'this>(&'this self) -> u64 {
             self.fixed64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14559,6 +14582,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this>;
+
         fn sfixed32_required<'this>(&'this self) -> i32 {
             self.sfixed32_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14569,6 +14593,7 @@ pub mod _puroro_traits {
         fn sfixed32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
+
         fn sfixed32_optional<'this>(&'this self) -> i32 {
             self.sfixed32_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14585,6 +14610,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this>;
+
         fn sfixed64_required<'this>(&'this self) -> i64 {
             self.sfixed64_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14595,6 +14621,7 @@ pub mod _puroro_traits {
         fn sfixed64_required_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
+
         fn sfixed64_optional<'this>(&'this self) -> i64 {
             self.sfixed64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14611,6 +14638,7 @@ pub mod _puroro_traits {
         where
             Self: 'this;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this>;
+
         fn f64_required<'this>(&'this self) -> f64 {
             self.f64_required_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -14621,6 +14649,7 @@ pub mod _puroro_traits {
         fn f64_required_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             ::std::option::Option::None
         }
+
         fn f64_optional<'this>(&'this self) -> f64 {
             self.f64_optional_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -16758,6 +16787,7 @@ pub mod _puroro_nested {
                 fn i32_required_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
+
                 fn i64_required<'this>(&'this self) -> i64 {
                     self.i64_required_opt()
                         .unwrap_or_else(::std::default::Default::default)
