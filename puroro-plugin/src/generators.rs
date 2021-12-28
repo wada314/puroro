@@ -429,8 +429,11 @@ struct OneofField {
     getter_ident: String,
     getter_ident_unesc: String,
     number: i32,
-    is_length_delimited: bool,
     is_message: bool,
+    is_string: bool,
+    is_bytes: bool,
+    is_length_delimited: bool,
+    is_numerical: bool,
     field_type: String,
     simple_field_type: String,
     bumpalo_field_type: String,
@@ -441,18 +444,20 @@ struct OneofField {
 
 impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
+        let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
+        let is_string = matches!(f.field_type()?, wrappers::FieldType::String);
+        let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
+        let is_length_delimited = is_message || is_string || is_bytes;
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
             getter_ident: f.rust_ident().to_string(),
             getter_ident_unesc: f.rust_ident_unesc().to_string(),
             number: f.number(),
-            is_length_delimited: matches!(
-                f.field_type()?,
-                wrappers::FieldType::Bytes
-                    | wrappers::FieldType::String
-                    | wrappers::FieldType::Message(_)
-            ),
-            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_message,
+            is_string,
+            is_bytes,
+            is_length_delimited,
+            is_numerical: !is_length_delimited,
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
             simple_field_type: f.simple_oneof_field_type()?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
