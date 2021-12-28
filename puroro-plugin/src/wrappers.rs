@@ -644,7 +644,7 @@ impl Field {
             LengthDelimited(String) => "&'this str".into(),
             LengthDelimited(Bytes) => "&'this [u8]".into(),
             LengthDelimited(Message(_)) => format!(
-                "Self::Field{number}MessageType<'this>",
+                "::std::option::Option<Self::Field{number}MessageType<'this>>",
                 number = self.number()
             )
             .into(),

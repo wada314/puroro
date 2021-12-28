@@ -28,7 +28,13 @@ pub trait {{ m.trait_ident }} {
     }
     {%- endif %}
 
-    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }};
+    fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+        {%- if f.is_message %}
+        self.{{ f.ident_unesc }}_opt()
+        {%- else %} {#- if f.is_message #}
+        self.{{ f.ident_unesc }}_opt().unwrap_or({{ f.default_value }})
+        {%- endif %} {#- if f.is_message #}
+    }
     fn has_{{ f.ident_unesc }}<'this>(&'this self) -> bool {
         self.{{ f.ident_unesc }}_opt().is_some()
     }
@@ -89,10 +95,6 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
             (**self).{{ f.ident_unesc }}_opt()
         }
         {%- endif %}
-        
-        fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
-            (**self).{{ f.ident }}()
-        }
 
         {%- endif %} {#- if f.is_repeated #}
 
