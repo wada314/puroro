@@ -564,6 +564,7 @@ pub mod _puroro_impls {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::sync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+
             static DEFAULT_INSTANCE: Lazy<self::Test1Bumpalo<'static>> =
                 Lazy::new(|| self::Test1Bumpalo::new_in(&BUMP));
             &DEFAULT_INSTANCE
@@ -789,6 +790,7 @@ pub mod _puroro_impls {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::sync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+
             static DEFAULT_INSTANCE: Lazy<self::Test2Bumpalo<'static>> =
                 Lazy::new(|| self::Test2Bumpalo::new_in(&BUMP));
             &DEFAULT_INSTANCE
@@ -1032,6 +1034,7 @@ pub mod _puroro_impls {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::sync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+
             static DEFAULT_INSTANCE: Lazy<self::Test3Bumpalo<'static>> =
                 Lazy::new(|| self::Test3Bumpalo::new_in(&BUMP));
             &DEFAULT_INSTANCE
@@ -1295,6 +1298,7 @@ pub mod _puroro_impls {
             use ::puroro::bumpalo::Bump;
             use ::puroro::once_cell::sync::Lazy;
             static BUMP: Lazy<Bump> = Lazy::new(|| Bump::new());
+
             static DEFAULT_INSTANCE: Lazy<self::Test4Bumpalo<'static>> =
                 Lazy::new(|| self::Test4Bumpalo::new_in(&BUMP));
             &DEFAULT_INSTANCE
