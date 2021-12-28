@@ -6,8 +6,7 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ f.simpl
 
 {%- if f.is_repeated %}
 
-{%- match f.simple_maybe_borrowed_field_type %}
-{%- when Some with (borrowed) %}
+{%- if f.is_length_delimited %}
 {%- if f.is_message %}
 {#- repeated MyMessage => &'this [MyMessage] #}
 type Field{{ f.number }}RepeatedType<'this> = &'this [{{ f.simple_scalar_field_type }}];
@@ -17,10 +16,11 @@ type Field{{ f.number }}RepeatedType<'this> = ::puroro::AsRefRepeatedField<
     'this,
     {{ f.simple_field_type }},
     {{ f.simple_scalar_field_type }},
-    {{ borrowed }}
+    {%- if f.is_string %}str,{%- endif %}
+    {%- if f.is_bytes %}[u8],{%- endif %}
 >;
 {%- endif %} {#- if f.is_message #}
-{%- else %}
+{%- else %} {#- if f.is_length_delimited #}
 {#- repeated i32 => CloneThenIntoRepeatedField<'this, Vec<i32>, i32, i32> #}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
     'this,
@@ -28,19 +28,18 @@ type Field{{ f.number }}RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedFie
     {{ f.trait_scalar_getter_type }},
     {{ f.trait_scalar_getter_type }},
     >;
-{%- endmatch %}
+{%- endif %} {#- if f.is_length_delimited #}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
-    {%- match f.simple_maybe_borrowed_field_type %}
-    {%- when Some with (borrowed) %}
+    {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     &self.{{ f.ident }}
     {%- else %} {#- if f.is_message #}
     ::puroro::AsRefRepeatedField::new(&self.{{ f.ident }})
     {%- endif %} {#- if f.is_message #}
-    {%- else %}
+    {%- else %} {#- if f.is_length_delimited #}
     ::puroro::CloneThenIntoRepeatedField::new(&self.{{ f.ident }})
-    {%- endmatch %}
+    {%- endif %} {#- if f.is_length_delimited #}
 }
 
 {%- else %} {#- if f.is_repeated #}
