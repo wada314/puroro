@@ -1,10 +1,8 @@
 
-{%- match f.bumpalo_maybe_field_message_path %}
-{%- when Some with (struct_path) %}
+{%- if f.is_message %}
 {#- [optional|repeated] MyMessage => &'this MyMessageBumpalo<'this> #}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }};
-{%- else %}
-{%- endmatch %}
+type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ f.bumpalo_field_message_path }};
+{%- endif %} {#- if f.is_message #}
 
 {%- if f.is_repeated %}
 
