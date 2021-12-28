@@ -19,7 +19,7 @@ use ::puroro::internal::de::DeserMessageFromBytesIter;
 fn test_simple_int32() {
     let mut msg = Msg::default();
 
-    // Check struct fields are initialized by the specified default values
+    // Check struct fields has specified default values
     assert_eq!(0, msg.i32_default());
     assert_eq!(0, msg.i32_0());
     assert_eq!(42, msg.i32_42());
@@ -29,13 +29,13 @@ fn test_simple_int32() {
     assert_eq!(0o123, msg.i32_0123());
     assert_eq!(0x123, msg.i32_0x123());
     assert!(!msg.has_i32_default());
-    assert!(msg.has_i32_0());
-    assert!(msg.has_i32_42());
-    assert!(msg.has_i32_m42());
-    assert!(msg.has_i32_2147483647());
-    assert!(msg.has_i32_m2147483648());
-    assert!(msg.has_i32_0123());
-    assert!(msg.has_i32_0x123());
+    assert!(!msg.has_i32_0());
+    assert!(!msg.has_i32_42());
+    assert!(!msg.has_i32_m42());
+    assert!(!msg.has_i32_2147483647());
+    assert!(!msg.has_i32_m2147483648());
+    assert!(!msg.has_i32_0123());
+    assert!(!msg.has_i32_0x123());
 
     // When the fields are explicitly set to None,
     *msg.i32_default_mut() = None;
@@ -48,7 +48,7 @@ fn test_simple_int32() {
     *msg.i32_0x123_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(0, msg.i32_default());
     assert_eq!(0, msg.i32_0());
     assert_eq!(42, msg.i32_42());
@@ -79,11 +79,11 @@ fn test_simple_uint32() {
     assert_eq!(0o123, msg.u32_0123());
     assert_eq!(0x123, msg.u32_0x123());
     assert!(!msg.has_u32_default());
-    assert!(msg.has_u32_0());
-    assert!(msg.has_u32_42());
-    assert!(msg.has_u32_4294967295());
-    assert!(msg.has_u32_0123());
-    assert!(msg.has_u32_0x123());
+    assert!(!msg.has_u32_0());
+    assert!(!msg.has_u32_42());
+    assert!(!msg.has_u32_4294967295());
+    assert!(!msg.has_u32_0123());
+    assert!(!msg.has_u32_0x123());
 
     // When the fields are explicitly set to None,
     *msg.u32_default_mut() = None;
@@ -94,7 +94,7 @@ fn test_simple_uint32() {
     *msg.u32_0x123_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(0, msg.u32_default());
     assert_eq!(0, msg.u32_0());
     assert_eq!(42, msg.u32_42());
@@ -123,13 +123,13 @@ fn test_simple_int64() {
     assert_eq!(0o123, msg.i64_0123());
     assert_eq!(0x123, msg.i64_0x123());
     assert!(!msg.has_i64_default());
-    assert!(msg.has_i64_0());
-    assert!(msg.has_i64_42());
-    assert!(msg.has_i64_m42());
-    assert!(msg.has_i64_9223372036854775807());
-    assert!(msg.has_i64_m9223372036854775808());
-    assert!(msg.has_i64_0123());
-    assert!(msg.has_i64_0x123());
+    assert!(!msg.has_i64_0());
+    assert!(!msg.has_i64_42());
+    assert!(!msg.has_i64_m42());
+    assert!(!msg.has_i64_9223372036854775807());
+    assert!(!msg.has_i64_m9223372036854775808());
+    assert!(!msg.has_i64_0123());
+    assert!(!msg.has_i64_0x123());
 
     // When the fields are explicitly set to None,
     *msg.i64_default_mut() = None;
@@ -142,7 +142,7 @@ fn test_simple_int64() {
     *msg.i64_0x123_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(0, msg.i64_default());
     assert_eq!(0, msg.i64_0());
     assert_eq!(42, msg.i64_42());
@@ -173,11 +173,11 @@ fn test_simple_uint64() {
     assert_eq!(0o123, msg.u64_0123());
     assert_eq!(0x123, msg.u64_0x123());
     assert!(!msg.has_u64_default());
-    assert!(msg.has_u64_0());
-    assert!(msg.has_u64_42());
-    assert!(msg.has_u64_18446744073709551615());
-    assert!(msg.has_u64_0123());
-    assert!(msg.has_u64_0x123());
+    assert!(!msg.has_u64_0());
+    assert!(!msg.has_u64_42());
+    assert!(!msg.has_u64_18446744073709551615());
+    assert!(!msg.has_u64_0123());
+    assert!(!msg.has_u64_0x123());
 
     // When the fields are explicitly set to None,
     *msg.u64_default_mut() = None;
@@ -188,7 +188,7 @@ fn test_simple_uint64() {
     *msg.u64_0x123_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(0, msg.u64_default());
     assert_eq!(0, msg.u64_0());
     assert_eq!(42, msg.u64_42());
@@ -223,17 +223,17 @@ fn test_simple_float() {
     assert!(msg.f32_nan().is_nan());
     assert!(msg.f32_mnan().is_nan());
     assert!(!msg.has_f32_default());
-    assert!(msg.has_f32_0());
-    assert!(msg.has_f32_m0());
-    assert!(msg.has_f32_0p());
-    assert!(msg.has_f32_p0());
-    assert!(msg.has_f32_0p0());
-    assert!(msg.has_f32_42());
-    assert!(msg.has_f32_m42());
-    assert!(msg.has_f32_0p25());
-    assert!(msg.has_f32_1p5e2());
-    assert!(msg.has_f32_inf());
-    assert!(msg.has_f32_minf());
+    assert!(!msg.has_f32_0());
+    assert!(!msg.has_f32_m0());
+    assert!(!msg.has_f32_0p());
+    assert!(!msg.has_f32_p0());
+    assert!(!msg.has_f32_0p0());
+    assert!(!msg.has_f32_42());
+    assert!(!msg.has_f32_m42());
+    assert!(!msg.has_f32_0p25());
+    assert!(!msg.has_f32_1p5e2());
+    assert!(!msg.has_f32_inf());
+    assert!(!msg.has_f32_minf());
 
     // When the fields are explicitly set to None, then it's None anyway.
     *msg.f32_default_mut() = None;
@@ -252,7 +252,7 @@ fn test_simple_float() {
     *msg.f32_mnan_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(0.0, msg.f32_default());
     assert_eq!(0.0, msg.f32_0());
     assert_eq!(-0.0, msg.f32_m0());
@@ -290,8 +290,8 @@ fn test_simple_bool() {
     assert_eq!(false, msg.bool_false());
     assert_eq!(true, msg.bool_true());
     assert!(!msg.has_bool_default());
-    assert!(msg.has_bool_false());
-    assert!(msg.has_bool_true());
+    assert!(!msg.has_bool_false());
+    assert!(!msg.has_bool_true());
 
     // When the fields are explicitly set to None,
     *msg.bool_default_mut() = None;
@@ -299,7 +299,7 @@ fn test_simple_bool() {
     *msg.bool_true_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(false, msg.bool_default());
     assert_eq!(false, msg.bool_false());
     assert_eq!(true, msg.bool_true());
@@ -321,12 +321,12 @@ fn test_simple_string() {
     assert_eq!("\t", msg.string_tab());
     assert_eq!("\r\n", msg.string_crlf());
     assert!(!msg.has_string_default());
-    assert!(msg.has_string_empty());
-    assert!(msg.has_string_abc());
-    assert!(msg.has_string_aiu());
-    assert!(msg.has_string_backslash());
-    assert!(msg.has_string_tab());
-    assert!(msg.has_string_crlf());
+    assert!(!msg.has_string_empty());
+    assert!(!msg.has_string_abc());
+    assert!(!msg.has_string_aiu());
+    assert!(!msg.has_string_backslash());
+    assert!(!msg.has_string_tab());
+    assert!(!msg.has_string_crlf());
 
     // When the fields are explicitly set to None,
     *msg.string_default_mut() = None;
@@ -338,7 +338,7 @@ fn test_simple_string() {
     *msg.string_crlf_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!("", msg.string_default());
     assert_eq!("", msg.string_empty());
     assert_eq!("abc", msg.string_abc());
@@ -368,12 +368,12 @@ fn test_simple_bytes() {
     assert_eq!(b"\t", msg.bytes_tab());
     assert_eq!(b"\r\n", msg.bytes_crlf());
     assert!(!msg.has_bytes_default());
-    assert!(msg.has_bytes_empty());
-    assert!(msg.has_bytes_abc());
-    assert!(msg.has_bytes_aiu());
-    assert!(msg.has_bytes_backslash());
-    assert!(msg.has_bytes_tab());
-    assert!(msg.has_bytes_crlf());
+    assert!(!msg.has_bytes_empty());
+    assert!(!msg.has_bytes_abc());
+    assert!(!msg.has_bytes_aiu());
+    assert!(!msg.has_bytes_backslash());
+    assert!(!msg.has_bytes_tab());
+    assert!(!msg.has_bytes_crlf());
 
     // When the fields are explicitly set to None,
     *msg.bytes_default_mut() = None;
@@ -385,7 +385,7 @@ fn test_simple_bytes() {
     *msg.bytes_crlf_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(b"", msg.bytes_default());
     assert_eq!(b"", msg.bytes_empty());
     assert_eq!(b"abc", msg.bytes_abc());
@@ -411,8 +411,8 @@ fn test_simple_enum() {
     assert_eq!(MyEnum::One, msg.enum_one());
     assert_eq!(MyEnum::FourtyTwo, msg.enum_fourty_two());
     assert!(!msg.has_enum_default());
-    assert!(msg.has_enum_one());
-    assert!(msg.has_enum_fourty_two());
+    assert!(!msg.has_enum_one());
+    assert!(!msg.has_enum_fourty_two());
 
     // When the fields are explicitly set to None,
     *msg.enum_default_mut() = None;
@@ -420,7 +420,7 @@ fn test_simple_enum() {
     *msg.enum_fourty_two_mut() = None;
 
     // the trait methods still return the default values.
-    // Though has_xxx methods return false.
+    // And has_xxx methods return false.
     assert_eq!(MyEnum::One, msg.enum_default());
     assert_eq!(MyEnum::One, msg.enum_one());
     assert_eq!(MyEnum::FourtyTwo, msg.enum_fourty_two());

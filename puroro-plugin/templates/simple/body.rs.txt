@@ -28,20 +28,7 @@ impl {{ m.simple_ident }} {
         Self {        
             {%- for f in m.fields %}
             {%- if !f.is_explicit_oneof_field %}
-            {%- if f.has_default_value %}
-            {%- if f.is_length_delimited %}
-            {%- if f.is_bytes %}
-            {{ f.ident }}: ::std::option::Option::Some({{ f.default_value }}.to_vec()),
-            {%- endif %}
-            {%- if f.is_string %}
-            {{ f.ident }}: ::std::option::Option::Some({{ f.default_value }}.to_string()),
-            {%- endif %}
-            {%- else %}
-            {{ f.ident }}: ::std::option::Option::Some({{ f.default_value }}),
-            {%- endif %}
-            {%- else %}
             {{ f.ident }}: ::std::default::Default::default(),
-            {%- endif %}
             {%- endif %}
             {%- endfor %}
 
