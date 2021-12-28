@@ -191,7 +191,7 @@ struct Field {
     oneof_enum_value_ident: String,
     simple_field_type: String,
     simple_scalar_field_type: String,
-    simple_maybe_field_message_path: Option<String>,
+    simple_field_message_path: String,
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
     single_field_type: String,
@@ -213,12 +213,6 @@ impl Field {
         } else {
             None
         };
-        let simple_maybe_field_message_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Simple", &[]))
-            } else {
-                None
-            };
         let bumpalo_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'this"]))
@@ -279,7 +273,10 @@ impl Field {
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
             simple_field_type: f.simple_field_type()?.into(),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
-            simple_maybe_field_message_path,
+            simple_field_message_path: maybe_message
+                .as_ref()
+                .map(|m| m.rust_impl_path("Simple", &[]))
+                .unwrap_or_default(),
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple", &[])?,
             simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {

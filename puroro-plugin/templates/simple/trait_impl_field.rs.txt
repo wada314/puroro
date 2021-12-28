@@ -1,10 +1,8 @@
 
-{%- match f.simple_maybe_field_message_path %}
-{%- when Some with (struct_path) %}
+{%- if f.is_message %}
 {#- [optional|repeated] MyMessage => &'this MyMessage #}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ struct_path }};
-{%- else %}
-{%- endmatch %}
+type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ f.simple_field_message_path }};
+{%- endif %} {#- if f.is_message #}
 
 {%- if f.is_repeated %}
 

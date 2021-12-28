@@ -1,8 +1,6 @@
-{%- match f.simple_maybe_field_message_path %}
-{%- when Some with (struct_path) %}
+{%- if f.is_message %}
 type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this ScalarType;
-{%- else %}
-{%- endmatch %}
+{%- endif %} {#- if f.is_message #}
 
 {%- if f.is_repeated %}
 
