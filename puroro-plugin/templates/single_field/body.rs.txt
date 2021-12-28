@@ -20,7 +20,7 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
 {}
 
-impl{{ maybe_gp }} super::_puroro_traits::{{ m.ident }}Trait
+impl{{ maybe_gp }} super::_puroro_traits::{{ m.trait_ident }}
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
 {
