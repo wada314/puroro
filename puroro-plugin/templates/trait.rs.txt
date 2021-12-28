@@ -2,12 +2,10 @@
 pub trait {{ m.trait_ident }} {
     {%- for f in m.fields %}
 
-    {%- match f.trait_maybe_field_message_trait_path %}
-    {%- when Some with (field_msg_path) %}
-    type Field{{ f.number }}MessageType<'this>: {{ field_msg_path }}
+    {%- if f.is_message %}
+    type Field{{ f.number }}MessageType<'this>: {{ f.trait_field_message_trait_path }}
         where Self: 'this;
-    {%- else %}
-    {%- endmatch %}
+    {%- endif %} {#- if f.is_message #}
 
     {%- if f.is_repeated %}
 

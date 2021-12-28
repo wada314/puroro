@@ -178,6 +178,7 @@ struct Field {
     is_string: bool,
     is_bytes: bool,
     is_length_delimited: bool,
+    is_numerical: bool,
     is_explicit_oneof_field: bool,
     is_repeated: bool,
     is_unlabeled: bool,
@@ -186,13 +187,12 @@ struct Field {
     has_optional_bit: bool,
     bitfield_index: i32,
     trait_scalar_getter_type: String,
-    trait_maybe_field_message_trait_path: Option<String>,
+    trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
     simple_field_type: String,
     simple_scalar_field_type: String,
-    simple_maybe_field_message_path: Option<String>,
-    simple_maybe_borrowed_field_type: Option<String>,
+    simple_field_message_path: String,
     simple_label_and_type_tags: String,
     single_field_type: String,
     single_numerical_rust_type: String,
@@ -201,34 +201,23 @@ struct Field {
     bumpalo_getter_type: String,
     bumpalo_getter_opt_type: String,
     bumpalo_getter_mut_type: String,
-    bumpalo_maybe_field_message_path: Option<String>,
-    bumpalo_maybe_borrowed_field_type: Option<String>,
+    bumpalo_field_message_path: String,
     bumpalo_label_and_type_tags: String,
 }
 
 impl Field {
     fn try_new(f: &wrappers::Field, bitfield_index: &mut i32) -> Result<Self> {
-        let trait_maybe_field_message_trait_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_trait_path())
-            } else {
-                None
-            };
-        let simple_maybe_field_message_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Simple", &[]))
-            } else {
-                None
-            };
-        let bumpalo_maybe_field_message_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Bumpalo", &["'this"]))
-            } else {
-                None
-            };
+        let maybe_message = if let wrappers::FieldType::Message(m) = f.field_type()? {
+            Some(upgrade(&m)?)
+        } else {
+            None
+        };
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
+        let is_string = matches!(f.field_type()?, wrappers::FieldType::String);
+        let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
         let is_repeated = matches!(f.field_label()?, wrappers::FieldLabel::Repeated);
         let is_unlabeled = matches!(f.field_label()?, wrappers::FieldLabel::Unlabeled);
+        let is_length_delimited = is_message || is_string || is_bytes;
         // i.e. any Option<> types except messages
         let has_optional_bit = !is_repeated && !is_unlabeled && !is_message;
 
@@ -238,14 +227,10 @@ impl Field {
             number: f.number(),
             oneof_index: f.oneof_index().unwrap_or(-1),
             is_message,
-            is_string: matches!(f.field_type()?, wrappers::FieldType::String),
-            is_bytes: matches!(f.field_type()?, wrappers::FieldType::Bytes),
-            is_length_delimited: matches!(
-                f.field_type()?,
-                wrappers::FieldType::Bytes
-                    | wrappers::FieldType::String
-                    | wrappers::FieldType::Message(_)
-            ),
+            is_string,
+            is_bytes,
+            is_length_delimited,
+            is_numerical: !is_length_delimited,
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             is_repeated,
             is_unlabeled,
@@ -266,7 +251,10 @@ impl Field {
                 }
             },
             trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
-            trait_maybe_field_message_trait_path,
+            trait_field_message_trait_path: maybe_message
+                .as_ref()
+                .map(|m| m.rust_trait_path())
+                .unwrap_or_default(),
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
                     "<Self as super::_puroro_traits::{trait_ident}>::Field{number}MessageType<'_>",
@@ -277,9 +265,10 @@ impl Field {
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
             simple_field_type: f.simple_field_type()?.into(),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
-            simple_maybe_field_message_path,
-            simple_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Simple", &[])?,
+            simple_field_message_path: maybe_message
+                .as_ref()
+                .map(|m| m.rust_impl_path("Simple", &[]))
+                .unwrap_or_default(),
             simple_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
@@ -312,9 +301,10 @@ impl Field {
             } else {
                 f.bumpalo_getter_mut_type("'bump", "'this")?
             },
-            bumpalo_maybe_field_message_path,
-            bumpalo_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("Bumpalo", &["'this"])?,
+            bumpalo_field_message_path: maybe_message
+                .as_ref()
+                .map(|m| m.rust_impl_path("Bumpalo", &["'this"]))
+                .unwrap_or_default(),
             bumpalo_label_and_type_tags: f.rust_label_and_type_tags(|msg| {
                 Ok(
                     if matches!(f.field_label()?, wrappers::FieldLabel::Repeated) {
@@ -439,8 +429,11 @@ struct OneofField {
     getter_ident: String,
     getter_ident_unesc: String,
     number: i32,
-    is_length_delimited: bool,
     is_message: bool,
+    is_string: bool,
+    is_bytes: bool,
+    is_length_delimited: bool,
+    is_numerical: bool,
     field_type: String,
     simple_field_type: String,
     bumpalo_field_type: String,
@@ -451,18 +444,20 @@ struct OneofField {
 
 impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
+        let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
+        let is_string = matches!(f.field_type()?, wrappers::FieldType::String);
+        let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
+        let is_length_delimited = is_message || is_string || is_bytes;
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
             getter_ident: f.rust_ident().to_string(),
             getter_ident_unesc: f.rust_ident_unesc().to_string(),
             number: f.number(),
-            is_length_delimited: matches!(
-                f.field_type()?,
-                wrappers::FieldType::Bytes
-                    | wrappers::FieldType::String
-                    | wrappers::FieldType::Message(_)
-            ),
-            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_message,
+            is_string,
+            is_bytes,
+            is_length_delimited,
+            is_numerical: !is_length_delimited,
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
             simple_field_type: f.simple_oneof_field_type()?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),

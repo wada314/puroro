@@ -19,5 +19,4 @@ pub mod empty;
 pub mod merged;
 pub mod option;
 pub mod simple;
-pub mod single_field;
 pub mod traits;

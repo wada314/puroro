@@ -170,15 +170,15 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {#- repeated String => AddBumpVecView<'bump, 'this, NoAllocBumpString> #}
     {#- repeated MyMessage => RefMutBumpVec<'bump, 'this, MyMessageBumpalo<'bump>> #}
     pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.bumpalo_getter_mut_type }} {
-        {%- if f.is_length_delimited %}
         {%- if f.is_message %}
         unsafe { self.{{ f.ident }}.as_mut_vec_in(self._bump) }
-        {%- else %} {#- if f.is_message #}
-        unsafe { self.{{ f.ident }}.as_add_bump_vec_view_in(self._bump) }
         {%- endif %} {#- if f.is_message #}
-        {%- else %} {#- if f.is_length_delimited #}
+        {%- if f.is_string || f.is_bytes %}
+        unsafe { self.{{ f.ident }}.as_add_bump_vec_view_in(self._bump) }
+        {%- endif %} {#- if f.is_string || f.is_bytes #}
+        {%- if f.is_numerical %}
         unsafe { self.{{ f.ident }}.as_mut_vec_in(self._bump) }
-        {%- endif %} {#- if f.is_length_delimited #}
+        {%- endif %} {#- if f.is_numerical #}
     }
 
     {%- else %} {#- if f.is_repeated #}
@@ -208,8 +208,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             self._bitfield.set({{ f.bitfield_index }}, true);
             {%- endif %} {#- if f.has_optional_bit #}
         }
-        
-        {%- if f.is_length_delimited %}
+
         {%- if f.is_message %}
         {#- Non-repeated message f. Field type is always `Optional<NoAllocBox<T>>`.#}
         let bump = self._bump;
@@ -224,9 +223,9 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         {%- if f.is_bytes %}
         unsafe { self.{{ f.ident }}.as_mut_vec_in(self._bump) }
         {%- endif %} {#- if f.is_bytes #}
-        {%- else %} {#- if f.is_length_delimited #}
+        {%- if f.is_numerical %}
         &mut self.{{ f.ident }}
-        {%- endif %} {#- if f.is_length_delimited #}
+        {%- endif %} {#- if f.is_numerical #}
     }
 
     {%- endif %} {#- if f.is_repeated #}
@@ -276,16 +275,16 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
             E::_None(_) => ::std::option::Option::None,
             {%- for f in oneof.fields %}
             E::{{ f.ident }}(val) => ::std::option::Option::Some(
-                {% if f.is_length_delimited %}
                 {%- if f.is_message %}
                 {#- message field need to be cast the lifetime param #}
                 F::{{ f.ident }}(unsafe { ::std::mem::transmute(val.as_ref()) })
-                {%- else %} {#- if f.is_message #}
-                F::{{ f.ident }}(val.as_ref())
                 {%- endif %} {#- if f.is_message #}
-                {% else %}
+                {%- if f.is_string || f.is_bytes %}
+                F::{{ f.ident }}(val.as_ref())
+                {%- endif %} {#- if f.is_string || f.is_bytes #}
+                {%- if f.is_numerical %}
                 F::{{ f.ident }}(val.inner().clone())
-                {% endif %}
+                {%- endif %} {#- if f.is_numerical #}
             ),
             {%- endfor %}
         }
