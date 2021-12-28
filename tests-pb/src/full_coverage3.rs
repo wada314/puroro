@@ -2512,6 +2512,7 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field13RepeatedType<'this>
         where
             Self: 'this,
@@ -3122,6 +3123,7 @@ pub mod _puroro_impls {
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field23RepeatedType<'this>
         where
             Self: 'this,
@@ -3732,6 +3734,7 @@ pub mod _puroro_impls {
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field33RepeatedType<'this>
         where
             Self: 'this,
@@ -4350,6 +4353,7 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field43RepeatedType<'this>
         where
             Self: 'this,
@@ -5002,6 +5006,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
+
         type Field53RepeatedType<'this>
         where
             Self: 'this,
@@ -5622,6 +5627,7 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field103RepeatedType<'this>
         where
             Self: 'this,
@@ -6236,6 +6242,7 @@ pub mod _puroro_impls {
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field113RepeatedType<'this>
         where
             Self: 'this,
@@ -6850,6 +6857,7 @@ pub mod _puroro_impls {
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field123RepeatedType<'this>
         where
             Self: 'this,
@@ -7464,6 +7472,7 @@ pub mod _puroro_impls {
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field133RepeatedType<'this>
         where
             Self: 'this,
@@ -8078,6 +8087,7 @@ pub mod _puroro_impls {
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field143RepeatedType<'this>
         where
             Self: 'this,
@@ -8692,6 +8702,7 @@ pub mod _puroro_impls {
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field153RepeatedType<'this>
         where
             Self: 'this,
@@ -9306,6 +9317,7 @@ pub mod _puroro_impls {
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field163RepeatedType<'this>
         where
             Self: 'this,
@@ -9920,6 +9932,7 @@ pub mod _puroro_impls {
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field173RepeatedType<'this>
         where
             Self: 'this,
@@ -10534,6 +10547,7 @@ pub mod _puroro_impls {
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field183RepeatedType<'this>
         where
             Self: 'this,
@@ -11148,6 +11162,7 @@ pub mod _puroro_impls {
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field193RepeatedType<'this>
         where
             Self: 'this,
@@ -13617,7 +13632,10 @@ pub mod _puroro_impls {
     pub fn append_submsg_unlabeled<ScalarType>(self, value: ScalarType)
         -> MsgBuilder<(T, MsgSingleField51<ScalarType>)>
 where
-ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+
+ScalarType:
+    self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+    + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     {
             MsgBuilder((
                 self.0,
@@ -13630,7 +13648,10 @@ ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_tra
     pub fn append_submsg_optional<ScalarType>(self, value: ScalarType)
         -> MsgBuilder<(T, MsgSingleField52<ScalarType>)>
 where
-ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+
+ScalarType:
+    self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+    + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
     {
             MsgBuilder((
                 self.0,
@@ -13643,7 +13664,10 @@ ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_tra
     pub fn append_submsg_repeated<ScalarType, RepeatedType>(self, value: RepeatedType)
         -> MsgBuilder<(T, MsgSingleField53<ScalarType, RepeatedType>)>
 where
-ScalarType: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+
+ScalarType:
+    self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+    + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {

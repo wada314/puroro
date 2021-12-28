@@ -1,26 +1,20 @@
 
 where
 
-{%- if f.is_length_delimited %}
-
-{%- if f.is_bytes %}
-ScalarType: ::std::convert::AsRef<[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-{%- endif %} {#- if f.is_bytes #}
-
-{%- if f.is_string %}
-ScalarType: ::std::convert::AsRef<str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-{%- endif %} {#- if f.is_string #}
-
-{%- if f.is_message %}
-ScalarType: {{ f.trait_field_message_trait_path }} + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-{%- endif %} {#- if f.is_message #}
-
-{%- else %} {#- if f.is_length_delimited #}
-
-ScalarType: ::std::convert::Into<{{ f.single_numerical_rust_type }}> +
-    ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-
-{%- endif %} {#- if f.is_length_delimited #}
+ScalarType:
+    {%- if f.is_bytes %}
+    ::std::convert::AsRef<[u8]>
+    {%- endif %} {#- if f.is_bytes #}
+    {%- if f.is_string %}
+    ::std::convert::AsRef<str>
+    {%- endif %} {#- if f.is_string #}
+    {%- if f.is_message %}
+    {{ f.trait_field_message_trait_path }}
+    {%- endif %} {#- if f.is_message #}
+    {%- if f.is_numerical %}
+    ::std::convert::Into<{{ f.single_numerical_rust_type }}>
+    {%- endif %} {#- if f.is_numerical #}
+    + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 
 {%- if f.is_repeated %}
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 

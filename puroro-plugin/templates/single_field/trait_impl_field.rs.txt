@@ -4,28 +4,27 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this ScalarType
 
 {%- if f.is_repeated %}
 
-{%- if f.is_length_delimited %}
-{%- if f.is_message %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this = &'this RepeatedType;
-{%- else %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = ::puroro::AsRefRepeatedField<
+type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
+    {%- if f.is_message %}
+    &'this RepeatedType;
+    {%- endif %} {#- if f.is_message #}
+    {%- if f.is_string || f.is_bytes %}
+    ::puroro::AsRefRepeatedField<
         'this,
         RepeatedType,
         ScalarType,
         {%- if f.is_bytes %}[u8],{%- endif %}
         {%- if f.is_string %}str,{%- endif %}
     >;
-{%- endif %}
-{%- else %}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this
-    = ::puroro::CloneThenIntoRepeatedField<
+    {%- endif %} {#- if f.is_string || f.is_bytes #}
+    {%- if f.is_numerical %}
+    ::puroro::CloneThenIntoRepeatedField<
         'this,
         RepeatedType,
         ScalarType,
         {{ f.single_numerical_rust_type }}
     >;
-{%- endif %}
+    {%- endif %} {#- if f.is_numerical #}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
     {%- if f.is_length_delimited %}

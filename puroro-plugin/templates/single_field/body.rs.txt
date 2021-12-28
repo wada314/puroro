@@ -60,17 +60,17 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
         ::std::option::Option::Some(
             E::{{ target_f.oneof_enum_value_ident }}(
-                {%- if target_f.is_length_delimited %}
                 {%- if target_f.is_message %}
                 &self.{{ target_f.ident }}
-                {%- else %}
+                {%- endif %} {#- if target_f.is_message #}
+                {%- if target_f.is_string || target_f.is_bytes %}
                 self.{{ target_f.ident }}.as_ref()
-                {%- endif %}
-                {%- else %}
+                {%- endif %} {#- if target_f.is_string || target_f.is_bytes #}
+                {%- if target_f.is_numerical %}
                 ::std::convert::Into::into(
                     ::std::clone::Clone::clone(&self.{{ target_f.ident }})
                 )
-                {%- endif %}
+                {%- endif %} {#- if target_f.is_numerical #}
             )
         )
         {%- else %}

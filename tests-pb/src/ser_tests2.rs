@@ -839,6 +839,7 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field4RepeatedType<'this>
         where
             Self: 'this,
@@ -1090,6 +1091,7 @@ pub mod _puroro_impls {
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field6RepeatedType<'this>
         where
             Self: 'this,
@@ -1363,6 +1365,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
+
         type Field8RepeatedType<'this>
         where
             Self: 'this,
@@ -1624,6 +1627,7 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+
         type Field10RepeatedType<'this>
         where
             Self: 'this,
