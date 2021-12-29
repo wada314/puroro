@@ -108,6 +108,11 @@ impl {{ m.simple_ident }} {
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
+    pub fn {{ oneof.field_ident }}(&self) -> ::std::option::Option<()> {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
+        todo!()
+    }
+
     {%- for f in oneof.fields %}
     pub fn {{ f.getter_ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
