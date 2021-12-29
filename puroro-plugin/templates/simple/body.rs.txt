@@ -38,6 +38,91 @@ impl {{ m.simple_ident }} {
         }
     }
 
+    {#- Immutable getter interfaces. #}
+    {%- for f in m.fields %}
+    {%- if f.is_repeated %}
+
+    {#- TODO #}
+
+    {#- repeated i32 => &[i32] #}
+    {#- repeated String => &[impl Deref<Target=str>] #}
+    {#- repeated MyMessage => &[MyMessage] #}
+    {%- else %} {#- if f.is_repeated #}
+
+    {%- if !f.is_explicit_oneof_field %}
+    {#- [optional] i32 => Option<i32> #}
+    {#- [optional] String => Option<&str> #}
+    {#- [optional] MyMessage => Option<&MyMessage> #}
+    pub fn {{ f.ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
+        {%- if f.is_unlabeled %}
+
+        {%- if f.is_message %}
+        self.{{ f.ident }}.as_ref(),
+        {%- endif %} {#- if f.is_message #}
+        {%- if f.is_string || f.is_bytes %}
+        if self.{{ f.ident }}.is_empty() {
+            ::std::option::Option::None,
+        } else {
+            ::std::option::Option::Some(&self.{{ f.ident }}),
+        }
+        {%- endif %} {#- if f.is_string || f.is_bytes #}
+        {%- if f.is_numerical %}
+        if self.{{ f.ident }} == ::std::default::Default::default() {
+            ::std::option::Option::None,
+        } else {
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.{{ f.ident }})),
+        }
+        {%- endif %} {#- if f.is_numerical #}
+
+        {%- else %} {#- if f.is_unlabeled #}
+
+        {%- if f.is_message %}
+        self.{{ f.ident }}.as_ref(),
+        {%- endif %} {#- if f.is_message #}
+        {%- if f.is_string || f.is_bytes %}
+        if self.{{ f.ident }}.as_deref()
+        {%- endif %} {#- if f.is_string || f.is_bytes #}
+        {%- if f.is_numerical %}
+        self.{{ f.ident }}.clone()
+        {%- endif %} {#- if f.is_numerical #}
+
+        {%- endif %} {#- if f.is_unlabeled #}
+    }
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
+
+    pub fn has_{{ f.ident_unesc }}(&self) -> bool {
+        Self::{{ f.ident_unesc }}_opt(self).is_some()
+    }
+
+    pub fn {{ f.ident }}(&self) -> {{ f.simple_getter_type }} {
+        {%- if f.is_message %}
+        self.{{ f.ident_unesc }}_opt()
+        {%- else %} {#- if f.is_message #}
+        self.{{ f.ident_unesc }}_opt().unwrap_or(
+            {{ f.default_value }}
+        )
+        {%- endif %} {#- if f.is_message #}
+    }
+
+    {%- endif %} {#- if f.is_repeated #}
+    {%- endfor %} {#- for f in m.fields #}
+
+    {%- for oneof in m.oneofs %}
+    {%- for f in oneof.fields %}
+    pub fn {{ f.getter_ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
+        if matches!(
+            &self.{{ oneof.field_ident }},
+            ::std::option::Option::Some(E::{{ f.ident }}(ref v)))
+        {
+            
+        } else {
+            ::std::option::Option::None
+        }
+    }
+    {%- endfor %} {#- for f in oneof.fields #}
+    {%- endfor %} {#- for oneof in m.oneofs #}
+
     {#- Tentative mutable interfaces. #}
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
@@ -55,6 +140,7 @@ impl {{ m.simple_ident }} {
     }
     {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
+
     {%- for oneof in m.oneofs %}
     pub fn clear_{{ oneof.field_ident }}(&mut self) {
         self.{{ oneof.field_ident }} = ::std::option::Option::None;

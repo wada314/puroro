@@ -32,6 +32,62 @@ pub mod _puroro_simple_impl {
                 group_three: ::std::default::Default::default(),
             }
         }
+
+        pub fn has_g1_int32(&self) -> bool {
+            Self::g1_int32_opt(self).is_some()
+        }
+
+        pub fn g1_int32(&self) -> i32 {
+            self.g1_int32_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn has_g1_string(&self) -> bool {
+            Self::g1_string_opt(self).is_some()
+        }
+
+        pub fn g1_string(&self) -> &'_ str {
+            self.g1_string_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn has_g2_f32(&self) -> bool {
+            Self::g2_f32_opt(self).is_some()
+        }
+
+        pub fn g2_f32(&self) -> f32 {
+            self.g2_f32_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn has_g2_string(&self) -> bool {
+            Self::g2_string_opt(self).is_some()
+        }
+
+        pub fn g2_string(&self) -> &'_ str {
+            self.g2_string_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn has_g2_submsg(&self) -> bool {
+            Self::g2_submsg_opt(self).is_some()
+        }
+
+        pub fn g2_submsg(
+            &self,
+        ) -> ::std::option::Option<&'_ self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>
+        {
+            self.g2_submsg_opt()
+        }
+
+        pub fn has_g3_int32(&self) -> bool {
+            Self::g3_int32_opt(self).is_some()
+        }
+
+        pub fn g3_int32(&self) -> i32 {
+            self.g3_int32_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
         pub fn clear_group_one(&mut self) {
             self.group_one = ::std::option::Option::None;
         }
@@ -380,6 +436,18 @@ pub mod _puroro_simple_impl {
             Self {
                 i32_optional: ::std::default::Default::default(),
             }
+        }
+        pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
+            self.i32_optional.clone()
+        }
+
+        pub fn has_i32_optional(&self) -> bool {
+            Self::i32_optional_opt(self).is_some()
+        }
+
+        pub fn i32_optional(&self) -> i32 {
+            self.i32_optional_opt()
+                .unwrap_or(::std::default::Default::default())
         }
         pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
             &mut self.i32_optional

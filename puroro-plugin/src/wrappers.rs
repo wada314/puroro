@@ -766,6 +766,41 @@ impl Field {
         })
     }
 
+    pub fn simple_getter_scalar_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => format!("&{} str", lt).into(),
+            LengthDelimited(Bytes) => format!("&{} [u8]", lt).into(),
+            LengthDelimited(Message(m)) => {
+                let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
+                format!("&{lt} {msg}", lt = lt, msg = msg_type).into()
+            }
+            Trivial(field_type) => field_type.rust_type_name()?,
+        })
+    }
+
+    pub fn simple_getter_repeated_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(String) => {
+                format!("&{lt}[impl ::std::ops::Deref<Target=str>]", lt = lt)
+            }
+            LengthDelimited(Bytes) => {
+                format!("&{lt}[impl ::std::ops::Deref<Target=[u8]>]", lt = lt)
+            }
+            LengthDelimited(Message(m)) => {
+                let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
+                format!("&{lt}[{msg}]", lt = lt, msg = msg_type)
+            }
+            Trivial(field_type) => {
+                format!("&{lt}[{ty}]", lt = lt, ty = field_type.rust_type_name()?)
+            }
+        }
+        .into())
+    }
+
     pub fn bumpalo_field_type(&self) -> Result<Cow<'static, str>> {
         let scalar_type = self.bumpalo_scalar_field_type()?;
         if self.is_repeated()? {
