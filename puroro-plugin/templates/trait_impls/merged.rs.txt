@@ -73,14 +73,8 @@ where
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
-            <'this, Self>
-            {%- else %}
-            <'this>
-            {%- endif %}
-            {%- endif %}
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
+                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_this_self }}
         >
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
