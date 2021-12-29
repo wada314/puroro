@@ -387,6 +387,7 @@ struct Oneof {
     enum_ident: String,
     simple_enum_ident: String,
     bumpalo_enum_ident: String,
+    enum_maybe_gp_this_self: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -396,29 +397,41 @@ struct Oneof {
 
 impl Oneof {
     fn try_new(o: &wrappers::Oneof) -> Result<Self> {
+        let has_ld_field = o.fields()?.into_iter().any(|f| {
+            matches!(
+                f.field_type(),
+                Ok(wrappers::FieldType::Bytes
+                    | wrappers::FieldType::String
+                    | wrappers::FieldType::Message(_))
+            )
+        });
+        let has_message_field = o
+            .fields()?
+            .into_iter()
+            .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_))));
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
             simple_enum_ident: format!("{}Simple", o.rust_enum_ident().to_string()),
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident().to_string()),
+            enum_maybe_gp_this_self: if has_ld_field {
+                if has_message_field {
+                    "<'this, Self>"
+                } else {
+                    "<'this>"
+                }
+            } else {
+                ""
+            }
+            .to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
-            has_ld_field: o.fields()?.into_iter().any(|f| {
-                matches!(
-                    f.field_type(),
-                    Ok(wrappers::FieldType::Bytes
-                        | wrappers::FieldType::String
-                        | wrappers::FieldType::Message(_))
-                )
-            }),
-            has_message_field: o
-                .fields()?
-                .into_iter()
-                .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_)))),
+            has_ld_field,
+            has_message_field,
             owner_message_trait_path: o.message()?.rust_trait_path(),
         })
     }
