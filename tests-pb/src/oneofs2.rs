@@ -88,6 +88,93 @@ pub mod _puroro_simple_impl {
             self.g3_int32_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+
+        pub fn group_one<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as F;
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
+            self.group_one.as_ref().map(|oneof| match oneof {
+                E::G1Int32(v) => F::G1Int32(v.clone()),
+
+                E::G1String(v) => F::G1String(v.as_ref()),
+            })
+        }
+        pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
+            if let &::std::option::Option::Some(E::G1Int32(ref v)) = &self.group_one {
+                ::std::option::Option::Some(v.clone())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g1_string_opt(&self) -> ::std::option::Option<&'_ str> {
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
+            if let &::std::option::Option::Some(E::G1String(ref v)) = &self.group_one {
+                ::std::option::Option::Some(v.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+
+        pub fn group_two<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as F;
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
+            self.group_two.as_ref().map(|oneof| match oneof {
+                E::G2F32(v) => F::G2F32(v.clone()),
+
+                E::G2String(v) => F::G2String(v.as_ref()),
+
+                E::G2Submsg(v) => F::G2Submsg(v.as_ref()),
+            })
+        }
+        pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
+            if let &::std::option::Option::Some(E::G2F32(ref v)) = &self.group_two {
+                ::std::option::Option::Some(v.clone())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g2_string_opt(&self) -> ::std::option::Option<&'_ str> {
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
+            if let &::std::option::Option::Some(E::G2String(ref v)) = &self.group_two {
+                ::std::option::Option::Some(v.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn g2_submsg_opt(
+            &self,
+        ) -> ::std::option::Option<&'_ self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>
+        {
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
+            if let &::std::option::Option::Some(E::G2Submsg(ref v)) = &self.group_two {
+                ::std::option::Option::Some(v.as_ref())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+
+        pub fn group_three<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as F;
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
+            self.group_three.as_ref().map(|oneof| match oneof {
+                E::G3Int32(v) => F::G3Int32(v.clone()),
+            })
+        }
+        pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
+            use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
+            if let &::std::option::Option::Some(E::G3Int32(ref v)) = &self.group_three {
+                ::std::option::Option::Some(v.clone())
+            } else {
+                ::std::option::Option::None
+            }
+        }
         pub fn clear_group_one(&mut self) {
             self.group_one = ::std::option::Option::None;
         }

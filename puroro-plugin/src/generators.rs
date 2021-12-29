@@ -465,6 +465,7 @@ struct OneofField {
     is_numerical: bool,
     field_type: String,
     simple_field_type: String,
+    simple_getter_opt_type: String,
     bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
@@ -489,6 +490,10 @@ impl OneofField {
             is_numerical: !is_length_delimited,
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
             simple_field_type: f.simple_oneof_field_type()?.into(),
+            simple_getter_opt_type: format!(
+                "::std::option::Option<{}>",
+                f.simple_getter_scalar_type("'_")?
+            ),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {

@@ -42,7 +42,9 @@ impl {{ m.simple_ident }} {
     {%- for f in m.fields %}
     {%- if f.is_repeated %}
 
-    {#- TODO #}
+    pub fn {{ f.ident }}(&self) -> {{ f.simple_getter_type }} {
+        &self.{{ f.ident }}
+    }
 
     {#- repeated i32 => &[i32] #}
     {#- repeated String => &[impl Deref<Target=str>] #}
@@ -57,30 +59,30 @@ impl {{ m.simple_ident }} {
         {%- if f.is_unlabeled %}
 
         {%- if f.is_message %}
-        self.{{ f.ident }}.as_ref(),
+        self.{{ f.ident }}.as_deref()
         {%- endif %} {#- if f.is_message #}
         {%- if f.is_string || f.is_bytes %}
         if self.{{ f.ident }}.is_empty() {
-            ::std::option::Option::None,
+            ::std::option::Option::None
         } else {
-            ::std::option::Option::Some(&self.{{ f.ident }}),
+            ::std::option::Option::Some(&self.{{ f.ident }})
         }
         {%- endif %} {#- if f.is_string || f.is_bytes #}
         {%- if f.is_numerical %}
         if self.{{ f.ident }} == ::std::default::Default::default() {
-            ::std::option::Option::None,
+            ::std::option::Option::None
         } else {
-            ::std::option::Option::Some(::std::clone::Clone::clone(&self.{{ f.ident }})),
+            ::std::option::Option::Some(::std::clone::Clone::clone(&self.{{ f.ident }}))
         }
         {%- endif %} {#- if f.is_numerical #}
 
         {%- else %} {#- if f.is_unlabeled #}
 
         {%- if f.is_message %}
-        self.{{ f.ident }}.as_ref(),
+        self.{{ f.ident }}.as_deref()
         {%- endif %} {#- if f.is_message #}
         {%- if f.is_string || f.is_bytes %}
-        if self.{{ f.ident }}.as_deref()
+        self.{{ f.ident }}.as_deref()
         {%- endif %} {#- if f.is_string || f.is_bytes #}
         {%- if f.is_numerical %}
         self.{{ f.ident }}.clone()
@@ -108,19 +110,37 @@ impl {{ m.simple_ident }} {
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
-    pub fn {{ oneof.field_ident }}(&self) -> ::std::option::Option<()> {
+    
+    pub fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
+                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_this_self }}
+        >
+    {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
-        todo!()
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
+        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
+            {%- for f in oneof.fields %}
+            {% if f.is_length_delimited %}
+            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.as_ref()),
+            {%- else %}
+            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.clone()),
+            {%- endif %}
+            {%- endfor %}
+        })
     }
 
     {%- for f in oneof.fields %}
     pub fn {{ f.getter_ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
-        if matches!(
-            &self.{{ oneof.field_ident }},
-            ::std::option::Option::Some(E::{{ f.ident }}(ref v)))
-        {
-            
+        if let &::std::option::Option::Some(E::{{ f.ident }}(ref v)) = &self.{{ oneof.field_ident }} {
+            ::std::option::Option::Some(
+                {%- if f.is_length_delimited %}
+                v.as_ref()
+                {%- else %} {#- if f.is_length_delimited #}
+                v.clone()
+                {%- endif %} {#- if f.is_length_delimited #}
+            )
         } else {
             ::std::option::Option::None
         }
