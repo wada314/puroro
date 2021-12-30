@@ -31,6 +31,7 @@ pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
 use ::bitvec::store::BitStore;
+use ::std::fmt::{self, Debug};
 use ::std::ops::{Deref, DerefMut};
 
 pub fn get_bitvec_bit<O, T>(slice: &BitSlice<O, T>, index: usize) -> bool
@@ -101,3 +102,8 @@ impl<T: Clone> Clone for Bare<T> {
     }
 }
 impl<T: Copy> Copy for Bare<T> {}
+impl<T: Debug> Debug for Bare<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        <T as Debug>::fmt(&self.0, f)
+    }
+}

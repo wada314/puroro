@@ -181,7 +181,6 @@ struct Field {
     is_numerical: bool,
     is_explicit_oneof_field: bool,
     is_repeated: bool,
-    is_unlabeled: bool,
     has_default_value: bool,
     default_value: String,
     has_optional_bit: bool,
@@ -236,7 +235,6 @@ impl Field {
             is_numerical: !is_length_delimited,
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             is_repeated,
-            is_unlabeled,
             has_default_value: f.default_value().is_some(),
             default_value: f
                 .default_value()
