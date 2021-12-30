@@ -43,7 +43,14 @@ pub mod _puroro_simple_impl {
             self.a_opt().unwrap_or(::std::default::Default::default())
         }
         pub fn a_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_a() {
+                self.a = ::std::default::Default::default();
+            }
             &mut self.a
+        }
+
+        pub fn clear_a(&mut self) {
+            self.a = ::std::default::Default::default();
         }
     }
 
@@ -68,9 +75,11 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-            >::deser_field(&mut self.a, data),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.a, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -157,7 +166,14 @@ pub mod _puroro_simple_impl {
             self.b_opt().unwrap_or(::std::default::Default::default())
         }
         pub fn b_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::string::String> {
+            if !self.has_b() {
+                self.b = ::std::default::Default::default();
+            }
             &mut self.b
+        }
+
+        pub fn clear_b(&mut self) {
+            self.b = ::std::default::Default::default();
         }
     }
 
@@ -182,9 +198,11 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::String
-            >::deser_field(&mut self.b, data),
+            2 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.b, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -281,7 +299,16 @@ pub mod _puroro_simple_impl {
         ) -> &mut ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>,
         > {
-            &mut self.c
+            if !self.has_c() {
+                self.c = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.c
+                .get_or_insert_with(::std::default::Default::default())
+        }
+
+        pub fn clear_c(&mut self) {
+            self.c = ::std::default::Default::default();
         }
     }
 
@@ -394,7 +421,14 @@ pub mod _puroro_simple_impl {
             &self.d
         }
         pub fn d_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            if !self.has_d() {
+                self.d = ::std::default::Default::default();
+            }
             &mut self.d
+        }
+
+        pub fn clear_d(&mut self) {
+            self.d = ::std::default::Default::default();
         }
     }
 
@@ -422,9 +456,11 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.d, data),
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.d, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }

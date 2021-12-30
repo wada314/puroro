@@ -195,7 +195,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     }
 
     {#- mut get scalar field #}
-    {#- always returns an option-unwrapped mut reference. The value is initialized if it's not present. #}
+    {#- always returns an option-unwrapped mut reference. The field is initialized if it's not present. #}
     {#- [optional] int32 => &'this mut i32 #}
     {#- [optional] String => RefMutBumpString<'bump, 'this> #}
     {#- [optional] MyMessage => &'this mut MyMessageBumpalo<'bump> #}
@@ -259,14 +259,8 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
-            <'this, Self>
-            {%- else %}
-            <'this>
-            {%- endif %}
-            {%- endif %}
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
+                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_this_self }}
         >
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }} as E;

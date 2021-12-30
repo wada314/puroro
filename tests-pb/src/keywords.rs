@@ -41,7 +41,15 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn type_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_type() {
+                self.r#type = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
             &mut self.r#type
+        }
+
+        pub fn clear_type(&mut self) {
+            self._bitfield.set(0, false);
         }
     }
 
@@ -66,12 +74,15 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.r#type, data),
+                1 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.r#type, data)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 

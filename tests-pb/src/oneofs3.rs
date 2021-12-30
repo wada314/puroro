@@ -547,7 +547,14 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
             &mut self.i32_unlabeled
+        }
+
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
         }
     }
 
@@ -572,9 +579,11 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_unlabeled, data),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }

@@ -155,18 +155,50 @@ impl {{ m.simple_ident }} {
     {#- Tentative mutable interfaces. #}
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
-    {#- optional i32 => &mut Option<i32> #}
-    {#- optional String => &mut Option<String> #}
-    {#- optional MyMessage => &mut Option<Box<MyMessage>> #}
-    {#- i32 => &mut i32 #}
-    {#- String => &mut String #}
-    {#- MyMessage => &mut Option<Box<MyMessage>> #}
+
+    {%- if f.is_repeated %}
+    {%- else %} {#- if f.is_repeated #}
+
+    {#- clear scalar field #}
+    pub fn clear_{{ f.ident_unesc }}(&mut self) {
+        {%- if f.has_optional_bit %}
+        self._bitfield.set({{ f.bitfield_index }}, false);
+        {#- Skip dropping the f. No need to do that unless it's a message field, #}
+        {#- and the message field will never have optional bitfield. #}
+        {%- else %} {#- if f.has_optional_bit #}
+        self.{{ f.ident }} = ::std::default::Default::default();
+        {%- endif %} {#- if f.has_optional_bit #}
+    }
+
+    {#- always returns an option-unwrapped mut reference. The field is initialized if it's not present. #}
+    {#- [optional] i32 => &mut i32 #}
+    {#- [optional] String => &mut String #}
+    {#- [optional] MyMessage => &mut MyMessage #}
     {#- repeated i32 => &mut Vec<i32> #}
     {#- repeated String => &mut Vec<String> #}
-    {#- repeated MyMessage => &mut Option<MyMessage> #}
+    {#- repeated MyMessage => &mut Vec<MyMessage> #}
     pub fn {{ f.ident_unesc }}_mut(&mut self) -> &mut {{ f.simple_field_type }} {
+        if !self.has_{{ f.ident_unesc }}() {
+            {#- field is not set so we need to initialize / clear it. #}
+            self.{{ f.ident }} = ::std::default::Default::default();
+
+            {%- if f.has_optional_bit %}
+            self._bitfield.set({{ f.bitfield_index }}, true);
+            {%- endif %} {#- if f.has_optional_bit #}
+        }
+
+        {%- if f.is_message %}
+        {#- Non-repeated message f. Field type is always `Optional<Box<T>>`. #}
+        let bump = self._bump;
+        self.{{ f.ident }}.get_or_insert_with(::std::default::Default::default())
+        {%- else %} {#- if f.is_message #}
+        {#- Otherwise, just return the mut reference of the field. #}
         &mut self.{{ f.ident }}
+        {%- endif %} {#- if f.is_message #}
     }
+
+    {%- endif %} {#- if f.is_repeated #}
+
     {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 
@@ -240,9 +272,14 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} 
         match field_number {
             {%- for f in m.fields %}
             {%- if !f.is_explicit_oneof_field %}
-            {{ f.number }} => DeserFieldFromBytesIter::<
-                {{ f.simple_label_and_type_tags }}
-            >::deser_field(&mut self.{{ f.ident }}, data),
+            {{ f.number }} => {
+                {%- if f.has_optional_bit %}
+                self._bitfield.set({{ f.bitfield_index }}, true);
+                {%- endif %}
+                DeserFieldFromBytesIter::<
+                    {{ f.simple_label_and_type_tags }}
+                >::deser_field(&mut self.{{ f.ident }}, data)
+            }
             {%- endif %}
             {%- endfor %}
 

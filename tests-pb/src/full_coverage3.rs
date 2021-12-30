@@ -675,164 +675,521 @@ pub mod _puroro_simple_impl {
             &self.f64_repeated
         }
         pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
             &mut self.i32_unlabeled
         }
+
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
         pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
             &mut self.i32_optional
         }
+
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            if !self.has_i32_repeated() {
+                self.i32_repeated = ::std::default::Default::default();
+            }
             &mut self.i32_repeated
         }
+
+        pub fn clear_i32_repeated(&mut self) {
+            self.i32_repeated = ::std::default::Default::default();
+        }
         pub fn float_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
+            if !self.has_float_unlabeled() {
+                self.float_unlabeled = ::std::default::Default::default();
+            }
             &mut self.float_unlabeled
         }
+
+        pub fn clear_float_unlabeled(&mut self) {
+            self.float_unlabeled = ::std::default::Default::default();
+        }
         pub fn float_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
+            if !self.has_float_optional() {
+                self.float_optional = ::std::default::Default::default();
+                self._bitfield.set(1, true);
+            }
             &mut self.float_optional
         }
+
+        pub fn clear_float_optional(&mut self) {
+            self._bitfield.set(1, false);
+        }
         pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
+            if !self.has_float_repeated() {
+                self.float_repeated = ::std::default::Default::default();
+            }
             &mut self.float_repeated
+        }
+
+        pub fn clear_float_repeated(&mut self) {
+            self.float_repeated = ::std::default::Default::default();
         }
         pub fn bytes_unlabeled_mut(
             &mut self,
         ) -> &mut ::puroro::internal::Bare<::std::vec::Vec<u8>> {
+            if !self.has_bytes_unlabeled() {
+                self.bytes_unlabeled = ::std::default::Default::default();
+            }
             &mut self.bytes_unlabeled
         }
+
+        pub fn clear_bytes_unlabeled(&mut self) {
+            self.bytes_unlabeled = ::std::default::Default::default();
+        }
         pub fn bytes_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::vec::Vec<u8>> {
+            if !self.has_bytes_optional() {
+                self.bytes_optional = ::std::default::Default::default();
+                self._bitfield.set(2, true);
+            }
             &mut self.bytes_optional
         }
+
+        pub fn clear_bytes_optional(&mut self) {
+            self._bitfield.set(2, false);
+        }
         pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::vec::Vec<u8>> {
+            if !self.has_bytes_repeated() {
+                self.bytes_repeated = ::std::default::Default::default();
+            }
             &mut self.bytes_repeated
+        }
+
+        pub fn clear_bytes_repeated(&mut self) {
+            self.bytes_repeated = ::std::default::Default::default();
         }
         pub fn string_unlabeled_mut(
             &mut self,
         ) -> &mut ::puroro::internal::Bare<::std::string::String> {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
             &mut self.string_unlabeled
+        }
+
+        pub fn clear_string_unlabeled(&mut self) {
+            self.string_unlabeled = ::std::default::Default::default();
         }
         pub fn string_optional_mut(
             &mut self,
         ) -> &mut ::puroro::internal::Bare<::std::string::String> {
+            if !self.has_string_optional() {
+                self.string_optional = ::std::default::Default::default();
+                self._bitfield.set(3, true);
+            }
             &mut self.string_optional
         }
+
+        pub fn clear_string_optional(&mut self) {
+            self._bitfield.set(3, false);
+        }
         pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
+            if !self.has_string_repeated() {
+                self.string_repeated = ::std::default::Default::default();
+            }
             &mut self.string_repeated
+        }
+
+        pub fn clear_string_repeated(&mut self) {
+            self.string_repeated = ::std::default::Default::default();
         }
         pub fn enum_unlabeled_mut(
             &mut self,
         ) -> &mut ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum> {
+            if !self.has_enum_unlabeled() {
+                self.enum_unlabeled = ::std::default::Default::default();
+            }
             &mut self.enum_unlabeled
+        }
+
+        pub fn clear_enum_unlabeled(&mut self) {
+            self.enum_unlabeled = ::std::default::Default::default();
         }
         pub fn enum_optional_mut(
             &mut self,
         ) -> &mut ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum> {
+            if !self.has_enum_optional() {
+                self.enum_optional = ::std::default::Default::default();
+                self._bitfield.set(4, true);
+            }
             &mut self.enum_optional
+        }
+
+        pub fn clear_enum_optional(&mut self) {
+            self._bitfield.set(4, false);
         }
         pub fn enum_repeated_mut(
             &mut self,
         ) -> &mut ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum> {
+            if !self.has_enum_repeated() {
+                self.enum_repeated = ::std::default::Default::default();
+            }
             &mut self.enum_repeated
         }
+
+        pub fn clear_enum_repeated(&mut self) {
+            self.enum_repeated = ::std::default::Default::default();
+        }
         pub fn submsg_unlabeled_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
-            &mut self.submsg_unlabeled
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.submsg_unlabeled
+                .get_or_insert_with(::std::default::Default::default())
+        }
+
+        pub fn clear_submsg_unlabeled(&mut self) {
+            self.submsg_unlabeled = ::std::default::Default::default();
         }
         pub fn submsg_optional_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
-            &mut self.submsg_optional
+            if !self.has_submsg_optional() {
+                self.submsg_optional = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.submsg_optional
+                .get_or_insert_with(::std::default::Default::default())
+        }
+
+        pub fn clear_submsg_optional(&mut self) {
+            self.submsg_optional = ::std::default::Default::default();
         }
         pub fn submsg_repeated_mut(
             &mut self,
         ) -> &mut ::std::vec::Vec<
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         > {
-            &mut self.submsg_repeated
+            if !self.has_submsg_repeated() {
+                self.submsg_repeated = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.submsg_repeated
+                .get_or_insert_with(::std::default::Default::default())
+        }
+
+        pub fn clear_submsg_repeated(&mut self) {
+            self.submsg_repeated = ::std::default::Default::default();
         }
         pub fn i64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
+            if !self.has_i64_unlabeled() {
+                self.i64_unlabeled = ::std::default::Default::default();
+            }
             &mut self.i64_unlabeled
         }
+
+        pub fn clear_i64_unlabeled(&mut self) {
+            self.i64_unlabeled = ::std::default::Default::default();
+        }
         pub fn i64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
+            if !self.has_i64_optional() {
+                self.i64_optional = ::std::default::Default::default();
+                self._bitfield.set(5, true);
+            }
             &mut self.i64_optional
         }
+
+        pub fn clear_i64_optional(&mut self) {
+            self._bitfield.set(5, false);
+        }
         pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            if !self.has_i64_repeated() {
+                self.i64_repeated = ::std::default::Default::default();
+            }
             &mut self.i64_repeated
         }
+
+        pub fn clear_i64_repeated(&mut self) {
+            self.i64_repeated = ::std::default::Default::default();
+        }
         pub fn u32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
+            if !self.has_u32_unlabeled() {
+                self.u32_unlabeled = ::std::default::Default::default();
+            }
             &mut self.u32_unlabeled
         }
+
+        pub fn clear_u32_unlabeled(&mut self) {
+            self.u32_unlabeled = ::std::default::Default::default();
+        }
         pub fn u32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
+            if !self.has_u32_optional() {
+                self.u32_optional = ::std::default::Default::default();
+                self._bitfield.set(6, true);
+            }
             &mut self.u32_optional
         }
+
+        pub fn clear_u32_optional(&mut self) {
+            self._bitfield.set(6, false);
+        }
         pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
+            if !self.has_u32_repeated() {
+                self.u32_repeated = ::std::default::Default::default();
+            }
             &mut self.u32_repeated
         }
+
+        pub fn clear_u32_repeated(&mut self) {
+            self.u32_repeated = ::std::default::Default::default();
+        }
         pub fn u64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
+            if !self.has_u64_unlabeled() {
+                self.u64_unlabeled = ::std::default::Default::default();
+            }
             &mut self.u64_unlabeled
         }
+
+        pub fn clear_u64_unlabeled(&mut self) {
+            self.u64_unlabeled = ::std::default::Default::default();
+        }
         pub fn u64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
+            if !self.has_u64_optional() {
+                self.u64_optional = ::std::default::Default::default();
+                self._bitfield.set(7, true);
+            }
             &mut self.u64_optional
         }
+
+        pub fn clear_u64_optional(&mut self) {
+            self._bitfield.set(7, false);
+        }
         pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
+            if !self.has_u64_repeated() {
+                self.u64_repeated = ::std::default::Default::default();
+            }
             &mut self.u64_repeated
         }
+
+        pub fn clear_u64_repeated(&mut self) {
+            self.u64_repeated = ::std::default::Default::default();
+        }
         pub fn s32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_s32_unlabeled() {
+                self.s32_unlabeled = ::std::default::Default::default();
+            }
             &mut self.s32_unlabeled
         }
+
+        pub fn clear_s32_unlabeled(&mut self) {
+            self.s32_unlabeled = ::std::default::Default::default();
+        }
         pub fn s32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_s32_optional() {
+                self.s32_optional = ::std::default::Default::default();
+                self._bitfield.set(8, true);
+            }
             &mut self.s32_optional
         }
+
+        pub fn clear_s32_optional(&mut self) {
+            self._bitfield.set(8, false);
+        }
         pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            if !self.has_s32_repeated() {
+                self.s32_repeated = ::std::default::Default::default();
+            }
             &mut self.s32_repeated
         }
+
+        pub fn clear_s32_repeated(&mut self) {
+            self.s32_repeated = ::std::default::Default::default();
+        }
         pub fn s64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
+            if !self.has_s64_unlabeled() {
+                self.s64_unlabeled = ::std::default::Default::default();
+            }
             &mut self.s64_unlabeled
         }
+
+        pub fn clear_s64_unlabeled(&mut self) {
+            self.s64_unlabeled = ::std::default::Default::default();
+        }
         pub fn s64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
+            if !self.has_s64_optional() {
+                self.s64_optional = ::std::default::Default::default();
+                self._bitfield.set(9, true);
+            }
             &mut self.s64_optional
         }
+
+        pub fn clear_s64_optional(&mut self) {
+            self._bitfield.set(9, false);
+        }
         pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            if !self.has_s64_repeated() {
+                self.s64_repeated = ::std::default::Default::default();
+            }
             &mut self.s64_repeated
         }
+
+        pub fn clear_s64_repeated(&mut self) {
+            self.s64_repeated = ::std::default::Default::default();
+        }
         pub fn fixed32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
+            if !self.has_fixed32_unlabeled() {
+                self.fixed32_unlabeled = ::std::default::Default::default();
+            }
             &mut self.fixed32_unlabeled
         }
+
+        pub fn clear_fixed32_unlabeled(&mut self) {
+            self.fixed32_unlabeled = ::std::default::Default::default();
+        }
         pub fn fixed32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
+            if !self.has_fixed32_optional() {
+                self.fixed32_optional = ::std::default::Default::default();
+                self._bitfield.set(10, true);
+            }
             &mut self.fixed32_optional
         }
+
+        pub fn clear_fixed32_optional(&mut self) {
+            self._bitfield.set(10, false);
+        }
         pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
+            if !self.has_fixed32_repeated() {
+                self.fixed32_repeated = ::std::default::Default::default();
+            }
             &mut self.fixed32_repeated
         }
+
+        pub fn clear_fixed32_repeated(&mut self) {
+            self.fixed32_repeated = ::std::default::Default::default();
+        }
         pub fn fixed64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
+            if !self.has_fixed64_unlabeled() {
+                self.fixed64_unlabeled = ::std::default::Default::default();
+            }
             &mut self.fixed64_unlabeled
         }
+
+        pub fn clear_fixed64_unlabeled(&mut self) {
+            self.fixed64_unlabeled = ::std::default::Default::default();
+        }
         pub fn fixed64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
+            if !self.has_fixed64_optional() {
+                self.fixed64_optional = ::std::default::Default::default();
+                self._bitfield.set(11, true);
+            }
             &mut self.fixed64_optional
         }
+
+        pub fn clear_fixed64_optional(&mut self) {
+            self._bitfield.set(11, false);
+        }
         pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
+            if !self.has_fixed64_repeated() {
+                self.fixed64_repeated = ::std::default::Default::default();
+            }
             &mut self.fixed64_repeated
         }
+
+        pub fn clear_fixed64_repeated(&mut self) {
+            self.fixed64_repeated = ::std::default::Default::default();
+        }
         pub fn sfixed32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_sfixed32_unlabeled() {
+                self.sfixed32_unlabeled = ::std::default::Default::default();
+            }
             &mut self.sfixed32_unlabeled
         }
+
+        pub fn clear_sfixed32_unlabeled(&mut self) {
+            self.sfixed32_unlabeled = ::std::default::Default::default();
+        }
         pub fn sfixed32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+            if !self.has_sfixed32_optional() {
+                self.sfixed32_optional = ::std::default::Default::default();
+                self._bitfield.set(12, true);
+            }
             &mut self.sfixed32_optional
         }
+
+        pub fn clear_sfixed32_optional(&mut self) {
+            self._bitfield.set(12, false);
+        }
         pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+            if !self.has_sfixed32_repeated() {
+                self.sfixed32_repeated = ::std::default::Default::default();
+            }
             &mut self.sfixed32_repeated
         }
+
+        pub fn clear_sfixed32_repeated(&mut self) {
+            self.sfixed32_repeated = ::std::default::Default::default();
+        }
         pub fn sfixed64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
+            if !self.has_sfixed64_unlabeled() {
+                self.sfixed64_unlabeled = ::std::default::Default::default();
+            }
             &mut self.sfixed64_unlabeled
         }
+
+        pub fn clear_sfixed64_unlabeled(&mut self) {
+            self.sfixed64_unlabeled = ::std::default::Default::default();
+        }
         pub fn sfixed64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
+            if !self.has_sfixed64_optional() {
+                self.sfixed64_optional = ::std::default::Default::default();
+                self._bitfield.set(13, true);
+            }
             &mut self.sfixed64_optional
         }
+
+        pub fn clear_sfixed64_optional(&mut self) {
+            self._bitfield.set(13, false);
+        }
         pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
+            if !self.has_sfixed64_repeated() {
+                self.sfixed64_repeated = ::std::default::Default::default();
+            }
             &mut self.sfixed64_repeated
         }
+
+        pub fn clear_sfixed64_repeated(&mut self) {
+            self.sfixed64_repeated = ::std::default::Default::default();
+        }
         pub fn f64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f64> {
+            if !self.has_f64_unlabeled() {
+                self.f64_unlabeled = ::std::default::Default::default();
+            }
             &mut self.f64_unlabeled
         }
+
+        pub fn clear_f64_unlabeled(&mut self) {
+            self.f64_unlabeled = ::std::default::Default::default();
+        }
         pub fn f64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f64> {
+            if !self.has_f64_optional() {
+                self.f64_optional = ::std::default::Default::default();
+                self._bitfield.set(14, true);
+            }
             &mut self.f64_optional
         }
+
+        pub fn clear_f64_optional(&mut self) {
+            self._bitfield.set(14, false);
+        }
         pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f64> {
+            if !self.has_f64_repeated() {
+                self.f64_repeated = ::std::default::Default::default();
+            }
             &mut self.f64_repeated
+        }
+
+        pub fn clear_f64_repeated(&mut self) {
+            self.f64_repeated = ::std::default::Default::default();
         }
     }
 
@@ -1065,150 +1422,261 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_unlabeled, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_optional, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_repeated, data),
-            11 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Float
-            >::deser_field(&mut self.float_unlabeled, data),
-            12 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.float_optional, data),
-            13 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Float
-            >::deser_field(&mut self.float_repeated, data),
-            21 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_unlabeled, data),
-            22 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_optional, data),
-            23 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_repeated, data),
-            31 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::String
-            >::deser_field(&mut self.string_unlabeled, data),
-            32 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_optional, data),
-            33 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::String
-            >::deser_field(&mut self.string_repeated, data),
-            41 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
-            >::deser_field(&mut self.enum_unlabeled, data),
-            42 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
-            >::deser_field(&mut self.enum_optional, data),
-            43 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
-            >::deser_field(&mut self.enum_repeated, data),
-            51 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
-            >::deser_field(&mut self.submsg_unlabeled, data),
-            52 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
-            >::deser_field(&mut self.submsg_optional, data),
-            53 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
-            >::deser_field(&mut self.submsg_repeated, data),
-            101 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_unlabeled, data),
-            102 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_optional, data),
-            103 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_repeated, data),
-            111 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_unlabeled, data),
-            112 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_optional, data),
-            113 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_repeated, data),
-            121 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_unlabeled, data),
-            122 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_optional, data),
-            123 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_repeated, data),
-            131 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SInt32
-            >::deser_field(&mut self.s32_unlabeled, data),
-            132 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SInt32
-            >::deser_field(&mut self.s32_optional, data),
-            133 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SInt32
-            >::deser_field(&mut self.s32_repeated, data),
-            141 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SInt64
-            >::deser_field(&mut self.s64_unlabeled, data),
-            142 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SInt64
-            >::deser_field(&mut self.s64_optional, data),
-            143 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SInt64
-            >::deser_field(&mut self.s64_repeated, data),
-            151 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Fixed32
-            >::deser_field(&mut self.fixed32_unlabeled, data),
-            152 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Fixed32
-            >::deser_field(&mut self.fixed32_optional, data),
-            153 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Fixed32
-            >::deser_field(&mut self.fixed32_repeated, data),
-            161 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Fixed64
-            >::deser_field(&mut self.fixed64_unlabeled, data),
-            162 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Fixed64
-            >::deser_field(&mut self.fixed64_optional, data),
-            163 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Fixed64
-            >::deser_field(&mut self.fixed64_repeated, data),
-            171 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SFixed32
-            >::deser_field(&mut self.sfixed32_unlabeled, data),
-            172 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SFixed32
-            >::deser_field(&mut self.sfixed32_optional, data),
-            173 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SFixed32
-            >::deser_field(&mut self.sfixed32_repeated, data),
-            181 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::SFixed64
-            >::deser_field(&mut self.sfixed64_unlabeled, data),
-            182 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::SFixed64
-            >::deser_field(&mut self.sfixed64_optional, data),
-            183 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::SFixed64
-            >::deser_field(&mut self.sfixed64_repeated, data),
-            191 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Double
-            >::deser_field(&mut self.f64_unlabeled, data),
-            192 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Double
-            >::deser_field(&mut self.f64_optional, data),
-            193 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Double
-            >::deser_field(&mut self.f64_repeated, data),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data)
+            }
+            2 => {
+                self._bitfield.set(0, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_optional, data)
+            }
+            3 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_repeated, data)
+            }
+            11 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                >::deser_field(&mut self.float_unlabeled, data)
+            }
+            12 => {
+                self._bitfield.set(1, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.float_optional, data)
+            }
+            13 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Float
+                >::deser_field(&mut self.float_repeated, data)
+            }
+            21 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_unlabeled, data)
+            }
+            22 => {
+                self._bitfield.set(2, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_optional, data)
+            }
+            23 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_repeated, data)
+            }
+            31 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.string_unlabeled, data)
+            }
+            32 => {
+                self._bitfield.set(3, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_optional, data)
+            }
+            33 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::String
+                >::deser_field(&mut self.string_repeated, data)
+            }
+            41 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_unlabeled, data)
+            }
+            42 => {
+                self._bitfield.set(4, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_optional, data)
+            }
+            43 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+                >::deser_field(&mut self.enum_repeated, data)
+            }
+            51 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
+                >::deser_field(&mut self.submsg_unlabeled, data)
+            }
+            52 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
+                >::deser_field(&mut self.submsg_optional, data)
+            }
+            53 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+                >::deser_field(&mut self.submsg_repeated, data)
+            }
+            101 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_unlabeled, data)
+            }
+            102 => {
+                self._bitfield.set(5, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_optional, data)
+            }
+            103 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_repeated, data)
+            }
+            111 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_unlabeled, data)
+            }
+            112 => {
+                self._bitfield.set(6, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_optional, data)
+            }
+            113 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_repeated, data)
+            }
+            121 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_unlabeled, data)
+            }
+            122 => {
+                self._bitfield.set(7, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_optional, data)
+            }
+            123 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_repeated, data)
+            }
+            131 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_unlabeled, data)
+            }
+            132 => {
+                self._bitfield.set(8, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_optional, data)
+            }
+            133 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SInt32
+                >::deser_field(&mut self.s32_repeated, data)
+            }
+            141 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_unlabeled, data)
+            }
+            142 => {
+                self._bitfield.set(9, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_optional, data)
+            }
+            143 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SInt64
+                >::deser_field(&mut self.s64_repeated, data)
+            }
+            151 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_unlabeled, data)
+            }
+            152 => {
+                self._bitfield.set(10, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_optional, data)
+            }
+            153 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Fixed32
+                >::deser_field(&mut self.fixed32_repeated, data)
+            }
+            161 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_unlabeled, data)
+            }
+            162 => {
+                self._bitfield.set(11, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_optional, data)
+            }
+            163 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Fixed64
+                >::deser_field(&mut self.fixed64_repeated, data)
+            }
+            171 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_unlabeled, data)
+            }
+            172 => {
+                self._bitfield.set(12, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_optional, data)
+            }
+            173 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SFixed32
+                >::deser_field(&mut self.sfixed32_repeated, data)
+            }
+            181 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_unlabeled, data)
+            }
+            182 => {
+                self._bitfield.set(13, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_optional, data)
+            }
+            183 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::SFixed64
+                >::deser_field(&mut self.sfixed64_repeated, data)
+            }
+            191 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_unlabeled, data)
+            }
+            192 => {
+                self._bitfield.set(14, true);
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_optional, data)
+            }
+            193 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Double
+                >::deser_field(&mut self.f64_repeated, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -16861,10 +17329,24 @@ pub mod _puroro_nested {
                         .unwrap_or(::std::default::Default::default())
                 }
                 pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+                    if !self.has_i32_unlabeled() {
+                        self.i32_unlabeled = ::std::default::Default::default();
+                    }
                     &mut self.i32_unlabeled
                 }
+
+                pub fn clear_i32_unlabeled(&mut self) {
+                    self.i32_unlabeled = ::std::default::Default::default();
+                }
                 pub fn i64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
+                    if !self.has_i64_unlabeled() {
+                        self.i64_unlabeled = ::std::default::Default::default();
+                    }
                     &mut self.i64_unlabeled
+                }
+
+                pub fn clear_i64_unlabeled(&mut self) {
+                    self.i64_unlabeled = ::std::default::Default::default();
                 }
             }
 

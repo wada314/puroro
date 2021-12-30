@@ -17,9 +17,11 @@ use crate::internal::de::DeserMessageFromBytesIter;
 use crate::internal::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use crate::internal::types::FieldData;
 use crate::internal::variant::VariantTypeTag;
+use crate::internal::Bare;
 use crate::ErrorKind;
 use crate::{tags, Result};
 use ::std::marker::PhantomData;
+use std::ops::DerefMut;
 
 pub trait VecOrOptionOrBare<T> {
     fn push(&mut self, val: T);
@@ -69,9 +71,9 @@ impl<T> VecOrOptionOrBare<T> for Vec<T> {
         <[T]>::iter(self)
     }
 }
-impl<T> VecOrOptionOrBare<T> for T {
+impl<T> VecOrOptionOrBare<T> for Bare<T> {
     fn push(&mut self, val: T) {
-        *self = val;
+        *self.deref_mut() = val;
     }
     fn get_or_insert_with<F>(&mut self, _: F) -> &mut T
     where
