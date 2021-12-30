@@ -375,7 +375,7 @@ impl ::std::clone::Clone for {{ m.simple_ident }} {
 }
 
 impl ::std::cmp::PartialEq for {{ m.simple_ident }} {
-    {#- NEED FIX: Incorrect! The unset optional field value must be ignored. #}
+    {#- NEED FIX: Incorrect! The unset optional field values must be ignored. #}
     fn eq(&self, rhs: &Self) -> bool {
         {%- for f in m.fields %}
         self._bitfield == rhs._bitfield &&
