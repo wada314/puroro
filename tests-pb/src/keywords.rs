@@ -11,18 +11,25 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        r#type: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        r#type: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
             }
         }
         pub fn type_opt(&self) -> ::std::option::Option<i32> {
-            self.r#type.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.r#type.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_type(&self) -> bool {
@@ -33,7 +40,7 @@ pub mod _puroro_simple_impl {
             self.type_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn type_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn type_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.r#type
         }
     }

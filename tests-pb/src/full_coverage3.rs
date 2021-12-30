@@ -11,53 +11,57 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-    i32_unlabeled: i32,
-    i32_optional: ::std::option::Option<i32>,
+    _bitfield: ::puroro::bitvec::array::BitArray<
+        ::puroro::bitvec::order::Lsb0,
+        [u32; (15 + 31) / 32],
+    >,
+    i32_unlabeled: ::puroro::internal::Bare<i32>,
+    i32_optional: ::puroro::internal::Bare<i32>,
     i32_repeated: ::std::vec::Vec<i32>,
-    float_unlabeled: f32,
-    float_optional: ::std::option::Option<f32>,
+    float_unlabeled: ::puroro::internal::Bare<f32>,
+    float_optional: ::puroro::internal::Bare<f32>,
     float_repeated: ::std::vec::Vec<f32>,
-    bytes_unlabeled: ::std::vec::Vec<u8>,
-    bytes_optional: ::std::option::Option<::std::vec::Vec<u8>>,
+    bytes_unlabeled: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+    bytes_optional: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
     bytes_repeated: ::std::vec::Vec<::std::vec::Vec<u8>>,
-    string_unlabeled: ::std::string::String,
-    string_optional: ::std::option::Option<::std::string::String>,
+    string_unlabeled: ::puroro::internal::Bare<::std::string::String>,
+    string_optional: ::puroro::internal::Bare<::std::string::String>,
     string_repeated: ::std::vec::Vec<::std::string::String>,
-    enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
-    enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
+    enum_unlabeled: ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum>,
+    enum_optional: ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum>,
     enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
     submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
     submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
     submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>,
-    i64_unlabeled: i64,
-    i64_optional: ::std::option::Option<i64>,
+    i64_unlabeled: ::puroro::internal::Bare<i64>,
+    i64_optional: ::puroro::internal::Bare<i64>,
     i64_repeated: ::std::vec::Vec<i64>,
-    u32_unlabeled: u32,
-    u32_optional: ::std::option::Option<u32>,
+    u32_unlabeled: ::puroro::internal::Bare<u32>,
+    u32_optional: ::puroro::internal::Bare<u32>,
     u32_repeated: ::std::vec::Vec<u32>,
-    u64_unlabeled: u64,
-    u64_optional: ::std::option::Option<u64>,
+    u64_unlabeled: ::puroro::internal::Bare<u64>,
+    u64_optional: ::puroro::internal::Bare<u64>,
     u64_repeated: ::std::vec::Vec<u64>,
-    s32_unlabeled: i32,
-    s32_optional: ::std::option::Option<i32>,
+    s32_unlabeled: ::puroro::internal::Bare<i32>,
+    s32_optional: ::puroro::internal::Bare<i32>,
     s32_repeated: ::std::vec::Vec<i32>,
-    s64_unlabeled: i64,
-    s64_optional: ::std::option::Option<i64>,
+    s64_unlabeled: ::puroro::internal::Bare<i64>,
+    s64_optional: ::puroro::internal::Bare<i64>,
     s64_repeated: ::std::vec::Vec<i64>,
-    fixed32_unlabeled: u32,
-    fixed32_optional: ::std::option::Option<u32>,
+    fixed32_unlabeled: ::puroro::internal::Bare<u32>,
+    fixed32_optional: ::puroro::internal::Bare<u32>,
     fixed32_repeated: ::std::vec::Vec<u32>,
-    fixed64_unlabeled: u64,
-    fixed64_optional: ::std::option::Option<u64>,
+    fixed64_unlabeled: ::puroro::internal::Bare<u64>,
+    fixed64_optional: ::puroro::internal::Bare<u64>,
     fixed64_repeated: ::std::vec::Vec<u64>,
-    sfixed32_unlabeled: i32,
-    sfixed32_optional: ::std::option::Option<i32>,
+    sfixed32_unlabeled: ::puroro::internal::Bare<i32>,
+    sfixed32_optional: ::puroro::internal::Bare<i32>,
     sfixed32_repeated: ::std::vec::Vec<i32>,
-    sfixed64_unlabeled: i64,
-    sfixed64_optional: ::std::option::Option<i64>,
+    sfixed64_unlabeled: ::puroro::internal::Bare<i64>,
+    sfixed64_optional: ::puroro::internal::Bare<i64>,
     sfixed64_repeated: ::std::vec::Vec<i64>,
-    f64_unlabeled: f64,
-    f64_optional: ::std::option::Option<f64>,
+    f64_unlabeled: ::puroro::internal::Bare<f64>,
+    f64_optional: ::puroro::internal::Bare<f64>,
     f64_repeated: ::std::vec::Vec<f64>,
 }
     impl ::puroro::Message<Msg> for Msg {}
@@ -65,6 +69,7 @@ pub mod _puroro_simple_impl {
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
                 i32_repeated: ::std::default::Default::default(),
@@ -116,10 +121,10 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -132,7 +137,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_optional.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_optional(&self) -> bool {
@@ -143,15 +152,14 @@ pub mod _puroro_simple_impl {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn i32_repeated(&self) -> &'_ [i32] {
             &self.i32_repeated
         }
         pub fn float_unlabeled_opt(&self) -> ::std::option::Option<f32> {
-            if self.float_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.float_unlabeled) {
+                ::std::option::Option::Some(self.float_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -164,7 +172,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn float_optional_opt(&self) -> ::std::option::Option<f32> {
-            self.float_optional.clone()
+            if self._bitfield.get(1).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.float_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_float_optional(&self) -> bool {
@@ -175,15 +187,14 @@ pub mod _puroro_simple_impl {
             self.float_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn float_repeated(&self) -> &'_ [f32] {
             &self.float_repeated
         }
         pub fn bytes_unlabeled_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            if self.bytes_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
+            if !::puroro::internal::IsDefault::is_default(&*self.bytes_unlabeled) {
                 ::std::option::Option::Some(&self.bytes_unlabeled)
+            } else {
+                ::std::option::Option::None
             }
         }
 
@@ -196,7 +207,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn bytes_optional_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_optional.as_deref()
+            if self._bitfield.get(2).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_optional)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_optional(&self) -> bool {
@@ -207,15 +222,14 @@ pub mod _puroro_simple_impl {
             self.bytes_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn bytes_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = [u8]>] {
             &self.bytes_repeated
         }
         pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&'_ str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
                 ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
             }
         }
 
@@ -228,7 +242,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn string_optional_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_optional.as_deref()
+            if self._bitfield.get(3).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_optional)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_optional(&self) -> bool {
@@ -239,17 +257,16 @@ pub mod _puroro_simple_impl {
             self.string_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn string_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = str>] {
             &self.string_repeated
         }
         pub fn enum_unlabeled_opt(
             &self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-            if self.enum_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.enum_unlabeled) {
+                ::std::option::Option::Some(self.enum_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -264,7 +281,11 @@ pub mod _puroro_simple_impl {
         pub fn enum_optional_opt(
             &self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-            self.enum_optional.clone()
+            if self._bitfield.get(4).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.enum_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_enum_optional(&self) -> bool {
@@ -275,7 +296,6 @@ pub mod _puroro_simple_impl {
             self.enum_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn enum_repeated(&self) -> &'_ [self::_puroro_root::full_coverage3::Enum] {
             &self.enum_repeated
         }
@@ -301,15 +321,14 @@ pub mod _puroro_simple_impl {
         pub fn submsg_optional(&self) -> ::std::option::Option<&'_ self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>{
             self.submsg_optional_opt()
         }
-
         pub fn submsg_repeated(&self) -> &'_[self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg]{
             &self.submsg_repeated
         }
         pub fn i64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
-            if self.i64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.i64_unlabeled) {
+                ::std::option::Option::Some(self.i64_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -322,7 +341,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i64_optional_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_optional.clone()
+            if self._bitfield.get(5).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_optional(&self) -> bool {
@@ -333,15 +356,14 @@ pub mod _puroro_simple_impl {
             self.i64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn i64_repeated(&self) -> &'_ [i64] {
             &self.i64_repeated
         }
         pub fn u32_unlabeled_opt(&self) -> ::std::option::Option<u32> {
-            if self.u32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.u32_unlabeled) {
+                ::std::option::Option::Some(self.u32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -354,7 +376,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn u32_optional_opt(&self) -> ::std::option::Option<u32> {
-            self.u32_optional.clone()
+            if self._bitfield.get(6).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u32_optional(&self) -> bool {
@@ -365,15 +391,14 @@ pub mod _puroro_simple_impl {
             self.u32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn u32_repeated(&self) -> &'_ [u32] {
             &self.u32_repeated
         }
         pub fn u64_unlabeled_opt(&self) -> ::std::option::Option<u64> {
-            if self.u64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.u64_unlabeled) {
+                ::std::option::Option::Some(self.u64_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -386,7 +411,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn u64_optional_opt(&self) -> ::std::option::Option<u64> {
-            self.u64_optional.clone()
+            if self._bitfield.get(7).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u64_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u64_optional(&self) -> bool {
@@ -397,15 +426,14 @@ pub mod _puroro_simple_impl {
             self.u64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn u64_repeated(&self) -> &'_ [u64] {
             &self.u64_repeated
         }
         pub fn s32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-            if self.s32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.s32_unlabeled) {
+                ::std::option::Option::Some(self.s32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -418,7 +446,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn s32_optional_opt(&self) -> ::std::option::Option<i32> {
-            self.s32_optional.clone()
+            if self._bitfield.get(8).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.s32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_s32_optional(&self) -> bool {
@@ -429,15 +461,14 @@ pub mod _puroro_simple_impl {
             self.s32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn s32_repeated(&self) -> &'_ [i32] {
             &self.s32_repeated
         }
         pub fn s64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
-            if self.s64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.s64_unlabeled) {
+                ::std::option::Option::Some(self.s64_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -450,7 +481,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn s64_optional_opt(&self) -> ::std::option::Option<i64> {
-            self.s64_optional.clone()
+            if self._bitfield.get(9).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.s64_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_s64_optional(&self) -> bool {
@@ -461,15 +496,14 @@ pub mod _puroro_simple_impl {
             self.s64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn s64_repeated(&self) -> &'_ [i64] {
             &self.s64_repeated
         }
         pub fn fixed32_unlabeled_opt(&self) -> ::std::option::Option<u32> {
-            if self.fixed32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.fixed32_unlabeled) {
+                ::std::option::Option::Some(self.fixed32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -482,7 +516,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn fixed32_optional_opt(&self) -> ::std::option::Option<u32> {
-            self.fixed32_optional.clone()
+            if self._bitfield.get(10).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.fixed32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_fixed32_optional(&self) -> bool {
@@ -493,15 +531,14 @@ pub mod _puroro_simple_impl {
             self.fixed32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn fixed32_repeated(&self) -> &'_ [u32] {
             &self.fixed32_repeated
         }
         pub fn fixed64_unlabeled_opt(&self) -> ::std::option::Option<u64> {
-            if self.fixed64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.fixed64_unlabeled) {
+                ::std::option::Option::Some(self.fixed64_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -514,7 +551,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn fixed64_optional_opt(&self) -> ::std::option::Option<u64> {
-            self.fixed64_optional.clone()
+            if self._bitfield.get(11).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.fixed64_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_fixed64_optional(&self) -> bool {
@@ -525,15 +566,14 @@ pub mod _puroro_simple_impl {
             self.fixed64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn fixed64_repeated(&self) -> &'_ [u64] {
             &self.fixed64_repeated
         }
         pub fn sfixed32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-            if self.sfixed32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.sfixed32_unlabeled) {
+                ::std::option::Option::Some(self.sfixed32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -546,7 +586,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn sfixed32_optional_opt(&self) -> ::std::option::Option<i32> {
-            self.sfixed32_optional.clone()
+            if self._bitfield.get(12).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.sfixed32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_sfixed32_optional(&self) -> bool {
@@ -557,15 +601,14 @@ pub mod _puroro_simple_impl {
             self.sfixed32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn sfixed32_repeated(&self) -> &'_ [i32] {
             &self.sfixed32_repeated
         }
         pub fn sfixed64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
-            if self.sfixed64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.sfixed64_unlabeled) {
+                ::std::option::Option::Some(self.sfixed64_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -578,7 +621,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn sfixed64_optional_opt(&self) -> ::std::option::Option<i64> {
-            self.sfixed64_optional.clone()
+            if self._bitfield.get(13).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.sfixed64_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_sfixed64_optional(&self) -> bool {
@@ -589,15 +636,14 @@ pub mod _puroro_simple_impl {
             self.sfixed64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn sfixed64_repeated(&self) -> &'_ [i64] {
             &self.sfixed64_repeated
         }
         pub fn f64_unlabeled_opt(&self) -> ::std::option::Option<f64> {
-            if self.f64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.f64_unlabeled) {
+                ::std::option::Option::Some(self.f64_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -610,7 +656,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn f64_optional_opt(&self) -> ::std::option::Option<f64> {
-            self.f64_optional.clone()
+            if self._bitfield.get(14).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f64_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f64_optional(&self) -> bool {
@@ -621,52 +671,59 @@ pub mod _puroro_simple_impl {
             self.f64_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn f64_repeated(&self) -> &'_ [f64] {
             &self.f64_repeated
         }
-        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+        pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.i32_unlabeled
         }
-        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.i32_optional
         }
         pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
-        pub fn float_unlabeled_mut(&mut self) -> &mut f32 {
+        pub fn float_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             &mut self.float_unlabeled
         }
-        pub fn float_optional_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn float_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             &mut self.float_optional
         }
         pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
             &mut self.float_repeated
         }
-        pub fn bytes_unlabeled_mut(&mut self) -> &mut ::std::vec::Vec<u8> {
+        pub fn bytes_unlabeled_mut(
+            &mut self,
+        ) -> &mut ::puroro::internal::Bare<::std::vec::Vec<u8>> {
             &mut self.bytes_unlabeled
         }
-        pub fn bytes_optional_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn bytes_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::vec::Vec<u8>> {
             &mut self.bytes_optional
         }
         pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::vec::Vec<u8>> {
             &mut self.bytes_repeated
         }
-        pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+        pub fn string_unlabeled_mut(
+            &mut self,
+        ) -> &mut ::puroro::internal::Bare<::std::string::String> {
             &mut self.string_unlabeled
         }
-        pub fn string_optional_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn string_optional_mut(
+            &mut self,
+        ) -> &mut ::puroro::internal::Bare<::std::string::String> {
             &mut self.string_optional
         }
         pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
             &mut self.string_repeated
         }
-        pub fn enum_unlabeled_mut(&mut self) -> &mut self::_puroro_root::full_coverage3::Enum {
+        pub fn enum_unlabeled_mut(
+            &mut self,
+        ) -> &mut ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum> {
             &mut self.enum_unlabeled
         }
         pub fn enum_optional_mut(
             &mut self,
-        ) -> &mut ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+        ) -> &mut ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum> {
             &mut self.enum_optional
         }
         pub fn enum_repeated_mut(
@@ -687,91 +744,91 @@ pub mod _puroro_simple_impl {
         > {
             &mut self.submsg_repeated
         }
-        pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
+        pub fn i64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             &mut self.i64_unlabeled
         }
-        pub fn i64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn i64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             &mut self.i64_optional
         }
         pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
             &mut self.i64_repeated
         }
-        pub fn u32_unlabeled_mut(&mut self) -> &mut u32 {
+        pub fn u32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             &mut self.u32_unlabeled
         }
-        pub fn u32_optional_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn u32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             &mut self.u32_optional
         }
         pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
             &mut self.u32_repeated
         }
-        pub fn u64_unlabeled_mut(&mut self) -> &mut u64 {
+        pub fn u64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             &mut self.u64_unlabeled
         }
-        pub fn u64_optional_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn u64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             &mut self.u64_optional
         }
         pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
             &mut self.u64_repeated
         }
-        pub fn s32_unlabeled_mut(&mut self) -> &mut i32 {
+        pub fn s32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.s32_unlabeled
         }
-        pub fn s32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn s32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.s32_optional
         }
         pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
             &mut self.s32_repeated
         }
-        pub fn s64_unlabeled_mut(&mut self) -> &mut i64 {
+        pub fn s64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             &mut self.s64_unlabeled
         }
-        pub fn s64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn s64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             &mut self.s64_optional
         }
         pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
             &mut self.s64_repeated
         }
-        pub fn fixed32_unlabeled_mut(&mut self) -> &mut u32 {
+        pub fn fixed32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             &mut self.fixed32_unlabeled
         }
-        pub fn fixed32_optional_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn fixed32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             &mut self.fixed32_optional
         }
         pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
             &mut self.fixed32_repeated
         }
-        pub fn fixed64_unlabeled_mut(&mut self) -> &mut u64 {
+        pub fn fixed64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             &mut self.fixed64_unlabeled
         }
-        pub fn fixed64_optional_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn fixed64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             &mut self.fixed64_optional
         }
         pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
             &mut self.fixed64_repeated
         }
-        pub fn sfixed32_unlabeled_mut(&mut self) -> &mut i32 {
+        pub fn sfixed32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.sfixed32_unlabeled
         }
-        pub fn sfixed32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn sfixed32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.sfixed32_optional
         }
         pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
             &mut self.sfixed32_repeated
         }
-        pub fn sfixed64_unlabeled_mut(&mut self) -> &mut i64 {
+        pub fn sfixed64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             &mut self.sfixed64_unlabeled
         }
-        pub fn sfixed64_optional_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn sfixed64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             &mut self.sfixed64_optional
         }
         pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
             &mut self.sfixed64_repeated
         }
-        pub fn f64_unlabeled_mut(&mut self) -> &mut f64 {
+        pub fn f64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f64> {
             &mut self.f64_unlabeled
         }
-        pub fn f64_optional_mut(&mut self) -> &mut ::std::option::Option<f64> {
+        pub fn f64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f64> {
             &mut self.f64_optional
         }
         pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f64> {
@@ -786,7 +843,6 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::i32_optional_opt(self)
         }
-
         type Field3RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -799,7 +855,6 @@ pub mod _puroro_simple_impl {
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <self::Msg>::float_optional_opt(self)
         }
-
         type Field13RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
 
@@ -812,7 +867,6 @@ pub mod _puroro_simple_impl {
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <self::Msg>::bytes_optional_opt(self)
         }
-
         type Field23RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
             ::std::vec::Vec<::std::vec::Vec<u8>>,
@@ -829,7 +883,6 @@ pub mod _puroro_simple_impl {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Msg>::string_optional_opt(self)
         }
-
         type Field33RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
             ::std::vec::Vec<::std::string::String>,
@@ -850,7 +903,6 @@ pub mod _puroro_simple_impl {
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             <self::Msg>::enum_optional_opt(self)
         }
-
         type Field43RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
             'this,
             ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
@@ -870,7 +922,6 @@ pub mod _puroro_simple_impl {
             <self::Msg>::submsg_optional_opt(self)
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-
         type Field53RepeatedType<'this> =
     &'this [self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg];
 
@@ -883,7 +934,6 @@ pub mod _puroro_simple_impl {
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             <self::Msg>::i64_optional_opt(self)
         }
-
         type Field103RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i64>, i64, i64>;
 
@@ -896,7 +946,6 @@ pub mod _puroro_simple_impl {
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             <self::Msg>::u32_optional_opt(self)
         }
-
         type Field113RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u32>, u32, u32>;
 
@@ -909,7 +958,6 @@ pub mod _puroro_simple_impl {
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             <self::Msg>::u64_optional_opt(self)
         }
-
         type Field123RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u64>, u64, u64>;
 
@@ -922,7 +970,6 @@ pub mod _puroro_simple_impl {
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::s32_optional_opt(self)
         }
-
         type Field133RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -935,7 +982,6 @@ pub mod _puroro_simple_impl {
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             <self::Msg>::s64_optional_opt(self)
         }
-
         type Field143RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i64>, i64, i64>;
 
@@ -948,7 +994,6 @@ pub mod _puroro_simple_impl {
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             <self::Msg>::fixed32_optional_opt(self)
         }
-
         type Field153RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u32>, u32, u32>;
 
@@ -961,7 +1006,6 @@ pub mod _puroro_simple_impl {
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             <self::Msg>::fixed64_optional_opt(self)
         }
-
         type Field163RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<u64>, u64, u64>;
 
@@ -974,7 +1018,6 @@ pub mod _puroro_simple_impl {
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::sfixed32_optional_opt(self)
         }
-
         type Field173RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -987,7 +1030,6 @@ pub mod _puroro_simple_impl {
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             <self::Msg>::sfixed64_optional_opt(self)
         }
-
         type Field183RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i64>, i64, i64>;
 
@@ -1000,7 +1042,6 @@ pub mod _puroro_simple_impl {
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             <self::Msg>::f64_optional_opt(self)
         }
-
         type Field193RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f64>, f64, f64>;
 
@@ -16770,23 +16811,28 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                i32_unlabeled: i32,
-                i64_unlabeled: i64,
+                _bitfield: ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (0 + 31) / 32],
+                >,
+                i32_unlabeled: ::puroro::internal::Bare<i32>,
+                i64_unlabeled: ::puroro::internal::Bare<i64>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
             impl Submsg {
                 pub fn new() -> Self {
                     Self {
+                        _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
                     }
                 }
                 pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-                    if self.i32_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
+                    if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                        ::std::option::Option::Some(self.i32_unlabeled.inner())
                     } else {
-                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                        ::std::option::Option::None
                     }
                 }
 
@@ -16799,10 +16845,10 @@ pub mod _puroro_nested {
                         .unwrap_or(::std::default::Default::default())
                 }
                 pub fn i64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
-                    if self.i64_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
+                    if !::puroro::internal::IsDefault::is_default(&*self.i64_unlabeled) {
+                        ::std::option::Option::Some(self.i64_unlabeled.inner())
                     } else {
-                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
+                        ::std::option::Option::None
                     }
                 }
 
@@ -16814,10 +16860,10 @@ pub mod _puroro_nested {
                     self.i64_unlabeled_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
-                pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+                pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
                     &mut self.i32_unlabeled
                 }
-                pub fn i64_unlabeled_mut(&mut self) -> &mut i64 {
+                pub fn i64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
                     &mut self.i64_unlabeled
                 }
             }

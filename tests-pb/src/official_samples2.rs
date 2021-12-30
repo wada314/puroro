@@ -14,18 +14,25 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Test1 {
-        a: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        a: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Test1> for Test1 {}
 
     impl Test1 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
         }
         pub fn a_opt(&self) -> ::std::option::Option<i32> {
-            self.a.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.a.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_a(&self) -> bool {
@@ -35,7 +42,7 @@ pub mod _puroro_simple_impl {
         pub fn a(&self) -> i32 {
             self.a_opt().unwrap_or(::std::default::Default::default())
         }
-        pub fn a_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn a_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.a
         }
     }
@@ -124,18 +131,25 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Test2 {
-        b: ::std::option::Option<::std::string::String>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        b: ::puroro::internal::Bare<::std::string::String>,
     }
     impl ::puroro::Message<Test2> for Test2 {}
 
     impl Test2 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 b: ::std::default::Default::default(),
             }
         }
         pub fn b_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.b.as_deref()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.b)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_b(&self) -> bool {
@@ -145,7 +159,7 @@ pub mod _puroro_simple_impl {
         pub fn b(&self) -> &'_ str {
             self.b_opt().unwrap_or(::std::default::Default::default())
         }
-        pub fn b_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn b_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::string::String> {
             &mut self.b
         }
     }
@@ -234,6 +248,8 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Test3 {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         c: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>,
         >,
@@ -243,6 +259,7 @@ pub mod _puroro_simple_impl {
     impl Test3 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 c: ::std::default::Default::default(),
             }
         }
@@ -366,6 +383,8 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Test4 {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         d: ::std::vec::Vec<i32>,
     }
     impl ::puroro::Message<Test4> for Test4 {}
@@ -373,10 +392,10 @@ pub mod _puroro_simple_impl {
     impl Test4 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 d: ::std::default::Default::default(),
             }
         }
-
         pub fn d(&self) -> &'_ [i32] {
             &self.d
         }

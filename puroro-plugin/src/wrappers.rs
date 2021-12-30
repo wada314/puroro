@@ -729,17 +729,14 @@ impl Field {
         let scalar_type = self.simple_scalar_field_type()?;
         Ok(match self.field_label()? {
             FieldLabel::OneofField => scalar_type,
-            FieldLabel::Required | FieldLabel::Optional => {
-                format!("::std::option::Option<{}>", scalar_type).into()
-            }
-            FieldLabel::Unlabeled => {
+            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type).into(),
+            _ => {
                 if matches!(self.field_type(), Ok(FieldType::Message(_))) {
                     format!("::std::option::Option<{}>", scalar_type).into()
                 } else {
-                    scalar_type
+                    format!("::puroro::internal::Bare<{}>", scalar_type).into()
                 }
             }
-            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type).into(),
         })
     }
 

@@ -12,11 +12,13 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        i32_unlabeled: i32,
-        i32_optional: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
+        i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::std::vec::Vec<i32>,
-        f32_unlabeled: f32,
-        string_unlabeled: ::std::string::String,
+        f32_unlabeled: ::puroro::internal::Bare<f32>,
+        string_unlabeled: ::puroro::internal::Bare<::std::string::String>,
         submsg_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
         >,
@@ -26,6 +28,7 @@ pub mod _puroro_simple_impl {
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
                 i32_repeated: ::std::default::Default::default(),
@@ -35,10 +38,10 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -51,7 +54,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_optional.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_optional(&self) -> bool {
@@ -62,15 +69,14 @@ pub mod _puroro_simple_impl {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn i32_repeated(&self) -> &'_ [i32] {
             &self.i32_repeated
         }
         pub fn f32_unlabeled_opt(&self) -> ::std::option::Option<f32> {
-            if self.f32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.f32_unlabeled) {
+                ::std::option::Option::Some(self.f32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -83,10 +89,10 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&'_ str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
                 ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
             }
         }
 
@@ -117,19 +123,21 @@ pub mod _puroro_simple_impl {
         > {
             self.submsg_unlabeled_opt()
         }
-        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+        pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.i32_unlabeled
         }
-        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.i32_optional
         }
         pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
-        pub fn f32_unlabeled_mut(&mut self) -> &mut f32 {
+        pub fn f32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             &mut self.f32_unlabeled
         }
-        pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+        pub fn string_unlabeled_mut(
+            &mut self,
+        ) -> &mut ::puroro::internal::Bare<::std::string::String> {
             &mut self.string_unlabeled
         }
         pub fn submsg_unlabeled_mut(
@@ -148,7 +156,6 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::i32_optional_opt(self)
         }
-
         type Field3RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -338,21 +345,24 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Submsg {
-        i32_unlabeled: i32,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Submsg> for Submsg {}
 
     impl Submsg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
             }
         }
         pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -364,7 +374,7 @@ pub mod _puroro_simple_impl {
             self.i32_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+        pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.i32_unlabeled
         }
     }

@@ -93,7 +93,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {#- [optional] MyMessage => Option<&'this MyMessageBumpalo<'this>> #}
     pub fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> {{ f.bumpalo_getter_opt_type }} {
         {%- if f.is_message %}
-        {#- Non-repeated message f. Field type is always `Optional<NoAllocBox<T>>`.#}
+        {#- Non-repeated message f. Field type is always `Option<NoAllocBox<T>>`.#}
         {#- Need to cast the lifetime. #}
         self.{{ f.ident }}.as_ref().map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
 

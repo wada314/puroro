@@ -11,11 +11,13 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        i32_optional: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+        i32_optional: ::puroro::internal::Bare<i32>,
         i32_repeated: ::std::vec::Vec<i32>,
-        float_optional: ::std::option::Option<f32>,
+        float_optional: ::puroro::internal::Bare<f32>,
         float_repeated: ::std::vec::Vec<f32>,
-        string_optional: ::std::option::Option<::std::string::String>,
+        string_optional: ::puroro::internal::Bare<::std::string::String>,
         string_repeated: ::std::vec::Vec<::std::string::String>,
         submsg_optional: ::std::option::Option<
             ::std::boxed::Box<
@@ -25,15 +27,16 @@ pub mod _puroro_simple_impl {
         submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >,
-        enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
+        enum_optional: ::puroro::internal::Bare<self::_puroro_root::ser_tests2::Enum>,
         enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
-        very_large_field_number: ::std::option::Option<i32>,
+        very_large_field_number: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
                 i32_repeated: ::std::default::Default::default(),
                 float_optional: ::std::default::Default::default(),
@@ -48,7 +51,11 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_optional.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_optional(&self) -> bool {
@@ -59,12 +66,15 @@ pub mod _puroro_simple_impl {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn i32_repeated(&self) -> &'_ [i32] {
             &self.i32_repeated
         }
         pub fn float_optional_opt(&self) -> ::std::option::Option<f32> {
-            self.float_optional.clone()
+            if self._bitfield.get(1).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.float_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_float_optional(&self) -> bool {
@@ -75,12 +85,15 @@ pub mod _puroro_simple_impl {
             self.float_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn float_repeated(&self) -> &'_ [f32] {
             &self.float_repeated
         }
         pub fn string_optional_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_optional.as_deref()
+            if self._bitfield.get(2).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_optional)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_optional(&self) -> bool {
@@ -91,7 +104,6 @@ pub mod _puroro_simple_impl {
             self.string_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn string_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = str>] {
             &self.string_repeated
         }
@@ -114,7 +126,6 @@ pub mod _puroro_simple_impl {
         > {
             self.submsg_optional_opt()
         }
-
         pub fn submsg_repeated(
             &self,
         ) -> &'_ [self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg]
@@ -124,7 +135,11 @@ pub mod _puroro_simple_impl {
         pub fn enum_optional_opt(
             &self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
-            self.enum_optional.clone()
+            if self._bitfield.get(3).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.enum_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_enum_optional(&self) -> bool {
@@ -135,12 +150,15 @@ pub mod _puroro_simple_impl {
             self.enum_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn enum_repeated(&self) -> &'_ [self::_puroro_root::ser_tests2::Enum] {
             &self.enum_repeated
         }
         pub fn very_large_field_number_opt(&self) -> ::std::option::Option<i32> {
-            self.very_large_field_number.clone()
+            if self._bitfield.get(4).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.very_large_field_number.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_very_large_field_number(&self) -> bool {
@@ -151,19 +169,21 @@ pub mod _puroro_simple_impl {
             self.very_large_field_number_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.i32_optional
         }
         pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
-        pub fn float_optional_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn float_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             &mut self.float_optional
         }
         pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
             &mut self.float_repeated
         }
-        pub fn string_optional_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn string_optional_mut(
+            &mut self,
+        ) -> &mut ::puroro::internal::Bare<::std::string::String> {
             &mut self.string_optional
         }
         pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
@@ -187,7 +207,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn enum_optional_mut(
             &mut self,
-        ) -> &mut ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
+        ) -> &mut ::puroro::internal::Bare<self::_puroro_root::ser_tests2::Enum> {
             &mut self.enum_optional
         }
         pub fn enum_repeated_mut(
@@ -195,7 +215,7 @@ pub mod _puroro_simple_impl {
         ) -> &mut ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum> {
             &mut self.enum_repeated
         }
-        pub fn very_large_field_number_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn very_large_field_number_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.very_large_field_number
         }
     }
@@ -204,7 +224,6 @@ pub mod _puroro_simple_impl {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::i32_optional_opt(self)
         }
-
         type Field2RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -214,7 +233,6 @@ pub mod _puroro_simple_impl {
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <self::Msg>::float_optional_opt(self)
         }
-
         type Field4RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
 
@@ -224,7 +242,6 @@ pub mod _puroro_simple_impl {
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Msg>::string_optional_opt(self)
         }
-
         type Field6RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
             ::std::vec::Vec<::std::string::String>,
@@ -246,7 +263,6 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-
         type Field8RepeatedType<'this> =
     &'this [self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg];
 
@@ -256,7 +272,6 @@ pub mod _puroro_simple_impl {
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             <self::Msg>::enum_optional_opt(self)
         }
-
         type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
             'this,
             ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
@@ -3362,18 +3377,27 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                i32_optional: ::std::option::Option<i32>,
+                _bitfield: ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (1 + 31) / 32],
+                >,
+                i32_optional: ::puroro::internal::Bare<i32>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
             impl Submsg {
                 pub fn new() -> Self {
                     Self {
+                        _bitfield: ::std::default::Default::default(),
                         i32_optional: ::std::default::Default::default(),
                     }
                 }
                 pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-                    self.i32_optional.clone()
+                    if self._bitfield.get(0).map_or(false, |v| *v) {
+                        ::std::option::Option::Some(self.i32_optional.clone().inner())
+                    } else {
+                        ::std::option::Option::None
+                    }
                 }
 
                 pub fn has_i32_optional(&self) -> bool {
@@ -3384,7 +3408,7 @@ pub mod _puroro_nested {
                     self.i32_optional_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
-                pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+                pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
                     &mut self.i32_optional
                 }
             }

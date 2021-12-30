@@ -12,6 +12,8 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
         group_one: ::std::option::Option<
             super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple,
         >,
@@ -27,6 +29,7 @@ pub mod _puroro_simple_impl {
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 group_one: ::std::default::Default::default(),
                 group_two: ::std::default::Default::default(),
                 group_three: ::std::default::Default::default(),
@@ -514,18 +517,25 @@ pub mod _puroro_simple_impl {
         }
     }
     pub struct Submsg {
-        i32_optional: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        i32_optional: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Submsg> for Submsg {}
 
     impl Submsg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
             }
         }
         pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_optional.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_optional(&self) -> bool {
@@ -536,7 +546,7 @@ pub mod _puroro_simple_impl {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             &mut self.i32_optional
         }
     }

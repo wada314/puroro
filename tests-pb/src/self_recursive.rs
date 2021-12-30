@@ -11,6 +11,8 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         recursive_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
         >,
@@ -20,6 +22,7 @@ pub mod _puroro_simple_impl {
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }
