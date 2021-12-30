@@ -116,15 +116,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test1Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test1")
-                .field("a", &<Self as super::_puroro_traits::Test1Trait>::a(self))
-                .finish()
+            f.debug_struct("Test1").field("a", &self.a()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test1 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 a: ::std::clone::Clone::clone(&self.a),
             }
         }
@@ -132,7 +131,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test1 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.a == rhs.a && true
+            self._bitfield == rhs._bitfield && self.a == rhs.a && true
         }
     }
     pub struct Test2 {
@@ -238,15 +237,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test2Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test2")
-                .field("b", &<Self as super::_puroro_traits::Test2Trait>::b(self))
-                .finish()
+            f.debug_struct("Test2").field("b", &self.b()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test2 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 b: ::std::clone::Clone::clone(&self.b),
             }
         }
@@ -254,7 +252,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test2 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.b == rhs.b && true
+            self._bitfield == rhs._bitfield && self.b == rhs.b && true
         }
     }
     pub struct Test3 {
@@ -303,7 +301,6 @@ pub mod _puroro_simple_impl {
             if !self.has_c() {
                 self.c = ::std::default::Default::default();
             }
-            let bump = self._bump;
             self.c
                 .get_or_insert_with(::std::default::Default::default())
         }
@@ -381,15 +378,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test3Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test3")
-                .field("c", &<Self as super::_puroro_traits::Test3Trait>::c(self))
-                .finish()
+            f.debug_struct("Test3").field("c", &self.c()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test3 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 c: ::std::clone::Clone::clone(&self.c),
             }
         }
@@ -397,7 +393,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test3 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.c == rhs.c && true
+            self._bitfield == rhs._bitfield && self.c == rhs.c && true
         }
     }
     pub struct Test4 {
@@ -484,20 +480,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test4Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test4")
-                .field(
-                    "d",
-                    &<Self as super::_puroro_traits::Test4Trait>::d(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .finish()
+            f.debug_struct("Test4").field("d", &self.d()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test4 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 d: ::std::clone::Clone::clone(&self.d),
             }
         }
@@ -505,7 +495,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test4 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.d == rhs.d && true
+            self._bitfield == rhs._bitfield && self.d == rhs.d && true
         }
     }
 }

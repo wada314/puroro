@@ -225,7 +225,6 @@ pub mod _puroro_simple_impl {
             if !self.has_submsg_optional() {
                 self.submsg_optional = ::std::default::Default::default();
             }
-            let bump = self._bump;
             self.submsg_optional
                 .get_or_insert_with(::std::default::Default::default())
         }
@@ -529,59 +528,19 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "i32_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-                )
-                .field(
-                    "i32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "float_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
-                )
-                .field(
-                    "float_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "string_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
-                )
-                .field(
-                    "string_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "submsg_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_optional(self),
-                )
-                .field(
-                    "submsg_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "enum_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
-                )
-                .field(
-                    "enum_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
+                .field("i32_optional", &self.i32_optional_opt())
+                .field("i32_repeated", &self.i32_repeated())
+                .field("float_optional", &self.float_optional_opt())
+                .field("float_repeated", &self.float_repeated())
+                .field("string_optional", &self.string_optional_opt())
+                .field("string_repeated", &self.string_repeated())
+                .field("submsg_optional", &self.submsg_optional())
+                .field("submsg_repeated", &self.submsg_repeated())
+                .field("enum_optional", &self.enum_optional_opt())
+                .field("enum_repeated", &self.enum_repeated())
                 .field(
                     "very_large_field_number",
-                    &<Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
+                    &self.very_large_field_number_opt(),
                 )
                 .finish()
         }
@@ -590,6 +549,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
                 i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
                 float_optional: ::std::clone::Clone::clone(&self.float_optional),
@@ -607,16 +567,27 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_optional == rhs.i32_optional
+            self._bitfield == rhs._bitfield
+                && self.i32_optional == rhs.i32_optional
+                && self._bitfield == rhs._bitfield
                 && self.i32_repeated == rhs.i32_repeated
+                && self._bitfield == rhs._bitfield
                 && self.float_optional == rhs.float_optional
+                && self._bitfield == rhs._bitfield
                 && self.float_repeated == rhs.float_repeated
+                && self._bitfield == rhs._bitfield
                 && self.string_optional == rhs.string_optional
+                && self._bitfield == rhs._bitfield
                 && self.string_repeated == rhs.string_repeated
+                && self._bitfield == rhs._bitfield
                 && self.submsg_optional == rhs.submsg_optional
+                && self._bitfield == rhs._bitfield
                 && self.submsg_repeated == rhs.submsg_repeated
+                && self._bitfield == rhs._bitfield
                 && self.enum_optional == rhs.enum_optional
+                && self._bitfield == rhs._bitfield
                 && self.enum_repeated == rhs.enum_repeated
+                && self._bitfield == rhs._bitfield
                 && self.very_large_field_number == rhs.very_large_field_number
                 && true
         }
@@ -3557,10 +3528,7 @@ pub mod _puroro_nested {
             {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     f.debug_struct("Submsg")
-                        .field(
-                            "i32_optional",
-                            &<Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
-                        )
+                        .field("i32_optional", &self.i32_optional_opt())
                         .finish()
                 }
             }
@@ -3568,6 +3536,7 @@ pub mod _puroro_nested {
             impl ::std::clone::Clone for Submsg {
                 fn clone(&self) -> Self {
                     Self {
+                        _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                         i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
                     }
                 }
@@ -3575,7 +3544,7 @@ pub mod _puroro_nested {
 
             impl ::std::cmp::PartialEq for Submsg {
                 fn eq(&self, rhs: &Self) -> bool {
-                    self.i32_optional == rhs.i32_optional && true
+                    self._bitfield == rhs._bitfield && self.i32_optional == rhs.i32_optional && true
                 }
             }
         }

@@ -11,12 +11,9 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
 
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
-    {#- optional int32 => Bare<i32> #}
-    {#- optional String => Bare<NoAllocBumpString> #}
-    {#- optional MyMessage => Option<NoAllocBumpBox<MyMessageBumpalo<'bump>>> #}
-    {#- int32 => Bare<i32> #}
-    {#- String => Bare<NoAllocBumpString >#}
-    {#- MyMessage => Option<NoAllocBumpBox<MyMessageBumpalo<'bump>>> #}
+    {#- [optional] int32 => Bare<i32> #}
+    {#- [optional] String => Bare<NoAllocBumpString> #}
+    {#- [optional] MyMessage => Option<NoAllocBumpBox<MyMessageBumpalo<'bump>>> #}
     {#- repeated int32 => NoAllocBumpVec<i32> #}
     {#- repeated String => NoAllocBumpVec<NoAllocBumpString> #}
     {#- repeated MyMessage => NoAllocBumpVec<MyMessageBumpalo<'bump>> #}

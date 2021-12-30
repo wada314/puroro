@@ -2840,254 +2840,77 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "i32_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_default_opt(self),
-                )
-                .field(
-                    "i32_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_0_opt(self),
-                )
-                .field(
-                    "i32_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_42_opt(self),
-                )
-                .field(
-                    "i32_m42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_m42_opt(self),
-                )
-                .field(
-                    "i32_2147483647",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_2147483647_opt(self),
-                )
-                .field(
-                    "i32_m2147483648",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_m2147483648_opt(self),
-                )
-                .field(
-                    "i32_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_0123_opt(self),
-                )
-                .field(
-                    "i32_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_0x123_opt(self),
-                )
-                .field(
-                    "u32_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_default_opt(self),
-                )
-                .field(
-                    "u32_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_0_opt(self),
-                )
-                .field(
-                    "u32_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_42_opt(self),
-                )
-                .field(
-                    "u32_4294967295",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_4294967295_opt(self),
-                )
-                .field(
-                    "u32_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_0123_opt(self),
-                )
-                .field(
-                    "u32_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_0x123_opt(self),
-                )
-                .field(
-                    "i64_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_default_opt(self),
-                )
-                .field(
-                    "i64_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_0_opt(self),
-                )
-                .field(
-                    "i64_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_42_opt(self),
-                )
-                .field(
-                    "i64_m42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_m42_opt(self),
-                )
+                .field("i32_default", &self.i32_default_opt())
+                .field("i32_0", &self.i32_0_opt())
+                .field("i32_42", &self.i32_42_opt())
+                .field("i32_m42", &self.i32_m42_opt())
+                .field("i32_2147483647", &self.i32_2147483647_opt())
+                .field("i32_m2147483648", &self.i32_m2147483648_opt())
+                .field("i32_0123", &self.i32_0123_opt())
+                .field("i32_0x123", &self.i32_0x123_opt())
+                .field("u32_default", &self.u32_default_opt())
+                .field("u32_0", &self.u32_0_opt())
+                .field("u32_42", &self.u32_42_opt())
+                .field("u32_4294967295", &self.u32_4294967295_opt())
+                .field("u32_0123", &self.u32_0123_opt())
+                .field("u32_0x123", &self.u32_0x123_opt())
+                .field("i64_default", &self.i64_default_opt())
+                .field("i64_0", &self.i64_0_opt())
+                .field("i64_42", &self.i64_42_opt())
+                .field("i64_m42", &self.i64_m42_opt())
                 .field(
                     "i64_9223372036854775807",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807_opt(self),
+                    &self.i64_9223372036854775807_opt(),
                 )
                 .field(
                     "i64_m9223372036854775808",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808_opt(self),
+                    &self.i64_m9223372036854775808_opt(),
                 )
-                .field(
-                    "i64_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_0123_opt(self),
-                )
-                .field(
-                    "i64_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_0x123_opt(self),
-                )
-                .field(
-                    "u64_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_default_opt(self),
-                )
-                .field(
-                    "u64_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_0_opt(self),
-                )
-                .field(
-                    "u64_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_42_opt(self),
-                )
+                .field("i64_0123", &self.i64_0123_opt())
+                .field("i64_0x123", &self.i64_0x123_opt())
+                .field("u64_default", &self.u64_default_opt())
+                .field("u64_0", &self.u64_0_opt())
+                .field("u64_42", &self.u64_42_opt())
                 .field(
                     "u64_18446744073709551615",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615_opt(self),
+                    &self.u64_18446744073709551615_opt(),
                 )
-                .field(
-                    "u64_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_0123_opt(self),
-                )
-                .field(
-                    "u64_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_0x123_opt(self),
-                )
-                .field(
-                    "f32_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_default_opt(self),
-                )
-                .field(
-                    "f32_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0_opt(self),
-                )
-                .field(
-                    "f32_m0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_m0_opt(self),
-                )
-                .field(
-                    "f32_0p",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p_opt(self),
-                )
-                .field(
-                    "f32_p0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_p0_opt(self),
-                )
-                .field(
-                    "f32_0p0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p0_opt(self),
-                )
-                .field(
-                    "f32_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_42_opt(self),
-                )
-                .field(
-                    "f32_m42",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_m42_opt(self),
-                )
-                .field(
-                    "f32_0p25",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p25_opt(self),
-                )
-                .field(
-                    "f32_1p5e2",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_1p5e2_opt(self),
-                )
-                .field(
-                    "f32_inf",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_inf_opt(self),
-                )
-                .field(
-                    "f32_minf",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_minf_opt(self),
-                )
-                .field(
-                    "f32_nan",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_nan_opt(self),
-                )
-                .field(
-                    "f32_mnan",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_mnan_opt(self),
-                )
-                .field(
-                    "bool_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::bool_default_opt(self),
-                )
-                .field(
-                    "bool_true",
-                    &<Self as super::_puroro_traits::MsgTrait>::bool_true_opt(self),
-                )
-                .field(
-                    "bool_false",
-                    &<Self as super::_puroro_traits::MsgTrait>::bool_false_opt(self),
-                )
-                .field(
-                    "string_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_default_opt(self),
-                )
-                .field(
-                    "string_empty",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_empty_opt(self),
-                )
-                .field(
-                    "string_abc",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_abc_opt(self),
-                )
-                .field(
-                    "string_aiu",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_aiu_opt(self),
-                )
-                .field(
-                    "string_backslash",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_backslash_opt(self),
-                )
-                .field(
-                    "string_tab",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_tab_opt(self),
-                )
-                .field(
-                    "string_crlf",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_crlf_opt(self),
-                )
-                .field(
-                    "bytes_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_default_opt(self),
-                )
-                .field(
-                    "bytes_empty",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_empty_opt(self),
-                )
-                .field(
-                    "bytes_abc",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_abc_opt(self),
-                )
-                .field(
-                    "bytes_aiu",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_aiu_opt(self),
-                )
-                .field(
-                    "bytes_backslash",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_backslash_opt(self),
-                )
-                .field(
-                    "bytes_tab",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_tab_opt(self),
-                )
-                .field(
-                    "bytes_crlf",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_crlf_opt(self),
-                )
-                .field(
-                    "enum_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_default_opt(self),
-                )
-                .field(
-                    "enum_one",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_one_opt(self),
-                )
-                .field(
-                    "enum_fourty_two",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_fourty_two_opt(self),
-                )
+                .field("u64_0123", &self.u64_0123_opt())
+                .field("u64_0x123", &self.u64_0x123_opt())
+                .field("f32_default", &self.f32_default_opt())
+                .field("f32_0", &self.f32_0_opt())
+                .field("f32_m0", &self.f32_m0_opt())
+                .field("f32_0p", &self.f32_0p_opt())
+                .field("f32_p0", &self.f32_p0_opt())
+                .field("f32_0p0", &self.f32_0p0_opt())
+                .field("f32_42", &self.f32_42_opt())
+                .field("f32_m42", &self.f32_m42_opt())
+                .field("f32_0p25", &self.f32_0p25_opt())
+                .field("f32_1p5e2", &self.f32_1p5e2_opt())
+                .field("f32_inf", &self.f32_inf_opt())
+                .field("f32_minf", &self.f32_minf_opt())
+                .field("f32_nan", &self.f32_nan_opt())
+                .field("f32_mnan", &self.f32_mnan_opt())
+                .field("bool_default", &self.bool_default_opt())
+                .field("bool_true", &self.bool_true_opt())
+                .field("bool_false", &self.bool_false_opt())
+                .field("string_default", &self.string_default_opt())
+                .field("string_empty", &self.string_empty_opt())
+                .field("string_abc", &self.string_abc_opt())
+                .field("string_aiu", &self.string_aiu_opt())
+                .field("string_backslash", &self.string_backslash_opt())
+                .field("string_tab", &self.string_tab_opt())
+                .field("string_crlf", &self.string_crlf_opt())
+                .field("bytes_default", &self.bytes_default_opt())
+                .field("bytes_empty", &self.bytes_empty_opt())
+                .field("bytes_abc", &self.bytes_abc_opt())
+                .field("bytes_aiu", &self.bytes_aiu_opt())
+                .field("bytes_backslash", &self.bytes_backslash_opt())
+                .field("bytes_tab", &self.bytes_tab_opt())
+                .field("bytes_crlf", &self.bytes_crlf_opt())
+                .field("enum_default", &self.enum_default_opt())
+                .field("enum_one", &self.enum_one_opt())
+                .field("enum_fourty_two", &self.enum_fourty_two_opt())
                 .finish()
         }
     }
@@ -3095,6 +2918,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_default: ::std::clone::Clone::clone(&self.i32_default),
                 i32_0: ::std::clone::Clone::clone(&self.i32_0),
                 i32_42: ::std::clone::Clone::clone(&self.i32_42),
@@ -3167,67 +2991,129 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_default == rhs.i32_default
+            self._bitfield == rhs._bitfield
+                && self.i32_default == rhs.i32_default
+                && self._bitfield == rhs._bitfield
                 && self.i32_0 == rhs.i32_0
+                && self._bitfield == rhs._bitfield
                 && self.i32_42 == rhs.i32_42
+                && self._bitfield == rhs._bitfield
                 && self.i32_m42 == rhs.i32_m42
+                && self._bitfield == rhs._bitfield
                 && self.i32_2147483647 == rhs.i32_2147483647
+                && self._bitfield == rhs._bitfield
                 && self.i32_m2147483648 == rhs.i32_m2147483648
+                && self._bitfield == rhs._bitfield
                 && self.i32_0123 == rhs.i32_0123
+                && self._bitfield == rhs._bitfield
                 && self.i32_0x123 == rhs.i32_0x123
+                && self._bitfield == rhs._bitfield
                 && self.u32_default == rhs.u32_default
+                && self._bitfield == rhs._bitfield
                 && self.u32_0 == rhs.u32_0
+                && self._bitfield == rhs._bitfield
                 && self.u32_42 == rhs.u32_42
+                && self._bitfield == rhs._bitfield
                 && self.u32_4294967295 == rhs.u32_4294967295
+                && self._bitfield == rhs._bitfield
                 && self.u32_0123 == rhs.u32_0123
+                && self._bitfield == rhs._bitfield
                 && self.u32_0x123 == rhs.u32_0x123
+                && self._bitfield == rhs._bitfield
                 && self.i64_default == rhs.i64_default
+                && self._bitfield == rhs._bitfield
                 && self.i64_0 == rhs.i64_0
+                && self._bitfield == rhs._bitfield
                 && self.i64_42 == rhs.i64_42
+                && self._bitfield == rhs._bitfield
                 && self.i64_m42 == rhs.i64_m42
+                && self._bitfield == rhs._bitfield
                 && self.i64_9223372036854775807 == rhs.i64_9223372036854775807
+                && self._bitfield == rhs._bitfield
                 && self.i64_m9223372036854775808 == rhs.i64_m9223372036854775808
+                && self._bitfield == rhs._bitfield
                 && self.i64_0123 == rhs.i64_0123
+                && self._bitfield == rhs._bitfield
                 && self.i64_0x123 == rhs.i64_0x123
+                && self._bitfield == rhs._bitfield
                 && self.u64_default == rhs.u64_default
+                && self._bitfield == rhs._bitfield
                 && self.u64_0 == rhs.u64_0
+                && self._bitfield == rhs._bitfield
                 && self.u64_42 == rhs.u64_42
+                && self._bitfield == rhs._bitfield
                 && self.u64_18446744073709551615 == rhs.u64_18446744073709551615
+                && self._bitfield == rhs._bitfield
                 && self.u64_0123 == rhs.u64_0123
+                && self._bitfield == rhs._bitfield
                 && self.u64_0x123 == rhs.u64_0x123
+                && self._bitfield == rhs._bitfield
                 && self.f32_default == rhs.f32_default
+                && self._bitfield == rhs._bitfield
                 && self.f32_0 == rhs.f32_0
+                && self._bitfield == rhs._bitfield
                 && self.f32_m0 == rhs.f32_m0
+                && self._bitfield == rhs._bitfield
                 && self.f32_0p == rhs.f32_0p
+                && self._bitfield == rhs._bitfield
                 && self.f32_p0 == rhs.f32_p0
+                && self._bitfield == rhs._bitfield
                 && self.f32_0p0 == rhs.f32_0p0
+                && self._bitfield == rhs._bitfield
                 && self.f32_42 == rhs.f32_42
+                && self._bitfield == rhs._bitfield
                 && self.f32_m42 == rhs.f32_m42
+                && self._bitfield == rhs._bitfield
                 && self.f32_0p25 == rhs.f32_0p25
+                && self._bitfield == rhs._bitfield
                 && self.f32_1p5e2 == rhs.f32_1p5e2
+                && self._bitfield == rhs._bitfield
                 && self.f32_inf == rhs.f32_inf
+                && self._bitfield == rhs._bitfield
                 && self.f32_minf == rhs.f32_minf
+                && self._bitfield == rhs._bitfield
                 && self.f32_nan == rhs.f32_nan
+                && self._bitfield == rhs._bitfield
                 && self.f32_mnan == rhs.f32_mnan
+                && self._bitfield == rhs._bitfield
                 && self.bool_default == rhs.bool_default
+                && self._bitfield == rhs._bitfield
                 && self.bool_true == rhs.bool_true
+                && self._bitfield == rhs._bitfield
                 && self.bool_false == rhs.bool_false
+                && self._bitfield == rhs._bitfield
                 && self.string_default == rhs.string_default
+                && self._bitfield == rhs._bitfield
                 && self.string_empty == rhs.string_empty
+                && self._bitfield == rhs._bitfield
                 && self.string_abc == rhs.string_abc
+                && self._bitfield == rhs._bitfield
                 && self.string_aiu == rhs.string_aiu
+                && self._bitfield == rhs._bitfield
                 && self.string_backslash == rhs.string_backslash
+                && self._bitfield == rhs._bitfield
                 && self.string_tab == rhs.string_tab
+                && self._bitfield == rhs._bitfield
                 && self.string_crlf == rhs.string_crlf
+                && self._bitfield == rhs._bitfield
                 && self.bytes_default == rhs.bytes_default
+                && self._bitfield == rhs._bitfield
                 && self.bytes_empty == rhs.bytes_empty
+                && self._bitfield == rhs._bitfield
                 && self.bytes_abc == rhs.bytes_abc
+                && self._bitfield == rhs._bitfield
                 && self.bytes_aiu == rhs.bytes_aiu
+                && self._bitfield == rhs._bitfield
                 && self.bytes_backslash == rhs.bytes_backslash
+                && self._bitfield == rhs._bitfield
                 && self.bytes_tab == rhs.bytes_tab
+                && self._bitfield == rhs._bitfield
                 && self.bytes_crlf == rhs.bytes_crlf
+                && self._bitfield == rhs._bitfield
                 && self.enum_default == rhs.enum_default
+                && self._bitfield == rhs._bitfield
                 && self.enum_one == rhs.enum_one
+                && self._bitfield == rhs._bitfield
                 && self.enum_fourty_two == rhs.enum_fourty_two
                 && true
         }

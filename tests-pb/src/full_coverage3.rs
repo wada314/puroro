@@ -807,7 +807,6 @@ pub mod _puroro_simple_impl {
             if !self.has_submsg_unlabeled() {
                 self.submsg_unlabeled = ::std::default::Default::default();
             }
-            let bump = self._bump;
             self.submsg_unlabeled
                 .get_or_insert_with(::std::default::Default::default())
         }
@@ -818,7 +817,6 @@ pub mod _puroro_simple_impl {
             if !self.has_submsg_optional() {
                 self.submsg_optional = ::std::default::Default::default();
             }
-            let bump = self._bump;
             self.submsg_optional
                 .get_or_insert_with(::std::default::Default::default())
         }
@@ -1955,230 +1953,54 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "i32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_unlabeled(self),
-                )
-                .field(
-                    "i32_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-                )
-                .field(
-                    "i32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "float_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::float_unlabeled(self),
-                )
-                .field(
-                    "float_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
-                )
-                .field(
-                    "float_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "bytes_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_unlabeled(self),
-                )
-                .field(
-                    "bytes_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_optional_opt(self),
-                )
-                .field(
-                    "bytes_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "string_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_unlabeled(self),
-                )
-                .field(
-                    "string_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
-                )
-                .field(
-                    "string_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "enum_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_unlabeled(self),
-                )
-                .field(
-                    "enum_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
-                )
-                .field(
-                    "enum_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "submsg_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self),
-                )
-                .field(
-                    "submsg_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_optional(self),
-                )
-                .field(
-                    "submsg_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "i64_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_unlabeled(self),
-                )
-                .field(
-                    "i64_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_optional_opt(self),
-                )
-                .field(
-                    "i64_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "u32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_unlabeled(self),
-                )
-                .field(
-                    "u32_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_optional_opt(self),
-                )
-                .field(
-                    "u32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "u64_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_unlabeled(self),
-                )
-                .field(
-                    "u64_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_optional_opt(self),
-                )
-                .field(
-                    "u64_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "s32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::s32_unlabeled(self),
-                )
-                .field(
-                    "s32_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::s32_optional_opt(self),
-                )
-                .field(
-                    "s32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::s32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "s64_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::s64_unlabeled(self),
-                )
-                .field(
-                    "s64_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::s64_optional_opt(self),
-                )
-                .field(
-                    "s64_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::s64_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "fixed32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::fixed32_unlabeled(self),
-                )
-                .field(
-                    "fixed32_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::fixed32_optional_opt(self),
-                )
-                .field(
-                    "fixed32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::fixed32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "fixed64_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::fixed64_unlabeled(self),
-                )
-                .field(
-                    "fixed64_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::fixed64_optional_opt(self),
-                )
-                .field(
-                    "fixed64_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::fixed64_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "sfixed32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::sfixed32_unlabeled(self),
-                )
-                .field(
-                    "sfixed32_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::sfixed32_optional_opt(self),
-                )
-                .field(
-                    "sfixed32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::sfixed32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "sfixed64_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::sfixed64_unlabeled(self),
-                )
-                .field(
-                    "sfixed64_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::sfixed64_optional_opt(self),
-                )
-                .field(
-                    "sfixed64_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::sfixed64_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "f64_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::f64_unlabeled(self),
-                )
-                .field(
-                    "f64_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::f64_optional_opt(self),
-                )
-                .field(
-                    "f64_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::f64_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
+                .field("i32_unlabeled", &self.i32_unlabeled())
+                .field("i32_optional", &self.i32_optional_opt())
+                .field("i32_repeated", &self.i32_repeated())
+                .field("float_unlabeled", &self.float_unlabeled())
+                .field("float_optional", &self.float_optional_opt())
+                .field("float_repeated", &self.float_repeated())
+                .field("bytes_unlabeled", &self.bytes_unlabeled())
+                .field("bytes_optional", &self.bytes_optional_opt())
+                .field("bytes_repeated", &self.bytes_repeated())
+                .field("string_unlabeled", &self.string_unlabeled())
+                .field("string_optional", &self.string_optional_opt())
+                .field("string_repeated", &self.string_repeated())
+                .field("enum_unlabeled", &self.enum_unlabeled())
+                .field("enum_optional", &self.enum_optional_opt())
+                .field("enum_repeated", &self.enum_repeated())
+                .field("submsg_unlabeled", &self.submsg_unlabeled())
+                .field("submsg_optional", &self.submsg_optional())
+                .field("submsg_repeated", &self.submsg_repeated())
+                .field("i64_unlabeled", &self.i64_unlabeled())
+                .field("i64_optional", &self.i64_optional_opt())
+                .field("i64_repeated", &self.i64_repeated())
+                .field("u32_unlabeled", &self.u32_unlabeled())
+                .field("u32_optional", &self.u32_optional_opt())
+                .field("u32_repeated", &self.u32_repeated())
+                .field("u64_unlabeled", &self.u64_unlabeled())
+                .field("u64_optional", &self.u64_optional_opt())
+                .field("u64_repeated", &self.u64_repeated())
+                .field("s32_unlabeled", &self.s32_unlabeled())
+                .field("s32_optional", &self.s32_optional_opt())
+                .field("s32_repeated", &self.s32_repeated())
+                .field("s64_unlabeled", &self.s64_unlabeled())
+                .field("s64_optional", &self.s64_optional_opt())
+                .field("s64_repeated", &self.s64_repeated())
+                .field("fixed32_unlabeled", &self.fixed32_unlabeled())
+                .field("fixed32_optional", &self.fixed32_optional_opt())
+                .field("fixed32_repeated", &self.fixed32_repeated())
+                .field("fixed64_unlabeled", &self.fixed64_unlabeled())
+                .field("fixed64_optional", &self.fixed64_optional_opt())
+                .field("fixed64_repeated", &self.fixed64_repeated())
+                .field("sfixed32_unlabeled", &self.sfixed32_unlabeled())
+                .field("sfixed32_optional", &self.sfixed32_optional_opt())
+                .field("sfixed32_repeated", &self.sfixed32_repeated())
+                .field("sfixed64_unlabeled", &self.sfixed64_unlabeled())
+                .field("sfixed64_optional", &self.sfixed64_optional_opt())
+                .field("sfixed64_repeated", &self.sfixed64_repeated())
+                .field("f64_unlabeled", &self.f64_unlabeled())
+                .field("f64_optional", &self.f64_optional_opt())
+                .field("f64_repeated", &self.f64_repeated())
                 .finish()
         }
     }
@@ -2186,6 +2008,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                 i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
                 i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
@@ -2240,53 +2063,101 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_unlabeled == rhs.i32_unlabeled
+            self._bitfield == rhs._bitfield
+                && self.i32_unlabeled == rhs.i32_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.i32_optional == rhs.i32_optional
+                && self._bitfield == rhs._bitfield
                 && self.i32_repeated == rhs.i32_repeated
+                && self._bitfield == rhs._bitfield
                 && self.float_unlabeled == rhs.float_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.float_optional == rhs.float_optional
+                && self._bitfield == rhs._bitfield
                 && self.float_repeated == rhs.float_repeated
+                && self._bitfield == rhs._bitfield
                 && self.bytes_unlabeled == rhs.bytes_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.bytes_optional == rhs.bytes_optional
+                && self._bitfield == rhs._bitfield
                 && self.bytes_repeated == rhs.bytes_repeated
+                && self._bitfield == rhs._bitfield
                 && self.string_unlabeled == rhs.string_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.string_optional == rhs.string_optional
+                && self._bitfield == rhs._bitfield
                 && self.string_repeated == rhs.string_repeated
+                && self._bitfield == rhs._bitfield
                 && self.enum_unlabeled == rhs.enum_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.enum_optional == rhs.enum_optional
+                && self._bitfield == rhs._bitfield
                 && self.enum_repeated == rhs.enum_repeated
+                && self._bitfield == rhs._bitfield
                 && self.submsg_unlabeled == rhs.submsg_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.submsg_optional == rhs.submsg_optional
+                && self._bitfield == rhs._bitfield
                 && self.submsg_repeated == rhs.submsg_repeated
+                && self._bitfield == rhs._bitfield
                 && self.i64_unlabeled == rhs.i64_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.i64_optional == rhs.i64_optional
+                && self._bitfield == rhs._bitfield
                 && self.i64_repeated == rhs.i64_repeated
+                && self._bitfield == rhs._bitfield
                 && self.u32_unlabeled == rhs.u32_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.u32_optional == rhs.u32_optional
+                && self._bitfield == rhs._bitfield
                 && self.u32_repeated == rhs.u32_repeated
+                && self._bitfield == rhs._bitfield
                 && self.u64_unlabeled == rhs.u64_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.u64_optional == rhs.u64_optional
+                && self._bitfield == rhs._bitfield
                 && self.u64_repeated == rhs.u64_repeated
+                && self._bitfield == rhs._bitfield
                 && self.s32_unlabeled == rhs.s32_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.s32_optional == rhs.s32_optional
+                && self._bitfield == rhs._bitfield
                 && self.s32_repeated == rhs.s32_repeated
+                && self._bitfield == rhs._bitfield
                 && self.s64_unlabeled == rhs.s64_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.s64_optional == rhs.s64_optional
+                && self._bitfield == rhs._bitfield
                 && self.s64_repeated == rhs.s64_repeated
+                && self._bitfield == rhs._bitfield
                 && self.fixed32_unlabeled == rhs.fixed32_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.fixed32_optional == rhs.fixed32_optional
+                && self._bitfield == rhs._bitfield
                 && self.fixed32_repeated == rhs.fixed32_repeated
+                && self._bitfield == rhs._bitfield
                 && self.fixed64_unlabeled == rhs.fixed64_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.fixed64_optional == rhs.fixed64_optional
+                && self._bitfield == rhs._bitfield
                 && self.fixed64_repeated == rhs.fixed64_repeated
+                && self._bitfield == rhs._bitfield
                 && self.sfixed32_unlabeled == rhs.sfixed32_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.sfixed32_optional == rhs.sfixed32_optional
+                && self._bitfield == rhs._bitfield
                 && self.sfixed32_repeated == rhs.sfixed32_repeated
+                && self._bitfield == rhs._bitfield
                 && self.sfixed64_unlabeled == rhs.sfixed64_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.sfixed64_optional == rhs.sfixed64_optional
+                && self._bitfield == rhs._bitfield
                 && self.sfixed64_repeated == rhs.sfixed64_repeated
+                && self._bitfield == rhs._bitfield
                 && self.f64_unlabeled == rhs.f64_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.f64_optional == rhs.f64_optional
+                && self._bitfield == rhs._bitfield
                 && self.f64_repeated == rhs.f64_repeated
                 && true
         }
@@ -17284,14 +17155,8 @@ pub mod _puroro_nested {
             {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     f.debug_struct("Submsg")
-                        .field(
-                            "i32_unlabeled",
-                            &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
-                        )
-                        .field(
-                            "i64_unlabeled",
-                            &<Self as super::_puroro_traits::SubmsgTrait>::i64_unlabeled(self),
-                        )
+                        .field("i32_unlabeled", &self.i32_unlabeled())
+                        .field("i64_unlabeled", &self.i64_unlabeled())
                         .finish()
                 }
             }
@@ -17299,6 +17164,7 @@ pub mod _puroro_nested {
             impl ::std::clone::Clone for Submsg {
                 fn clone(&self) -> Self {
                     Self {
+                        _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                         i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                         i64_unlabeled: ::std::clone::Clone::clone(&self.i64_unlabeled),
                     }
@@ -17307,7 +17173,9 @@ pub mod _puroro_nested {
 
             impl ::std::cmp::PartialEq for Submsg {
                 fn eq(&self, rhs: &Self) -> bool {
-                    self.i32_unlabeled == rhs.i32_unlabeled
+                    self._bitfield == rhs._bitfield
+                        && self.i32_unlabeled == rhs.i32_unlabeled
+                        && self._bitfield == rhs._bitfield
                         && self.i64_unlabeled == rhs.i64_unlabeled
                         && true
                 }

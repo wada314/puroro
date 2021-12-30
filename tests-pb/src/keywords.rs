@@ -117,10 +117,7 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "r#type",
-                    &<Self as super::_puroro_traits::MsgTrait>::type_opt(self),
-                )
+                .field("r#type", &self.type_opt())
                 .finish()
         }
     }
@@ -128,6 +125,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 r#type: ::std::clone::Clone::clone(&self.r#type),
             }
         }
@@ -135,7 +133,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.r#type == rhs.r#type && true
+            self._bitfield == rhs._bitfield && self.r#type == rhs.r#type && true
         }
     }
 }

@@ -176,7 +176,6 @@ pub mod _puroro_simple_impl {
             if !self.has_submsg_unlabeled() {
                 self.submsg_unlabeled = ::std::default::Default::default();
             }
-            let bump = self._bump;
             self.submsg_unlabeled
                 .get_or_insert_with(::std::default::Default::default())
         }
@@ -336,32 +335,12 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "i32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_unlabeled(self),
-                )
-                .field(
-                    "i32_optional",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-                )
-                .field(
-                    "i32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "f32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_unlabeled(self),
-                )
-                .field(
-                    "string_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_unlabeled(self),
-                )
-                .field(
-                    "submsg_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self),
-                )
+                .field("i32_unlabeled", &self.i32_unlabeled())
+                .field("i32_optional", &self.i32_optional_opt())
+                .field("i32_repeated", &self.i32_repeated())
+                .field("f32_unlabeled", &self.f32_unlabeled())
+                .field("string_unlabeled", &self.string_unlabeled())
+                .field("submsg_unlabeled", &self.submsg_unlabeled())
                 .finish()
         }
     }
@@ -369,6 +348,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                 i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
                 i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
@@ -381,11 +361,17 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_unlabeled == rhs.i32_unlabeled
+            self._bitfield == rhs._bitfield
+                && self.i32_unlabeled == rhs.i32_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.i32_optional == rhs.i32_optional
+                && self._bitfield == rhs._bitfield
                 && self.i32_repeated == rhs.i32_repeated
+                && self._bitfield == rhs._bitfield
                 && self.f32_unlabeled == rhs.f32_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.string_unlabeled == rhs.string_unlabeled
+                && self._bitfield == rhs._bitfield
                 && self.submsg_unlabeled == rhs.submsg_unlabeled
                 && true
         }
@@ -495,10 +481,7 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Submsg")
-                .field(
-                    "i32_unlabeled",
-                    &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
-                )
+                .field("i32_unlabeled", &self.i32_unlabeled())
                 .finish()
         }
     }
@@ -506,6 +489,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Submsg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
             }
         }
@@ -513,7 +497,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Submsg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_unlabeled == rhs.i32_unlabeled && true
+            self._bitfield == rhs._bitfield && self.i32_unlabeled == rhs.i32_unlabeled && true
         }
     }
 }
