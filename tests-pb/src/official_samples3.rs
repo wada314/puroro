@@ -24,6 +24,21 @@ pub mod _puroro_simple_impl {
                 a: ::std::default::Default::default(),
             }
         }
+        pub fn a_opt(&self) -> ::std::option::Option<i32> {
+            if self.a == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
+            }
+        }
+
+        pub fn has_a(&self) -> bool {
+            Self::a_opt(self).is_some()
+        }
+
+        pub fn a(&self) -> i32 {
+            self.a_opt().unwrap_or(::std::default::Default::default())
+        }
         pub fn a_mut(&mut self) -> &mut i32 {
             &mut self.a
         }
@@ -31,11 +46,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::Test1Trait for Test1 {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            if self.a == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.a.clone())
-            }
+            <self::Test1>::a_opt(self)
         }
     }
 
@@ -124,6 +135,21 @@ pub mod _puroro_simple_impl {
                 b: ::std::default::Default::default(),
             }
         }
+        pub fn b_opt(&self) -> ::std::option::Option<&'_ str> {
+            if self.b.is_empty() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(&self.b)
+            }
+        }
+
+        pub fn has_b(&self) -> bool {
+            Self::b_opt(self).is_some()
+        }
+
+        pub fn b(&self) -> &'_ str {
+            self.b_opt().unwrap_or(::std::default::Default::default())
+        }
         pub fn b_mut(&mut self) -> &mut ::std::string::String {
             &mut self.b
         }
@@ -131,11 +157,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::Test2Trait for Test2 {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            if self.b.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.b.as_ref())
-            }
+            <self::Test2>::b_opt(self)
         }
     }
 
@@ -226,6 +248,25 @@ pub mod _puroro_simple_impl {
                 c: ::std::default::Default::default(),
             }
         }
+        pub fn c_opt(
+            &self,
+        ) -> ::std::option::Option<
+            &'_ self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
+        > {
+            self.c.as_deref()
+        }
+
+        pub fn has_c(&self) -> bool {
+            Self::c_opt(self).is_some()
+        }
+
+        pub fn c(
+            &self,
+        ) -> ::std::option::Option<
+            &'_ self::_puroro_root::official_samples3::_puroro_simple_impl::Test1,
+        > {
+            self.c_opt()
+        }
         pub fn c_mut(
             &mut self,
         ) -> &mut ::std::option::Option<
@@ -241,7 +282,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::official_samples3::_puroro_simple_impl::Test1;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            <self::Test3>::c_opt(self)
         }
     }
 
@@ -336,6 +377,10 @@ pub mod _puroro_simple_impl {
             Self {
                 d: ::std::default::Default::default(),
             }
+        }
+
+        pub fn d(&self) -> &'_ [i32] {
+            &self.d
         }
         pub fn d_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
             &mut self.d

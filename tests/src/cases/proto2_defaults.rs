@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::tests_pb::proto2_defaults::{Msg, MsgTrait, MyEnum};
+use crate::tests_pb::proto2_defaults::{Msg, MyEnum};
 use ::puroro::internal::de::DeserMessageFromBytesIter;
 
 #[test]
@@ -431,6 +431,8 @@ fn test_simple_enum() {
 
 #[test]
 fn test_empty_int32() {
+    use crate::tests_pb::proto2_defaults::MsgTrait as _;
+
     let msg = ();
 
     // The trait values are "not set" but return the default values

@@ -115,6 +115,516 @@ pub mod _puroro_simple_impl {
                 f64_repeated: ::std::default::Default::default(),
             }
         }
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            if self.i32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+            }
+        }
+
+        pub fn has_i32_unlabeled(&self) -> bool {
+            Self::i32_unlabeled_opt(self).is_some()
+        }
+
+        pub fn i32_unlabeled(&self) -> i32 {
+            self.i32_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
+            self.i32_optional.clone()
+        }
+
+        pub fn has_i32_optional(&self) -> bool {
+            Self::i32_optional_opt(self).is_some()
+        }
+
+        pub fn i32_optional(&self) -> i32 {
+            self.i32_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn i32_repeated(&self) -> &'_ [i32] {
+            &self.i32_repeated
+        }
+        pub fn float_unlabeled_opt(&self) -> ::std::option::Option<f32> {
+            if self.float_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
+            }
+        }
+
+        pub fn has_float_unlabeled(&self) -> bool {
+            Self::float_unlabeled_opt(self).is_some()
+        }
+
+        pub fn float_unlabeled(&self) -> f32 {
+            self.float_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn float_optional_opt(&self) -> ::std::option::Option<f32> {
+            self.float_optional.clone()
+        }
+
+        pub fn has_float_optional(&self) -> bool {
+            Self::float_optional_opt(self).is_some()
+        }
+
+        pub fn float_optional(&self) -> f32 {
+            self.float_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn float_repeated(&self) -> &'_ [f32] {
+            &self.float_repeated
+        }
+        pub fn bytes_unlabeled_opt(&self) -> ::std::option::Option<&'_ [u8]> {
+            if self.bytes_unlabeled.is_empty() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(&self.bytes_unlabeled)
+            }
+        }
+
+        pub fn has_bytes_unlabeled(&self) -> bool {
+            Self::bytes_unlabeled_opt(self).is_some()
+        }
+
+        pub fn bytes_unlabeled(&self) -> &'_ [u8] {
+            self.bytes_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn bytes_optional_opt(&self) -> ::std::option::Option<&'_ [u8]> {
+            self.bytes_optional.as_deref()
+        }
+
+        pub fn has_bytes_optional(&self) -> bool {
+            Self::bytes_optional_opt(self).is_some()
+        }
+
+        pub fn bytes_optional(&self) -> &'_ [u8] {
+            self.bytes_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn bytes_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = [u8]>] {
+            &self.bytes_repeated
+        }
+        pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&'_ str> {
+            if self.string_unlabeled.is_empty() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(&self.string_unlabeled)
+            }
+        }
+
+        pub fn has_string_unlabeled(&self) -> bool {
+            Self::string_unlabeled_opt(self).is_some()
+        }
+
+        pub fn string_unlabeled(&self) -> &'_ str {
+            self.string_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn string_optional_opt(&self) -> ::std::option::Option<&'_ str> {
+            self.string_optional.as_deref()
+        }
+
+        pub fn has_string_optional(&self) -> bool {
+            Self::string_optional_opt(self).is_some()
+        }
+
+        pub fn string_optional(&self) -> &'_ str {
+            self.string_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn string_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = str>] {
+            &self.string_repeated
+        }
+        pub fn enum_unlabeled_opt(
+            &self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            if self.enum_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
+            }
+        }
+
+        pub fn has_enum_unlabeled(&self) -> bool {
+            Self::enum_unlabeled_opt(self).is_some()
+        }
+
+        pub fn enum_unlabeled(&self) -> self::_puroro_root::full_coverage3::Enum {
+            self.enum_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn enum_optional_opt(
+            &self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            self.enum_optional.clone()
+        }
+
+        pub fn has_enum_optional(&self) -> bool {
+            Self::enum_optional_opt(self).is_some()
+        }
+
+        pub fn enum_optional(&self) -> self::_puroro_root::full_coverage3::Enum {
+            self.enum_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn enum_repeated(&self) -> &'_ [self::_puroro_root::full_coverage3::Enum] {
+            &self.enum_repeated
+        }
+        pub fn submsg_unlabeled_opt(&self) -> ::std::option::Option<&'_ self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>{
+            self.submsg_unlabeled.as_deref()
+        }
+
+        pub fn has_submsg_unlabeled(&self) -> bool {
+            Self::submsg_unlabeled_opt(self).is_some()
+        }
+
+        pub fn submsg_unlabeled(&self) -> ::std::option::Option<&'_ self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>{
+            self.submsg_unlabeled_opt()
+        }
+        pub fn submsg_optional_opt(&self) -> ::std::option::Option<&'_ self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>{
+            self.submsg_optional.as_deref()
+        }
+
+        pub fn has_submsg_optional(&self) -> bool {
+            Self::submsg_optional_opt(self).is_some()
+        }
+
+        pub fn submsg_optional(&self) -> ::std::option::Option<&'_ self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>{
+            self.submsg_optional_opt()
+        }
+
+        pub fn submsg_repeated(&self) -> &'_[self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg]{
+            &self.submsg_repeated
+        }
+        pub fn i64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
+            if self.i64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
+            }
+        }
+
+        pub fn has_i64_unlabeled(&self) -> bool {
+            Self::i64_unlabeled_opt(self).is_some()
+        }
+
+        pub fn i64_unlabeled(&self) -> i64 {
+            self.i64_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn i64_optional_opt(&self) -> ::std::option::Option<i64> {
+            self.i64_optional.clone()
+        }
+
+        pub fn has_i64_optional(&self) -> bool {
+            Self::i64_optional_opt(self).is_some()
+        }
+
+        pub fn i64_optional(&self) -> i64 {
+            self.i64_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn i64_repeated(&self) -> &'_ [i64] {
+            &self.i64_repeated
+        }
+        pub fn u32_unlabeled_opt(&self) -> ::std::option::Option<u32> {
+            if self.u32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u32_unlabeled))
+            }
+        }
+
+        pub fn has_u32_unlabeled(&self) -> bool {
+            Self::u32_unlabeled_opt(self).is_some()
+        }
+
+        pub fn u32_unlabeled(&self) -> u32 {
+            self.u32_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn u32_optional_opt(&self) -> ::std::option::Option<u32> {
+            self.u32_optional.clone()
+        }
+
+        pub fn has_u32_optional(&self) -> bool {
+            Self::u32_optional_opt(self).is_some()
+        }
+
+        pub fn u32_optional(&self) -> u32 {
+            self.u32_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn u32_repeated(&self) -> &'_ [u32] {
+            &self.u32_repeated
+        }
+        pub fn u64_unlabeled_opt(&self) -> ::std::option::Option<u64> {
+            if self.u64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.u64_unlabeled))
+            }
+        }
+
+        pub fn has_u64_unlabeled(&self) -> bool {
+            Self::u64_unlabeled_opt(self).is_some()
+        }
+
+        pub fn u64_unlabeled(&self) -> u64 {
+            self.u64_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn u64_optional_opt(&self) -> ::std::option::Option<u64> {
+            self.u64_optional.clone()
+        }
+
+        pub fn has_u64_optional(&self) -> bool {
+            Self::u64_optional_opt(self).is_some()
+        }
+
+        pub fn u64_optional(&self) -> u64 {
+            self.u64_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn u64_repeated(&self) -> &'_ [u64] {
+            &self.u64_repeated
+        }
+        pub fn s32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            if self.s32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s32_unlabeled))
+            }
+        }
+
+        pub fn has_s32_unlabeled(&self) -> bool {
+            Self::s32_unlabeled_opt(self).is_some()
+        }
+
+        pub fn s32_unlabeled(&self) -> i32 {
+            self.s32_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn s32_optional_opt(&self) -> ::std::option::Option<i32> {
+            self.s32_optional.clone()
+        }
+
+        pub fn has_s32_optional(&self) -> bool {
+            Self::s32_optional_opt(self).is_some()
+        }
+
+        pub fn s32_optional(&self) -> i32 {
+            self.s32_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn s32_repeated(&self) -> &'_ [i32] {
+            &self.s32_repeated
+        }
+        pub fn s64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
+            if self.s64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.s64_unlabeled))
+            }
+        }
+
+        pub fn has_s64_unlabeled(&self) -> bool {
+            Self::s64_unlabeled_opt(self).is_some()
+        }
+
+        pub fn s64_unlabeled(&self) -> i64 {
+            self.s64_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn s64_optional_opt(&self) -> ::std::option::Option<i64> {
+            self.s64_optional.clone()
+        }
+
+        pub fn has_s64_optional(&self) -> bool {
+            Self::s64_optional_opt(self).is_some()
+        }
+
+        pub fn s64_optional(&self) -> i64 {
+            self.s64_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn s64_repeated(&self) -> &'_ [i64] {
+            &self.s64_repeated
+        }
+        pub fn fixed32_unlabeled_opt(&self) -> ::std::option::Option<u32> {
+            if self.fixed32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed32_unlabeled))
+            }
+        }
+
+        pub fn has_fixed32_unlabeled(&self) -> bool {
+            Self::fixed32_unlabeled_opt(self).is_some()
+        }
+
+        pub fn fixed32_unlabeled(&self) -> u32 {
+            self.fixed32_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn fixed32_optional_opt(&self) -> ::std::option::Option<u32> {
+            self.fixed32_optional.clone()
+        }
+
+        pub fn has_fixed32_optional(&self) -> bool {
+            Self::fixed32_optional_opt(self).is_some()
+        }
+
+        pub fn fixed32_optional(&self) -> u32 {
+            self.fixed32_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn fixed32_repeated(&self) -> &'_ [u32] {
+            &self.fixed32_repeated
+        }
+        pub fn fixed64_unlabeled_opt(&self) -> ::std::option::Option<u64> {
+            if self.fixed64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.fixed64_unlabeled))
+            }
+        }
+
+        pub fn has_fixed64_unlabeled(&self) -> bool {
+            Self::fixed64_unlabeled_opt(self).is_some()
+        }
+
+        pub fn fixed64_unlabeled(&self) -> u64 {
+            self.fixed64_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn fixed64_optional_opt(&self) -> ::std::option::Option<u64> {
+            self.fixed64_optional.clone()
+        }
+
+        pub fn has_fixed64_optional(&self) -> bool {
+            Self::fixed64_optional_opt(self).is_some()
+        }
+
+        pub fn fixed64_optional(&self) -> u64 {
+            self.fixed64_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn fixed64_repeated(&self) -> &'_ [u64] {
+            &self.fixed64_repeated
+        }
+        pub fn sfixed32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            if self.sfixed32_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed32_unlabeled))
+            }
+        }
+
+        pub fn has_sfixed32_unlabeled(&self) -> bool {
+            Self::sfixed32_unlabeled_opt(self).is_some()
+        }
+
+        pub fn sfixed32_unlabeled(&self) -> i32 {
+            self.sfixed32_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn sfixed32_optional_opt(&self) -> ::std::option::Option<i32> {
+            self.sfixed32_optional.clone()
+        }
+
+        pub fn has_sfixed32_optional(&self) -> bool {
+            Self::sfixed32_optional_opt(self).is_some()
+        }
+
+        pub fn sfixed32_optional(&self) -> i32 {
+            self.sfixed32_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn sfixed32_repeated(&self) -> &'_ [i32] {
+            &self.sfixed32_repeated
+        }
+        pub fn sfixed64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
+            if self.sfixed64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.sfixed64_unlabeled))
+            }
+        }
+
+        pub fn has_sfixed64_unlabeled(&self) -> bool {
+            Self::sfixed64_unlabeled_opt(self).is_some()
+        }
+
+        pub fn sfixed64_unlabeled(&self) -> i64 {
+            self.sfixed64_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn sfixed64_optional_opt(&self) -> ::std::option::Option<i64> {
+            self.sfixed64_optional.clone()
+        }
+
+        pub fn has_sfixed64_optional(&self) -> bool {
+            Self::sfixed64_optional_opt(self).is_some()
+        }
+
+        pub fn sfixed64_optional(&self) -> i64 {
+            self.sfixed64_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn sfixed64_repeated(&self) -> &'_ [i64] {
+            &self.sfixed64_repeated
+        }
+        pub fn f64_unlabeled_opt(&self) -> ::std::option::Option<f64> {
+            if self.f64_unlabeled == ::std::default::Default::default() {
+                ::std::option::Option::None
+            } else {
+                ::std::option::Option::Some(::std::clone::Clone::clone(&self.f64_unlabeled))
+            }
+        }
+
+        pub fn has_f64_unlabeled(&self) -> bool {
+            Self::f64_unlabeled_opt(self).is_some()
+        }
+
+        pub fn f64_unlabeled(&self) -> f64 {
+            self.f64_unlabeled_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+        pub fn f64_optional_opt(&self) -> ::std::option::Option<f64> {
+            self.f64_optional.clone()
+        }
+
+        pub fn has_f64_optional(&self) -> bool {
+            Self::f64_optional_opt(self).is_some()
+        }
+
+        pub fn f64_optional(&self) -> f64 {
+            self.f64_optional_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
+
+        pub fn f64_repeated(&self) -> &'_ [f64] {
+            &self.f64_repeated
+        }
         pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
             &mut self.i32_unlabeled
         }
@@ -271,14 +781,10 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            <self::Msg>::i32_unlabeled_opt(self)
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            <self::Msg>::i32_optional_opt(self)
         }
 
         type Field3RepeatedType<'this> =
@@ -288,14 +794,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-            if self.float_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.float_unlabeled.clone())
-            }
+            <self::Msg>::float_unlabeled_opt(self)
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.float_optional)
+            <self::Msg>::float_optional_opt(self)
         }
 
         type Field13RepeatedType<'this> =
@@ -305,14 +807,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            if self.bytes_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.bytes_unlabeled.as_ref())
-            }
+            <self::Msg>::bytes_unlabeled_opt(self)
         }
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_optional.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_optional_opt(self)
         }
 
         type Field23RepeatedType<'this> = ::puroro::AsRefRepeatedField<
@@ -326,14 +824,10 @@ pub mod _puroro_simple_impl {
             ::puroro::AsRefRepeatedField::new(&self.bytes_repeated)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.string_unlabeled.as_ref())
-            }
+            <self::Msg>::string_unlabeled_opt(self)
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_optional_opt(self)
         }
 
         type Field33RepeatedType<'this> = ::puroro::AsRefRepeatedField<
@@ -349,16 +843,12 @@ pub mod _puroro_simple_impl {
         fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
-            if self.enum_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.enum_unlabeled.clone())
-            }
+            <self::Msg>::enum_unlabeled_opt(self)
         }
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
-            Clone::clone(&self.enum_optional)
+            <self::Msg>::enum_optional_opt(self)
         }
 
         type Field43RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
@@ -373,11 +863,11 @@ pub mod _puroro_simple_impl {
         }
         type Field51MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+            <self::Msg>::submsg_unlabeled_opt(self)
         }
         type Field52MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            <self::Msg>::submsg_optional_opt(self)
         }
         type Field53MessageType<'this> where Self: 'this = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
 
@@ -388,14 +878,10 @@ pub mod _puroro_simple_impl {
             &self.submsg_repeated
         }
         fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-            if self.i64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i64_unlabeled.clone())
-            }
+            <self::Msg>::i64_unlabeled_opt(self)
         }
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_optional)
+            <self::Msg>::i64_optional_opt(self)
         }
 
         type Field103RepeatedType<'this> =
@@ -405,14 +891,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i64_repeated)
         }
         fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
-            if self.u32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.u32_unlabeled.clone())
-            }
+            <self::Msg>::u32_unlabeled_opt(self)
         }
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_optional)
+            <self::Msg>::u32_optional_opt(self)
         }
 
         type Field113RepeatedType<'this> =
@@ -422,14 +904,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.u32_repeated)
         }
         fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
-            if self.u64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.u64_unlabeled.clone())
-            }
+            <self::Msg>::u64_unlabeled_opt(self)
         }
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_optional)
+            <self::Msg>::u64_optional_opt(self)
         }
 
         type Field123RepeatedType<'this> =
@@ -439,14 +917,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.u64_repeated)
         }
         fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.s32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.s32_unlabeled.clone())
-            }
+            <self::Msg>::s32_unlabeled_opt(self)
         }
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.s32_optional)
+            <self::Msg>::s32_optional_opt(self)
         }
 
         type Field133RepeatedType<'this> =
@@ -456,14 +930,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.s32_repeated)
         }
         fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-            if self.s64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.s64_unlabeled.clone())
-            }
+            <self::Msg>::s64_unlabeled_opt(self)
         }
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.s64_optional)
+            <self::Msg>::s64_optional_opt(self)
         }
 
         type Field143RepeatedType<'this> =
@@ -473,14 +943,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.s64_repeated)
         }
         fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
-            if self.fixed32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.fixed32_unlabeled.clone())
-            }
+            <self::Msg>::fixed32_unlabeled_opt(self)
         }
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.fixed32_optional)
+            <self::Msg>::fixed32_optional_opt(self)
         }
 
         type Field153RepeatedType<'this> =
@@ -490,14 +956,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.fixed32_repeated)
         }
         fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
-            if self.fixed64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.fixed64_unlabeled.clone())
-            }
+            <self::Msg>::fixed64_unlabeled_opt(self)
         }
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.fixed64_optional)
+            <self::Msg>::fixed64_optional_opt(self)
         }
 
         type Field163RepeatedType<'this> =
@@ -507,14 +969,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.fixed64_repeated)
         }
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.sfixed32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.sfixed32_unlabeled.clone())
-            }
+            <self::Msg>::sfixed32_unlabeled_opt(self)
         }
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.sfixed32_optional)
+            <self::Msg>::sfixed32_optional_opt(self)
         }
 
         type Field173RepeatedType<'this> =
@@ -524,14 +982,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.sfixed32_repeated)
         }
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-            if self.sfixed64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.sfixed64_unlabeled.clone())
-            }
+            <self::Msg>::sfixed64_unlabeled_opt(self)
         }
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.sfixed64_optional)
+            <self::Msg>::sfixed64_optional_opt(self)
         }
 
         type Field183RepeatedType<'this> =
@@ -541,14 +995,10 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.sfixed64_repeated)
         }
         fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
-            if self.f64_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.f64_unlabeled.clone())
-            }
+            <self::Msg>::f64_unlabeled_opt(self)
         }
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
-            Clone::clone(&self.f64_optional)
+            <self::Msg>::f64_optional_opt(self)
         }
 
         type Field193RepeatedType<'this> =
@@ -16332,6 +16782,38 @@ pub mod _puroro_nested {
                         i64_unlabeled: ::std::default::Default::default(),
                     }
                 }
+                pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+                    if self.i32_unlabeled == ::std::default::Default::default() {
+                        ::std::option::Option::None
+                    } else {
+                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                    }
+                }
+
+                pub fn has_i32_unlabeled(&self) -> bool {
+                    Self::i32_unlabeled_opt(self).is_some()
+                }
+
+                pub fn i32_unlabeled(&self) -> i32 {
+                    self.i32_unlabeled_opt()
+                        .unwrap_or(::std::default::Default::default())
+                }
+                pub fn i64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
+                    if self.i64_unlabeled == ::std::default::Default::default() {
+                        ::std::option::Option::None
+                    } else {
+                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i64_unlabeled))
+                    }
+                }
+
+                pub fn has_i64_unlabeled(&self) -> bool {
+                    Self::i64_unlabeled_opt(self).is_some()
+                }
+
+                pub fn i64_unlabeled(&self) -> i64 {
+                    self.i64_unlabeled_opt()
+                        .unwrap_or(::std::default::Default::default())
+                }
                 pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
                     &mut self.i32_unlabeled
                 }
@@ -16342,18 +16824,10 @@ pub mod _puroro_nested {
 
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-                    if self.i32_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
-                    } else {
-                        ::std::option::Option::Some(self.i32_unlabeled.clone())
-                    }
+                    <self::Submsg>::i32_unlabeled_opt(self)
                 }
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
-                    if self.i64_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
-                    } else {
-                        ::std::option::Option::Some(self.i64_unlabeled.clone())
-                    }
+                    <self::Submsg>::i64_unlabeled_opt(self)
                 }
             }
 

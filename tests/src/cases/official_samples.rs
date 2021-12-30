@@ -32,25 +32,20 @@ const TEST4_EXPECTED: &[i32] = &[3, 270, 86942];
 
 #[test]
 fn proto2_test1_simple() {
-    use s2::Test1Trait as _;
     use std::io::Read as _;
-    let mut t1 = s2::Test1::default();
-    t1.merge_from_bytes(TEST1_INPUT.bytes()).unwrap();
+    let t1 = s2::Test1::from_bytes(TEST1_INPUT.bytes()).unwrap();
     assert_eq!(TEST1_EXPECTED, t1.a());
 }
 
 #[test]
 fn proto3_test1_simple() {
-    use s3::Test1Trait as _;
     use std::io::Read as _;
-    let mut t1 = s3::Test1::default();
-    t1.merge_from_bytes(TEST1_INPUT.bytes()).unwrap();
+    let t1 = s3::Test1::from_bytes(TEST1_INPUT.bytes()).unwrap();
     assert_eq!(TEST1_EXPECTED, t1.a());
 }
 
 #[test]
 fn proto2_test2_simple() {
-    use s2::Test2Trait as _;
     use std::io::Read as _;
     let mut t2 = s2::Test2::default();
     t2.merge_from_bytes(TEST2_INPUT.bytes()).unwrap();
@@ -59,7 +54,6 @@ fn proto2_test2_simple() {
 
 #[test]
 fn proto3_test2_simple() {
-    use s3::Test2Trait as _;
     use std::io::Read as _;
     let mut t2 = s3::Test2::default();
     t2.merge_from_bytes(TEST2_INPUT.bytes()).unwrap();
@@ -68,7 +62,6 @@ fn proto3_test2_simple() {
 
 #[test]
 fn proto2_test3_simple() {
-    use s2::{Test1Trait as _, Test3Trait as _};
     use std::io::Read as _;
     let mut t3 = s2::Test3::default();
     t3.merge_from_bytes(TEST3_INPUT.bytes()).unwrap();
@@ -78,7 +71,6 @@ fn proto2_test3_simple() {
 
 #[test]
 fn proto3_test3_simple() {
-    use s3::{Test1Trait as _, Test3Trait as _};
     use std::io::Read as _;
     let mut t3 = s3::Test3::default();
     t3.merge_from_bytes(TEST3_INPUT.bytes()).unwrap();
@@ -88,18 +80,16 @@ fn proto3_test3_simple() {
 
 #[test]
 fn proto2_test4_simple() {
-    use s2::Test4Trait as _;
     use std::io::Read as _;
     let mut t4 = s2::Test4::default();
     t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
-    assert_eq!(TEST4_EXPECTED, &t4.d().into_iter().collect::<Vec<_>>());
+    assert_eq!(TEST4_EXPECTED, t4.d());
 }
 
 #[test]
 fn proto3_test4_simple() {
-    use s3::Test4Trait as _;
     use std::io::Read as _;
     let mut t4 = s3::Test4::default();
     t4.merge_from_bytes(TEST4_INPUT.bytes()).unwrap();
-    assert_eq!(TEST4_EXPECTED, &t4.d().into_iter().collect::<Vec<_>>());
+    assert_eq!(TEST4_EXPECTED, t4.d());
 }

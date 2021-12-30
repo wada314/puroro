@@ -191,6 +191,8 @@ struct Field {
     trait_label_and_type_tags: String,
     oneof_enum_value_ident: String,
     simple_field_type: String,
+    simple_getter_type: String,
+    simple_getter_opt_type: String,
     simple_scalar_field_type: String,
     simple_field_message_path: String,
     simple_label_and_type_tags: String,
@@ -239,7 +241,7 @@ impl Field {
                 .default_value()
                 .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
                 .transpose()?
-                .unwrap_or(Default::default()),
+                .unwrap_or("::std::default::Default::default()".to_string()),
             has_optional_bit,
             bitfield_index: {
                 if has_optional_bit {
@@ -264,6 +266,20 @@ impl Field {
             })?,
             oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
             simple_field_type: f.simple_field_type()?.into(),
+            simple_getter_type: if f.is_repeated()? {
+                f.simple_getter_repeated_type("'_")?.into()
+            } else {
+                let bare_type = f.simple_getter_scalar_type("'_")?;
+                if f.is_message()? {
+                    format!("::std::option::Option<{}>", bare_type)
+                } else {
+                    bare_type.into()
+                }
+            },
+            simple_getter_opt_type: format!(
+                "::std::option::Option<{}>",
+                f.simple_getter_scalar_type("'_")?
+            ),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_field_message_path: maybe_message
                 .as_ref()
@@ -449,6 +465,7 @@ struct OneofField {
     is_numerical: bool,
     field_type: String,
     simple_field_type: String,
+    simple_getter_opt_type: String,
     bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
@@ -473,6 +490,10 @@ impl OneofField {
             is_numerical: !is_length_delimited,
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
             simple_field_type: f.simple_oneof_field_type()?.into(),
+            simple_getter_opt_type: format!(
+                "::std::option::Option<{}>",
+                f.simple_getter_scalar_type("'_")?
+            ),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {

@@ -23,6 +23,23 @@ pub mod _puroro_simple_impl {
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }
+        pub fn recursive_unlabeled_opt(
+            &self,
+        ) -> ::std::option::Option<&'_ self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>
+        {
+            self.recursive_unlabeled.as_deref()
+        }
+
+        pub fn has_recursive_unlabeled(&self) -> bool {
+            Self::recursive_unlabeled_opt(self).is_some()
+        }
+
+        pub fn recursive_unlabeled(
+            &self,
+        ) -> ::std::option::Option<&'_ self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>
+        {
+            self.recursive_unlabeled_opt()
+        }
         pub fn recursive_unlabeled_mut(
             &mut self,
         ) -> &mut ::std::option::Option<
@@ -38,7 +55,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+            <self::Msg>::recursive_unlabeled_opt(self)
         }
     }
 

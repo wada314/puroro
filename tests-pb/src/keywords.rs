@@ -21,6 +21,18 @@ pub mod _puroro_simple_impl {
                 r#type: ::std::default::Default::default(),
             }
         }
+        pub fn type_opt(&self) -> ::std::option::Option<i32> {
+            self.r#type.clone()
+        }
+
+        pub fn has_type(&self) -> bool {
+            Self::type_opt(self).is_some()
+        }
+
+        pub fn r#type(&self) -> i32 {
+            self.type_opt()
+                .unwrap_or(::std::default::Default::default())
+        }
         pub fn type_mut(&mut self) -> &mut ::std::option::Option<i32> {
             &mut self.r#type
         }
@@ -28,7 +40,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::MsgTrait for Msg {
         fn type_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.r#type)
+            <self::Msg>::type_opt(self)
         }
     }
 

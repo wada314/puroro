@@ -6,6 +6,7 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ f.simpl
 
 {%- if f.is_repeated %}
 
+{#- The repeated field getters are different with the struct itselves repeated getter impls. #}
 type Field{{ f.number }}RepeatedType<'this> =
     {%- if f.is_message %}
     {#- repeated MyMessage => &'this [MyMessage] #}
@@ -46,43 +47,12 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
 {%- else %} {#- if f.is_repeated #}
 
 {%- if !f.is_explicit_oneof_field %}
+{#- As same as the struct itselves impl. #}
 {#- [optional] i32 => Option<i32> #}
 {#- [optional] String => Option<&'this str> #}
 {#- [optional] MyMessage => Option<&'this MyMessage> #}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
-    {%- if f.is_unlabeled %}
-
-    {%- if f.is_message %}
-    {#- Message, the field type is Option<T> #}
-    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
-    {%- endif %} {#- if f.is_message #}
-    {%- if f.is_string || f.is_bytes %}
-    {#- String / Bytes, the field type is T #}
-    if self.{{ f.ident }}.is_empty() {
-        ::std::option::Option::None
-    } else {
-        ::std::option::Option::Some(self.{{ f.ident }}.as_ref())
-    }
-    {%- endif %} {#- if f.is_string || f.is_bytes #}
-    {%- if f.is_numerical %}
-    {#- Numerical types, the field type is T #}
-    if self.{{ f.ident }} == ::std::default::Default::default() {
-        ::std::option::Option::None
-    } else {
-        ::std::option::Option::Some(self.{{ f.ident }}.clone())
-    }
-    {%- endif %} {#- if f.is_numerical #}
-
-    {%- else %} {#- if f.is_unlabeled #}
-
-    {#- The field type is Option<T> #}
-    {%- if f.is_length_delimited %}
-    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
-    {%- else %}
-    Clone::clone(&self.{{ f.ident }})
-    {%- endif %}
-
-    {%- endif %} {#- if f.is_unlabeled #}
+    <self::{{ m.simple_ident }}>::{{ f.ident_unesc }}_opt(self)
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
