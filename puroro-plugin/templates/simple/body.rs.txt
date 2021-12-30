@@ -128,7 +128,7 @@ impl {{ m.simple_ident }} {
             {% if f.is_length_delimited %}
             E::{{ f.ident }}(v) => F::{{ f.ident }}(v.as_ref()),
             {%- else %}
-            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.clone()),
+            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.inner().clone()),
             {%- endif %}
             {%- endfor %}
         })
@@ -142,7 +142,7 @@ impl {{ m.simple_ident }} {
                 {%- if f.is_length_delimited %}
                 v.as_ref()
                 {%- else %} {#- if f.is_length_delimited #}
-                v.clone()
+                v.inner().clone()
                 {%- endif %} {#- if f.is_length_delimited #}
             )
         } else {
@@ -256,7 +256,7 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
             {% if f.is_length_delimited %}
             E::{{ f.ident }}(v) => F::{{ f.ident }}(v.as_ref()),
             {%- else %}
-            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.clone()),
+            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.inner().clone()),
             {%- endif %}
             {%- endfor %}
         })

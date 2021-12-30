@@ -491,7 +491,7 @@ impl OneofField {
             is_length_delimited,
             is_numerical: !is_length_delimited,
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
-            simple_field_type: f.simple_oneof_field_type()?.into(),
+            simple_field_type: f.simple_field_type()?.into(),
             simple_getter_opt_type: format!(
                 "::std::option::Option<{}>",
                 f.simple_getter_scalar_type("'_")?

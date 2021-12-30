@@ -728,8 +728,8 @@ impl Field {
     pub fn simple_field_type(&self) -> Result<Cow<'static, str>> {
         let scalar_type = self.simple_scalar_field_type()?;
         Ok(match self.field_label()? {
-            FieldLabel::OneofField => scalar_type,
             FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type).into(),
+            FieldLabel::OneofField => format!("::puroro::internal::Bare<{}>", scalar_type).into(),
             _ => {
                 if matches!(self.field_type(), Ok(FieldType::Message(_))) {
                     format!("::std::option::Option<{}>", scalar_type).into()
@@ -738,11 +738,6 @@ impl Field {
                 }
             }
         })
-    }
-
-    pub fn simple_oneof_field_type(&self) -> Result<Cow<'static, str>> {
-        let scalar_type = self.simple_scalar_field_type()?;
-        Ok(scalar_type)
     }
 
     pub fn simple_scalar_field_type(&self) -> Result<Cow<'static, str>> {
