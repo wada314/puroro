@@ -403,7 +403,7 @@ struct Oneof {
     enum_ident: String,
     simple_enum_ident: String,
     bumpalo_enum_ident: String,
-    enum_maybe_gp_this_self: String,
+    enum_maybe_gp_self: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -430,16 +430,7 @@ impl Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
             simple_enum_ident: format!("{}Simple", o.rust_enum_ident().to_string()),
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident().to_string()),
-            enum_maybe_gp_this_self: if has_ld_field {
-                if has_message_field {
-                    "<'this, Self>"
-                } else {
-                    "<'this>"
-                }
-            } else {
-                ""
-            }
-            .to_string(),
+            enum_maybe_gp_self: if has_message_field { "<Self>" } else { "" }.to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
