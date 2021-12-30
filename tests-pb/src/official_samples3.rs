@@ -45,7 +45,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_a(&mut self) {
             self.a = ::std::default::Default::default();
         }
-        pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn a_mut(&mut self) -> &'_ mut i32 {
             if !self.has_a() {
                 self.a = ::std::default::Default::default();
             }
@@ -166,7 +166,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_b(&mut self) {
             self.b = ::std::default::Default::default();
         }
-        pub fn b_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
+        pub fn b_mut(&mut self) -> &'_ mut ::std::string::String {
             if !self.has_b() {
                 self.b = ::std::default::Default::default();
             }
@@ -293,9 +293,9 @@ pub mod _puroro_simple_impl {
         pub fn clear_c(&mut self) {
             self.c = ::std::default::Default::default();
         }
-        pub fn c_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut self::_puroro_root::official_samples3::_puroro_simple_impl::Test1 {
+        pub fn c_mut(
+            &mut self,
+        ) -> &'_ mut self::_puroro_root::official_samples3::_puroro_simple_impl::Test1 {
             if !self.has_c() {
                 self.c = ::std::default::Default::default();
             }
@@ -410,7 +410,7 @@ pub mod _puroro_simple_impl {
         pub fn d(&self) -> &'_ [i32] {
             &self.d
         }
-        pub fn d_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
+        pub fn d_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
             &mut self.d
         }
     }

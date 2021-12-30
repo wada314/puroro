@@ -160,7 +160,7 @@ impl {{ m.simple_ident }} {
     {#- repeated int32 => &mut Vec<i32> #}
     {#- repeated String => &mut Vec<String> #}
     {#- repeated MyMessage => &mut Vec<MyMessage> #}
-    pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.simple_getter_mut_type }} {
+    pub fn {{ f.ident_unesc }}_mut(&mut self) -> {{ f.simple_getter_mut_type }} {
         &mut self.{{ f.ident }}
     }
 
@@ -181,7 +181,7 @@ impl {{ m.simple_ident }} {
     {#- [optional] i32 => &mut i32 #}
     {#- [optional] String => &mut String #}
     {#- [optional] MyMessage => &mut MyMessage #}
-    pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.simple_getter_mut_type }} {
+    pub fn {{ f.ident_unesc }}_mut(&mut self) -> {{ f.simple_getter_mut_type }} {
         if !self.has_{{ f.ident_unesc }}() {
             {#- field is not set so we need to initialize / clear it. #}
             self.{{ f.ident }} = ::std::default::Default::default();
@@ -211,7 +211,7 @@ impl {{ m.simple_ident }} {
     }
 
     {%- for f in oneof.fields %}
-    pub fn {{ f.getter_ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.simple_getter_mut_type }}
+    pub fn {{ f.getter_ident_unesc }}_mut(&mut self) -> {{ f.simple_getter_mut_type }}
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
         if !matches!(&self.{{ oneof.field_ident }}, E::{{ f.ident }}(_)) {

@@ -681,7 +681,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_i32_required(&mut self) {
             self._bitfield.set(0, false);
         }
-        pub fn i32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn i32_required_mut(&mut self) -> &'_ mut i32 {
             if !self.has_i32_required() {
                 self.i32_required = ::std::default::Default::default();
                 self._bitfield.set(0, true);
@@ -691,20 +691,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_i32_optional(&mut self) {
             self._bitfield.set(1, false);
         }
-        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn i32_optional_mut(&mut self) -> &'_ mut i32 {
             if !self.has_i32_optional() {
                 self.i32_optional = ::std::default::Default::default();
                 self._bitfield.set(1, true);
             }
             &mut self.i32_optional
         }
-        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
+        pub fn i32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
         pub fn clear_float_required(&mut self) {
             self._bitfield.set(2, false);
         }
-        pub fn float_required_mut<'this>(&'this mut self) -> &'this mut f32 {
+        pub fn float_required_mut(&mut self) -> &'_ mut f32 {
             if !self.has_float_required() {
                 self.float_required = ::std::default::Default::default();
                 self._bitfield.set(2, true);
@@ -714,20 +714,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_float_optional(&mut self) {
             self._bitfield.set(3, false);
         }
-        pub fn float_optional_mut<'this>(&'this mut self) -> &'this mut f32 {
+        pub fn float_optional_mut(&mut self) -> &'_ mut f32 {
             if !self.has_float_optional() {
                 self.float_optional = ::std::default::Default::default();
                 self._bitfield.set(3, true);
             }
             &mut self.float_optional
         }
-        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<f32> {
+        pub fn float_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<f32> {
             &mut self.float_repeated
         }
         pub fn clear_bytes_required(&mut self) {
             self._bitfield.set(4, false);
         }
-        pub fn bytes_required_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u8> {
+        pub fn bytes_required_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
             if !self.has_bytes_required() {
                 self.bytes_required = ::std::default::Default::default();
                 self._bitfield.set(4, true);
@@ -737,22 +737,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_bytes_optional(&mut self) {
             self._bitfield.set(5, false);
         }
-        pub fn bytes_optional_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u8> {
+        pub fn bytes_optional_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
             if !self.has_bytes_optional() {
                 self.bytes_optional = ::std::default::Default::default();
                 self._bitfield.set(5, true);
             }
             &mut self.bytes_optional
         }
-        pub fn bytes_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut ::std::vec::Vec<::std::vec::Vec<u8>> {
+        pub fn bytes_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<::std::vec::Vec<u8>> {
             &mut self.bytes_repeated
         }
         pub fn clear_string_required(&mut self) {
             self._bitfield.set(6, false);
         }
-        pub fn string_required_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
+        pub fn string_required_mut(&mut self) -> &'_ mut ::std::string::String {
             if !self.has_string_required() {
                 self.string_required = ::std::default::Default::default();
                 self._bitfield.set(6, true);
@@ -762,24 +760,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_string_optional(&mut self) {
             self._bitfield.set(7, false);
         }
-        pub fn string_optional_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
+        pub fn string_optional_mut(&mut self) -> &'_ mut ::std::string::String {
             if !self.has_string_optional() {
                 self.string_optional = ::std::default::Default::default();
                 self._bitfield.set(7, true);
             }
             &mut self.string_optional
         }
-        pub fn string_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut ::std::vec::Vec<::std::string::String> {
+        pub fn string_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<::std::string::String> {
             &mut self.string_repeated
         }
         pub fn clear_enum_required(&mut self) {
             self._bitfield.set(8, false);
         }
-        pub fn enum_required_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut self::_puroro_root::full_coverage2::Enum {
+        pub fn enum_required_mut(&mut self) -> &'_ mut self::_puroro_root::full_coverage2::Enum {
             if !self.has_enum_required() {
                 self.enum_required = ::std::default::Default::default();
                 self._bitfield.set(8, true);
@@ -789,24 +783,22 @@ pub mod _puroro_simple_impl {
         pub fn clear_enum_optional(&mut self) {
             self._bitfield.set(9, false);
         }
-        pub fn enum_optional_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut self::_puroro_root::full_coverage2::Enum {
+        pub fn enum_optional_mut(&mut self) -> &'_ mut self::_puroro_root::full_coverage2::Enum {
             if !self.has_enum_optional() {
                 self.enum_optional = ::std::default::Default::default();
                 self._bitfield.set(9, true);
             }
             &mut self.enum_optional
         }
-        pub fn enum_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut ::std::vec::Vec<self::_puroro_root::full_coverage2::Enum> {
+        pub fn enum_repeated_mut(
+            &mut self,
+        ) -> &'_ mut ::std::vec::Vec<self::_puroro_root::full_coverage2::Enum> {
             &mut self.enum_repeated
         }
         pub fn clear_submsg_required(&mut self) {
             self.submsg_required = ::std::default::Default::default();
         }
-        pub fn submsg_required_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg{
+        pub fn submsg_required_mut(&mut self) -> &'_ mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg{
             if !self.has_submsg_required() {
                 self.submsg_required = ::std::default::Default::default();
             }
@@ -816,16 +808,16 @@ pub mod _puroro_simple_impl {
         pub fn clear_submsg_optional(&mut self) {
             self.submsg_optional = ::std::default::Default::default();
         }
-        pub fn submsg_optional_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg{
+        pub fn submsg_optional_mut(&mut self) -> &'_ mut self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg{
             if !self.has_submsg_optional() {
                 self.submsg_optional = ::std::default::Default::default();
             }
             self.submsg_optional
                 .get_or_insert_with(::std::default::Default::default)
         }
-        pub fn submsg_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut ::std::vec::Vec<
+        pub fn submsg_repeated_mut(
+            &mut self,
+        ) -> &'_ mut ::std::vec::Vec<
             self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         > {
             &mut self.submsg_repeated
@@ -833,7 +825,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_i64_required(&mut self) {
             self._bitfield.set(10, false);
         }
-        pub fn i64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
+        pub fn i64_required_mut(&mut self) -> &'_ mut i64 {
             if !self.has_i64_required() {
                 self.i64_required = ::std::default::Default::default();
                 self._bitfield.set(10, true);
@@ -843,20 +835,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_i64_optional(&mut self) {
             self._bitfield.set(11, false);
         }
-        pub fn i64_optional_mut<'this>(&'this mut self) -> &'this mut i64 {
+        pub fn i64_optional_mut(&mut self) -> &'_ mut i64 {
             if !self.has_i64_optional() {
                 self.i64_optional = ::std::default::Default::default();
                 self._bitfield.set(11, true);
             }
             &mut self.i64_optional
         }
-        pub fn i64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i64> {
+        pub fn i64_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i64> {
             &mut self.i64_repeated
         }
         pub fn clear_u32_required(&mut self) {
             self._bitfield.set(12, false);
         }
-        pub fn u32_required_mut<'this>(&'this mut self) -> &'this mut u32 {
+        pub fn u32_required_mut(&mut self) -> &'_ mut u32 {
             if !self.has_u32_required() {
                 self.u32_required = ::std::default::Default::default();
                 self._bitfield.set(12, true);
@@ -866,20 +858,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_u32_optional(&mut self) {
             self._bitfield.set(13, false);
         }
-        pub fn u32_optional_mut<'this>(&'this mut self) -> &'this mut u32 {
+        pub fn u32_optional_mut(&mut self) -> &'_ mut u32 {
             if !self.has_u32_optional() {
                 self.u32_optional = ::std::default::Default::default();
                 self._bitfield.set(13, true);
             }
             &mut self.u32_optional
         }
-        pub fn u32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u32> {
+        pub fn u32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<u32> {
             &mut self.u32_repeated
         }
         pub fn clear_u64_required(&mut self) {
             self._bitfield.set(14, false);
         }
-        pub fn u64_required_mut<'this>(&'this mut self) -> &'this mut u64 {
+        pub fn u64_required_mut(&mut self) -> &'_ mut u64 {
             if !self.has_u64_required() {
                 self.u64_required = ::std::default::Default::default();
                 self._bitfield.set(14, true);
@@ -889,20 +881,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_u64_optional(&mut self) {
             self._bitfield.set(15, false);
         }
-        pub fn u64_optional_mut<'this>(&'this mut self) -> &'this mut u64 {
+        pub fn u64_optional_mut(&mut self) -> &'_ mut u64 {
             if !self.has_u64_optional() {
                 self.u64_optional = ::std::default::Default::default();
                 self._bitfield.set(15, true);
             }
             &mut self.u64_optional
         }
-        pub fn u64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u64> {
+        pub fn u64_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<u64> {
             &mut self.u64_repeated
         }
         pub fn clear_s32_required(&mut self) {
             self._bitfield.set(16, false);
         }
-        pub fn s32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn s32_required_mut(&mut self) -> &'_ mut i32 {
             if !self.has_s32_required() {
                 self.s32_required = ::std::default::Default::default();
                 self._bitfield.set(16, true);
@@ -912,20 +904,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_s32_optional(&mut self) {
             self._bitfield.set(17, false);
         }
-        pub fn s32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn s32_optional_mut(&mut self) -> &'_ mut i32 {
             if !self.has_s32_optional() {
                 self.s32_optional = ::std::default::Default::default();
                 self._bitfield.set(17, true);
             }
             &mut self.s32_optional
         }
-        pub fn s32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
+        pub fn s32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
             &mut self.s32_repeated
         }
         pub fn clear_s64_required(&mut self) {
             self._bitfield.set(18, false);
         }
-        pub fn s64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
+        pub fn s64_required_mut(&mut self) -> &'_ mut i64 {
             if !self.has_s64_required() {
                 self.s64_required = ::std::default::Default::default();
                 self._bitfield.set(18, true);
@@ -935,20 +927,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_s64_optional(&mut self) {
             self._bitfield.set(19, false);
         }
-        pub fn s64_optional_mut<'this>(&'this mut self) -> &'this mut i64 {
+        pub fn s64_optional_mut(&mut self) -> &'_ mut i64 {
             if !self.has_s64_optional() {
                 self.s64_optional = ::std::default::Default::default();
                 self._bitfield.set(19, true);
             }
             &mut self.s64_optional
         }
-        pub fn s64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i64> {
+        pub fn s64_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i64> {
             &mut self.s64_repeated
         }
         pub fn clear_fixed32_required(&mut self) {
             self._bitfield.set(20, false);
         }
-        pub fn fixed32_required_mut<'this>(&'this mut self) -> &'this mut u32 {
+        pub fn fixed32_required_mut(&mut self) -> &'_ mut u32 {
             if !self.has_fixed32_required() {
                 self.fixed32_required = ::std::default::Default::default();
                 self._bitfield.set(20, true);
@@ -958,20 +950,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_fixed32_optional(&mut self) {
             self._bitfield.set(21, false);
         }
-        pub fn fixed32_optional_mut<'this>(&'this mut self) -> &'this mut u32 {
+        pub fn fixed32_optional_mut(&mut self) -> &'_ mut u32 {
             if !self.has_fixed32_optional() {
                 self.fixed32_optional = ::std::default::Default::default();
                 self._bitfield.set(21, true);
             }
             &mut self.fixed32_optional
         }
-        pub fn fixed32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u32> {
+        pub fn fixed32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<u32> {
             &mut self.fixed32_repeated
         }
         pub fn clear_fixed64_required(&mut self) {
             self._bitfield.set(22, false);
         }
-        pub fn fixed64_required_mut<'this>(&'this mut self) -> &'this mut u64 {
+        pub fn fixed64_required_mut(&mut self) -> &'_ mut u64 {
             if !self.has_fixed64_required() {
                 self.fixed64_required = ::std::default::Default::default();
                 self._bitfield.set(22, true);
@@ -981,20 +973,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_fixed64_optional(&mut self) {
             self._bitfield.set(23, false);
         }
-        pub fn fixed64_optional_mut<'this>(&'this mut self) -> &'this mut u64 {
+        pub fn fixed64_optional_mut(&mut self) -> &'_ mut u64 {
             if !self.has_fixed64_optional() {
                 self.fixed64_optional = ::std::default::Default::default();
                 self._bitfield.set(23, true);
             }
             &mut self.fixed64_optional
         }
-        pub fn fixed64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u64> {
+        pub fn fixed64_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<u64> {
             &mut self.fixed64_repeated
         }
         pub fn clear_sfixed32_required(&mut self) {
             self._bitfield.set(24, false);
         }
-        pub fn sfixed32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn sfixed32_required_mut(&mut self) -> &'_ mut i32 {
             if !self.has_sfixed32_required() {
                 self.sfixed32_required = ::std::default::Default::default();
                 self._bitfield.set(24, true);
@@ -1004,20 +996,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_sfixed32_optional(&mut self) {
             self._bitfield.set(25, false);
         }
-        pub fn sfixed32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn sfixed32_optional_mut(&mut self) -> &'_ mut i32 {
             if !self.has_sfixed32_optional() {
                 self.sfixed32_optional = ::std::default::Default::default();
                 self._bitfield.set(25, true);
             }
             &mut self.sfixed32_optional
         }
-        pub fn sfixed32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
+        pub fn sfixed32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
             &mut self.sfixed32_repeated
         }
         pub fn clear_sfixed64_required(&mut self) {
             self._bitfield.set(26, false);
         }
-        pub fn sfixed64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
+        pub fn sfixed64_required_mut(&mut self) -> &'_ mut i64 {
             if !self.has_sfixed64_required() {
                 self.sfixed64_required = ::std::default::Default::default();
                 self._bitfield.set(26, true);
@@ -1027,20 +1019,20 @@ pub mod _puroro_simple_impl {
         pub fn clear_sfixed64_optional(&mut self) {
             self._bitfield.set(27, false);
         }
-        pub fn sfixed64_optional_mut<'this>(&'this mut self) -> &'this mut i64 {
+        pub fn sfixed64_optional_mut(&mut self) -> &'_ mut i64 {
             if !self.has_sfixed64_optional() {
                 self.sfixed64_optional = ::std::default::Default::default();
                 self._bitfield.set(27, true);
             }
             &mut self.sfixed64_optional
         }
-        pub fn sfixed64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i64> {
+        pub fn sfixed64_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i64> {
             &mut self.sfixed64_repeated
         }
         pub fn clear_f64_required(&mut self) {
             self._bitfield.set(28, false);
         }
-        pub fn f64_required_mut<'this>(&'this mut self) -> &'this mut f64 {
+        pub fn f64_required_mut(&mut self) -> &'_ mut f64 {
             if !self.has_f64_required() {
                 self.f64_required = ::std::default::Default::default();
                 self._bitfield.set(28, true);
@@ -1050,14 +1042,14 @@ pub mod _puroro_simple_impl {
         pub fn clear_f64_optional(&mut self) {
             self._bitfield.set(29, false);
         }
-        pub fn f64_optional_mut<'this>(&'this mut self) -> &'this mut f64 {
+        pub fn f64_optional_mut(&mut self) -> &'_ mut f64 {
             if !self.has_f64_optional() {
                 self.f64_optional = ::std::default::Default::default();
                 self._bitfield.set(29, true);
             }
             &mut self.f64_optional
         }
-        pub fn f64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<f64> {
+        pub fn f64_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<f64> {
             &mut self.f64_repeated
         }
     }
@@ -17070,7 +17062,7 @@ pub mod _puroro_nested {
                 pub fn clear_i32_required(&mut self) {
                     self._bitfield.set(0, false);
                 }
-                pub fn i32_required_mut<'this>(&'this mut self) -> &'this mut i32 {
+                pub fn i32_required_mut(&mut self) -> &'_ mut i32 {
                     if !self.has_i32_required() {
                         self.i32_required = ::std::default::Default::default();
                         self._bitfield.set(0, true);
@@ -17080,7 +17072,7 @@ pub mod _puroro_nested {
                 pub fn clear_i64_required(&mut self) {
                     self._bitfield.set(1, false);
                 }
-                pub fn i64_required_mut<'this>(&'this mut self) -> &'this mut i64 {
+                pub fn i64_required_mut(&mut self) -> &'_ mut i64 {
                     if !self.has_i64_required() {
                         self.i64_required = ::std::default::Default::default();
                         self._bitfield.set(1, true);

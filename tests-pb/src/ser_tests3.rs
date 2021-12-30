@@ -174,54 +174,55 @@ pub mod _puroro_simple_impl {
         pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();
         }
-        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
             &mut self.i32_unlabeled
         }
-        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
+        pub fn i32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
         }
-        pub fn float_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
+        pub fn float_unlabeled_mut(&mut self) -> &'_ mut f32 {
             if !self.has_float_unlabeled() {
                 self.float_unlabeled = ::std::default::Default::default();
             }
             &mut self.float_unlabeled
         }
-        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<f32> {
+        pub fn float_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<f32> {
             &mut self.float_repeated
         }
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
         }
-        pub fn string_unlabeled_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
+        pub fn string_unlabeled_mut(&mut self) -> &'_ mut ::std::string::String {
             if !self.has_string_unlabeled() {
                 self.string_unlabeled = ::std::default::Default::default();
             }
             &mut self.string_unlabeled
         }
-        pub fn string_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut ::std::vec::Vec<::std::string::String> {
+        pub fn string_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<::std::string::String> {
             &mut self.string_repeated
         }
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
-        pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg{
+        pub fn submsg_unlabeled_mut(
+            &mut self,
+        ) -> &'_ mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg
+        {
             if !self.has_submsg_unlabeled() {
                 self.submsg_unlabeled = ::std::default::Default::default();
             }
             self.submsg_unlabeled
                 .get_or_insert_with(::std::default::Default::default)
         }
-        pub fn submsg_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut ::std::vec::Vec<
+        pub fn submsg_repeated_mut(
+            &mut self,
+        ) -> &'_ mut ::std::vec::Vec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         > {
             &mut self.submsg_repeated
@@ -229,23 +230,21 @@ pub mod _puroro_simple_impl {
         pub fn clear_enum_unlabeled(&mut self) {
             self.enum_unlabeled = ::std::default::Default::default();
         }
-        pub fn enum_unlabeled_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut self::_puroro_root::ser_tests3::Enum {
+        pub fn enum_unlabeled_mut(&mut self) -> &'_ mut self::_puroro_root::ser_tests3::Enum {
             if !self.has_enum_unlabeled() {
                 self.enum_unlabeled = ::std::default::Default::default();
             }
             &mut self.enum_unlabeled
         }
-        pub fn enum_repeated_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum> {
+        pub fn enum_repeated_mut(
+            &mut self,
+        ) -> &'_ mut ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum> {
             &mut self.enum_repeated
         }
         pub fn clear_very_large_field_number(&mut self) {
             self.very_large_field_number = ::std::default::Default::default();
         }
-        pub fn very_large_field_number_mut<'this>(&'this mut self) -> &'this mut i32 {
+        pub fn very_large_field_number_mut(&mut self) -> &'_ mut i32 {
             if !self.has_very_large_field_number() {
                 self.very_large_field_number = ::std::default::Default::default();
             }
@@ -3416,7 +3415,7 @@ pub mod _puroro_nested {
                 pub fn clear_i32_unlabeled(&mut self) {
                     self.i32_unlabeled = ::std::default::Default::default();
                 }
-                pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+                pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
                     if !self.has_i32_unlabeled() {
                         self.i32_unlabeled = ::std::default::Default::default();
                     }

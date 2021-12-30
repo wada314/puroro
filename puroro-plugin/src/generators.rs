@@ -279,7 +279,7 @@ impl Field {
                 "::std::option::Option<{}>",
                 f.simple_getter_scalar_type("'_")?
             ),
-            simple_getter_mut_type: f.simple_getter_mut_type("'this")?.into(),
+            simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_field_message_path: maybe_message
                 .as_ref()
@@ -495,7 +495,7 @@ impl OneofField {
                 "::std::option::Option<{}>",
                 f.simple_getter_scalar_type("'_")?
             ),
-            simple_getter_mut_type: f.simple_getter_mut_type("'this")?.into(),
+            simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {

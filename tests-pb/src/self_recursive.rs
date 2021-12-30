@@ -46,9 +46,9 @@ pub mod _puroro_simple_impl {
         pub fn clear_recursive_unlabeled(&mut self) {
             self.recursive_unlabeled = ::std::default::Default::default();
         }
-        pub fn recursive_unlabeled_mut<'this>(
-            &'this mut self,
-        ) -> &'this mut self::_puroro_root::self_recursive::_puroro_simple_impl::Msg {
+        pub fn recursive_unlabeled_mut(
+            &mut self,
+        ) -> &'_ mut self::_puroro_root::self_recursive::_puroro_simple_impl::Msg {
             if !self.has_recursive_unlabeled() {
                 self.recursive_unlabeled = ::std::default::Default::default();
             }
