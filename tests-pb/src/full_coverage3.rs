@@ -222,7 +222,9 @@ pub mod _puroro_simple_impl {
             self.bytes_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn bytes_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = [u8]>] {
+        pub fn bytes_repeated(
+            &self,
+        ) -> &'_ [impl ::std::ops::Deref<Target = [u8]> + ::std::fmt::Debug] {
             &self.bytes_repeated
         }
         pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&'_ str> {
@@ -257,7 +259,9 @@ pub mod _puroro_simple_impl {
             self.string_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn string_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = str>] {
+        pub fn string_repeated(
+            &self,
+        ) -> &'_ [impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug] {
             &self.string_repeated
         }
         pub fn enum_unlabeled_opt(

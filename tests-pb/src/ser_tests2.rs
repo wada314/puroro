@@ -104,7 +104,9 @@ pub mod _puroro_simple_impl {
             self.string_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn string_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = str>] {
+        pub fn string_repeated(
+            &self,
+        ) -> &'_ [impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug] {
             &self.string_repeated
         }
         pub fn submsg_optional_opt(

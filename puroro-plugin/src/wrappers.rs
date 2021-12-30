@@ -782,10 +782,16 @@ impl Field {
         use LdFieldType::*;
         Ok(match self.field_type()?.categories()? {
             LengthDelimited(String) => {
-                format!("&{lt}[impl ::std::ops::Deref<Target=str>]", lt = lt)
+                format!(
+                    "&{lt}[impl ::std::ops::Deref<Target=str> + ::std::fmt::Debug]",
+                    lt = lt
+                )
             }
             LengthDelimited(Bytes) => {
-                format!("&{lt}[impl ::std::ops::Deref<Target=[u8]>]", lt = lt)
+                format!(
+                    "&{lt}[impl ::std::ops::Deref<Target=[u8]> + ::std::fmt::Debug]",
+                    lt = lt
+                )
             }
             LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Simple", &[]);
