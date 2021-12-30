@@ -181,7 +181,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_group_one(&mut self) {
             self.group_one = ::std::default::Default::default();
         }
-        pub fn g1_int32_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+        pub fn g1_int32_mut<'this>(&'this mut self) -> &'this mut i32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
             if !matches!(&self.group_one, E::G1Int32(_)) {
                 self.group_one = E::G1Int32(::std::default::Default::default());
@@ -191,7 +191,7 @@ pub mod _puroro_simple_impl {
                 _ => unreachable!(),
             }
         }
-        pub fn g1_string_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::string::String> {
+        pub fn g1_string_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
             if !matches!(&self.group_one, E::G1String(_)) {
                 self.group_one = E::G1String(::std::default::Default::default());
@@ -204,7 +204,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_group_two(&mut self) {
             self.group_two = ::std::default::Default::default();
         }
-        pub fn g2_f32_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
+        pub fn g2_f32_mut<'this>(&'this mut self) -> &'this mut f32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
             if !matches!(&self.group_two, E::G2F32(_)) {
                 self.group_two = E::G2F32(::std::default::Default::default());
@@ -214,7 +214,7 @@ pub mod _puroro_simple_impl {
                 _ => unreachable!(),
             }
         }
-        pub fn g2_string_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::string::String> {
+        pub fn g2_string_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
             if !matches!(&self.group_two, E::G2String(_)) {
                 self.group_two = E::G2String(::std::default::Default::default());
@@ -224,11 +224,9 @@ pub mod _puroro_simple_impl {
                 _ => unreachable!(),
             }
         }
-        pub fn g2_submsg_mut(
-            &mut self,
-        ) -> &mut ::puroro::internal::Bare<
-            ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>,
-        > {
+        pub fn g2_submsg_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
             if !matches!(&self.group_two, E::G2Submsg(_)) {
                 self.group_two = E::G2Submsg(::std::default::Default::default());
@@ -241,7 +239,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_group_three(&mut self) {
             self.group_three = ::std::default::Default::default();
         }
-        pub fn g3_int32_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+        pub fn g3_int32_mut<'this>(&'this mut self) -> &'this mut i32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
             if !matches!(&self.group_three, E::G3Int32(_)) {
                 self.group_three = E::G3Int32(::std::default::Default::default());

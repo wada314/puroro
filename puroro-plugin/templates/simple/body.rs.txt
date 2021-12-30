@@ -211,7 +211,7 @@ impl {{ m.simple_ident }} {
     }
 
     {%- for f in oneof.fields %}
-    pub fn {{ f.getter_ident_unesc }}_mut(&mut self) -> &mut {{ f.simple_field_type }}
+    pub fn {{ f.getter_ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.simple_getter_mut_type }}
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
         if !matches!(&self.{{ oneof.field_ident }}, E::{{ f.ident }}(_)) {

@@ -466,6 +466,7 @@ struct OneofField {
     field_type: String,
     simple_field_type: String,
     simple_getter_opt_type: String,
+    simple_getter_mut_type: String,
     bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
@@ -494,6 +495,7 @@ impl OneofField {
                 "::std::option::Option<{}>",
                 f.simple_getter_scalar_type("'_")?
             ),
+            simple_getter_mut_type: f.simple_getter_mut_type("'this")?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
