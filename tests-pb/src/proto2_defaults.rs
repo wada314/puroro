@@ -2987,127 +2987,66 @@ pub mod _puroro_simple_impl {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
                 && self.i32_default == rhs.i32_default
-                && self._bitfield == rhs._bitfield
                 && self.i32_0 == rhs.i32_0
-                && self._bitfield == rhs._bitfield
                 && self.i32_42 == rhs.i32_42
-                && self._bitfield == rhs._bitfield
                 && self.i32_m42 == rhs.i32_m42
-                && self._bitfield == rhs._bitfield
                 && self.i32_2147483647 == rhs.i32_2147483647
-                && self._bitfield == rhs._bitfield
                 && self.i32_m2147483648 == rhs.i32_m2147483648
-                && self._bitfield == rhs._bitfield
                 && self.i32_0123 == rhs.i32_0123
-                && self._bitfield == rhs._bitfield
                 && self.i32_0x123 == rhs.i32_0x123
-                && self._bitfield == rhs._bitfield
                 && self.u32_default == rhs.u32_default
-                && self._bitfield == rhs._bitfield
                 && self.u32_0 == rhs.u32_0
-                && self._bitfield == rhs._bitfield
                 && self.u32_42 == rhs.u32_42
-                && self._bitfield == rhs._bitfield
                 && self.u32_4294967295 == rhs.u32_4294967295
-                && self._bitfield == rhs._bitfield
                 && self.u32_0123 == rhs.u32_0123
-                && self._bitfield == rhs._bitfield
                 && self.u32_0x123 == rhs.u32_0x123
-                && self._bitfield == rhs._bitfield
                 && self.i64_default == rhs.i64_default
-                && self._bitfield == rhs._bitfield
                 && self.i64_0 == rhs.i64_0
-                && self._bitfield == rhs._bitfield
                 && self.i64_42 == rhs.i64_42
-                && self._bitfield == rhs._bitfield
                 && self.i64_m42 == rhs.i64_m42
-                && self._bitfield == rhs._bitfield
                 && self.i64_9223372036854775807 == rhs.i64_9223372036854775807
-                && self._bitfield == rhs._bitfield
                 && self.i64_m9223372036854775808 == rhs.i64_m9223372036854775808
-                && self._bitfield == rhs._bitfield
                 && self.i64_0123 == rhs.i64_0123
-                && self._bitfield == rhs._bitfield
                 && self.i64_0x123 == rhs.i64_0x123
-                && self._bitfield == rhs._bitfield
                 && self.u64_default == rhs.u64_default
-                && self._bitfield == rhs._bitfield
                 && self.u64_0 == rhs.u64_0
-                && self._bitfield == rhs._bitfield
                 && self.u64_42 == rhs.u64_42
-                && self._bitfield == rhs._bitfield
                 && self.u64_18446744073709551615 == rhs.u64_18446744073709551615
-                && self._bitfield == rhs._bitfield
                 && self.u64_0123 == rhs.u64_0123
-                && self._bitfield == rhs._bitfield
                 && self.u64_0x123 == rhs.u64_0x123
-                && self._bitfield == rhs._bitfield
                 && self.f32_default == rhs.f32_default
-                && self._bitfield == rhs._bitfield
                 && self.f32_0 == rhs.f32_0
-                && self._bitfield == rhs._bitfield
                 && self.f32_m0 == rhs.f32_m0
-                && self._bitfield == rhs._bitfield
                 && self.f32_0p == rhs.f32_0p
-                && self._bitfield == rhs._bitfield
                 && self.f32_p0 == rhs.f32_p0
-                && self._bitfield == rhs._bitfield
                 && self.f32_0p0 == rhs.f32_0p0
-                && self._bitfield == rhs._bitfield
                 && self.f32_42 == rhs.f32_42
-                && self._bitfield == rhs._bitfield
                 && self.f32_m42 == rhs.f32_m42
-                && self._bitfield == rhs._bitfield
                 && self.f32_0p25 == rhs.f32_0p25
-                && self._bitfield == rhs._bitfield
                 && self.f32_1p5e2 == rhs.f32_1p5e2
-                && self._bitfield == rhs._bitfield
                 && self.f32_inf == rhs.f32_inf
-                && self._bitfield == rhs._bitfield
                 && self.f32_minf == rhs.f32_minf
-                && self._bitfield == rhs._bitfield
                 && self.f32_nan == rhs.f32_nan
-                && self._bitfield == rhs._bitfield
                 && self.f32_mnan == rhs.f32_mnan
-                && self._bitfield == rhs._bitfield
                 && self.bool_default == rhs.bool_default
-                && self._bitfield == rhs._bitfield
                 && self.bool_true == rhs.bool_true
-                && self._bitfield == rhs._bitfield
                 && self.bool_false == rhs.bool_false
-                && self._bitfield == rhs._bitfield
                 && self.string_default == rhs.string_default
-                && self._bitfield == rhs._bitfield
                 && self.string_empty == rhs.string_empty
-                && self._bitfield == rhs._bitfield
                 && self.string_abc == rhs.string_abc
-                && self._bitfield == rhs._bitfield
                 && self.string_aiu == rhs.string_aiu
-                && self._bitfield == rhs._bitfield
                 && self.string_backslash == rhs.string_backslash
-                && self._bitfield == rhs._bitfield
                 && self.string_tab == rhs.string_tab
-                && self._bitfield == rhs._bitfield
                 && self.string_crlf == rhs.string_crlf
-                && self._bitfield == rhs._bitfield
                 && self.bytes_default == rhs.bytes_default
-                && self._bitfield == rhs._bitfield
                 && self.bytes_empty == rhs.bytes_empty
-                && self._bitfield == rhs._bitfield
                 && self.bytes_abc == rhs.bytes_abc
-                && self._bitfield == rhs._bitfield
                 && self.bytes_aiu == rhs.bytes_aiu
-                && self._bitfield == rhs._bitfield
                 && self.bytes_backslash == rhs.bytes_backslash
-                && self._bitfield == rhs._bitfield
                 && self.bytes_tab == rhs.bytes_tab
-                && self._bitfield == rhs._bitfield
                 && self.bytes_crlf == rhs.bytes_crlf
-                && self._bitfield == rhs._bitfield
                 && self.enum_default == rhs.enum_default
-                && self._bitfield == rhs._bitfield
                 && self.enum_one == rhs.enum_one
-                && self._bitfield == rhs._bitfield
                 && self.enum_fourty_two == rhs.enum_fourty_two
                 && true
         }

@@ -499,11 +499,6 @@ pub mod _puroro_simple_impl {
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
-                && self._bitfield == rhs._bitfield
-                && self._bitfield == rhs._bitfield
-                && self._bitfield == rhs._bitfield
-                && self._bitfield == rhs._bitfield
-                && self._bitfield == rhs._bitfield
                 && self.group_one == rhs.group_one
                 && self.group_two == rhs.group_two
                 && self.group_three == rhs.group_three

@@ -2063,99 +2063,52 @@ pub mod _puroro_simple_impl {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
                 && self.i32_unlabeled == rhs.i32_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.i32_optional == rhs.i32_optional
-                && self._bitfield == rhs._bitfield
                 && self.i32_repeated == rhs.i32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.float_unlabeled == rhs.float_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.float_optional == rhs.float_optional
-                && self._bitfield == rhs._bitfield
                 && self.float_repeated == rhs.float_repeated
-                && self._bitfield == rhs._bitfield
                 && self.bytes_unlabeled == rhs.bytes_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.bytes_optional == rhs.bytes_optional
-                && self._bitfield == rhs._bitfield
                 && self.bytes_repeated == rhs.bytes_repeated
-                && self._bitfield == rhs._bitfield
                 && self.string_unlabeled == rhs.string_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.string_optional == rhs.string_optional
-                && self._bitfield == rhs._bitfield
                 && self.string_repeated == rhs.string_repeated
-                && self._bitfield == rhs._bitfield
                 && self.enum_unlabeled == rhs.enum_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.enum_optional == rhs.enum_optional
-                && self._bitfield == rhs._bitfield
                 && self.enum_repeated == rhs.enum_repeated
-                && self._bitfield == rhs._bitfield
                 && self.submsg_unlabeled == rhs.submsg_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.submsg_optional == rhs.submsg_optional
-                && self._bitfield == rhs._bitfield
                 && self.submsg_repeated == rhs.submsg_repeated
-                && self._bitfield == rhs._bitfield
                 && self.i64_unlabeled == rhs.i64_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.i64_optional == rhs.i64_optional
-                && self._bitfield == rhs._bitfield
                 && self.i64_repeated == rhs.i64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.u32_unlabeled == rhs.u32_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.u32_optional == rhs.u32_optional
-                && self._bitfield == rhs._bitfield
                 && self.u32_repeated == rhs.u32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.u64_unlabeled == rhs.u64_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.u64_optional == rhs.u64_optional
-                && self._bitfield == rhs._bitfield
                 && self.u64_repeated == rhs.u64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.s32_unlabeled == rhs.s32_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.s32_optional == rhs.s32_optional
-                && self._bitfield == rhs._bitfield
                 && self.s32_repeated == rhs.s32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.s64_unlabeled == rhs.s64_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.s64_optional == rhs.s64_optional
-                && self._bitfield == rhs._bitfield
                 && self.s64_repeated == rhs.s64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.fixed32_unlabeled == rhs.fixed32_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.fixed32_optional == rhs.fixed32_optional
-                && self._bitfield == rhs._bitfield
                 && self.fixed32_repeated == rhs.fixed32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.fixed64_unlabeled == rhs.fixed64_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.fixed64_optional == rhs.fixed64_optional
-                && self._bitfield == rhs._bitfield
                 && self.fixed64_repeated == rhs.fixed64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.sfixed32_unlabeled == rhs.sfixed32_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.sfixed32_optional == rhs.sfixed32_optional
-                && self._bitfield == rhs._bitfield
                 && self.sfixed32_repeated == rhs.sfixed32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.sfixed64_unlabeled == rhs.sfixed64_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.sfixed64_optional == rhs.sfixed64_optional
-                && self._bitfield == rhs._bitfield
                 && self.sfixed64_repeated == rhs.sfixed64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.f64_unlabeled == rhs.f64_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.f64_optional == rhs.f64_optional
-                && self._bitfield == rhs._bitfield
                 && self.f64_repeated == rhs.f64_repeated
                 && true
         }
@@ -17173,7 +17126,6 @@ pub mod _puroro_nested {
                 fn eq(&self, rhs: &Self) -> bool {
                     self._bitfield == rhs._bitfield
                         && self.i32_unlabeled == rhs.i32_unlabeled
-                        && self._bitfield == rhs._bitfield
                         && self.i64_unlabeled == rhs.i64_unlabeled
                         && true
                 }

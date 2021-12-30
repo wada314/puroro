@@ -2093,99 +2093,52 @@ pub mod _puroro_simple_impl {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
                 && self.i32_required == rhs.i32_required
-                && self._bitfield == rhs._bitfield
                 && self.i32_optional == rhs.i32_optional
-                && self._bitfield == rhs._bitfield
                 && self.i32_repeated == rhs.i32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.float_required == rhs.float_required
-                && self._bitfield == rhs._bitfield
                 && self.float_optional == rhs.float_optional
-                && self._bitfield == rhs._bitfield
                 && self.float_repeated == rhs.float_repeated
-                && self._bitfield == rhs._bitfield
                 && self.bytes_required == rhs.bytes_required
-                && self._bitfield == rhs._bitfield
                 && self.bytes_optional == rhs.bytes_optional
-                && self._bitfield == rhs._bitfield
                 && self.bytes_repeated == rhs.bytes_repeated
-                && self._bitfield == rhs._bitfield
                 && self.string_required == rhs.string_required
-                && self._bitfield == rhs._bitfield
                 && self.string_optional == rhs.string_optional
-                && self._bitfield == rhs._bitfield
                 && self.string_repeated == rhs.string_repeated
-                && self._bitfield == rhs._bitfield
                 && self.enum_required == rhs.enum_required
-                && self._bitfield == rhs._bitfield
                 && self.enum_optional == rhs.enum_optional
-                && self._bitfield == rhs._bitfield
                 && self.enum_repeated == rhs.enum_repeated
-                && self._bitfield == rhs._bitfield
                 && self.submsg_required == rhs.submsg_required
-                && self._bitfield == rhs._bitfield
                 && self.submsg_optional == rhs.submsg_optional
-                && self._bitfield == rhs._bitfield
                 && self.submsg_repeated == rhs.submsg_repeated
-                && self._bitfield == rhs._bitfield
                 && self.i64_required == rhs.i64_required
-                && self._bitfield == rhs._bitfield
                 && self.i64_optional == rhs.i64_optional
-                && self._bitfield == rhs._bitfield
                 && self.i64_repeated == rhs.i64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.u32_required == rhs.u32_required
-                && self._bitfield == rhs._bitfield
                 && self.u32_optional == rhs.u32_optional
-                && self._bitfield == rhs._bitfield
                 && self.u32_repeated == rhs.u32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.u64_required == rhs.u64_required
-                && self._bitfield == rhs._bitfield
                 && self.u64_optional == rhs.u64_optional
-                && self._bitfield == rhs._bitfield
                 && self.u64_repeated == rhs.u64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.s32_required == rhs.s32_required
-                && self._bitfield == rhs._bitfield
                 && self.s32_optional == rhs.s32_optional
-                && self._bitfield == rhs._bitfield
                 && self.s32_repeated == rhs.s32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.s64_required == rhs.s64_required
-                && self._bitfield == rhs._bitfield
                 && self.s64_optional == rhs.s64_optional
-                && self._bitfield == rhs._bitfield
                 && self.s64_repeated == rhs.s64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.fixed32_required == rhs.fixed32_required
-                && self._bitfield == rhs._bitfield
                 && self.fixed32_optional == rhs.fixed32_optional
-                && self._bitfield == rhs._bitfield
                 && self.fixed32_repeated == rhs.fixed32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.fixed64_required == rhs.fixed64_required
-                && self._bitfield == rhs._bitfield
                 && self.fixed64_optional == rhs.fixed64_optional
-                && self._bitfield == rhs._bitfield
                 && self.fixed64_repeated == rhs.fixed64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.sfixed32_required == rhs.sfixed32_required
-                && self._bitfield == rhs._bitfield
                 && self.sfixed32_optional == rhs.sfixed32_optional
-                && self._bitfield == rhs._bitfield
                 && self.sfixed32_repeated == rhs.sfixed32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.sfixed64_required == rhs.sfixed64_required
-                && self._bitfield == rhs._bitfield
                 && self.sfixed64_optional == rhs.sfixed64_optional
-                && self._bitfield == rhs._bitfield
                 && self.sfixed64_repeated == rhs.sfixed64_repeated
-                && self._bitfield == rhs._bitfield
                 && self.f64_required == rhs.f64_required
-                && self._bitfield == rhs._bitfield
                 && self.f64_optional == rhs.f64_optional
-                && self._bitfield == rhs._bitfield
                 && self.f64_repeated == rhs.f64_repeated
                 && true
         }
@@ -17238,7 +17191,6 @@ pub mod _puroro_nested {
                 fn eq(&self, rhs: &Self) -> bool {
                     self._bitfield == rhs._bitfield
                         && self.i32_required == rhs.i32_required
-                        && self._bitfield == rhs._bitfield
                         && self.i64_required == rhs.i64_required
                         && true
                 }

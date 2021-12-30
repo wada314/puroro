@@ -16,11 +16,11 @@ use ::std::borrow::Cow;
 use ::tests_pb::oneofs2::msg::{
     GroupOne as GroupOne2, GroupThree as GroupThree2, GroupTwo as GroupTwo2,
 };
-use ::tests_pb::oneofs2::{Msg as Msg2, MsgTrait as _, Submsg as Submsg2, SubmsgTrait as _};
+use ::tests_pb::oneofs2::{Msg as Msg2, Submsg as Submsg2};
 use ::tests_pb::oneofs3::msg::{
     GroupOne as GroupOne3, GroupThree as GroupThree3, GroupTwo as GroupTwo3,
 };
-use ::tests_pb::oneofs3::{Msg as Msg3, MsgTrait as _, Submsg as Submsg3, SubmsgTrait as _};
+use ::tests_pb::oneofs3::{Msg as Msg3, Submsg as Submsg3};
 
 #[test]
 fn test_oneof_simple2() {
@@ -37,7 +37,7 @@ fn test_oneof_simple2() {
     assert!(!msg.has_g2_submsg());
     assert!(!msg.has_g3_int32());
 
-    // Set values and check it via trait's getter methods
+    // Set values and check it via getter methods
     *msg.g1_int32_mut() = 100;
     assert!(matches!(msg.group_one(), Some(GroupOne2::G1Int32(100))));
     assert_eq!(msg.g1_int32(), 100);
@@ -61,8 +61,8 @@ fn test_oneof_simple2() {
     assert_eq!(msg.g2_string(), "Test");
     assert!(!msg.has_g2_f32());
     assert!(!msg.has_g2_submsg());
-    *msg.g2_submsg_mut() = Box::new(Submsg2::default());
-    *msg.g2_submsg_mut().i32_optional_mut() = Some(100);
+    *msg.g2_submsg_mut() = Submsg2::default();
+    *msg.g2_submsg_mut().i32_optional_mut() = 100;
     assert!(matches!(msg.group_two(), Some(GroupTwo2::G2Submsg(_))));
     assert!(msg.g2_submsg().is_some());
     assert_eq!(msg.g2_submsg().unwrap().i32_optional(), 100);
@@ -97,7 +97,7 @@ fn test_oneof_simple3() {
     assert!(!msg.has_g2_submsg());
     assert!(!msg.has_g3_int32());
 
-    // Set values and check it via trait's getter methods
+    // Set values and check it via getter methods
     *msg.g1_int32_mut() = 100;
     assert!(matches!(msg.group_one(), Some(GroupOne3::G1Int32(100))));
     assert_eq!(msg.g1_int32(), 100);
@@ -121,7 +121,6 @@ fn test_oneof_simple3() {
     assert_eq!(msg.g2_string(), "Test");
     assert!(!msg.has_g2_f32());
     assert!(!msg.has_g2_submsg());
-    *msg.g2_submsg_mut() = Box::new(Submsg3::default());
     *msg.g2_submsg_mut().i32_unlabeled_mut() = 100;
     assert!(matches!(msg.group_two(), Some(GroupTwo3::G2Submsg(_))));
     assert!(msg.g2_submsg().is_some());

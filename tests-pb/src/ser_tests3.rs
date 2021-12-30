@@ -550,25 +550,15 @@ pub mod _puroro_simple_impl {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
                 && self.i32_unlabeled == rhs.i32_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.i32_repeated == rhs.i32_repeated
-                && self._bitfield == rhs._bitfield
                 && self.float_unlabeled == rhs.float_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.float_repeated == rhs.float_repeated
-                && self._bitfield == rhs._bitfield
                 && self.string_unlabeled == rhs.string_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.string_repeated == rhs.string_repeated
-                && self._bitfield == rhs._bitfield
                 && self.submsg_unlabeled == rhs.submsg_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.submsg_repeated == rhs.submsg_repeated
-                && self._bitfield == rhs._bitfield
                 && self.enum_unlabeled == rhs.enum_unlabeled
-                && self._bitfield == rhs._bitfield
                 && self.enum_repeated == rhs.enum_repeated
-                && self._bitfield == rhs._bitfield
                 && self.very_large_field_number == rhs.very_large_field_number
                 && true
         }
