@@ -798,6 +798,25 @@ impl Field {
         .into())
     }
 
+    pub fn simple_getter_mut_type(&self, lt: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        Ok({
+            let scalar_type = match self.field_type()?.categories()? {
+                LengthDelimited(String) => "::std::string::String".into(),
+                LengthDelimited(Bytes) => "::std::vec::Vec<u8>".into(),
+                LengthDelimited(Message(m)) => upgrade(&m)?.rust_impl_path("Simple", &[]).into(),
+                Trivial(field_type) => field_type.rust_type_name()?,
+            };
+            if self.is_repeated()? {
+                format!("&{lt} mut ::std::vec::Vec<{ty}>", lt = lt, ty = scalar_type)
+            } else {
+                format!("&{lt} mut {ty}", lt = lt, ty = scalar_type)
+            }
+            .into()
+        })
+    }
+
     pub fn bumpalo_field_type(&self) -> Result<Cow<'static, str>> {
         let scalar_type = self.bumpalo_scalar_field_type()?;
         if self.is_repeated()? {

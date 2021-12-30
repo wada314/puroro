@@ -193,6 +193,7 @@ struct Field {
     simple_field_type: String,
     simple_getter_type: String,
     simple_getter_opt_type: String,
+    simple_getter_mut_type: String,
     simple_scalar_field_type: String,
     simple_field_message_path: String,
     simple_label_and_type_tags: String,
@@ -280,6 +281,7 @@ impl Field {
                 "::std::option::Option<{}>",
                 f.simple_getter_scalar_type("'_")?
             ),
+            simple_getter_mut_type: f.simple_getter_mut_type("'this")?.into(),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_field_message_path: maybe_message
                 .as_ref()

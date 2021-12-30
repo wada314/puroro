@@ -43,6 +43,9 @@ pub mod _puroro_simple_impl {
         {
             self.recursive_unlabeled_opt()
         }
+        pub fn clear_recursive_unlabeled(&mut self) {
+            self.recursive_unlabeled = ::std::default::Default::default();
+        }
         pub fn recursive_unlabeled_mut(
             &mut self,
         ) -> &mut ::std::option::Option<
@@ -54,10 +57,6 @@ pub mod _puroro_simple_impl {
             let bump = self._bump;
             self.recursive_unlabeled
                 .get_or_insert_with(::std::default::Default::default())
-        }
-
-        pub fn clear_recursive_unlabeled(&mut self) {
-            self.recursive_unlabeled = ::std::default::Default::default();
         }
     }
 

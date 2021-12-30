@@ -674,15 +674,17 @@ pub mod _puroro_simple_impl {
         pub fn f64_repeated(&self) -> &'_ [f64] {
             &self.f64_repeated
         }
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
         pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
             &mut self.i32_unlabeled
         }
-
-        pub fn clear_i32_unlabeled(&mut self) {
-            self.i32_unlabeled = ::std::default::Default::default();
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
         }
         pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_i32_optional() {
@@ -691,19 +693,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.i32_optional
         }
-
-        pub fn clear_i32_optional(&mut self) {
-            self._bitfield.set(0, false);
-        }
-        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
-            if !self.has_i32_repeated() {
-                self.i32_repeated = ::std::default::Default::default();
-            }
+        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
-
-        pub fn clear_i32_repeated(&mut self) {
-            self.i32_repeated = ::std::default::Default::default();
+        pub fn clear_float_unlabeled(&mut self) {
+            self.float_unlabeled = ::std::default::Default::default();
         }
         pub fn float_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             if !self.has_float_unlabeled() {
@@ -711,9 +705,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.float_unlabeled
         }
-
-        pub fn clear_float_unlabeled(&mut self) {
-            self.float_unlabeled = ::std::default::Default::default();
+        pub fn clear_float_optional(&mut self) {
+            self._bitfield.set(1, false);
         }
         pub fn float_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             if !self.has_float_optional() {
@@ -722,19 +715,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.float_optional
         }
-
-        pub fn clear_float_optional(&mut self) {
-            self._bitfield.set(1, false);
-        }
-        pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
-            if !self.has_float_repeated() {
-                self.float_repeated = ::std::default::Default::default();
-            }
+        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<f32> {
             &mut self.float_repeated
         }
-
-        pub fn clear_float_repeated(&mut self) {
-            self.float_repeated = ::std::default::Default::default();
+        pub fn clear_bytes_unlabeled(&mut self) {
+            self.bytes_unlabeled = ::std::default::Default::default();
         }
         pub fn bytes_unlabeled_mut(
             &mut self,
@@ -744,9 +729,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.bytes_unlabeled
         }
-
-        pub fn clear_bytes_unlabeled(&mut self) {
-            self.bytes_unlabeled = ::std::default::Default::default();
+        pub fn clear_bytes_optional(&mut self) {
+            self._bitfield.set(2, false);
         }
         pub fn bytes_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::vec::Vec<u8>> {
             if !self.has_bytes_optional() {
@@ -755,19 +739,13 @@ pub mod _puroro_simple_impl {
             }
             &mut self.bytes_optional
         }
-
-        pub fn clear_bytes_optional(&mut self) {
-            self._bitfield.set(2, false);
-        }
-        pub fn bytes_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::vec::Vec<u8>> {
-            if !self.has_bytes_repeated() {
-                self.bytes_repeated = ::std::default::Default::default();
-            }
+        pub fn bytes_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut ::std::vec::Vec<::std::vec::Vec<u8>> {
             &mut self.bytes_repeated
         }
-
-        pub fn clear_bytes_repeated(&mut self) {
-            self.bytes_repeated = ::std::default::Default::default();
+        pub fn clear_string_unlabeled(&mut self) {
+            self.string_unlabeled = ::std::default::Default::default();
         }
         pub fn string_unlabeled_mut(
             &mut self,
@@ -777,9 +755,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.string_unlabeled
         }
-
-        pub fn clear_string_unlabeled(&mut self) {
-            self.string_unlabeled = ::std::default::Default::default();
+        pub fn clear_string_optional(&mut self) {
+            self._bitfield.set(3, false);
         }
         pub fn string_optional_mut(
             &mut self,
@@ -790,19 +767,13 @@ pub mod _puroro_simple_impl {
             }
             &mut self.string_optional
         }
-
-        pub fn clear_string_optional(&mut self) {
-            self._bitfield.set(3, false);
-        }
-        pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
-            if !self.has_string_repeated() {
-                self.string_repeated = ::std::default::Default::default();
-            }
+        pub fn string_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut ::std::vec::Vec<::std::string::String> {
             &mut self.string_repeated
         }
-
-        pub fn clear_string_repeated(&mut self) {
-            self.string_repeated = ::std::default::Default::default();
+        pub fn clear_enum_unlabeled(&mut self) {
+            self.enum_unlabeled = ::std::default::Default::default();
         }
         pub fn enum_unlabeled_mut(
             &mut self,
@@ -812,9 +783,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.enum_unlabeled
         }
-
-        pub fn clear_enum_unlabeled(&mut self) {
-            self.enum_unlabeled = ::std::default::Default::default();
+        pub fn clear_enum_optional(&mut self) {
+            self._bitfield.set(4, false);
         }
         pub fn enum_optional_mut(
             &mut self,
@@ -825,21 +795,13 @@ pub mod _puroro_simple_impl {
             }
             &mut self.enum_optional
         }
-
-        pub fn clear_enum_optional(&mut self) {
-            self._bitfield.set(4, false);
-        }
-        pub fn enum_repeated_mut(
-            &mut self,
-        ) -> &mut ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum> {
-            if !self.has_enum_repeated() {
-                self.enum_repeated = ::std::default::Default::default();
-            }
+        pub fn enum_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum> {
             &mut self.enum_repeated
         }
-
-        pub fn clear_enum_repeated(&mut self) {
-            self.enum_repeated = ::std::default::Default::default();
+        pub fn clear_submsg_unlabeled(&mut self) {
+            self.submsg_unlabeled = ::std::default::Default::default();
         }
         pub fn submsg_unlabeled_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
             if !self.has_submsg_unlabeled() {
@@ -849,9 +811,8 @@ pub mod _puroro_simple_impl {
             self.submsg_unlabeled
                 .get_or_insert_with(::std::default::Default::default())
         }
-
-        pub fn clear_submsg_unlabeled(&mut self) {
-            self.submsg_unlabeled = ::std::default::Default::default();
+        pub fn clear_submsg_optional(&mut self) {
+            self.submsg_optional = ::std::default::Default::default();
         }
         pub fn submsg_optional_mut(&mut self) -> &mut ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>{
             if !self.has_submsg_optional() {
@@ -861,25 +822,15 @@ pub mod _puroro_simple_impl {
             self.submsg_optional
                 .get_or_insert_with(::std::default::Default::default())
         }
-
-        pub fn clear_submsg_optional(&mut self) {
-            self.submsg_optional = ::std::default::Default::default();
-        }
-        pub fn submsg_repeated_mut(
-            &mut self,
-        ) -> &mut ::std::vec::Vec<
+        pub fn submsg_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut ::std::vec::Vec<
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         > {
-            if !self.has_submsg_repeated() {
-                self.submsg_repeated = ::std::default::Default::default();
-            }
-            let bump = self._bump;
-            self.submsg_repeated
-                .get_or_insert_with(::std::default::Default::default())
+            &mut self.submsg_repeated
         }
-
-        pub fn clear_submsg_repeated(&mut self) {
-            self.submsg_repeated = ::std::default::Default::default();
+        pub fn clear_i64_unlabeled(&mut self) {
+            self.i64_unlabeled = ::std::default::Default::default();
         }
         pub fn i64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             if !self.has_i64_unlabeled() {
@@ -887,9 +838,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.i64_unlabeled
         }
-
-        pub fn clear_i64_unlabeled(&mut self) {
-            self.i64_unlabeled = ::std::default::Default::default();
+        pub fn clear_i64_optional(&mut self) {
+            self._bitfield.set(5, false);
         }
         pub fn i64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             if !self.has_i64_optional() {
@@ -898,19 +848,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.i64_optional
         }
-
-        pub fn clear_i64_optional(&mut self) {
-            self._bitfield.set(5, false);
-        }
-        pub fn i64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
-            if !self.has_i64_repeated() {
-                self.i64_repeated = ::std::default::Default::default();
-            }
+        pub fn i64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i64> {
             &mut self.i64_repeated
         }
-
-        pub fn clear_i64_repeated(&mut self) {
-            self.i64_repeated = ::std::default::Default::default();
+        pub fn clear_u32_unlabeled(&mut self) {
+            self.u32_unlabeled = ::std::default::Default::default();
         }
         pub fn u32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             if !self.has_u32_unlabeled() {
@@ -918,9 +860,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.u32_unlabeled
         }
-
-        pub fn clear_u32_unlabeled(&mut self) {
-            self.u32_unlabeled = ::std::default::Default::default();
+        pub fn clear_u32_optional(&mut self) {
+            self._bitfield.set(6, false);
         }
         pub fn u32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             if !self.has_u32_optional() {
@@ -929,19 +870,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.u32_optional
         }
-
-        pub fn clear_u32_optional(&mut self) {
-            self._bitfield.set(6, false);
-        }
-        pub fn u32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
-            if !self.has_u32_repeated() {
-                self.u32_repeated = ::std::default::Default::default();
-            }
+        pub fn u32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u32> {
             &mut self.u32_repeated
         }
-
-        pub fn clear_u32_repeated(&mut self) {
-            self.u32_repeated = ::std::default::Default::default();
+        pub fn clear_u64_unlabeled(&mut self) {
+            self.u64_unlabeled = ::std::default::Default::default();
         }
         pub fn u64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             if !self.has_u64_unlabeled() {
@@ -949,9 +882,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.u64_unlabeled
         }
-
-        pub fn clear_u64_unlabeled(&mut self) {
-            self.u64_unlabeled = ::std::default::Default::default();
+        pub fn clear_u64_optional(&mut self) {
+            self._bitfield.set(7, false);
         }
         pub fn u64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             if !self.has_u64_optional() {
@@ -960,19 +892,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.u64_optional
         }
-
-        pub fn clear_u64_optional(&mut self) {
-            self._bitfield.set(7, false);
-        }
-        pub fn u64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
-            if !self.has_u64_repeated() {
-                self.u64_repeated = ::std::default::Default::default();
-            }
+        pub fn u64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u64> {
             &mut self.u64_repeated
         }
-
-        pub fn clear_u64_repeated(&mut self) {
-            self.u64_repeated = ::std::default::Default::default();
+        pub fn clear_s32_unlabeled(&mut self) {
+            self.s32_unlabeled = ::std::default::Default::default();
         }
         pub fn s32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_s32_unlabeled() {
@@ -980,9 +904,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.s32_unlabeled
         }
-
-        pub fn clear_s32_unlabeled(&mut self) {
-            self.s32_unlabeled = ::std::default::Default::default();
+        pub fn clear_s32_optional(&mut self) {
+            self._bitfield.set(8, false);
         }
         pub fn s32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_s32_optional() {
@@ -991,19 +914,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.s32_optional
         }
-
-        pub fn clear_s32_optional(&mut self) {
-            self._bitfield.set(8, false);
-        }
-        pub fn s32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
-            if !self.has_s32_repeated() {
-                self.s32_repeated = ::std::default::Default::default();
-            }
+        pub fn s32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
             &mut self.s32_repeated
         }
-
-        pub fn clear_s32_repeated(&mut self) {
-            self.s32_repeated = ::std::default::Default::default();
+        pub fn clear_s64_unlabeled(&mut self) {
+            self.s64_unlabeled = ::std::default::Default::default();
         }
         pub fn s64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             if !self.has_s64_unlabeled() {
@@ -1011,9 +926,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.s64_unlabeled
         }
-
-        pub fn clear_s64_unlabeled(&mut self) {
-            self.s64_unlabeled = ::std::default::Default::default();
+        pub fn clear_s64_optional(&mut self) {
+            self._bitfield.set(9, false);
         }
         pub fn s64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             if !self.has_s64_optional() {
@@ -1022,19 +936,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.s64_optional
         }
-
-        pub fn clear_s64_optional(&mut self) {
-            self._bitfield.set(9, false);
-        }
-        pub fn s64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
-            if !self.has_s64_repeated() {
-                self.s64_repeated = ::std::default::Default::default();
-            }
+        pub fn s64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i64> {
             &mut self.s64_repeated
         }
-
-        pub fn clear_s64_repeated(&mut self) {
-            self.s64_repeated = ::std::default::Default::default();
+        pub fn clear_fixed32_unlabeled(&mut self) {
+            self.fixed32_unlabeled = ::std::default::Default::default();
         }
         pub fn fixed32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             if !self.has_fixed32_unlabeled() {
@@ -1042,9 +948,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.fixed32_unlabeled
         }
-
-        pub fn clear_fixed32_unlabeled(&mut self) {
-            self.fixed32_unlabeled = ::std::default::Default::default();
+        pub fn clear_fixed32_optional(&mut self) {
+            self._bitfield.set(10, false);
         }
         pub fn fixed32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u32> {
             if !self.has_fixed32_optional() {
@@ -1053,19 +958,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.fixed32_optional
         }
-
-        pub fn clear_fixed32_optional(&mut self) {
-            self._bitfield.set(10, false);
-        }
-        pub fn fixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u32> {
-            if !self.has_fixed32_repeated() {
-                self.fixed32_repeated = ::std::default::Default::default();
-            }
+        pub fn fixed32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u32> {
             &mut self.fixed32_repeated
         }
-
-        pub fn clear_fixed32_repeated(&mut self) {
-            self.fixed32_repeated = ::std::default::Default::default();
+        pub fn clear_fixed64_unlabeled(&mut self) {
+            self.fixed64_unlabeled = ::std::default::Default::default();
         }
         pub fn fixed64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             if !self.has_fixed64_unlabeled() {
@@ -1073,9 +970,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.fixed64_unlabeled
         }
-
-        pub fn clear_fixed64_unlabeled(&mut self) {
-            self.fixed64_unlabeled = ::std::default::Default::default();
+        pub fn clear_fixed64_optional(&mut self) {
+            self._bitfield.set(11, false);
         }
         pub fn fixed64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<u64> {
             if !self.has_fixed64_optional() {
@@ -1084,19 +980,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.fixed64_optional
         }
-
-        pub fn clear_fixed64_optional(&mut self) {
-            self._bitfield.set(11, false);
-        }
-        pub fn fixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<u64> {
-            if !self.has_fixed64_repeated() {
-                self.fixed64_repeated = ::std::default::Default::default();
-            }
+        pub fn fixed64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<u64> {
             &mut self.fixed64_repeated
         }
-
-        pub fn clear_fixed64_repeated(&mut self) {
-            self.fixed64_repeated = ::std::default::Default::default();
+        pub fn clear_sfixed32_unlabeled(&mut self) {
+            self.sfixed32_unlabeled = ::std::default::Default::default();
         }
         pub fn sfixed32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_sfixed32_unlabeled() {
@@ -1104,9 +992,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.sfixed32_unlabeled
         }
-
-        pub fn clear_sfixed32_unlabeled(&mut self) {
-            self.sfixed32_unlabeled = ::std::default::Default::default();
+        pub fn clear_sfixed32_optional(&mut self) {
+            self._bitfield.set(12, false);
         }
         pub fn sfixed32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_sfixed32_optional() {
@@ -1115,19 +1002,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.sfixed32_optional
         }
-
-        pub fn clear_sfixed32_optional(&mut self) {
-            self._bitfield.set(12, false);
-        }
-        pub fn sfixed32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
-            if !self.has_sfixed32_repeated() {
-                self.sfixed32_repeated = ::std::default::Default::default();
-            }
+        pub fn sfixed32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
             &mut self.sfixed32_repeated
         }
-
-        pub fn clear_sfixed32_repeated(&mut self) {
-            self.sfixed32_repeated = ::std::default::Default::default();
+        pub fn clear_sfixed64_unlabeled(&mut self) {
+            self.sfixed64_unlabeled = ::std::default::Default::default();
         }
         pub fn sfixed64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             if !self.has_sfixed64_unlabeled() {
@@ -1135,9 +1014,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.sfixed64_unlabeled
         }
-
-        pub fn clear_sfixed64_unlabeled(&mut self) {
-            self.sfixed64_unlabeled = ::std::default::Default::default();
+        pub fn clear_sfixed64_optional(&mut self) {
+            self._bitfield.set(13, false);
         }
         pub fn sfixed64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
             if !self.has_sfixed64_optional() {
@@ -1146,19 +1024,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.sfixed64_optional
         }
-
-        pub fn clear_sfixed64_optional(&mut self) {
-            self._bitfield.set(13, false);
-        }
-        pub fn sfixed64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i64> {
-            if !self.has_sfixed64_repeated() {
-                self.sfixed64_repeated = ::std::default::Default::default();
-            }
+        pub fn sfixed64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i64> {
             &mut self.sfixed64_repeated
         }
-
-        pub fn clear_sfixed64_repeated(&mut self) {
-            self.sfixed64_repeated = ::std::default::Default::default();
+        pub fn clear_f64_unlabeled(&mut self) {
+            self.f64_unlabeled = ::std::default::Default::default();
         }
         pub fn f64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f64> {
             if !self.has_f64_unlabeled() {
@@ -1166,9 +1036,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.f64_unlabeled
         }
-
-        pub fn clear_f64_unlabeled(&mut self) {
-            self.f64_unlabeled = ::std::default::Default::default();
+        pub fn clear_f64_optional(&mut self) {
+            self._bitfield.set(14, false);
         }
         pub fn f64_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f64> {
             if !self.has_f64_optional() {
@@ -1177,19 +1046,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.f64_optional
         }
-
-        pub fn clear_f64_optional(&mut self) {
-            self._bitfield.set(14, false);
-        }
-        pub fn f64_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f64> {
-            if !self.has_f64_repeated() {
-                self.f64_repeated = ::std::default::Default::default();
-            }
+        pub fn f64_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<f64> {
             &mut self.f64_repeated
-        }
-
-        pub fn clear_f64_repeated(&mut self) {
-            self.f64_repeated = ::std::default::Default::default();
         }
     }
 
@@ -17328,25 +17186,23 @@ pub mod _puroro_nested {
                     self.i64_unlabeled_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
+                pub fn clear_i32_unlabeled(&mut self) {
+                    self.i32_unlabeled = ::std::default::Default::default();
+                }
                 pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
                     if !self.has_i32_unlabeled() {
                         self.i32_unlabeled = ::std::default::Default::default();
                     }
                     &mut self.i32_unlabeled
                 }
-
-                pub fn clear_i32_unlabeled(&mut self) {
-                    self.i32_unlabeled = ::std::default::Default::default();
+                pub fn clear_i64_unlabeled(&mut self) {
+                    self.i64_unlabeled = ::std::default::Default::default();
                 }
                 pub fn i64_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i64> {
                     if !self.has_i64_unlabeled() {
                         self.i64_unlabeled = ::std::default::Default::default();
                     }
                     &mut self.i64_unlabeled
-                }
-
-                pub fn clear_i64_unlabeled(&mut self) {
-                    self.i64_unlabeled = ::std::default::Default::default();
                 }
             }
 

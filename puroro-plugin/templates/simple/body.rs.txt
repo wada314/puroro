@@ -157,6 +157,14 @@ impl {{ m.simple_ident }} {
     {%- if !f.is_explicit_oneof_field %}
 
     {%- if f.is_repeated %}
+
+    {#- repeated int32 => &mut Vec<i32> #}
+    {#- repeated String => &mut Vec<String> #}
+    {#- repeated MyMessage => &mut Vec<MyMessage> #}
+    pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.simple_getter_mut_type }} {
+        &mut self.{{ f.ident }}
+    }
+
     {%- else %} {#- if f.is_repeated #}
 
     {#- clear scalar field #}

@@ -42,16 +42,15 @@ pub mod _puroro_simple_impl {
         pub fn a(&self) -> i32 {
             self.a_opt().unwrap_or(::std::default::Default::default())
         }
+        pub fn clear_a(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn a_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_a() {
                 self.a = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
             &mut self.a
-        }
-
-        pub fn clear_a(&mut self) {
-            self._bitfield.set(0, false);
         }
     }
 
@@ -170,16 +169,15 @@ pub mod _puroro_simple_impl {
         pub fn b(&self) -> &'_ str {
             self.b_opt().unwrap_or(::std::default::Default::default())
         }
+        pub fn clear_b(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn b_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::string::String> {
             if !self.has_b() {
                 self.b = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
             &mut self.b
-        }
-
-        pub fn clear_b(&mut self) {
-            self._bitfield.set(0, false);
         }
     }
 
@@ -304,6 +302,9 @@ pub mod _puroro_simple_impl {
         > {
             self.c_opt()
         }
+        pub fn clear_c(&mut self) {
+            self.c = ::std::default::Default::default();
+        }
         pub fn c_mut(
             &mut self,
         ) -> &mut ::std::option::Option<
@@ -315,10 +316,6 @@ pub mod _puroro_simple_impl {
             let bump = self._bump;
             self.c
                 .get_or_insert_with(::std::default::Default::default())
-        }
-
-        pub fn clear_c(&mut self) {
-            self.c = ::std::default::Default::default();
         }
     }
 
@@ -430,15 +427,8 @@ pub mod _puroro_simple_impl {
         pub fn d(&self) -> &'_ [i32] {
             &self.d
         }
-        pub fn d_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
-            if !self.has_d() {
-                self.d = ::std::default::Default::default();
-            }
+        pub fn d_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
             &mut self.d
-        }
-
-        pub fn clear_d(&mut self) {
-            self.d = ::std::default::Default::default();
         }
     }
 

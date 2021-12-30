@@ -40,16 +40,15 @@ pub mod _puroro_simple_impl {
             self.type_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+        pub fn clear_type(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn type_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_type() {
                 self.r#type = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
             &mut self.r#type
-        }
-
-        pub fn clear_type(&mut self) {
-            self._bitfield.set(0, false);
         }
     }
 

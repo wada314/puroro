@@ -123,15 +123,17 @@ pub mod _puroro_simple_impl {
         > {
             self.submsg_unlabeled_opt()
         }
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
         pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
             &mut self.i32_unlabeled
         }
-
-        pub fn clear_i32_unlabeled(&mut self) {
-            self.i32_unlabeled = ::std::default::Default::default();
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
         }
         pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_i32_optional() {
@@ -140,19 +142,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.i32_optional
         }
-
-        pub fn clear_i32_optional(&mut self) {
-            self._bitfield.set(0, false);
-        }
-        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
-            if !self.has_i32_repeated() {
-                self.i32_repeated = ::std::default::Default::default();
-            }
+        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
-
-        pub fn clear_i32_repeated(&mut self) {
-            self.i32_repeated = ::std::default::Default::default();
+        pub fn clear_f32_unlabeled(&mut self) {
+            self.f32_unlabeled = ::std::default::Default::default();
         }
         pub fn f32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             if !self.has_f32_unlabeled() {
@@ -160,9 +154,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.f32_unlabeled
         }
-
-        pub fn clear_f32_unlabeled(&mut self) {
-            self.f32_unlabeled = ::std::default::Default::default();
+        pub fn clear_string_unlabeled(&mut self) {
+            self.string_unlabeled = ::std::default::Default::default();
         }
         pub fn string_unlabeled_mut(
             &mut self,
@@ -172,9 +165,8 @@ pub mod _puroro_simple_impl {
             }
             &mut self.string_unlabeled
         }
-
-        pub fn clear_string_unlabeled(&mut self) {
-            self.string_unlabeled = ::std::default::Default::default();
+        pub fn clear_submsg_unlabeled(&mut self) {
+            self.submsg_unlabeled = ::std::default::Default::default();
         }
         pub fn submsg_unlabeled_mut(
             &mut self,
@@ -187,10 +179,6 @@ pub mod _puroro_simple_impl {
             let bump = self._bump;
             self.submsg_unlabeled
                 .get_or_insert_with(::std::default::Default::default())
-        }
-
-        pub fn clear_submsg_unlabeled(&mut self) {
-            self.submsg_unlabeled = ::std::default::Default::default();
         }
     }
 
@@ -432,15 +420,14 @@ pub mod _puroro_simple_impl {
             self.i32_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
         pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
             &mut self.i32_unlabeled
-        }
-
-        pub fn clear_i32_unlabeled(&mut self) {
-            self.i32_unlabeled = ::std::default::Default::default();
         }
     }
 

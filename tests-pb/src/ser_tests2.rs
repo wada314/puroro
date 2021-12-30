@@ -169,6 +169,9 @@ pub mod _puroro_simple_impl {
             self.very_large_field_number_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_i32_optional() {
                 self.i32_optional = ::std::default::Default::default();
@@ -176,19 +179,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.i32_optional
         }
-
-        pub fn clear_i32_optional(&mut self) {
-            self._bitfield.set(0, false);
-        }
-        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
-            if !self.has_i32_repeated() {
-                self.i32_repeated = ::std::default::Default::default();
-            }
+        pub fn i32_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
-
-        pub fn clear_i32_repeated(&mut self) {
-            self.i32_repeated = ::std::default::Default::default();
+        pub fn clear_float_optional(&mut self) {
+            self._bitfield.set(1, false);
         }
         pub fn float_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
             if !self.has_float_optional() {
@@ -197,19 +192,11 @@ pub mod _puroro_simple_impl {
             }
             &mut self.float_optional
         }
-
-        pub fn clear_float_optional(&mut self) {
-            self._bitfield.set(1, false);
-        }
-        pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
-            if !self.has_float_repeated() {
-                self.float_repeated = ::std::default::Default::default();
-            }
+        pub fn float_repeated_mut<'this>(&'this mut self) -> &'this mut ::std::vec::Vec<f32> {
             &mut self.float_repeated
         }
-
-        pub fn clear_float_repeated(&mut self) {
-            self.float_repeated = ::std::default::Default::default();
+        pub fn clear_string_optional(&mut self) {
+            self._bitfield.set(2, false);
         }
         pub fn string_optional_mut(
             &mut self,
@@ -220,19 +207,13 @@ pub mod _puroro_simple_impl {
             }
             &mut self.string_optional
         }
-
-        pub fn clear_string_optional(&mut self) {
-            self._bitfield.set(2, false);
-        }
-        pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
-            if !self.has_string_repeated() {
-                self.string_repeated = ::std::default::Default::default();
-            }
+        pub fn string_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut ::std::vec::Vec<::std::string::String> {
             &mut self.string_repeated
         }
-
-        pub fn clear_string_repeated(&mut self) {
-            self.string_repeated = ::std::default::Default::default();
+        pub fn clear_submsg_optional(&mut self) {
+            self.submsg_optional = ::std::default::Default::default();
         }
         pub fn submsg_optional_mut(
             &mut self,
@@ -248,25 +229,15 @@ pub mod _puroro_simple_impl {
             self.submsg_optional
                 .get_or_insert_with(::std::default::Default::default())
         }
-
-        pub fn clear_submsg_optional(&mut self) {
-            self.submsg_optional = ::std::default::Default::default();
-        }
-        pub fn submsg_repeated_mut(
-            &mut self,
-        ) -> &mut ::std::vec::Vec<
+        pub fn submsg_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut ::std::vec::Vec<
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         > {
-            if !self.has_submsg_repeated() {
-                self.submsg_repeated = ::std::default::Default::default();
-            }
-            let bump = self._bump;
-            self.submsg_repeated
-                .get_or_insert_with(::std::default::Default::default())
+            &mut self.submsg_repeated
         }
-
-        pub fn clear_submsg_repeated(&mut self) {
-            self.submsg_repeated = ::std::default::Default::default();
+        pub fn clear_enum_optional(&mut self) {
+            self._bitfield.set(3, false);
         }
         pub fn enum_optional_mut(
             &mut self,
@@ -277,21 +248,13 @@ pub mod _puroro_simple_impl {
             }
             &mut self.enum_optional
         }
-
-        pub fn clear_enum_optional(&mut self) {
-            self._bitfield.set(3, false);
-        }
-        pub fn enum_repeated_mut(
-            &mut self,
-        ) -> &mut ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum> {
-            if !self.has_enum_repeated() {
-                self.enum_repeated = ::std::default::Default::default();
-            }
+        pub fn enum_repeated_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum> {
             &mut self.enum_repeated
         }
-
-        pub fn clear_enum_repeated(&mut self) {
-            self.enum_repeated = ::std::default::Default::default();
+        pub fn clear_very_large_field_number(&mut self) {
+            self._bitfield.set(4, false);
         }
         pub fn very_large_field_number_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_very_large_field_number() {
@@ -299,10 +262,6 @@ pub mod _puroro_simple_impl {
                 self._bitfield.set(4, true);
             }
             &mut self.very_large_field_number
-        }
-
-        pub fn clear_very_large_field_number(&mut self) {
-            self._bitfield.set(4, false);
         }
     }
 
@@ -3521,16 +3480,15 @@ pub mod _puroro_nested {
                     self.i32_optional_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
+                pub fn clear_i32_optional(&mut self) {
+                    self._bitfield.set(0, false);
+                }
                 pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
                     if !self.has_i32_optional() {
                         self.i32_optional = ::std::default::Default::default();
                         self._bitfield.set(0, true);
                     }
                     &mut self.i32_optional
-                }
-
-                pub fn clear_i32_optional(&mut self) {
-                    self._bitfield.set(0, false);
                 }
             }
 

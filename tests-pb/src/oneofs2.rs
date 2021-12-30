@@ -546,16 +546,15 @@ pub mod _puroro_simple_impl {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
         pub fn i32_optional_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
             if !self.has_i32_optional() {
                 self.i32_optional = ::std::default::Default::default();
                 self._bitfield.set(0, true);
             }
             &mut self.i32_optional
-        }
-
-        pub fn clear_i32_optional(&mut self) {
-            self._bitfield.set(0, false);
         }
     }
 
