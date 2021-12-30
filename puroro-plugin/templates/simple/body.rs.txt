@@ -17,9 +17,7 @@ pub struct {{ m.simple_ident }} {
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
-    {{ oneof.field_ident }}: ::std::option::Option<
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }}
-    >,
+    {{ oneof.field_ident }}: super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }},
     {%- endfor %}
 }
 impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_ident }} {}
@@ -123,21 +121,22 @@ impl {{ m.simple_ident }} {
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
+        match &self.{{ oneof.field_ident }} {
+            E::_None => ::std::option::Option::None,
             {%- for f in oneof.fields %}
             {% if f.is_length_delimited %}
-            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.as_ref()),
+            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.as_ref())),
             {%- else %}
-            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.inner().clone()),
+            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.inner().clone())),
             {%- endif %}
             {%- endfor %}
-        })
+        }
     }
 
     {%- for f in oneof.fields %}
     pub fn {{ f.getter_ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
-        if let &::std::option::Option::Some(E::{{ f.ident }}(ref v)) = &self.{{ oneof.field_ident }} {
+        if let E::{{ f.ident }}(ref v) = &self.{{ oneof.field_ident }} {
             ::std::option::Option::Some(
                 {%- if f.is_length_delimited %}
                 v.as_ref()
@@ -182,9 +181,6 @@ impl {{ m.simple_ident }} {
     {#- [optional] i32 => &mut i32 #}
     {#- [optional] String => &mut String #}
     {#- [optional] MyMessage => &mut MyMessage #}
-    {#- repeated i32 => &mut Vec<i32> #}
-    {#- repeated String => &mut Vec<String> #}
-    {#- repeated MyMessage => &mut Vec<MyMessage> #}
     pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.simple_getter_mut_type }} {
         if !self.has_{{ f.ident_unesc }}() {
             {#- field is not set so we need to initialize / clear it. #}
@@ -211,25 +207,20 @@ impl {{ m.simple_ident }} {
 
     {%- for oneof in m.oneofs %}
     pub fn clear_{{ oneof.field_ident }}(&mut self) {
-        self.{{ oneof.field_ident }} = ::std::option::Option::None;
+        self.{{ oneof.field_ident }} = ::std::default::Default::default();
     }
 
     {%- for f in oneof.fields %}
     pub fn {{ f.getter_ident_unesc }}_mut(&mut self) -> &mut {{ f.simple_field_type }}
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
-        if !matches!(
-            &self.{{ oneof.field_ident }},
-            Some(E::{{ f.ident }}(_)))
-        {
-            self.{{ oneof.field_ident }} = Some(
-                E::{{ f.ident }}(
-                    ::std::default::Default::default()
-                )
+        if !matches!(&self.{{ oneof.field_ident }}, E::{{ f.ident }}(_)) {
+            self.{{ oneof.field_ident }} = E::{{ f.ident }}(
+                ::std::default::Default::default()
             );
         }
         match &mut self.{{ oneof.field_ident }} {
-            Some(E::{{ f.ident }}(v)) => v,
+            E::{{ f.ident }}(ref mut v) => v,
             _ => unreachable!(),
         }
     }
@@ -251,15 +242,16 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
+        match &self.{{ oneof.field_ident }} {
+            E::_None => ::std::option::Option::None,
             {%- for f in oneof.fields %}
             {% if f.is_length_delimited %}
-            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.as_ref()),
+            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.as_ref())),
             {%- else %}
-            E::{{ f.ident }}(v) => F::{{ f.ident }}(v.inner().clone()),
+            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.inner().clone())),
             {%- endif %}
             {%- endfor %}
-        })
+        }
     }
     {%- endfor %}
 }
@@ -296,16 +288,14 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} 
                 use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
                 if !matches!(
                     &self.{{ oneof.field_ident }},
-                    Some(E::{{ f.ident }}(_)))
+                    E::{{ f.ident }}(_))
                 {
-                    self.{{ oneof.field_ident }} = Some(
-                        E::{{ f.ident }}(
-                            ::std::default::Default::default()
-                        )
+                    self.{{ oneof.field_ident }} = E::{{ f.ident }}(
+                        ::std::default::Default::default()
                     );
                 }
                 let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
-                    Some(E::{{ f.ident }}(v)) => v,
+                    E::{{ f.ident }}(v) => v,
                     _ => unreachable!(),
                 };
                 DeserFieldFromBytesIter::<
