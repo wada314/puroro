@@ -45,7 +45,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_a(&mut self) {
             self._bitfield.set(0, false);
         }
-        pub fn a_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+        pub fn a_mut<'this>(&'this mut self) -> &'this mut i32 {
             if !self.has_a() {
                 self.a = ::std::default::Default::default();
                 self._bitfield.set(0, true);
@@ -168,7 +168,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_b(&mut self) {
             self._bitfield.set(0, false);
         }
-        pub fn b_mut(&mut self) -> &mut ::puroro::internal::Bare<::std::string::String> {
+        pub fn b_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
             if !self.has_b() {
                 self.b = ::std::default::Default::default();
                 self._bitfield.set(0, true);
@@ -297,16 +297,15 @@ pub mod _puroro_simple_impl {
         pub fn clear_c(&mut self) {
             self.c = ::std::default::Default::default();
         }
-        pub fn c_mut(
-            &mut self,
-        ) -> &mut ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>,
-        > {
+        pub fn c_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::official_samples2::_puroro_simple_impl::Test1 {
             if !self.has_c() {
                 self.c = ::std::default::Default::default();
             }
             self.c
                 .get_or_insert_with(::std::default::Default::default())
+                .as_deref_mut()
         }
     }
 

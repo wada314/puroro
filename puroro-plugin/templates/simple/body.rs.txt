@@ -185,7 +185,7 @@ impl {{ m.simple_ident }} {
     {#- repeated i32 => &mut Vec<i32> #}
     {#- repeated String => &mut Vec<String> #}
     {#- repeated MyMessage => &mut Vec<MyMessage> #}
-    pub fn {{ f.ident_unesc }}_mut(&mut self) -> &mut {{ f.simple_field_type }} {
+    pub fn {{ f.ident_unesc }}_mut<'this>(&'this mut self) -> {{ f.simple_getter_mut_type }} {
         if !self.has_{{ f.ident_unesc }}() {
             {#- field is not set so we need to initialize / clear it. #}
             self.{{ f.ident }} = ::std::default::Default::default();
@@ -197,7 +197,7 @@ impl {{ m.simple_ident }} {
 
         {%- if f.is_message %}
         {#- Non-repeated message f. Field type is always `Optional<Box<T>>`. #}
-        self.{{ f.ident }}.get_or_insert_with(::std::default::Default::default())
+        self.{{ f.ident }}.get_or_insert_with(::std::default::Default::default()).as_deref_mut()
         {%- else %} {#- if f.is_message #}
         {#- Otherwise, just return the mut reference of the field. #}
         &mut self.{{ f.ident }}

@@ -172,7 +172,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();
         }
-        pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
@@ -184,7 +184,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_float_unlabeled(&mut self) {
             self.float_unlabeled = ::std::default::Default::default();
         }
-        pub fn float_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<f32> {
+        pub fn float_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
             if !self.has_float_unlabeled() {
                 self.float_unlabeled = ::std::default::Default::default();
             }
@@ -196,9 +196,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
         }
-        pub fn string_unlabeled_mut(
-            &mut self,
-        ) -> &mut ::puroro::internal::Bare<::std::string::String> {
+        pub fn string_unlabeled_mut<'this>(&'this mut self) -> &'this mut ::std::string::String {
             if !self.has_string_unlabeled() {
                 self.string_unlabeled = ::std::default::Default::default();
             }
@@ -212,18 +210,13 @@ pub mod _puroro_simple_impl {
         pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
-        pub fn submsg_unlabeled_mut(
-            &mut self,
-        ) -> &mut ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            >,
-        > {
+        pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg{
             if !self.has_submsg_unlabeled() {
                 self.submsg_unlabeled = ::std::default::Default::default();
             }
             self.submsg_unlabeled
                 .get_or_insert_with(::std::default::Default::default())
+                .as_deref_mut()
         }
         pub fn submsg_repeated_mut<'this>(
             &'this mut self,
@@ -235,9 +228,9 @@ pub mod _puroro_simple_impl {
         pub fn clear_enum_unlabeled(&mut self) {
             self.enum_unlabeled = ::std::default::Default::default();
         }
-        pub fn enum_unlabeled_mut(
-            &mut self,
-        ) -> &mut ::puroro::internal::Bare<self::_puroro_root::ser_tests3::Enum> {
+        pub fn enum_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::ser_tests3::Enum {
             if !self.has_enum_unlabeled() {
                 self.enum_unlabeled = ::std::default::Default::default();
             }
@@ -251,7 +244,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_very_large_field_number(&mut self) {
             self.very_large_field_number = ::std::default::Default::default();
         }
-        pub fn very_large_field_number_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+        pub fn very_large_field_number_mut<'this>(&'this mut self) -> &'this mut i32 {
             if !self.has_very_large_field_number() {
                 self.very_large_field_number = ::std::default::Default::default();
             }
@@ -3432,7 +3425,7 @@ pub mod _puroro_nested {
                 pub fn clear_i32_unlabeled(&mut self) {
                     self.i32_unlabeled = ::std::default::Default::default();
                 }
-                pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+                pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
                     if !self.has_i32_unlabeled() {
                         self.i32_unlabeled = ::std::default::Default::default();
                     }

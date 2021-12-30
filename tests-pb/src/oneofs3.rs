@@ -538,7 +538,7 @@ pub mod _puroro_simple_impl {
         pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();
         }
-        pub fn i32_unlabeled_mut(&mut self) -> &mut ::puroro::internal::Bare<i32> {
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
             if !self.has_i32_unlabeled() {
                 self.i32_unlabeled = ::std::default::Default::default();
             }
