@@ -299,9 +299,7 @@ pub mod _puroro_simple_impl {
             if !self.has_c() {
                 self.c = ::std::default::Default::default();
             }
-            self.c
-                .get_or_insert_with(::std::default::Default::default())
-                .as_deref_mut()
+            self.c.get_or_insert_with(::std::default::Default::default)
         }
     }
 

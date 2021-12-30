@@ -218,8 +218,7 @@ pub mod _puroro_simple_impl {
                 self.submsg_optional = ::std::default::Default::default();
             }
             self.submsg_optional
-                .get_or_insert_with(::std::default::Default::default())
-                .as_deref_mut()
+                .get_or_insert_with(::std::default::Default::default)
         }
         pub fn submsg_repeated_mut<'this>(
             &'this mut self,

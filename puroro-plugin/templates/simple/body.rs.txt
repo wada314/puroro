@@ -197,7 +197,7 @@ impl {{ m.simple_ident }} {
 
         {%- if f.is_message %}
         {#- Non-repeated message f. Field type is always `Optional<Box<T>>`. #}
-        self.{{ f.ident }}.get_or_insert_with(::std::default::Default::default()).as_deref_mut()
+        self.{{ f.ident }}.get_or_insert_with(::std::default::Default::default)
         {%- else %} {#- if f.is_message #}
         {#- Otherwise, just return the mut reference of the field. #}
         &mut self.{{ f.ident }}

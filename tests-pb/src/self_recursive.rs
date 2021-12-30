@@ -53,8 +53,7 @@ pub mod _puroro_simple_impl {
                 self.recursive_unlabeled = ::std::default::Default::default();
             }
             self.recursive_unlabeled
-                .get_or_insert_with(::std::default::Default::default())
-                .as_deref_mut()
+                .get_or_insert_with(::std::default::Default::default)
         }
     }
 
