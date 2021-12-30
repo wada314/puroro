@@ -543,7 +543,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::SubmsgTrait for Submsg {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            <self::Submsg>::i32_optional_opt(self)
         }
     }
 

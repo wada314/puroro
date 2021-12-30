@@ -42,7 +42,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::Test1Trait for Test1 {
         fn a_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.a)
+            <self::Test1>::a_opt(self)
         }
     }
 
@@ -152,7 +152,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::Test2Trait for Test2 {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
-            self.b.as_ref().map(|v| v.as_ref())
+            <self::Test2>::b_opt(self)
         }
     }
 
@@ -280,7 +280,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::official_samples2::_puroro_simple_impl::Test1;
         fn c_opt<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
-            self.c.as_ref().map(|v| v.as_ref())
+            <self::Test3>::c_opt(self)
         }
     }
 

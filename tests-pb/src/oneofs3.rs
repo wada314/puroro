@@ -547,11 +547,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::SubmsgTrait for Submsg {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            <self::Submsg>::i32_unlabeled_opt(self)
         }
     }
 

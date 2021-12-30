@@ -55,7 +55,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::self_recursive::_puroro_simple_impl::Msg;
         fn recursive_unlabeled_opt<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
-            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
+            <self::Msg>::recursive_unlabeled_opt(self)
         }
     }
 

@@ -40,7 +40,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::MsgTrait for Msg {
         fn type_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.r#type)
+            <self::Msg>::type_opt(self)
         }
     }
 

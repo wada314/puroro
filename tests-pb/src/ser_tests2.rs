@@ -202,7 +202,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            <self::Msg>::i32_optional_opt(self)
         }
 
         type Field2RepeatedType<'this> =
@@ -212,7 +212,7 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.float_optional)
+            <self::Msg>::float_optional_opt(self)
         }
 
         type Field4RepeatedType<'this> =
@@ -222,7 +222,7 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_optional.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_optional_opt(self)
         }
 
         type Field6RepeatedType<'this> = ::puroro::AsRefRepeatedField<
@@ -240,7 +240,7 @@ pub mod _puroro_simple_impl {
             Self: 'this,
         = &'this self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
-            self.submsg_optional.as_ref().map(|v| v.as_ref())
+            <self::Msg>::submsg_optional_opt(self)
         }
         type Field8MessageType<'this>
         where
@@ -254,7 +254,7 @@ pub mod _puroro_simple_impl {
             &self.submsg_repeated
         }
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
-            Clone::clone(&self.enum_optional)
+            <self::Msg>::enum_optional_opt(self)
         }
 
         type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
@@ -268,7 +268,7 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.very_large_field_number)
+            <self::Msg>::very_large_field_number_opt(self)
         }
     }
 
@@ -3391,7 +3391,7 @@ pub mod _puroro_nested {
 
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-                    Clone::clone(&self.i32_optional)
+                    <self::Submsg>::i32_optional_opt(self)
                 }
             }
 

@@ -143,14 +143,10 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            <self::Msg>::i32_unlabeled_opt(self)
         }
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
+            <self::Msg>::i32_optional_opt(self)
         }
 
         type Field3RepeatedType<'this> =
@@ -160,25 +156,17 @@ pub mod _puroro_simple_impl {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-            if self.f32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.f32_unlabeled.clone())
-            }
+            <self::Msg>::f32_unlabeled_opt(self)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.string_unlabeled.as_ref())
-            }
+            <self::Msg>::string_unlabeled_opt(self)
         }
         type Field6MessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
-            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
+            <self::Msg>::submsg_unlabeled_opt(self)
         }
     }
 
@@ -383,11 +371,7 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::SubmsgTrait for Submsg {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
-            } else {
-                ::std::option::Option::Some(self.i32_unlabeled.clone())
-            }
+            <self::Submsg>::i32_unlabeled_opt(self)
         }
     }
 

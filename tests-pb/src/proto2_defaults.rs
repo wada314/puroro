@@ -1044,194 +1044,194 @@ pub mod _puroro_simple_impl {
 
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_default_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_default)
+            <self::Msg>::i32_default_opt(self)
         }
         fn i32_0_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0)
+            <self::Msg>::i32_0_opt(self)
         }
         fn i32_42_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_42)
+            <self::Msg>::i32_42_opt(self)
         }
         fn i32_m42_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_m42)
+            <self::Msg>::i32_m42_opt(self)
         }
         fn i32_2147483647_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_2147483647)
+            <self::Msg>::i32_2147483647_opt(self)
         }
         fn i32_m2147483648_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_m2147483648)
+            <self::Msg>::i32_m2147483648_opt(self)
         }
         fn i32_0123_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0123)
+            <self::Msg>::i32_0123_opt(self)
         }
         fn i32_0x123_opt<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_0x123)
+            <self::Msg>::i32_0x123_opt(self)
         }
         fn u32_default_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_default)
+            <self::Msg>::u32_default_opt(self)
         }
         fn u32_0_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0)
+            <self::Msg>::u32_0_opt(self)
         }
         fn u32_42_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_42)
+            <self::Msg>::u32_42_opt(self)
         }
         fn u32_4294967295_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_4294967295)
+            <self::Msg>::u32_4294967295_opt(self)
         }
         fn u32_0123_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0123)
+            <self::Msg>::u32_0123_opt(self)
         }
         fn u32_0x123_opt<'this>(&'this self) -> Option<u32> {
-            Clone::clone(&self.u32_0x123)
+            <self::Msg>::u32_0x123_opt(self)
         }
         fn i64_default_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_default)
+            <self::Msg>::i64_default_opt(self)
         }
         fn i64_0_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0)
+            <self::Msg>::i64_0_opt(self)
         }
         fn i64_42_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_42)
+            <self::Msg>::i64_42_opt(self)
         }
         fn i64_m42_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_m42)
+            <self::Msg>::i64_m42_opt(self)
         }
         fn i64_9223372036854775807_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_9223372036854775807)
+            <self::Msg>::i64_9223372036854775807_opt(self)
         }
         fn i64_m9223372036854775808_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_m9223372036854775808)
+            <self::Msg>::i64_m9223372036854775808_opt(self)
         }
         fn i64_0123_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0123)
+            <self::Msg>::i64_0123_opt(self)
         }
         fn i64_0x123_opt<'this>(&'this self) -> Option<i64> {
-            Clone::clone(&self.i64_0x123)
+            <self::Msg>::i64_0x123_opt(self)
         }
         fn u64_default_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_default)
+            <self::Msg>::u64_default_opt(self)
         }
         fn u64_0_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0)
+            <self::Msg>::u64_0_opt(self)
         }
         fn u64_42_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_42)
+            <self::Msg>::u64_42_opt(self)
         }
         fn u64_18446744073709551615_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_18446744073709551615)
+            <self::Msg>::u64_18446744073709551615_opt(self)
         }
         fn u64_0123_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0123)
+            <self::Msg>::u64_0123_opt(self)
         }
         fn u64_0x123_opt<'this>(&'this self) -> Option<u64> {
-            Clone::clone(&self.u64_0x123)
+            <self::Msg>::u64_0x123_opt(self)
         }
         fn f32_default_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_default)
+            <self::Msg>::f32_default_opt(self)
         }
         fn f32_0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0)
+            <self::Msg>::f32_0_opt(self)
         }
         fn f32_m0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_m0)
+            <self::Msg>::f32_m0_opt(self)
         }
         fn f32_0p_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p)
+            <self::Msg>::f32_0p_opt(self)
         }
         fn f32_p0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_p0)
+            <self::Msg>::f32_p0_opt(self)
         }
         fn f32_0p0_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p0)
+            <self::Msg>::f32_0p0_opt(self)
         }
         fn f32_42_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_42)
+            <self::Msg>::f32_42_opt(self)
         }
         fn f32_m42_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_m42)
+            <self::Msg>::f32_m42_opt(self)
         }
         fn f32_0p25_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_0p25)
+            <self::Msg>::f32_0p25_opt(self)
         }
         fn f32_1p5e2_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_1p5e2)
+            <self::Msg>::f32_1p5e2_opt(self)
         }
         fn f32_inf_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_inf)
+            <self::Msg>::f32_inf_opt(self)
         }
         fn f32_minf_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_minf)
+            <self::Msg>::f32_minf_opt(self)
         }
         fn f32_nan_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_nan)
+            <self::Msg>::f32_nan_opt(self)
         }
         fn f32_mnan_opt<'this>(&'this self) -> Option<f32> {
-            Clone::clone(&self.f32_mnan)
+            <self::Msg>::f32_mnan_opt(self)
         }
         fn bool_default_opt<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.bool_default)
+            <self::Msg>::bool_default_opt(self)
         }
         fn bool_true_opt<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.bool_true)
+            <self::Msg>::bool_true_opt(self)
         }
         fn bool_false_opt<'this>(&'this self) -> Option<bool> {
-            Clone::clone(&self.bool_false)
+            <self::Msg>::bool_false_opt(self)
         }
         fn string_default_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_default.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_default_opt(self)
         }
         fn string_empty_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_empty.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_empty_opt(self)
         }
         fn string_abc_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_abc.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_abc_opt(self)
         }
         fn string_aiu_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_aiu.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_aiu_opt(self)
         }
         fn string_backslash_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_backslash.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_backslash_opt(self)
         }
         fn string_tab_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_tab.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_tab_opt(self)
         }
         fn string_crlf_opt<'this>(&'this self) -> Option<&'this str> {
-            self.string_crlf.as_ref().map(|v| v.as_ref())
+            <self::Msg>::string_crlf_opt(self)
         }
         fn bytes_default_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_default.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_default_opt(self)
         }
         fn bytes_empty_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_empty.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_empty_opt(self)
         }
         fn bytes_abc_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_abc.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_abc_opt(self)
         }
         fn bytes_aiu_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_aiu.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_aiu_opt(self)
         }
         fn bytes_backslash_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_backslash.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_backslash_opt(self)
         }
         fn bytes_tab_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_tab.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_tab_opt(self)
         }
         fn bytes_crlf_opt<'this>(&'this self) -> Option<&'this [u8]> {
-            self.bytes_crlf.as_ref().map(|v| v.as_ref())
+            <self::Msg>::bytes_crlf_opt(self)
         }
         fn enum_default_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            Clone::clone(&self.enum_default)
+            <self::Msg>::enum_default_opt(self)
         }
         fn enum_one_opt<'this>(&'this self) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            Clone::clone(&self.enum_one)
+            <self::Msg>::enum_one_opt(self)
         }
         fn enum_fourty_two_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            Clone::clone(&self.enum_fourty_two)
+            <self::Msg>::enum_fourty_two_opt(self)
         }
     }
 
