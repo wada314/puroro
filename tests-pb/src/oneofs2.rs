@@ -12,21 +12,18 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        group_one: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple,
-        >,
-        group_two: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple,
-        >,
-        group_three: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple,
-        >,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+        group_one: super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple,
+        group_two: super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple,
+        group_three: super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 group_one: ::std::default::Default::default(),
                 group_two: ::std::default::Default::default(),
                 group_three: ::std::default::Default::default(),
@@ -89,58 +86,60 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
 
-        pub fn group_one<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        pub fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-            self.group_one.as_ref().map(|oneof| match oneof {
-                E::G1Int32(v) => F::G1Int32(v.clone()),
+            match &self.group_one {
+                E::_None => ::std::option::Option::None,
 
-                E::G1String(v) => F::G1String(v.as_ref()),
-            })
+                E::G1Int32(v) => ::std::option::Option::Some(F::G1Int32(v.inner().clone())),
+
+                E::G1String(v) => ::std::option::Option::Some(F::G1String(v.as_ref())),
+            }
         }
         pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-            if let &::std::option::Option::Some(E::G1Int32(ref v)) = &self.group_one {
-                ::std::option::Option::Some(v.clone())
+            if let E::G1Int32(ref v) = &self.group_one {
+                ::std::option::Option::Some(v.inner().clone())
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn g1_string_opt(&self) -> ::std::option::Option<&'_ str> {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-            if let &::std::option::Option::Some(E::G1String(ref v)) = &self.group_one {
+            if let E::G1String(ref v) = &self.group_one {
                 ::std::option::Option::Some(v.as_ref())
             } else {
                 ::std::option::Option::None
             }
         }
 
-        pub fn group_two<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+        pub fn group_two(
+            &self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            self.group_two.as_ref().map(|oneof| match oneof {
-                E::G2F32(v) => F::G2F32(v.clone()),
+            match &self.group_two {
+                E::_None => ::std::option::Option::None,
 
-                E::G2String(v) => F::G2String(v.as_ref()),
+                E::G2F32(v) => ::std::option::Option::Some(F::G2F32(v.inner().clone())),
 
-                E::G2Submsg(v) => F::G2Submsg(v.as_ref()),
-            })
+                E::G2String(v) => ::std::option::Option::Some(F::G2String(v.as_ref())),
+
+                E::G2Submsg(v) => ::std::option::Option::Some(F::G2Submsg(v.as_ref())),
+            }
         }
         pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            if let &::std::option::Option::Some(E::G2F32(ref v)) = &self.group_two {
-                ::std::option::Option::Some(v.clone())
+            if let E::G2F32(ref v) = &self.group_two {
+                ::std::option::Option::Some(v.inner().clone())
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn g2_string_opt(&self) -> ::std::option::Option<&'_ str> {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            if let &::std::option::Option::Some(E::G2String(ref v)) = &self.group_two {
+            if let E::G2String(ref v) = &self.group_two {
                 ::std::option::Option::Some(v.as_ref())
             } else {
                 ::std::option::Option::None
@@ -151,99 +150,100 @@ pub mod _puroro_simple_impl {
         ) -> ::std::option::Option<&'_ self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>
         {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            if let &::std::option::Option::Some(E::G2Submsg(ref v)) = &self.group_two {
+            if let E::G2Submsg(ref v) = &self.group_two {
                 ::std::option::Option::Some(v.as_ref())
             } else {
                 ::std::option::Option::None
             }
         }
 
-        pub fn group_three<'this>(
-            &'this self,
+        pub fn group_three(
+            &self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
-            self.group_three.as_ref().map(|oneof| match oneof {
-                E::G3Int32(v) => F::G3Int32(v.clone()),
-            })
+            match &self.group_three {
+                E::_None => ::std::option::Option::None,
+
+                E::G3Int32(v) => ::std::option::Option::Some(F::G3Int32(v.inner().clone())),
+            }
         }
         pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
-            if let &::std::option::Option::Some(E::G3Int32(ref v)) = &self.group_three {
-                ::std::option::Option::Some(v.clone())
+            if let E::G3Int32(ref v) = &self.group_three {
+                ::std::option::Option::Some(v.inner().clone())
             } else {
                 ::std::option::Option::None
             }
         }
         pub fn clear_group_one(&mut self) {
-            self.group_one = ::std::option::Option::None;
+            self.group_one = ::std::default::Default::default();
         }
-        pub fn g1_int32_mut(&mut self) -> &mut i32 {
+        pub fn g1_int32_mut(&mut self) -> &'_ mut i32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-            if !matches!(&self.group_one, Some(E::G1Int32(_))) {
-                self.group_one = Some(E::G1Int32(::std::default::Default::default()));
+            if !matches!(&self.group_one, E::G1Int32(_)) {
+                self.group_one = E::G1Int32(::std::default::Default::default());
             }
             match &mut self.group_one {
-                Some(E::G1Int32(v)) => v,
+                E::G1Int32(ref mut v) => v,
                 _ => unreachable!(),
             }
         }
-        pub fn g1_string_mut(&mut self) -> &mut ::std::string::String {
+        pub fn g1_string_mut(&mut self) -> &'_ mut ::std::string::String {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-            if !matches!(&self.group_one, Some(E::G1String(_))) {
-                self.group_one = Some(E::G1String(::std::default::Default::default()));
+            if !matches!(&self.group_one, E::G1String(_)) {
+                self.group_one = E::G1String(::std::default::Default::default());
             }
             match &mut self.group_one {
-                Some(E::G1String(v)) => v,
+                E::G1String(ref mut v) => v,
                 _ => unreachable!(),
             }
         }
         pub fn clear_group_two(&mut self) {
-            self.group_two = ::std::option::Option::None;
+            self.group_two = ::std::default::Default::default();
         }
-        pub fn g2_f32_mut(&mut self) -> &mut f32 {
+        pub fn g2_f32_mut(&mut self) -> &'_ mut f32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            if !matches!(&self.group_two, Some(E::G2F32(_))) {
-                self.group_two = Some(E::G2F32(::std::default::Default::default()));
+            if !matches!(&self.group_two, E::G2F32(_)) {
+                self.group_two = E::G2F32(::std::default::Default::default());
             }
             match &mut self.group_two {
-                Some(E::G2F32(v)) => v,
+                E::G2F32(ref mut v) => v,
                 _ => unreachable!(),
             }
         }
-        pub fn g2_string_mut(&mut self) -> &mut ::std::string::String {
+        pub fn g2_string_mut(&mut self) -> &'_ mut ::std::string::String {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            if !matches!(&self.group_two, Some(E::G2String(_))) {
-                self.group_two = Some(E::G2String(::std::default::Default::default()));
+            if !matches!(&self.group_two, E::G2String(_)) {
+                self.group_two = E::G2String(::std::default::Default::default());
             }
             match &mut self.group_two {
-                Some(E::G2String(v)) => v,
+                E::G2String(ref mut v) => v,
                 _ => unreachable!(),
             }
         }
         pub fn g2_submsg_mut(
             &mut self,
-        ) -> &mut ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>
-        {
+        ) -> &'_ mut self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            if !matches!(&self.group_two, Some(E::G2Submsg(_))) {
-                self.group_two = Some(E::G2Submsg(::std::default::Default::default()));
+            if !matches!(&self.group_two, E::G2Submsg(_)) {
+                self.group_two = E::G2Submsg(::std::default::Default::default());
             }
             match &mut self.group_two {
-                Some(E::G2Submsg(v)) => v,
+                E::G2Submsg(ref mut v) => v,
                 _ => unreachable!(),
             }
         }
         pub fn clear_group_three(&mut self) {
-            self.group_three = ::std::option::Option::None;
+            self.group_three = ::std::default::Default::default();
         }
-        pub fn g3_int32_mut(&mut self) -> &mut i32 {
+        pub fn g3_int32_mut(&mut self) -> &'_ mut i32 {
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
-            if !matches!(&self.group_three, Some(E::G3Int32(_))) {
-                self.group_three = Some(E::G3Int32(::std::default::Default::default()));
+            if !matches!(&self.group_three, E::G3Int32(_)) {
+                self.group_three = E::G3Int32(::std::default::Default::default());
             }
             match &mut self.group_three {
-                Some(E::G3Int32(v)) => v,
+                E::G3Int32(ref mut v) => v,
                 _ => unreachable!(),
             }
         }
@@ -254,38 +254,38 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg;
-        fn group_one<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-            self.group_one.as_ref().map(|oneof| match oneof {
-                E::G1Int32(v) => F::G1Int32(v.clone()),
+            match &self.group_one {
+                E::_None => ::std::option::Option::None,
 
-                E::G1String(v) => F::G1String(v.as_ref()),
-            })
+                E::G1Int32(v) => ::std::option::Option::Some(F::G1Int32(v.inner().clone())),
+
+                E::G1String(v) => ::std::option::Option::Some(F::G1String(v.as_ref())),
+            }
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+        fn group_two(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-            self.group_two.as_ref().map(|oneof| match oneof {
-                E::G2F32(v) => F::G2F32(v.clone()),
+            match &self.group_two {
+                E::_None => ::std::option::Option::None,
 
-                E::G2String(v) => F::G2String(v.as_ref()),
+                E::G2F32(v) => ::std::option::Option::Some(F::G2F32(v.inner().clone())),
 
-                E::G2Submsg(v) => F::G2Submsg(v.as_ref()),
-            })
+                E::G2String(v) => ::std::option::Option::Some(F::G2String(v.as_ref())),
+
+                E::G2Submsg(v) => ::std::option::Option::Some(F::G2Submsg(v.as_ref())),
+            }
         }
-        fn group_three<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        fn group_three(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
-            self.group_three.as_ref().map(|oneof| match oneof {
-                E::G3Int32(v) => F::G3Int32(v.clone()),
-            })
+            match &self.group_three {
+                E::_None => ::std::option::Option::None,
+
+                E::G3Int32(v) => ::std::option::Option::Some(F::G3Int32(v.inner().clone())),
+            }
         }
     }
 
@@ -306,11 +306,11 @@ pub mod _puroro_simple_impl {
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-                    if !matches!(&self.group_one, Some(E::G1Int32(_))) {
-                        self.group_one = Some(E::G1Int32(::std::default::Default::default()));
+                    if !matches!(&self.group_one, E::G1Int32(_)) {
+                        self.group_one = E::G1Int32(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_one {
-                        Some(E::G1Int32(v)) => v,
+                        E::G1Int32(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -319,11 +319,11 @@ pub mod _puroro_simple_impl {
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneSimple as E;
-                    if !matches!(&self.group_one, Some(E::G1String(_))) {
-                        self.group_one = Some(E::G1String(::std::default::Default::default()));
+                    if !matches!(&self.group_one, E::G1String(_)) {
+                        self.group_one = E::G1String(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_one {
-                        Some(E::G1String(v)) => v,
+                        E::G1String(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -332,11 +332,11 @@ pub mod _puroro_simple_impl {
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-                    if !matches!(&self.group_two, Some(E::G2F32(_))) {
-                        self.group_two = Some(E::G2F32(::std::default::Default::default()));
+                    if !matches!(&self.group_two, E::G2F32(_)) {
+                        self.group_two = E::G2F32(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_two {
-                        Some(E::G2F32(v)) => v,
+                        E::G2F32(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -345,11 +345,11 @@ pub mod _puroro_simple_impl {
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-                    if !matches!(&self.group_two, Some(E::G2String(_))) {
-                        self.group_two = Some(E::G2String(::std::default::Default::default()));
+                    if !matches!(&self.group_two, E::G2String(_)) {
+                        self.group_two = E::G2String(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_two {
-                        Some(E::G2String(v)) => v,
+                        E::G2String(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -358,11 +358,11 @@ pub mod _puroro_simple_impl {
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoSimple as E;
-                    if !matches!(&self.group_two, Some(E::G2Submsg(_))) {
-                        self.group_two = Some(E::G2Submsg(::std::default::Default::default()));
+                    if !matches!(&self.group_two, E::G2Submsg(_)) {
+                        self.group_two = E::G2Submsg(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_two {
-                        Some(E::G2Submsg(v)) => v,
+                        E::G2Submsg(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -376,11 +376,11 @@ pub mod _puroro_simple_impl {
                 }
                 6 => {
                     use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeSimple as E;
-                    if !matches!(&self.group_three, Some(E::G3Int32(_))) {
-                        self.group_three = Some(E::G3Int32(::std::default::Default::default()));
+                    if !matches!(&self.group_three, E::G3Int32(_)) {
+                        self.group_three = E::G3Int32(::std::default::Default::default());
                     }
                     let field_value_mut_ref = match &mut self.group_three {
-                        Some(E::G3Int32(v)) => v,
+                        E::G3Int32(v) => v,
                         _ => unreachable!(),
                     };
                     DeserFieldFromBytesIter::<
@@ -467,30 +467,12 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "g1_int32",
-                    &<Self as super::_puroro_traits::MsgTrait>::g1_int32_opt(self),
-                )
-                .field(
-                    "g1_string",
-                    &<Self as super::_puroro_traits::MsgTrait>::g1_string_opt(self),
-                )
-                .field(
-                    "g2_f32",
-                    &<Self as super::_puroro_traits::MsgTrait>::g2_f32_opt(self),
-                )
-                .field(
-                    "g2_string",
-                    &<Self as super::_puroro_traits::MsgTrait>::g2_string_opt(self),
-                )
-                .field(
-                    "g2_submsg",
-                    &<Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
-                )
-                .field(
-                    "g3_int32",
-                    &<Self as super::_puroro_traits::MsgTrait>::g3_int32_opt(self),
-                )
+                .field("g1_int32", &self.g1_int32_opt())
+                .field("g1_string", &self.g1_string_opt())
+                .field("g2_f32", &self.g2_f32_opt())
+                .field("g2_string", &self.g2_string_opt())
+                .field("g2_submsg", &self.g2_submsg_opt())
+                .field("g3_int32", &self.g3_int32_opt())
                 .finish()
         }
     }
@@ -498,6 +480,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 group_one: ::std::clone::Clone::clone(&self.group_one),
                 group_two: ::std::clone::Clone::clone(&self.group_two),
                 group_three: ::std::clone::Clone::clone(&self.group_three),
@@ -507,25 +490,33 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.group_one == rhs.group_one
+            self._bitfield == rhs._bitfield
+                && self.group_one == rhs.group_one
                 && self.group_two == rhs.group_two
                 && self.group_three == rhs.group_three
                 && true
         }
     }
     pub struct Submsg {
-        i32_optional: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        i32_optional: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Submsg> for Submsg {}
 
     impl Submsg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
             }
         }
         pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_optional.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_optional(&self) -> bool {
@@ -536,7 +527,14 @@ pub mod _puroro_simple_impl {
             self.i32_optional_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn i32_optional_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn i32_optional_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
             &mut self.i32_optional
         }
     }
@@ -562,12 +560,15 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_optional, data),
+                1 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_optional, data)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -603,10 +604,7 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Submsg")
-                .field(
-                    "i32_optional",
-                    &<Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
-                )
+                .field("i32_optional", &self.i32_optional_opt())
                 .finish()
         }
     }
@@ -614,6 +612,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Submsg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
             }
         }
@@ -621,7 +620,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Submsg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_optional == rhs.i32_optional && true
+            self._bitfield == rhs._bitfield && self.i32_optional == rhs.i32_optional && true
         }
     }
 }
@@ -664,23 +663,22 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
-        {
+        fn group_one(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             ::std::option::Option::Some(E::G1Int32(::std::convert::Into::into(
                 ::std::clone::Clone::clone(&self.g1_int32),
             )))
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        fn group_two(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             ::std::option::Option::None
         }
-        fn group_three<'this>(
-            &'this self,
+        fn group_three(
+            &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             ::std::option::Option::None
         }
@@ -753,21 +751,20 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
-        {
+        fn group_one(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             ::std::option::Option::Some(E::G1String(self.g1_string.as_ref()))
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        fn group_two(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             ::std::option::Option::None
         }
-        fn group_three<'this>(
-            &'this self,
+        fn group_three(
+            &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             ::std::option::Option::None
         }
@@ -840,23 +837,22 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
-        {
+        fn group_one(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             ::std::option::Option::None
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        fn group_two(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             ::std::option::Option::Some(E::G2F32(::std::convert::Into::into(
                 ::std::clone::Clone::clone(&self.g2_f32),
             )))
         }
-        fn group_three<'this>(
-            &'this self,
+        fn group_three(
+            &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             ::std::option::Option::None
         }
@@ -929,21 +925,20 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
-        {
+        fn group_one(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             ::std::option::Option::None
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        fn group_two(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             ::std::option::Option::Some(E::G2String(self.g2_string.as_ref()))
         }
-        fn group_three<'this>(
-            &'this self,
+        fn group_three(
+            &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             ::std::option::Option::None
         }
@@ -1016,21 +1011,20 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
-        {
+        fn group_one(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             ::std::option::Option::None
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        fn group_two(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             ::std::option::Option::Some(E::G2Submsg(&self.g2_submsg))
         }
-        fn group_three<'this>(
-            &'this self,
+        fn group_three(
+            &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             ::std::option::Option::None
         }
@@ -1107,20 +1101,19 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        fn group_one(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
+            ::std::option::Option::None
+        }
+        fn group_two(
+            &self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             ::std::option::Option::None
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            ::std::option::Option::None
-        }
-        fn group_three<'this>(
-            &'this self,
+        fn group_three(
+            &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             ::std::option::Option::Some(E::G3Int32(::std::convert::Into::into(
@@ -1208,9 +1201,7 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'this>;
-        fn group_one<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupOneBumpalo as E;
             match &self.group_one {
@@ -1219,9 +1210,7 @@ pub mod _puroro_impls {
                 E::G1String(val) => ::std::option::Option::Some(F::G1String(val.as_ref())),
             }
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+        fn group_two(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupTwoBumpalo as E;
             match &self.group_two {
@@ -1233,9 +1222,7 @@ pub mod _puroro_impls {
                 })),
             }
         }
-        fn group_three<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        fn group_three(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as F;
             use super::_puroro_nested::msg::_puroro_private_oneofs::GroupThreeBumpalo as E;
             match &self.group_three {
@@ -1938,19 +1925,13 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             None
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+        fn group_two(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>> {
             None
         }
-        fn group_three<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        fn group_three(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             None
         }
     }
@@ -1966,9 +1947,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::Field5MessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::Field5MessageType<'this>>,
         );
-        fn group_one<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             Some(match (self.0.group_one(), self.1.group_one()) {
                 (None, None) => {
@@ -1982,9 +1961,7 @@ pub mod _puroro_traits {
                 (Some(E::G1String(left)), None) => E::G1String(left),
             })
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+        fn group_two(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             Some(match (self.0.group_two(), self.1.group_two()) {
                 (None, None) => {
@@ -2003,9 +1980,7 @@ pub mod _puroro_traits {
                 (Some(E::G2Submsg(left)), None) => E::G2Submsg((Some(left), None)),
             })
         }
-        fn group_three<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        fn group_three(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             Some(match (self.0.group_three(), self.1.group_three()) {
                 (None, None) => {
@@ -2029,9 +2004,7 @@ pub mod _puroro_traits {
             <T as MsgTrait>::Field5MessageType<'this>,
             <U as MsgTrait>::Field5MessageType<'this>,
         >;
-        fn group_one<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             match self.as_ref().either(
                 |t| t.group_one().map(|t| ::puroro::Either::Left(t)),
@@ -2044,9 +2017,7 @@ pub mod _puroro_traits {
                 None => None,
             }
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+        fn group_two(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             match self.as_ref().either(
                 |t| t.group_two().map(|t| ::puroro::Either::Left(t)),
@@ -2065,9 +2036,7 @@ pub mod _puroro_traits {
                 None => None,
             }
         }
-        fn group_three<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        fn group_three(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             match self.as_ref().either(
                 |t| t.group_three().map(|t| ::puroro::Either::Left(t)),
@@ -2087,9 +2056,7 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = T::Field5MessageType<'this>;
-        fn group_one<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.as_ref().and_then(|msg| {
                 msg.group_one().map(|oneof| match oneof {
@@ -2098,9 +2065,7 @@ pub mod _puroro_traits {
                 })
             })
         }
-        fn group_two<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+        fn group_two(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             self.as_ref().and_then(|msg| {
                 msg.group_two().map(|oneof| match oneof {
@@ -2110,9 +2075,7 @@ pub mod _puroro_traits {
                 })
             })
         }
-        fn group_three<'this>(
-            &'this self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        fn group_three(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             self.as_ref().and_then(|msg| {
                 msg.group_three().map(|oneof| match oneof {
@@ -2500,13 +2463,20 @@ pub mod _puroro_nested {
             }
 
             pub(crate) enum GroupOneSimple {
-                G1Int32(i32),
-                G1String(::std::string::String),
+                _None,
+                G1Int32(::puroro::internal::Bare<i32>),
+                G1String(::puroro::internal::Bare<::std::string::String>),
             }
 
+            impl ::std::default::Default for GroupOneSimple {
+                fn default() -> Self {
+                    Self::_None
+                }
+            }
             impl ::std::fmt::Debug for GroupOneSimple {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     match self {
+                        Self::_None => f.write_str("None"),
                         Self::G1Int32(v) => {
                             f.debug_tuple("GroupOneSimple::G1Int32").field(&v).finish()
                         }
@@ -2520,6 +2490,7 @@ pub mod _puroro_nested {
             impl ::std::clone::Clone for GroupOneSimple {
                 fn clone(&self) -> Self {
                     match self {
+                        Self::_None => Self::_None,
                         Self::G1Int32(v) => Self::G1Int32(::std::clone::Clone::clone(&v)),
                         Self::G1String(v) => Self::G1String(::std::clone::Clone::clone(&v)),
                     }
@@ -2529,6 +2500,7 @@ pub mod _puroro_nested {
             impl ::std::cmp::PartialEq for GroupOneSimple {
                 fn eq(&self, rhs: &Self) -> bool {
                     match (self, rhs) {
+                        (Self::_None, Self::_None) => true,
                         (Self::G1Int32(left), Self::G1Int32(right)) => left == right,
                         (Self::G1String(left), Self::G1String(right)) => left == right,
                         #[allow(unreachable_patterns)]
@@ -2549,16 +2521,25 @@ pub mod _puroro_nested {
             }
 
             pub(crate) enum GroupTwoSimple {
-                G2F32(f32),
-                G2String(::std::string::String),
+                _None,
+                G2F32(::puroro::internal::Bare<f32>),
+                G2String(::puroro::internal::Bare<::std::string::String>),
                 G2Submsg(
-                    ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>,
+                    ::puroro::internal::Bare<
+                        ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>,
+                    >,
                 ),
             }
 
+            impl ::std::default::Default for GroupTwoSimple {
+                fn default() -> Self {
+                    Self::_None
+                }
+            }
             impl ::std::fmt::Debug for GroupTwoSimple {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     match self {
+                        Self::_None => f.write_str("None"),
                         Self::G2F32(v) => f.debug_tuple("GroupTwoSimple::G2F32").field(&v).finish(),
                         Self::G2String(v) => {
                             f.debug_tuple("GroupTwoSimple::G2String").field(&v).finish()
@@ -2573,6 +2554,7 @@ pub mod _puroro_nested {
             impl ::std::clone::Clone for GroupTwoSimple {
                 fn clone(&self) -> Self {
                     match self {
+                        Self::_None => Self::_None,
                         Self::G2F32(v) => Self::G2F32(::std::clone::Clone::clone(&v)),
                         Self::G2String(v) => Self::G2String(::std::clone::Clone::clone(&v)),
                         Self::G2Submsg(v) => Self::G2Submsg(::std::clone::Clone::clone(&v)),
@@ -2583,6 +2565,7 @@ pub mod _puroro_nested {
             impl ::std::cmp::PartialEq for GroupTwoSimple {
                 fn eq(&self, rhs: &Self) -> bool {
                     match (self, rhs) {
+                        (Self::_None, Self::_None) => true,
                         (Self::G2F32(left), Self::G2F32(right)) => left == right,
                         (Self::G2String(left), Self::G2String(right)) => left == right,
                         (Self::G2Submsg(left), Self::G2Submsg(right)) => left == right,
@@ -2611,12 +2594,19 @@ pub mod _puroro_nested {
             }
 
             pub(crate) enum GroupThreeSimple {
-                G3Int32(i32),
+                _None,
+                G3Int32(::puroro::internal::Bare<i32>),
             }
 
+            impl ::std::default::Default for GroupThreeSimple {
+                fn default() -> Self {
+                    Self::_None
+                }
+            }
             impl ::std::fmt::Debug for GroupThreeSimple {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     match self {
+                        Self::_None => f.write_str("None"),
                         Self::G3Int32(v) => f
                             .debug_tuple("GroupThreeSimple::G3Int32")
                             .field(&v)
@@ -2628,6 +2618,7 @@ pub mod _puroro_nested {
             impl ::std::clone::Clone for GroupThreeSimple {
                 fn clone(&self) -> Self {
                     match self {
+                        Self::_None => Self::_None,
                         Self::G3Int32(v) => Self::G3Int32(::std::clone::Clone::clone(&v)),
                     }
                 }
@@ -2636,6 +2627,7 @@ pub mod _puroro_nested {
             impl ::std::cmp::PartialEq for GroupThreeSimple {
                 fn eq(&self, rhs: &Self) -> bool {
                     match (self, rhs) {
+                        (Self::_None, Self::_None) => true,
                         (Self::G3Int32(left), Self::G3Int32(right)) => left == right,
                         #[allow(unreachable_patterns)]
                         _ => false,

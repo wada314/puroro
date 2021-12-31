@@ -14,21 +14,24 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Test1 {
-        a: i32,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        a: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Test1> for Test1 {}
 
     impl Test1 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
         }
         pub fn a_opt(&self) -> ::std::option::Option<i32> {
-            if self.a == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.a) {
+                ::std::option::Option::Some(self.a.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.a))
+                ::std::option::Option::None
             }
         }
 
@@ -39,7 +42,13 @@ pub mod _puroro_simple_impl {
         pub fn a(&self) -> i32 {
             self.a_opt().unwrap_or(::std::default::Default::default())
         }
-        pub fn a_mut(&mut self) -> &mut i32 {
+        pub fn clear_a(&mut self) {
+            self.a = ::std::default::Default::default();
+        }
+        pub fn a_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_a() {
+                self.a = ::std::default::Default::default();
+            }
             &mut self.a
         }
     }
@@ -65,9 +74,11 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-            >::deser_field(&mut self.a, data),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.a, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -105,15 +116,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test1Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test1")
-                .field("a", &<Self as super::_puroro_traits::Test1Trait>::a(self))
-                .finish()
+            f.debug_struct("Test1").field("a", &self.a()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test1 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 a: ::std::clone::Clone::clone(&self.a),
             }
         }
@@ -121,25 +131,28 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test1 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.a == rhs.a && true
+            self._bitfield == rhs._bitfield && self.a == rhs.a && true
         }
     }
     pub struct Test2 {
-        b: ::std::string::String,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        b: ::puroro::internal::Bare<::std::string::String>,
     }
     impl ::puroro::Message<Test2> for Test2 {}
 
     impl Test2 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 b: ::std::default::Default::default(),
             }
         }
         pub fn b_opt(&self) -> ::std::option::Option<&'_ str> {
-            if self.b.is_empty() {
-                ::std::option::Option::None
-            } else {
+            if !::puroro::internal::IsDefault::is_default(&*self.b) {
                 ::std::option::Option::Some(&self.b)
+            } else {
+                ::std::option::Option::None
             }
         }
 
@@ -150,7 +163,13 @@ pub mod _puroro_simple_impl {
         pub fn b(&self) -> &'_ str {
             self.b_opt().unwrap_or(::std::default::Default::default())
         }
-        pub fn b_mut(&mut self) -> &mut ::std::string::String {
+        pub fn clear_b(&mut self) {
+            self.b = ::std::default::Default::default();
+        }
+        pub fn b_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_b() {
+                self.b = ::std::default::Default::default();
+            }
             &mut self.b
         }
     }
@@ -176,9 +195,11 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::String
-            >::deser_field(&mut self.b, data),
+            2 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.b, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -216,15 +237,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test2Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test2")
-                .field("b", &<Self as super::_puroro_traits::Test2Trait>::b(self))
-                .finish()
+            f.debug_struct("Test2").field("b", &self.b()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test2 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 b: ::std::clone::Clone::clone(&self.b),
             }
         }
@@ -232,10 +252,12 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test2 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.b == rhs.b && true
+            self._bitfield == rhs._bitfield && self.b == rhs.b && true
         }
     }
     pub struct Test3 {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         c: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>,
         >,
@@ -245,6 +267,7 @@ pub mod _puroro_simple_impl {
     impl Test3 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 c: ::std::default::Default::default(),
             }
         }
@@ -267,12 +290,16 @@ pub mod _puroro_simple_impl {
         > {
             self.c_opt()
         }
+        pub fn clear_c(&mut self) {
+            self.c = ::std::default::Default::default();
+        }
         pub fn c_mut(
             &mut self,
-        ) -> &mut ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_simple_impl::Test1>,
-        > {
-            &mut self.c
+        ) -> &'_ mut self::_puroro_root::official_samples3::_puroro_simple_impl::Test1 {
+            if !self.has_c() {
+                self.c = ::std::default::Default::default();
+            }
+            self.c.get_or_insert_with(::std::default::Default::default)
         }
     }
 
@@ -348,15 +375,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test3Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test3")
-                .field("c", &<Self as super::_puroro_traits::Test3Trait>::c(self))
-                .finish()
+            f.debug_struct("Test3").field("c", &self.c()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test3 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 c: ::std::clone::Clone::clone(&self.c),
             }
         }
@@ -364,10 +390,12 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test3 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.c == rhs.c && true
+            self._bitfield == rhs._bitfield && self.c == rhs.c && true
         }
     }
     pub struct Test4 {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         d: ::std::vec::Vec<i32>,
     }
     impl ::puroro::Message<Test4> for Test4 {}
@@ -375,14 +403,14 @@ pub mod _puroro_simple_impl {
     impl Test4 {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 d: ::std::default::Default::default(),
             }
         }
-
         pub fn d(&self) -> &'_ [i32] {
             &self.d
         }
-        pub fn d_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+        pub fn d_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
             &mut self.d
         }
     }
@@ -411,9 +439,11 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.d, data),
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.d, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -447,20 +477,14 @@ pub mod _puroro_simple_impl {
         Self: super::_puroro_traits::Test4Trait,
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-            f.debug_struct("Test4")
-                .field(
-                    "d",
-                    &<Self as super::_puroro_traits::Test4Trait>::d(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .finish()
+            f.debug_struct("Test4").field("d", &self.d()).finish()
         }
     }
 
     impl ::std::clone::Clone for Test4 {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 d: ::std::clone::Clone::clone(&self.d),
             }
         }
@@ -468,7 +492,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test4 {
         fn eq(&self, rhs: &Self) -> bool {
-            self.d == rhs.d && true
+            self._bitfield == rhs._bitfield && self.d == rhs.d && true
         }
     }
 }

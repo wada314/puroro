@@ -75,13 +75,13 @@ fn test_i32_optional() {
     assert_eq!(0, msg.i32_optional());
     assert!(!msg.has_i32_optional());
 
-    *msg.i32_optional_mut() = Some(10);
+    *msg.i32_optional_mut() = 10;
     assert_eq!(10, msg.i32_optional());
     assert!(msg.has_i32_optional());
 
     msg.merge_from_bytes(INPUT_FIELD2_I32_ZERO.bytes()).unwrap();
     assert_eq!(Some(0), msg.i32_optional_opt());
-    *msg.i32_optional_mut() = Some(10);
+    *msg.i32_optional_mut() = 10;
     assert_eq!(10, msg.i32_optional());
     assert!(msg.has_i32_optional());
     msg.merge_from_bytes(INPUT_FIELD2_I32_PACKED_ZERO.bytes())
@@ -142,39 +142,21 @@ fn test_message_unlabeled() {
     assert_eq!(None, msg.submsg_unlabeled());
     assert!(!msg.has_submsg_unlabeled());
 
-    *msg.submsg_unlabeled_mut() = Some(Box::new(<Submsg as Default>::default()));
-    assert_eq!(
-        Some(0),
-        msg.submsg_unlabeled().as_ref().map(|m| m.i32_unlabeled())
-    );
+    // calling the mut getter automatically initializes the message field
+    msg.submsg_unlabeled_mut();
     assert_eq!(Some(0), msg.submsg_unlabeled().map(|m| m.i32_unlabeled()));
     assert!(msg.has_submsg_unlabeled());
-    *msg.submsg_unlabeled_mut()
-        .as_mut()
-        .unwrap()
-        .i32_unlabeled_mut() = 10;
-    assert_eq!(
-        Some(10),
-        msg.submsg_unlabeled().as_ref().map(|m| m.i32_unlabeled())
-    );
+    *msg.submsg_unlabeled_mut().i32_unlabeled_mut() = 10;
     assert_eq!(Some(10), msg.submsg_unlabeled().map(|m| m.i32_unlabeled()));
     assert!(msg.has_submsg_unlabeled());
 
     msg.merge_from_bytes(INPUT_FIELDS6_MSG_FIELD1_I32_ZERO.bytes())
         .unwrap();
-    assert_eq!(
-        Some(10),
-        msg.submsg_unlabeled().as_ref().map(|m| m.i32_unlabeled())
-    );
     assert_eq!(Some(10), msg.submsg_unlabeled().map(|m| m.i32_unlabeled()));
     assert!(msg.has_submsg_unlabeled());
 
     msg.merge_from_bytes(INPUT_FIELDS6_MSG_FIELD1_I32_ONE.bytes())
         .unwrap();
-    assert_eq!(
-        Some(1),
-        msg.submsg_unlabeled().as_ref().map(|m| m.i32_unlabeled())
-    );
     assert_eq!(Some(1), msg.submsg_unlabeled().map(|m| m.i32_unlabeled()));
     assert!(msg.has_submsg_unlabeled());
 }

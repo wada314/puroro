@@ -11,11 +11,13 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        i32_unlabeled: i32,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
         i32_repeated: ::std::vec::Vec<i32>,
-        float_unlabeled: f32,
+        float_unlabeled: ::puroro::internal::Bare<f32>,
         float_repeated: ::std::vec::Vec<f32>,
-        string_unlabeled: ::std::string::String,
+        string_unlabeled: ::puroro::internal::Bare<::std::string::String>,
         string_repeated: ::std::vec::Vec<::std::string::String>,
         submsg_unlabeled: ::std::option::Option<
             ::std::boxed::Box<
@@ -25,15 +27,16 @@ pub mod _puroro_simple_impl {
         submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >,
-        enum_unlabeled: self::_puroro_root::ser_tests3::Enum,
+        enum_unlabeled: ::puroro::internal::Bare<self::_puroro_root::ser_tests3::Enum>,
         enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
-        very_large_field_number: i32,
+        very_large_field_number: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
                 i32_repeated: ::std::default::Default::default(),
                 float_unlabeled: ::std::default::Default::default(),
@@ -48,10 +51,10 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-            if self.i32_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -63,15 +66,14 @@ pub mod _puroro_simple_impl {
             self.i32_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn i32_repeated(&self) -> &'_ [i32] {
             &self.i32_repeated
         }
         pub fn float_unlabeled_opt(&self) -> ::std::option::Option<f32> {
-            if self.float_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.float_unlabeled) {
+                ::std::option::Option::Some(self.float_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.float_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -83,15 +85,14 @@ pub mod _puroro_simple_impl {
             self.float_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn float_repeated(&self) -> &'_ [f32] {
             &self.float_repeated
         }
         pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&'_ str> {
-            if self.string_unlabeled.is_empty() {
-                ::std::option::Option::None
-            } else {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
                 ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
             }
         }
 
@@ -103,8 +104,9 @@ pub mod _puroro_simple_impl {
             self.string_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
-        pub fn string_repeated(&self) -> &'_ [impl ::std::ops::Deref<Target = str>] {
+        pub fn string_repeated(
+            &self,
+        ) -> &'_ [impl ::std::ops::Deref<Target = str> + ::std::fmt::Debug] {
             &self.string_repeated
         }
         pub fn submsg_unlabeled_opt(
@@ -126,7 +128,6 @@ pub mod _puroro_simple_impl {
         > {
             self.submsg_unlabeled_opt()
         }
-
         pub fn submsg_repeated(
             &self,
         ) -> &'_ [self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg]
@@ -136,10 +137,10 @@ pub mod _puroro_simple_impl {
         pub fn enum_unlabeled_opt(
             &self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests3::Enum> {
-            if self.enum_unlabeled == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.enum_unlabeled) {
+                ::std::option::Option::Some(self.enum_unlabeled.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(&self.enum_unlabeled))
+                ::std::option::Option::None
             }
         }
 
@@ -151,17 +152,14 @@ pub mod _puroro_simple_impl {
             self.enum_unlabeled_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-
         pub fn enum_repeated(&self) -> &'_ [self::_puroro_root::ser_tests3::Enum] {
             &self.enum_repeated
         }
         pub fn very_large_field_number_opt(&self) -> ::std::option::Option<i32> {
-            if self.very_large_field_number == ::std::default::Default::default() {
-                ::std::option::Option::None
+            if !::puroro::internal::IsDefault::is_default(&*self.very_large_field_number) {
+                ::std::option::Option::Some(self.very_large_field_number.inner())
             } else {
-                ::std::option::Option::Some(::std::clone::Clone::clone(
-                    &self.very_large_field_number,
-                ))
+                ::std::option::Option::None
             }
         }
 
@@ -173,49 +171,83 @@ pub mod _puroro_simple_impl {
             self.very_large_field_number_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+        pub fn clear_i32_unlabeled(&mut self) {
+            self.i32_unlabeled = ::std::default::Default::default();
+        }
+        pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
             &mut self.i32_unlabeled
         }
-        pub fn i32_repeated_mut(&mut self) -> &mut ::std::vec::Vec<i32> {
+        pub fn i32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
             &mut self.i32_repeated
         }
-        pub fn float_unlabeled_mut(&mut self) -> &mut f32 {
+        pub fn clear_float_unlabeled(&mut self) {
+            self.float_unlabeled = ::std::default::Default::default();
+        }
+        pub fn float_unlabeled_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_float_unlabeled() {
+                self.float_unlabeled = ::std::default::Default::default();
+            }
             &mut self.float_unlabeled
         }
-        pub fn float_repeated_mut(&mut self) -> &mut ::std::vec::Vec<f32> {
+        pub fn float_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<f32> {
             &mut self.float_repeated
         }
-        pub fn string_unlabeled_mut(&mut self) -> &mut ::std::string::String {
+        pub fn clear_string_unlabeled(&mut self) {
+            self.string_unlabeled = ::std::default::Default::default();
+        }
+        pub fn string_unlabeled_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
             &mut self.string_unlabeled
         }
-        pub fn string_repeated_mut(&mut self) -> &mut ::std::vec::Vec<::std::string::String> {
+        pub fn string_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<::std::string::String> {
             &mut self.string_repeated
+        }
+        pub fn clear_submsg_unlabeled(&mut self) {
+            self.submsg_unlabeled = ::std::default::Default::default();
         }
         pub fn submsg_unlabeled_mut(
             &mut self,
-        ) -> &mut ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
-            >,
-        > {
-            &mut self.submsg_unlabeled
+        ) -> &'_ mut self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg
+        {
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
+            self.submsg_unlabeled
+                .get_or_insert_with(::std::default::Default::default)
         }
         pub fn submsg_repeated_mut(
             &mut self,
-        ) -> &mut ::std::vec::Vec<
+        ) -> &'_ mut ::std::vec::Vec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         > {
             &mut self.submsg_repeated
         }
-        pub fn enum_unlabeled_mut(&mut self) -> &mut self::_puroro_root::ser_tests3::Enum {
+        pub fn clear_enum_unlabeled(&mut self) {
+            self.enum_unlabeled = ::std::default::Default::default();
+        }
+        pub fn enum_unlabeled_mut(&mut self) -> &'_ mut self::_puroro_root::ser_tests3::Enum {
+            if !self.has_enum_unlabeled() {
+                self.enum_unlabeled = ::std::default::Default::default();
+            }
             &mut self.enum_unlabeled
         }
         pub fn enum_repeated_mut(
             &mut self,
-        ) -> &mut ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum> {
+        ) -> &'_ mut ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum> {
             &mut self.enum_repeated
         }
-        pub fn very_large_field_number_mut(&mut self) -> &mut i32 {
+        pub fn clear_very_large_field_number(&mut self) {
+            self.very_large_field_number = ::std::default::Default::default();
+        }
+        pub fn very_large_field_number_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_very_large_field_number() {
+                self.very_large_field_number = ::std::default::Default::default();
+            }
             &mut self.very_large_field_number
         }
     }
@@ -224,7 +256,6 @@ pub mod _puroro_simple_impl {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::i32_unlabeled_opt(self)
         }
-
         type Field2RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
@@ -234,7 +265,6 @@ pub mod _puroro_simple_impl {
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <self::Msg>::float_unlabeled_opt(self)
         }
-
         type Field4RepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
 
@@ -244,7 +274,6 @@ pub mod _puroro_simple_impl {
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Msg>::string_unlabeled_opt(self)
         }
-
         type Field6RepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
             ::std::vec::Vec<::std::string::String>,
@@ -266,7 +295,6 @@ pub mod _puroro_simple_impl {
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-
         type Field8RepeatedType<'this> =
     &'this [self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg];
 
@@ -276,7 +304,6 @@ pub mod _puroro_simple_impl {
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             <self::Msg>::enum_unlabeled_opt(self)
         }
-
         type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
             'this,
             ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
@@ -307,39 +334,61 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_unlabeled, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_repeated, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Float
-            >::deser_field(&mut self.float_unlabeled, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Float
-            >::deser_field(&mut self.float_repeated, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::String
-            >::deser_field(&mut self.string_unlabeled, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::String
-            >::deser_field(&mut self.string_repeated, data),
-            7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
-            >::deser_field(&mut self.submsg_unlabeled, data),
-            8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
-            >::deser_field(&mut self.submsg_repeated, data),
-            9 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
-            >::deser_field(&mut self.enum_unlabeled, data),
-            10 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
-            >::deser_field(&mut self.enum_repeated, data),
-            536870911 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-            >::deser_field(&mut self.very_large_field_number, data),
+            1 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_unlabeled, data)
+            }
+            2 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_repeated, data)
+            }
+            3 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Float
+                >::deser_field(&mut self.float_unlabeled, data)
+            }
+            4 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Float
+                >::deser_field(&mut self.float_repeated, data)
+            }
+            5 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::String
+                >::deser_field(&mut self.string_unlabeled, data)
+            }
+            6 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::String
+                >::deser_field(&mut self.string_repeated, data)
+            }
+            7 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Message<::std::boxed::Box<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>
+                >::deser_field(&mut self.submsg_unlabeled, data)
+            }
+            8 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
+                >::deser_field(&mut self.submsg_repeated, data)
+            }
+            9 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                >::deser_field(&mut self.enum_unlabeled, data)
+            }
+            10 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::ser_tests3::Enum>
+                >::deser_field(&mut self.enum_repeated, data)
+            }
+            536870911 => {
+                DeserFieldFromBytesIter::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::deser_field(&mut self.very_large_field_number, data)
+            }
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
@@ -462,60 +511,17 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "i32_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_unlabeled(self),
-                )
-                .field(
-                    "i32_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "float_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::float_unlabeled(self),
-                )
-                .field(
-                    "float_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::float_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "string_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_unlabeled(self),
-                )
-                .field(
-                    "string_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "submsg_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled(self),
-                )
-                .field(
-                    "submsg_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "enum_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_unlabeled(self),
-                )
-                .field(
-                    "enum_repeated",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_repeated(self)
-                        .into_iter()
-                        .collect::<::std::vec::Vec<_>>(),
-                )
-                .field(
-                    "very_large_field_number",
-                    &<Self as super::_puroro_traits::MsgTrait>::very_large_field_number(self),
-                )
+                .field("i32_unlabeled", &self.i32_unlabeled())
+                .field("i32_repeated", &self.i32_repeated())
+                .field("float_unlabeled", &self.float_unlabeled())
+                .field("float_repeated", &self.float_repeated())
+                .field("string_unlabeled", &self.string_unlabeled())
+                .field("string_repeated", &self.string_repeated())
+                .field("submsg_unlabeled", &self.submsg_unlabeled())
+                .field("submsg_repeated", &self.submsg_repeated())
+                .field("enum_unlabeled", &self.enum_unlabeled())
+                .field("enum_repeated", &self.enum_repeated())
+                .field("very_large_field_number", &self.very_large_field_number())
                 .finish()
         }
     }
@@ -523,6 +529,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                 i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
                 float_unlabeled: ::std::clone::Clone::clone(&self.float_unlabeled),
@@ -540,7 +547,8 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_unlabeled == rhs.i32_unlabeled
+            self._bitfield == rhs._bitfield
+                && self.i32_unlabeled == rhs.i32_unlabeled
                 && self.i32_repeated == rhs.i32_repeated
                 && self.float_unlabeled == rhs.float_unlabeled
                 && self.float_repeated == rhs.float_repeated
@@ -3373,21 +3381,26 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
             pub struct Submsg {
-                i32_unlabeled: i32,
+                _bitfield: ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (0 + 31) / 32],
+                >,
+                i32_unlabeled: ::puroro::internal::Bare<i32>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
 
             impl Submsg {
                 pub fn new() -> Self {
                     Self {
+                        _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
                     }
                 }
                 pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-                    if self.i32_unlabeled == ::std::default::Default::default() {
-                        ::std::option::Option::None
+                    if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                        ::std::option::Option::Some(self.i32_unlabeled.inner())
                     } else {
-                        ::std::option::Option::Some(::std::clone::Clone::clone(&self.i32_unlabeled))
+                        ::std::option::Option::None
                     }
                 }
 
@@ -3399,7 +3412,13 @@ pub mod _puroro_nested {
                     self.i32_unlabeled_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
-                pub fn i32_unlabeled_mut(&mut self) -> &mut i32 {
+                pub fn clear_i32_unlabeled(&mut self) {
+                    self.i32_unlabeled = ::std::default::Default::default();
+                }
+                pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
+                    if !self.has_i32_unlabeled() {
+                        self.i32_unlabeled = ::std::default::Default::default();
+                    }
                     &mut self.i32_unlabeled
                 }
             }
@@ -3467,10 +3486,7 @@ pub mod _puroro_nested {
             {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     f.debug_struct("Submsg")
-                        .field(
-                            "i32_unlabeled",
-                            &<Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(self),
-                        )
+                        .field("i32_unlabeled", &self.i32_unlabeled())
                         .finish()
                 }
             }
@@ -3478,6 +3494,7 @@ pub mod _puroro_nested {
             impl ::std::clone::Clone for Submsg {
                 fn clone(&self) -> Self {
                     Self {
+                        _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                         i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                     }
                 }
@@ -3485,7 +3502,9 @@ pub mod _puroro_nested {
 
             impl ::std::cmp::PartialEq for Submsg {
                 fn eq(&self, rhs: &Self) -> bool {
-                    self.i32_unlabeled == rhs.i32_unlabeled && true
+                    self._bitfield == rhs._bitfield
+                        && self.i32_unlabeled == rhs.i32_unlabeled
+                        && true
                 }
             }
         }

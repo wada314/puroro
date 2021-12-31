@@ -13,10 +13,10 @@ impl {{ m.ident }}Trait for () {
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
-    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+    fn {{ oneof.field_ident }}(&self) ->
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_this_self }}
+                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
         >
     {
         None

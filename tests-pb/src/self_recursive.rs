@@ -11,6 +11,8 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
         recursive_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
         >,
@@ -20,6 +22,7 @@ pub mod _puroro_simple_impl {
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }
@@ -40,12 +43,17 @@ pub mod _puroro_simple_impl {
         {
             self.recursive_unlabeled_opt()
         }
+        pub fn clear_recursive_unlabeled(&mut self) {
+            self.recursive_unlabeled = ::std::default::Default::default();
+        }
         pub fn recursive_unlabeled_mut(
             &mut self,
-        ) -> &mut ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
-        > {
-            &mut self.recursive_unlabeled
+        ) -> &'_ mut self::_puroro_root::self_recursive::_puroro_simple_impl::Msg {
+            if !self.has_recursive_unlabeled() {
+                self.recursive_unlabeled = ::std::default::Default::default();
+            }
+            self.recursive_unlabeled
+                .get_or_insert_with(::std::default::Default::default)
         }
     }
 
@@ -122,10 +130,7 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "recursive_unlabeled",
-                    &<Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled(self),
-                )
+                .field("recursive_unlabeled", &self.recursive_unlabeled())
                 .finish()
         }
     }
@@ -133,6 +138,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 recursive_unlabeled: ::std::clone::Clone::clone(&self.recursive_unlabeled),
             }
         }
@@ -140,7 +146,9 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.recursive_unlabeled == rhs.recursive_unlabeled && true
+            self._bitfield == rhs._bitfield
+                && self.recursive_unlabeled == rhs.recursive_unlabeled
+                && true
         }
     }
 }

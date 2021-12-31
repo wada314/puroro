@@ -181,7 +181,6 @@ struct Field {
     is_numerical: bool,
     is_explicit_oneof_field: bool,
     is_repeated: bool,
-    is_unlabeled: bool,
     has_default_value: bool,
     default_value: String,
     has_optional_bit: bool,
@@ -193,6 +192,7 @@ struct Field {
     simple_field_type: String,
     simple_getter_type: String,
     simple_getter_opt_type: String,
+    simple_getter_mut_type: String,
     simple_scalar_field_type: String,
     simple_field_message_path: String,
     simple_label_and_type_tags: String,
@@ -235,7 +235,6 @@ impl Field {
             is_numerical: !is_length_delimited,
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             is_repeated,
-            is_unlabeled,
             has_default_value: f.default_value().is_some(),
             default_value: f
                 .default_value()
@@ -280,6 +279,7 @@ impl Field {
                 "::std::option::Option<{}>",
                 f.simple_getter_scalar_type("'_")?
             ),
+            simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
             simple_scalar_field_type: f.simple_scalar_field_type()?.into(),
             simple_field_message_path: maybe_message
                 .as_ref()
@@ -403,7 +403,7 @@ struct Oneof {
     enum_ident: String,
     simple_enum_ident: String,
     bumpalo_enum_ident: String,
-    enum_maybe_gp_this_self: String,
+    enum_maybe_gp_self: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -430,16 +430,7 @@ impl Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
             simple_enum_ident: format!("{}Simple", o.rust_enum_ident().to_string()),
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident().to_string()),
-            enum_maybe_gp_this_self: if has_ld_field {
-                if has_message_field {
-                    "<'this, Self>"
-                } else {
-                    "<'this>"
-                }
-            } else {
-                ""
-            }
-            .to_string(),
+            enum_maybe_gp_self: if has_message_field { "<Self>" } else { "" }.to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
@@ -466,6 +457,7 @@ struct OneofField {
     field_type: String,
     simple_field_type: String,
     simple_getter_opt_type: String,
+    simple_getter_mut_type: String,
     bumpalo_field_type: String,
     trait_getter_type: String,
     simple_field_type_tag: String,
@@ -489,11 +481,12 @@ impl OneofField {
             is_length_delimited,
             is_numerical: !is_length_delimited,
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
-            simple_field_type: f.simple_oneof_field_type()?.into(),
+            simple_field_type: f.simple_field_type()?.into(),
             simple_getter_opt_type: format!(
                 "::std::option::Option<{}>",
                 f.simple_getter_scalar_type("'_")?
             ),
+            simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
