@@ -132,10 +132,8 @@ fn test_get_oneof_field() {
     let mut msg_test2 = Msg::default();
     *msg_test2.g2_string_mut() = "Test2".to_string();
     let mut msg_submsg_0 = Msg::default();
-    *msg_submsg_0.g2_submsg_mut() = Box::new(Submsg::default());
     *msg_submsg_0.g2_submsg_mut().i32_unlabeled_mut() = 0;
     let mut msg_submsg_3 = Msg::default();
-    *msg_submsg_3.g2_submsg_mut() = Box::new(Submsg::default());
     *msg_submsg_3.g2_submsg_mut().i32_unlabeled_mut() = 3;
     // None x None
     assert_eq!(None, (&none, &none).group_two());

@@ -11,18 +11,25 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        r#type: ::std::option::Option<i32>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        r#type: ::puroro::internal::Bare<i32>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
             }
         }
         pub fn type_opt(&self) -> ::std::option::Option<i32> {
-            self.r#type.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.r#type.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_type(&self) -> bool {
@@ -33,7 +40,14 @@ pub mod _puroro_simple_impl {
             self.type_opt()
                 .unwrap_or(::std::default::Default::default())
         }
-        pub fn type_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_type(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn type_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_type() {
+                self.r#type = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
             &mut self.r#type
         }
     }
@@ -59,12 +73,15 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.r#type, data),
+                1 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.r#type, data)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -100,10 +117,7 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "r#type",
-                    &<Self as super::_puroro_traits::MsgTrait>::type_opt(self),
-                )
+                .field("r#type", &self.type_opt())
                 .finish()
         }
     }
@@ -111,6 +125,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 r#type: ::std::clone::Clone::clone(&self.r#type),
             }
         }
@@ -118,7 +133,7 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.r#type == rhs.r#type && true
+            self._bitfield == rhs._bitfield && self.r#type == rhs.r#type && true
         }
     }
 }

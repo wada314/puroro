@@ -11,74 +11,77 @@ pub mod _puroro_simple_impl {
         pub use super::super::_puroro_root::*;
     }
     pub struct Msg {
-        i32_default: ::std::option::Option<i32>,
-        i32_0: ::std::option::Option<i32>,
-        i32_42: ::std::option::Option<i32>,
-        i32_m42: ::std::option::Option<i32>,
-        i32_2147483647: ::std::option::Option<i32>,
-        i32_m2147483648: ::std::option::Option<i32>,
-        i32_0123: ::std::option::Option<i32>,
-        i32_0x123: ::std::option::Option<i32>,
-        u32_default: ::std::option::Option<u32>,
-        u32_0: ::std::option::Option<u32>,
-        u32_42: ::std::option::Option<u32>,
-        u32_4294967295: ::std::option::Option<u32>,
-        u32_0123: ::std::option::Option<u32>,
-        u32_0x123: ::std::option::Option<u32>,
-        i64_default: ::std::option::Option<i64>,
-        i64_0: ::std::option::Option<i64>,
-        i64_42: ::std::option::Option<i64>,
-        i64_m42: ::std::option::Option<i64>,
-        i64_9223372036854775807: ::std::option::Option<i64>,
-        i64_m9223372036854775808: ::std::option::Option<i64>,
-        i64_0123: ::std::option::Option<i64>,
-        i64_0x123: ::std::option::Option<i64>,
-        u64_default: ::std::option::Option<u64>,
-        u64_0: ::std::option::Option<u64>,
-        u64_42: ::std::option::Option<u64>,
-        u64_18446744073709551615: ::std::option::Option<u64>,
-        u64_0123: ::std::option::Option<u64>,
-        u64_0x123: ::std::option::Option<u64>,
-        f32_default: ::std::option::Option<f32>,
-        f32_0: ::std::option::Option<f32>,
-        f32_m0: ::std::option::Option<f32>,
-        f32_0p: ::std::option::Option<f32>,
-        f32_p0: ::std::option::Option<f32>,
-        f32_0p0: ::std::option::Option<f32>,
-        f32_42: ::std::option::Option<f32>,
-        f32_m42: ::std::option::Option<f32>,
-        f32_0p25: ::std::option::Option<f32>,
-        f32_1p5e2: ::std::option::Option<f32>,
-        f32_inf: ::std::option::Option<f32>,
-        f32_minf: ::std::option::Option<f32>,
-        f32_nan: ::std::option::Option<f32>,
-        f32_mnan: ::std::option::Option<f32>,
-        bool_default: ::std::option::Option<bool>,
-        bool_true: ::std::option::Option<bool>,
-        bool_false: ::std::option::Option<bool>,
-        string_default: ::std::option::Option<::std::string::String>,
-        string_empty: ::std::option::Option<::std::string::String>,
-        string_abc: ::std::option::Option<::std::string::String>,
-        string_aiu: ::std::option::Option<::std::string::String>,
-        string_backslash: ::std::option::Option<::std::string::String>,
-        string_tab: ::std::option::Option<::std::string::String>,
-        string_crlf: ::std::option::Option<::std::string::String>,
-        bytes_default: ::std::option::Option<::std::vec::Vec<u8>>,
-        bytes_empty: ::std::option::Option<::std::vec::Vec<u8>>,
-        bytes_abc: ::std::option::Option<::std::vec::Vec<u8>>,
-        bytes_aiu: ::std::option::Option<::std::vec::Vec<u8>>,
-        bytes_backslash: ::std::option::Option<::std::vec::Vec<u8>>,
-        bytes_tab: ::std::option::Option<::std::vec::Vec<u8>>,
-        bytes_crlf: ::std::option::Option<::std::vec::Vec<u8>>,
-        enum_default: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
-        enum_one: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
-        enum_fourty_two: ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum>,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (62 + 31) / 32]>,
+        i32_default: ::puroro::internal::Bare<i32>,
+        i32_0: ::puroro::internal::Bare<i32>,
+        i32_42: ::puroro::internal::Bare<i32>,
+        i32_m42: ::puroro::internal::Bare<i32>,
+        i32_2147483647: ::puroro::internal::Bare<i32>,
+        i32_m2147483648: ::puroro::internal::Bare<i32>,
+        i32_0123: ::puroro::internal::Bare<i32>,
+        i32_0x123: ::puroro::internal::Bare<i32>,
+        u32_default: ::puroro::internal::Bare<u32>,
+        u32_0: ::puroro::internal::Bare<u32>,
+        u32_42: ::puroro::internal::Bare<u32>,
+        u32_4294967295: ::puroro::internal::Bare<u32>,
+        u32_0123: ::puroro::internal::Bare<u32>,
+        u32_0x123: ::puroro::internal::Bare<u32>,
+        i64_default: ::puroro::internal::Bare<i64>,
+        i64_0: ::puroro::internal::Bare<i64>,
+        i64_42: ::puroro::internal::Bare<i64>,
+        i64_m42: ::puroro::internal::Bare<i64>,
+        i64_9223372036854775807: ::puroro::internal::Bare<i64>,
+        i64_m9223372036854775808: ::puroro::internal::Bare<i64>,
+        i64_0123: ::puroro::internal::Bare<i64>,
+        i64_0x123: ::puroro::internal::Bare<i64>,
+        u64_default: ::puroro::internal::Bare<u64>,
+        u64_0: ::puroro::internal::Bare<u64>,
+        u64_42: ::puroro::internal::Bare<u64>,
+        u64_18446744073709551615: ::puroro::internal::Bare<u64>,
+        u64_0123: ::puroro::internal::Bare<u64>,
+        u64_0x123: ::puroro::internal::Bare<u64>,
+        f32_default: ::puroro::internal::Bare<f32>,
+        f32_0: ::puroro::internal::Bare<f32>,
+        f32_m0: ::puroro::internal::Bare<f32>,
+        f32_0p: ::puroro::internal::Bare<f32>,
+        f32_p0: ::puroro::internal::Bare<f32>,
+        f32_0p0: ::puroro::internal::Bare<f32>,
+        f32_42: ::puroro::internal::Bare<f32>,
+        f32_m42: ::puroro::internal::Bare<f32>,
+        f32_0p25: ::puroro::internal::Bare<f32>,
+        f32_1p5e2: ::puroro::internal::Bare<f32>,
+        f32_inf: ::puroro::internal::Bare<f32>,
+        f32_minf: ::puroro::internal::Bare<f32>,
+        f32_nan: ::puroro::internal::Bare<f32>,
+        f32_mnan: ::puroro::internal::Bare<f32>,
+        bool_default: ::puroro::internal::Bare<bool>,
+        bool_true: ::puroro::internal::Bare<bool>,
+        bool_false: ::puroro::internal::Bare<bool>,
+        string_default: ::puroro::internal::Bare<::std::string::String>,
+        string_empty: ::puroro::internal::Bare<::std::string::String>,
+        string_abc: ::puroro::internal::Bare<::std::string::String>,
+        string_aiu: ::puroro::internal::Bare<::std::string::String>,
+        string_backslash: ::puroro::internal::Bare<::std::string::String>,
+        string_tab: ::puroro::internal::Bare<::std::string::String>,
+        string_crlf: ::puroro::internal::Bare<::std::string::String>,
+        bytes_default: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+        bytes_empty: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+        bytes_abc: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+        bytes_aiu: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+        bytes_backslash: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+        bytes_tab: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+        bytes_crlf: ::puroro::internal::Bare<::std::vec::Vec<u8>>,
+        enum_default: ::puroro::internal::Bare<self::_puroro_root::proto2_defaults::MyEnum>,
+        enum_one: ::puroro::internal::Bare<self::_puroro_root::proto2_defaults::MyEnum>,
+        enum_fourty_two: ::puroro::internal::Bare<self::_puroro_root::proto2_defaults::MyEnum>,
     }
     impl ::puroro::Message<Msg> for Msg {}
 
     impl Msg {
         pub fn new() -> Self {
             Self {
+                _bitfield: ::std::default::Default::default(),
                 i32_default: ::std::default::Default::default(),
                 i32_0: ::std::default::Default::default(),
                 i32_42: ::std::default::Default::default(),
@@ -144,7 +147,11 @@ pub mod _puroro_simple_impl {
             }
         }
         pub fn i32_default_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_default.clone()
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_default.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_default(&self) -> bool {
@@ -156,7 +163,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i32_0_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_0.clone()
+            if self._bitfield.get(1).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_0(&self) -> bool {
@@ -167,7 +178,11 @@ pub mod _puroro_simple_impl {
             self.i32_0_opt().unwrap_or(0)
         }
         pub fn i32_42_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_42.clone()
+            if self._bitfield.get(2).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_42(&self) -> bool {
@@ -178,7 +193,11 @@ pub mod _puroro_simple_impl {
             self.i32_42_opt().unwrap_or(42)
         }
         pub fn i32_m42_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_m42.clone()
+            if self._bitfield.get(3).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_m42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_m42(&self) -> bool {
@@ -189,7 +208,11 @@ pub mod _puroro_simple_impl {
             self.i32_m42_opt().unwrap_or(-42)
         }
         pub fn i32_2147483647_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_2147483647.clone()
+            if self._bitfield.get(4).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_2147483647.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_2147483647(&self) -> bool {
@@ -200,7 +223,11 @@ pub mod _puroro_simple_impl {
             self.i32_2147483647_opt().unwrap_or(2147483647)
         }
         pub fn i32_m2147483648_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_m2147483648.clone()
+            if self._bitfield.get(5).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_m2147483648.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_m2147483648(&self) -> bool {
@@ -211,7 +238,11 @@ pub mod _puroro_simple_impl {
             self.i32_m2147483648_opt().unwrap_or(-2147483648)
         }
         pub fn i32_0123_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_0123.clone()
+            if self._bitfield.get(6).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_0123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_0123(&self) -> bool {
@@ -222,7 +253,11 @@ pub mod _puroro_simple_impl {
             self.i32_0123_opt().unwrap_or(83)
         }
         pub fn i32_0x123_opt(&self) -> ::std::option::Option<i32> {
-            self.i32_0x123.clone()
+            if self._bitfield.get(7).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_0x123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i32_0x123(&self) -> bool {
@@ -233,7 +268,11 @@ pub mod _puroro_simple_impl {
             self.i32_0x123_opt().unwrap_or(291)
         }
         pub fn u32_default_opt(&self) -> ::std::option::Option<u32> {
-            self.u32_default.clone()
+            if self._bitfield.get(8).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u32_default.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u32_default(&self) -> bool {
@@ -245,7 +284,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn u32_0_opt(&self) -> ::std::option::Option<u32> {
-            self.u32_0.clone()
+            if self._bitfield.get(9).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u32_0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u32_0(&self) -> bool {
@@ -256,7 +299,11 @@ pub mod _puroro_simple_impl {
             self.u32_0_opt().unwrap_or(0)
         }
         pub fn u32_42_opt(&self) -> ::std::option::Option<u32> {
-            self.u32_42.clone()
+            if self._bitfield.get(10).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u32_42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u32_42(&self) -> bool {
@@ -267,7 +314,11 @@ pub mod _puroro_simple_impl {
             self.u32_42_opt().unwrap_or(42)
         }
         pub fn u32_4294967295_opt(&self) -> ::std::option::Option<u32> {
-            self.u32_4294967295.clone()
+            if self._bitfield.get(11).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u32_4294967295.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u32_4294967295(&self) -> bool {
@@ -278,7 +329,11 @@ pub mod _puroro_simple_impl {
             self.u32_4294967295_opt().unwrap_or(4294967295)
         }
         pub fn u32_0123_opt(&self) -> ::std::option::Option<u32> {
-            self.u32_0123.clone()
+            if self._bitfield.get(12).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u32_0123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u32_0123(&self) -> bool {
@@ -289,7 +344,11 @@ pub mod _puroro_simple_impl {
             self.u32_0123_opt().unwrap_or(83)
         }
         pub fn u32_0x123_opt(&self) -> ::std::option::Option<u32> {
-            self.u32_0x123.clone()
+            if self._bitfield.get(13).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u32_0x123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u32_0x123(&self) -> bool {
@@ -300,7 +359,11 @@ pub mod _puroro_simple_impl {
             self.u32_0x123_opt().unwrap_or(291)
         }
         pub fn i64_default_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_default.clone()
+            if self._bitfield.get(14).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_default.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_default(&self) -> bool {
@@ -312,7 +375,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn i64_0_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_0.clone()
+            if self._bitfield.get(15).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_0(&self) -> bool {
@@ -323,7 +390,11 @@ pub mod _puroro_simple_impl {
             self.i64_0_opt().unwrap_or(0)
         }
         pub fn i64_42_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_42.clone()
+            if self._bitfield.get(16).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_42(&self) -> bool {
@@ -334,7 +405,11 @@ pub mod _puroro_simple_impl {
             self.i64_42_opt().unwrap_or(42)
         }
         pub fn i64_m42_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_m42.clone()
+            if self._bitfield.get(17).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_m42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_m42(&self) -> bool {
@@ -345,7 +420,11 @@ pub mod _puroro_simple_impl {
             self.i64_m42_opt().unwrap_or(-42)
         }
         pub fn i64_9223372036854775807_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_9223372036854775807.clone()
+            if self._bitfield.get(18).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_9223372036854775807.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_9223372036854775807(&self) -> bool {
@@ -357,7 +436,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(9223372036854775807)
         }
         pub fn i64_m9223372036854775808_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_m9223372036854775808.clone()
+            if self._bitfield.get(19).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_m9223372036854775808.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_m9223372036854775808(&self) -> bool {
@@ -369,7 +452,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(-9223372036854775808)
         }
         pub fn i64_0123_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_0123.clone()
+            if self._bitfield.get(20).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_0123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_0123(&self) -> bool {
@@ -380,7 +467,11 @@ pub mod _puroro_simple_impl {
             self.i64_0123_opt().unwrap_or(83)
         }
         pub fn i64_0x123_opt(&self) -> ::std::option::Option<i64> {
-            self.i64_0x123.clone()
+            if self._bitfield.get(21).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i64_0x123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_i64_0x123(&self) -> bool {
@@ -391,7 +482,11 @@ pub mod _puroro_simple_impl {
             self.i64_0x123_opt().unwrap_or(291)
         }
         pub fn u64_default_opt(&self) -> ::std::option::Option<u64> {
-            self.u64_default.clone()
+            if self._bitfield.get(22).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u64_default.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u64_default(&self) -> bool {
@@ -403,7 +498,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn u64_0_opt(&self) -> ::std::option::Option<u64> {
-            self.u64_0.clone()
+            if self._bitfield.get(23).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u64_0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u64_0(&self) -> bool {
@@ -414,7 +513,11 @@ pub mod _puroro_simple_impl {
             self.u64_0_opt().unwrap_or(0)
         }
         pub fn u64_42_opt(&self) -> ::std::option::Option<u64> {
-            self.u64_42.clone()
+            if self._bitfield.get(24).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u64_42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u64_42(&self) -> bool {
@@ -425,7 +528,11 @@ pub mod _puroro_simple_impl {
             self.u64_42_opt().unwrap_or(42)
         }
         pub fn u64_18446744073709551615_opt(&self) -> ::std::option::Option<u64> {
-            self.u64_18446744073709551615.clone()
+            if self._bitfield.get(25).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u64_18446744073709551615.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u64_18446744073709551615(&self) -> bool {
@@ -437,7 +544,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(18446744073709551615)
         }
         pub fn u64_0123_opt(&self) -> ::std::option::Option<u64> {
-            self.u64_0123.clone()
+            if self._bitfield.get(26).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u64_0123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u64_0123(&self) -> bool {
@@ -448,7 +559,11 @@ pub mod _puroro_simple_impl {
             self.u64_0123_opt().unwrap_or(83)
         }
         pub fn u64_0x123_opt(&self) -> ::std::option::Option<u64> {
-            self.u64_0x123.clone()
+            if self._bitfield.get(27).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.u64_0x123.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_u64_0x123(&self) -> bool {
@@ -459,7 +574,11 @@ pub mod _puroro_simple_impl {
             self.u64_0x123_opt().unwrap_or(291)
         }
         pub fn f32_default_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_default.clone()
+            if self._bitfield.get(28).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_default.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_default(&self) -> bool {
@@ -471,7 +590,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn f32_0_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_0.clone()
+            if self._bitfield.get(29).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_0(&self) -> bool {
@@ -482,7 +605,11 @@ pub mod _puroro_simple_impl {
             self.f32_0_opt().unwrap_or(0f32)
         }
         pub fn f32_m0_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_m0.clone()
+            if self._bitfield.get(30).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_m0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_m0(&self) -> bool {
@@ -493,7 +620,11 @@ pub mod _puroro_simple_impl {
             self.f32_m0_opt().unwrap_or(-0f32)
         }
         pub fn f32_0p_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_0p.clone()
+            if self._bitfield.get(31).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_0p.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_0p(&self) -> bool {
@@ -504,7 +635,11 @@ pub mod _puroro_simple_impl {
             self.f32_0p_opt().unwrap_or(0f32)
         }
         pub fn f32_p0_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_p0.clone()
+            if self._bitfield.get(32).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_p0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_p0(&self) -> bool {
@@ -515,7 +650,11 @@ pub mod _puroro_simple_impl {
             self.f32_p0_opt().unwrap_or(0f32)
         }
         pub fn f32_0p0_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_0p0.clone()
+            if self._bitfield.get(33).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_0p0.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_0p0(&self) -> bool {
@@ -526,7 +665,11 @@ pub mod _puroro_simple_impl {
             self.f32_0p0_opt().unwrap_or(0f32)
         }
         pub fn f32_42_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_42.clone()
+            if self._bitfield.get(34).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_42(&self) -> bool {
@@ -537,7 +680,11 @@ pub mod _puroro_simple_impl {
             self.f32_42_opt().unwrap_or(42f32)
         }
         pub fn f32_m42_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_m42.clone()
+            if self._bitfield.get(35).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_m42.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_m42(&self) -> bool {
@@ -548,7 +695,11 @@ pub mod _puroro_simple_impl {
             self.f32_m42_opt().unwrap_or(-42f32)
         }
         pub fn f32_0p25_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_0p25.clone()
+            if self._bitfield.get(36).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_0p25.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_0p25(&self) -> bool {
@@ -559,7 +710,11 @@ pub mod _puroro_simple_impl {
             self.f32_0p25_opt().unwrap_or(0.25f32)
         }
         pub fn f32_1p5e2_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_1p5e2.clone()
+            if self._bitfield.get(37).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_1p5e2.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_1p5e2(&self) -> bool {
@@ -570,7 +725,11 @@ pub mod _puroro_simple_impl {
             self.f32_1p5e2_opt().unwrap_or(150f32)
         }
         pub fn f32_inf_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_inf.clone()
+            if self._bitfield.get(38).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_inf.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_inf(&self) -> bool {
@@ -581,7 +740,11 @@ pub mod _puroro_simple_impl {
             self.f32_inf_opt().unwrap_or(f32::INFINITY)
         }
         pub fn f32_minf_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_minf.clone()
+            if self._bitfield.get(39).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_minf.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_minf(&self) -> bool {
@@ -592,7 +755,11 @@ pub mod _puroro_simple_impl {
             self.f32_minf_opt().unwrap_or(f32::NEG_INFINITY)
         }
         pub fn f32_nan_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_nan.clone()
+            if self._bitfield.get(40).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_nan.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_nan(&self) -> bool {
@@ -603,7 +770,11 @@ pub mod _puroro_simple_impl {
             self.f32_nan_opt().unwrap_or(f32::NAN)
         }
         pub fn f32_mnan_opt(&self) -> ::std::option::Option<f32> {
-            self.f32_mnan.clone()
+            if self._bitfield.get(41).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.f32_mnan.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_f32_mnan(&self) -> bool {
@@ -614,7 +785,11 @@ pub mod _puroro_simple_impl {
             self.f32_mnan_opt().unwrap_or(f32::NAN)
         }
         pub fn bool_default_opt(&self) -> ::std::option::Option<bool> {
-            self.bool_default.clone()
+            if self._bitfield.get(42).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.bool_default.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bool_default(&self) -> bool {
@@ -626,7 +801,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn bool_true_opt(&self) -> ::std::option::Option<bool> {
-            self.bool_true.clone()
+            if self._bitfield.get(43).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.bool_true.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bool_true(&self) -> bool {
@@ -637,7 +816,11 @@ pub mod _puroro_simple_impl {
             self.bool_true_opt().unwrap_or(true)
         }
         pub fn bool_false_opt(&self) -> ::std::option::Option<bool> {
-            self.bool_false.clone()
+            if self._bitfield.get(44).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.bool_false.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bool_false(&self) -> bool {
@@ -648,7 +831,11 @@ pub mod _puroro_simple_impl {
             self.bool_false_opt().unwrap_or(false)
         }
         pub fn string_default_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_default.as_deref()
+            if self._bitfield.get(45).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_default)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_default(&self) -> bool {
@@ -660,7 +847,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn string_empty_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_empty.as_deref()
+            if self._bitfield.get(46).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_empty)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_empty(&self) -> bool {
@@ -671,7 +862,11 @@ pub mod _puroro_simple_impl {
             self.string_empty_opt().unwrap_or("")
         }
         pub fn string_abc_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_abc.as_deref()
+            if self._bitfield.get(47).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_abc)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_abc(&self) -> bool {
@@ -682,7 +877,11 @@ pub mod _puroro_simple_impl {
             self.string_abc_opt().unwrap_or("abc")
         }
         pub fn string_aiu_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_aiu.as_deref()
+            if self._bitfield.get(48).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_aiu)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_aiu(&self) -> bool {
@@ -693,7 +892,11 @@ pub mod _puroro_simple_impl {
             self.string_aiu_opt().unwrap_or("\u{3042}\u{3044}\u{3046}")
         }
         pub fn string_backslash_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_backslash.as_deref()
+            if self._bitfield.get(49).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_backslash)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_backslash(&self) -> bool {
@@ -704,7 +907,11 @@ pub mod _puroro_simple_impl {
             self.string_backslash_opt().unwrap_or("\\")
         }
         pub fn string_tab_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_tab.as_deref()
+            if self._bitfield.get(50).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_tab)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_tab(&self) -> bool {
@@ -715,7 +922,11 @@ pub mod _puroro_simple_impl {
             self.string_tab_opt().unwrap_or("\t")
         }
         pub fn string_crlf_opt(&self) -> ::std::option::Option<&'_ str> {
-            self.string_crlf.as_deref()
+            if self._bitfield.get(51).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.string_crlf)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_string_crlf(&self) -> bool {
@@ -726,7 +937,11 @@ pub mod _puroro_simple_impl {
             self.string_crlf_opt().unwrap_or("\r\n")
         }
         pub fn bytes_default_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_default.as_deref()
+            if self._bitfield.get(52).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_default)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_default(&self) -> bool {
@@ -738,7 +953,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(::std::default::Default::default())
         }
         pub fn bytes_empty_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_empty.as_deref()
+            if self._bitfield.get(53).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_empty)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_empty(&self) -> bool {
@@ -749,7 +968,11 @@ pub mod _puroro_simple_impl {
             self.bytes_empty_opt().unwrap_or(b"")
         }
         pub fn bytes_abc_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_abc.as_deref()
+            if self._bitfield.get(54).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_abc)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_abc(&self) -> bool {
@@ -760,7 +983,11 @@ pub mod _puroro_simple_impl {
             self.bytes_abc_opt().unwrap_or(b"\x61\x62\x63")
         }
         pub fn bytes_aiu_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_aiu.as_deref()
+            if self._bitfield.get(55).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_aiu)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_aiu(&self) -> bool {
@@ -772,7 +999,11 @@ pub mod _puroro_simple_impl {
                 .unwrap_or(b"\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86")
         }
         pub fn bytes_backslash_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_backslash.as_deref()
+            if self._bitfield.get(56).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_backslash)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_backslash(&self) -> bool {
@@ -783,7 +1014,11 @@ pub mod _puroro_simple_impl {
             self.bytes_backslash_opt().unwrap_or(b"\x5c")
         }
         pub fn bytes_tab_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_tab.as_deref()
+            if self._bitfield.get(57).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_tab)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_tab(&self) -> bool {
@@ -794,7 +1029,11 @@ pub mod _puroro_simple_impl {
             self.bytes_tab_opt().unwrap_or(b"\x09")
         }
         pub fn bytes_crlf_opt(&self) -> ::std::option::Option<&'_ [u8]> {
-            self.bytes_crlf.as_deref()
+            if self._bitfield.get(58).map_or(false, |v| *v) {
+                ::std::option::Option::Some(&self.bytes_crlf)
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_bytes_crlf(&self) -> bool {
@@ -807,7 +1046,11 @@ pub mod _puroro_simple_impl {
         pub fn enum_default_opt(
             &self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.enum_default.clone()
+            if self._bitfield.get(59).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.enum_default.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_enum_default(&self) -> bool {
@@ -821,7 +1064,11 @@ pub mod _puroro_simple_impl {
         pub fn enum_one_opt(
             &self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.enum_one.clone()
+            if self._bitfield.get(60).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.enum_one.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_enum_one(&self) -> bool {
@@ -835,7 +1082,11 @@ pub mod _puroro_simple_impl {
         pub fn enum_fourty_two_opt(
             &self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
-            self.enum_fourty_two.clone()
+            if self._bitfield.get(61).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.enum_fourty_two.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
 
         pub fn has_enum_fourty_two(&self) -> bool {
@@ -846,198 +1097,626 @@ pub mod _puroro_simple_impl {
             self.enum_fourty_two_opt()
                 .unwrap_or(self::_puroro_root::proto2_defaults::MyEnum::FourtyTwo)
         }
-        pub fn i32_default_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_default(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn i32_default_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_default() {
+                self.i32_default = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
             &mut self.i32_default
         }
-        pub fn i32_0_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_0(&mut self) {
+            self._bitfield.set(1, false);
+        }
+        pub fn i32_0_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_0() {
+                self.i32_0 = ::std::default::Default::default();
+                self._bitfield.set(1, true);
+            }
             &mut self.i32_0
         }
-        pub fn i32_42_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_42(&mut self) {
+            self._bitfield.set(2, false);
+        }
+        pub fn i32_42_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_42() {
+                self.i32_42 = ::std::default::Default::default();
+                self._bitfield.set(2, true);
+            }
             &mut self.i32_42
         }
-        pub fn i32_m42_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_m42(&mut self) {
+            self._bitfield.set(3, false);
+        }
+        pub fn i32_m42_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_m42() {
+                self.i32_m42 = ::std::default::Default::default();
+                self._bitfield.set(3, true);
+            }
             &mut self.i32_m42
         }
-        pub fn i32_2147483647_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_2147483647(&mut self) {
+            self._bitfield.set(4, false);
+        }
+        pub fn i32_2147483647_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_2147483647() {
+                self.i32_2147483647 = ::std::default::Default::default();
+                self._bitfield.set(4, true);
+            }
             &mut self.i32_2147483647
         }
-        pub fn i32_m2147483648_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_m2147483648(&mut self) {
+            self._bitfield.set(5, false);
+        }
+        pub fn i32_m2147483648_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_m2147483648() {
+                self.i32_m2147483648 = ::std::default::Default::default();
+                self._bitfield.set(5, true);
+            }
             &mut self.i32_m2147483648
         }
-        pub fn i32_0123_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_0123(&mut self) {
+            self._bitfield.set(6, false);
+        }
+        pub fn i32_0123_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_0123() {
+                self.i32_0123 = ::std::default::Default::default();
+                self._bitfield.set(6, true);
+            }
             &mut self.i32_0123
         }
-        pub fn i32_0x123_mut(&mut self) -> &mut ::std::option::Option<i32> {
+        pub fn clear_i32_0x123(&mut self) {
+            self._bitfield.set(7, false);
+        }
+        pub fn i32_0x123_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_0x123() {
+                self.i32_0x123 = ::std::default::Default::default();
+                self._bitfield.set(7, true);
+            }
             &mut self.i32_0x123
         }
-        pub fn u32_default_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn clear_u32_default(&mut self) {
+            self._bitfield.set(8, false);
+        }
+        pub fn u32_default_mut(&mut self) -> &'_ mut u32 {
+            if !self.has_u32_default() {
+                self.u32_default = ::std::default::Default::default();
+                self._bitfield.set(8, true);
+            }
             &mut self.u32_default
         }
-        pub fn u32_0_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn clear_u32_0(&mut self) {
+            self._bitfield.set(9, false);
+        }
+        pub fn u32_0_mut(&mut self) -> &'_ mut u32 {
+            if !self.has_u32_0() {
+                self.u32_0 = ::std::default::Default::default();
+                self._bitfield.set(9, true);
+            }
             &mut self.u32_0
         }
-        pub fn u32_42_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn clear_u32_42(&mut self) {
+            self._bitfield.set(10, false);
+        }
+        pub fn u32_42_mut(&mut self) -> &'_ mut u32 {
+            if !self.has_u32_42() {
+                self.u32_42 = ::std::default::Default::default();
+                self._bitfield.set(10, true);
+            }
             &mut self.u32_42
         }
-        pub fn u32_4294967295_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn clear_u32_4294967295(&mut self) {
+            self._bitfield.set(11, false);
+        }
+        pub fn u32_4294967295_mut(&mut self) -> &'_ mut u32 {
+            if !self.has_u32_4294967295() {
+                self.u32_4294967295 = ::std::default::Default::default();
+                self._bitfield.set(11, true);
+            }
             &mut self.u32_4294967295
         }
-        pub fn u32_0123_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn clear_u32_0123(&mut self) {
+            self._bitfield.set(12, false);
+        }
+        pub fn u32_0123_mut(&mut self) -> &'_ mut u32 {
+            if !self.has_u32_0123() {
+                self.u32_0123 = ::std::default::Default::default();
+                self._bitfield.set(12, true);
+            }
             &mut self.u32_0123
         }
-        pub fn u32_0x123_mut(&mut self) -> &mut ::std::option::Option<u32> {
+        pub fn clear_u32_0x123(&mut self) {
+            self._bitfield.set(13, false);
+        }
+        pub fn u32_0x123_mut(&mut self) -> &'_ mut u32 {
+            if !self.has_u32_0x123() {
+                self.u32_0x123 = ::std::default::Default::default();
+                self._bitfield.set(13, true);
+            }
             &mut self.u32_0x123
         }
-        pub fn i64_default_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_default(&mut self) {
+            self._bitfield.set(14, false);
+        }
+        pub fn i64_default_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_default() {
+                self.i64_default = ::std::default::Default::default();
+                self._bitfield.set(14, true);
+            }
             &mut self.i64_default
         }
-        pub fn i64_0_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_0(&mut self) {
+            self._bitfield.set(15, false);
+        }
+        pub fn i64_0_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_0() {
+                self.i64_0 = ::std::default::Default::default();
+                self._bitfield.set(15, true);
+            }
             &mut self.i64_0
         }
-        pub fn i64_42_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_42(&mut self) {
+            self._bitfield.set(16, false);
+        }
+        pub fn i64_42_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_42() {
+                self.i64_42 = ::std::default::Default::default();
+                self._bitfield.set(16, true);
+            }
             &mut self.i64_42
         }
-        pub fn i64_m42_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_m42(&mut self) {
+            self._bitfield.set(17, false);
+        }
+        pub fn i64_m42_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_m42() {
+                self.i64_m42 = ::std::default::Default::default();
+                self._bitfield.set(17, true);
+            }
             &mut self.i64_m42
         }
-        pub fn i64_9223372036854775807_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_9223372036854775807(&mut self) {
+            self._bitfield.set(18, false);
+        }
+        pub fn i64_9223372036854775807_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_9223372036854775807() {
+                self.i64_9223372036854775807 = ::std::default::Default::default();
+                self._bitfield.set(18, true);
+            }
             &mut self.i64_9223372036854775807
         }
-        pub fn i64_m9223372036854775808_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_m9223372036854775808(&mut self) {
+            self._bitfield.set(19, false);
+        }
+        pub fn i64_m9223372036854775808_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_m9223372036854775808() {
+                self.i64_m9223372036854775808 = ::std::default::Default::default();
+                self._bitfield.set(19, true);
+            }
             &mut self.i64_m9223372036854775808
         }
-        pub fn i64_0123_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_0123(&mut self) {
+            self._bitfield.set(20, false);
+        }
+        pub fn i64_0123_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_0123() {
+                self.i64_0123 = ::std::default::Default::default();
+                self._bitfield.set(20, true);
+            }
             &mut self.i64_0123
         }
-        pub fn i64_0x123_mut(&mut self) -> &mut ::std::option::Option<i64> {
+        pub fn clear_i64_0x123(&mut self) {
+            self._bitfield.set(21, false);
+        }
+        pub fn i64_0x123_mut(&mut self) -> &'_ mut i64 {
+            if !self.has_i64_0x123() {
+                self.i64_0x123 = ::std::default::Default::default();
+                self._bitfield.set(21, true);
+            }
             &mut self.i64_0x123
         }
-        pub fn u64_default_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn clear_u64_default(&mut self) {
+            self._bitfield.set(22, false);
+        }
+        pub fn u64_default_mut(&mut self) -> &'_ mut u64 {
+            if !self.has_u64_default() {
+                self.u64_default = ::std::default::Default::default();
+                self._bitfield.set(22, true);
+            }
             &mut self.u64_default
         }
-        pub fn u64_0_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn clear_u64_0(&mut self) {
+            self._bitfield.set(23, false);
+        }
+        pub fn u64_0_mut(&mut self) -> &'_ mut u64 {
+            if !self.has_u64_0() {
+                self.u64_0 = ::std::default::Default::default();
+                self._bitfield.set(23, true);
+            }
             &mut self.u64_0
         }
-        pub fn u64_42_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn clear_u64_42(&mut self) {
+            self._bitfield.set(24, false);
+        }
+        pub fn u64_42_mut(&mut self) -> &'_ mut u64 {
+            if !self.has_u64_42() {
+                self.u64_42 = ::std::default::Default::default();
+                self._bitfield.set(24, true);
+            }
             &mut self.u64_42
         }
-        pub fn u64_18446744073709551615_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn clear_u64_18446744073709551615(&mut self) {
+            self._bitfield.set(25, false);
+        }
+        pub fn u64_18446744073709551615_mut(&mut self) -> &'_ mut u64 {
+            if !self.has_u64_18446744073709551615() {
+                self.u64_18446744073709551615 = ::std::default::Default::default();
+                self._bitfield.set(25, true);
+            }
             &mut self.u64_18446744073709551615
         }
-        pub fn u64_0123_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn clear_u64_0123(&mut self) {
+            self._bitfield.set(26, false);
+        }
+        pub fn u64_0123_mut(&mut self) -> &'_ mut u64 {
+            if !self.has_u64_0123() {
+                self.u64_0123 = ::std::default::Default::default();
+                self._bitfield.set(26, true);
+            }
             &mut self.u64_0123
         }
-        pub fn u64_0x123_mut(&mut self) -> &mut ::std::option::Option<u64> {
+        pub fn clear_u64_0x123(&mut self) {
+            self._bitfield.set(27, false);
+        }
+        pub fn u64_0x123_mut(&mut self) -> &'_ mut u64 {
+            if !self.has_u64_0x123() {
+                self.u64_0x123 = ::std::default::Default::default();
+                self._bitfield.set(27, true);
+            }
             &mut self.u64_0x123
         }
-        pub fn f32_default_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_default(&mut self) {
+            self._bitfield.set(28, false);
+        }
+        pub fn f32_default_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_default() {
+                self.f32_default = ::std::default::Default::default();
+                self._bitfield.set(28, true);
+            }
             &mut self.f32_default
         }
-        pub fn f32_0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_0(&mut self) {
+            self._bitfield.set(29, false);
+        }
+        pub fn f32_0_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_0() {
+                self.f32_0 = ::std::default::Default::default();
+                self._bitfield.set(29, true);
+            }
             &mut self.f32_0
         }
-        pub fn f32_m0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_m0(&mut self) {
+            self._bitfield.set(30, false);
+        }
+        pub fn f32_m0_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_m0() {
+                self.f32_m0 = ::std::default::Default::default();
+                self._bitfield.set(30, true);
+            }
             &mut self.f32_m0
         }
-        pub fn f32_0p_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_0p(&mut self) {
+            self._bitfield.set(31, false);
+        }
+        pub fn f32_0p_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_0p() {
+                self.f32_0p = ::std::default::Default::default();
+                self._bitfield.set(31, true);
+            }
             &mut self.f32_0p
         }
-        pub fn f32_p0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_p0(&mut self) {
+            self._bitfield.set(32, false);
+        }
+        pub fn f32_p0_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_p0() {
+                self.f32_p0 = ::std::default::Default::default();
+                self._bitfield.set(32, true);
+            }
             &mut self.f32_p0
         }
-        pub fn f32_0p0_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_0p0(&mut self) {
+            self._bitfield.set(33, false);
+        }
+        pub fn f32_0p0_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_0p0() {
+                self.f32_0p0 = ::std::default::Default::default();
+                self._bitfield.set(33, true);
+            }
             &mut self.f32_0p0
         }
-        pub fn f32_42_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_42(&mut self) {
+            self._bitfield.set(34, false);
+        }
+        pub fn f32_42_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_42() {
+                self.f32_42 = ::std::default::Default::default();
+                self._bitfield.set(34, true);
+            }
             &mut self.f32_42
         }
-        pub fn f32_m42_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_m42(&mut self) {
+            self._bitfield.set(35, false);
+        }
+        pub fn f32_m42_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_m42() {
+                self.f32_m42 = ::std::default::Default::default();
+                self._bitfield.set(35, true);
+            }
             &mut self.f32_m42
         }
-        pub fn f32_0p25_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_0p25(&mut self) {
+            self._bitfield.set(36, false);
+        }
+        pub fn f32_0p25_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_0p25() {
+                self.f32_0p25 = ::std::default::Default::default();
+                self._bitfield.set(36, true);
+            }
             &mut self.f32_0p25
         }
-        pub fn f32_1p5e2_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_1p5e2(&mut self) {
+            self._bitfield.set(37, false);
+        }
+        pub fn f32_1p5e2_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_1p5e2() {
+                self.f32_1p5e2 = ::std::default::Default::default();
+                self._bitfield.set(37, true);
+            }
             &mut self.f32_1p5e2
         }
-        pub fn f32_inf_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_inf(&mut self) {
+            self._bitfield.set(38, false);
+        }
+        pub fn f32_inf_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_inf() {
+                self.f32_inf = ::std::default::Default::default();
+                self._bitfield.set(38, true);
+            }
             &mut self.f32_inf
         }
-        pub fn f32_minf_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_minf(&mut self) {
+            self._bitfield.set(39, false);
+        }
+        pub fn f32_minf_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_minf() {
+                self.f32_minf = ::std::default::Default::default();
+                self._bitfield.set(39, true);
+            }
             &mut self.f32_minf
         }
-        pub fn f32_nan_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_nan(&mut self) {
+            self._bitfield.set(40, false);
+        }
+        pub fn f32_nan_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_nan() {
+                self.f32_nan = ::std::default::Default::default();
+                self._bitfield.set(40, true);
+            }
             &mut self.f32_nan
         }
-        pub fn f32_mnan_mut(&mut self) -> &mut ::std::option::Option<f32> {
+        pub fn clear_f32_mnan(&mut self) {
+            self._bitfield.set(41, false);
+        }
+        pub fn f32_mnan_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_mnan() {
+                self.f32_mnan = ::std::default::Default::default();
+                self._bitfield.set(41, true);
+            }
             &mut self.f32_mnan
         }
-        pub fn bool_default_mut(&mut self) -> &mut ::std::option::Option<bool> {
+        pub fn clear_bool_default(&mut self) {
+            self._bitfield.set(42, false);
+        }
+        pub fn bool_default_mut(&mut self) -> &'_ mut bool {
+            if !self.has_bool_default() {
+                self.bool_default = ::std::default::Default::default();
+                self._bitfield.set(42, true);
+            }
             &mut self.bool_default
         }
-        pub fn bool_true_mut(&mut self) -> &mut ::std::option::Option<bool> {
+        pub fn clear_bool_true(&mut self) {
+            self._bitfield.set(43, false);
+        }
+        pub fn bool_true_mut(&mut self) -> &'_ mut bool {
+            if !self.has_bool_true() {
+                self.bool_true = ::std::default::Default::default();
+                self._bitfield.set(43, true);
+            }
             &mut self.bool_true
         }
-        pub fn bool_false_mut(&mut self) -> &mut ::std::option::Option<bool> {
+        pub fn clear_bool_false(&mut self) {
+            self._bitfield.set(44, false);
+        }
+        pub fn bool_false_mut(&mut self) -> &'_ mut bool {
+            if !self.has_bool_false() {
+                self.bool_false = ::std::default::Default::default();
+                self._bitfield.set(44, true);
+            }
             &mut self.bool_false
         }
-        pub fn string_default_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn clear_string_default(&mut self) {
+            self._bitfield.set(45, false);
+        }
+        pub fn string_default_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_default() {
+                self.string_default = ::std::default::Default::default();
+                self._bitfield.set(45, true);
+            }
             &mut self.string_default
         }
-        pub fn string_empty_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn clear_string_empty(&mut self) {
+            self._bitfield.set(46, false);
+        }
+        pub fn string_empty_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_empty() {
+                self.string_empty = ::std::default::Default::default();
+                self._bitfield.set(46, true);
+            }
             &mut self.string_empty
         }
-        pub fn string_abc_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn clear_string_abc(&mut self) {
+            self._bitfield.set(47, false);
+        }
+        pub fn string_abc_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_abc() {
+                self.string_abc = ::std::default::Default::default();
+                self._bitfield.set(47, true);
+            }
             &mut self.string_abc
         }
-        pub fn string_aiu_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn clear_string_aiu(&mut self) {
+            self._bitfield.set(48, false);
+        }
+        pub fn string_aiu_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_aiu() {
+                self.string_aiu = ::std::default::Default::default();
+                self._bitfield.set(48, true);
+            }
             &mut self.string_aiu
         }
-        pub fn string_backslash_mut(
-            &mut self,
-        ) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn clear_string_backslash(&mut self) {
+            self._bitfield.set(49, false);
+        }
+        pub fn string_backslash_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_backslash() {
+                self.string_backslash = ::std::default::Default::default();
+                self._bitfield.set(49, true);
+            }
             &mut self.string_backslash
         }
-        pub fn string_tab_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn clear_string_tab(&mut self) {
+            self._bitfield.set(50, false);
+        }
+        pub fn string_tab_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_tab() {
+                self.string_tab = ::std::default::Default::default();
+                self._bitfield.set(50, true);
+            }
             &mut self.string_tab
         }
-        pub fn string_crlf_mut(&mut self) -> &mut ::std::option::Option<::std::string::String> {
+        pub fn clear_string_crlf(&mut self) {
+            self._bitfield.set(51, false);
+        }
+        pub fn string_crlf_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_crlf() {
+                self.string_crlf = ::std::default::Default::default();
+                self._bitfield.set(51, true);
+            }
             &mut self.string_crlf
         }
-        pub fn bytes_default_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn clear_bytes_default(&mut self) {
+            self._bitfield.set(52, false);
+        }
+        pub fn bytes_default_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
+            if !self.has_bytes_default() {
+                self.bytes_default = ::std::default::Default::default();
+                self._bitfield.set(52, true);
+            }
             &mut self.bytes_default
         }
-        pub fn bytes_empty_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn clear_bytes_empty(&mut self) {
+            self._bitfield.set(53, false);
+        }
+        pub fn bytes_empty_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
+            if !self.has_bytes_empty() {
+                self.bytes_empty = ::std::default::Default::default();
+                self._bitfield.set(53, true);
+            }
             &mut self.bytes_empty
         }
-        pub fn bytes_abc_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn clear_bytes_abc(&mut self) {
+            self._bitfield.set(54, false);
+        }
+        pub fn bytes_abc_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
+            if !self.has_bytes_abc() {
+                self.bytes_abc = ::std::default::Default::default();
+                self._bitfield.set(54, true);
+            }
             &mut self.bytes_abc
         }
-        pub fn bytes_aiu_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn clear_bytes_aiu(&mut self) {
+            self._bitfield.set(55, false);
+        }
+        pub fn bytes_aiu_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
+            if !self.has_bytes_aiu() {
+                self.bytes_aiu = ::std::default::Default::default();
+                self._bitfield.set(55, true);
+            }
             &mut self.bytes_aiu
         }
-        pub fn bytes_backslash_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn clear_bytes_backslash(&mut self) {
+            self._bitfield.set(56, false);
+        }
+        pub fn bytes_backslash_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
+            if !self.has_bytes_backslash() {
+                self.bytes_backslash = ::std::default::Default::default();
+                self._bitfield.set(56, true);
+            }
             &mut self.bytes_backslash
         }
-        pub fn bytes_tab_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn clear_bytes_tab(&mut self) {
+            self._bitfield.set(57, false);
+        }
+        pub fn bytes_tab_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
+            if !self.has_bytes_tab() {
+                self.bytes_tab = ::std::default::Default::default();
+                self._bitfield.set(57, true);
+            }
             &mut self.bytes_tab
         }
-        pub fn bytes_crlf_mut(&mut self) -> &mut ::std::option::Option<::std::vec::Vec<u8>> {
+        pub fn clear_bytes_crlf(&mut self) {
+            self._bitfield.set(58, false);
+        }
+        pub fn bytes_crlf_mut(&mut self) -> &'_ mut ::std::vec::Vec<u8> {
+            if !self.has_bytes_crlf() {
+                self.bytes_crlf = ::std::default::Default::default();
+                self._bitfield.set(58, true);
+            }
             &mut self.bytes_crlf
         }
-        pub fn enum_default_mut(
-            &mut self,
-        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+        pub fn clear_enum_default(&mut self) {
+            self._bitfield.set(59, false);
+        }
+        pub fn enum_default_mut(&mut self) -> &'_ mut self::_puroro_root::proto2_defaults::MyEnum {
+            if !self.has_enum_default() {
+                self.enum_default = ::std::default::Default::default();
+                self._bitfield.set(59, true);
+            }
             &mut self.enum_default
         }
-        pub fn enum_one_mut(
-            &mut self,
-        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+        pub fn clear_enum_one(&mut self) {
+            self._bitfield.set(60, false);
+        }
+        pub fn enum_one_mut(&mut self) -> &'_ mut self::_puroro_root::proto2_defaults::MyEnum {
+            if !self.has_enum_one() {
+                self.enum_one = ::std::default::Default::default();
+                self._bitfield.set(60, true);
+            }
             &mut self.enum_one
+        }
+        pub fn clear_enum_fourty_two(&mut self) {
+            self._bitfield.set(61, false);
         }
         pub fn enum_fourty_two_mut(
             &mut self,
-        ) -> &mut ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
+        ) -> &'_ mut self::_puroro_root::proto2_defaults::MyEnum {
+            if !self.has_enum_fourty_two() {
+                self.enum_fourty_two = ::std::default::Default::default();
+                self._bitfield.set(61, true);
+            }
             &mut self.enum_fourty_two
         }
     }
@@ -1250,195 +1929,384 @@ pub mod _puroro_simple_impl {
         {
             use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_default, data),
-            2 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_0, data),
-            3 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_42, data),
-            4 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_m42, data),
-            5 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_2147483647, data),
-            6 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_m2147483648, data),
-            7 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_0123, data),
-            8 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_0x123, data),
-            11 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_default, data),
-            12 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_0, data),
-            13 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_42, data),
-            15 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_4294967295, data),
-            17 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_0123, data),
-            18 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt32
-            >::deser_field(&mut self.u32_0x123, data),
-            21 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_default, data),
-            22 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_0, data),
-            23 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_42, data),
-            24 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_m42, data),
-            25 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_9223372036854775807, data),
-            26 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_m9223372036854775808, data),
-            27 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_0123, data),
-            28 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int64
-            >::deser_field(&mut self.i64_0x123, data),
-            31 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_default, data),
-            32 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_0, data),
-            33 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_42, data),
-            35 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_18446744073709551615, data),
-            37 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_0123, data),
-            38 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::UInt64
-            >::deser_field(&mut self.u64_0x123, data),
-            41 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_default, data),
-            42 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0, data),
-            43 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_m0, data),
-            44 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0p, data),
-            45 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_p0, data),
-            46 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0p0, data),
-            47 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_42, data),
-            48 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_m42, data),
-            49 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_0p25, data),
-            50 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_1p5e2, data),
-            51 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_inf, data),
-            52 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_minf, data),
-            53 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_nan, data),
-            54 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Float
-            >::deser_field(&mut self.f32_mnan, data),
-            61 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.bool_default, data),
-            62 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.bool_true, data),
-            63 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bool
-            >::deser_field(&mut self.bool_false, data),
-            71 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_default, data),
-            72 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_empty, data),
-            73 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_abc, data),
-            74 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_aiu, data),
-            75 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_backslash, data),
-            76 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_tab, data),
-            77 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::String
-            >::deser_field(&mut self.string_crlf, data),
-            81 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_default, data),
-            82 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_empty, data),
-            83 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_abc, data),
-            84 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_aiu, data),
-            85 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_backslash, data),
-            86 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_tab, data),
-            87 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Bytes
-            >::deser_field(&mut self.bytes_crlf, data),
-            91 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
-            >::deser_field(&mut self.enum_default, data),
-            92 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
-            >::deser_field(&mut self.enum_one, data),
-            93 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>
-            >::deser_field(&mut self.enum_fourty_two, data),
+                1 => {
+                    self._bitfield.set(0, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_default, data)
+                }
+                2 => {
+                    self._bitfield.set(1, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_0, data)
+                }
+                3 => {
+                    self._bitfield.set(2, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_42, data)
+                }
+                4 => {
+                    self._bitfield.set(3, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_m42, data)
+                }
+                5 => {
+                    self._bitfield.set(4, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_2147483647, data)
+                }
+                6 => {
+                    self._bitfield.set(5, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_m2147483648, data)
+                }
+                7 => {
+                    self._bitfield.set(6, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_0123, data)
+                }
+                8 => {
+                    self._bitfield.set(7, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::deser_field(&mut self.i32_0x123, data)
+                }
+                11 => {
+                    self._bitfield.set(8, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_default, data)
+                }
+                12 => {
+                    self._bitfield.set(9, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_0, data)
+                }
+                13 => {
+                    self._bitfield.set(10, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_42, data)
+                }
+                15 => {
+                    self._bitfield.set(11, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_4294967295, data)
+                }
+                17 => {
+                    self._bitfield.set(12, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_0123, data)
+                }
+                18 => {
+                    self._bitfield.set(13, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt32
+                >::deser_field(&mut self.u32_0x123, data)
+                }
+                21 => {
+                    self._bitfield.set(14, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_default, data)
+                }
+                22 => {
+                    self._bitfield.set(15, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_0, data)
+                }
+                23 => {
+                    self._bitfield.set(16, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_42, data)
+                }
+                24 => {
+                    self._bitfield.set(17, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_m42, data)
+                }
+                25 => {
+                    self._bitfield.set(18, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_9223372036854775807, data)
+                }
+                26 => {
+                    self._bitfield.set(19, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_m9223372036854775808, data)
+                }
+                27 => {
+                    self._bitfield.set(20, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_0123, data)
+                }
+                28 => {
+                    self._bitfield.set(21, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int64
+                >::deser_field(&mut self.i64_0x123, data)
+                }
+                31 => {
+                    self._bitfield.set(22, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_default, data)
+                }
+                32 => {
+                    self._bitfield.set(23, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_0, data)
+                }
+                33 => {
+                    self._bitfield.set(24, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_42, data)
+                }
+                35 => {
+                    self._bitfield.set(25, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_18446744073709551615, data)
+                }
+                37 => {
+                    self._bitfield.set(26, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_0123, data)
+                }
+                38 => {
+                    self._bitfield.set(27, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::UInt64
+                >::deser_field(&mut self.u64_0x123, data)
+                }
+                41 => {
+                    self._bitfield.set(28, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_default, data)
+                }
+                42 => {
+                    self._bitfield.set(29, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_0, data)
+                }
+                43 => {
+                    self._bitfield.set(30, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_m0, data)
+                }
+                44 => {
+                    self._bitfield.set(31, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_0p, data)
+                }
+                45 => {
+                    self._bitfield.set(32, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_p0, data)
+                }
+                46 => {
+                    self._bitfield.set(33, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_0p0, data)
+                }
+                47 => {
+                    self._bitfield.set(34, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_42, data)
+                }
+                48 => {
+                    self._bitfield.set(35, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_m42, data)
+                }
+                49 => {
+                    self._bitfield.set(36, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_0p25, data)
+                }
+                50 => {
+                    self._bitfield.set(37, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_1p5e2, data)
+                }
+                51 => {
+                    self._bitfield.set(38, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_inf, data)
+                }
+                52 => {
+                    self._bitfield.set(39, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_minf, data)
+                }
+                53 => {
+                    self._bitfield.set(40, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_nan, data)
+                }
+                54 => {
+                    self._bitfield.set(41, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Float
+                >::deser_field(&mut self.f32_mnan, data)
+                }
+                61 => {
+                    self._bitfield.set(42, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bool
+                >::deser_field(&mut self.bool_default, data)
+                }
+                62 => {
+                    self._bitfield.set(43, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bool
+                >::deser_field(&mut self.bool_true, data)
+                }
+                63 => {
+                    self._bitfield.set(44, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bool
+                >::deser_field(&mut self.bool_false, data)
+                }
+                71 => {
+                    self._bitfield.set(45, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_default, data)
+                }
+                72 => {
+                    self._bitfield.set(46, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_empty, data)
+                }
+                73 => {
+                    self._bitfield.set(47, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_abc, data)
+                }
+                74 => {
+                    self._bitfield.set(48, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_aiu, data)
+                }
+                75 => {
+                    self._bitfield.set(49, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_backslash, data)
+                }
+                76 => {
+                    self._bitfield.set(50, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_tab, data)
+                }
+                77 => {
+                    self._bitfield.set(51, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::String
+                >::deser_field(&mut self.string_crlf, data)
+                }
+                81 => {
+                    self._bitfield.set(52, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_default, data)
+                }
+                82 => {
+                    self._bitfield.set(53, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_empty, data)
+                }
+                83 => {
+                    self._bitfield.set(54, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_abc, data)
+                }
+                84 => {
+                    self._bitfield.set(55, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_aiu, data)
+                }
+                85 => {
+                    self._bitfield.set(56, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_backslash, data)
+                }
+                86 => {
+                    self._bitfield.set(57, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_tab, data)
+                }
+                87 => {
+                    self._bitfield.set(58, true);
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::Optional, ::puroro::tags::Bytes
+                >::deser_field(&mut self.bytes_crlf, data)
+                }
+                91 => {
+                    self._bitfield.set(59, true);
+                    DeserFieldFromBytesIter::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+                    >::deser_field(&mut self.enum_default, data)
+                }
+                92 => {
+                    self._bitfield.set(60, true);
+                    DeserFieldFromBytesIter::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+                    >::deser_field(&mut self.enum_one, data)
+                }
+                93 => {
+                    self._bitfield.set(61, true);
+                    DeserFieldFromBytesIter::<
+                        ::puroro::tags::Optional,
+                        ::puroro::tags::Enum2<self::_puroro_root::proto2_defaults::MyEnum>,
+                    >::deser_field(&mut self.enum_fourty_two, data)
+                }
 
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
+                _ => unimplemented!("TODO: This case should be handled properly..."),
+            }
         }
     }
 
@@ -1962,254 +2830,77 @@ pub mod _puroro_simple_impl {
     {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
-                .field(
-                    "i32_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_default_opt(self),
-                )
-                .field(
-                    "i32_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_0_opt(self),
-                )
-                .field(
-                    "i32_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_42_opt(self),
-                )
-                .field(
-                    "i32_m42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_m42_opt(self),
-                )
-                .field(
-                    "i32_2147483647",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_2147483647_opt(self),
-                )
-                .field(
-                    "i32_m2147483648",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_m2147483648_opt(self),
-                )
-                .field(
-                    "i32_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_0123_opt(self),
-                )
-                .field(
-                    "i32_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i32_0x123_opt(self),
-                )
-                .field(
-                    "u32_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_default_opt(self),
-                )
-                .field(
-                    "u32_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_0_opt(self),
-                )
-                .field(
-                    "u32_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_42_opt(self),
-                )
-                .field(
-                    "u32_4294967295",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_4294967295_opt(self),
-                )
-                .field(
-                    "u32_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_0123_opt(self),
-                )
-                .field(
-                    "u32_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u32_0x123_opt(self),
-                )
-                .field(
-                    "i64_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_default_opt(self),
-                )
-                .field(
-                    "i64_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_0_opt(self),
-                )
-                .field(
-                    "i64_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_42_opt(self),
-                )
-                .field(
-                    "i64_m42",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_m42_opt(self),
-                )
+                .field("i32_default", &self.i32_default_opt())
+                .field("i32_0", &self.i32_0_opt())
+                .field("i32_42", &self.i32_42_opt())
+                .field("i32_m42", &self.i32_m42_opt())
+                .field("i32_2147483647", &self.i32_2147483647_opt())
+                .field("i32_m2147483648", &self.i32_m2147483648_opt())
+                .field("i32_0123", &self.i32_0123_opt())
+                .field("i32_0x123", &self.i32_0x123_opt())
+                .field("u32_default", &self.u32_default_opt())
+                .field("u32_0", &self.u32_0_opt())
+                .field("u32_42", &self.u32_42_opt())
+                .field("u32_4294967295", &self.u32_4294967295_opt())
+                .field("u32_0123", &self.u32_0123_opt())
+                .field("u32_0x123", &self.u32_0x123_opt())
+                .field("i64_default", &self.i64_default_opt())
+                .field("i64_0", &self.i64_0_opt())
+                .field("i64_42", &self.i64_42_opt())
+                .field("i64_m42", &self.i64_m42_opt())
                 .field(
                     "i64_9223372036854775807",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807_opt(self),
+                    &self.i64_9223372036854775807_opt(),
                 )
                 .field(
                     "i64_m9223372036854775808",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808_opt(self),
+                    &self.i64_m9223372036854775808_opt(),
                 )
-                .field(
-                    "i64_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_0123_opt(self),
-                )
-                .field(
-                    "i64_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::i64_0x123_opt(self),
-                )
-                .field(
-                    "u64_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_default_opt(self),
-                )
-                .field(
-                    "u64_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_0_opt(self),
-                )
-                .field(
-                    "u64_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_42_opt(self),
-                )
+                .field("i64_0123", &self.i64_0123_opt())
+                .field("i64_0x123", &self.i64_0x123_opt())
+                .field("u64_default", &self.u64_default_opt())
+                .field("u64_0", &self.u64_0_opt())
+                .field("u64_42", &self.u64_42_opt())
                 .field(
                     "u64_18446744073709551615",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615_opt(self),
+                    &self.u64_18446744073709551615_opt(),
                 )
-                .field(
-                    "u64_0123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_0123_opt(self),
-                )
-                .field(
-                    "u64_0x123",
-                    &<Self as super::_puroro_traits::MsgTrait>::u64_0x123_opt(self),
-                )
-                .field(
-                    "f32_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_default_opt(self),
-                )
-                .field(
-                    "f32_0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0_opt(self),
-                )
-                .field(
-                    "f32_m0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_m0_opt(self),
-                )
-                .field(
-                    "f32_0p",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p_opt(self),
-                )
-                .field(
-                    "f32_p0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_p0_opt(self),
-                )
-                .field(
-                    "f32_0p0",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p0_opt(self),
-                )
-                .field(
-                    "f32_42",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_42_opt(self),
-                )
-                .field(
-                    "f32_m42",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_m42_opt(self),
-                )
-                .field(
-                    "f32_0p25",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_0p25_opt(self),
-                )
-                .field(
-                    "f32_1p5e2",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_1p5e2_opt(self),
-                )
-                .field(
-                    "f32_inf",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_inf_opt(self),
-                )
-                .field(
-                    "f32_minf",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_minf_opt(self),
-                )
-                .field(
-                    "f32_nan",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_nan_opt(self),
-                )
-                .field(
-                    "f32_mnan",
-                    &<Self as super::_puroro_traits::MsgTrait>::f32_mnan_opt(self),
-                )
-                .field(
-                    "bool_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::bool_default_opt(self),
-                )
-                .field(
-                    "bool_true",
-                    &<Self as super::_puroro_traits::MsgTrait>::bool_true_opt(self),
-                )
-                .field(
-                    "bool_false",
-                    &<Self as super::_puroro_traits::MsgTrait>::bool_false_opt(self),
-                )
-                .field(
-                    "string_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_default_opt(self),
-                )
-                .field(
-                    "string_empty",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_empty_opt(self),
-                )
-                .field(
-                    "string_abc",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_abc_opt(self),
-                )
-                .field(
-                    "string_aiu",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_aiu_opt(self),
-                )
-                .field(
-                    "string_backslash",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_backslash_opt(self),
-                )
-                .field(
-                    "string_tab",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_tab_opt(self),
-                )
-                .field(
-                    "string_crlf",
-                    &<Self as super::_puroro_traits::MsgTrait>::string_crlf_opt(self),
-                )
-                .field(
-                    "bytes_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_default_opt(self),
-                )
-                .field(
-                    "bytes_empty",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_empty_opt(self),
-                )
-                .field(
-                    "bytes_abc",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_abc_opt(self),
-                )
-                .field(
-                    "bytes_aiu",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_aiu_opt(self),
-                )
-                .field(
-                    "bytes_backslash",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_backslash_opt(self),
-                )
-                .field(
-                    "bytes_tab",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_tab_opt(self),
-                )
-                .field(
-                    "bytes_crlf",
-                    &<Self as super::_puroro_traits::MsgTrait>::bytes_crlf_opt(self),
-                )
-                .field(
-                    "enum_default",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_default_opt(self),
-                )
-                .field(
-                    "enum_one",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_one_opt(self),
-                )
-                .field(
-                    "enum_fourty_two",
-                    &<Self as super::_puroro_traits::MsgTrait>::enum_fourty_two_opt(self),
-                )
+                .field("u64_0123", &self.u64_0123_opt())
+                .field("u64_0x123", &self.u64_0x123_opt())
+                .field("f32_default", &self.f32_default_opt())
+                .field("f32_0", &self.f32_0_opt())
+                .field("f32_m0", &self.f32_m0_opt())
+                .field("f32_0p", &self.f32_0p_opt())
+                .field("f32_p0", &self.f32_p0_opt())
+                .field("f32_0p0", &self.f32_0p0_opt())
+                .field("f32_42", &self.f32_42_opt())
+                .field("f32_m42", &self.f32_m42_opt())
+                .field("f32_0p25", &self.f32_0p25_opt())
+                .field("f32_1p5e2", &self.f32_1p5e2_opt())
+                .field("f32_inf", &self.f32_inf_opt())
+                .field("f32_minf", &self.f32_minf_opt())
+                .field("f32_nan", &self.f32_nan_opt())
+                .field("f32_mnan", &self.f32_mnan_opt())
+                .field("bool_default", &self.bool_default_opt())
+                .field("bool_true", &self.bool_true_opt())
+                .field("bool_false", &self.bool_false_opt())
+                .field("string_default", &self.string_default_opt())
+                .field("string_empty", &self.string_empty_opt())
+                .field("string_abc", &self.string_abc_opt())
+                .field("string_aiu", &self.string_aiu_opt())
+                .field("string_backslash", &self.string_backslash_opt())
+                .field("string_tab", &self.string_tab_opt())
+                .field("string_crlf", &self.string_crlf_opt())
+                .field("bytes_default", &self.bytes_default_opt())
+                .field("bytes_empty", &self.bytes_empty_opt())
+                .field("bytes_abc", &self.bytes_abc_opt())
+                .field("bytes_aiu", &self.bytes_aiu_opt())
+                .field("bytes_backslash", &self.bytes_backslash_opt())
+                .field("bytes_tab", &self.bytes_tab_opt())
+                .field("bytes_crlf", &self.bytes_crlf_opt())
+                .field("enum_default", &self.enum_default_opt())
+                .field("enum_one", &self.enum_one_opt())
+                .field("enum_fourty_two", &self.enum_fourty_two_opt())
                 .finish()
         }
     }
@@ -2217,6 +2908,7 @@ pub mod _puroro_simple_impl {
     impl ::std::clone::Clone for Msg {
         fn clone(&self) -> Self {
             Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                 i32_default: ::std::clone::Clone::clone(&self.i32_default),
                 i32_0: ::std::clone::Clone::clone(&self.i32_0),
                 i32_42: ::std::clone::Clone::clone(&self.i32_42),
@@ -2289,7 +2981,8 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self.i32_default == rhs.i32_default
+            self._bitfield == rhs._bitfield
+                && self.i32_default == rhs.i32_default
                 && self.i32_0 == rhs.i32_0
                 && self.i32_42 == rhs.i32_42
                 && self.i32_m42 == rhs.i32_m42
