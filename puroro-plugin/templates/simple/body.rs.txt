@@ -382,7 +382,8 @@ impl ::std::cmp::PartialEq for {{ m.simple_ident }} {
         {%- if f.has_optional_bit %}
         {#- if the optional bit is not set (== the field is not set), #}
         {#- then we can (must) skip the actual field value check. #}
-        (self._bitfield.get({{ f.bitfield_index }}) != Some(true) || self.{{ f.ident }} == rhs.{{ f.ident }}) &&
+        (self._bitfield.get({{ f.bitfield_index }}).as_deref() != Some(&true) ||
+            self.{{ f.ident }} == rhs.{{ f.ident }}) &&
         {%- else %} {#- if f.has_optional_bit #}
         self.{{ f.ident }} == rhs.{{ f.ident }} &&
         {%- endif %} {#- if f.has_optional_bit #}

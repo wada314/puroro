@@ -2055,52 +2055,67 @@ pub mod _puroro_simple_impl {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
                 && self.i32_unlabeled == rhs.i32_unlabeled
-                && self.i32_optional == rhs.i32_optional
+                && (self._bitfield.get(0).as_deref() != Some(&true)
+                    || self.i32_optional == rhs.i32_optional)
                 && self.i32_repeated == rhs.i32_repeated
                 && self.float_unlabeled == rhs.float_unlabeled
-                && self.float_optional == rhs.float_optional
+                && (self._bitfield.get(1).as_deref() != Some(&true)
+                    || self.float_optional == rhs.float_optional)
                 && self.float_repeated == rhs.float_repeated
                 && self.bytes_unlabeled == rhs.bytes_unlabeled
-                && self.bytes_optional == rhs.bytes_optional
+                && (self._bitfield.get(2).as_deref() != Some(&true)
+                    || self.bytes_optional == rhs.bytes_optional)
                 && self.bytes_repeated == rhs.bytes_repeated
                 && self.string_unlabeled == rhs.string_unlabeled
-                && self.string_optional == rhs.string_optional
+                && (self._bitfield.get(3).as_deref() != Some(&true)
+                    || self.string_optional == rhs.string_optional)
                 && self.string_repeated == rhs.string_repeated
                 && self.enum_unlabeled == rhs.enum_unlabeled
-                && self.enum_optional == rhs.enum_optional
+                && (self._bitfield.get(4).as_deref() != Some(&true)
+                    || self.enum_optional == rhs.enum_optional)
                 && self.enum_repeated == rhs.enum_repeated
                 && self.submsg_unlabeled == rhs.submsg_unlabeled
                 && self.submsg_optional == rhs.submsg_optional
                 && self.submsg_repeated == rhs.submsg_repeated
                 && self.i64_unlabeled == rhs.i64_unlabeled
-                && self.i64_optional == rhs.i64_optional
+                && (self._bitfield.get(5).as_deref() != Some(&true)
+                    || self.i64_optional == rhs.i64_optional)
                 && self.i64_repeated == rhs.i64_repeated
                 && self.u32_unlabeled == rhs.u32_unlabeled
-                && self.u32_optional == rhs.u32_optional
+                && (self._bitfield.get(6).as_deref() != Some(&true)
+                    || self.u32_optional == rhs.u32_optional)
                 && self.u32_repeated == rhs.u32_repeated
                 && self.u64_unlabeled == rhs.u64_unlabeled
-                && self.u64_optional == rhs.u64_optional
+                && (self._bitfield.get(7).as_deref() != Some(&true)
+                    || self.u64_optional == rhs.u64_optional)
                 && self.u64_repeated == rhs.u64_repeated
                 && self.s32_unlabeled == rhs.s32_unlabeled
-                && self.s32_optional == rhs.s32_optional
+                && (self._bitfield.get(8).as_deref() != Some(&true)
+                    || self.s32_optional == rhs.s32_optional)
                 && self.s32_repeated == rhs.s32_repeated
                 && self.s64_unlabeled == rhs.s64_unlabeled
-                && self.s64_optional == rhs.s64_optional
+                && (self._bitfield.get(9).as_deref() != Some(&true)
+                    || self.s64_optional == rhs.s64_optional)
                 && self.s64_repeated == rhs.s64_repeated
                 && self.fixed32_unlabeled == rhs.fixed32_unlabeled
-                && self.fixed32_optional == rhs.fixed32_optional
+                && (self._bitfield.get(10).as_deref() != Some(&true)
+                    || self.fixed32_optional == rhs.fixed32_optional)
                 && self.fixed32_repeated == rhs.fixed32_repeated
                 && self.fixed64_unlabeled == rhs.fixed64_unlabeled
-                && self.fixed64_optional == rhs.fixed64_optional
+                && (self._bitfield.get(11).as_deref() != Some(&true)
+                    || self.fixed64_optional == rhs.fixed64_optional)
                 && self.fixed64_repeated == rhs.fixed64_repeated
                 && self.sfixed32_unlabeled == rhs.sfixed32_unlabeled
-                && self.sfixed32_optional == rhs.sfixed32_optional
+                && (self._bitfield.get(12).as_deref() != Some(&true)
+                    || self.sfixed32_optional == rhs.sfixed32_optional)
                 && self.sfixed32_repeated == rhs.sfixed32_repeated
                 && self.sfixed64_unlabeled == rhs.sfixed64_unlabeled
-                && self.sfixed64_optional == rhs.sfixed64_optional
+                && (self._bitfield.get(13).as_deref() != Some(&true)
+                    || self.sfixed64_optional == rhs.sfixed64_optional)
                 && self.sfixed64_repeated == rhs.sfixed64_repeated
                 && self.f64_unlabeled == rhs.f64_unlabeled
-                && self.f64_optional == rhs.f64_optional
+                && (self._bitfield.get(14).as_deref() != Some(&true)
+                    || self.f64_optional == rhs.f64_optional)
                 && self.f64_repeated == rhs.f64_repeated
                 && true
         }

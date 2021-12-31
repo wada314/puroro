@@ -561,17 +561,22 @@ pub mod _puroro_simple_impl {
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
-                && self.i32_optional == rhs.i32_optional
+                && (self._bitfield.get(0).as_deref() != Some(&true)
+                    || self.i32_optional == rhs.i32_optional)
                 && self.i32_repeated == rhs.i32_repeated
-                && self.float_optional == rhs.float_optional
+                && (self._bitfield.get(1).as_deref() != Some(&true)
+                    || self.float_optional == rhs.float_optional)
                 && self.float_repeated == rhs.float_repeated
-                && self.string_optional == rhs.string_optional
+                && (self._bitfield.get(2).as_deref() != Some(&true)
+                    || self.string_optional == rhs.string_optional)
                 && self.string_repeated == rhs.string_repeated
                 && self.submsg_optional == rhs.submsg_optional
                 && self.submsg_repeated == rhs.submsg_repeated
-                && self.enum_optional == rhs.enum_optional
+                && (self._bitfield.get(3).as_deref() != Some(&true)
+                    || self.enum_optional == rhs.enum_optional)
                 && self.enum_repeated == rhs.enum_repeated
-                && self.very_large_field_number == rhs.very_large_field_number
+                && (self._bitfield.get(4).as_deref() != Some(&true)
+                    || self.very_large_field_number == rhs.very_large_field_number)
                 && true
         }
     }
@@ -3527,7 +3532,10 @@ pub mod _puroro_nested {
 
             impl ::std::cmp::PartialEq for Submsg {
                 fn eq(&self, rhs: &Self) -> bool {
-                    self._bitfield == rhs._bitfield && self.i32_optional == rhs.i32_optional && true
+                    self._bitfield == rhs._bitfield
+                        && (self._bitfield.get(0).as_deref() != Some(&true)
+                            || self.i32_optional == rhs.i32_optional)
+                        && true
                 }
             }
         }

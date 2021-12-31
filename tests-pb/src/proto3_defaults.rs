@@ -359,7 +359,8 @@ pub mod _puroro_simple_impl {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
                 && self.i32_unlabeled == rhs.i32_unlabeled
-                && self.i32_optional == rhs.i32_optional
+                && (self._bitfield.get(0).as_deref() != Some(&true)
+                    || self.i32_optional == rhs.i32_optional)
                 && self.i32_repeated == rhs.i32_repeated
                 && self.f32_unlabeled == rhs.f32_unlabeled
                 && self.string_unlabeled == rhs.string_unlabeled
