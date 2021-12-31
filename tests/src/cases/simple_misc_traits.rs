@@ -36,4 +36,57 @@ pub fn test_partial_eq_2() {
     // i32_optional: None(10) vs. None(0)
     assert_eq!(&msg1, &Msg2::default());
     assert_eq!(&Msg2::default(), &msg1);
+
+    let mut msg2 = Msg2::default();
+    *msg2.i32_optional_mut();
+    // i32_optional: None(10) vs. Some(0)
+    assert_ne!(&msg1, &msg2);
+    assert_ne!(&msg2, &msg1);
+
+    *msg2.i32_optional_mut() = 10;
+    // i32_optional: None(10) vs. Some(10)
+    assert_ne!(&msg1, &msg2);
+    assert_ne!(&msg2, &msg1);
+
+    msg2.clear_i32_optional();
+    // i32_optional: None(10) vs. None(10)
+    assert_eq!(&msg1, &msg2);
+    assert_eq!(&msg2, &msg1);
+}
+
+#[test]
+pub fn test_partial_eq_3() {
+    assert_eq!(Msg3::default(), Msg3::default());
+
+    let mut msg1 = Msg3::default();
+    *msg1.i32_unlabeled_mut();
+    // i32_unlabeled: 0 vs. 0
+    assert_eq!(&msg1, &Msg3::default());
+    assert_eq!(&Msg3::default(), &msg1);
+
+    *msg1.i32_unlabeled_mut() = 10;
+    // i32_unlabeled: 10 vs. 0
+    assert_ne!(&msg1, &Msg3::default());
+    assert_ne!(&Msg3::default(), &msg1);
+
+    msg1.clear_i32_unlabeled();
+    // i32_unlabeled: 0 vs. 0
+    assert_eq!(&msg1, &Msg3::default());
+    assert_eq!(&Msg3::default(), &msg1);
+
+    let mut msg2 = Msg3::default();
+    *msg2.i32_unlabeled_mut();
+    // i32_unlabeled: 0 vs. 0
+    assert_eq!(&msg1, &msg2);
+    assert_eq!(&msg2, &msg1);
+
+    *msg2.i32_unlabeled_mut() = 10;
+    // i32_unlabeled: 0 vs. 10
+    assert_ne!(&msg1, &msg2);
+    assert_ne!(&msg2, &msg1);
+
+    msg2.clear_i32_unlabeled();
+    // i32_unlabeled: 0 vs. 0
+    assert_eq!(&msg1, &msg2);
+    assert_eq!(&msg2, &msg1);
 }
