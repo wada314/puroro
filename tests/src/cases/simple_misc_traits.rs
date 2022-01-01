@@ -97,4 +97,20 @@ fn test_clone_2() {
     *msg1.i32_optional_mut() = 10;
     let mut cloned = msg1.clone();
     assert_eq!(&msg1, &cloned);
+
+    // modify the original one
+    *msg1.i32_optional_mut() = 20;
+    assert_ne!(&msg1, &cloned);
+}
+
+#[test]
+fn test_clone_3() {
+    let mut msg1 = Msg3::default();
+    *msg1.i32_unlabeled_mut() = 10;
+    let mut cloned = msg1.clone();
+    assert_eq!(&msg1, &cloned);
+
+    // modify the original one
+    *msg1.i32_unlabeled_mut() = 20;
+    assert_ne!(&msg1, &cloned);
 }
