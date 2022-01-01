@@ -22,6 +22,7 @@ mod oneof;
 mod proto2_defaults;
 mod proto3_defaults;
 mod self_recursive;
+mod simple_get_set;
 mod simple_misc_traits;
 mod simple_ser_tests;
 mod traits;
