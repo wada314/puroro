@@ -90,3 +90,11 @@ pub fn test_partial_eq_3() {
     assert_eq!(&msg1, &msg2);
     assert_eq!(&msg2, &msg1);
 }
+
+#[test]
+fn test_clone_2() {
+    let mut msg1 = Msg2::default();
+    *msg1.i32_optional_mut() = 10;
+    let mut cloned = msg1.clone();
+    assert_eq!(&msg1, &cloned);
+}
