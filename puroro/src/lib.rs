@@ -103,7 +103,7 @@
 //! # Deserializing
 //!
 //! ```rust
-//! use puroro::Message; // For from_bytes() method
+//! use puroro::Message; // For from_bytes(), merge_from_bytes() methods
 //! use std::io::Read; // For bytes() method
 //! use puroro_doc_samples::library::Book;
 //!
@@ -112,38 +112,32 @@
 //!
 //! // You can use `from_bytes()` method to deserialize a message
 //! // from an input buffer.
-//! let mut msg = Book::from_bytes(input1.bytes()).unwrap();
-//! assert_eq!(130, msg.num_pages());
+//! let mut book = Book::from_bytes(input1.bytes()).unwrap();
+//! assert_eq!(130, book.num_pages());
 //!
 //! // Or, you can use `merge_from_bytes(&mut self)` method to deserialize
 //! // and merge from an input buffer to an existing message instance.
-//! msg.merge_from_bytes(input2.bytes()).unwrap();
-//! assert_eq!("Yo", msg.title());
-//! assert_eq!(130, msg.num_pages());
+//! book.merge_from_bytes(input2.bytes()).unwrap();
+//! assert_eq!("Yo", book.title());
+//! assert_eq!(130, book.num_pages());
 //! ```
 //!
-//! And serialize it to `std::io::Write`:
+//! # Serializing
+//!
 //! ```ignore
-//! # #[derive(Default)]
-//! # pub struct MyMessage {
-//! #     pub my_number: i32,
-//! # }
-//! # use ::puroro::{internal, Result, tags};
-//! # impl Message<MyMessage> for MyMessage {}
-//! # impl ::puroro::internal::SerializableMessageToIoWrite for MyMessage {
-//! #     fn ser<W>(&self, out: &mut W) -> Result<()> where W: std::io::Write {
-//! #         internal::impls::simple::se::SerFieldToIoWrite::<tags::Unlabeled, tags::Int32>::ser_field(
-//! #             &self.my_number, 1, out
-//! #         )
-//! #     }
-//! # }
 //! use puroro::Message; // For ser() method
+//! use puroro_doc_samples::library::Book;
+//!
 //! let mut output = vec![];
-//! let mut msg = MyMessage::default();
-//! msg.my_number = 10;
+//! let mut book = Book::new();
+//!
+//! *book.title_mut() = "Yo";
 //! msg.ser(&mut output).unwrap();
-//! assert_eq!(vec![0x08, 0x0a], output);
+//!
+//! assert_eq!(vec![0x0a, 0x02, 0x59, 0x6f], output);
 //! ```
+//!
+//! NEED WORK FROM HERE!!
 //!
 //! # Trait impls
 //! ([Detailed doc](internal::impls::traits))
