@@ -26,7 +26,7 @@ fn simple2_get_set_int32() {
     assert_eq!(0, msg.i32_repeated().len());
     assert!(!msg.has_i32_optional());
 
-    *msg.i32_optional_mut();
+    msg.i32_optional_mut();
     assert_eq!(0, msg.i32_optional());
     assert!(msg.has_i32_optional());
 
@@ -35,20 +35,27 @@ fn simple2_get_set_int32() {
     assert_eq!(10, msg.i32_optional());
     assert_eq!(&[30, 40], msg.i32_repeated());
     assert!(msg.has_i32_optional());
+
+    msg.clear_i32_optional();
+    assert_eq!(0, msg.i32_optional());
+    assert!(!msg.has_i32_optional());
 }
 
 #[test]
 fn simple3_get_set_int32() {
     let mut msg = Msg3::new();
-    assert_eq!(0, msg.i32_unlabeled());
     assert_eq!(0, msg.i32_optional());
+    assert_eq!(0, msg.i32_unlabeled());
     assert_eq!(0, msg.i32_repeated().len());
-    assert!(!msg.has_i32_unlabeled());
     assert!(!msg.has_i32_optional());
+    assert!(!msg.has_i32_unlabeled());
 
-    *msg.i32_optional_mut();
+    msg.i32_optional_mut();
     assert_eq!(0, msg.i32_optional());
     assert!(msg.has_i32_optional());
+    msg.i32_unlabeled_mut();
+    assert_eq!(0, msg.i32_unlabeled());
+    assert!(!msg.has_i32_unlabeled());
 
     *msg.i32_optional_mut() = 10;
     *msg.i32_unlabeled_mut() = 20;
@@ -58,4 +65,62 @@ fn simple3_get_set_int32() {
     assert_eq!(&[30, 40], msg.i32_repeated());
     assert!(msg.has_i32_optional());
     assert!(msg.has_i32_unlabeled());
+
+    msg.clear_i32_optional();
+    msg.clear_i32_unlabeled();
+    assert_eq!(0, msg.i32_optional());
+    assert_eq!(0, msg.i32_unlabeled());
+    assert!(!msg.has_i32_optional());
+    assert!(!msg.has_i32_unlabeled());
+}
+
+#[test]
+fn simple2_get_set_string() {
+    let mut msg = Msg3::new();
+    assert_eq!("", msg.string_optional());
+    assert_eq!(0, msg.string_repeated().len());
+    assert!(!msg.has_string_optional());
+
+    msg.string_optional_mut();
+    assert_eq!("", msg.string_optional());
+    assert!(msg.has_string_optional());
+
+    *msg.string_optional_mut() = "test1".to_string();
+    assert_eq!("test1", msg.string_optional());
+    assert!(msg.has_string_optional());
+
+    msg.clear_string_optional();
+    assert_eq!("", msg.string_optional());
+    assert!(!msg.has_string_optional());
+}
+
+#[test]
+fn simple3_get_set_string() {
+    let mut msg = Msg3::new();
+    assert_eq!("", msg.string_optional());
+    assert_eq!("", msg.string_unlabeled());
+    assert_eq!(0, msg.string_repeated().len());
+    assert!(!msg.has_string_optional());
+    assert!(!msg.has_string_unlabeled());
+
+    msg.string_optional_mut();
+    assert_eq!("", msg.string_optional());
+    assert!(msg.has_string_optional());
+    msg.string_unlabeled_mut();
+    assert_eq!("", msg.string_unlabeled());
+    assert!(!msg.has_string_unlabeled());
+
+    *msg.string_optional_mut() = "test1".to_string();
+    assert_eq!("test1", msg.string_optional());
+    assert!(msg.has_string_optional());
+    *msg.string_unlabeled_mut() = "test2".to_string();
+    assert_eq!("test2", msg.string_unlabeled());
+    assert!(msg.has_string_unlabeled());
+
+    msg.clear_string_optional();
+    assert_eq!("", msg.string_optional());
+    assert!(!msg.has_string_optional());
+    msg.clear_string_unlabeled();
+    assert_eq!("", msg.string_unlabeled());
+    assert!(!msg.has_string_unlabeled());
 }
