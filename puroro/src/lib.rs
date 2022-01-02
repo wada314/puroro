@@ -87,7 +87,13 @@
 //!
 //! ```rust
 //! use ::puroro_doc_samples::library::Book;
-//! assert!(true);
+//!
+//! let mut k_and_r = Book::default();
+//! *k_and_r.title_mut() = "The C Programming Language".to_string();
+//! // The number of pages is unknown so we do not set it.
+//!
+//! assert_eq!("The C Programming Language", k_and_r.title());
+//! assert!(!k_and_r.has_num_pages());
 //! ```
 //!
 //! ```ignore
