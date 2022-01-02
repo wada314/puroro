@@ -21,17 +21,71 @@
 //! For an input .proto file like this:
 //! ```protobuf
 //! syntax = "proto3";
-//! message MyMessage {
-//!     int32 my_number = 1;
-//!     repeated string my_name = 2;
-//!     MyMessage my_child = 3;
+//! message Book {
+//!     String title = 1;
+//!     uint32 num_pages = 2;
 //! }
 //! ```
 //!
-//! A struct & trait like this is output:
+//! A struct like this is output:
 //! ```rust
+//! #[derive(Clone, Default, PartialEq)]
 //! pub struct MyMessage { /* ... */ }
+//! impl MyMessage {
+//!     pub fn new() {
+//!         // ...
+//! #       todo!()
+//!     }
 //!
+//!     pub fn title(&self) -> &str {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn title_opt(&self) -> Option<&str> {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn has_title(&self) -> bool {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn title_mut(&mut self) -> &mut String {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn clear_title(&mut self) {
+//!         // ...
+//! #       todo!()
+//!     }
+//!
+//!     pub fn num_pages(&self) -> u32 {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn num_pages_opt(&self) -> Option<u32> {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn has_num_pages(&self) -> bool {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn num_pages_mut(&mut self) -> &mut u32 {
+//!         // ...
+//! #       todo!()
+//!     }
+//!     pub fn clear_num_pages(&mut self) {
+//!         // ...
+//! #       todo!()
+//!     }
+//! }
+//! ```
+//!
+//! ```rust
+//!
+//! ```
+//!
+//! ```rust
 //! // A readonly trait for message `MyMessage`
 //! # #![feature(generic_associated_types)]
 //! # use ::std::ops::Deref;
