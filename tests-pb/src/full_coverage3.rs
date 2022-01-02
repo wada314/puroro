@@ -2055,52 +2055,67 @@ pub mod _puroro_simple_impl {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
                 && self.i32_unlabeled == rhs.i32_unlabeled
-                && self.i32_optional == rhs.i32_optional
+                && (self._bitfield.get(0).as_deref() != Some(&true)
+                    || self.i32_optional == rhs.i32_optional)
                 && self.i32_repeated == rhs.i32_repeated
                 && self.float_unlabeled == rhs.float_unlabeled
-                && self.float_optional == rhs.float_optional
+                && (self._bitfield.get(1).as_deref() != Some(&true)
+                    || self.float_optional == rhs.float_optional)
                 && self.float_repeated == rhs.float_repeated
                 && self.bytes_unlabeled == rhs.bytes_unlabeled
-                && self.bytes_optional == rhs.bytes_optional
+                && (self._bitfield.get(2).as_deref() != Some(&true)
+                    || self.bytes_optional == rhs.bytes_optional)
                 && self.bytes_repeated == rhs.bytes_repeated
                 && self.string_unlabeled == rhs.string_unlabeled
-                && self.string_optional == rhs.string_optional
+                && (self._bitfield.get(3).as_deref() != Some(&true)
+                    || self.string_optional == rhs.string_optional)
                 && self.string_repeated == rhs.string_repeated
                 && self.enum_unlabeled == rhs.enum_unlabeled
-                && self.enum_optional == rhs.enum_optional
+                && (self._bitfield.get(4).as_deref() != Some(&true)
+                    || self.enum_optional == rhs.enum_optional)
                 && self.enum_repeated == rhs.enum_repeated
                 && self.submsg_unlabeled == rhs.submsg_unlabeled
                 && self.submsg_optional == rhs.submsg_optional
                 && self.submsg_repeated == rhs.submsg_repeated
                 && self.i64_unlabeled == rhs.i64_unlabeled
-                && self.i64_optional == rhs.i64_optional
+                && (self._bitfield.get(5).as_deref() != Some(&true)
+                    || self.i64_optional == rhs.i64_optional)
                 && self.i64_repeated == rhs.i64_repeated
                 && self.u32_unlabeled == rhs.u32_unlabeled
-                && self.u32_optional == rhs.u32_optional
+                && (self._bitfield.get(6).as_deref() != Some(&true)
+                    || self.u32_optional == rhs.u32_optional)
                 && self.u32_repeated == rhs.u32_repeated
                 && self.u64_unlabeled == rhs.u64_unlabeled
-                && self.u64_optional == rhs.u64_optional
+                && (self._bitfield.get(7).as_deref() != Some(&true)
+                    || self.u64_optional == rhs.u64_optional)
                 && self.u64_repeated == rhs.u64_repeated
                 && self.s32_unlabeled == rhs.s32_unlabeled
-                && self.s32_optional == rhs.s32_optional
+                && (self._bitfield.get(8).as_deref() != Some(&true)
+                    || self.s32_optional == rhs.s32_optional)
                 && self.s32_repeated == rhs.s32_repeated
                 && self.s64_unlabeled == rhs.s64_unlabeled
-                && self.s64_optional == rhs.s64_optional
+                && (self._bitfield.get(9).as_deref() != Some(&true)
+                    || self.s64_optional == rhs.s64_optional)
                 && self.s64_repeated == rhs.s64_repeated
                 && self.fixed32_unlabeled == rhs.fixed32_unlabeled
-                && self.fixed32_optional == rhs.fixed32_optional
+                && (self._bitfield.get(10).as_deref() != Some(&true)
+                    || self.fixed32_optional == rhs.fixed32_optional)
                 && self.fixed32_repeated == rhs.fixed32_repeated
                 && self.fixed64_unlabeled == rhs.fixed64_unlabeled
-                && self.fixed64_optional == rhs.fixed64_optional
+                && (self._bitfield.get(11).as_deref() != Some(&true)
+                    || self.fixed64_optional == rhs.fixed64_optional)
                 && self.fixed64_repeated == rhs.fixed64_repeated
                 && self.sfixed32_unlabeled == rhs.sfixed32_unlabeled
-                && self.sfixed32_optional == rhs.sfixed32_optional
+                && (self._bitfield.get(12).as_deref() != Some(&true)
+                    || self.sfixed32_optional == rhs.sfixed32_optional)
                 && self.sfixed32_repeated == rhs.sfixed32_repeated
                 && self.sfixed64_unlabeled == rhs.sfixed64_unlabeled
-                && self.sfixed64_optional == rhs.sfixed64_optional
+                && (self._bitfield.get(13).as_deref() != Some(&true)
+                    || self.sfixed64_optional == rhs.sfixed64_optional)
                 && self.sfixed64_repeated == rhs.sfixed64_repeated
                 && self.f64_unlabeled == rhs.f64_unlabeled
-                && self.f64_optional == rhs.f64_optional
+                && (self._bitfield.get(14).as_deref() != Some(&true)
+                    || self.f64_optional == rhs.f64_optional)
                 && self.f64_repeated == rhs.f64_repeated
                 && true
         }
@@ -16956,6 +16971,7 @@ pub mod _puroro_nested {
                     [u32; (0 + 31) / 32],
                 >,
                 i32_unlabeled: ::puroro::internal::Bare<i32>,
+                i32_optional: ::puroro::internal::Bare<i32>,
                 i64_unlabeled: ::puroro::internal::Bare<i64>,
             }
             impl ::puroro::Message<Submsg> for Submsg {}
@@ -16965,6 +16981,7 @@ pub mod _puroro_nested {
                     Self {
                         _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
+                        i32_optional: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
                     }
                 }
@@ -16982,6 +16999,22 @@ pub mod _puroro_nested {
 
                 pub fn i32_unlabeled(&self) -> i32 {
                     self.i32_unlabeled_opt()
+                        .unwrap_or(::std::default::Default::default())
+                }
+                pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
+                    if !::puroro::internal::IsDefault::is_default(&*self.i32_optional) {
+                        ::std::option::Option::Some(self.i32_optional.inner())
+                    } else {
+                        ::std::option::Option::None
+                    }
+                }
+
+                pub fn has_i32_optional(&self) -> bool {
+                    Self::i32_optional_opt(self).is_some()
+                }
+
+                pub fn i32_optional(&self) -> i32 {
+                    self.i32_optional_opt()
                         .unwrap_or(::std::default::Default::default())
                 }
                 pub fn i64_unlabeled_opt(&self) -> ::std::option::Option<i64> {
@@ -17009,6 +17042,15 @@ pub mod _puroro_nested {
                     }
                     &mut self.i32_unlabeled
                 }
+                pub fn clear_i32_optional(&mut self) {
+                    self.i32_optional = ::std::default::Default::default();
+                }
+                pub fn i32_optional_mut(&mut self) -> &'_ mut i32 {
+                    if !self.has_i32_optional() {
+                        self.i32_optional = ::std::default::Default::default();
+                    }
+                    &mut self.i32_optional
+                }
                 pub fn clear_i64_unlabeled(&mut self) {
                     self.i64_unlabeled = ::std::default::Default::default();
                 }
@@ -17023,6 +17065,9 @@ pub mod _puroro_nested {
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
                     <self::Submsg>::i32_unlabeled_opt(self)
+                }
+                fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+                    <self::Submsg>::i32_optional_opt(self)
                 }
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
                     <self::Submsg>::i64_unlabeled_opt(self)
@@ -17048,6 +17093,10 @@ pub mod _puroro_nested {
                             ::puroro::tags::Unlabeled,
                             ::puroro::tags::Int32,
                         >::deser_field(&mut self.i32_unlabeled, data),
+                        2 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Unlabeled,
+                            ::puroro::tags::Int32,
+                        >::deser_field(&mut self.i32_optional, data),
                         101 => DeserFieldFromBytesIter::<
                             ::puroro::tags::Unlabeled,
                             ::puroro::tags::Int64,
@@ -17076,6 +17125,14 @@ pub mod _puroro_nested {
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Unlabeled,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                        2,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Unlabeled,
                         ::puroro::tags::Int64,
                     >::ser_field(
                         <Self as super::_puroro_traits::SubmsgTrait>::i64_unlabeled_opt(self),
@@ -17099,6 +17156,7 @@ pub mod _puroro_nested {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     f.debug_struct("Submsg")
                         .field("i32_unlabeled", &self.i32_unlabeled())
+                        .field("i32_optional", &self.i32_optional())
                         .field("i64_unlabeled", &self.i64_unlabeled())
                         .finish()
                 }
@@ -17109,6 +17167,7 @@ pub mod _puroro_nested {
                     Self {
                         _bitfield: ::std::clone::Clone::clone(&self._bitfield),
                         i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                        i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
                         i64_unlabeled: ::std::clone::Clone::clone(&self.i64_unlabeled),
                     }
                 }
@@ -17118,6 +17177,7 @@ pub mod _puroro_nested {
                 fn eq(&self, rhs: &Self) -> bool {
                     self._bitfield == rhs._bitfield
                         && self.i32_unlabeled == rhs.i32_unlabeled
+                        && self.i32_optional == rhs.i32_optional
                         && self.i64_unlabeled == rhs.i64_unlabeled
                         && true
                 }
@@ -17205,6 +17265,78 @@ pub mod _puroro_nested {
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 
+            pub struct SubmsgSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                pub i32_optional: ScalarType,
+            }
+
+            impl<ScalarType> ::puroro::Message<super::Submsg> for SubmsgSingleField2<ScalarType> where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug
+            {
+            }
+
+            impl<ScalarType> super::_puroro_traits::SubmsgTrait for SubmsgSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    ::std::option::Option::Some(::std::convert::Into::into(
+                        ::std::clone::Clone::clone(&self.i32_optional),
+                    ))
+                }
+            }
+
+            impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+                Self: super::_puroro_traits::SubmsgTrait,
+            {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Unlabeled,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                        2,
+                        out,
+                    )?;
+                    ::std::result::Result::Ok(())
+                }
+            }
+
+            impl<ScalarType> ::std::convert::From<ScalarType> for SubmsgSingleField2<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32>
+                    + ::std::clone::Clone
+                    + ::std::cmp::PartialEq
+                    + ::std::fmt::Debug,
+            {
+                fn from(value: ScalarType) -> Self {
+                    Self {
+                        i32_optional: value,
+                    }
+                }
+            }
+
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+
             pub struct SubmsgSingleField101<ScalarType>
             where
                 ScalarType: ::std::convert::Into<i64>
@@ -17281,6 +17413,7 @@ pub mod _puroro_nested {
                     [u32; (0 + 31) / 32],
                 >,
                 i32_unlabeled: ::puroro::internal::Bare<i32>,
+                i32_optional: ::puroro::internal::Bare<i32>,
                 i64_unlabeled: ::puroro::internal::Bare<i64>,
             }
 
@@ -17295,6 +17428,7 @@ pub mod _puroro_nested {
                         _bump: bump,
                         _bitfield: ::std::default::Default::default(),
                         i32_unlabeled: ::std::default::Default::default(),
+                        i32_optional: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
                     }
                 }
@@ -17314,6 +17448,23 @@ pub mod _puroro_nested {
 
                 pub fn has_i32_unlabeled(&self) -> bool {
                     self.i32_unlabeled_opt().is_some()
+                }
+                pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    if !::puroro::internal::IsDefault::is_default(&*self.i32_optional) {
+                        ::std::option::Option::Some(self.i32_optional.inner())
+                    } else {
+                        ::std::option::Option::None
+                    }
+                }
+                pub fn i32_optional<'this>(&'this self) -> i32 {
+                    match self.i32_optional_opt() {
+                        ::std::option::Option::Some(x) => x,
+                        _ => ::std::default::Default::default(),
+                    }
+                }
+
+                pub fn has_i32_optional(&self) -> bool {
+                    self.i32_optional_opt().is_some()
                 }
                 pub fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     if !::puroro::internal::IsDefault::is_default(&*self.i64_unlabeled) {
@@ -17340,6 +17491,15 @@ pub mod _puroro_nested {
                         self.i32_unlabeled = ::std::default::Default::default();
                     }
                     &mut self.i32_unlabeled
+                }
+                pub fn clear_i32_optional(&mut self) {
+                    self.i32_optional = ::std::default::Default::default();
+                }
+                pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+                    if !self.has_i32_optional() {
+                        self.i32_optional = ::std::default::Default::default();
+                    }
+                    &mut self.i32_optional
                 }
                 pub fn clear_i64_unlabeled(&mut self) {
                     self.i64_unlabeled = ::std::default::Default::default();
@@ -17369,6 +17529,9 @@ pub mod _puroro_nested {
                 fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
                     <Self>::i32_unlabeled_opt(self)
                 }
+                fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+                    <Self>::i32_optional_opt(self)
+                }
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
                     <Self>::i64_unlabeled_opt(self)
                 }
@@ -17392,6 +17555,12 @@ pub mod _puroro_nested {
                             ::puroro::tags::Int32,
                         >::deser_field(
                             &mut self.i32_unlabeled, data, self._bump
+                        ),
+                        2 => DeserFieldFromBytesIter::<
+                            ::puroro::tags::Unlabeled,
+                            ::puroro::tags::Int32,
+                        >::deser_field(
+                            &mut self.i32_optional, data, self._bump
                         ),
                         101 => DeserFieldFromBytesIter::<
                             ::puroro::tags::Unlabeled,
@@ -17419,6 +17588,14 @@ pub mod _puroro_nested {
                     >::ser_field(
                         <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
                         1,
+                        out,
+                    )?;
+                    ::puroro::internal::se::SerFieldToIoWrite::<
+                        ::puroro::tags::Unlabeled,
+                        ::puroro::tags::Int32,
+                    >::ser_field(
+                        <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
+                        2,
                         out,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
@@ -17452,6 +17629,24 @@ pub mod _puroro_nested {
                         self.0,
                         SubmsgSingleField1 {
                             i32_unlabeled: value,
+                        },
+                    ))
+                }
+
+                pub fn append_i32_optional<ScalarType>(
+                    self,
+                    value: ScalarType,
+                ) -> SubmsgBuilder<(T, SubmsgSingleField2<ScalarType>)>
+                where
+                    ScalarType: ::std::convert::Into<i32>
+                        + ::std::clone::Clone
+                        + ::std::cmp::PartialEq
+                        + ::std::fmt::Debug,
+                {
+                    SubmsgBuilder((
+                        self.0,
+                        SubmsgSingleField2 {
+                            i32_optional: value,
                         },
                     ))
                 }
@@ -17502,6 +17697,16 @@ pub mod _puroro_nested {
                 fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
+                fn i32_optional<'this>(&'this self) -> i32 {
+                    self.i32_optional_opt()
+                        .unwrap_or_else(::std::default::Default::default)
+                }
+                fn has_i32_optional<'this>(&'this self) -> bool {
+                    self.i32_optional_opt().is_some()
+                }
+                fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    ::std::option::Option::None
+                }
                 fn i64_unlabeled<'this>(&'this self) -> i64 {
                     self.i64_unlabeled_opt()
                         .unwrap_or_else(::std::default::Default::default)
@@ -17518,6 +17723,9 @@ pub mod _puroro_nested {
                 ($ty:ty) => {
                     fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).i32_unlabeled_opt()
+                    }
+                    fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                        (**self).i32_optional_opt()
                     }
                     fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                         (**self).i64_unlabeled_opt()
@@ -17569,6 +17777,10 @@ pub mod _puroro_nested {
                     <U as SubmsgTrait>::i32_unlabeled_opt(&self.1)
                         .or_else(|| <T as SubmsgTrait>::i32_unlabeled_opt(&self.0))
                 }
+                fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+                    <U as SubmsgTrait>::i32_optional_opt(&self.1)
+                        .or_else(|| <T as SubmsgTrait>::i32_optional_opt(&self.0))
+                }
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
                     <U as SubmsgTrait>::i64_unlabeled_opt(&self.1)
                         .or_else(|| <T as SubmsgTrait>::i64_unlabeled_opt(&self.0))
@@ -17585,6 +17797,12 @@ pub mod _puroro_nested {
                         |u| <U as SubmsgTrait>::i32_unlabeled_opt(u),
                     )
                 }
+                fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    self.as_ref().either(
+                        |t| <T as SubmsgTrait>::i32_optional_opt(t),
+                        |u| <U as SubmsgTrait>::i32_optional_opt(u),
+                    )
+                }
                 fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     self.as_ref().either(
                         |t| <T as SubmsgTrait>::i64_unlabeled_opt(t),
@@ -17598,6 +17816,9 @@ pub mod _puroro_nested {
             {
                 fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
+                }
+                fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+                    self.as_ref().and_then(|msg| msg.i32_optional_opt())
                 }
                 fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     self.as_ref().and_then(|msg| msg.i64_unlabeled_opt())

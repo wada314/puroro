@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ::std::borrow::Cow;
 use ::tests_pb::oneofs2::msg::{
     GroupOne as GroupOne2, GroupThree as GroupThree2, GroupTwo as GroupTwo2,
 };

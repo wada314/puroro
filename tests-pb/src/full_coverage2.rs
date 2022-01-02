@@ -2084,53 +2084,83 @@ pub mod _puroro_simple_impl {
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
-                && self.i32_required == rhs.i32_required
-                && self.i32_optional == rhs.i32_optional
+                && (self._bitfield.get(0).as_deref() != Some(&true)
+                    || self.i32_required == rhs.i32_required)
+                && (self._bitfield.get(1).as_deref() != Some(&true)
+                    || self.i32_optional == rhs.i32_optional)
                 && self.i32_repeated == rhs.i32_repeated
-                && self.float_required == rhs.float_required
-                && self.float_optional == rhs.float_optional
+                && (self._bitfield.get(2).as_deref() != Some(&true)
+                    || self.float_required == rhs.float_required)
+                && (self._bitfield.get(3).as_deref() != Some(&true)
+                    || self.float_optional == rhs.float_optional)
                 && self.float_repeated == rhs.float_repeated
-                && self.bytes_required == rhs.bytes_required
-                && self.bytes_optional == rhs.bytes_optional
+                && (self._bitfield.get(4).as_deref() != Some(&true)
+                    || self.bytes_required == rhs.bytes_required)
+                && (self._bitfield.get(5).as_deref() != Some(&true)
+                    || self.bytes_optional == rhs.bytes_optional)
                 && self.bytes_repeated == rhs.bytes_repeated
-                && self.string_required == rhs.string_required
-                && self.string_optional == rhs.string_optional
+                && (self._bitfield.get(6).as_deref() != Some(&true)
+                    || self.string_required == rhs.string_required)
+                && (self._bitfield.get(7).as_deref() != Some(&true)
+                    || self.string_optional == rhs.string_optional)
                 && self.string_repeated == rhs.string_repeated
-                && self.enum_required == rhs.enum_required
-                && self.enum_optional == rhs.enum_optional
+                && (self._bitfield.get(8).as_deref() != Some(&true)
+                    || self.enum_required == rhs.enum_required)
+                && (self._bitfield.get(9).as_deref() != Some(&true)
+                    || self.enum_optional == rhs.enum_optional)
                 && self.enum_repeated == rhs.enum_repeated
                 && self.submsg_required == rhs.submsg_required
                 && self.submsg_optional == rhs.submsg_optional
                 && self.submsg_repeated == rhs.submsg_repeated
-                && self.i64_required == rhs.i64_required
-                && self.i64_optional == rhs.i64_optional
+                && (self._bitfield.get(10).as_deref() != Some(&true)
+                    || self.i64_required == rhs.i64_required)
+                && (self._bitfield.get(11).as_deref() != Some(&true)
+                    || self.i64_optional == rhs.i64_optional)
                 && self.i64_repeated == rhs.i64_repeated
-                && self.u32_required == rhs.u32_required
-                && self.u32_optional == rhs.u32_optional
+                && (self._bitfield.get(12).as_deref() != Some(&true)
+                    || self.u32_required == rhs.u32_required)
+                && (self._bitfield.get(13).as_deref() != Some(&true)
+                    || self.u32_optional == rhs.u32_optional)
                 && self.u32_repeated == rhs.u32_repeated
-                && self.u64_required == rhs.u64_required
-                && self.u64_optional == rhs.u64_optional
+                && (self._bitfield.get(14).as_deref() != Some(&true)
+                    || self.u64_required == rhs.u64_required)
+                && (self._bitfield.get(15).as_deref() != Some(&true)
+                    || self.u64_optional == rhs.u64_optional)
                 && self.u64_repeated == rhs.u64_repeated
-                && self.s32_required == rhs.s32_required
-                && self.s32_optional == rhs.s32_optional
+                && (self._bitfield.get(16).as_deref() != Some(&true)
+                    || self.s32_required == rhs.s32_required)
+                && (self._bitfield.get(17).as_deref() != Some(&true)
+                    || self.s32_optional == rhs.s32_optional)
                 && self.s32_repeated == rhs.s32_repeated
-                && self.s64_required == rhs.s64_required
-                && self.s64_optional == rhs.s64_optional
+                && (self._bitfield.get(18).as_deref() != Some(&true)
+                    || self.s64_required == rhs.s64_required)
+                && (self._bitfield.get(19).as_deref() != Some(&true)
+                    || self.s64_optional == rhs.s64_optional)
                 && self.s64_repeated == rhs.s64_repeated
-                && self.fixed32_required == rhs.fixed32_required
-                && self.fixed32_optional == rhs.fixed32_optional
+                && (self._bitfield.get(20).as_deref() != Some(&true)
+                    || self.fixed32_required == rhs.fixed32_required)
+                && (self._bitfield.get(21).as_deref() != Some(&true)
+                    || self.fixed32_optional == rhs.fixed32_optional)
                 && self.fixed32_repeated == rhs.fixed32_repeated
-                && self.fixed64_required == rhs.fixed64_required
-                && self.fixed64_optional == rhs.fixed64_optional
+                && (self._bitfield.get(22).as_deref() != Some(&true)
+                    || self.fixed64_required == rhs.fixed64_required)
+                && (self._bitfield.get(23).as_deref() != Some(&true)
+                    || self.fixed64_optional == rhs.fixed64_optional)
                 && self.fixed64_repeated == rhs.fixed64_repeated
-                && self.sfixed32_required == rhs.sfixed32_required
-                && self.sfixed32_optional == rhs.sfixed32_optional
+                && (self._bitfield.get(24).as_deref() != Some(&true)
+                    || self.sfixed32_required == rhs.sfixed32_required)
+                && (self._bitfield.get(25).as_deref() != Some(&true)
+                    || self.sfixed32_optional == rhs.sfixed32_optional)
                 && self.sfixed32_repeated == rhs.sfixed32_repeated
-                && self.sfixed64_required == rhs.sfixed64_required
-                && self.sfixed64_optional == rhs.sfixed64_optional
+                && (self._bitfield.get(26).as_deref() != Some(&true)
+                    || self.sfixed64_required == rhs.sfixed64_required)
+                && (self._bitfield.get(27).as_deref() != Some(&true)
+                    || self.sfixed64_optional == rhs.sfixed64_optional)
                 && self.sfixed64_repeated == rhs.sfixed64_repeated
-                && self.f64_required == rhs.f64_required
-                && self.f64_optional == rhs.f64_optional
+                && (self._bitfield.get(28).as_deref() != Some(&true)
+                    || self.f64_required == rhs.f64_required)
+                && (self._bitfield.get(29).as_deref() != Some(&true)
+                    || self.f64_optional == rhs.f64_optional)
                 && self.f64_repeated == rhs.f64_repeated
                 && true
         }
@@ -17182,8 +17212,10 @@ pub mod _puroro_nested {
             impl ::std::cmp::PartialEq for Submsg {
                 fn eq(&self, rhs: &Self) -> bool {
                     self._bitfield == rhs._bitfield
-                        && self.i32_required == rhs.i32_required
-                        && self.i64_required == rhs.i64_required
+                        && (self._bitfield.get(0).as_deref() != Some(&true)
+                            || self.i32_required == rhs.i32_required)
+                        && (self._bitfield.get(1).as_deref() != Some(&true)
+                            || self.i64_required == rhs.i64_required)
                         && true
                 }
             }

@@ -133,7 +133,9 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test1 {
         fn eq(&self, rhs: &Self) -> bool {
-            self._bitfield == rhs._bitfield && self.a == rhs.a && true
+            self._bitfield == rhs._bitfield
+                && (self._bitfield.get(0).as_deref() != Some(&true) || self.a == rhs.a)
+                && true
         }
     }
     pub struct Test2 {
@@ -256,7 +258,9 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Test2 {
         fn eq(&self, rhs: &Self) -> bool {
-            self._bitfield == rhs._bitfield && self.b == rhs.b && true
+            self._bitfield == rhs._bitfield
+                && (self._bitfield.get(0).as_deref() != Some(&true) || self.b == rhs.b)
+                && true
         }
     }
     pub struct Test3 {

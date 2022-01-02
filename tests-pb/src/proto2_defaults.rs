@@ -2982,68 +2982,111 @@ pub mod _puroro_simple_impl {
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
             self._bitfield == rhs._bitfield
-                && self.i32_default == rhs.i32_default
-                && self.i32_0 == rhs.i32_0
-                && self.i32_42 == rhs.i32_42
-                && self.i32_m42 == rhs.i32_m42
-                && self.i32_2147483647 == rhs.i32_2147483647
-                && self.i32_m2147483648 == rhs.i32_m2147483648
-                && self.i32_0123 == rhs.i32_0123
-                && self.i32_0x123 == rhs.i32_0x123
-                && self.u32_default == rhs.u32_default
-                && self.u32_0 == rhs.u32_0
-                && self.u32_42 == rhs.u32_42
-                && self.u32_4294967295 == rhs.u32_4294967295
-                && self.u32_0123 == rhs.u32_0123
-                && self.u32_0x123 == rhs.u32_0x123
-                && self.i64_default == rhs.i64_default
-                && self.i64_0 == rhs.i64_0
-                && self.i64_42 == rhs.i64_42
-                && self.i64_m42 == rhs.i64_m42
-                && self.i64_9223372036854775807 == rhs.i64_9223372036854775807
-                && self.i64_m9223372036854775808 == rhs.i64_m9223372036854775808
-                && self.i64_0123 == rhs.i64_0123
-                && self.i64_0x123 == rhs.i64_0x123
-                && self.u64_default == rhs.u64_default
-                && self.u64_0 == rhs.u64_0
-                && self.u64_42 == rhs.u64_42
-                && self.u64_18446744073709551615 == rhs.u64_18446744073709551615
-                && self.u64_0123 == rhs.u64_0123
-                && self.u64_0x123 == rhs.u64_0x123
-                && self.f32_default == rhs.f32_default
-                && self.f32_0 == rhs.f32_0
-                && self.f32_m0 == rhs.f32_m0
-                && self.f32_0p == rhs.f32_0p
-                && self.f32_p0 == rhs.f32_p0
-                && self.f32_0p0 == rhs.f32_0p0
-                && self.f32_42 == rhs.f32_42
-                && self.f32_m42 == rhs.f32_m42
-                && self.f32_0p25 == rhs.f32_0p25
-                && self.f32_1p5e2 == rhs.f32_1p5e2
-                && self.f32_inf == rhs.f32_inf
-                && self.f32_minf == rhs.f32_minf
-                && self.f32_nan == rhs.f32_nan
-                && self.f32_mnan == rhs.f32_mnan
-                && self.bool_default == rhs.bool_default
-                && self.bool_true == rhs.bool_true
-                && self.bool_false == rhs.bool_false
-                && self.string_default == rhs.string_default
-                && self.string_empty == rhs.string_empty
-                && self.string_abc == rhs.string_abc
-                && self.string_aiu == rhs.string_aiu
-                && self.string_backslash == rhs.string_backslash
-                && self.string_tab == rhs.string_tab
-                && self.string_crlf == rhs.string_crlf
-                && self.bytes_default == rhs.bytes_default
-                && self.bytes_empty == rhs.bytes_empty
-                && self.bytes_abc == rhs.bytes_abc
-                && self.bytes_aiu == rhs.bytes_aiu
-                && self.bytes_backslash == rhs.bytes_backslash
-                && self.bytes_tab == rhs.bytes_tab
-                && self.bytes_crlf == rhs.bytes_crlf
-                && self.enum_default == rhs.enum_default
-                && self.enum_one == rhs.enum_one
-                && self.enum_fourty_two == rhs.enum_fourty_two
+                && (self._bitfield.get(0).as_deref() != Some(&true)
+                    || self.i32_default == rhs.i32_default)
+                && (self._bitfield.get(1).as_deref() != Some(&true) || self.i32_0 == rhs.i32_0)
+                && (self._bitfield.get(2).as_deref() != Some(&true) || self.i32_42 == rhs.i32_42)
+                && (self._bitfield.get(3).as_deref() != Some(&true) || self.i32_m42 == rhs.i32_m42)
+                && (self._bitfield.get(4).as_deref() != Some(&true)
+                    || self.i32_2147483647 == rhs.i32_2147483647)
+                && (self._bitfield.get(5).as_deref() != Some(&true)
+                    || self.i32_m2147483648 == rhs.i32_m2147483648)
+                && (self._bitfield.get(6).as_deref() != Some(&true)
+                    || self.i32_0123 == rhs.i32_0123)
+                && (self._bitfield.get(7).as_deref() != Some(&true)
+                    || self.i32_0x123 == rhs.i32_0x123)
+                && (self._bitfield.get(8).as_deref() != Some(&true)
+                    || self.u32_default == rhs.u32_default)
+                && (self._bitfield.get(9).as_deref() != Some(&true) || self.u32_0 == rhs.u32_0)
+                && (self._bitfield.get(10).as_deref() != Some(&true) || self.u32_42 == rhs.u32_42)
+                && (self._bitfield.get(11).as_deref() != Some(&true)
+                    || self.u32_4294967295 == rhs.u32_4294967295)
+                && (self._bitfield.get(12).as_deref() != Some(&true)
+                    || self.u32_0123 == rhs.u32_0123)
+                && (self._bitfield.get(13).as_deref() != Some(&true)
+                    || self.u32_0x123 == rhs.u32_0x123)
+                && (self._bitfield.get(14).as_deref() != Some(&true)
+                    || self.i64_default == rhs.i64_default)
+                && (self._bitfield.get(15).as_deref() != Some(&true) || self.i64_0 == rhs.i64_0)
+                && (self._bitfield.get(16).as_deref() != Some(&true) || self.i64_42 == rhs.i64_42)
+                && (self._bitfield.get(17).as_deref() != Some(&true) || self.i64_m42 == rhs.i64_m42)
+                && (self._bitfield.get(18).as_deref() != Some(&true)
+                    || self.i64_9223372036854775807 == rhs.i64_9223372036854775807)
+                && (self._bitfield.get(19).as_deref() != Some(&true)
+                    || self.i64_m9223372036854775808 == rhs.i64_m9223372036854775808)
+                && (self._bitfield.get(20).as_deref() != Some(&true)
+                    || self.i64_0123 == rhs.i64_0123)
+                && (self._bitfield.get(21).as_deref() != Some(&true)
+                    || self.i64_0x123 == rhs.i64_0x123)
+                && (self._bitfield.get(22).as_deref() != Some(&true)
+                    || self.u64_default == rhs.u64_default)
+                && (self._bitfield.get(23).as_deref() != Some(&true) || self.u64_0 == rhs.u64_0)
+                && (self._bitfield.get(24).as_deref() != Some(&true) || self.u64_42 == rhs.u64_42)
+                && (self._bitfield.get(25).as_deref() != Some(&true)
+                    || self.u64_18446744073709551615 == rhs.u64_18446744073709551615)
+                && (self._bitfield.get(26).as_deref() != Some(&true)
+                    || self.u64_0123 == rhs.u64_0123)
+                && (self._bitfield.get(27).as_deref() != Some(&true)
+                    || self.u64_0x123 == rhs.u64_0x123)
+                && (self._bitfield.get(28).as_deref() != Some(&true)
+                    || self.f32_default == rhs.f32_default)
+                && (self._bitfield.get(29).as_deref() != Some(&true) || self.f32_0 == rhs.f32_0)
+                && (self._bitfield.get(30).as_deref() != Some(&true) || self.f32_m0 == rhs.f32_m0)
+                && (self._bitfield.get(31).as_deref() != Some(&true) || self.f32_0p == rhs.f32_0p)
+                && (self._bitfield.get(32).as_deref() != Some(&true) || self.f32_p0 == rhs.f32_p0)
+                && (self._bitfield.get(33).as_deref() != Some(&true) || self.f32_0p0 == rhs.f32_0p0)
+                && (self._bitfield.get(34).as_deref() != Some(&true) || self.f32_42 == rhs.f32_42)
+                && (self._bitfield.get(35).as_deref() != Some(&true) || self.f32_m42 == rhs.f32_m42)
+                && (self._bitfield.get(36).as_deref() != Some(&true)
+                    || self.f32_0p25 == rhs.f32_0p25)
+                && (self._bitfield.get(37).as_deref() != Some(&true)
+                    || self.f32_1p5e2 == rhs.f32_1p5e2)
+                && (self._bitfield.get(38).as_deref() != Some(&true) || self.f32_inf == rhs.f32_inf)
+                && (self._bitfield.get(39).as_deref() != Some(&true)
+                    || self.f32_minf == rhs.f32_minf)
+                && (self._bitfield.get(40).as_deref() != Some(&true) || self.f32_nan == rhs.f32_nan)
+                && (self._bitfield.get(41).as_deref() != Some(&true)
+                    || self.f32_mnan == rhs.f32_mnan)
+                && (self._bitfield.get(42).as_deref() != Some(&true)
+                    || self.bool_default == rhs.bool_default)
+                && (self._bitfield.get(43).as_deref() != Some(&true)
+                    || self.bool_true == rhs.bool_true)
+                && (self._bitfield.get(44).as_deref() != Some(&true)
+                    || self.bool_false == rhs.bool_false)
+                && (self._bitfield.get(45).as_deref() != Some(&true)
+                    || self.string_default == rhs.string_default)
+                && (self._bitfield.get(46).as_deref() != Some(&true)
+                    || self.string_empty == rhs.string_empty)
+                && (self._bitfield.get(47).as_deref() != Some(&true)
+                    || self.string_abc == rhs.string_abc)
+                && (self._bitfield.get(48).as_deref() != Some(&true)
+                    || self.string_aiu == rhs.string_aiu)
+                && (self._bitfield.get(49).as_deref() != Some(&true)
+                    || self.string_backslash == rhs.string_backslash)
+                && (self._bitfield.get(50).as_deref() != Some(&true)
+                    || self.string_tab == rhs.string_tab)
+                && (self._bitfield.get(51).as_deref() != Some(&true)
+                    || self.string_crlf == rhs.string_crlf)
+                && (self._bitfield.get(52).as_deref() != Some(&true)
+                    || self.bytes_default == rhs.bytes_default)
+                && (self._bitfield.get(53).as_deref() != Some(&true)
+                    || self.bytes_empty == rhs.bytes_empty)
+                && (self._bitfield.get(54).as_deref() != Some(&true)
+                    || self.bytes_abc == rhs.bytes_abc)
+                && (self._bitfield.get(55).as_deref() != Some(&true)
+                    || self.bytes_aiu == rhs.bytes_aiu)
+                && (self._bitfield.get(56).as_deref() != Some(&true)
+                    || self.bytes_backslash == rhs.bytes_backslash)
+                && (self._bitfield.get(57).as_deref() != Some(&true)
+                    || self.bytes_tab == rhs.bytes_tab)
+                && (self._bitfield.get(58).as_deref() != Some(&true)
+                    || self.bytes_crlf == rhs.bytes_crlf)
+                && (self._bitfield.get(59).as_deref() != Some(&true)
+                    || self.enum_default == rhs.enum_default)
+                && (self._bitfield.get(60).as_deref() != Some(&true)
+                    || self.enum_one == rhs.enum_one)
+                && (self._bitfield.get(61).as_deref() != Some(&true)
+                    || self.enum_fourty_two == rhs.enum_fourty_two)
                 && true
         }
     }

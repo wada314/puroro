@@ -133,7 +133,9 @@ pub mod _puroro_simple_impl {
 
     impl ::std::cmp::PartialEq for Msg {
         fn eq(&self, rhs: &Self) -> bool {
-            self._bitfield == rhs._bitfield && self.r#type == rhs.r#type && true
+            self._bitfield == rhs._bitfield
+                && (self._bitfield.get(0).as_deref() != Some(&true) || self.r#type == rhs.r#type)
+                && true
         }
     }
 }
