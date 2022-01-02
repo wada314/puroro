@@ -124,3 +124,69 @@ fn simple3_get_set_string() {
     assert_eq!("", msg.string_unlabeled());
     assert!(!msg.has_string_unlabeled());
 }
+
+#[test]
+fn simple2_get_set_message() {
+    let mut msg = Msg3::default();
+    assert!(msg.submsg_optional().is_none());
+    assert!(msg.submsg_optional_opt().is_none());
+    assert!(!msg.has_submsg_optional());
+    assert_eq!(0, msg.submsg_repeated().len());
+
+    msg.submsg_optional_mut();
+    assert!(msg.submsg_optional().is_some());
+    assert!(msg.submsg_optional_opt().is_some());
+    assert!(msg.has_submsg_optional());
+    assert_eq!(0, msg.submsg_optional().unwrap().i32_optional());
+    assert!(!msg.submsg_optional().unwrap().has_i32_optional());
+
+    *msg.submsg_optional_mut().i32_optional_mut() = 10;
+    assert!(msg.submsg_optional().is_some());
+    assert_eq!(10, msg.submsg_optional().unwrap().i32_optional());
+
+    msg.clear_submsg_optional();
+    assert!(msg.submsg_optional().is_none());
+    assert!(msg.submsg_optional_opt().is_none());
+    assert!(!msg.has_submsg_optional());
+}
+
+#[test]
+fn simple3_get_set_message() {
+    let mut msg = Msg3::default();
+    assert!(msg.submsg_optional().is_none());
+    assert!(msg.submsg_optional_opt().is_none());
+    assert!(!msg.has_submsg_optional());
+    assert!(msg.submsg_unlabeled().is_none());
+    assert!(msg.submsg_unlabeled_opt().is_none());
+    assert!(!msg.has_submsg_unlabeled());
+    assert_eq!(0, msg.submsg_repeated().len());
+
+    msg.submsg_optional_mut();
+    assert!(msg.submsg_optional().is_some());
+    assert!(msg.submsg_optional_opt().is_some());
+    assert!(msg.has_submsg_optional());
+    assert_eq!(0, msg.submsg_optional().unwrap().i32_optional());
+    assert!(!msg.submsg_optional().unwrap().has_i32_optional());
+    msg.submsg_unlabeled_mut();
+    assert!(msg.submsg_unlabeled().is_some());
+    assert!(msg.submsg_unlabeled_opt().is_some());
+    assert!(msg.has_submsg_unlabeled());
+    assert_eq!(0, msg.submsg_unlabeled().unwrap().i32_optional());
+    assert!(!msg.submsg_unlabeled().unwrap().has_i32_optional());
+
+    *msg.submsg_optional_mut().i32_optional_mut() = 10;
+    assert!(msg.submsg_optional().is_some());
+    assert_eq!(10, msg.submsg_optional().unwrap().i32_optional());
+    *msg.submsg_unlabeled_mut().i32_optional_mut() = 10;
+    assert!(msg.submsg_unlabeled().is_some());
+    assert_eq!(10, msg.submsg_unlabeled().unwrap().i32_optional());
+
+    msg.clear_submsg_optional();
+    assert!(msg.submsg_optional().is_none());
+    assert!(msg.submsg_optional_opt().is_none());
+    assert!(!msg.has_submsg_optional());
+    msg.clear_submsg_unlabeled();
+    assert!(msg.submsg_unlabeled().is_none());
+    assert!(msg.submsg_unlabeled_opt().is_none());
+    assert!(!msg.has_submsg_unlabeled());
+}

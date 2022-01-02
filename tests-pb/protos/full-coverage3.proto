@@ -34,6 +34,7 @@ message Msg {
 
     message Submsg {
         int32 i32_unlabeled = 1;
+        int32 i32_optional = 2;
         int64 i64_unlabeled = 101;
     }
     Submsg submsg_unlabeled = 51;
