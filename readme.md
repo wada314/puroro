@@ -13,7 +13,101 @@ This library is under development and it is very possible to make breaking chang
 
 Currently this library only supports Rust nightly channel.
 
-## subcrates
+# How to compile your .pb files to .rs files
+
+First, let's create a crate for your .pb files (and the generated .rs files).
+It is highly recommended to make a separated crate which only contains
+the .pb files and the generated .rs files.
+
+```shell
+$ cargo new my-examples --lib
+$ cd my-examples
+
+# Download and compile puroro-plugin executable file
+# The command generates bin/ directory and put the executable file under it
+# Check the output and remember the version of puroro-plugin you installed
+$ cargo install puroro-plugin --root=./
+
+# Create your .pb files under this directory
+$ mkdir protos
+```
+
+As an example, let's make a simple proto file `test1.proto`:
+
+```protobuf
+syntax = "proto3";
+package library;
+message Book {
+    string title = 1;
+    uint32 num_pages = 2;
+}
+```
+
+Note that the file names does not make any effect in the generated codes
+(For the generated code's filenames, the package names specified in the
+proto files are used).
+
+
+Then edit the `Cargo.toml` to add the dependency to `puroro` library crate:
+
+```toml
+[dependencies]
+# Use the same version with the puroro-plugin you installed at above
+puroro = "0.3.1"
+```
+
+As a last step, create a file `build.rs` into the crate root directory
+with a contents like this (You can just copy-and-paste. Don't forget to
+edit the "exe" extension for non-Windows users).
+
+```rust
+use std::env;
+use std::path::PathBuf;
+use std::process::Command;
+fn main() {
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=protos/*.proto");
+    // ############ You may want to edit here for non-windows environment ############
+    let plugin_exe_path = ["bin", "puroro-plugin.exe"].iter().collect::<PathBuf>();
+    let output_rust_path = ["src"].iter().collect::<PathBuf>();
+    // ######### You may also want to edit here for finding protoc command ###########
+    let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
+    let protoc_status = Command::new(&protoc_exe)
+        .arg("protos/*.proto")
+        .arg(format!(
+            "--plugin=protoc-gen-rust={}",
+            plugin_exe_path.to_str().unwrap()
+        ))
+        .arg(format!("--rust_out={}", output_rust_path.to_str().unwrap()))
+        .arg(format!("--proto_path={}", "./protos/"))
+        .arg("--experimental_allow_proto3_optional")
+        .status()
+        .unwrap();
+    if !protoc_status.success() {
+        println!("cargo:warning=Failed to run `protoc` command.");
+        panic!("Failed to run `protoc` command.")
+    }
+}
+```
+
+Once you have finished these steps, the directory should be like this:
+
+    + my-examples/
+        ├ src/
+        │   └ (empty)
+        ├ protos/
+        │   └ test1.proto
+        ├ bin/
+        │   └ puroro-plugin.exe
+        ├ cargo.toml
+        ├ build.rs
+        ├ (some other generated files)
+
+Then run `cargo build` command. If it successfully runs, then the generated
+`.rs` files will be generated under `src/` directory and you can use it from
+your own crate. Congraturations!
+
+# subcrates
 - puroro -- The crate that the library user need to import
 - puroro-plugin -- A protoc compiler plugin
 - tests -- Test cases
@@ -22,23 +116,7 @@ Currently this library only supports Rust nightly channel.
 - puroro-protobuf-compiled -- Compiled .rs files in protobuf crate so that puroro-plugin crate can use it
     - update-plugin-protos.bat -- A batch file to generate the compiled .rs files
 
-## Sample command to compile
-The crate `puroro-plugin` generates an executable file which can be used as
-a `protoc` command's `--plugin=` flag target.
-So once you build `puroro-plugin` somehow you can run `protoc` command like this
-(The sample below is for Windows OS. For Linux, just replace .exe):
-
-```
-$ protoc <protofile-path> --plugin=protoc-gen-rust=./target/debug/puroro-plugin.exe --rust_out=<output-dir> --proto_path=<protofile-dir>
-```
-
-(Keep in mind that protoc command not work properly with Windows path separator "\\". Use "/" instead)
-
-Check `tests-pb/build.rs` and `tests-pb/Cargo.toml` for a sample build script.
-This library generates root `lib.rs` file and submodule files and directories, so you will
-want to make a separated crate containing only generated .rs code (and build.rs and the source .pb files).
-
-## TODOs
+# TODOs
 - proto2
     - [ ] Groups, at least correctly ignore it
     - [x] Enums (In proto2 we need to refuse the unknown value)
@@ -59,7 +137,7 @@ want to make a separated crate containing only generated .rs code (and build.rs 
     - [ ] Nightly / stable features
         - [ ] Support stable (not using nightly features)
     - [ ] More useful message traits
-        - [ ] Mutable interface
+        - [x] Mutable interface
         - [ ] (More) Repeated field interface
         - [ ] Map interface
     - [ ] Keep unknown fields
@@ -69,7 +147,7 @@ want to make a separated crate containing only generated .rs code (and build.rs 
     - [ ] Custom deserializer (?)
     - [ ] Required field checker
     - [ ] Other implementations
-        - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
+        - [x] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
         - [ ] SliceView -- A viewer over a `&[u8]` slice, without allocating any extra memories
         - [x] Empty(Unit) -- `()`, which only returns default values
         - [x] Merged -- `(T, U)`

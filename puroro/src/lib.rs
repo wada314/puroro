@@ -16,7 +16,11 @@
 //!
 //! __Warning! The interface is still experimental and it will change very frequently!!__
 //!
-//! # Generated structs & traits
+//! # How to compile your .pb files to .rs files
+//!
+//! Please check [the `readme` of this repository](https://github.com/wada314/puroro#readme)
+//!
+//! # Simple example
 //!
 //! For an input .proto file like this:
 //! ```protobuf
@@ -96,80 +100,26 @@
 //! assert!(!k_and_r.has_num_pages());
 //! ```
 //!
-//! ```ignore
-//! // A readonly trait for message `MyMessage`
-//! # #![feature(generic_associated_types)]
-//! # use ::std::ops::Deref;
-//! pub trait MyMessageTrait {
-//!     fn my_number(&self) -> i32;
-//!     fn my_number_opt(&self) -> Option<i32>;
-//!     fn has_my_number(&self) -> bool;
+//! # Deserializing
 //!
-//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str>;
-//!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
-//!
-//!     type Field3MessageType<'this>: MyMessageTrait;
-//!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
-//!     fn my_child_opt(&self) -> Option<Self::Field3MessageType<'_>>;
-//!     fn has_my_child(&self) -> bool;
-//! }
-//!
-//! impl MyMesasgeTrait for MyMessage {
-//!     /* ... */
-//! #     fn my_number(&self) -> i32 { todo!() }
-//! #     fn my_number_opt(&self) -> Option<i32> { todo!() }
-//! #     fn has_my_number(&self) -> bool { todo!() }
-//! #     type Field2RepeatedType<'this> = Vec<&'this str>;
-//! #     fn my_name(&self) -> Self::Field2RepeatedType<'_> { todo!() }
-//! #     type Field3MessageType<'this> = MyMessage;
-//! #     fn my_child(&self) -> Option<Self::Field3MessageType<'_>> { todo!() }
-//! #     fn my_child_opt(&self) -> Option<Self::Field3MessageType<'_>> { todo!() }
-//! #     fn has_my_child(&self) -> bool { todo!() }
-//! }
-//! ```
-//!
-//! (Omitting some trait bounds for explanation. Please check the [traits](internal::impls::traits) page for detail):
-//!
-//! You can deserialize a struct from `Iterator<std::io::Result<u8>>`
-//! (which is a return type of `std::io::Read::bytes()` method):
-//! ```ignore
-//! # #[derive(Default)]
-//! # pub struct MyMessage {
-//! #     pub my_number: i32,
-//! # }
-//! # use ::puroro::*;
-//! # impl Message<MyMessage> for MyMessage {}
-//! # impl internal::de::DeserMessageFromBytesIter for MyMessage {
-//! #     fn deser<I>(&mut self, iter: I) -> Result<()>
-//! #     where
-//! #         I: Iterator<Item = ::std::io::Result<u8>>
-//! #     {
-//! #         internal::de::from_iter::deser_from_iter(self, iter)
-//! #     }
-//! # }
-//! # impl internal::de::DeserFieldsFromBytesIter for MyMessage {
-//! #     fn deser_field<I>(
-//! #         &mut self,
-//! #         field_number: i32,
-//! #         data: internal::types::FieldData<&mut internal::de::from_iter::ScopedIter<I>>,
-//! #     ) -> Result<()>
-//! #     where
-//! #         I: Iterator<Item = ::std::io::Result<u8>>,
-//! #     {
-//! #         use internal::impls::simple::de::DeserFieldFromBytesIter;
-//! #         match field_number {
-//! #             1 => DeserFieldFromBytesIter::<
-//! #                 tags::Unlabeled, tags::Int32
-//! #             >::deser_field(&mut self.my_number, data),
-//! #             _ => panic!(),
-//! #         }
-//! #     }
-//! # }
+//! ```rust
 //! use puroro::Message; // For from_bytes() method
 //! use std::io::Read; // For bytes() method
-//! let input = vec![0x08, 0x0a];
-//! let msg = MyMessage::from_bytes(input.bytes()).unwrap();
-//! assert_eq!(10, msg.my_number);
+//! use puroro_doc_samples::library::Book;
+//!
+//! let input1 = vec![0x10, 0x82, 0x01]; // encoded `num_pages: 130`
+//! let input2 = vec![0x0a, 0x02, 0x59, 0x6f]; // encoded `title: "Yo"`
+//!
+//! // You can use `from_bytes()` method to deserialize a message
+//! // from an input buffer.
+//! let mut msg = Book::from_bytes(input1.bytes()).unwrap();
+//! assert_eq!(130, msg.num_pages());
+//!
+//! // Or, you can use `merge_from_bytes(&mut self)` method to deserialize
+//! // and merge from an input buffer to an existing message instance.
+//! msg.merge_from_bytes(input2.bytes()).unwrap();
+//! assert_eq!("Yo", msg.title());
+//! assert_eq!(130, msg.num_pages());
 //! ```
 //!
 //! And serialize it to `std::io::Write`:
