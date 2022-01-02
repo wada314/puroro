@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::tests_pb::ser_tests2::msg::Submsg as Submsg2;
-use crate::tests_pb::ser_tests2::{Enum as Enum2, Msg as Msg2};
-use crate::tests_pb::ser_tests3::msg::Submsg as Submsg3;
-use crate::tests_pb::ser_tests3::{Enum as Enum3, Msg as Msg3};
+use crate::tests_pb::full_coverage2::msg::Submsg as Submsg2;
+use crate::tests_pb::full_coverage2::{Enum as Enum2, Msg as Msg2};
+use crate::tests_pb::full_coverage3::msg::Submsg as Submsg3;
+use crate::tests_pb::full_coverage3::{Enum as Enum3, Msg as Msg3};
 
 #[test]
 pub fn test_partial_eq_2() {
@@ -101,16 +101,18 @@ fn test_clone_2() {
     // modify the original one
     *msg1.i32_optional_mut() = 20;
     assert_ne!(&msg1, &cloned);
+    assert_eq!(10, cloned.i32_optional());
 }
 
 #[test]
 fn test_clone_3() {
     let mut msg1 = Msg3::default();
-    *msg1.i32_unlabeled_mut() = 10;
+    *msg1.i32_optional_mut() = 10;
     let mut cloned = msg1.clone();
     assert_eq!(&msg1, &cloned);
 
     // modify the original one
-    *msg1.i32_unlabeled_mut() = 20;
+    *msg1.i32_optional_mut() = 20;
     assert_ne!(&msg1, &cloned);
+    assert_eq!(10, cloned.i32_optional());
 }
