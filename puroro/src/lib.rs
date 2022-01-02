@@ -21,8 +21,9 @@
 //! For an input .proto file like this:
 //! ```protobuf
 //! syntax = "proto3";
+//! package library;
 //! message Book {
-//!     String title = 1;
+//!     string title = 1;
 //!     uint32 num_pages = 2;
 //! }
 //! ```
@@ -81,11 +82,15 @@
 //! }
 //! ```
 //!
-//! ```rust
+//! Let's assume the generated code is in `puroro-doc-samples` crate,
+//! then you can use the generated protobuf like this:
 //!
+//! ```rust
+//! use ::puroro_doc_samples::library::Book;
+//! assert!(true);
 //! ```
 //!
-//! ```rust
+//! ```ignore
 //! // A readonly trait for message `MyMessage`
 //! # #![feature(generic_associated_types)]
 //! # use ::std::ops::Deref;
@@ -121,7 +126,7 @@
 //!
 //! You can deserialize a struct from `Iterator<std::io::Result<u8>>`
 //! (which is a return type of `std::io::Read::bytes()` method):
-//! ```rust
+//! ```ignore
 //! # #[derive(Default)]
 //! # pub struct MyMessage {
 //! #     pub my_number: i32,
@@ -162,7 +167,7 @@
 //! ```
 //!
 //! And serialize it to `std::io::Write`:
-//! ```rust
+//! ```ignore
 //! # #[derive(Default)]
 //! # pub struct MyMessage {
 //! #     pub my_number: i32,
