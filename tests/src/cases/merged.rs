@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use ::itertools::Itertools;
-use ::std::borrow::Cow;
 use ::std::ops::Deref;
 use ::tests_pb::full_coverage3::msg::{Submsg, SubmsgBuilder, SubmsgTrait as _};
 use ::tests_pb::full_coverage3::{Msg, MsgBuilder, MsgTrait as _};

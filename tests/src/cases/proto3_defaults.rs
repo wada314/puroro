@@ -79,6 +79,9 @@ fn test_i32_optional() {
     assert_eq!(10, msg.i32_optional());
     assert!(msg.has_i32_optional());
 
+    // Deserializing (merging into) the field by 0 value.
+    // Doing the same thing with i32_unlabeled, but for optional field
+    // the field value is overwritten even if the input value is 0.
     msg.merge_from_bytes(INPUT_FIELD2_I32_ZERO.bytes()).unwrap();
     assert_eq!(Some(0), msg.i32_optional_opt());
     *msg.i32_optional_mut() = 10;
