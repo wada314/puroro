@@ -194,7 +194,7 @@ impl<T> NoAllocVec<T> {
         ))
     }
 
-    /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
+    /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`RefMutVec`].
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
