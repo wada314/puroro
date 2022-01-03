@@ -3,17 +3,17 @@ pub trait {{ m.trait_ident }} {
     {%- for f in m.fields %}
 
     {%- if f.is_message %}
-    type Field{{ f.number }}MessageType<'this>: {{ f.trait_field_message_trait_path }}
+    type {{ f.ident_camel_unesc }}MessageType<'this>: {{ f.trait_field_message_trait_path }}
         where Self: 'this;
     {%- endif %} {#- if f.is_message #}
 
     {%- if f.is_repeated %}
 
-    type Field{{ f.number }}RepeatedType<'this>:
+    type {{ f.ident_camel_unesc }}RepeatedType<'this>:
         ::puroro::RepeatedField<'this>
         + ::std::iter::IntoIterator<Item = {{ f.trait_scalar_getter_type }}>
     where Self: 'this;
-    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>;
+    fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this>;
 
     {%- else %} {#- if f.is_repeated #}
 
@@ -83,13 +83,13 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
     ($ty:ty) => {
         {%- for f in m.fields %}
         {%- if f.is_message %}
-        type Field{{ f.number }}MessageType<'this> where Self: 'this = <$ty>::Field{{ f.number }}MessageType<'this>;
+        type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = <$ty>::{{ f.ident_camel_unesc }}MessageType<'this>;
         {%- endif %}
 
         {%- if f.is_repeated %}
 
-        type Field{{ f.number }}RepeatedType<'this> where Self: 'this = <$ty>::Field{{ f.number }}RepeatedType<'this>;
-        fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+        type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this = <$ty>::{{ f.ident_camel_unesc }}RepeatedType<'this>;
+        fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this> {
             (**self).{{ f.ident }}()
         }
 

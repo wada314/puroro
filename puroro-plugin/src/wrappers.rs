@@ -650,8 +650,8 @@ impl Field {
             LengthDelimited(String) => "&'this str".into(),
             LengthDelimited(Bytes) => "&'this [u8]".into(),
             LengthDelimited(Message(_)) => format!(
-                "Self::Field{number}MessageType<'this>",
-                number = self.number()
+                "Self::{ident_camel}MessageType<'this>",
+                ident_camel = self.ident_camel_unesc
             )
             .into(),
             Trivial(field_type) => field_type.rust_type_name()?,
@@ -664,11 +664,11 @@ impl Field {
             LengthDelimited(String) => format!("&{lt} str", lt = lt).into(),
             LengthDelimited(Bytes) => format!("&{lt} [u8]", lt = lt).into(),
             LengthDelimited(Message(_)) => format!(
-                "<{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>",
+                "<{trait_impl} as {trait_path}>::{ident_camel}MessageType<{lt}>",
                 lt = lt,
                 trait_impl = trait_impl,
                 trait_path = self.message()?.rust_trait_path(),
-                number = self.number(),
+                ident_camel = self.ident_camel_unesc,
             )
             .into(),
             Trivial(field_type) => field_type.rust_type_name()?,

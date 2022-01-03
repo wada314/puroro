@@ -260,9 +260,9 @@ impl Field {
                 .unwrap_or_default(),
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
-                    "<Self as super::_puroro_traits::{trait_ident}>::Field{number}MessageType<'_>",
+                    "<Self as super::_puroro_traits::{trait_ident}>::{camel_ident}MessageType<'_>",
                     trait_ident = f.message()?.rust_trait_ident(),
-                    number = f.number(),
+                    camel_ident = f.ident_camel_unesc(),
                 ))
             })?,
             oneof_enum_value_ident: f.ident_camel().to_string(),

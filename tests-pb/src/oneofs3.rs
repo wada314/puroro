@@ -250,7 +250,7 @@ pub mod _puroro_simple_impl {
     }
 
     impl super::_puroro_traits::MsgTrait for Msg {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg;
@@ -436,7 +436,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
@@ -646,7 +646,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = ();
@@ -729,7 +729,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = ();
@@ -810,7 +810,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = ();
@@ -893,7 +893,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = ();
@@ -974,7 +974,7 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = &'this ScalarType;
@@ -1001,7 +1001,7 @@ pub mod _puroro_impls {
     where
         ScalarType: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait,
         Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1011,7 +1011,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
@@ -1059,7 +1059,7 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = ();
@@ -1165,7 +1165,7 @@ pub mod _puroro_impls {
     }
 
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this>;
@@ -1312,7 +1312,7 @@ pub mod _puroro_impls {
     impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
     where
         Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1354,7 +1354,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field5MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
@@ -1692,10 +1692,12 @@ pub mod _puroro_traits {
         fn has_g2_string<'this>(&'this self) -> bool {
             self.g2_string_opt().is_some()
         }
-        type Field5MessageType<'this>: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
+        type G2SubmsgMessageType<'this>: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
         where
             Self: 'this;
-        fn g2_submsg<'this>(&'this self) -> ::std::option::Option<Self::Field5MessageType<'this>> {
+        fn g2_submsg<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::G2SubmsgMessageType<'this>> {
             self.g2_submsg_opt()
         }
         fn has_g2_submsg<'this>(&'this self) -> bool {
@@ -1767,7 +1769,7 @@ pub mod _puroro_traits {
         fn g2_submsg_opt<'this>(
             &'this self,
         ) -> Option<
-            <Self as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+            <Self as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::G2SubmsgMessageType<
                 'this,
             >,
         > {
@@ -1801,10 +1803,10 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
-            type Field5MessageType<'this>
+            type G2SubmsgMessageType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field5MessageType<'this>;
+            = <$ty>::G2SubmsgMessageType<'this>;
             fn group_one<'this>(
                 &'this self,
             ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -1861,7 +1863,7 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = ();
@@ -1880,12 +1882,12 @@ pub mod _puroro_traits {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = (
-            ::std::option::Option<<T as MsgTrait>::Field5MessageType<'this>>,
-            ::std::option::Option<<U as MsgTrait>::Field5MessageType<'this>>,
+            ::std::option::Option<<T as MsgTrait>::G2SubmsgMessageType<'this>>,
+            ::std::option::Option<<U as MsgTrait>::G2SubmsgMessageType<'this>>,
         );
         fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
@@ -1937,12 +1939,12 @@ pub mod _puroro_traits {
         T: MsgTrait,
         U: MsgTrait,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field5MessageType<'this>,
-            <U as MsgTrait>::Field5MessageType<'this>,
+            <T as MsgTrait>::G2SubmsgMessageType<'this>,
+            <U as MsgTrait>::G2SubmsgMessageType<'this>,
         >;
         fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
@@ -1992,10 +1994,10 @@ pub mod _puroro_traits {
     where
         T: MsgTrait,
     {
-        type Field5MessageType<'this>
+        type G2SubmsgMessageType<'this>
         where
             Self: 'this,
-        = T::Field5MessageType<'this>;
+        = T::G2SubmsgMessageType<'this>;
         fn group_one(&self) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.as_ref().and_then(|msg| {
@@ -2194,7 +2196,7 @@ pub mod _puroro_nested {
             {
                 G2F32(f32),
                 G2String(&'msg str),
-                G2Submsg(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<'msg>),
+                G2Submsg(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'msg>),
             }
 
             impl<'msg, T> GroupTwo<'msg, T>
@@ -2215,13 +2217,7 @@ pub mod _puroro_nested {
                         _ => None,
                     }
                 }
-                pub fn g2_submsg(
-                    self,
-                ) -> ::std::option::Option<
-                    <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
-                        'msg,
-                    >,
-                > {
+                pub fn g2_submsg(self) -> ::std::option::Option<<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'msg>>{
                     match self {
                         Self::G2Submsg(v) => ::std::option::Option::Some(v),
                         #[allow(unreachable_patterns)]
@@ -2234,7 +2230,7 @@ pub mod _puroro_nested {
             where
                 f32: ::std::fmt::Debug,
                 &'msg str: ::std::fmt::Debug,
-                <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+                <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::G2SubmsgMessageType<
                     'msg,
                 >: ::std::fmt::Debug,
                 T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
@@ -2252,7 +2248,7 @@ pub mod _puroro_nested {
             where
                 f32: ::std::clone::Clone,
                 &'msg str: ::std::clone::Clone,
-                <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+                <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::G2SubmsgMessageType<
                     'msg,
                 >: ::std::clone::Clone,
                 T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
@@ -2270,7 +2266,7 @@ pub mod _puroro_nested {
             where
                 f32: ::std::cmp::PartialEq,
                 &'msg str: ::std::cmp::PartialEq,
-                <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<
+                <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::G2SubmsgMessageType<
                     'msg,
                 >: ::std::cmp::PartialEq,
                 T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,

@@ -1,13 +1,13 @@
 
 {%- if f.is_message %}
 {#- [optional|repeated] MyMessage => &'this MyMessage #}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ f.simple_field_message_path }};
+type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = &'this {{ f.simple_field_message_path }};
 {%- endif %} {#- if f.is_message #}
 
 {%- if f.is_repeated %}
 
 {#- The repeated field getters are different with the struct itselves repeated getter impls. #}
-type Field{{ f.number }}RepeatedType<'this> =
+type {{ f.ident_camel_unesc }}RepeatedType<'this> =
     {%- if f.is_message %}
     {#- repeated MyMessage => &'this [MyMessage] #}
     &'this [{{ f.simple_scalar_field_type }}];
@@ -32,7 +32,7 @@ type Field{{ f.number }}RepeatedType<'this> =
         >;
     {%- endif %} {#- if f.is_numerical #}
 
-fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this> {
     {%- if f.is_message %}
     &self.{{ f.ident }}
     {%- endif %} {#- if f.is_message #}
