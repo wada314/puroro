@@ -124,15 +124,15 @@
 //!
 //! # Serializing
 //!
-//! ```ignore
+//! ```rust
 //! use puroro::Message; // For ser() method
 //! use puroro_doc_samples::library::Book;
 //!
 //! let mut output = vec![];
 //! let mut book = Book::new();
 //!
-//! *book.title_mut() = "Yo";
-//! msg.ser(&mut output).unwrap();
+//! *book.title_mut() = "Yo".to_string();
+//! book.ser(&mut output).unwrap();
 //!
 //! assert_eq!(vec![0x0a, 0x02, 0x59, 0x6f], output);
 //! ```
