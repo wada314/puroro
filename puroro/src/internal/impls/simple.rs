@@ -105,7 +105,7 @@
 //! }
 //!
 //! // Returns a mutable reference. Similar to `Option::get_or_insert_with()`,
-//! // it sets the field present at invocation timing (even if the returned
+//! // it sets the field as present at invocation timing (even if the returned
 //! // mutable reference is not used).
 //! pub fn foo_mut(&mut self) -> &mut i32 {
 //! #   todo!()
@@ -139,7 +139,7 @@
 //! | `double`   | `f64` |
 //! | `bool`     | `bool`|
 //!
-//! ### proto3 scalar numeric fields
+//! ### proto3 singular numeric fields
 //!
 //! For the following input:
 //!
@@ -185,7 +185,7 @@
 //! # }
 //! ```
 //!
-//! ### proto2 & proto3 optional string | bytes fields
+//! ### proto2 & proto3 optional string / bytes fields
 //!
 //! For the both of the following example:
 //!
@@ -223,7 +223,7 @@
 //! }
 //!
 //! // Returns a mutable reference. Similar to `Option::get_or_insert_with()`,
-//! // it sets the field present at invocation timing (even if the returned
+//! // it sets the field as present at invocation timing (even if the returned
 //! // mutable reference is not used).
 //! pub fn foo_mut(&mut self) -> &mut String {
 //! #   todo!()
@@ -360,7 +360,7 @@
 //! }
 //!
 //! // Returns a mutable reference. Similar to `Option::get_or_insert_with()`,
-//! // it sets the field present at invocation timing (even if the returned
+//! // it sets the field as present at invocation timing (even if the returned
 //! // mutable reference is not used).
 //! pub fn foo_mut(&mut self) -> &mut Bar {
 //! #   todo!()
