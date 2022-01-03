@@ -20,10 +20,11 @@
 //!
 //! Please check [the `readme` of this repository](https://github.com/wada314/puroro#readme)
 //!
-//! # Index
+//! # Table of contents
 //!
-//! * Basic usage (this page)
-//! * [Basic message implementation](internal::impls::simple)
+//! 1. Basic usage (this page)
+//! 1. [Generated struct](internal::impls::simple)
+//! 1. [Generated trait](internal::impls::traits)
 //!
 //! # Simple example
 //!
@@ -39,9 +40,8 @@
 //!
 //! A struct like this is output:
 //! ```rust
-//! #[derive(Clone, Default, PartialEq)]
-//! pub struct MyMessage { /* ... */ }
-//! impl MyMessage {
+//! pub struct Book { /* ... */ }
+//! impl Book {
 //!     pub fn new() -> Self {
 //!         // ...
 //! #       todo!()
@@ -91,15 +91,18 @@
 //! }
 //! ```
 //!
+//! The struct also implements [`Clone`], [`Default`], [`PartialEq`] and
+//! [`Debug`](std::fmt::Debug) standard library traits.
+//!
 //! Let's assume the generated code is in `puroro-doc-samples` crate,
 //! then you can use the generated protobuf like this:
 //!
 //! ```rust
 //! use ::puroro_doc_samples::library::Book;
 //!
-//! let mut book = Book::default();
+//! let mut book = Book::new();
 //! *book.title_mut() = "The C Programming Language".to_string();
-//! // The number of pages is unknown so we do not set it.
+//! // We are not setting the number of pages here.
 //!
 //! assert_eq!("The C Programming Language", book.title());
 //! assert!(!book.has_num_pages());
