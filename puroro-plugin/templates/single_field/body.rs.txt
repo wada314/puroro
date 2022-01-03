@@ -112,4 +112,16 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     }
 }
 
+impl{{ maybe_gp }} ::std::clone::Clone
+for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
+{%- call single_field_bound(target_f) %}
+    {{ target_f.single_field_type }}: ::std::clone::Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            {{ target_f.ident }}: ::std::clone::Clone::clone(&self.{{ target_f.ident }}),
+        }
+    }
+}
+
 {%- endfor %}
