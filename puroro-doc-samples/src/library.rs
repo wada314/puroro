@@ -191,32 +191,21 @@ pub mod _puroro_impls {
     }
     use super::_puroro_traits::*;
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-
     pub struct BookSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
     {
         pub title: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Book> for BookSingleField1<ScalarType> where
         ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
     {
     }
 
     impl<ScalarType> super::_puroro_traits::BookTrait for BookSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
     {
         fn title_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.title.as_ref())
@@ -225,10 +214,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for BookSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
         Self: super::_puroro_traits::BookTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -249,42 +235,40 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for BookSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
     {
         fn from(value: ScalarType) -> Self {
             Self { title: value }
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType> ::std::clone::Clone for BookSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                title: ::std::clone::Clone::clone(&self.title),
+            }
+        }
+    }
 
     pub struct BookSingleField2<ScalarType>
     where
-        ScalarType: ::std::convert::Into<u32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
     {
         pub num_pages: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Book> for BookSingleField2<ScalarType> where
-        ScalarType: ::std::convert::Into<u32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
+        ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone
     {
     }
 
     impl<ScalarType> super::_puroro_traits::BookTrait for BookSingleField2<ScalarType>
     where
-        ScalarType: ::std::convert::Into<u32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
     {
         fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
@@ -295,10 +279,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for BookSingleField2<ScalarType>
     where
-        ScalarType: ::std::convert::Into<u32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
         Self: super::_puroro_traits::BookTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -319,13 +300,22 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for BookSingleField2<ScalarType>
     where
-        ScalarType: ::std::convert::Into<u32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
     {
         fn from(value: ScalarType) -> Self {
             Self { num_pages: value }
+        }
+    }
+
+    impl<ScalarType> ::std::clone::Clone for BookSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                num_pages: ::std::clone::Clone::clone(&self.num_pages),
+            }
         }
     }
     pub struct BookBumpalo<'bump> {
@@ -496,10 +486,7 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> BookBuilder<(T, BookSingleField1<ScalarType>)>
         where
-            ScalarType: ::std::convert::AsRef<str>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::AsRef<str>,
         {
             BookBuilder((self.0, BookSingleField1 { title: value }))
         }
@@ -509,10 +496,7 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> BookBuilder<(T, BookSingleField2<ScalarType>)>
         where
-            ScalarType: ::std::convert::Into<u32>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
         {
             BookBuilder((self.0, BookSingleField2 { num_pages: value }))
         }

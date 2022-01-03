@@ -219,11 +219,7 @@
 //!         self,
 //!         value: ScalarType,
 //!     ) -> BookBuilder<(T, BookSingleField1<ScalarType>)>
-//!     where
-//!         ScalarType: ::std::convert::AsRef<str>
-//!             + ::std::clone::Clone
-//!             + ::std::cmp::PartialEq
-//!             + ::std::fmt::Debug,
+//!     where ScalarType: AsRef<str>,
 //!     {
 //!         // ...
 //! #       todo!()
@@ -233,11 +229,7 @@
 //!         self,
 //!         value: ScalarType,
 //!     ) -> BookBuilder<(T, BookSingleField2<ScalarType>)>
-//!     where
-//!         ScalarType: ::std::convert::Into<u32>
-//!             + ::std::clone::Clone
-//!             + ::std::cmp::PartialEq
-//!             + ::std::fmt::Debug,
+//!     where ScalarType: Into<u32> + Clone,
 //!     {
 //!         // ...
 //! #       todo!()
@@ -281,6 +273,7 @@
 //! allocator instead of the default global allocator.
 //!
 //! ```rust
+//! # use std::ops::DerefMut;
 //! pub struct BookBumpalo<'bump> {
 //! #   phantom: std::marker::PhantomData<&'bump ()>,
 //!     // ...
@@ -304,7 +297,7 @@
 //!         // ...
 //!     }
 //!     pub fn title_mut(&mut self) -> impl '_ + DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>> {
-//! #       todo!()
+//! #       todo!(); unsafe { std::ptr::NonNull::dangling().as_mut() }
 //!         // ...
 //!     }
 //!     pub fn clear_title(&mut self) {
