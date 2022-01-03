@@ -1,7 +1,5 @@
 {%- for target_f in m.fields %}
 
-#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-
 {%- let maybe_gp %}
 {%- if target_f.is_repeated %}
     {%- let maybe_gp = "<ScalarType, RepeatedType>" %}
@@ -110,6 +108,18 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     fn from(value: {{ target_f.single_field_type }}) -> Self {
         Self {
             {{ target_f.ident }}: value,
+        }
+    }
+}
+
+impl{{ maybe_gp }} ::std::clone::Clone
+for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
+{%- call single_field_bound(target_f) %}
+    {{ target_f.single_field_type }}: ::std::clone::Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            {{ target_f.ident }}: ::std::clone::Clone::clone(&self.{{ target_f.ident }}),
         }
     }
 }
