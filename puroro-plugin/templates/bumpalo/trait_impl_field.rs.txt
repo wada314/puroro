@@ -1,7 +1,7 @@
 
 {%- if f.is_message %}
 {#- [optional|repeated] MyMessage => &'this MyMessageBumpalo<'this> #}
-type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ f.bumpalo_field_message_path }};
+type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = &'this {{ f.bumpalo_field_message_path }};
 {%- endif %} {#- if f.is_message #}
 
 {%- if f.is_repeated %}
@@ -9,7 +9,7 @@ type Field{{ f.number }}MessageType<'this> where Self: 'this = &'this {{ f.bumpa
 {#- repeated i32 =>  CloneThenIntoRepeatedField<'this, NoAllocBumpVec<i32>, i32, i32> #}
 {#- repeated String => AsRefRepeatedField<'this, NoAllocBumpVec<NoAllocBumpString>, NoAllocBumpString, str> #}
 {#- repeated MyMessage => &'this [MyMessageBumpalo<'this>] #}
-type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
+type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this =
 {%- if f.is_length_delimited %}
 {%- if f.is_message %}
     &'this [{{ f.bumpalo_field_message_path }}];
@@ -26,7 +26,7 @@ type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
     ::puroro::CloneThenIntoRepeatedField<'this, {{ f.bumpalo_field_type }}, {{ f.trait_scalar_getter_type }}, {{ f.trait_scalar_getter_type }}>;
 {%- endif %} {#- if f.is_length_delimited #}
 
-fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this> {
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     unsafe { self.{{ f.ident }}.cast_item_unchecked() }

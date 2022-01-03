@@ -6,9 +6,9 @@ where
     {%- for f in m.fields %}
 
     {%- if f.is_message %}
-    type Field{{ f.number }}MessageType<'this> where Self: 'this = ::puroro::Either<
-        <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
-        <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
+    type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = ::puroro::Either<
+        <T as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'this>,
+        <U as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'this>,
     >;
     {%- endif %}
 
@@ -20,13 +20,13 @@ where
     {%- else %}
     {%- let either_repeated_field_type = "EitherRepeatedField" %}
     {%- endif %}
-    type Field{{ f.number }}RepeatedType<'this> where Self: 'this
+    type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this
         = ::puroro::internal::impls::either::{{ either_repeated_field_type }}<
-            <T as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
-            <U as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+            <T as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}RepeatedType<'this>,
+            <U as {{ m.trait_ident }}>::{{ f.ident_camel_unesc }}RepeatedType<'this>,
         >;
 
-    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
+    fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this>
     {
         ::puroro::internal::impls::either::{{ either_repeated_field_type }}::new(self
             .as_ref()
