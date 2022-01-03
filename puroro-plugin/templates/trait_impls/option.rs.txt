@@ -4,14 +4,14 @@ where
 {
     {%- for f in m.fields %}
     {%- if f.is_message %}
-    type Field{{ f.number }}MessageType<'this> where Self: 'this = T::Field{{ f.number }}MessageType<'this>;
+    type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = T::{{ f.ident_camel_unesc }}MessageType<'this>;
     {%- endif %}
 
     {%- if f.is_repeated %}
 
-    type Field{{ f.number }}RepeatedType<'this> where Self: 'this =
-        ::puroro::internal::impls::option::OptionRepeatedField<T::Field{{ f.number }}RepeatedType<'this>>;
-    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+    type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this =
+        ::puroro::internal::impls::option::OptionRepeatedField<T::{{ f.ident_camel_unesc }}RepeatedType<'this>>;
+    fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this> {
         ::puroro::internal::impls::option::OptionRepeatedField::new(self.as_ref().map(|msg| msg.{{ f.ident }}()))
     }
 

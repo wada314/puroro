@@ -256,62 +256,64 @@ pub mod _puroro_simple_impl {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::i32_unlabeled_opt(self)
         }
-        type Field2RepeatedType<'this> =
+        type I32RepeatedRepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <self::Msg>::float_unlabeled_opt(self)
         }
-        type Field4RepeatedType<'this> =
+        type FloatRepeatedRepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<f32>, f32, f32>;
 
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Msg>::string_unlabeled_opt(self)
         }
-        type Field6RepeatedType<'this> = ::puroro::AsRefRepeatedField<
+        type StringRepeatedRepeatedType<'this> = ::puroro::AsRefRepeatedField<
             'this,
             ::std::vec::Vec<::std::string::String>,
             ::std::string::String,
             str,
         >;
 
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
             <self::Msg>::submsg_unlabeled_opt(self)
         }
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
-        type Field8RepeatedType<'this> =
+        type SubmsgRepeatedRepeatedType<'this> =
     &'this [self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg];
 
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             &self.submsg_repeated
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             <self::Msg>::enum_unlabeled_opt(self)
         }
-        type Field10RepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
+        type EnumRepeatedRepeatedType<'this> = ::puroro::CloneThenIntoRepeatedField<
             'this,
             ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>,
             self::_puroro_root::ser_tests3::Enum,
             self::_puroro_root::ser_tests3::Enum,
         >;
 
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
@@ -454,7 +456,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
@@ -464,7 +466,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
@@ -592,49 +594,51 @@ pub mod _puroro_impls {
                 &self.i32_unlabeled,
             )))
         }
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -708,50 +712,52 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
 
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -824,11 +830,11 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
@@ -837,42 +843,44 @@ pub mod _puroro_impls {
                 &self.float_unlabeled,
             )))
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -946,51 +954,53 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, f32>;
 
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -1063,53 +1073,55 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::AsRef<str>,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::Some(self.string_unlabeled.as_ref())
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -1183,51 +1195,53 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::AsRefRepeatedField<'this, RepeatedType, ScalarType, str>;
 
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -1303,55 +1317,57 @@ pub mod _puroro_impls {
         ScalarType:
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = &'this ScalarType;
 
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             ::std::option::Option::Some(&self.submsg_unlabeled)
         }
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -1361,7 +1377,7 @@ pub mod _puroro_impls {
         ScalarType:
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1371,7 +1387,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
@@ -1435,51 +1451,51 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = &'this ScalarType;
 
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = &'this RepeatedType;
 
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             &self.submsg_repeated
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -1492,7 +1508,7 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1502,7 +1518,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
@@ -1562,40 +1578,42 @@ pub mod _puroro_impls {
         ScalarType:
             ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
@@ -1606,13 +1624,13 @@ pub mod _puroro_impls {
                 &self.enum_unlabeled,
             )))
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -1692,44 +1710,46 @@ pub mod _puroro_impls {
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::CloneThenIntoRepeatedField<
@@ -1739,7 +1759,7 @@ pub mod _puroro_impls {
             self::_puroro_root::ser_tests3::Enum,
         >;
 
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
     }
@@ -1815,49 +1835,51 @@ pub mod _puroro_impls {
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
 
@@ -2194,7 +2216,7 @@ pub mod _puroro_impls {
         fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_unlabeled_opt(self)
         }
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::CloneThenIntoRepeatedField<
@@ -2204,13 +2226,13 @@ pub mod _puroro_impls {
             i32,
         >;
 
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
         }
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <Self>::float_unlabeled_opt(self)
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::CloneThenIntoRepeatedField<
@@ -2220,13 +2242,13 @@ pub mod _puroro_impls {
             f32,
         >;
 
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.float_repeated)
         }
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::string_unlabeled_opt(self)
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::AsRefRepeatedField<
@@ -2236,34 +2258,36 @@ pub mod _puroro_impls {
             str,
         >;
 
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::AsRefRepeatedField::new(&self.string_repeated)
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
             'this,
         >;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
             <Self>::submsg_unlabeled_opt(self)
         }
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<
             'this,
         >;
-        type Field8RepeatedType<'this> where Self: 'this =
+        type SubmsgRepeatedRepeatedType<'this> where Self: 'this =
     &'this [self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgBumpalo<'this>];
 
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             unsafe { self.submsg_repeated.cast_item_unchecked() }
         }
         fn enum_unlabeled_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests3::Enum> {
             <Self>::enum_unlabeled_opt(self)
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::CloneThenIntoRepeatedField<
@@ -2273,7 +2297,7 @@ pub mod _puroro_impls {
             self::_puroro_root::ser_tests3::Enum,
         >;
 
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::CloneThenIntoRepeatedField::new(&self.enum_repeated)
         }
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
@@ -2358,9 +2382,9 @@ pub mod _puroro_impls {
     impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
     where
         Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'a>:
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -2418,7 +2442,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
@@ -2428,7 +2452,7 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::Field8MessageType<'_>,
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
                 >,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
@@ -2676,11 +2700,11 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
 
-        type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this>
+        type I32RepeatedRepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
         where
             Self: 'this;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this>;
         fn float_unlabeled<'this>(&'this self) -> f32 {
             self.float_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2692,11 +2716,11 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
 
-        type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
+        type FloatRepeatedRepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = f32>
         where
             Self: 'this;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this>;
         fn string_unlabeled<'this>(&'this self) -> &'this str {
             self.string_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2708,16 +2732,16 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
 
-        type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
+        type StringRepeatedRepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = &'this str>
         where
             Self: 'this;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
-        type Field7MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this>;
+        type SubmsgUnlabeledMessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             self.submsg_unlabeled_opt()
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
@@ -2725,17 +2749,17 @@ pub mod _puroro_traits {
         }
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             ::std::option::Option::None
         }
-        type Field8MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
+        type SubmsgRepeatedMessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
             where Self: 'this;
 
-        type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
-            + ::std::iter::IntoIterator<Item = Self::Field8MessageType<'this>>
+        type SubmsgRepeatedRepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = Self::SubmsgRepeatedMessageType<'this>>
         where
             Self: 'this;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this>;
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             self.enum_unlabeled_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2749,11 +2773,11 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
 
-        type Field10RepeatedType<'this>: ::puroro::RepeatedField<'this>
+        type EnumRepeatedRepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = self::_puroro_root::ser_tests3::Enum>
         where
             Self: 'this;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this>;
         fn very_large_field_number<'this>(&'this self) -> i32 {
             self.very_large_field_number_opt()
                 .unwrap_or_else(::std::default::Default::default)
@@ -2772,54 +2796,54 @@ pub mod _puroro_traits {
                 (**self).i32_unlabeled_opt()
             }
 
-            type Field2RepeatedType<'this>
+            type I32RepeatedRepeatedType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field2RepeatedType<'this>;
-            fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            = <$ty>::I32RepeatedRepeatedType<'this>;
+            fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
                 (**self).i32_repeated()
             }
             fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).float_unlabeled_opt()
             }
 
-            type Field4RepeatedType<'this>
+            type FloatRepeatedRepeatedType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field4RepeatedType<'this>;
-            fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            = <$ty>::FloatRepeatedRepeatedType<'this>;
+            fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
                 (**self).float_repeated()
             }
             fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_unlabeled_opt()
             }
 
-            type Field6RepeatedType<'this>
+            type StringRepeatedRepeatedType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field6RepeatedType<'this>;
-            fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            = <$ty>::StringRepeatedRepeatedType<'this>;
+            fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
                 (**self).string_repeated()
             }
-            type Field7MessageType<'this>
+            type SubmsgUnlabeledMessageType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field7MessageType<'this>;
+            = <$ty>::SubmsgUnlabeledMessageType<'this>;
             fn submsg_unlabeled_opt<'this>(
                 &'this self,
-            ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+            ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
-            type Field8MessageType<'this>
+            type SubmsgRepeatedMessageType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field8MessageType<'this>;
+            = <$ty>::SubmsgRepeatedMessageType<'this>;
 
-            type Field8RepeatedType<'this>
+            type SubmsgRepeatedRepeatedType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field8RepeatedType<'this>;
-            fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            = <$ty>::SubmsgRepeatedRepeatedType<'this>;
+            fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
                 (**self).submsg_repeated()
             }
             fn enum_unlabeled_opt<'this>(
@@ -2828,11 +2852,11 @@ pub mod _puroro_traits {
                 (**self).enum_unlabeled_opt()
             }
 
-            type Field10RepeatedType<'this>
+            type EnumRepeatedRepeatedType<'this>
             where
                 Self: 'this,
-            = <$ty>::Field10RepeatedType<'this>;
-            fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            = <$ty>::EnumRepeatedRepeatedType<'this>;
+            fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
                 (**self).enum_repeated()
             }
             fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
@@ -2876,49 +2900,51 @@ pub mod _puroro_traits {
         msg_delegate!(T);
     }
     impl MsgTrait for () {
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<&'this str>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ();
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<
+            Self::SubmsgRepeatedMessageType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::ser_tests3::Enum,
         >;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
@@ -2931,15 +2957,15 @@ pub mod _puroro_traits {
             <U as MsgTrait>::i32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_unlabeled_opt(&self.0))
         }
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::Field2RepeatedType<'this>,
-            <U as MsgTrait>::Field2RepeatedType<'this>,
+            <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
+            <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
         >;
 
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::i32_repeated(&self.0),
                 <U as MsgTrait>::i32_repeated(&self.1),
@@ -2949,15 +2975,15 @@ pub mod _puroro_traits {
             <U as MsgTrait>::float_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::float_unlabeled_opt(&self.0))
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::Field4RepeatedType<'this>,
-            <U as MsgTrait>::Field4RepeatedType<'this>,
+            <T as MsgTrait>::FloatRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::FloatRepeatedRepeatedType<'this>,
         >;
 
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::float_repeated(&self.0),
                 <U as MsgTrait>::float_repeated(&self.1),
@@ -2967,28 +2993,30 @@ pub mod _puroro_traits {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::Field6RepeatedType<'this>,
-            <U as MsgTrait>::Field6RepeatedType<'this>,
+            <T as MsgTrait>::StringRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::StringRepeatedRepeatedType<'this>,
         >;
 
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::string_repeated(&self.0),
                 <U as MsgTrait>::string_repeated(&self.1),
             )
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = (
-            ::std::option::Option<<T as MsgTrait>::Field7MessageType<'this>>,
-            ::std::option::Option<<U as MsgTrait>::Field7MessageType<'this>>,
+            ::std::option::Option<<T as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
+            ::std::option::Option<<U as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
         );
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
             match (
                 <T as MsgTrait>::submsg_unlabeled_opt(&self.0),
                 <U as MsgTrait>::submsg_unlabeled_opt(&self.1),
@@ -2999,22 +3027,22 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field8MessageType<'this>,
-            <U as MsgTrait>::Field8MessageType<'this>,
+            <T as MsgTrait>::SubmsgRepeatedMessageType<'this>,
+            <U as MsgTrait>::SubmsgRepeatedMessageType<'this>,
         >;
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::merged::MergedRepeatedMessageField<
-            <T as MsgTrait>::Field8RepeatedType<'this>,
-            <U as MsgTrait>::Field8RepeatedType<'this>,
+            <T as MsgTrait>::SubmsgRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::SubmsgRepeatedRepeatedType<'this>,
         >;
 
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
                 <T as MsgTrait>::submsg_repeated(&self.0),
                 <U as MsgTrait>::submsg_repeated(&self.1),
@@ -3024,15 +3052,15 @@ pub mod _puroro_traits {
             <U as MsgTrait>::enum_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::enum_unlabeled_opt(&self.0))
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::merged::MergedRepeatedField<
-            <T as MsgTrait>::Field10RepeatedType<'this>,
-            <U as MsgTrait>::Field10RepeatedType<'this>,
+            <T as MsgTrait>::EnumRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::EnumRepeatedRepeatedType<'this>,
         >;
 
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::enum_repeated(&self.0),
                 <U as MsgTrait>::enum_repeated(&self.1),
@@ -3054,15 +3082,15 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::i32_unlabeled_opt(u),
             )
         }
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::Field2RepeatedType<'this>,
-            <U as MsgTrait>::Field2RepeatedType<'this>,
+            <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
+            <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
         >;
 
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::i32_repeated(t))
@@ -3075,15 +3103,15 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::float_unlabeled_opt(u),
             )
         }
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::Field4RepeatedType<'this>,
-            <U as MsgTrait>::Field4RepeatedType<'this>,
+            <T as MsgTrait>::FloatRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::FloatRepeatedRepeatedType<'this>,
         >;
 
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::float_repeated(t))
@@ -3096,52 +3124,52 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::string_unlabeled_opt(u),
             )
         }
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::Field6RepeatedType<'this>,
-            <U as MsgTrait>::Field6RepeatedType<'this>,
+            <T as MsgTrait>::StringRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::StringRepeatedRepeatedType<'this>,
         >;
 
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::string_repeated(t))
                     .map_right(|u| <U as MsgTrait>::string_repeated(u)),
             )
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field7MessageType<'this>,
-            <U as MsgTrait>::Field7MessageType<'this>,
+            <T as MsgTrait>::SubmsgUnlabeledMessageType<'this>,
+            <U as MsgTrait>::SubmsgUnlabeledMessageType<'this>,
         >;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
                 |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
         = ::puroro::Either<
-            <T as MsgTrait>::Field8MessageType<'this>,
-            <U as MsgTrait>::Field8MessageType<'this>,
+            <T as MsgTrait>::SubmsgRepeatedMessageType<'this>,
+            <U as MsgTrait>::SubmsgRepeatedMessageType<'this>,
         >;
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::either::EitherRepeatedMessageField<
-            <T as MsgTrait>::Field8RepeatedType<'this>,
-            <U as MsgTrait>::Field8RepeatedType<'this>,
+            <T as MsgTrait>::SubmsgRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::SubmsgRepeatedRepeatedType<'this>,
         >;
 
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::submsg_repeated(t))
@@ -3156,15 +3184,15 @@ pub mod _puroro_traits {
                 |u| <U as MsgTrait>::enum_unlabeled_opt(u),
             )
         }
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
         = ::puroro::internal::impls::either::EitherRepeatedField<
-            <T as MsgTrait>::Field10RepeatedType<'this>,
-            <U as MsgTrait>::Field10RepeatedType<'this>,
+            <T as MsgTrait>::EnumRepeatedRepeatedType<'this>,
+            <U as MsgTrait>::EnumRepeatedRepeatedType<'this>,
         >;
 
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::enum_repeated(t))
@@ -3186,11 +3214,11 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| msg.i32_unlabeled_opt())
         }
 
-        type Field2RepeatedType<'this>
+        type I32RepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field2RepeatedType<'this>>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::I32RepeatedRepeatedType<'this>>;
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.i32_repeated()),
             )
@@ -3199,11 +3227,13 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| msg.float_unlabeled_opt())
         }
 
-        type Field4RepeatedType<'this>
+        type FloatRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field4RepeatedType<'this>>;
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+        = ::puroro::internal::impls::option::OptionRepeatedField<
+            T::FloatRepeatedRepeatedType<'this>,
+        >;
+        fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.float_repeated()),
             )
@@ -3212,34 +3242,38 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
 
-        type Field6RepeatedType<'this>
+        type StringRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field6RepeatedType<'this>>;
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+        = ::puroro::internal::impls::option::OptionRepeatedField<
+            T::StringRepeatedRepeatedType<'this>,
+        >;
+        fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.string_repeated()),
             )
         }
-        type Field7MessageType<'this>
+        type SubmsgUnlabeledMessageType<'this>
         where
             Self: 'this,
-        = T::Field7MessageType<'this>;
+        = T::SubmsgUnlabeledMessageType<'this>;
         fn submsg_unlabeled_opt<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.submsg_unlabeled_opt())
         }
-        type Field8MessageType<'this>
+        type SubmsgRepeatedMessageType<'this>
         where
             Self: 'this,
-        = T::Field8MessageType<'this>;
+        = T::SubmsgRepeatedMessageType<'this>;
 
-        type Field8RepeatedType<'this>
+        type SubmsgRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field8RepeatedType<'this>>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+        = ::puroro::internal::impls::option::OptionRepeatedField<
+            T::SubmsgRepeatedRepeatedType<'this>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.submsg_repeated()),
             )
@@ -3250,11 +3284,13 @@ pub mod _puroro_traits {
             self.as_ref().and_then(|msg| msg.enum_unlabeled_opt())
         }
 
-        type Field10RepeatedType<'this>
+        type EnumRepeatedRepeatedType<'this>
         where
             Self: 'this,
-        = ::puroro::internal::impls::option::OptionRepeatedField<T::Field10RepeatedType<'this>>;
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+        = ::puroro::internal::impls::option::OptionRepeatedField<
+            T::EnumRepeatedRepeatedType<'this>,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
             ::puroro::internal::impls::option::OptionRepeatedField::new(
                 self.as_ref().map(|msg| msg.enum_repeated()),
             )

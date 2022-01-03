@@ -28,12 +28,12 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     {%- else %} {#- if f.number == target_f.number #}
 
     {%- if f.is_message %}
-    type Field{{ f.number }}MessageType<'this> where Self: 'this = ();
+    type {{ f.ident_camel_unesc }}MessageType<'this> where Self: 'this = ();
     {%- endif %}
 
     {%- if f.is_repeated %}
-    type Field{{ f.number }}RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
-    fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+    type {{ f.ident_camel_unesc }}RepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
+    fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedType<'this> {
         ::puroro::internal::impls::empty::EmptyRepeatedField::new()
     }
     {%- endif %}
@@ -78,7 +78,7 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
     Self: super::_puroro_traits::{{ m.ident }}Trait,
 {%- if target_f.is_message %}
-    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::Field{{ target_f.number }}MessageType<'a> :
+    for<'a> <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ target_f.ident_camel_unesc }}MessageType<'a> :
         ::puroro::internal::se::SerMessageToIoWrite,
 {%- endif %}
 {

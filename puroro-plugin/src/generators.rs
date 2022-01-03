@@ -172,6 +172,7 @@ impl EnumValue {
 struct Field {
     ident: String,
     ident_unesc: String,
+    ident_camel_unesc: String,
     number: i32,
     oneof_index: i32,
     is_message: bool,
@@ -224,8 +225,9 @@ impl Field {
         let has_optional_bit = !is_repeated && !is_unlabeled && !is_message;
 
         Ok(Field {
-            ident: f.rust_ident().to_string(),
-            ident_unesc: f.rust_ident_unesc().to_string(),
+            ident: f.ident_lower_snake().to_string(),
+            ident_unesc: f.lower_snake_ident_unesc().to_string(),
+            ident_camel_unesc: f.ident_camel_unesc().to_string(),
             number: f.number(),
             oneof_index: f.oneof_index().unwrap_or(-1),
             is_message,
@@ -258,12 +260,12 @@ impl Field {
                 .unwrap_or_default(),
             trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
                 Ok(format!(
-                    "<Self as super::_puroro_traits::{trait_ident}>::Field{number}MessageType<'_>",
+                    "<Self as super::_puroro_traits::{trait_ident}>::{camel_ident}MessageType<'_>",
                     trait_ident = f.message()?.rust_trait_ident(),
-                    number = f.number(),
+                    camel_ident = f.ident_camel_unesc(),
                 ))
             })?,
-            oneof_enum_value_ident: f.rust_oneof_ident().to_string(),
+            oneof_enum_value_ident: f.ident_camel().to_string(),
             simple_field_type: f.simple_field_type()?.into(),
             simple_getter_type: if f.is_repeated()? {
                 f.simple_getter_repeated_type("'_")?.into()
@@ -471,9 +473,9 @@ impl OneofField {
         let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
         let is_length_delimited = is_message || is_string || is_bytes;
         Ok(Self {
-            ident: f.rust_oneof_ident().to_string(),
-            getter_ident: f.rust_ident().to_string(),
-            getter_ident_unesc: f.rust_ident_unesc().to_string(),
+            ident: f.ident_camel().to_string(),
+            getter_ident: f.ident_lower_snake().to_string(),
+            getter_ident_unesc: f.lower_snake_ident_unesc().to_string(),
             number: f.number(),
             is_message,
             is_string,

@@ -344,7 +344,7 @@ where
     Self: super::_puroro_traits::{{ m.ident }}Trait,
 {%- for f in m.fields %}
 {%- if f.is_message %}
-    for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'a> :
+    for<'a> <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident_camel_unesc }}MessageType<'a> :
         ::puroro::internal::se::SerMessageToIoWrite,
 {%- endif %}
 {%- endfor %}
