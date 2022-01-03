@@ -270,6 +270,24 @@
 //! edit previously added repeated field values.
 //! * You always need to manually write a code to use the builder. No deserialization support.
 //!
+//! # Using [`bumpalo`](https://github.com/fitzgen/bumpalo) allocator
+//!
+//! puroro has an experimental implementation using [`bumpalo`](https://github.com/fitzgen/bumpalo)
+//! allocator instead of the default global allocator.
+//!
+//! ```rust
+//! pub struct BookBumpalo<'bump> {
+//! #   phantom: std::marker::PhantomData<&'bump ()>,
+//!     // ...
+//! }
+//! impl<'bump> BookBumpalo<'bump> {
+//!     pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+//! #       todo!()
+//!         // ...
+//!     }
+//! }
+//! ```
+//!
 #![allow(incomplete_features)]
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
