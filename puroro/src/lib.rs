@@ -92,12 +92,12 @@
 //! ```rust
 //! use ::puroro_doc_samples::library::Book;
 //!
-//! let mut k_and_r = Book::default();
-//! *k_and_r.title_mut() = "The C Programming Language".to_string();
+//! let mut book = Book::default();
+//! *book.title_mut() = "The C Programming Language".to_string();
 //! // The number of pages is unknown so we do not set it.
 //!
-//! assert_eq!("The C Programming Language", k_and_r.title());
-//! assert!(!k_and_r.has_num_pages());
+//! assert_eq!("The C Programming Language", book.title());
+//! assert!(!book.has_num_pages());
 //! ```
 //!
 //! # Deserializing
@@ -164,7 +164,8 @@
 //! `trait BookTrait`'s interface are slightly different
 //! (e.g. `string` fields, or `repeated` fields).
 //!
-//! The trait is not only implemented for the `struct Book`, but for some other types:
+//! The trait is not only implemented for the `struct Book`,
+//! but also for some other types:
 //!
 //! ```rust
 //! # trait BookTrait {}
@@ -186,6 +187,88 @@
 //!
 //! puroro also generates a builder type for each message.
 //! The name of builder is *MessageName*Builder (e.g. `BookBuilder` for `message Book`).
+//!
+//! ```rust
+//! # use puroro_doc_samples::library::{
+//! #     BookTrait, BookSingleField1, BookSingleField2
+//! # };
+//! pub struct BookBuilder<T>(T);
+//!
+//! impl BookBuilder<()> {
+//!     pub fn new() -> Self {
+//!         // ...
+//! #       todo!()
+//!     }
+//! }
+//!
+//! impl<T> BookBuilder<T>
+//! where
+//!     T: BookTrait,
+//! {
+//!     pub fn build(self) -> T {
+//!         // ...
+//! #       todo!()
+//!     }
+//!
+//!     pub fn append_title<ScalarType>(
+//!         self,
+//!         value: ScalarType,
+//!     ) -> BookBuilder<(T, BookSingleField1<ScalarType>)>
+//!     where
+//!         ScalarType: ::std::convert::AsRef<str>
+//!             + ::std::clone::Clone
+//!             + ::std::cmp::PartialEq
+//!             + ::std::fmt::Debug,
+//!     {
+//!         // ...
+//! #       todo!()
+//!     }
+//!
+//!     pub fn append_num_pages<ScalarType>(
+//!         self,
+//!         value: ScalarType,
+//!     ) -> BookBuilder<(T, BookSingleField2<ScalarType>)>
+//!     where
+//!         ScalarType: ::std::convert::Into<u32>
+//!             + ::std::clone::Clone
+//!             + ::std::cmp::PartialEq
+//!             + ::std::fmt::Debug,
+//!     {
+//!         // ...
+//! #       todo!()
+//!     }
+//! }
+//! ```
+//!
+//! This might look like little complicated, but the usage is very simple:
+//!
+//! ```rust
+//! use puroro_doc_samples::library::{BookBuilder, BookTrait};
+//!
+//! let book = BookBuilder::new()
+//!     .append_title("The C Programming Language")
+//!     .build();
+//!
+//! assert_eq!("The C Programming Language", book.title());
+//! assert!(!book.has_num_pages());
+//! ```
+//!
+//! You need to call `new()` method of builder first, then call `append_***()` methods
+//! as many as you like, then terminate with `build()` method.
+//! Then you can get a generated type which is implementing `BookTrait` trait,
+//! and of course it can be serialized.
+//!
+//! There are some benefits of using this builder instead of the normal `struct Book`:
+//! * The builder generated type has lesser memory footprint. It only consumes the memory
+//! for explicitly appended fields.
+//! * The field type is more flexible. Note that you don't need to call `to_string()` method
+//! when setting the string field. Actually, in the example above the internal field type
+//! is not `String` but `&str`, which does not allocate any heap memory.
+//!
+//! Instead, the builder has some downsides compared to the normal struct.
+//! * You can only `append` the field. Particurally, you cannot clear field nor
+//! edit previously added repeated field values.
+//! * You always need to manually write a code to use the builder. No deserialization support.
 //!
 #![allow(incomplete_features)]
 #![feature(backtrace)]
