@@ -286,7 +286,7 @@
 //!         // ...
 //!     }
 //!
-//!     pub fn title(&self) -> &'this str {
+//!     pub fn title(&self) -> &str {
 //! #       todo!()
 //!         // ...
 //!     }
