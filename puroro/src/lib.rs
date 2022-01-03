@@ -20,6 +20,11 @@
 //!
 //! Please check [the `readme` of this repository](https://github.com/wada314/puroro#readme)
 //!
+//! # Index
+//!
+//! * Basic usage (this page)
+//! * [Basic message implementation](internal::impls::simple)
+//!
 //! # Simple example
 //!
 //! For an input .proto file like this:

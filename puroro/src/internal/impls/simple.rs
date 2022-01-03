@@ -12,4 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//!
+//! # Generated code
+//!
+//! ## Packages
+//!
+//! The package declaration in the `.proto` files are converted into
+//! `lower_snake_case` and be used as a module path in generated code.
+//! For example,
+//!
+//! ```protobuf
+//! package foo.bar.my_package
+//! ```
+//!
+//! will generate code in `foo::bar::my_package` module.
+//!
+
 pub mod de;
