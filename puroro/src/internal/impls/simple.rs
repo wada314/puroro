@@ -27,5 +27,45 @@
 //!
 //! will generate code in `foo::bar::my_package` module.
 //!
+//! ## Messages and nested Messages
+//!
+//! The message in the `.proto` generates a `CamelCase` named struct:
+//!
+//! ```protobuf
+//! message LaptopDevice {}
+//! ```
+//!
+//! generates:
+//!
+//! ```rust
+//! pub struct LaptopDevice {}
+//! ```
+//!
+//! The struct implements [`Default`], [`Clone`], [`PartialEq`] and
+//! [`Debug`](std::fmt::Debug) traits by default. It also has `new()` method to
+//! initialize it.
+//!
+//! The generated struct always implements [`Message`](crate::Message) trait.
+//! The trait has methods for serializing and deserializing the protobuf fields.
+//!
+//! For the nested message:
+//!
+//! ```protobuf
+//! message LaptopDevice {
+//!     message Manufacturer {}
+//! }
+//! ```
+//!
+//! a `lower_snake_case` module name is generated from the outer message name:
+//!
+//! ```rust
+//! pub struct LaptopDevice {}
+//! pub mod laptop_device {
+//!     pub struct Manufacturer {}
+//! }
+//! ```
+//!
+//! ## Fields
+//!
 
 pub mod de;
