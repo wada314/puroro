@@ -571,32 +571,21 @@ pub mod _puroro_impls {
     }
     use super::_puroro_traits::*;
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-
     pub struct MsgSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
         pub i32_unlabeled: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
     {
     }
 
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
@@ -652,10 +641,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -676,10 +662,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField1<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
         fn from(value: ScalarType) -> Self {
             Self {
@@ -688,14 +671,21 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+            }
+        }
+    }
 
     pub struct MsgSingleField2<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -705,10 +695,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField2<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -717,10 +704,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField2<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -775,10 +759,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField2<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
@@ -802,10 +783,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField2<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -816,32 +794,35 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField2<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        RepeatedType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+            }
+        }
+    }
 
     pub struct MsgSingleField3<ScalarType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
     {
         pub float_unlabeled: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField3<ScalarType> where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone
     {
     }
 
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField3<ScalarType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
     {
         type Field2RepeatedType<'this>
         where
@@ -898,10 +879,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField3<ScalarType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -922,10 +900,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField3<ScalarType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
     {
         fn from(value: ScalarType) -> Self {
             Self {
@@ -934,14 +909,21 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField3<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                float_unlabeled: ::std::clone::Clone::clone(&self.float_unlabeled),
+            }
+        }
+    }
 
     pub struct MsgSingleField4<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -951,10 +933,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField4<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -963,10 +942,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField4<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1022,10 +998,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField4<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
@@ -1049,10 +1022,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField4<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<f32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1063,32 +1033,35 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField4<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        RepeatedType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                float_repeated: ::std::clone::Clone::clone(&self.float_repeated),
+            }
+        }
+    }
 
     pub struct MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
     {
         pub string_unlabeled: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField5<ScalarType> where
         ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
     {
     }
 
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
     {
         type Field2RepeatedType<'this>
         where
@@ -1143,10 +1116,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1167,10 +1137,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField5<ScalarType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
     {
         fn from(value: ScalarType) -> Self {
             Self {
@@ -1179,14 +1146,21 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+            }
+        }
+    }
 
     pub struct MsgSingleField6<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1196,10 +1170,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField6<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1208,10 +1179,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField6<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1267,10 +1235,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField6<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
@@ -1294,10 +1259,7 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField6<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::AsRef<str>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::AsRef<str>,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1308,15 +1270,24 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField6<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        RepeatedType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                string_repeated: ::std::clone::Clone::clone(&self.string_repeated),
+            }
+        }
+    }
 
     pub struct MsgSingleField7<ScalarType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
     {
         pub submsg_unlabeled: ScalarType,
     }
@@ -1324,19 +1295,13 @@ pub mod _puroro_impls {
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField7<ScalarType> where
         ScalarType:
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug
     {
     }
 
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField7<ScalarType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
     {
         type Field2RepeatedType<'this>
         where
@@ -1394,10 +1359,7 @@ pub mod _puroro_impls {
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField7<ScalarType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         Self: super::_puroro_traits::MsgTrait,
         for<'a> <Self as super::_puroro_traits::MsgTrait>::Field7MessageType<'a>:
             ::puroro::internal::se::SerMessageToIoWrite,
@@ -1423,10 +1385,7 @@ pub mod _puroro_impls {
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField7<ScalarType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
     {
         fn from(value: ScalarType) -> Self {
             Self {
@@ -1435,15 +1394,23 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField7<ScalarType>
+    where
+        ScalarType:
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
+            }
+        }
+    }
 
     pub struct MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1454,10 +1421,7 @@ pub mod _puroro_impls {
         for MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1467,10 +1431,7 @@ pub mod _puroro_impls {
         for MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1527,10 +1488,7 @@ pub mod _puroro_impls {
         for MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
@@ -1559,10 +1517,7 @@ pub mod _puroro_impls {
         for MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1573,32 +1528,39 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField8<ScalarType, RepeatedType>
+    where
+        ScalarType:
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        RepeatedType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                submsg_repeated: ::std::clone::Clone::clone(&self.submsg_repeated),
+            }
+        }
+    }
 
     pub struct MsgSingleField9<ScalarType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
     {
         pub enum_unlabeled: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField9<ScalarType> where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone
     {
     }
 
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField9<ScalarType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
     {
         type Field2RepeatedType<'this>
         where
@@ -1657,10 +1619,8 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField9<ScalarType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1681,10 +1641,8 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField9<ScalarType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
     {
         fn from(value: ScalarType) -> Self {
             Self {
@@ -1693,14 +1651,23 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField9<ScalarType>
+    where
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                enum_unlabeled: ::std::clone::Clone::clone(&self.enum_unlabeled),
+            }
+        }
+    }
 
     pub struct MsgSingleField10<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1710,10 +1677,8 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField10<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1722,10 +1687,8 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField10<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1784,10 +1747,8 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField10<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         Self: super::_puroro_traits::MsgTrait,
@@ -1811,10 +1772,8 @@ pub mod _puroro_impls {
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField10<ScalarType, RepeatedType>
     where
-        ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
         for<'a> &'a RepeatedType:
             ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
     {
@@ -1825,32 +1784,36 @@ pub mod _puroro_impls {
         }
     }
 
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+    impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField10<ScalarType, RepeatedType>
+    where
+        ScalarType:
+            ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        RepeatedType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                enum_repeated: ::std::clone::Clone::clone(&self.enum_repeated),
+            }
+        }
+    }
 
     pub struct MsgSingleField536870911<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
         pub very_large_field_number: ScalarType,
     }
 
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField536870911<ScalarType> where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
     {
     }
 
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField536870911<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
         type Field2RepeatedType<'this>
         where
@@ -1907,10 +1870,7 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField536870911<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         Self: super::_puroro_traits::MsgTrait,
     {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -1931,14 +1891,23 @@ pub mod _puroro_impls {
 
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField536870911<ScalarType>
     where
-        ScalarType: ::std::convert::Into<i32>
-            + ::std::clone::Clone
-            + ::std::cmp::PartialEq
-            + ::std::fmt::Debug,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
         fn from(value: ScalarType) -> Self {
             Self {
                 very_large_field_number: value,
+            }
+        }
+    }
+
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField536870911<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                very_large_field_number: ::std::clone::Clone::clone(&self.very_large_field_number),
             }
         }
     }
@@ -2504,10 +2473,7 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
         where
-            ScalarType: ::std::convert::Into<i32>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -2522,10 +2488,7 @@ pub mod _puroro_impls {
             value: RepeatedType,
         ) -> MsgBuilder<(T, MsgSingleField2<ScalarType, RepeatedType>)>
         where
-            ScalarType: ::std::convert::Into<i32>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
             for<'a> &'a RepeatedType:
                 ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
@@ -2542,10 +2505,7 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField3<ScalarType>)>
         where
-            ScalarType: ::std::convert::Into<f32>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -2560,10 +2520,7 @@ pub mod _puroro_impls {
             value: RepeatedType,
         ) -> MsgBuilder<(T, MsgSingleField4<ScalarType, RepeatedType>)>
         where
-            ScalarType: ::std::convert::Into<f32>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
             for<'a> &'a RepeatedType:
                 ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
@@ -2580,10 +2537,7 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
         where
-            ScalarType: ::std::convert::AsRef<str>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::AsRef<str>,
         {
             MsgBuilder((
                 self.0,
@@ -2598,10 +2552,7 @@ pub mod _puroro_impls {
             value: RepeatedType,
         ) -> MsgBuilder<(T, MsgSingleField6<ScalarType, RepeatedType>)>
         where
-            ScalarType: ::std::convert::AsRef<str>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::AsRef<str>,
             for<'a> &'a RepeatedType:
                 ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
@@ -2619,10 +2570,7 @@ pub mod _puroro_impls {
         ) -> MsgBuilder<(T, MsgSingleField7<ScalarType>)>
         where
             ScalarType:
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
         {
             MsgBuilder((
                 self.0,
@@ -2638,10 +2586,7 @@ pub mod _puroro_impls {
         ) -> MsgBuilder<(T, MsgSingleField8<ScalarType, RepeatedType>)>
         where
             ScalarType:
-                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait,
             for<'a> &'a RepeatedType:
                 ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
@@ -2658,10 +2603,8 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField9<ScalarType>)>
         where
-            ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType:
+                ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -2676,10 +2619,8 @@ pub mod _puroro_impls {
             value: RepeatedType,
         ) -> MsgBuilder<(T, MsgSingleField10<ScalarType, RepeatedType>)>
         where
-            ScalarType: ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType:
+                ::std::convert::Into<self::_puroro_root::ser_tests3::Enum> + ::std::clone::Clone,
             for<'a> &'a RepeatedType:
                 ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
         {
@@ -2696,10 +2637,7 @@ pub mod _puroro_impls {
             value: ScalarType,
         ) -> MsgBuilder<(T, MsgSingleField536870911<ScalarType>)>
         where
-            ScalarType: ::std::convert::Into<i32>
-                + ::std::clone::Clone
-                + ::std::cmp::PartialEq
-                + ::std::fmt::Debug,
+            ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
         {
             MsgBuilder((
                 self.0,
@@ -3517,32 +3455,21 @@ pub mod _puroro_nested {
             }
             use super::_puroro_traits::*;
 
-            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-
             pub struct SubmsgSingleField1<ScalarType>
             where
-                ScalarType: ::std::convert::Into<i32>
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
+                ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
             {
                 pub i32_unlabeled: ScalarType,
             }
 
             impl<ScalarType> ::puroro::Message<super::Submsg> for SubmsgSingleField1<ScalarType> where
-                ScalarType: ::std::convert::Into<i32>
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug
+                ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
             {
             }
 
             impl<ScalarType> super::_puroro_traits::SubmsgTrait for SubmsgSingleField1<ScalarType>
             where
-                ScalarType: ::std::convert::Into<i32>
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
+                ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
             {
                 fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::Some(::std::convert::Into::into(
@@ -3553,10 +3480,7 @@ pub mod _puroro_nested {
 
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField1<ScalarType>
             where
-                ScalarType: ::std::convert::Into<i32>
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
+                ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
                 Self: super::_puroro_traits::SubmsgTrait,
             {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
@@ -3577,14 +3501,23 @@ pub mod _puroro_nested {
 
             impl<ScalarType> ::std::convert::From<ScalarType> for SubmsgSingleField1<ScalarType>
             where
-                ScalarType: ::std::convert::Into<i32>
-                    + ::std::clone::Clone
-                    + ::std::cmp::PartialEq
-                    + ::std::fmt::Debug,
+                ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
             {
                 fn from(value: ScalarType) -> Self {
                     Self {
                         i32_unlabeled: value,
+                    }
+                }
+            }
+
+            impl<ScalarType> ::std::clone::Clone for SubmsgSingleField1<ScalarType>
+            where
+                ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+                ScalarType: ::std::clone::Clone,
+            {
+                fn clone(&self) -> Self {
+                    Self {
+                        i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
                     }
                 }
             }
@@ -3712,10 +3645,7 @@ pub mod _puroro_nested {
                     value: ScalarType,
                 ) -> SubmsgBuilder<(T, SubmsgSingleField1<ScalarType>)>
                 where
-                    ScalarType: ::std::convert::Into<i32>
-                        + ::std::clone::Clone
-                        + ::std::cmp::PartialEq
-                        + ::std::fmt::Debug,
+                    ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
                 {
                     SubmsgBuilder((
                         self.0,
