@@ -1177,7 +1177,8 @@ pub mod _puroro_impls {
         }
         pub fn string_unlabeled_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_unlabeled() {
                 self.string_unlabeled = ::std::default::Default::default();
             }

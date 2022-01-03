@@ -12687,7 +12687,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_required_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_required() {
                 self.bytes_required = ::std::default::Default::default();
                 self._bitfield.set(4, true);
@@ -12699,7 +12700,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_optional_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_optional() {
                 self.bytes_optional = ::std::default::Default::default();
                 self._bitfield.set(5, true);
@@ -12717,7 +12719,8 @@ pub mod _puroro_impls {
         }
         pub fn string_required_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_required() {
                 self.string_required = ::std::default::Default::default();
                 self._bitfield.set(6, true);
@@ -12729,7 +12732,8 @@ pub mod _puroro_impls {
         }
         pub fn string_optional_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_optional() {
                 self.string_optional = ::std::default::Default::default();
                 self._bitfield.set(7, true);

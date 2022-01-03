@@ -9101,7 +9101,8 @@ pub mod _puroro_impls {
         }
         pub fn string_default_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_default() {
                 self.string_default = ::std::default::Default::default();
                 self._bitfield.set(45, true);
@@ -9113,7 +9114,8 @@ pub mod _puroro_impls {
         }
         pub fn string_empty_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_empty() {
                 self.string_empty = ::std::default::Default::default();
                 self._bitfield.set(46, true);
@@ -9125,7 +9127,8 @@ pub mod _puroro_impls {
         }
         pub fn string_abc_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_abc() {
                 self.string_abc = ::std::default::Default::default();
                 self._bitfield.set(47, true);
@@ -9137,7 +9140,8 @@ pub mod _puroro_impls {
         }
         pub fn string_aiu_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_aiu() {
                 self.string_aiu = ::std::default::Default::default();
                 self._bitfield.set(48, true);
@@ -9149,7 +9153,8 @@ pub mod _puroro_impls {
         }
         pub fn string_backslash_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_backslash() {
                 self.string_backslash = ::std::default::Default::default();
                 self._bitfield.set(49, true);
@@ -9161,7 +9166,8 @@ pub mod _puroro_impls {
         }
         pub fn string_tab_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_tab() {
                 self.string_tab = ::std::default::Default::default();
                 self._bitfield.set(50, true);
@@ -9173,7 +9179,8 @@ pub mod _puroro_impls {
         }
         pub fn string_crlf_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_string_crlf() {
                 self.string_crlf = ::std::default::Default::default();
                 self._bitfield.set(51, true);
@@ -9185,7 +9192,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_default_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_default() {
                 self.bytes_default = ::std::default::Default::default();
                 self._bitfield.set(52, true);
@@ -9197,7 +9205,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_empty_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_empty() {
                 self.bytes_empty = ::std::default::Default::default();
                 self._bitfield.set(53, true);
@@ -9209,7 +9218,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_abc_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_abc() {
                 self.bytes_abc = ::std::default::Default::default();
                 self._bitfield.set(54, true);
@@ -9221,7 +9231,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_aiu_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_aiu() {
                 self.bytes_aiu = ::std::default::Default::default();
                 self._bitfield.set(55, true);
@@ -9233,7 +9244,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_backslash_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_backslash() {
                 self.bytes_backslash = ::std::default::Default::default();
                 self._bitfield.set(56, true);
@@ -9245,7 +9257,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_tab_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_tab() {
                 self.bytes_tab = ::std::default::Default::default();
                 self._bitfield.set(57, true);
@@ -9257,7 +9270,8 @@ pub mod _puroro_impls {
         }
         pub fn bytes_crlf_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, u8> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::Vec<'bump, u8>>
+        {
             if !self.has_bytes_crlf() {
                 self.bytes_crlf = ::std::default::Default::default();
                 self._bitfield.set(58, true);
