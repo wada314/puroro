@@ -887,12 +887,14 @@ impl Field {
         Ok(match self.field_type()?.categories()? {
             // ↓ Maybe need to double check the lt params
             LengthDelimited(String) => format!(
-                "::puroro::internal::RefMutBumpString<{}, {}>",
-                bump_lt, this_lt
+                "impl {this_lt} + ::std::ops::DerefMut<Target=::puroro::bumpalo::collections::String<{bump_lt}>>",
+                bump_lt = bump_lt,
+                this_lt = this_lt,
             ),
             LengthDelimited(Bytes) => format!(
-                "::puroro::internal::RefMutBumpVec<{}, {}, u8>",
-                bump_lt, this_lt
+                "impl {this_lt} + ::std::ops::DerefMut<Target=::puroro::bumpalo::collections::Vec<{bump_lt}, u8>>",
+                bump_lt = bump_lt,
+                this_lt = this_lt,
             ),
             LengthDelimited(Message(m)) => {
                 let msg_type = upgrade(&m)?.rust_impl_path("Bumpalo", &[bump_lt]);

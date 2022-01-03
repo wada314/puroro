@@ -830,7 +830,10 @@ pub mod _puroro_impls {
         pub fn clear_b(&mut self) {
             self._bitfield.set(0, false);
         }
-        pub fn b_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        pub fn b_mut<'this>(
+            &'this mut self,
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_b() {
                 self.b = ::std::default::Default::default();
                 self._bitfield.set(0, true);
