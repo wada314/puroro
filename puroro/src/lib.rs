@@ -298,10 +298,7 @@
 //! #       todo!()
 //!         // ...
 //!     }
-//!     pub fn title_mut<'this>(
-//!         &'this mut self,
-//!     ) -> impl 'this + DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
-//!     {
+//!     pub fn title_mut(&mut self) -> impl '_ + DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>> {
 //! #       todo!()
 //!         // ...
 //!     }
@@ -332,6 +329,12 @@
 //!     }
 //! }
 //! ```
+//!
+//! This behaves almost as same as the normal `struct Book` impl,
+//! though the interface of `repeated` fields or `string` / `bytes` / `message` fields
+//! are different with the normal one.
+//! Especially, for `repated` field's mutable interface is not very useful yet
+//! so please make sure about that before using this implementation.
 //!
 #![allow(incomplete_features)]
 #![feature(backtrace)]
