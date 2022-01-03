@@ -477,9 +477,10 @@ impl Enum {
 #[derive(Debug)]
 pub struct Field {
     message: Weak<Message>,
-    rust_ident: String,
-    rust_ident_unesc: String,
-    rust_oneof_ident: String,
+    ident_lower_snake: String,
+    ident_lower_snake_unesc: String,
+    ident_camel: String,
+    ident_camel_unesc: String,
     lazy_proto_type: OnceCell<FieldType>,
     proto_name: String,
     proto_type_name: String,
@@ -513,9 +514,11 @@ impl Field {
         let proto_oneof_index = proto.oneof_index;
         Ok(Self {
             message: Clone::clone(&message),
-            rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)).to_string(),
-            rust_ident_unesc: to_lower_snake_case(&proto_name).to_string(),
-            rust_oneof_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
+            ident_lower_snake: get_keyword_safe_ident(&to_lower_snake_case(&proto_name))
+                .to_string(),
+            ident_lower_snake_unesc: to_lower_snake_case(&proto_name).to_string(),
+            ident_camel: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
+            ident_camel_unesc: to_camel_case(&proto_name).to_string(),
             proto_name,
             proto_type_name,
             proto_type_enum,
@@ -529,17 +532,20 @@ impl Field {
         })
     }
 
-    pub fn rust_ident(&self) -> &str {
-        &self.rust_ident
-    }
-    pub fn rust_ident_unesc(&self) -> &str {
-        &self.rust_ident_unesc
-    }
     pub fn proto_name(&self) -> &str {
         &self.proto_name
     }
-    pub fn rust_oneof_ident(&self) -> &str {
-        &self.rust_oneof_ident
+    pub fn ident_lower_snake(&self) -> &str {
+        &self.ident_lower_snake
+    }
+    pub fn lower_snake_ident_unesc(&self) -> &str {
+        &self.ident_lower_snake_unesc
+    }
+    pub fn ident_camel(&self) -> &str {
+        &self.ident_camel
+    }
+    pub fn ident_camel_unesc(&self) -> &str {
+        &self.ident_camel_unesc
     }
     pub fn message(&self) -> Result<Rc<Message>> {
         Ok(upgrade(&self.message)?)
