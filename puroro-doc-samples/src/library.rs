@@ -389,7 +389,8 @@ pub mod _puroro_impls {
         }
         pub fn title_mut<'this>(
             &'this mut self,
-        ) -> ::puroro::internal::RefMutBumpString<'bump, 'this> {
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
             if !self.has_title() {
                 self.title = ::std::default::Default::default();
             }
