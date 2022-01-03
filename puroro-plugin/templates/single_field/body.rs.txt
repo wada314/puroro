@@ -1,7 +1,5 @@
 {%- for target_f in m.fields %}
 
-#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-
 {%- let maybe_gp %}
 {%- if target_f.is_repeated %}
     {%- let maybe_gp = "<ScalarType, RepeatedType>" %}

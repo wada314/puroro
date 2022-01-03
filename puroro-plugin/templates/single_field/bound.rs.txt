@@ -3,18 +3,17 @@ where
 
 ScalarType:
     {%- if f.is_bytes %}
-    ::std::convert::AsRef<[u8]>
+    ::std::convert::AsRef<[u8]>,
     {%- endif %} {#- if f.is_bytes #}
     {%- if f.is_string %}
-    ::std::convert::AsRef<str>
+    ::std::convert::AsRef<str>,
     {%- endif %} {#- if f.is_string #}
     {%- if f.is_message %}
-    {{ f.trait_field_message_trait_path }}
+    {{ f.trait_field_message_trait_path }},
     {%- endif %} {#- if f.is_message #}
     {%- if f.is_numerical %}
-    ::std::convert::Into<{{ f.single_numerical_rust_type }}>
+    ::std::convert::Into<{{ f.single_numerical_rust_type }}> + ::std::clone::Clone,
     {%- endif %} {#- if f.is_numerical #}
-    + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
 
 {%- if f.is_repeated %}
 for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
