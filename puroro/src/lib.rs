@@ -285,6 +285,51 @@
 //! #       todo!()
 //!         // ...
 //!     }
+//!
+//!     pub fn title(&self) -> &'this str {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn title_opt(&self) -> Option<&str> {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn has_title(&self) -> bool {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn title_mut<'this>(
+//!         &'this mut self,
+//!     ) -> impl 'this + DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+//!     {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn clear_title(&mut self) {
+//! #       todo!()
+//!         // ...
+//!     }
+//!
+//!     pub fn num_pages(&self) -> u32 {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn num_pages_opt(&self) -> Option<u32> {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn has_num_pages(&self) -> bool {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn num_pages_mut(&mut self) -> &mut u32 {
+//! #       todo!()
+//!         // ...
+//!     }
+//!     pub fn clear_num_pages(&mut self) {
+//! #       todo!()
+//!         // ...
+//!     }
 //! }
 //! ```
 //!
