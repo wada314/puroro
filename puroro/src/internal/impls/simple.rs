@@ -467,6 +467,8 @@
 //! oneof FooBar {
 //!     int32 foo = 1;
 //!     string bar = 2;
+//!     // Note: you cannot specify "optional", "required" or "repeated"
+//!     // for oneof items in both proto2 and proto3.
 //! }
 //! ```
 //!
@@ -484,9 +486,15 @@
 //! #   todo!()
 //!     // ...
 //! }
+//!
+//! pub fn clear_foo_bar(&mut self) {
+//! #   todo!()
+//!     // ...
+//! }
 //! # }
 //! ```
 //!
+//! 
 //!
 //!
 
