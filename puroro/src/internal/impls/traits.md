@@ -14,7 +14,9 @@ For any of the following inputs,
 
 ```protobuf
 optional int32 foo = 1;
-repeated int32 foo = 1;
+
+// proto2 only
+required int32 foo = 1;
 
 // proto3 only
 int32 foo = 1;
@@ -53,7 +55,9 @@ for any of the following inputs:
 
 ```protobuf
 optional Bar foo = 1;
-repeated Bar foo = 1;
+
+// proto2 only
+required Bar foo = 1;
 
 // proto3 only
 Bar foo = 1;

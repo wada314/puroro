@@ -411,7 +411,7 @@ puroro generates the interface like this:
 ```rust
 # pub struct Message;
 # impl Message {
-pub fn foo(&self) -> &[&str] {
+pub fn foo(&self) -> &[impl Deref<Target=str>] {
 #   todo!()
     // ...
 }
