@@ -94,9 +94,16 @@ The generated code is:
 
 ```rust
 # trait MyMessageTrait {
-pub fn foo(&self) -> !;
+type FooRepeatedType<'this> = ::puroro::RepeatedField<'this>
+    + IntoIterator<Item = i32>;
+
+pub fn foo(&self) -> Self::FooRepeatedType<'_>;
 #}
 ```
+
+The trait [`puroro::RepeatedField`](crate::RepeatedField) is currently
+no-op. So the bound you need check is `IntoIterator<Item = i32>`.
+
 
 ## oneofs
 
