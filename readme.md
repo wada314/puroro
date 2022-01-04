@@ -53,7 +53,7 @@ Then edit the `Cargo.toml` to add the dependency to `puroro` library crate:
 ```toml
 [dependencies]
 # Use the same version with the puroro-plugin you installed at above
-puroro = "0.3.1"
+puroro = "0.4.0"
 ```
 
 As a last step, create a file `build.rs` into the crate root directory
