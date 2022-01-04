@@ -42,11 +42,11 @@ use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
 fn make_package_to_subpackages_map(
-    files: &Vec<google::protobuf::FileDescriptorProto>,
+    files: &[google::protobuf::FileDescriptorProto],
 ) -> HashMap<String, HashSet<String>> {
     let mut map = HashMap::new();
     for file in files {
-        let package_string = file.package.clone().unwrap_or_default();
+        let package_string = file.package();
         let package_vec = package_string
             .split('.')
             .filter_map(|p| {
@@ -116,9 +116,9 @@ fn main() -> Result<()> {
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
     let mut cgres: CodeGeneratorResponse = Default::default();
-    cgres.supported_features = Some(Feature::FeatureProto3Optional as u64);
+    *cgres.supported_features_mut() = Feature::FeatureProto3Optional as u64;
 
-    let package_to_subpackage_map = make_package_to_subpackages_map(&cgreq.proto_file);
+    let package_to_subpackage_map = make_package_to_subpackages_map(cgreq.proto_file());
     let package_to_file_descriptor_map = wrapped_cgreq
         .input_files()
         .iter()
@@ -158,9 +158,9 @@ fn main() -> Result<()> {
         }
 
         let mut output_file = <File as Default>::default();
-        output_file.name = Some(filename.into());
-        output_file.content = Some(contents.into());
-        cgres.file.push(output_file);
+        *output_file.name_mut() = filename.into();
+        *output_file.content_mut() = contents.into();
+        cgres.file_mut().push(output_file);
     }
 
     cgres.ser(&mut stdout())?;

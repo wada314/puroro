@@ -46,8 +46,7 @@ impl Context {
     pub fn try_from_proto(proto: CodeGeneratorRequest) -> Result<Rc<Context>> {
         let context = Rc::new_cyclic(|weak_context| Context {
             input_files: proto
-                .proto_file
-                .clone()
+                .proto_file()
                 .into_iter()
                 .map(|file| InputFile::try_from_proto(weak_context.clone(), file))
                 .collect::<Result<Vec<_>>>()
@@ -132,12 +131,10 @@ pub struct InputFile {
 }
 
 impl InputFile {
-    pub fn try_from_proto(context: Weak<Context>, proto: FileDescriptorProto) -> Result<Rc<Self>> {
+    pub fn try_from_proto(context: Weak<Context>, proto: &FileDescriptorProto) -> Result<Rc<Self>> {
         let package = Rc::new(
             proto
-                .package
-                .clone()
-                .unwrap_or_default()
+                .package()
                 .split('.')
                 .filter_map(|p| {
                     if p.is_empty() {
@@ -148,9 +145,9 @@ impl InputFile {
                 })
                 .collect_vec(),
         );
-        let proto_messages = proto.message_type.clone();
-        let proto_enums = proto.enum_type.clone();
-        let proto_syntax = proto.syntax.clone();
+        let proto_messages = proto.message_type();
+        let proto_enums = proto.enum_type();
+        let proto_syntax = proto.syntax();
         let mut file = Rc::new_cyclic(|file| Self {
             context: context,
             package: Clone::clone(&package),
@@ -178,10 +175,10 @@ impl InputFile {
                 })
                 .collect::<Result<Vec<_>>>()
                 .expect("I need try_new_cyclic..."),
-            syntax: match proto_syntax.as_deref() {
-                Some("proto2") | None => ProtoSyntax::Proto2,
-                Some("proto3") => ProtoSyntax::Proto3,
-                Some(syntax) => Err(ErrorKind::UnknownProtoSyntax {
+            syntax: match proto_syntax {
+                "proto2" | "" => ProtoSyntax::Proto2,
+                "proto3" => ProtoSyntax::Proto3,
+                syntax => Err(ErrorKind::UnknownProtoSyntax {
                     name: syntax.to_owned(),
                 })
                 .expect("I need try_new_cyclic..."),
@@ -228,26 +225,20 @@ pub struct Message {
 impl Message {
     pub fn try_from_proto(
         input_file: Weak<InputFile>,
-        proto: DescriptorProto,
+        proto: &DescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
     ) -> Result<Rc<Self>> {
-        let proto_name = proto
-            .name
-            .clone()
-            .ok_or(ErrorKind::EmptyInputField {
-                name: "DescriptorProto.name".into(),
-            })?
-            .to_string();
+        let proto_name = proto.name().to_string();
         let new_outer_messages = Rc::new({
             let mut v = outer_messages.deref().clone();
             v.push(proto_name.clone());
             v
         });
-        let proto_field = proto.field.clone();
-        let proto_nested_type = proto.nested_type.clone();
-        let proto_enum_type = proto.enum_type.clone();
-        let proto_oneofs = proto.oneof_decl.clone();
+        let proto_field = proto.field();
+        let proto_nested_type = proto.nested_type();
+        let proto_enum_type = proto.enum_type();
+        let proto_oneofs = proto.oneof_decl();
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
             rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
@@ -406,18 +397,12 @@ pub struct Enum {
 impl Enum {
     pub fn try_from_proto(
         input_file: Weak<InputFile>,
-        proto: EnumDescriptorProto,
+        proto: &EnumDescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
     ) -> Result<Rc<Self>> {
-        let proto_name = proto
-            .name
-            .clone()
-            .ok_or(ErrorKind::EmptyInputField {
-                name: "EnumDescriptorProto.name".into(),
-            })?
-            .to_string();
-        let proto_value = proto.value.clone();
+        let proto_name = proto.name().to_string();
+        let proto_value = proto.value();
         Ok(Rc::new(Self {
             input_file: input_file,
             rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)).to_string(),
@@ -427,11 +412,8 @@ impl Enum {
             values: proto_value
                 .into_iter()
                 .map(|v| EnumValue {
-                    rust_ident: get_keyword_safe_ident(&to_camel_case(
-                        &v.name.clone().unwrap_or_default(),
-                    ))
-                    .to_string(),
-                    number: v.number.unwrap_or_default(),
+                    rust_ident: get_keyword_safe_ident(&to_camel_case(&v.name())).to_string(),
+                    number: v.number(),
                 })
                 .collect_vec(),
         }))
@@ -494,24 +476,14 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn try_from_proto(message: Weak<Message>, proto: FieldDescriptorProto) -> Result<Self> {
-        let proto_name = proto
-            .name
-            .clone()
-            .ok_or(ErrorKind::EmptyInputField {
-                name: "FieldDescriptorProto.name".into(),
-            })?
-            .to_string();
-        let proto_type_name = proto.type_name.clone().unwrap_or_default().to_string();
-        let proto_type_enum = proto.r#type.clone().ok_or(ErrorKind::InternalError {
-            detail: "currently we are assuming the field type enum is always set.".to_string(),
-        })?;
-        let proto_label = proto.label.clone().ok_or(ErrorKind::InternalError {
-            detail: "currently we are assuming the field label enum is always set.".to_string(),
-        })?;
-        let proto_is_optional3 = proto.proto3_optional.unwrap_or_default();
-        let proto_number = proto.number.unwrap_or_default();
-        let proto_oneof_index = proto.oneof_index;
+    pub fn try_from_proto(message: Weak<Message>, proto: &FieldDescriptorProto) -> Result<Self> {
+        let proto_name = proto.name().to_string();
+        let proto_type_name = proto.type_name().to_string();
+        let proto_type_enum = proto.r#type();
+        let proto_label = proto.label();
+        let proto_is_optional3 = proto.proto3_optional();
+        let proto_number = proto.number();
+        let proto_oneof_index = proto.oneof_index_opt();
         Ok(Self {
             message: Clone::clone(&message),
             ident_lower_snake: get_keyword_safe_ident(&to_lower_snake_case(&proto_name))
@@ -525,7 +497,7 @@ impl Field {
             lazy_proto_type: OnceCell::new(),
             proto_label,
             proto_is_optional3,
-            proto_default_value: proto.default_value,
+            proto_default_value: proto.default_value_opt().map(|s| s.to_string()),
             lazy_label: OnceCell::new(),
             number: proto_number,
             proto_oneof_index,
@@ -975,23 +947,18 @@ pub struct Oneof {
 impl Oneof {
     pub fn try_from_proto(
         message: Weak<Message>,
-        proto: OneofDescriptorProto,
+        proto: &OneofDescriptorProto,
         index: i32,
     ) -> Result<Rc<Self>> {
-        if let Some(name) = proto.name.as_ref() {
-            Ok(Rc::new(Self {
-                message,
-                index: index,
-                rust_enum_ident: get_keyword_safe_ident(&to_camel_case(name)).to_string(),
-                rust_getter_ident: get_keyword_safe_ident(&to_lower_snake_case(name)).to_string(),
-                lazy_fields: OnceCell::new(),
-                lazy_is_synthetic: OnceCell::new(),
-            }))
-        } else {
-            Err(ErrorKind::EmptyInputField {
-                name: "OneofDescriptorProto.name".to_string(),
-            })?
-        }
+        Ok(Rc::new(Self {
+            message,
+            index: index,
+            rust_enum_ident: get_keyword_safe_ident(&to_camel_case(proto.name())).to_string(),
+            rust_getter_ident: get_keyword_safe_ident(&to_lower_snake_case(proto.name()))
+                .to_string(),
+            lazy_fields: OnceCell::new(),
+            lazy_is_synthetic: OnceCell::new(),
+        }))
     }
     pub fn rust_enum_ident(&self) -> &str {
         &self.rust_enum_ident

@@ -22,8 +22,6 @@ pub struct GeneratorError {
 
 #[derive(Debug, ::thiserror::Error)]
 pub enum ErrorKind {
-    #[error(r#"A field "{name}" should note be empty."#)]
-    EmptyInputField { name: String },
     #[error(r#"The type name "{name}" is not found in any other input .proto files."#)]
     UnknownTypeName { name: String },
     #[error(r#"The group feature is not yet supported. GIVE ME A DOCUMENT!!!"#)]
