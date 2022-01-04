@@ -255,19 +255,7 @@ as many as you like, then terminate with `build()` method.
 Then you can get a generated type which is implementing `BookTrait` trait,
 and of course it can be serialized.
 
-There are some benefits of using this builder instead of the normal `struct Book`:
-* The builder generated type has lesser memory footprint. It only consumes the memory
-for explicitly appended fields.
-* The field type is more flexible. Note that you don't need to call `to_string()` method
-when setting the string field. Actually, in the example above the internal field type
-is not `String` but `&str`, which does not allocate any heap memory.
-
-Instead, the builder has some downsides compared to the normal struct.
-* You can only `append` the field. Particurally, you cannot clear field nor
-edit previously added repeated field values.
-* You always need to manually write a code to use the builder. No deserialization support.
-
-# Using [`bumpalo`](https://github.com/fitzgen/bumpalo) allocator
+# Experimental and incomplete feature: Using [`bumpalo`](https://github.com/fitzgen/bumpalo) allocator
 
 [Detailed document here](internal::impls::bumpalo)
 
