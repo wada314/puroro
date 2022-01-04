@@ -1,3 +1,11 @@
+
+# v 0.4.0
+- So many changes.
+- The message struct does not have public fields anymore. Use the methods instead.
+- Added getter and setter methods for the normal message structs and the bumpalo structs.
+- Changed the internal implementation of the normal message struct and bumpalo struct.
+These uses a `bitvec` to manage `optional` fields' presence bit.
+
 # v 0.3.1
 - Fixed that the compile does not pass in the latest rustc nightly (1.58).
 
