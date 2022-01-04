@@ -189,6 +189,11 @@
 //!
 //! // Behaves like a merged message. Behaves like `U` is merged into `T`.
 //! impl<T: BookTrait, U: BookTrait> BookTrait for (T, U) {}
+//!
+//! // Trivial impls
+//! impl<'a, T: BookTrait> BookTrait for &'a T {}
+//! impl<'a, T: BookTrait> BookTrait for &'a mut T {}
+//! impl<T: BookTrait> BookTrait for Box<T> {}
 //! ```
 //!
 //! # Builders
@@ -341,6 +346,9 @@
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
+// Allow using GAT in document sample code.
+#![doc(test(attr(feature(generic_associated_types))))]
+
 mod common_traits;
 mod error;
 pub mod internal;

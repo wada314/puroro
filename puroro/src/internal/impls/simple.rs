@@ -25,7 +25,17 @@
 //! package foo.bar.my_package
 //! ```
 //!
-//! will generate code in `foo::bar::my_package` module.
+//! will generate rust modules:
+//!
+//! ```rust
+//! pub mod foo {
+//!     pub mod bar {
+//!         pub mod my_package {
+//!             // The generated items
+//!         }
+//!     }
+//! }
+//! ```
 //!
 //! ## Messages and nested Messages
 //!

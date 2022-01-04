@@ -15,6 +15,90 @@
 //! # Generated trait
 //! For every message in input .pb files, puroro generates a Trait named
 //! `<MyMessageName>Trait`.
+//! The trait only implements immutable interfaces, not mutable ones.
+//!
+//! Please also check the [Generated struct](super::simple) page for
+//! related informations like generated `enum`.
+//!
+//! ## Fields
+//!
+//! ### Singular non-message fields
+//!
+//! For any of the following inputs,
+//!
+//! ```protobuf
+//! optional int32 foo = 1;
+//! repeated int32 foo = 1;
+//!
+//! // proto3 only
+//! int32 foo = 1;
+//! ```
+//!
+//! The following trait methods are generated:
+//!
+//! ```rust
+//! # trait MyMessageTrait {
+//! // Returns the field value if the field is present.
+//! // Please note that for proto3 bare singluar field, 0-value fields
+//! // (or "" for string, b"" for bytes) are also considered as not present.
+//! // If the field is not present, then returns the default value,
+//! // which is normally 0 but in proto2 you can override it with
+//! // a field option like `[default = 10]`.
+//! fn foo(&self) -> i32;
+//!
+//! // Returns `Some` if the field is present, and `None` if not.
+//! // Unlike the `foo()` method, the default value setting does not
+//! // make any effect to this method.
+//! fn foo_opt(&self) -> Option<i32>;
+//!
+//! // A shorthand of `self.foo_opt().is_some()`.
+//! fn has_opt(&self) -> bool;
+//! # }
+//! ```
+//!
+//! The field return type are corresponding rust primitive type for
+//! numerical types, `&str` for `string`, `&[u8]` for `bytes`, and the
+//! generated `enum` (by value) for `enum` field.
+//!
+//! ### Singluar message field
+//!
+//! Assuming we have another message type `message Bar`,
+//! for any of the following inputs:
+//!
+//! ```protobuf
+//! optional Bar foo = 1;
+//! repeated Bar foo = 1;
+//!
+//! // proto3 only
+//! Bar foo = 1;
+//! ```
+//!
+//! The following trait methods and typedefs are generated:
+//!
+//! ```rust
+//! # trait BarTrait {}
+//! # trait MyMessageTrait {
+//! #
+//! type FooMessageType<'this>: BarTrait;
+//!
+//! // Returns the field value if the field is present.
+//! // Please note that for proto3 bare singluar field, 0-value fields
+//! // (or "" for string, b"" for bytes) are also considered as not present.
+//! // If the field is not present, then returns the default value,
+//! // which is normally 0 but in proto2 you can override it with
+//! // a field option like `[default = 10]`.
+//! fn foo(&self) -> i32;
+//!
+//! // Returns `Some` if the field is present, and `None` if not.
+//! // Unlike the `foo()` method, the default value setting does not
+//! // make any effect to this method.
+//! fn foo_opt(&self) -> Option<i32>;
+//!
+//! // A shorthand of `self.foo_opt().is_some()`.
+//! fn has_opt(&self) -> bool;
+//! # }
+//! ```
+//!
 //!
 //!
 //! For an input protobuf:
@@ -31,7 +115,6 @@
 //!
 //! ```rust
 //! // A readonly trait for message `MyMessage`
-//! # #![feature(generic_associated_types)]
 //! # use ::std::ops::Deref;
 //! pub trait MyMessageTrait {
 //!     fn my_number(&self) -> i32;

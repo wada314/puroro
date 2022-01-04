@@ -161,3 +161,4 @@ your own crate. Congraturations!
     - [ ] Support the `allocator_api`. Waiting for the `String` support
     - [ ] RPCs / services
     - [ ] Deserializer vulnerbility: Need to limit the recursion depth
+    - [ ] Get multiple fields mutable references at once
