@@ -29,6 +29,7 @@ message Book {
 
 A struct like this is output:
 ```rust
+mod library {
 pub struct Book { /* ... */ }
 impl Book {
     pub fn new() -> Self {
@@ -78,6 +79,7 @@ impl Book {
 #       todo!()
     }
 }
+} // mod library
 ```
 
 The struct also implements [`Clone`], [`Default`], [`PartialEq`] and
