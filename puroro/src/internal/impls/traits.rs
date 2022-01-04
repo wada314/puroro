@@ -81,83 +81,33 @@
 //! #
 //! type FooMessageType<'this>: BarTrait;
 //!
-//! // Returns the field value if the field is present.
-//! // Please note that for proto3 bare singluar field, 0-value fields
-//! // (or "" for string, b"" for bytes) are also considered as not present.
-//! // If the field is not present, then returns the default value,
-//! // which is normally 0 but in proto2 you can override it with
-//! // a field option like `[default = 10]`.
-//! fn foo(&self) -> i32;
-//!
 //! // Returns `Some` if the field is present, and `None` if not.
-//! // Unlike the `foo()` method, the default value setting does not
-//! // make any effect to this method.
-//! fn foo_opt(&self) -> Option<i32>;
+//! fn foo(&self) -> Option<Self::FooMessageType>;
+//!
+//! // Exactly the same as `foo()` method.
+//! fn foo_opt(&self) -> Option<Self::FooMessageType>;
 //!
 //! // A shorthand of `self.foo_opt().is_some()`.
 //! fn has_opt(&self) -> bool;
 //! # }
 //! ```
 //!
+//! The typedef `FooMessageType<'this>` is `&'this Bar` in the
+//! normal message implementation. So essentially, the interfaces are
+//! exactly the same as the normal message interface.
 //!
+//! ### Repeated numerical field
 //!
-//! For an input protobuf:
+//! For the following input:
+//!
 //! ```protobuf
-//! syntax = "proto3";
-//! message MyMessage {
-//!     int32 my_number = 1;
-//!     repeated string my_name = 2;
-//!     MyMessage my_child = 3;
-//! }
+//! repeated int32 foo = 1;
 //! ```
 //!
-//! Trait like this is generated:
+//! The generated code is:
 //!
 //! ```rust
-//! // A readonly trait for message `MyMessage`
-//! # use ::std::ops::Deref;
-//! pub trait MyMessageTrait {
-//!     fn my_number(&self) -> i32;
-//!     fn my_number_opt(&self) -> Option<i32>;
-//!     fn has_my_number(&self) -> bool;
-//!
-//!     type Field2RepeatedType<'this>: IntoIterator<Item=&'this str> where Self: 'this;
-//!     fn my_name(&self) -> Self::Field2RepeatedType<'_>;
-//!     fn has_my_name(&self) -> bool;
-//!
-//!     type Field3MessageType<'this>: MyMessageTrait where Self: 'this;
-//!     fn my_child(&self) -> Option<Self::Field3MessageType<'_>>;
-//!     fn my_name_opt(&self) -> Option<Self::Field3MessageType<'_>>;
-//!     fn has_my_child(&self) -> bool;
-//! }
 //! ```
-//!
-//! Each message field will generate a getter method which has same name
-//! (lower_snake_case_nized if it's not) with the original protobuf fields.
-//! If the field is a message type, then an associated type
-//! `Field[number]MessageType` which implements the message type's trait
-//! (something like `SomeMessageTrait`) is generated.
-//!
-//! And if the field is a repeated type, another associated type
-//! `Field[number]RepeatedType` is generated.
-//! This type implements [`puroro::RepeatedField`](crate::RepeatedField), which is the same
-//! as the [`IntoIterator`].
-//!
-//! The list of the generated getter methods' return types:
-//!
-//! | base protobuf type | non-`repeated` fields | `repeated`                     |
-//! |--------------------|-----------------------|--------------------------------|
-//! | `int32`            | `i32`                 | `impl IntoIterator<Item=i32>`  |
-//! | (Any numeric types)| `T`                   | `impl IntoIterator<Item=T>`    |
-//! | `bytes`            | `&[u8]`               | `impl IntoIterator<Item=&[u8]>`|
-//! | `string`           | `&str`                | `impl IntoIterator<Item=&str>` |
-//! | `SomeMessage`      | `Option<impl SomeMessageTrait>`|`impl IntoIterator<Item=impl SomeMessageTrait>`|
-//!
-//! It also generates a getter method with postfix `_opt`, which always returns `Option` type.
-//! If the field value is not set (`optional` or `required` fields) or the field value is
-//! default (unlabeled fields) then this method returns `None`, otherwise `Some`.
-//!
-//! And a method with prefix `has_` is generated, which is a shortcut of `self.foo_opt().is_some()`.
 //!
 //! ## oneofs
 //!
@@ -227,61 +177,4 @@
 //! - Non-repeated, non-message field: Prioritize `U`'s value.
 //! - Non-repeated, message field: Merges `T`'s and `U`'s values.
 //! - Repeated field: Concatenates `T` and `U`'s repaeted values.
-//!
-//! # Default values / has_ bits
-//!
-//! ## proto2
-//!
-//! In proto2, you can set a field's default value:
-//! ```protobuf
-//! syntax = "proto2";
-//! message MyMessage {
-//!     int32 my_number = 1 [default = 42];
-//! }
-//! ```
-//!
-//! The generated trait's getter method returns the default value
-//! when the value is not set (when `has_xxx()` returns false).
-//!
-//! ```rust
-//! # trait MyMessageTrait {
-//! #     fn my_number(&self) -> i32;
-//! #     fn has_my_number(&self) -> bool;
-//! # }
-//! # impl MyMessageTrait for () {
-//! #     fn my_number(&self) -> i32 { 42 }
-//! #     fn has_my_number(&self) -> bool { false }
-//! # }
-//! assert_eq!(42, ().my_number());
-//! assert_eq!(false, ().has_my_number());
-//! ```
-//!
-//! ## proto3
-//!
-//! In proto3 unlabeled fields, 0 value (or empty string / bytes) fields
-//! are considered as empty and not set.
-//!
-//! ```protobuf
-//! syntax = "proto3";
-//! message MyMessage {
-//!     int32 my_number = 1;
-//! }
-//! ```
-//!
-//! ```rust
-//! # #[derive(Default)]
-//! # pub struct MyMessage {
-//! #     pub my_number: i32,
-//! # }
-//! # trait MyMessageTrait {
-//! #     fn my_number(&self) -> i32;
-//! #     fn has_my_number(&self) -> bool;
-//! # }
-//! # impl MyMessageTrait for MyMessage {
-//! #     fn my_number(&self) -> i32 { self.my_number }
-//! #     fn has_my_number(&self) -> bool { self.my_number != 0 }
-//! # }
-//! assert_eq!(0, MyMessage::default().my_number());
-//! assert_eq!(false, MyMessage::default().has_my_number());
-//! ```
 //!
