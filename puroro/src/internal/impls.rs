@@ -19,4 +19,5 @@ pub mod empty;
 pub mod merged;
 pub mod option;
 pub mod simple;
-pub mod traits;
+#[doc = include_str!("impls/traits.md")]
+pub mod traits {}
