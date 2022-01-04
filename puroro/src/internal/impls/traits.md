@@ -65,13 +65,13 @@ The following trait methods and typedefs are generated:
 # trait BarTrait {}
 # trait MyMessageTrait {
 #
-type FooMessageType<'this>: BarTrait;
+type FooMessageType<'this>: BarTrait where Self: 'this;
 
 // Returns `Some` if the field is present, and `None` if not.
-fn foo(&self) -> Option<Self::FooMessageType>;
+fn foo(&self) -> Option<Self::FooMessageType<'_>>;
 
 // Exactly the same as `foo()` method.
-fn foo_opt(&self) -> Option<Self::FooMessageType>;
+fn foo_opt(&self) -> Option<Self::FooMessageType<'_>>;
 
 // A shorthand of `self.foo_opt().is_some()`.
 fn has_opt(&self) -> bool;
@@ -94,11 +94,13 @@ The generated code is:
 
 ```rust
 # trait MyMessageTrait {
-type FooRepeatedType<'this>: ::puroro::RepeatedField<'this>
-    + IntoIterator<Item = i32>;
+type FooRepeatedType<'this>:
+    ::puroro::RepeatedField<'this> +
+    IntoIterator<Item = i32>
+where Self: 'this;
 
-pub fn foo(&self) -> Self::FooRepeatedType<'_>;
-#}
+fn foo(&self) -> Self::FooRepeatedType<'_>;
+# }
 ```
 
 The trait [`puroro::RepeatedField`](crate::RepeatedField) is currently
@@ -119,11 +121,13 @@ The generated code is:
 
 ```rust
 # trait MyMessageTrait {
-type FooRepeatedType<'this>: ::puroro::RepeatedField<'this>
-    + IntoIterator<Item = &'this str>;
+type FooRepeatedType<'this>:
+    ::puroro::RepeatedField<'this>
+    + IntoIterator<Item = &'this str>
+where Self: 'this;
 
-pub fn foo(&self) -> Self::FooRepeatedType<'_>;
-#}
+fn foo(&self) -> Self::FooRepeatedType<'_>;
+# }
 ```
 
 For `bytes` field, just replace `str` by `[u8]`.
@@ -149,11 +153,13 @@ The generated code is:
 # trait BarTrait {}
 # trait MyMessageTrait {
 type FooMessageType<'this>: BarTrait;
-type FooRepeatedType<'this>: ::puroro::RepeatedField<'this>
-    + IntoIterator<Item = &'this str>;
+type FooRepeatedType<'this>:
+    ::puroro::RepeatedField<'this>
+    + IntoIterator<Item = &'this str>
+where Self: 'this;
 
-pub fn foo(&self) -> Self::FooRepeatedType<'_>;
-#}
+fn foo(&self) -> Self::FooRepeatedType<'_>;
+# }
 ```
 
 This is very straightforward composition of a singluar message field

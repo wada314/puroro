@@ -12,6 +12,7 @@ Please check [the `readme` of this repository](https://github.com/wada314/puroro
 1. Basic usage (this page)
 1. [Generated struct](internal::impls::simple)
 1. [Generated trait](internal::impls::traits)
+1. [Bumpalo struct (Super experimental)](internal::impls::bumpalo)
 
 # Simple example
 
@@ -262,6 +263,8 @@ edit previously added repeated field values.
 * You always need to manually write a code to use the builder. No deserialization support.
 
 # Using [`bumpalo`](https://github.com/fitzgen/bumpalo) allocator
+
+[Detailed document here](internal::impls::bumpalo)
 
 puroro has an experimental implementation using [`bumpalo`](https://github.com/fitzgen/bumpalo)
 allocator instead of the default global allocator.

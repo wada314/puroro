@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # Bumpalo message structs
-//!
-//! **The implementation is highly experimental and the interface will change
-//! in very soon!!**
-//!
+#![doc = include_str!("bumpalo.md")]
 
 pub mod de;
 
