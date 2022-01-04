@@ -94,7 +94,7 @@ The generated code is:
 
 ```rust
 # trait MyMessageTrait {
-type FooRepeatedType<'this> = ::puroro::RepeatedField<'this>
+type FooRepeatedType<'this>: ::puroro::RepeatedField<'this>
     + IntoIterator<Item = i32>;
 
 pub fn foo(&self) -> Self::FooRepeatedType<'_>;
@@ -102,46 +102,74 @@ pub fn foo(&self) -> Self::FooRepeatedType<'_>;
 ```
 
 The trait [`puroro::RepeatedField`](crate::RepeatedField) is currently
-no-op. So the bound you need check is `IntoIterator<Item = i32>`.
+no-op. So the bound you actually need check is `IntoIterator<Item = i32>`.
+This bound type is *different* with the normal message struct's implementation:
+The normal struct has: `fn foo(&self) -> &[i32]` method, where the return type
+is `IntoIterator<Item = &i32>`, not `IntoIterator<Item = i32>`.
 
+### Repeated string / bytes field
 
-## oneofs
+For this input:
 
-From a proto like this:
 ```protobuf
-syntax = "proto3";
-message MyMessage {
-    oneof my_oneofs {
-        int32 item1 = 1;
-        float item2 = 2;
-    }
-}
+repeated string foo = 1;
 ```
 
-This trait and enum are generated:
+The generated code is:
 
 ```rust
-pub trait MyMessageTrait {
-    fn my_oneofs(&self) -> Option<my_message::MyOneofs>;
+# trait MyMessageTrait {
+type FooRepeatedType<'this>: ::puroro::RepeatedField<'this>
+    + IntoIterator<Item = &'this str>;
 
-    fn item1(&self) -> i32;
-    fn item1_opt(&self) -> Option<i32>;
-    fn has_item1(&self) -> bool;
-    fn item2(&self) -> f32;
-    fn item2_opt(&self) -> Option<f32>;
-    fn has_item2(&self) -> bool;
-}
-pub mod my_message {
-    pub enum MyOneofs {
-        Item1(i32),
-        Item2(f32),
-    }
-}
+pub fn foo(&self) -> Self::FooRepeatedType<'_>;
+#}
 ```
+
+For `bytes` field, just replace `str` by `[u8]`.
+
+The interface is the almost the same as the numeric repeated field.
+And as same as the numeric fields, the bound of `FooRepeatedType` does *not*
+match with the normal message struct's getter type:
+The normal message struct's interface is `pub fn foo(&self) -> &[String]`,
+which the return type does not implement `IntoIterator<Item = &str>` but
+implements `IntoIterator<Item = &String>` instead. Ditto for `bytes` field.
+
+### Repeated message field
+
+Assuming we already have `message Bar`, for the input:
+
+```protobuf
+repeated Bar foo = 1;
+```
+
+The generated code is:
+
+```rust
+# trait BarTrait {}
+# trait MyMessageTrait {
+type FooMessageType<'this>: BarTrait;
+type FooRepeatedType<'this>: ::puroro::RepeatedField<'this>
+    + IntoIterator<Item = &'this str>;
+
+pub fn foo(&self) -> Self::FooRepeatedType<'_>;
+#}
+```
+
+This is very straightforward composition of a singluar message field
+and other repeated field definitions.
+Interestingly, unlike other repeated fields the type bound `FooRepeatedType`
+matches with the normal message implementation:
+The normal struct has `pub fn foo(&self) -> &[Bar]` method, which perfectly
+matches with the `FooRepeatedType` bound and `FooMessageTypeBound`.
+
+### oneofs
+
+It's exactly the same as the [normal message impl](crate::internal::impls::simple).
 
 # trait impls
 
-The generated trait is implemented for the generated message structs and
+The generated trait is implemented for the generated normal message structs and
 the following types:
 
 ```rust
@@ -172,5 +200,5 @@ Behaves as either `T` or `U`.
 Behaves as a merged message of `T` and `U`.
 - Non-repeated, non-message field: Prioritize `U`'s value.
 - Non-repeated, message field: Merges `T`'s and `U`'s values.
-- Repeated field: Concatenates `T` and `U`'s repaeted values.
+- Repeated field: Concatenates `T` and `U`'s repaeted values in this order.
 
