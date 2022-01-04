@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod builder;
+#[doc = include_str!("impls/builder.md")]
+pub mod builder {}
 pub mod bumpalo;
 pub mod either;
 pub mod empty;

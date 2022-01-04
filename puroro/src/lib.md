@@ -12,6 +12,7 @@ Please check [the `readme` of this repository](https://github.com/wada314/puroro
 1. Basic usage (this page)
 1. [Generated struct](internal::impls::simple)
 1. [Generated trait](internal::impls::traits)
+1. [Builders](internal::impls::builder)
 1. [Bumpalo struct (Super experimental)](internal::impls::bumpalo)
 
 # Simple example
@@ -138,7 +139,9 @@ book.ser(&mut output).unwrap();
 assert_eq!(vec![0x0a, 0x02, 0x59, 0x6f], output);
 ```
 
-# Trait and builder
+# Trait
+
+[Detailed document here](internal::impls::traits)
 
 The input proto message generates not only a struct, but also a trait.
 The trait name is *MessageName*Trait (e.g. `BookTrait` for `message Book`).
@@ -184,6 +187,8 @@ impl<T: BookTrait> BookTrait for Box<T> {}
 ```
 
 # Builders
+
+[Detailed document here](internal::impls::builder)
 
 puroro also generates a builder type for each message.
 The name of builder is *MessageName*Builder (e.g. `BookBuilder` for `message Book`).
