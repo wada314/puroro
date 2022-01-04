@@ -4,17 +4,19 @@
 **The implementation is highly experimental and the interface will change
 in very soon!!**
 
+The generated struct always own a reference to a instance of 
+[`Bump`](crate::bumpalo::Bump). Currently all the parent and children bumpalo
+message instances must refer to the same `Bump` instance.
+
 ## Naming
 
 The bumpalo struct has postfix `Bumpalo`.
-For example, from a given `message` name `Foo` then 
+For example, from a given `message` named `Foo`,
 `struct FooBumpalo` is generated.
 
 ## Initialize
 
-The generated struct always hold a reference to a instance of 
-[`Bump`](crate::bumpalo::Bump).
-So instead of the `new()` method, it has `new_in(bump: &Bump)` initializer method:
+Instead of the `new()` method, it has `new_in(bump: &Bump)` initializer method:
 
 ```rust
 pub struct FooBumpalo<'bump> {
@@ -82,6 +84,12 @@ The normal message struct's [`String`] is replaced by
 and `&mut` reference is replaced by [`DerefMut`](std::ops::DerefMut).
 
 For `bytes` field, it's using [`::puroro::bumpalo::collections::Vec<'bump, u8>`](crate::bumpalo::collections::Vec) type instead.
+
+### Singular message field mutable getters
+
+It's same as the normal message struct's getter, just the
+returned message type is not a normal message struct but
+a bumpalo message struct.
 
 ### Repeated field mutable getters
 
