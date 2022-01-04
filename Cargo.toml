@@ -5,4 +5,5 @@ members = [
     "tests",
     "tests-pb",
     "puroro-protobuf-compiled",
+    "puroro-doc-samples",
 ]

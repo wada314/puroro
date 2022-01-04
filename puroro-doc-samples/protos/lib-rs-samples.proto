@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[doc = include_str!("impls/builder.md")]
-pub mod builder {}
-pub mod bumpalo;
-pub mod either;
-pub mod empty;
-pub mod merged;
-pub mod option;
-pub mod simple;
-#[doc = include_str!("impls/traits.md")]
-pub mod traits {}
+syntax = "proto3";
+package library;
+
+message Book {    
+    string title = 1;
+    uint32 num_pages = 2;
+}

@@ -100,6 +100,27 @@
         },
         {
             "type": "cargo",
+            "command": "test",
+            "args": [
+                "-p",
+                "puroro"
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "group": "test",
+            "label": "rust: cargo test -p puroro"
+        },
+        {
+            "type": "cargo",
             "command": "doc",
             "args": [
                 "-p",
@@ -117,7 +138,7 @@
                 "clear": true
             },
             "group": "build",
-            "label": "rust: cargo doc"
+            "label": "rust: cargo doc -p puroro"
         }
     ]
 }

@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # Bumpalo message structs
-//!
-//! **The implementation is highly experimental and the interface will change
-//! in very soon!!**
-//!
+#![doc = include_str!("bumpalo.md")]
 
 pub mod de;
 
@@ -194,7 +190,7 @@ impl<T> NoAllocVec<T> {
         ))
     }
 
-    /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`MutRefVec`].
+    /// Construct a mutable [`Vec`](bumpalo::collections::Vec) wrapped by [`RefMutVec`].
     /// This function must take a same bump ref with the one given in `new_in` method.
     ///
     /// # Safety
