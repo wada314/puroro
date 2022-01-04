@@ -13,11 +13,7 @@ documentation = "https://docs.rs/puroro/0.1.0/puroro/"
 [dependencies]
 puroro = { version = "0.3.1" }
 puroro-protobuf-compiled = { path = "../puroro-protobuf-compiled", version = "0.3.1" }
-# We need to use the latest version of askama due to this bug in its dependent package:
-# https://github.com/bitvecto-rs/bitvec/blob/develop/CHANGELOG.md#0211
-# Because of teh bug above we cannot use the latest bitvec crate in our project.
-# askama = "0.10"
-askama = { git = "https://github.com/djc/askama" }
+askama = "0.11"
 itertools = "0.10.1"
 lazy_static = "1.4.0"
 thiserror = "1.0.25"
