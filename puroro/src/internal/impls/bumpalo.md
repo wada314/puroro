@@ -46,8 +46,8 @@ Still the same as the normal message struct.
 
 ### Singular string / bytes field mutable getters
 
-The interface become a little complicated, but you can use as same as
-the normal message struct. For the given input:
+The interface become a little complicated, but still you can use it as
+same as the normal message struct. For any of the following given inputs:
 
 ```protobuf
 optional string foo = 1;
@@ -58,6 +58,30 @@ required string foo = 1;
 // proto3 only
 string foo = 1;
 ```
+
+The generated interface is:
+
+```rust
+# use std::ops::DerefMut;
+# struct FooBumpalo<'bump>(std::marker::PhantomData<&'bump ()>);
+# impl<'bump> FooBumpalo<'bump> {
+pub fn foo_mut(&mut self) -> impl DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>> {
+    // ...
+#   unsafe { std::ptr::NonNull::dangling().as_mut() }
+}
+
+pub fn clear_foo(&mut self) {
+    // ...
+#   todo!()
+}
+# }
+```
+
+The normal message struct's [`String`] is replaced by
+[`::puroro::bumpalo::collections::String<'bump>`](crate::bumpalo::collections::String),
+and `&mut` reference is replaced by [`DerefMut`](std::ops::DerefMut).
+
+For `bytes` field, it's using [`::puroro::bumpalo::collections::Vec<'bump, u8>`](crate::bumpalo::collections::Vec) type instead.
 
 ### Repeated field mutable getters
 

@@ -410,9 +410,12 @@ puroro generates the interface like this:
 
 ```rust
 # pub struct Message;
+# use std::ops::Deref;
 # impl Message {
 pub fn foo(&self) -> &[impl Deref<Target=str>] {
-#   todo!()
+#   todo!();
+#   static A: [String; 0] = [];
+#   &A
     // ...
 }
 
