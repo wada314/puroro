@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #![doc = include_str!("lib.md")]
-#![allow(incomplete_features)]
 #![feature(backtrace)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
