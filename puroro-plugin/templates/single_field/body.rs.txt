@@ -95,7 +95,8 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
             <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ target_f.ident_unesc }}_opt(self),
             {%- endif %}
             {{ target_f.number }},
-            out
+            out,
+            {{ target_f.allow_variant_packing }},
         )?;
         ::std::result::Result::Ok(())
     }

@@ -470,7 +470,9 @@ pub struct Field {
     proto_label: FieldLabelProto,
     proto_is_optional3: bool,
     proto_default_value: Option<String>,
+    proto_options_packed: Option<bool>,
     lazy_label: OnceCell<FieldLabel>,
+    lazy_allow_variant_packing: OnceCell<bool>,
     number: i32,
     proto_oneof_index: Option<i32>,
 }
@@ -498,7 +500,9 @@ impl Field {
             proto_label,
             proto_is_optional3,
             proto_default_value: proto.default_value_opt().map(|s| s.to_string()),
+            proto_options_packed: proto.options_opt().and_then(|opt| opt.packed_opt()),
             lazy_label: OnceCell::new(),
+            lazy_allow_variant_packing: OnceCell::new(),
             number: proto_number,
             proto_oneof_index,
         })
@@ -578,6 +582,19 @@ impl Field {
     }
     pub fn oneof_index(&self) -> Option<i32> {
         self.proto_oneof_index.clone()
+    }
+    pub fn allow_variant_packing(&self) -> Result<bool> {
+        self.lazy_allow_variant_packing
+            .get_or_try_init(|| {
+                let syntax = self.message()?.input_file()?.syntax();
+                // In proto2, packed is true only if it's explicitly set to true.
+                // In proto3, packed is false only if it's explicitly set to false.
+                Ok(match syntax {
+                    ProtoSyntax::Proto2 => self.proto_options_packed.unwrap_or(false),
+                    ProtoSyntax::Proto3 => self.proto_options_packed.unwrap_or(true),
+                })
+            })
+            .map(|b| *b)
     }
 
     pub fn rust_type_tag<F: Fn(&Message) -> Result<String>>(

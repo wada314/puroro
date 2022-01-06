@@ -50,6 +50,7 @@ where
         field: Option<<tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         number: i32,
         out: &mut W,
+        _: bool,
     ) -> Result<()>
     where
         W: Write,
@@ -67,25 +68,39 @@ impl<V> SerFieldToIoWrite<tags::Repeated, tags::Variant<V>>
 where
     tags::Variant<V>: VariantTypeTag,
 {
-    pub fn ser_field<FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<FieldType, W>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+        allow_variant_packing: bool,
+    ) -> Result<()>
     where
         FieldType: IntoIterator<Item = <tags::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
     {
-        let mut encoded = Vec::new();
-        for item in field.into_iter() {
-            Variant::from_native::<tags::Variant<V>>(item.clone())?.encode_bytes(&mut encoded)?;
+        if allow_variant_packing {
+            let mut encoded = Vec::new();
+            for item in field.into_iter() {
+                Variant::from_native::<tags::Variant<V>>(item.clone())?
+                    .encode_bytes(&mut encoded)?;
+            }
+            let len = encoded.len();
+            if len == 0 {
+                return Ok(());
+            }
+            let len_i32 = len
+                .try_into()
+                .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
+            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+            Variant::from_i32(len_i32)?.encode_bytes(out)?;
+            out.write_all(&encoded)?;
+        } else {
+            for item in field.into_iter() {
+                write_field_number_and_wire_type(out, number, WireType::Variant)?;
+                let variant = Variant::from_native::<tags::Variant<V>>(item.clone())?;
+                variant.encode_bytes(out)?;
+            }
         }
-        let len = encoded.len();
-        if len == 0 {
-            return Ok(());
-        }
-        let len_i32 = len
-            .try_into()
-            .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
-        write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
-        Variant::from_i32(len_i32)?.encode_bytes(out)?;
-        out.write_all(&encoded)?;
         Ok(())
     }
 }
@@ -95,7 +110,12 @@ where
     L: tags::FieldLabelTag,
     tags::Bits32<V>: Bits32TypeTag,
 {
-    pub fn ser_field<FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<FieldType, W>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+        _: bool,
+    ) -> Result<()>
     where
         FieldType: IntoIterator<Item = <tags::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
@@ -114,7 +134,12 @@ where
     L: tags::FieldLabelTag,
     tags::Bits64<V>: Bits64TypeTag,
 {
-    pub fn ser_field<FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<FieldType, W>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+        _: bool,
+    ) -> Result<()>
     where
         FieldType: IntoIterator<Item = <tags::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
@@ -132,7 +157,12 @@ impl<L> SerFieldToIoWrite<L, tags::Bytes>
 where
     L: tags::FieldLabelTag,
 {
-    pub fn ser_field<'a, FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<'a, FieldType, W>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+        _: bool,
+    ) -> Result<()>
     where
         FieldType: 'a + IntoIterator<Item = &'a [u8]>,
         W: Write,
@@ -154,7 +184,12 @@ impl<L> SerFieldToIoWrite<L, tags::String>
 where
     L: tags::FieldLabelTag,
 {
-    pub fn ser_field<'a, FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<'a, FieldType, W>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+        _: bool,
+    ) -> Result<()>
     where
         FieldType: 'a + IntoIterator<Item = &'a str>,
         W: Write,
@@ -177,7 +212,12 @@ where
     L: tags::FieldLabelTag,
     M: SerMessageToIoWrite,
 {
-    pub fn ser_field<'a, FieldType, W>(field: FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<'a, FieldType, W>(
+        field: FieldType,
+        number: i32,
+        out: &mut W,
+        _: bool,
+    ) -> Result<()>
     where
         FieldType: IntoIterator<Item = M>,
         W: Write,

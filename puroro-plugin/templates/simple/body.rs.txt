@@ -328,7 +328,8 @@ where
             <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident_unesc }}_opt(self),
             {%- endif %}
             {{ f.number }},
-            out
+            out,
+            {{ f.allow_variant_packing }},
         )?;
         {%- endfor %} {#- for f in m.fields #}
         ::std::result::Result::Ok(())

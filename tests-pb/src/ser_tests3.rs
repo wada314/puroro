@@ -412,6 +412,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -420,6 +421,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
                 2,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -428,6 +430,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::float_unlabeled_opt(self),
                 3,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -436,6 +439,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
                 4,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -444,6 +448,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
                 5,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -452,6 +457,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
                 6,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -462,6 +468,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
                 7,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -472,6 +479,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
                 8,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -480,6 +488,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::enum_unlabeled_opt(self),
                 9,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -488,6 +497,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
                 10,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -496,6 +506,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
                 536870911,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -659,6 +670,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -781,6 +793,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
                 2,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -901,6 +914,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::float_unlabeled_opt(self),
                 3,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1024,6 +1038,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
                 4,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1142,6 +1157,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
                 5,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1265,6 +1281,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
                 6,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1393,6 +1410,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
                 7,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1524,6 +1542,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
                 8,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1652,6 +1671,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_unlabeled_opt(self),
                 9,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1784,6 +1804,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
                 10,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1906,6 +1927,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
                 536870911,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -2398,6 +2420,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2406,6 +2429,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
                 2,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -2414,6 +2438,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::float_unlabeled_opt(self),
                 3,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2422,6 +2447,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
                 4,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -2430,6 +2456,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
                 5,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2438,6 +2465,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
                 6,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -2448,6 +2476,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
                 7,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2458,6 +2487,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
                 8,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -2466,6 +2496,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_unlabeled_opt(self),
                 9,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2474,6 +2505,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
                 10,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -2482,6 +2514,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
                 536870911,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3444,6 +3477,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -3530,6 +3564,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -3666,6 +3701,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::std::result::Result::Ok(())
                 }

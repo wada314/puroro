@@ -102,6 +102,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -227,6 +228,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -367,6 +369,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -469,7 +472,12 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser_field(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
+            >::ser_field(
+                <Self as super::_puroro_traits::Test4Trait>::d(self),
+                4,
+                out,
+                true,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -551,6 +559,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -684,6 +693,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -752,6 +762,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -888,6 +899,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -965,6 +977,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1125,6 +1138,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1206,7 +1220,12 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser_field(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
+            >::ser_field(
+                <Self as super::_puroro_traits::Test4Trait>::d(self),
+                4,
+                out,
+                true,
+            )?;
             ::std::result::Result::Ok(())
         }
     }
@@ -1330,7 +1349,12 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser_field(<Self as super::_puroro_traits::Test4Trait>::d(self), 4, out)?;
+            >::ser_field(
+                <Self as super::_puroro_traits::Test4Trait>::d(self),
+                4,
+                out,
+                true,
+            )?;
             ::std::result::Result::Ok(())
         }
     }

@@ -186,6 +186,7 @@ struct Field {
     default_value: String,
     has_optional_bit: bool,
     bitfield_index: i32,
+    allow_variant_packing: bool,
     trait_scalar_getter_type: String,
     trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
@@ -253,6 +254,7 @@ impl Field {
                     -1
                 }
             },
+            allow_variant_packing: f.allow_variant_packing()?,
             trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
             trait_field_message_trait_path: maybe_message
                 .as_ref()

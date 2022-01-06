@@ -133,6 +133,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::BookTrait>::title_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -141,6 +142,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::BookTrait>::num_pages_opt(self),
                 2,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -228,6 +230,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::BookTrait>::title_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -293,6 +296,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::BookTrait>::num_pages_opt(self),
                 2,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -463,6 +467,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::BookTrait>::title_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -471,6 +476,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::BookTrait>::num_pages_opt(self),
                 2,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
