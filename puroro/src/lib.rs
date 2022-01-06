@@ -92,75 +92,24 @@ impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
 
 /////////////////////////////////////
 
-#[derive(Clone)]
-struct FakeNum;
-impl From<FakeNum> for i32 {
-    fn from(_: FakeNum) -> i32 {
+struct SF<N, T>(T, std::marker::PhantomData<N>);
+trait Foo3 {
+    fn foo3(&self) -> i32;
+}
+impl<_1, _2, _3, T> Foo3 for SF<(_1, (_2, (i32, _3))), T> {
+    fn foo3(&self) -> i32 {
+        3
+    }
+}
+impl<_1, _2, _3, T> Foo3 for SF<(_1, (_2, ((), _3))), T> {
+    fn foo3(&self) -> i32 {
         0
     }
 }
-struct FakeStr;
-impl AsRef<str> for FakeStr {
-    fn as_ref(&self) -> &str {
-        ""
-    }
-}
-
-#[derive(Clone)]
-struct FakeMsg;
-impl MsgTrait for FakeMsg {
-    type Msg3Type<'a>
-    where
-        Self: 'a,
-    = FakeMsg;
-}
-impl<'a> MsgTrait for &'a FakeMsg {
-    type Msg3Type<'b>
-    where
-        Self: 'b,
-    = FakeMsg;
-}
-
-trait MsgTrait {
-    fn int_opt(&self) -> Option<i32> {
-        None
-    }
-    fn str_opt(&self) -> Option<&str> {
-        None
-    }
-    type Msg3Type<'a>: MsgTrait
-    where
-        Self: 'a;
-    fn msg_opt(&self) -> Option<Self::Msg3Type<'_>> {
-        None
-    }
-}
-
-struct Msg<F1, F2, F3, const N: usize>(F1, F2, F3);
-impl<F1, F2, F3, const N: usize> MsgTrait for Msg<F1, F2, F3, N>
-where
-    F1: Clone + Into<i32>,
-    F2: AsRef<str>,
-    for<'a> &'a F3: MsgTrait,
-{
-    fn int_opt(&self) -> Option<i32> {
-        if N == 1 {
-            Some(self.0.clone().into())
-        } else {
-            None
-        }
-    }
-
-    fn str_opt(&self) -> Option<&str> {
-        if N == 2 { Some(self.1.as_ref()) } else { None }
-    }
-
-    type Msg3Type<'a>
-    where
-        Self: 'a,
-    = &'a F3;
-
-    fn msg_opt(&self) -> Option<Self::Msg3Type<'_>> {
-        if N == 3 { Some(&self.2) } else { None }
-    }
+#[test]
+fn hoge() {
+    let sf1 = SF::<((((), ()), ((), ())), (((), ()), (i32, ()))), _>(5, std::marker::PhantomData);
+    let sf2 = SF::<((((), ()), (i32, ())), (((), ()), ((), ()))), _>(5, std::marker::PhantomData);
+    assert_eq!(3, sf1.foo3());
+    assert_eq!(0, sf2.foo3());
 }
