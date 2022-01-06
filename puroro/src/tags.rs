@@ -93,7 +93,6 @@ pub type OneofField = (False, False, False, True, False);
 /// Reserved for future use...
 pub type MapEntry = (False, False, False, False, True);
 
-pub type LabelOptReqUnl<_1, _2> = (False, _1, _2, False, False);
 pub type LabelNonRepeated<_1, _2, _3> = (False, _1, _2, _3, False);
 
 impl FieldTypeTag for Int32 {}

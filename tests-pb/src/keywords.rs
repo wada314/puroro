@@ -100,6 +100,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::type_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -186,6 +187,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::type_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -319,6 +321,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::type_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }

@@ -20,7 +20,7 @@ mod merged;
 mod official_samples;
 mod oneof;
 mod proto2_defaults;
-mod proto2_packed;
+mod variants_packed;
 mod proto3_defaults;
 mod self_recursive;
 mod simple_get_set;

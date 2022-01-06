@@ -115,6 +115,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -210,6 +211,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -372,6 +374,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
                 1,
                 out,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }

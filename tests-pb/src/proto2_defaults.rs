@@ -2325,6 +2325,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_default_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2333,6 +2334,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2341,6 +2343,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_42_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2349,6 +2352,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_m42_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2357,6 +2361,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_2147483647_opt(self),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2365,6 +2370,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_m2147483648_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2373,6 +2379,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0123_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2381,6 +2388,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0x123_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2389,6 +2397,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u32_default_opt(self),
                 11,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2397,6 +2406,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0_opt(self),
                 12,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2405,6 +2415,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u32_42_opt(self),
                 13,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2413,6 +2424,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u32_4294967295_opt(self),
                 15,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2421,6 +2433,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0123_opt(self),
                 17,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2429,6 +2442,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0x123_opt(self),
                 18,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2437,6 +2451,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_default_opt(self),
                 21,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2445,6 +2460,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0_opt(self),
                 22,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2453,6 +2469,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_42_opt(self),
                 23,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2461,6 +2478,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_m42_opt(self),
                 24,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2469,6 +2487,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807_opt(self),
                 25,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2477,6 +2496,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808_opt(self),
                 26,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2485,6 +2505,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0123_opt(self),
                 27,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2493,6 +2514,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0x123_opt(self),
                 28,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2501,6 +2523,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u64_default_opt(self),
                 31,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2509,6 +2532,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0_opt(self),
                 32,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2517,6 +2541,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u64_42_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2525,6 +2550,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615_opt(self),
                 35,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2533,6 +2559,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0123_opt(self),
                 37,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2541,6 +2568,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0x123_opt(self),
                 38,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2549,6 +2577,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_default_opt(self),
                 41,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2557,6 +2586,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0_opt(self),
                 42,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2565,6 +2595,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_m0_opt(self),
                 43,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2573,6 +2604,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p_opt(self),
                 44,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2581,6 +2613,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_p0_opt(self),
                 45,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2589,6 +2622,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p0_opt(self),
                 46,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2597,6 +2631,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_42_opt(self),
                 47,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2605,6 +2640,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_m42_opt(self),
                 48,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2613,6 +2649,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p25_opt(self),
                 49,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2621,6 +2658,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_1p5e2_opt(self),
                 50,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2629,6 +2667,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_inf_opt(self),
                 51,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2637,6 +2676,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_minf_opt(self),
                 52,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2645,6 +2685,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_nan_opt(self),
                 53,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2653,6 +2694,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::f32_mnan_opt(self),
                 54,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2661,6 +2703,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bool_default_opt(self),
                 61,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2669,6 +2712,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bool_true_opt(self),
                 62,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2677,6 +2721,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bool_false_opt(self),
                 63,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2685,6 +2730,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_default_opt(self),
                 71,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2693,6 +2739,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_empty_opt(self),
                 72,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2701,6 +2748,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_abc_opt(self),
                 73,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2709,6 +2757,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_aiu_opt(self),
                 74,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2717,6 +2766,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_backslash_opt(self),
                 75,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2725,6 +2775,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_tab_opt(self),
                 76,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2733,6 +2784,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::string_crlf_opt(self),
                 77,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2741,6 +2793,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_default_opt(self),
                 81,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2749,6 +2802,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_empty_opt(self),
                 82,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2757,6 +2811,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_abc_opt(self),
                 83,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2765,6 +2820,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_aiu_opt(self),
                 84,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2773,6 +2829,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_backslash_opt(self),
                 85,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2781,6 +2838,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_tab_opt(self),
                 86,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2789,6 +2847,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_crlf_opt(self),
                 87,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2797,6 +2856,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::enum_default_opt(self),
                 91,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2805,6 +2865,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::enum_one_opt(self),
                 92,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2813,6 +2874,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::enum_fourty_two_opt(self),
                 93,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3138,6 +3200,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_default_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3203,6 +3266,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3268,6 +3332,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_42_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3333,6 +3398,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_m42_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3398,6 +3464,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_2147483647_opt(self),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3465,6 +3532,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_m2147483648_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3532,6 +3600,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0123_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3597,6 +3666,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0x123_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3662,6 +3732,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_default_opt(self),
                 11,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3727,6 +3798,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0_opt(self),
                 12,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3792,6 +3864,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_42_opt(self),
                 13,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3857,6 +3930,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_4294967295_opt(self),
                 15,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3924,6 +3998,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0123_opt(self),
                 17,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -3989,6 +4064,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0x123_opt(self),
                 18,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4054,6 +4130,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_default_opt(self),
                 21,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4119,6 +4196,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0_opt(self),
                 22,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4184,6 +4262,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_42_opt(self),
                 23,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4249,6 +4328,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_m42_opt(self),
                 24,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4314,6 +4394,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807_opt(self),
                 25,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4381,6 +4462,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808_opt(self),
                 26,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4450,6 +4532,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0123_opt(self),
                 27,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4515,6 +4598,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0x123_opt(self),
                 28,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4580,6 +4664,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_default_opt(self),
                 31,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4645,6 +4730,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0_opt(self),
                 32,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4710,6 +4796,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_42_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4775,6 +4862,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615_opt(self),
                 35,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4844,6 +4932,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0123_opt(self),
                 37,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4909,6 +4998,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0x123_opt(self),
                 38,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4974,6 +5064,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_default_opt(self),
                 41,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5039,6 +5130,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0_opt(self),
                 42,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5104,6 +5196,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_m0_opt(self),
                 43,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5169,6 +5262,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p_opt(self),
                 44,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5234,6 +5328,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_p0_opt(self),
                 45,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5299,6 +5394,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p0_opt(self),
                 46,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5364,6 +5460,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_42_opt(self),
                 47,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5429,6 +5526,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_m42_opt(self),
                 48,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5494,6 +5592,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p25_opt(self),
                 49,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5559,6 +5658,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_1p5e2_opt(self),
                 50,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5624,6 +5724,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_inf_opt(self),
                 51,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5689,6 +5790,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_minf_opt(self),
                 52,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5754,6 +5856,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_nan_opt(self),
                 53,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5819,6 +5922,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_mnan_opt(self),
                 54,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5884,6 +5988,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bool_default_opt(self),
                 61,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -5951,6 +6056,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bool_true_opt(self),
                 62,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6016,6 +6122,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bool_false_opt(self),
                 63,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6079,6 +6186,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_default_opt(self),
                 71,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6144,6 +6252,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_empty_opt(self),
                 72,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6209,6 +6318,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_abc_opt(self),
                 73,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6272,6 +6382,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_aiu_opt(self),
                 74,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6335,6 +6446,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_backslash_opt(self),
                 75,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6400,6 +6512,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_tab_opt(self),
                 76,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6463,6 +6576,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_crlf_opt(self),
                 77,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6526,6 +6640,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_default_opt(self),
                 81,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6591,6 +6706,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_empty_opt(self),
                 82,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6654,6 +6770,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_abc_opt(self),
                 83,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6717,6 +6834,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_aiu_opt(self),
                 84,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6780,6 +6898,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_backslash_opt(self),
                 85,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6845,6 +6964,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_tab_opt(self),
                 86,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6908,6 +7028,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_crlf_opt(self),
                 87,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6979,6 +7100,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_default_opt(self),
                 91,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7054,6 +7176,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_one_opt(self),
                 92,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7127,6 +7250,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_fourty_two_opt(self),
                 93,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -9643,6 +9767,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_default_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9651,6 +9776,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9659,6 +9785,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_42_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9667,6 +9794,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_m42_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9675,6 +9803,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_2147483647_opt(self),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9683,6 +9812,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_m2147483648_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9691,6 +9821,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0123_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9699,6 +9830,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i32_0x123_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9707,6 +9839,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_default_opt(self),
                 11,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9715,6 +9848,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0_opt(self),
                 12,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9723,6 +9857,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_42_opt(self),
                 13,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9731,6 +9866,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_4294967295_opt(self),
                 15,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9739,6 +9875,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0123_opt(self),
                 17,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9747,6 +9884,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u32_0x123_opt(self),
                 18,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9755,6 +9893,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_default_opt(self),
                 21,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9763,6 +9902,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0_opt(self),
                 22,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9771,6 +9911,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_42_opt(self),
                 23,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9779,6 +9920,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_m42_opt(self),
                 24,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9787,6 +9929,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_9223372036854775807_opt(self),
                 25,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9795,6 +9938,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_m9223372036854775808_opt(self),
                 26,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9803,6 +9947,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0123_opt(self),
                 27,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9811,6 +9956,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::i64_0x123_opt(self),
                 28,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9819,6 +9965,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_default_opt(self),
                 31,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9827,6 +9974,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0_opt(self),
                 32,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9835,6 +9983,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_42_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9843,6 +9992,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_18446744073709551615_opt(self),
                 35,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9851,6 +10001,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0123_opt(self),
                 37,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9859,6 +10010,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::u64_0x123_opt(self),
                 38,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9867,6 +10019,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_default_opt(self),
                 41,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9875,6 +10028,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0_opt(self),
                 42,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9883,6 +10037,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_m0_opt(self),
                 43,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9891,6 +10046,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p_opt(self),
                 44,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9899,6 +10055,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_p0_opt(self),
                 45,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9907,6 +10064,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p0_opt(self),
                 46,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9915,6 +10073,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_42_opt(self),
                 47,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9923,6 +10082,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_m42_opt(self),
                 48,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9931,6 +10091,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_0p25_opt(self),
                 49,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9939,6 +10100,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_1p5e2_opt(self),
                 50,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9947,6 +10109,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_inf_opt(self),
                 51,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9955,6 +10118,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_minf_opt(self),
                 52,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9963,6 +10127,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_nan_opt(self),
                 53,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9971,6 +10136,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::f32_mnan_opt(self),
                 54,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9979,6 +10145,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bool_default_opt(self),
                 61,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9987,6 +10154,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bool_true_opt(self),
                 62,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9995,6 +10163,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bool_false_opt(self),
                 63,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10003,6 +10172,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_default_opt(self),
                 71,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10011,6 +10181,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_empty_opt(self),
                 72,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10019,6 +10190,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_abc_opt(self),
                 73,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10027,6 +10199,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_aiu_opt(self),
                 74,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10035,6 +10208,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_backslash_opt(self),
                 75,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10043,6 +10217,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_tab_opt(self),
                 76,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10051,6 +10226,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::string_crlf_opt(self),
                 77,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10059,6 +10235,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_default_opt(self),
                 81,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10067,6 +10244,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_empty_opt(self),
                 82,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10075,6 +10253,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_abc_opt(self),
                 83,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10083,6 +10262,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_aiu_opt(self),
                 84,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10091,6 +10271,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_backslash_opt(self),
                 85,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10099,6 +10280,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_tab_opt(self),
                 86,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10107,6 +10289,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::bytes_crlf_opt(self),
                 87,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10115,6 +10298,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_default_opt(self),
                 91,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10123,6 +10307,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_one_opt(self),
                 92,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -10131,6 +10316,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::enum_fourty_two_opt(self),
                 93,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }

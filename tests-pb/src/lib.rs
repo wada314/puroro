@@ -11,6 +11,7 @@ pub mod oneofs3;
 pub mod proto2_defaults;
 pub mod proto2_packed;
 pub mod proto3_defaults;
+pub mod proto3_packed;
 pub mod self_recursive;
 pub mod ser_tests2;
 pub mod ser_tests3;

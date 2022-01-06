@@ -1,5 +1,5 @@
 // A generated source code by puroro library
-// package proto2_packed
+// package proto3_packed
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -140,7 +140,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MsgTrait>::not_annotated(self),
                 3,
                 out,
-                false,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -474,7 +474,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::not_annotated(self),
                 3,
                 out,
-                false,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -681,7 +681,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::MsgTrait>::not_annotated(self),
                 3,
                 out,
-                false,
+                true,
             )?;
             ::std::result::Result::Ok(())
         }
