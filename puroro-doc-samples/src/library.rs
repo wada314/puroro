@@ -604,6 +604,7 @@ pub mod _puroro_traits {
         fn title_opt<'this>(&'this self) -> Option<&'this str> {
             <U as BookTrait>::title_opt(&self.1).or_else(|| <T as BookTrait>::title_opt(&self.0))
         }
+
         fn num_pages_opt<'this>(&'this self) -> Option<u32> {
             <U as BookTrait>::num_pages_opt(&self.1)
                 .or_else(|| <T as BookTrait>::num_pages_opt(&self.0))

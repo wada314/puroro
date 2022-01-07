@@ -1848,6 +1848,7 @@ pub mod _puroro_traits {
             <U as MsgTrait>::i32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_unlabeled_opt(&self.0))
         }
+
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::i32_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
@@ -1866,10 +1867,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::i32_repeated(&self.1),
             )
         }
+
         fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::f32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::f32_unlabeled_opt(&self.0))
         }
+
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
@@ -1881,6 +1884,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
         );
+
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {

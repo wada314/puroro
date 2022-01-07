@@ -3043,6 +3043,7 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::i32_repeated(&self.1),
             )
         }
+
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::float_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::float_optional_opt(&self.0))
@@ -3061,6 +3062,7 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::float_repeated(&self.1),
             )
         }
+
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <U as MsgTrait>::string_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_optional_opt(&self.0))
@@ -3086,6 +3088,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::SubmsgOptionalMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::SubmsgOptionalMessageType<'this>>,
         );
+
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> Option<Self::SubmsgOptionalMessageType<'this>> {
@@ -3120,6 +3123,7 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::submsg_repeated(&self.1),
             )
         }
+
         fn enum_optional_opt<'this>(&'this self) -> Option<self::_puroro_root::ser_tests2::Enum> {
             <U as MsgTrait>::enum_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::enum_optional_opt(&self.0))
@@ -3138,6 +3142,7 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::enum_repeated(&self.1),
             )
         }
+
         fn very_large_field_number_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::very_large_field_number_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::very_large_field_number_opt(&self.0))

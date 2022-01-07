@@ -1648,6 +1648,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as Test3Trait>::CMessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::CMessageType<'this>>,
         );
+
         fn c_opt<'this>(&'this self) -> Option<Self::CMessageType<'this>> {
             match (
                 <T as Test3Trait>::c_opt(&self.0),

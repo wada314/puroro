@@ -191,6 +191,7 @@ struct Field {
     trait_scalar_getter_type: String,
     trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
+    oneof_enum_ident: String,
     oneof_enum_value_ident: String,
     oneof_field_ident: String,
     simple_field_type: String,
@@ -272,6 +273,10 @@ impl Field {
                     camel_ident = f.ident_camel_unesc(),
                 ))
             })?,
+            oneof_enum_ident: f
+                .oneof()?
+                .map(|o| o.rust_enum_ident().to_string())
+                .unwrap_or_default(),
             oneof_enum_value_ident: f.ident_camel().to_string(),
             oneof_field_ident: f
                 .oneof()?
