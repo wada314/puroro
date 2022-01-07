@@ -665,17 +665,6 @@ pub mod _puroro_impls {
                 ::std::clone::Clone::clone(&self.g1_int32),
             )))
         }
-        fn group_two(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
-        {
-            ::std::option::Option::None
-        }
-        fn group_three(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            ::std::option::Option::None
-        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
@@ -747,17 +736,6 @@ pub mod _puroro_impls {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             ::std::option::Option::Some(E::G1String(self.g1_string.as_ref()))
         }
-        fn group_two(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
-        {
-            ::std::option::Option::None
-        }
-        fn group_three(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            ::std::option::Option::None
-        }
     }
 
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField2<ScalarType>
@@ -823,11 +801,6 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
-            ::std::option::Option::None
-        }
         fn group_two(
             &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
@@ -836,11 +809,6 @@ pub mod _puroro_impls {
             ::std::option::Option::Some(E::G2F32(::std::convert::Into::into(
                 ::std::clone::Clone::clone(&self.g2_f32),
             )))
-        }
-        fn group_three(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            ::std::option::Option::None
         }
     }
 
@@ -907,22 +875,12 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
-            ::std::option::Option::None
-        }
         fn group_two(
             &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             ::std::option::Option::Some(E::G2String(self.g2_string.as_ref()))
-        }
-        fn group_three(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            ::std::option::Option::None
         }
     }
 
@@ -989,22 +947,12 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = &'this ScalarType;
-        fn group_one(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
-            ::std::option::Option::None
-        }
         fn group_two(
             &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             ::std::option::Option::Some(E::G2Submsg(&self.g2_submsg))
-        }
-        fn group_three(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            ::std::option::Option::None
         }
     }
 
@@ -1075,17 +1023,6 @@ pub mod _puroro_impls {
         where
             Self: 'this,
         = ();
-        fn group_one(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne> {
-            ::std::option::Option::None
-        }
-        fn group_two(
-            &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<Self>>
-        {
-            ::std::option::Option::None
-        }
         fn group_three(
             &self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {

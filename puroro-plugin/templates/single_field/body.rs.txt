@@ -42,13 +42,13 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
+    {%- if target_f.oneof_index == oneof.index %}
     fn {{ oneof.field_ident }}(&self) ->
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
                 {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
         >
     {
-        {%- if target_f.oneof_index == oneof.index %}
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
         ::std::option::Option::Some(
             E::{{ target_f.oneof_enum_value_ident }}(
@@ -65,10 +65,8 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
                 {%- endif %} {#- if target_f.is_numerical #}
             )
         )
-        {%- else %}
-        ::std::option::Option::None
-        {%- endif %}
     }
+    {%- endif %} {#- if target_f.oneof_index == oneof.index #}
     {%- endfor %}
 }
 
