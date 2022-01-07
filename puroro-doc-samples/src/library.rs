@@ -532,6 +532,7 @@ pub mod _puroro_traits {
         fn has_title<'this>(&'this self) -> bool {
             self.title_opt().is_some()
         }
+
         fn title_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -542,6 +543,7 @@ pub mod _puroro_traits {
         fn has_num_pages<'this>(&'this self) -> bool {
             self.num_pages_opt().is_some()
         }
+
         fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
