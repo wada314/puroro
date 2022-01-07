@@ -532,6 +532,7 @@ pub mod _puroro_traits {
         fn has_title<'this>(&'this self) -> bool {
             self.title_opt().is_some()
         }
+
         fn title_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -542,6 +543,7 @@ pub mod _puroro_traits {
         fn has_num_pages<'this>(&'this self) -> bool {
             self.num_pages_opt().is_some()
         }
+
         fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -552,6 +554,7 @@ pub mod _puroro_traits {
             fn title_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).title_opt()
             }
+
             fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).num_pages_opt()
             }
@@ -601,6 +604,7 @@ pub mod _puroro_traits {
         fn title_opt<'this>(&'this self) -> Option<&'this str> {
             <U as BookTrait>::title_opt(&self.1).or_else(|| <T as BookTrait>::title_opt(&self.0))
         }
+
         fn num_pages_opt<'this>(&'this self) -> Option<u32> {
             <U as BookTrait>::num_pages_opt(&self.1)
                 .or_else(|| <T as BookTrait>::num_pages_opt(&self.0))

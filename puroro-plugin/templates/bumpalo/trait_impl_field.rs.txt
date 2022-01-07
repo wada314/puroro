@@ -43,10 +43,8 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedT
 {#- [optional] int32 => Option<i32> #}
 {#- [optional] String => Option<&'this str> #}
 {#- [optional] MyMessage => Option<&'this MyMessageBumpalo<'this>> #}
-{%- if !f.is_explicit_oneof_field %}
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     <Self>::{{ f.ident_unesc }}_opt(self)
 }
-{%- endif %} {#- if !f.is_explicit_oneof_field #}
 
 {%- endif %} {#- if f.is_repeated #}

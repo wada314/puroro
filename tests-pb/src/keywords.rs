@@ -367,6 +367,7 @@ pub mod _puroro_traits {
         fn has_type<'this>(&'this self) -> bool {
             self.type_opt().is_some()
         }
+
         fn type_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }

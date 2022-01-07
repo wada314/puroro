@@ -172,6 +172,7 @@ impl EnumValue {
 struct Field {
     ident: String,
     ident_unesc: String,
+    ident_camel: String,
     ident_camel_unesc: String,
     number: i32,
     oneof_index: i32,
@@ -190,7 +191,9 @@ struct Field {
     trait_scalar_getter_type: String,
     trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
+    oneof_enum_ident: String,
     oneof_enum_value_ident: String,
+    oneof_field_ident: String,
     simple_field_type: String,
     simple_getter_type: String,
     simple_getter_opt_type: String,
@@ -198,6 +201,7 @@ struct Field {
     simple_scalar_field_type: String,
     simple_field_message_path: String,
     simple_label_and_type_tags: String,
+    simple_oneof_enum_ident: String,
     single_field_type: String,
     single_numerical_rust_type: String,
     bumpalo_field_type: String,
@@ -207,6 +211,7 @@ struct Field {
     bumpalo_getter_mut_type: String,
     bumpalo_field_message_path: String,
     bumpalo_label_and_type_tags: String,
+    bumpalo_oneof_enum_ident: String,
 }
 
 impl Field {
@@ -228,6 +233,7 @@ impl Field {
         Ok(Field {
             ident: f.ident_lower_snake().to_string(),
             ident_unesc: f.lower_snake_ident_unesc().to_string(),
+            ident_camel: f.ident_camel().to_string(),
             ident_camel_unesc: f.ident_camel_unesc().to_string(),
             number: f.number(),
             oneof_index: f.oneof_index().unwrap_or(-1),
@@ -267,7 +273,15 @@ impl Field {
                     camel_ident = f.ident_camel_unesc(),
                 ))
             })?,
+            oneof_enum_ident: f
+                .oneof()?
+                .map(|o| o.rust_enum_ident().to_string())
+                .unwrap_or_default(),
             oneof_enum_value_ident: f.ident_camel().to_string(),
+            oneof_field_ident: f
+                .oneof()?
+                .map(|o| o.rust_getter_ident().to_string())
+                .unwrap_or_default(),
             simple_field_type: f.simple_field_type()?.into(),
             simple_getter_type: if f.is_repeated()? {
                 f.simple_getter_repeated_type("'_")?.into()
@@ -298,6 +312,10 @@ impl Field {
                     },
                 )
             })?,
+            simple_oneof_enum_ident: f
+                .oneof()?
+                .map(|o| format!("{}Simple", o.rust_enum_ident()))
+                .unwrap_or_default(),
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
             bumpalo_field_type: f.bumpalo_field_type()?.into(),
@@ -337,6 +355,10 @@ impl Field {
                     },
                 )
             })?,
+            bumpalo_oneof_enum_ident: f
+                .oneof()?
+                .map(|o| format!("{}Bumpalo", o.rust_enum_ident()))
+                .unwrap_or_default(),
         })
     }
 
@@ -432,8 +454,8 @@ impl Oneof {
         Ok(Oneof {
             index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
-            simple_enum_ident: format!("{}Simple", o.rust_enum_ident().to_string()),
-            bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident().to_string()),
+            simple_enum_ident: format!("{}Simple", o.rust_enum_ident()),
+            bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
             enum_maybe_gp_self: if has_message_field { "<Self>" } else { "" }.to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
