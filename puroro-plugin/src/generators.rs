@@ -175,7 +175,6 @@ struct Field {
     ident_camel: String,
     ident_camel_unesc: String,
     number: i32,
-    oneof_index: i32,
     is_message: bool,
     is_string: bool,
     is_bytes: bool,
@@ -192,7 +191,6 @@ struct Field {
     trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
     oneof_enum_ident: String,
-    oneof_enum_value_ident: String,
     oneof_field_ident: String,
     simple_field_type: String,
     simple_getter_type: String,
@@ -236,7 +234,6 @@ impl Field {
             ident_camel: f.ident_camel().to_string(),
             ident_camel_unesc: f.ident_camel_unesc().to_string(),
             number: f.number(),
-            oneof_index: f.oneof_index().unwrap_or(-1),
             is_message,
             is_string,
             is_bytes,
@@ -277,7 +274,6 @@ impl Field {
                 .oneof()?
                 .map(|o| o.rust_enum_ident().to_string())
                 .unwrap_or_default(),
-            oneof_enum_value_ident: f.ident_camel().to_string(),
             oneof_field_ident: f
                 .oneof()?
                 .map(|o| o.rust_getter_ident().to_string())
@@ -425,7 +421,6 @@ impl Field {
 #[derive(Template)]
 #[template(path = "oneof.rs.txt")]
 struct Oneof {
-    index: i32,
     enum_ident: String,
     simple_enum_ident: String,
     bumpalo_enum_ident: String,
@@ -452,7 +447,6 @@ impl Oneof {
             .into_iter()
             .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_))));
         Ok(Oneof {
-            index: o.index(),
             enum_ident: o.rust_enum_ident().to_string(),
             simple_enum_ident: format!("{}Simple", o.rust_enum_ident()),
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
@@ -476,16 +470,10 @@ struct OneofField {
     getter_ident_unesc: String,
     number: i32,
     is_message: bool,
-    is_string: bool,
-    is_bytes: bool,
-    is_length_delimited: bool,
-    is_numerical: bool,
     field_type: String,
     simple_field_type: String,
-    simple_getter_opt_type: String,
     simple_getter_mut_type: String,
     bumpalo_field_type: String,
-    trait_getter_type: String,
     simple_field_type_tag: String,
     bumpalo_field_type_tag: String,
 }
@@ -493,28 +481,16 @@ struct OneofField {
 impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
-        let is_string = matches!(f.field_type()?, wrappers::FieldType::String);
-        let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
-        let is_length_delimited = is_message || is_string || is_bytes;
         Ok(Self {
             ident: f.ident_camel().to_string(),
             getter_ident: f.ident_lower_snake().to_string(),
             getter_ident_unesc: f.lower_snake_ident_unesc().to_string(),
             number: f.number(),
             is_message,
-            is_string,
-            is_bytes,
-            is_length_delimited,
-            is_numerical: !is_length_delimited,
             field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
             simple_field_type: f.simple_field_type()?.into(),
-            simple_getter_opt_type: format!(
-                "::std::option::Option<{}>",
-                f.simple_getter_scalar_type("'_")?
-            ),
             simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
-            trait_getter_type: f.trait_oneof_field_type("'this", "Self")?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(format!(
                     "::std::boxed::Box<{}>",
