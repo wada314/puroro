@@ -65,7 +65,6 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
 
     {#- ######## getters ######## #}
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
     {%- if f.is_repeated %}
     
     {#- ######## repeated getter ######## #}
@@ -89,6 +88,24 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {#- [optional] String => Option<&'this str> #}
     {#- [optional] MyMessage => Option<&'this MyMessageBumpalo<'this>> #}
     pub fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> {{ f.bumpalo_getter_opt_type }} {
+        {%- if f.is_explicit_oneof_field %}
+        {#- oneof fields. extract the value from oneof field. #}
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ f.bumpalo_oneof_enum_ident }} as E;
+        if let E::{{ f.ident_camel }}(val) = &self.{{ f.oneof_field_ident }} {
+            ::std::option::Option::Some(
+                {%- if f.is_length_delimited %}
+                val
+                {%- else %} {#- if f.is_length_delimited #}
+                val.clone().inner()
+                {%- endif %} {#- if f.is_length_delimited #}
+            )
+        } else {
+            ::std::option::Option::None
+        }
+
+        {%- else %} {#- if f.is_explicit_oneof_field #}
+
+        {#- normal (non-oneof) fields. #}
         {%- if f.is_message %}
         {#- Non-repeated message f. Field type is always `Option<NoAllocBox<T>>`.#}
         {#- Need to cast the lifetime. #}
@@ -123,6 +140,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         }
         {%- endif %} {#- if f.has_optional_bit #}
         {%- endif %} {#- if f.is_message #}
+        {%- endif %} {#- if f.is_explicit_oneof_field #}
     }
 
     {#- [optional] int32 => i32 #}
@@ -151,8 +169,19 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     }
 
     {%- endif %} {#- if f.is_repeated #}
-    {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
+    
+    {%- for oneof in m.oneofs %}
+    pub fn {{ oneof.field_ident }}(&self) ->
+        Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
+                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
+        >
+    {
+        {#- Reuse the trait's default impl. #}
+        <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ oneof.field_ident }}(self)
+    }
+    {%- endfor %} {#- for oneof in m.oneofs #}
 
     {#- ######## mut getter ######## #}
 

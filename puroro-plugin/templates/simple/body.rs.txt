@@ -52,11 +52,29 @@ impl {{ m.simple_ident }} {
 
     {%- else %} {#- if f.is_repeated #}
 
-    {%- if !f.is_explicit_oneof_field %}
     {#- [optional] i32 => Option<i32> #}
     {#- [optional] String => Option<&str> #}
     {#- [optional] MyMessage => Option<&MyMessage> #}
     pub fn {{ f.ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
+        {%- if f.is_explicit_oneof_field %}
+        {#- oneof fields. extract the value from oneof field. #}
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ f.simple_oneof_enum_ident }} as E;
+        if let E::{{ f.ident_camel }}(val) = &self.{{ f.oneof_field_ident }} {
+            ::std::option::Option::Some(
+                {%- if f.is_length_delimited %}
+                val
+                {%- else %} {#- if f.is_length_delimited #}
+                val.clone().inner()
+                {%- endif %} {#- if f.is_length_delimited #}
+            )
+        } else {
+            ::std::option::Option::None
+        }
+
+        {%- else %} {#- if f.is_explicit_oneof_field #}
+
+        {#- normal (non-oneof) fields. #}
+
         {%- if f.is_message %}
         {#- Non-repeated message f. Field type is always `Option<Box<T>>`. #}
         self.{{ f.ident }}.as_deref()
@@ -91,8 +109,8 @@ impl {{ m.simple_ident }} {
         }
         {%- endif %} {#- if f.has_optional_bit #}
         {%- endif %} {#- if f.is_message #}
+        {%- endif %} {#- if f.is_explicit_oneof_field #}
     }
-    {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
     pub fn has_{{ f.ident_unesc }}(&self) -> bool {
         Self::{{ f.ident_unesc }}_opt(self).is_some()
@@ -112,43 +130,15 @@ impl {{ m.simple_ident }} {
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
-    
     pub fn {{ oneof.field_ident }}(&self) ->
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
                 {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
         >
     {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        match &self.{{ oneof.field_ident }} {
-            E::_None => ::std::option::Option::None,
-            {%- for f in oneof.fields %}
-            {% if f.is_length_delimited %}
-            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.as_ref())),
-            {%- else %}
-            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.inner().clone())),
-            {%- endif %}
-            {%- endfor %}
-        }
+        {#- Reuse the trait's default impl. #}
+        <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ oneof.field_ident }}(self)
     }
-
-    {%- for f in oneof.fields %}
-    pub fn {{ f.getter_ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
-        if let E::{{ f.ident }}(ref v) = &self.{{ oneof.field_ident }} {
-            ::std::option::Option::Some(
-                {%- if f.is_length_delimited %}
-                v.as_ref()
-                {%- else %} {#- if f.is_length_delimited #}
-                v.inner().clone()
-                {%- endif %} {#- if f.is_length_delimited #}
-            )
-        } else {
-            ::std::option::Option::None
-        }
-    }
-    {%- endfor %} {#- for f in oneof.fields #}
     {%- endfor %} {#- for oneof in m.oneofs #}
 
     {#- Tentative mutable interfaces. #}
