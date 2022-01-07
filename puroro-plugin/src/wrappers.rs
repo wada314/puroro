@@ -459,6 +459,7 @@ impl Enum {
 #[derive(Debug)]
 pub struct Field {
     message: Weak<Message>,
+    lazy_oneof: OnceCell<Option<Rc<Oneof>>>,
     ident_lower_snake: String,
     ident_lower_snake_unesc: String,
     ident_camel: String,
@@ -488,6 +489,7 @@ impl Field {
         let proto_oneof_index = proto.oneof_index_opt();
         Ok(Self {
             message: Clone::clone(&message),
+            lazy_oneof: OnceCell::new(),
             ident_lower_snake: get_keyword_safe_ident(&to_lower_snake_case(&proto_name))
                 .to_string(),
             ident_lower_snake_unesc: to_lower_snake_case(&proto_name).to_string(),
@@ -525,6 +527,13 @@ impl Field {
     }
     pub fn message(&self) -> Result<Rc<Message>> {
         Ok(upgrade(&self.message)?)
+    }
+    pub fn oneof(&self) -> Result<Option<Rc<Oneof>>> {
+        Ok(if let Some(oneof_index) = self.oneof_index() {
+            self.message()?.oneofs().get(oneof_index as usize).cloned()
+        } else {
+            None
+        })
     }
     pub fn field_type(&self) -> Result<FieldType> {
         self.lazy_proto_type

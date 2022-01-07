@@ -428,6 +428,7 @@ pub mod _puroro_traits {
         fn has_recursive_unlabeled<'this>(&'this self) -> bool {
             self.recursive_unlabeled_opt().is_some()
         }
+
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::RecursiveUnlabeledMessageType<'this>> {
@@ -441,6 +442,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::RecursiveUnlabeledMessageType<'this>;
+
             fn recursive_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::RecursiveUnlabeledMessageType<'this>> {
@@ -501,6 +503,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::RecursiveUnlabeledMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::RecursiveUnlabeledMessageType<'this>>,
         );
+
         fn recursive_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<Self::RecursiveUnlabeledMessageType<'this>> {

@@ -42,8 +42,6 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedT
 
 {%- else %} {#- f.is_repeated #}
 
-{%- if !f.is_explicit_oneof_field %}
-
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
     {%- if f.is_message %}
     ::std::option::Option::Some(&self.{{ f.ident }})
@@ -57,7 +55,5 @@ fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.tra
     )
     {%- endif %} {#- if f.is_numerical #}
 }
-
-{%- endif %} {#- !f.is_explicit_oneof_field #}
 
 {%- endif %} {#- f.is_repeated #}

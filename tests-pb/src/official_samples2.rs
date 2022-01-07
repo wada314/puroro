@@ -1401,6 +1401,7 @@ pub mod _puroro_traits {
         fn has_a<'this>(&'this self) -> bool {
             self.a_opt().is_some()
         }
+
         fn a_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -1487,6 +1488,7 @@ pub mod _puroro_traits {
         fn has_b<'this>(&'this self) -> bool {
             self.b_opt().is_some()
         }
+
         fn b_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -1575,6 +1577,7 @@ pub mod _puroro_traits {
         fn has_c<'this>(&'this self) -> bool {
             self.c_opt().is_some()
         }
+
         fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
             ::std::option::Option::None
         }
@@ -1586,6 +1589,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::CMessageType<'this>;
+
             fn c_opt<'this>(&'this self) -> ::std::option::Option<Self::CMessageType<'this>> {
                 (**self).c_opt()
             }
@@ -1644,6 +1648,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as Test3Trait>::CMessageType<'this>>,
             ::std::option::Option<<U as Test3Trait>::CMessageType<'this>>,
         );
+
         fn c_opt<'this>(&'this self) -> Option<Self::CMessageType<'this>> {
             match (
                 <T as Test3Trait>::c_opt(&self.0),

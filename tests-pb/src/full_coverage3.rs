@@ -14855,6 +14855,7 @@ pub mod _puroro_traits {
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
+
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -14865,6 +14866,7 @@ pub mod _puroro_traits {
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
         }
+
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -14881,6 +14883,7 @@ pub mod _puroro_traits {
         fn has_float_unlabeled<'this>(&'this self) -> bool {
             self.float_unlabeled_opt().is_some()
         }
+
         fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -14891,6 +14894,7 @@ pub mod _puroro_traits {
         fn has_float_optional<'this>(&'this self) -> bool {
             self.float_optional_opt().is_some()
         }
+
         fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -14907,6 +14911,7 @@ pub mod _puroro_traits {
         fn has_bytes_unlabeled<'this>(&'this self) -> bool {
             self.bytes_unlabeled_opt().is_some()
         }
+
         fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -14917,6 +14922,7 @@ pub mod _puroro_traits {
         fn has_bytes_optional<'this>(&'this self) -> bool {
             self.bytes_optional_opt().is_some()
         }
+
         fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -14933,6 +14939,7 @@ pub mod _puroro_traits {
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
         }
+
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -14943,6 +14950,7 @@ pub mod _puroro_traits {
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
         }
+
         fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -14959,6 +14967,7 @@ pub mod _puroro_traits {
         fn has_enum_unlabeled<'this>(&'this self) -> bool {
             self.enum_unlabeled_opt().is_some()
         }
+
         fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
@@ -14971,6 +14980,7 @@ pub mod _puroro_traits {
         fn has_enum_optional<'this>(&'this self) -> bool {
             self.enum_optional_opt().is_some()
         }
+
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
@@ -14992,6 +15002,7 @@ pub mod _puroro_traits {
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
         }
+
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -15007,6 +15018,7 @@ pub mod _puroro_traits {
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
         }
+
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgOptionalMessageType<'this>> {
@@ -15027,6 +15039,7 @@ pub mod _puroro_traits {
         fn has_i64_unlabeled<'this>(&'this self) -> bool {
             self.i64_unlabeled_opt().is_some()
         }
+
         fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -15037,6 +15050,7 @@ pub mod _puroro_traits {
         fn has_i64_optional<'this>(&'this self) -> bool {
             self.i64_optional_opt().is_some()
         }
+
         fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -15053,6 +15067,7 @@ pub mod _puroro_traits {
         fn has_u32_unlabeled<'this>(&'this self) -> bool {
             self.u32_unlabeled_opt().is_some()
         }
+
         fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -15063,6 +15078,7 @@ pub mod _puroro_traits {
         fn has_u32_optional<'this>(&'this self) -> bool {
             self.u32_optional_opt().is_some()
         }
+
         fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -15079,6 +15095,7 @@ pub mod _puroro_traits {
         fn has_u64_unlabeled<'this>(&'this self) -> bool {
             self.u64_unlabeled_opt().is_some()
         }
+
         fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -15089,6 +15106,7 @@ pub mod _puroro_traits {
         fn has_u64_optional<'this>(&'this self) -> bool {
             self.u64_optional_opt().is_some()
         }
+
         fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -15105,6 +15123,7 @@ pub mod _puroro_traits {
         fn has_s32_unlabeled<'this>(&'this self) -> bool {
             self.s32_unlabeled_opt().is_some()
         }
+
         fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -15115,6 +15134,7 @@ pub mod _puroro_traits {
         fn has_s32_optional<'this>(&'this self) -> bool {
             self.s32_optional_opt().is_some()
         }
+
         fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -15131,6 +15151,7 @@ pub mod _puroro_traits {
         fn has_s64_unlabeled<'this>(&'this self) -> bool {
             self.s64_unlabeled_opt().is_some()
         }
+
         fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -15141,6 +15162,7 @@ pub mod _puroro_traits {
         fn has_s64_optional<'this>(&'this self) -> bool {
             self.s64_optional_opt().is_some()
         }
+
         fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -15157,6 +15179,7 @@ pub mod _puroro_traits {
         fn has_fixed32_unlabeled<'this>(&'this self) -> bool {
             self.fixed32_unlabeled_opt().is_some()
         }
+
         fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -15167,6 +15190,7 @@ pub mod _puroro_traits {
         fn has_fixed32_optional<'this>(&'this self) -> bool {
             self.fixed32_optional_opt().is_some()
         }
+
         fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -15183,6 +15207,7 @@ pub mod _puroro_traits {
         fn has_fixed64_unlabeled<'this>(&'this self) -> bool {
             self.fixed64_unlabeled_opt().is_some()
         }
+
         fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -15193,6 +15218,7 @@ pub mod _puroro_traits {
         fn has_fixed64_optional<'this>(&'this self) -> bool {
             self.fixed64_optional_opt().is_some()
         }
+
         fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -15209,6 +15235,7 @@ pub mod _puroro_traits {
         fn has_sfixed32_unlabeled<'this>(&'this self) -> bool {
             self.sfixed32_unlabeled_opt().is_some()
         }
+
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -15219,6 +15246,7 @@ pub mod _puroro_traits {
         fn has_sfixed32_optional<'this>(&'this self) -> bool {
             self.sfixed32_optional_opt().is_some()
         }
+
         fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -15235,6 +15263,7 @@ pub mod _puroro_traits {
         fn has_sfixed64_unlabeled<'this>(&'this self) -> bool {
             self.sfixed64_unlabeled_opt().is_some()
         }
+
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -15245,6 +15274,7 @@ pub mod _puroro_traits {
         fn has_sfixed64_optional<'this>(&'this self) -> bool {
             self.sfixed64_optional_opt().is_some()
         }
+
         fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -15261,6 +15291,7 @@ pub mod _puroro_traits {
         fn has_f64_unlabeled<'this>(&'this self) -> bool {
             self.f64_unlabeled_opt().is_some()
         }
+
         fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             ::std::option::Option::None
         }
@@ -15271,6 +15302,7 @@ pub mod _puroro_traits {
         fn has_f64_optional<'this>(&'this self) -> bool {
             self.f64_optional_opt().is_some()
         }
+
         fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             ::std::option::Option::None
         }
@@ -15287,6 +15319,7 @@ pub mod _puroro_traits {
             fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_unlabeled_opt()
             }
+
             fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_optional_opt()
             }
@@ -15298,9 +15331,11 @@ pub mod _puroro_traits {
             fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
                 (**self).i32_repeated()
             }
+
             fn float_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).float_unlabeled_opt()
             }
+
             fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).float_optional_opt()
             }
@@ -15312,9 +15347,11 @@ pub mod _puroro_traits {
             fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
                 (**self).float_repeated()
             }
+
             fn bytes_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_unlabeled_opt()
             }
+
             fn bytes_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_optional_opt()
             }
@@ -15326,9 +15363,11 @@ pub mod _puroro_traits {
             fn bytes_repeated<'this>(&'this self) -> Self::BytesRepeatedRepeatedType<'this> {
                 (**self).bytes_repeated()
             }
+
             fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_unlabeled_opt()
             }
+
             fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_optional_opt()
             }
@@ -15340,11 +15379,13 @@ pub mod _puroro_traits {
             fn string_repeated<'this>(&'this self) -> Self::StringRepeatedRepeatedType<'this> {
                 (**self).string_repeated()
             }
+
             fn enum_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
                 (**self).enum_unlabeled_opt()
             }
+
             fn enum_optional_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
@@ -15362,6 +15403,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::SubmsgUnlabeledMessageType<'this>;
+
             fn submsg_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -15371,6 +15413,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::SubmsgOptionalMessageType<'this>;
+
             fn submsg_optional_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::SubmsgOptionalMessageType<'this>> {
@@ -15388,9 +15431,11 @@ pub mod _puroro_traits {
             fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
                 (**self).submsg_repeated()
             }
+
             fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_unlabeled_opt()
             }
+
             fn i64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_optional_opt()
             }
@@ -15402,9 +15447,11 @@ pub mod _puroro_traits {
             fn i64_repeated<'this>(&'this self) -> Self::I64RepeatedRepeatedType<'this> {
                 (**self).i64_repeated()
             }
+
             fn u32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_unlabeled_opt()
             }
+
             fn u32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_optional_opt()
             }
@@ -15416,9 +15463,11 @@ pub mod _puroro_traits {
             fn u32_repeated<'this>(&'this self) -> Self::U32RepeatedRepeatedType<'this> {
                 (**self).u32_repeated()
             }
+
             fn u64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_unlabeled_opt()
             }
+
             fn u64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_optional_opt()
             }
@@ -15430,9 +15479,11 @@ pub mod _puroro_traits {
             fn u64_repeated<'this>(&'this self) -> Self::U64RepeatedRepeatedType<'this> {
                 (**self).u64_repeated()
             }
+
             fn s32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).s32_unlabeled_opt()
             }
+
             fn s32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).s32_optional_opt()
             }
@@ -15444,9 +15495,11 @@ pub mod _puroro_traits {
             fn s32_repeated<'this>(&'this self) -> Self::S32RepeatedRepeatedType<'this> {
                 (**self).s32_repeated()
             }
+
             fn s64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).s64_unlabeled_opt()
             }
+
             fn s64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).s64_optional_opt()
             }
@@ -15458,9 +15511,11 @@ pub mod _puroro_traits {
             fn s64_repeated<'this>(&'this self) -> Self::S64RepeatedRepeatedType<'this> {
                 (**self).s64_repeated()
             }
+
             fn fixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).fixed32_unlabeled_opt()
             }
+
             fn fixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).fixed32_optional_opt()
             }
@@ -15472,9 +15527,11 @@ pub mod _puroro_traits {
             fn fixed32_repeated<'this>(&'this self) -> Self::Fixed32RepeatedRepeatedType<'this> {
                 (**self).fixed32_repeated()
             }
+
             fn fixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).fixed64_unlabeled_opt()
             }
+
             fn fixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).fixed64_optional_opt()
             }
@@ -15486,9 +15543,11 @@ pub mod _puroro_traits {
             fn fixed64_repeated<'this>(&'this self) -> Self::Fixed64RepeatedRepeatedType<'this> {
                 (**self).fixed64_repeated()
             }
+
             fn sfixed32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).sfixed32_unlabeled_opt()
             }
+
             fn sfixed32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).sfixed32_optional_opt()
             }
@@ -15500,9 +15559,11 @@ pub mod _puroro_traits {
             fn sfixed32_repeated<'this>(&'this self) -> Self::Sfixed32RepeatedRepeatedType<'this> {
                 (**self).sfixed32_repeated()
             }
+
             fn sfixed64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).sfixed64_unlabeled_opt()
             }
+
             fn sfixed64_optional_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).sfixed64_optional_opt()
             }
@@ -15514,9 +15575,11 @@ pub mod _puroro_traits {
             fn sfixed64_repeated<'this>(&'this self) -> Self::Sfixed64RepeatedRepeatedType<'this> {
                 (**self).sfixed64_repeated()
             }
+
             fn f64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f64> {
                 (**self).f64_unlabeled_opt()
             }
+
             fn f64_optional_opt<'this>(&'this self) -> ::std::option::Option<f64> {
                 (**self).f64_optional_opt()
             }
@@ -15704,6 +15767,7 @@ pub mod _puroro_traits {
             <U as MsgTrait>::i32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_unlabeled_opt(&self.0))
         }
+
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::i32_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
@@ -15722,10 +15786,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::i32_repeated(&self.1),
             )
         }
+
         fn float_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::float_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::float_unlabeled_opt(&self.0))
         }
+
         fn float_optional_opt<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::float_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::float_optional_opt(&self.0))
@@ -15744,10 +15810,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::float_repeated(&self.1),
             )
         }
+
         fn bytes_unlabeled_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <U as MsgTrait>::bytes_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_unlabeled_opt(&self.0))
         }
+
         fn bytes_optional_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <U as MsgTrait>::bytes_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::bytes_optional_opt(&self.0))
@@ -15766,10 +15834,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::bytes_repeated(&self.1),
             )
         }
+
         fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
         }
+
         fn string_optional_opt<'this>(&'this self) -> Option<&'this str> {
             <U as MsgTrait>::string_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_optional_opt(&self.0))
@@ -15788,12 +15858,14 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::string_repeated(&self.1),
             )
         }
+
         fn enum_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
             <U as MsgTrait>::enum_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::enum_unlabeled_opt(&self.0))
         }
+
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::full_coverage3::Enum> {
@@ -15821,6 +15893,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
         );
+
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -15841,6 +15914,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MsgTrait>::SubmsgOptionalMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::SubmsgOptionalMessageType<'this>>,
         );
+
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> Option<Self::SubmsgOptionalMessageType<'this>> {
@@ -15875,10 +15949,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::submsg_repeated(&self.1),
             )
         }
+
         fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <U as MsgTrait>::i64_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i64_unlabeled_opt(&self.0))
         }
+
         fn i64_optional_opt<'this>(&'this self) -> Option<i64> {
             <U as MsgTrait>::i64_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i64_optional_opt(&self.0))
@@ -15897,10 +15973,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::i64_repeated(&self.1),
             )
         }
+
         fn u32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             <U as MsgTrait>::u32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::u32_unlabeled_opt(&self.0))
         }
+
         fn u32_optional_opt<'this>(&'this self) -> Option<u32> {
             <U as MsgTrait>::u32_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::u32_optional_opt(&self.0))
@@ -15919,10 +15997,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::u32_repeated(&self.1),
             )
         }
+
         fn u64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             <U as MsgTrait>::u64_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::u64_unlabeled_opt(&self.0))
         }
+
         fn u64_optional_opt<'this>(&'this self) -> Option<u64> {
             <U as MsgTrait>::u64_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::u64_optional_opt(&self.0))
@@ -15941,10 +16021,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::u64_repeated(&self.1),
             )
         }
+
         fn s32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::s32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::s32_unlabeled_opt(&self.0))
         }
+
         fn s32_optional_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::s32_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::s32_optional_opt(&self.0))
@@ -15963,10 +16045,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::s32_repeated(&self.1),
             )
         }
+
         fn s64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <U as MsgTrait>::s64_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::s64_unlabeled_opt(&self.0))
         }
+
         fn s64_optional_opt<'this>(&'this self) -> Option<i64> {
             <U as MsgTrait>::s64_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::s64_optional_opt(&self.0))
@@ -15985,10 +16069,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::s64_repeated(&self.1),
             )
         }
+
         fn fixed32_unlabeled_opt<'this>(&'this self) -> Option<u32> {
             <U as MsgTrait>::fixed32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::fixed32_unlabeled_opt(&self.0))
         }
+
         fn fixed32_optional_opt<'this>(&'this self) -> Option<u32> {
             <U as MsgTrait>::fixed32_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::fixed32_optional_opt(&self.0))
@@ -16007,10 +16093,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::fixed32_repeated(&self.1),
             )
         }
+
         fn fixed64_unlabeled_opt<'this>(&'this self) -> Option<u64> {
             <U as MsgTrait>::fixed64_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::fixed64_unlabeled_opt(&self.0))
         }
+
         fn fixed64_optional_opt<'this>(&'this self) -> Option<u64> {
             <U as MsgTrait>::fixed64_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::fixed64_optional_opt(&self.0))
@@ -16029,10 +16117,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::fixed64_repeated(&self.1),
             )
         }
+
         fn sfixed32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::sfixed32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::sfixed32_unlabeled_opt(&self.0))
         }
+
         fn sfixed32_optional_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::sfixed32_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::sfixed32_optional_opt(&self.0))
@@ -16051,10 +16141,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::sfixed32_repeated(&self.1),
             )
         }
+
         fn sfixed64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
             <U as MsgTrait>::sfixed64_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::sfixed64_unlabeled_opt(&self.0))
         }
+
         fn sfixed64_optional_opt<'this>(&'this self) -> Option<i64> {
             <U as MsgTrait>::sfixed64_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::sfixed64_optional_opt(&self.0))
@@ -16073,10 +16165,12 @@ pub mod _puroro_traits {
                 <U as MsgTrait>::sfixed64_repeated(&self.1),
             )
         }
+
         fn f64_unlabeled_opt<'this>(&'this self) -> Option<f64> {
             <U as MsgTrait>::f64_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::f64_unlabeled_opt(&self.0))
         }
+
         fn f64_optional_opt<'this>(&'this self) -> Option<f64> {
             <U as MsgTrait>::f64_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::f64_optional_opt(&self.0))
@@ -17631,6 +17725,7 @@ pub mod _puroro_nested {
                 fn has_i32_unlabeled<'this>(&'this self) -> bool {
                     self.i32_unlabeled_opt().is_some()
                 }
+
                 fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -17641,6 +17736,7 @@ pub mod _puroro_nested {
                 fn has_i32_optional<'this>(&'this self) -> bool {
                     self.i32_optional_opt().is_some()
                 }
+
                 fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -17651,6 +17747,7 @@ pub mod _puroro_nested {
                 fn has_i64_unlabeled<'this>(&'this self) -> bool {
                     self.i64_unlabeled_opt().is_some()
                 }
+
                 fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                     ::std::option::Option::None
                 }
@@ -17661,9 +17758,11 @@ pub mod _puroro_nested {
                     fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).i32_unlabeled_opt()
                     }
+
                     fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).i32_optional_opt()
                     }
+
                     fn i64_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                         (**self).i64_unlabeled_opt()
                     }
@@ -17714,10 +17813,12 @@ pub mod _puroro_nested {
                     <U as SubmsgTrait>::i32_unlabeled_opt(&self.1)
                         .or_else(|| <T as SubmsgTrait>::i32_unlabeled_opt(&self.0))
                 }
+
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
                     <U as SubmsgTrait>::i32_optional_opt(&self.1)
                         .or_else(|| <T as SubmsgTrait>::i32_optional_opt(&self.0))
                 }
+
                 fn i64_unlabeled_opt<'this>(&'this self) -> Option<i64> {
                     <U as SubmsgTrait>::i64_unlabeled_opt(&self.1)
                         .or_else(|| <T as SubmsgTrait>::i64_unlabeled_opt(&self.0))

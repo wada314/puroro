@@ -34,15 +34,10 @@ pub trait {{ m.trait_ident }} {
     fn has_{{ f.ident_unesc }}<'this>(&'this self) -> bool {
         self.{{ f.ident_unesc }}_opt().is_some()
     }
-    {#-
-     # Oneof items will have same interfaces with the scalar fields, but its default implementation 
-     # can depend on the oneof field getter's return value so skip it for now and define those at below.
-     #}
-    {%- if !f.is_explicit_oneof_field %}
+
     fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
         ::std::option::Option::None
     }
-    {%- endif %}
 
     {%- endif %} {#- if f.is_repeated #}
     {%- endfor %}
@@ -50,32 +45,20 @@ pub trait {{ m.trait_ident }} {
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         ::std::option::Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_ld_field %}
-            {%- if oneof.has_message_field %}
-            <'this, Self>
-            {%- else %}
-            <'this>
-            {%- endif %}
-            {%- endif %}
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
+                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
         >
     {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+
+        {%- for f in oneof.fields %}
+        if let ::std::option::Option::Some(val) = self.{{ f.getter_ident_unesc }}_opt() {
+            return ::std::option::Option::Some(E::{{ f.ident }}(val))
+        }
+        {%- endfor %} {#- for f in oneof.fields #}
+
         ::std::option::Option::None
     }
-
-    {%- for f in oneof.fields %}
-    fn {{ f.getter_ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_getter_type }}> {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
-        self.{{ oneof.field_ident }}().and_then(|oneof| {
-            #[allow(irrefutable_let_patterns)]
-            if let E::{{ f.ident }}(v) = oneof {
-                ::std::option::Option::Some(v)
-            } else {
-                ::std::option::Option::None
-            }
-        })
-    }
-    {%- endfor %}
     {%- endfor %}
 }
 
@@ -95,31 +78,12 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
 
         {%- else %} {#- if f.is_repeated #}
 
-        {%- if !f.is_explicit_oneof_field %}
         fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
             (**self).{{ f.ident_unesc }}_opt()
         }
-        {%- endif %}
 
         {%- endif %} {#- if f.is_repeated #}
 
-        {%- endfor %}
-
-        {%- for oneof in m.oneofs %}
-        fn {{ oneof.field_ident }}<'this>(&'this self) ->
-            ::std::option::Option<
-                super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-                {%- if oneof.has_ld_field %}
-                {%- if oneof.has_message_field %}
-                <'this, Self>
-                {%- else %}
-                <'this>
-                {%- endif %}
-                {%- endif %}
-            >
-        {
-            (**self).{{ oneof.field_ident }}().map(|v| v.into())
-        }
         {%- endfor %}
     };
 }
