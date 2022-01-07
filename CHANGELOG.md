@@ -1,4 +1,7 @@
 
+# v 0.4.1
+- Fixed the bug that [packed=...] option was ignored.
+
 # v 0.4.0
 - So many changes.
 - The message struct does not have public fields anymore. Use the methods instead.
