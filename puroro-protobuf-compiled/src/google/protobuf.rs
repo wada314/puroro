@@ -118,6 +118,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorSetTrait>::file(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -609,6 +610,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -617,6 +619,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::package_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -625,6 +628,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::dependency(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -633,6 +637,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::public_dependency(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -641,13 +646,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::weak_dependency(self),
                 11,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::FileDescriptorProtoTrait>::MessageTypeMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FileDescriptorProtoTrait>::message_type(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -660,6 +667,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::enum_type(self),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -672,6 +680,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::service(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -684,6 +693,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::extension(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -696,13 +706,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::options_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FileDescriptorProtoTrait>::source_code_info_opt(self),
             9,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -711,6 +723,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::syntax_opt(self),
                 12,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1135,6 +1148,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -1145,6 +1159,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::field(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -1155,6 +1170,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::extension(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -1167,6 +1183,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::nested_type(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -1177,13 +1194,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::enum_type(self),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::DescriptorProtoTrait>::ExtensionRangeMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::DescriptorProtoTrait>::extension_range(self),
             5,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -1194,6 +1213,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::oneof_decl(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1204,6 +1224,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::options_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -1216,6 +1237,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_range(self),
                 9,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -1224,6 +1246,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_name(self),
                 10,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1374,7 +1397,8 @@ pub mod _puroro_simple_impl {
         >::ser_field(
             <Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -1915,6 +1939,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1923,20 +1948,23 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::number_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
         >::ser_field(
             <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::label_opt(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
         >::ser_field(
             <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_opt(self),
             5,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1945,6 +1973,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_name_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1953,6 +1982,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::extendee_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1961,6 +1991,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::default_value_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1969,6 +2000,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::oneof_index_opt(self),
                 9,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1977,6 +2009,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::json_name_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1989,6 +2022,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::options_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1999,6 +2033,7 @@ pub mod _puroro_simple_impl {
                 ),
                 17,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -2216,6 +2251,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2228,6 +2264,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::options_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -2476,6 +2513,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2486,6 +2524,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::value(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2498,13 +2537,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::options_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumDescriptorProtoTrait>::ReservedRangeMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_range(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2513,6 +2554,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_name(self),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -2740,6 +2782,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2748,13 +2791,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::number_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::OptionsMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::options_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -2971,6 +3016,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2983,13 +3029,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::method(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::OptionsMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::options_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -3320,6 +3368,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -3328,6 +3377,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::input_type_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -3336,6 +3386,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::output_type_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -3348,6 +3399,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::options_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -3358,6 +3410,7 @@ pub mod _puroro_simple_impl {
                 ),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -3368,6 +3421,7 @@ pub mod _puroro_simple_impl {
                 ),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -4260,6 +4314,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_package_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4268,6 +4323,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_outer_classname_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4276,13 +4332,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_multiple_files_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Bool
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::java_generate_equals_and_hash_opt(self),
             20,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4291,13 +4349,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_string_check_utf8_opt(self),
                 27,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::optimize_for_opt(self),
             9,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4306,6 +4366,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::go_package_opt(self),
                 11,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4314,6 +4375,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::cc_generic_services_opt(self),
                 16,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4322,6 +4384,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_generic_services_opt(self),
                 17,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4330,6 +4393,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::py_generic_services_opt(self),
                 18,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4338,6 +4402,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_generic_services_opt(self),
                 42,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4346,6 +4411,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::deprecated_opt(self),
                 23,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4354,6 +4420,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::cc_enable_arenas_opt(self),
                 31,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4362,6 +4429,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::objc_class_prefix_opt(self),
                 36,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4370,6 +4438,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::csharp_namespace_opt(self),
                 37,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4378,6 +4447,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::swift_prefix_opt(self),
                 39,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4386,6 +4456,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_class_prefix_opt(self),
                 40,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4394,6 +4465,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_namespace_opt(self),
                 41,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4402,6 +4474,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_metadata_namespace_opt(self),
                 44,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4410,13 +4483,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FileOptionsTrait>::ruby_package_opt(self),
                 45,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::FileOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -4774,13 +4849,15 @@ pub mod _puroro_simple_impl {
                 ),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Bool
         >::ser_field(
             <Self as super::_puroro_traits::MessageOptionsTrait>::no_standard_descriptor_accessor_opt(self),
             2,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4789,6 +4866,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MessageOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -4797,13 +4875,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MessageOptionsTrait>::map_entry_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::MessageOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::MessageOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -5204,6 +5284,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldOptionsTrait>::ctype_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -5212,6 +5293,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldOptionsTrait>::packed_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -5222,6 +5304,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldOptionsTrait>::jstype_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -5230,6 +5313,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldOptionsTrait>::lazy_opt(self),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -5238,6 +5322,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -5246,13 +5331,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::FieldOptionsTrait>::weak_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::FieldOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FieldOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -5395,7 +5482,8 @@ pub mod _puroro_simple_impl {
         >::ser_field(
             <Self as super::_puroro_traits::OneofOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -5594,6 +5682,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumOptionsTrait>::allow_alias_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -5602,13 +5691,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -5778,13 +5869,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::EnumValueOptionsTrait>::deprecated_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumValueOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumValueOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -5950,13 +6043,15 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::ServiceOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::ServiceOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::ServiceOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -6173,20 +6268,23 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::MethodOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
         >::ser_field(
             <Self as super::_puroro_traits::MethodOptionsTrait>::idempotency_level_opt(self),
             34,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::MethodOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::MethodOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -6532,6 +6630,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::name(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -6542,6 +6641,7 @@ pub mod _puroro_simple_impl {
                 ),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -6552,6 +6652,7 @@ pub mod _puroro_simple_impl {
                 ),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -6562,6 +6663,7 @@ pub mod _puroro_simple_impl {
                 ),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -6570,6 +6672,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::double_value_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -6578,6 +6681,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::string_value_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -6588,6 +6692,7 @@ pub mod _puroro_simple_impl {
                 ),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6727,6 +6832,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::SourceCodeInfoTrait>::location(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6842,6 +6948,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::GeneratedCodeInfoTrait>::annotation(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -6950,6 +7057,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorSetTrait>::file(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7092,6 +7200,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorSetTrait>::file(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7240,6 +7349,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7380,6 +7490,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::package_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7526,6 +7637,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::dependency(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7679,6 +7791,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::public_dependency(self),
                 10,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7834,6 +7947,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::weak_dependency(self),
                 11,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -7989,7 +8103,8 @@ pub mod _puroro_impls {
         >::ser_field(
             <Self as super::_puroro_traits::FileDescriptorProtoTrait>::message_type(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -8151,6 +8266,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::enum_type(self),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -8314,6 +8430,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::service(self),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -8475,6 +8592,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::extension(self),
                 7,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -8630,6 +8748,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::options_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -8773,7 +8892,8 @@ pub mod _puroro_impls {
         >::ser_field(
             <Self as super::_puroro_traits::FileDescriptorProtoTrait>::source_code_info_opt(self),
             9,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -8917,6 +9037,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::syntax_opt(self),
                 12,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -9491,6 +9612,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9499,6 +9621,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::package_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -9507,6 +9630,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::dependency(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -9515,6 +9639,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::public_dependency(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -9523,13 +9648,15 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::weak_dependency(self),
                 11,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::FileDescriptorProtoTrait>::MessageTypeMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FileDescriptorProtoTrait>::message_type(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -9542,6 +9669,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::enum_type(self),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -9554,6 +9682,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::service(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -9566,6 +9695,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::extension(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9578,13 +9708,15 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::options_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FileDescriptorProtoTrait>::source_code_info_opt(self),
             9,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -9593,6 +9725,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::FileDescriptorProtoTrait>::syntax_opt(self),
                 12,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -9934,6 +10067,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -10104,6 +10238,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::field(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -10280,6 +10415,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::extension(self),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -10458,6 +10594,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::nested_type(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -10634,6 +10771,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::enum_type(self),
                 4,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -10762,7 +10900,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::DescriptorProtoTrait>::extension_range(self),
             5,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -10945,6 +11084,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::oneof_decl(self),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -11117,6 +11257,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::options_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -11239,7 +11380,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_range(self),
             9,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -11418,6 +11560,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_name(self),
                 10,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -11862,6 +12005,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -11872,6 +12016,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::field(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -11882,6 +12027,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::extension(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -11894,6 +12040,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::nested_type(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -11904,13 +12051,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::enum_type(self),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::DescriptorProtoTrait>::ExtensionRangeMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::DescriptorProtoTrait>::extension_range(self),
             5,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -11921,6 +12070,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::oneof_decl(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -11931,6 +12081,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::options_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -11943,6 +12094,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_range(self),
                 9,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -11951,6 +12103,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::DescriptorProtoTrait>::reserved_name(self),
                 10,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -12169,7 +12322,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -12317,7 +12471,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::ExtensionRangeOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -12405,6 +12560,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -12478,6 +12634,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::number_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -12561,7 +12718,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::label_opt(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -12649,7 +12807,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_opt(self),
             5,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -12725,6 +12884,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_name_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -12796,6 +12956,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::extendee_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -12867,6 +13028,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::default_value_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -12942,6 +13104,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::oneof_index_opt(self),
                 9,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -13013,6 +13176,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::json_name_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -13093,6 +13257,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::options_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -13169,6 +13334,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 17,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -13750,6 +13916,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13758,20 +13925,23 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::number_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Label>
         >::ser_field(
             <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::label_opt(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::field_descriptor_proto::Type>
         >::ser_field(
             <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_opt(self),
             5,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13780,6 +13950,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::type_name_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13788,6 +13959,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::extendee_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13796,6 +13968,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::default_value_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13804,6 +13977,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::oneof_index_opt(self),
                 9,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13812,6 +13986,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::json_name_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13824,6 +13999,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FieldDescriptorProtoTrait>::options_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -13834,6 +14010,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 17,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -14041,6 +14218,7 @@ ScalarType:
                 <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -14121,6 +14299,7 @@ ScalarType:
                 <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::options_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -14320,6 +14499,7 @@ ScalarType:
                 <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -14332,6 +14512,7 @@ ScalarType:
                 <Self as super::_puroro_traits::OneofDescriptorProtoTrait>::options_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -14452,6 +14633,7 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -14569,6 +14751,7 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::value(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -14688,6 +14871,7 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::options_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -14785,7 +14969,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_range(self),
             4,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -14907,6 +15092,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_name(self),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -15194,6 +15380,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -15204,6 +15391,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::value(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -15216,13 +15404,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::options_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumDescriptorProtoTrait>::ReservedRangeMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_range(self),
             4,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -15231,6 +15421,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumDescriptorProtoTrait>::reserved_name(self),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -15370,6 +15561,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -15444,6 +15636,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::number_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -15519,7 +15712,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::options_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -15764,6 +15958,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -15772,13 +15967,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::number_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::OptionsMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumValueDescriptorProtoTrait>::options_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -15895,6 +16092,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -15994,6 +16192,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::method(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -16087,7 +16286,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::options_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -16330,6 +16530,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -16342,13 +16543,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::method(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::OptionsMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::ServiceDescriptorProtoTrait>::options_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -16460,6 +16663,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -16531,6 +16735,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::input_type_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -16602,6 +16807,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::output_type_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -16682,6 +16888,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::options_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -16758,6 +16965,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -16836,6 +17044,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -17195,6 +17404,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::name_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -17203,6 +17413,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::input_type_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -17211,6 +17422,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::output_type_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -17223,6 +17435,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::MethodDescriptorProtoTrait>::options_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -17233,6 +17446,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -17243,6 +17457,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -17398,6 +17613,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_package_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -17478,6 +17694,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_outer_classname_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -17561,6 +17778,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_multiple_files_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -17642,7 +17860,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::java_generate_equals_and_hash_opt(self),
             20,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -17728,6 +17947,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_string_check_utf8_opt(self),
                 27,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -17820,7 +18040,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::optimize_for_opt(self),
             9,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -17906,6 +18127,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::go_package_opt(self),
                 11,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -17987,6 +18209,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::cc_generic_services_opt(self),
                 16,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18070,6 +18293,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_generic_services_opt(self),
                 17,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18153,6 +18377,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::py_generic_services_opt(self),
                 18,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18236,6 +18461,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_generic_services_opt(self),
                 42,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18319,6 +18545,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::deprecated_opt(self),
                 23,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18400,6 +18627,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::cc_enable_arenas_opt(self),
                 31,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18481,6 +18709,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::objc_class_prefix_opt(self),
                 36,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18562,6 +18791,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::csharp_namespace_opt(self),
                 37,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18643,6 +18873,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::swift_prefix_opt(self),
                 39,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18724,6 +18955,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_class_prefix_opt(self),
                 40,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18805,6 +19037,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_namespace_opt(self),
                 41,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18886,6 +19119,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_metadata_namespace_opt(self),
                 44,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -18967,6 +19201,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::ruby_package_opt(self),
                 45,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -19056,7 +19291,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -20006,6 +20242,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_package_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20014,6 +20251,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_outer_classname_opt(self),
                 8,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20022,13 +20260,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_multiple_files_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Bool
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::java_generate_equals_and_hash_opt(self),
             20,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20037,13 +20277,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_string_check_utf8_opt(self),
                 27,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::optimize_for_opt(self),
             9,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20052,6 +20294,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::go_package_opt(self),
                 11,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20060,6 +20303,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::cc_generic_services_opt(self),
                 16,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20068,6 +20312,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::java_generic_services_opt(self),
                 17,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20076,6 +20321,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::py_generic_services_opt(self),
                 18,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20084,6 +20330,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_generic_services_opt(self),
                 42,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20092,6 +20339,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::deprecated_opt(self),
                 23,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20100,6 +20348,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::cc_enable_arenas_opt(self),
                 31,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20108,6 +20357,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::objc_class_prefix_opt(self),
                 36,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20116,6 +20366,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::csharp_namespace_opt(self),
                 37,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20124,6 +20375,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::swift_prefix_opt(self),
                 39,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20132,6 +20384,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_class_prefix_opt(self),
                 40,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20140,6 +20393,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_namespace_opt(self),
                 41,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20148,6 +20402,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::php_metadata_namespace_opt(self),
                 44,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -20156,13 +20411,15 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::FileOptionsTrait>::ruby_package_opt(self),
                 45,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::FileOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FileOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -20550,6 +20807,7 @@ ScalarType:
                 ),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -20632,7 +20890,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::MessageOptionsTrait>::no_standard_descriptor_accessor_opt(self),
             2,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -20719,6 +20978,7 @@ ScalarType:
                 <Self as super::_puroro_traits::MessageOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -20801,6 +21061,7 @@ ScalarType:
                 <Self as super::_puroro_traits::MessageOptionsTrait>::map_entry_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -20888,7 +21149,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::MessageOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -21188,13 +21450,15 @@ ScalarType:
                 ),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Bool
         >::ser_field(
             <Self as super::_puroro_traits::MessageOptionsTrait>::no_standard_descriptor_accessor_opt(self),
             2,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -21203,6 +21467,7 @@ ScalarType:
                 <Self as super::_puroro_traits::MessageOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -21211,13 +21476,15 @@ ScalarType:
                 <Self as super::_puroro_traits::MessageOptionsTrait>::map_entry_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::MessageOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::MessageOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -21376,6 +21643,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::ctype_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -21461,6 +21729,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::packed_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -21556,6 +21825,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::jstype_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -21641,6 +21911,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::lazy_opt(self),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -21722,6 +21993,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -21803,6 +22075,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::weak_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -21890,7 +22163,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::FieldOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -22296,6 +22570,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::ctype_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -22304,6 +22579,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::packed_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -22314,6 +22590,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::jstype_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -22322,6 +22599,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::lazy_opt(self),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -22330,6 +22608,7 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -22338,13 +22617,15 @@ ScalarType:
                 <Self as super::_puroro_traits::FieldOptionsTrait>::weak_opt(self),
                 10,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::FieldOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::FieldOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -22509,7 +22790,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::OneofOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -22651,7 +22933,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::OneofOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -22745,6 +23028,7 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumOptionsTrait>::allow_alias_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -22825,6 +23109,7 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -22912,7 +23197,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::EnumOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -23132,6 +23418,7 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumOptionsTrait>::allow_alias_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -23140,13 +23427,15 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumOptionsTrait>::deprecated_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -23264,6 +23553,7 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumValueOptionsTrait>::deprecated_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -23351,7 +23641,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::EnumValueOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -23534,13 +23825,15 @@ ScalarType:
                 <Self as super::_puroro_traits::EnumValueOptionsTrait>::deprecated_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::EnumValueOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::EnumValueOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -23648,6 +23941,7 @@ ScalarType:
                 <Self as super::_puroro_traits::ServiceOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -23735,7 +24029,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::ServiceOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -23917,13 +24212,15 @@ ScalarType:
                 <Self as super::_puroro_traits::ServiceOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::ServiceOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::ServiceOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -24029,6 +24326,7 @@ ScalarType:
                 <Self as super::_puroro_traits::MethodOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -24109,7 +24407,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::MethodOptionsTrait>::idempotency_level_opt(self),
             34,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -24205,7 +24504,8 @@ ScalarType:
         >::ser_field(
             <Self as super::_puroro_traits::MethodOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -24440,20 +24740,23 @@ ScalarType:
                 <Self as super::_puroro_traits::MethodOptionsTrait>::deprecated_opt(self),
                 33,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Enum2<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel>
         >::ser_field(
             <Self as super::_puroro_traits::MethodOptionsTrait>::idempotency_level_opt(self),
             34,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::MethodOptionsTrait>::UninterpretedOptionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::MethodOptionsTrait>::uninterpreted_option(self),
             999,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -24579,7 +24882,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::UninterpretedOptionTrait>::name(self),
             2,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -24673,6 +24977,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -24758,6 +25063,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 4,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -24843,6 +25149,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 5,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -24926,6 +25233,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::double_value_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -25007,6 +25315,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::string_value_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -25090,6 +25399,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -25456,6 +25766,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::name(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -25466,6 +25777,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -25476,6 +25788,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 4,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -25486,6 +25799,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 5,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -25494,6 +25808,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::double_value_opt(self),
                 6,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -25502,6 +25817,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::UninterpretedOptionTrait>::string_value_opt(self),
                 7,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -25512,6 +25828,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 8,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -25696,7 +26013,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::SourceCodeInfoTrait>::location(self),
             1,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -25833,6 +26151,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::SourceCodeInfoTrait>::location(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -25927,7 +26246,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::GeneratedCodeInfoTrait>::annotation(self),
             1,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -26067,6 +26387,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::GeneratedCodeInfoTrait>::annotation(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -26264,6 +26585,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -26274,6 +26596,7 @@ pub mod _puroro_traits {
         fn has_package<'this>(&'this self) -> bool {
             self.package_opt().is_some()
         }
+
         fn package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -26335,6 +26658,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -26350,6 +26674,7 @@ pub mod _puroro_traits {
         fn has_source_code_info<'this>(&'this self) -> bool {
             self.source_code_info_opt().is_some()
         }
+
         fn source_code_info_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SourceCodeInfoMessageType<'this>> {
@@ -26362,6 +26687,7 @@ pub mod _puroro_traits {
         fn has_syntax<'this>(&'this self) -> bool {
             self.syntax_opt().is_some()
         }
+
         fn syntax_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -26372,6 +26698,7 @@ pub mod _puroro_traits {
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
+
             fn package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).package_opt()
             }
@@ -26451,6 +26778,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -26460,11 +26788,13 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::SourceCodeInfoMessageType<'this>;
+
             fn source_code_info_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::SourceCodeInfoMessageType<'this>> {
                 (**self).source_code_info_opt()
             }
+
             fn syntax_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).syntax_opt()
             }
@@ -26589,6 +26919,7 @@ pub mod _puroro_traits {
             <U as FileDescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as FileDescriptorProtoTrait>::name_opt(&self.0))
         }
+
         fn package_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileDescriptorProtoTrait>::package_opt(&self.1)
                 .or_else(|| <T as FileDescriptorProtoTrait>::package_opt(&self.0))
@@ -26726,6 +27057,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as FileDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as FileDescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as FileDescriptorProtoTrait>::options_opt(&self.0),
@@ -26748,6 +27080,7 @@ pub mod _puroro_traits {
                 <U as FileDescriptorProtoTrait>::SourceCodeInfoMessageType<'this>,
             >,
         );
+
         fn source_code_info_opt<'this>(
             &'this self,
         ) -> Option<Self::SourceCodeInfoMessageType<'this>> {
@@ -26761,6 +27094,7 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
+
         fn syntax_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileDescriptorProtoTrait>::syntax_opt(&self.1)
                 .or_else(|| <T as FileDescriptorProtoTrait>::syntax_opt(&self.0))
@@ -27096,6 +27430,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -27155,6 +27490,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -27257,6 +27593,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -27555,6 +27892,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as DescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as DescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as DescriptorProtoTrait>::options_opt(&self.0),
@@ -28103,6 +28441,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -28113,6 +28452,7 @@ pub mod _puroro_traits {
         fn has_number<'this>(&'this self) -> bool {
             self.number_opt().is_some()
         }
+
         fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -28126,6 +28466,7 @@ pub mod _puroro_traits {
         fn has_label<'this>(&'this self) -> bool {
             self.label_opt().is_some()
         }
+
         fn label_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -28143,6 +28484,7 @@ pub mod _puroro_traits {
         fn has_type<'this>(&'this self) -> bool {
             self.type_opt().is_some()
         }
+
         fn type_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -28157,6 +28499,7 @@ pub mod _puroro_traits {
         fn has_type_name<'this>(&'this self) -> bool {
             self.type_name_opt().is_some()
         }
+
         fn type_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -28167,6 +28510,7 @@ pub mod _puroro_traits {
         fn has_extendee<'this>(&'this self) -> bool {
             self.extendee_opt().is_some()
         }
+
         fn extendee_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -28177,6 +28521,7 @@ pub mod _puroro_traits {
         fn has_default_value<'this>(&'this self) -> bool {
             self.default_value_opt().is_some()
         }
+
         fn default_value_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -28187,6 +28532,7 @@ pub mod _puroro_traits {
         fn has_oneof_index<'this>(&'this self) -> bool {
             self.oneof_index_opt().is_some()
         }
+
         fn oneof_index_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -28197,6 +28543,7 @@ pub mod _puroro_traits {
         fn has_json_name<'this>(&'this self) -> bool {
             self.json_name_opt().is_some()
         }
+
         fn json_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -28208,6 +28555,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28220,6 +28568,7 @@ pub mod _puroro_traits {
         fn has_proto3_optional<'this>(&'this self) -> bool {
             self.proto3_optional_opt().is_some()
         }
+
         fn proto3_optional_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -28230,9 +28579,11 @@ pub mod _puroro_traits {
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
+
             fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).number_opt()
             }
+
             fn label_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<
@@ -28240,6 +28591,7 @@ pub mod _puroro_traits {
             > {
                 (**self).label_opt()
             }
+
             fn type_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<
@@ -28247,18 +28599,23 @@ pub mod _puroro_traits {
             > {
                 (**self).type_opt()
             }
+
             fn type_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).type_name_opt()
             }
+
             fn extendee_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).extendee_opt()
             }
+
             fn default_value_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).default_value_opt()
             }
+
             fn oneof_index_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).oneof_index_opt()
             }
+
             fn json_name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).json_name_opt()
             }
@@ -28266,11 +28623,13 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
                 (**self).options_opt()
             }
+
             fn proto3_optional_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).proto3_optional_opt()
             }
@@ -28326,10 +28685,12 @@ pub mod _puroro_traits {
             <U as FieldDescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::name_opt(&self.0))
         }
+
         fn number_opt<'this>(&'this self) -> Option<i32> {
             <U as FieldDescriptorProtoTrait>::number_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::number_opt(&self.0))
         }
+
         fn label_opt<'this>(
             &'this self,
         ) -> Option<
@@ -28338,6 +28699,7 @@ pub mod _puroro_traits {
             <U as FieldDescriptorProtoTrait>::label_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::label_opt(&self.0))
         }
+
         fn type_opt<'this>(
             &'this self,
         ) -> Option<
@@ -28346,22 +28708,27 @@ pub mod _puroro_traits {
             <U as FieldDescriptorProtoTrait>::type_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::type_opt(&self.0))
         }
+
         fn type_name_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FieldDescriptorProtoTrait>::type_name_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::type_name_opt(&self.0))
         }
+
         fn extendee_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FieldDescriptorProtoTrait>::extendee_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::extendee_opt(&self.0))
         }
+
         fn default_value_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FieldDescriptorProtoTrait>::default_value_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::default_value_opt(&self.0))
         }
+
         fn oneof_index_opt<'this>(&'this self) -> Option<i32> {
             <U as FieldDescriptorProtoTrait>::oneof_index_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::oneof_index_opt(&self.0))
         }
+
         fn json_name_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FieldDescriptorProtoTrait>::json_name_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::json_name_opt(&self.0))
@@ -28373,6 +28740,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as FieldDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as FieldDescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as FieldDescriptorProtoTrait>::options_opt(&self.0),
@@ -28384,6 +28752,7 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
+
         fn proto3_optional_opt<'this>(&'this self) -> Option<bool> {
             <U as FieldDescriptorProtoTrait>::proto3_optional_opt(&self.1)
                 .or_else(|| <T as FieldDescriptorProtoTrait>::proto3_optional_opt(&self.0))
@@ -28545,6 +28914,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -28556,6 +28926,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28572,6 +28943,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28636,6 +29008,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as OneofDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as OneofDescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as OneofDescriptorProtoTrait>::options_opt(&self.0),
@@ -28707,6 +29080,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -28726,6 +29100,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28768,6 +29143,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -28904,6 +29280,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as EnumDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as EnumDescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as EnumDescriptorProtoTrait>::options_opt(&self.0),
@@ -29111,6 +29488,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29121,6 +29499,7 @@ pub mod _puroro_traits {
         fn has_number<'this>(&'this self) -> bool {
             self.number_opt().is_some()
         }
+
         fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -29132,6 +29511,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29144,6 +29524,7 @@ pub mod _puroro_traits {
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
+
             fn number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).number_opt()
             }
@@ -29151,6 +29532,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29208,6 +29590,7 @@ pub mod _puroro_traits {
             <U as EnumValueDescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as EnumValueDescriptorProtoTrait>::name_opt(&self.0))
         }
+
         fn number_opt<'this>(&'this self) -> Option<i32> {
             <U as EnumValueDescriptorProtoTrait>::number_opt(&self.1)
                 .or_else(|| <T as EnumValueDescriptorProtoTrait>::number_opt(&self.0))
@@ -29219,6 +29602,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as EnumValueDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as EnumValueDescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as EnumValueDescriptorProtoTrait>::options_opt(&self.0),
@@ -29299,6 +29683,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29318,6 +29703,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29346,6 +29732,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29442,6 +29829,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as ServiceDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as ServiceDescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as ServiceDescriptorProtoTrait>::options_opt(&self.0),
@@ -29549,6 +29937,7 @@ pub mod _puroro_traits {
         fn has_name<'this>(&'this self) -> bool {
             self.name_opt().is_some()
         }
+
         fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29559,6 +29948,7 @@ pub mod _puroro_traits {
         fn has_input_type<'this>(&'this self) -> bool {
             self.input_type_opt().is_some()
         }
+
         fn input_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29569,6 +29959,7 @@ pub mod _puroro_traits {
         fn has_output_type<'this>(&'this self) -> bool {
             self.output_type_opt().is_some()
         }
+
         fn output_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29580,6 +29971,7 @@ pub mod _puroro_traits {
         fn has_options<'this>(&'this self) -> bool {
             self.options_opt().is_some()
         }
+
         fn options_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -29591,6 +29983,7 @@ pub mod _puroro_traits {
         fn has_client_streaming<'this>(&'this self) -> bool {
             self.client_streaming_opt().is_some()
         }
+
         fn client_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29600,6 +29993,7 @@ pub mod _puroro_traits {
         fn has_server_streaming<'this>(&'this self) -> bool {
             self.server_streaming_opt().is_some()
         }
+
         fn server_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29610,9 +30004,11 @@ pub mod _puroro_traits {
             fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).name_opt()
             }
+
             fn input_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).input_type_opt()
             }
+
             fn output_type_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).output_type_opt()
             }
@@ -29620,14 +30016,17 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::OptionsMessageType<'this>;
+
             fn options_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
                 (**self).options_opt()
             }
+
             fn client_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).client_streaming_opt()
             }
+
             fn server_streaming_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).server_streaming_opt()
             }
@@ -29683,10 +30082,12 @@ pub mod _puroro_traits {
             <U as MethodDescriptorProtoTrait>::name_opt(&self.1)
                 .or_else(|| <T as MethodDescriptorProtoTrait>::name_opt(&self.0))
         }
+
         fn input_type_opt<'this>(&'this self) -> Option<&'this str> {
             <U as MethodDescriptorProtoTrait>::input_type_opt(&self.1)
                 .or_else(|| <T as MethodDescriptorProtoTrait>::input_type_opt(&self.0))
         }
+
         fn output_type_opt<'this>(&'this self) -> Option<&'this str> {
             <U as MethodDescriptorProtoTrait>::output_type_opt(&self.1)
                 .or_else(|| <T as MethodDescriptorProtoTrait>::output_type_opt(&self.0))
@@ -29698,6 +30099,7 @@ pub mod _puroro_traits {
             ::std::option::Option<<T as MethodDescriptorProtoTrait>::OptionsMessageType<'this>>,
             ::std::option::Option<<U as MethodDescriptorProtoTrait>::OptionsMessageType<'this>>,
         );
+
         fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
             match (
                 <T as MethodDescriptorProtoTrait>::options_opt(&self.0),
@@ -29709,10 +30111,12 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
+
         fn client_streaming_opt<'this>(&'this self) -> Option<bool> {
             <U as MethodDescriptorProtoTrait>::client_streaming_opt(&self.1)
                 .or_else(|| <T as MethodDescriptorProtoTrait>::client_streaming_opt(&self.0))
         }
+
         fn server_streaming_opt<'this>(&'this self) -> Option<bool> {
             <U as MethodDescriptorProtoTrait>::server_streaming_opt(&self.1)
                 .or_else(|| <T as MethodDescriptorProtoTrait>::server_streaming_opt(&self.0))
@@ -29813,6 +30217,7 @@ pub mod _puroro_traits {
         fn has_java_package<'this>(&'this self) -> bool {
             self.java_package_opt().is_some()
         }
+
         fn java_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29823,6 +30228,7 @@ pub mod _puroro_traits {
         fn has_java_outer_classname<'this>(&'this self) -> bool {
             self.java_outer_classname_opt().is_some()
         }
+
         fn java_outer_classname_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29832,6 +30238,7 @@ pub mod _puroro_traits {
         fn has_java_multiple_files<'this>(&'this self) -> bool {
             self.java_multiple_files_opt().is_some()
         }
+
         fn java_multiple_files_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29842,6 +30249,7 @@ pub mod _puroro_traits {
         fn has_java_generate_equals_and_hash<'this>(&'this self) -> bool {
             self.java_generate_equals_and_hash_opt().is_some()
         }
+
         fn java_generate_equals_and_hash_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29851,6 +30259,7 @@ pub mod _puroro_traits {
         fn has_java_string_check_utf8<'this>(&'this self) -> bool {
             self.java_string_check_utf8_opt().is_some()
         }
+
         fn java_string_check_utf8_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29863,6 +30272,7 @@ pub mod _puroro_traits {
         fn has_optimize_for<'this>(&'this self) -> bool {
             self.optimize_for_opt().is_some()
         }
+
         fn optimize_for_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -29877,6 +30287,7 @@ pub mod _puroro_traits {
         fn has_go_package<'this>(&'this self) -> bool {
             self.go_package_opt().is_some()
         }
+
         fn go_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29886,6 +30297,7 @@ pub mod _puroro_traits {
         fn has_cc_generic_services<'this>(&'this self) -> bool {
             self.cc_generic_services_opt().is_some()
         }
+
         fn cc_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29895,6 +30307,7 @@ pub mod _puroro_traits {
         fn has_java_generic_services<'this>(&'this self) -> bool {
             self.java_generic_services_opt().is_some()
         }
+
         fn java_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29904,6 +30317,7 @@ pub mod _puroro_traits {
         fn has_py_generic_services<'this>(&'this self) -> bool {
             self.py_generic_services_opt().is_some()
         }
+
         fn py_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29913,6 +30327,7 @@ pub mod _puroro_traits {
         fn has_php_generic_services<'this>(&'this self) -> bool {
             self.php_generic_services_opt().is_some()
         }
+
         fn php_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29922,6 +30337,7 @@ pub mod _puroro_traits {
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
         }
+
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29931,6 +30347,7 @@ pub mod _puroro_traits {
         fn has_cc_enable_arenas<'this>(&'this self) -> bool {
             self.cc_enable_arenas_opt().is_some()
         }
+
         fn cc_enable_arenas_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -29941,6 +30358,7 @@ pub mod _puroro_traits {
         fn has_objc_class_prefix<'this>(&'this self) -> bool {
             self.objc_class_prefix_opt().is_some()
         }
+
         fn objc_class_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29951,6 +30369,7 @@ pub mod _puroro_traits {
         fn has_csharp_namespace<'this>(&'this self) -> bool {
             self.csharp_namespace_opt().is_some()
         }
+
         fn csharp_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29961,6 +30380,7 @@ pub mod _puroro_traits {
         fn has_swift_prefix<'this>(&'this self) -> bool {
             self.swift_prefix_opt().is_some()
         }
+
         fn swift_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29971,6 +30391,7 @@ pub mod _puroro_traits {
         fn has_php_class_prefix<'this>(&'this self) -> bool {
             self.php_class_prefix_opt().is_some()
         }
+
         fn php_class_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29981,6 +30402,7 @@ pub mod _puroro_traits {
         fn has_php_namespace<'this>(&'this self) -> bool {
             self.php_namespace_opt().is_some()
         }
+
         fn php_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -29991,6 +30413,7 @@ pub mod _puroro_traits {
         fn has_php_metadata_namespace<'this>(&'this self) -> bool {
             self.php_metadata_namespace_opt().is_some()
         }
+
         fn php_metadata_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -30001,6 +30424,7 @@ pub mod _puroro_traits {
         fn has_ruby_package<'this>(&'this self) -> bool {
             self.ruby_package_opt().is_some()
         }
+
         fn ruby_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -30020,20 +30444,25 @@ pub mod _puroro_traits {
             fn java_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).java_package_opt()
             }
+
             fn java_outer_classname_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).java_outer_classname_opt()
             }
+
             fn java_multiple_files_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).java_multiple_files_opt()
             }
+
             fn java_generate_equals_and_hash_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<bool> {
                 (**self).java_generate_equals_and_hash_opt()
             }
+
             fn java_string_check_utf8_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).java_string_check_utf8_opt()
             }
+
             fn optimize_for_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<
@@ -30041,45 +30470,59 @@ pub mod _puroro_traits {
             > {
                 (**self).optimize_for_opt()
             }
+
             fn go_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).go_package_opt()
             }
+
             fn cc_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).cc_generic_services_opt()
             }
+
             fn java_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).java_generic_services_opt()
             }
+
             fn py_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).py_generic_services_opt()
             }
+
             fn php_generic_services_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).php_generic_services_opt()
             }
+
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
+
             fn cc_enable_arenas_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).cc_enable_arenas_opt()
             }
+
             fn objc_class_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).objc_class_prefix_opt()
             }
+
             fn csharp_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).csharp_namespace_opt()
             }
+
             fn swift_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).swift_prefix_opt()
             }
+
             fn php_class_prefix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).php_class_prefix_opt()
             }
+
             fn php_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).php_namespace_opt()
             }
+
             fn php_metadata_namespace_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).php_metadata_namespace_opt()
             }
+
             fn ruby_package_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).ruby_package_opt()
             }
@@ -30160,22 +30603,27 @@ pub mod _puroro_traits {
             <U as FileOptionsTrait>::java_package_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::java_package_opt(&self.0))
         }
+
         fn java_outer_classname_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::java_outer_classname_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::java_outer_classname_opt(&self.0))
         }
+
         fn java_multiple_files_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::java_multiple_files_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::java_multiple_files_opt(&self.0))
         }
+
         fn java_generate_equals_and_hash_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::java_generate_equals_and_hash_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::java_generate_equals_and_hash_opt(&self.0))
         }
+
         fn java_string_check_utf8_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::java_string_check_utf8_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::java_string_check_utf8_opt(&self.0))
         }
+
         fn optimize_for_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::file_options::OptimizeMode>
@@ -30183,58 +30631,72 @@ pub mod _puroro_traits {
             <U as FileOptionsTrait>::optimize_for_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::optimize_for_opt(&self.0))
         }
+
         fn go_package_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::go_package_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::go_package_opt(&self.0))
         }
+
         fn cc_generic_services_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::cc_generic_services_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::cc_generic_services_opt(&self.0))
         }
+
         fn java_generic_services_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::java_generic_services_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::java_generic_services_opt(&self.0))
         }
+
         fn py_generic_services_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::py_generic_services_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::py_generic_services_opt(&self.0))
         }
+
         fn php_generic_services_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::php_generic_services_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::php_generic_services_opt(&self.0))
         }
+
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::deprecated_opt(&self.0))
         }
+
         fn cc_enable_arenas_opt<'this>(&'this self) -> Option<bool> {
             <U as FileOptionsTrait>::cc_enable_arenas_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::cc_enable_arenas_opt(&self.0))
         }
+
         fn objc_class_prefix_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::objc_class_prefix_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::objc_class_prefix_opt(&self.0))
         }
+
         fn csharp_namespace_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::csharp_namespace_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::csharp_namespace_opt(&self.0))
         }
+
         fn swift_prefix_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::swift_prefix_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::swift_prefix_opt(&self.0))
         }
+
         fn php_class_prefix_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::php_class_prefix_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::php_class_prefix_opt(&self.0))
         }
+
         fn php_namespace_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::php_namespace_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::php_namespace_opt(&self.0))
         }
+
         fn php_metadata_namespace_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::php_metadata_namespace_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::php_metadata_namespace_opt(&self.0))
         }
+
         fn ruby_package_opt<'this>(&'this self) -> Option<&'this str> {
             <U as FileOptionsTrait>::ruby_package_opt(&self.1)
                 .or_else(|| <T as FileOptionsTrait>::ruby_package_opt(&self.0))
@@ -30516,6 +30978,7 @@ pub mod _puroro_traits {
         fn has_message_set_wire_format<'this>(&'this self) -> bool {
             self.message_set_wire_format_opt().is_some()
         }
+
         fn message_set_wire_format_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30525,6 +30988,7 @@ pub mod _puroro_traits {
         fn has_no_standard_descriptor_accessor<'this>(&'this self) -> bool {
             self.no_standard_descriptor_accessor_opt().is_some()
         }
+
         fn no_standard_descriptor_accessor_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30534,6 +30998,7 @@ pub mod _puroro_traits {
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
         }
+
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30544,6 +31009,7 @@ pub mod _puroro_traits {
         fn has_map_entry<'this>(&'this self) -> bool {
             self.map_entry_opt().is_some()
         }
+
         fn map_entry_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30563,14 +31029,17 @@ pub mod _puroro_traits {
             fn message_set_wire_format_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).message_set_wire_format_opt()
             }
+
             fn no_standard_descriptor_accessor_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<bool> {
                 (**self).no_standard_descriptor_accessor_opt()
             }
+
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
+
             fn map_entry_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).map_entry_opt()
             }
@@ -30651,15 +31120,18 @@ pub mod _puroro_traits {
             <U as MessageOptionsTrait>::message_set_wire_format_opt(&self.1)
                 .or_else(|| <T as MessageOptionsTrait>::message_set_wire_format_opt(&self.0))
         }
+
         fn no_standard_descriptor_accessor_opt<'this>(&'this self) -> Option<bool> {
             <U as MessageOptionsTrait>::no_standard_descriptor_accessor_opt(&self.1).or_else(|| {
                 <T as MessageOptionsTrait>::no_standard_descriptor_accessor_opt(&self.0)
             })
         }
+
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <U as MessageOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as MessageOptionsTrait>::deprecated_opt(&self.0))
         }
+
         fn map_entry_opt<'this>(&'this self) -> Option<bool> {
             <U as MessageOptionsTrait>::map_entry_opt(&self.1)
                 .or_else(|| <T as MessageOptionsTrait>::map_entry_opt(&self.0))
@@ -30791,6 +31263,7 @@ pub mod _puroro_traits {
         fn has_ctype<'this>(&'this self) -> bool {
             self.ctype_opt().is_some()
         }
+
         fn ctype_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -30805,6 +31278,7 @@ pub mod _puroro_traits {
         fn has_packed<'this>(&'this self) -> bool {
             self.packed_opt().is_some()
         }
+
         fn packed_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30816,6 +31290,7 @@ pub mod _puroro_traits {
         fn has_jstype<'this>(&'this self) -> bool {
             self.jstype_opt().is_some()
         }
+
         fn jstype_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -30829,6 +31304,7 @@ pub mod _puroro_traits {
         fn has_lazy<'this>(&'this self) -> bool {
             self.lazy_opt().is_some()
         }
+
         fn lazy_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30838,6 +31314,7 @@ pub mod _puroro_traits {
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
         }
+
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30847,6 +31324,7 @@ pub mod _puroro_traits {
         fn has_weak<'this>(&'this self) -> bool {
             self.weak_opt().is_some()
         }
+
         fn weak_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -30870,9 +31348,11 @@ pub mod _puroro_traits {
             > {
                 (**self).ctype_opt()
             }
+
             fn packed_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).packed_opt()
             }
+
             fn jstype_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<
@@ -30880,12 +31360,15 @@ pub mod _puroro_traits {
             > {
                 (**self).jstype_opt()
             }
+
             fn lazy_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).lazy_opt()
             }
+
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
+
             fn weak_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).weak_opt()
             }
@@ -30969,10 +31452,12 @@ pub mod _puroro_traits {
             <U as FieldOptionsTrait>::ctype_opt(&self.1)
                 .or_else(|| <T as FieldOptionsTrait>::ctype_opt(&self.0))
         }
+
         fn packed_opt<'this>(&'this self) -> Option<bool> {
             <U as FieldOptionsTrait>::packed_opt(&self.1)
                 .or_else(|| <T as FieldOptionsTrait>::packed_opt(&self.0))
         }
+
         fn jstype_opt<'this>(
             &'this self,
         ) -> Option<self::_puroro_root::google::protobuf::_puroro_nested::field_options::Jstype>
@@ -30980,14 +31465,17 @@ pub mod _puroro_traits {
             <U as FieldOptionsTrait>::jstype_opt(&self.1)
                 .or_else(|| <T as FieldOptionsTrait>::jstype_opt(&self.0))
         }
+
         fn lazy_opt<'this>(&'this self) -> Option<bool> {
             <U as FieldOptionsTrait>::lazy_opt(&self.1)
                 .or_else(|| <T as FieldOptionsTrait>::lazy_opt(&self.0))
         }
+
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <U as FieldOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as FieldOptionsTrait>::deprecated_opt(&self.0))
         }
+
         fn weak_opt<'this>(&'this self) -> Option<bool> {
             <U as FieldOptionsTrait>::weak_opt(&self.1)
                 .or_else(|| <T as FieldOptionsTrait>::weak_opt(&self.0))
@@ -31313,6 +31801,7 @@ pub mod _puroro_traits {
         fn has_allow_alias<'this>(&'this self) -> bool {
             self.allow_alias_opt().is_some()
         }
+
         fn allow_alias_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -31322,6 +31811,7 @@ pub mod _puroro_traits {
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
         }
+
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -31341,6 +31831,7 @@ pub mod _puroro_traits {
             fn allow_alias_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).allow_alias_opt()
             }
+
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
@@ -31421,6 +31912,7 @@ pub mod _puroro_traits {
             <U as EnumOptionsTrait>::allow_alias_opt(&self.1)
                 .or_else(|| <T as EnumOptionsTrait>::allow_alias_opt(&self.0))
         }
+
         fn deprecated_opt<'this>(&'this self) -> Option<bool> {
             <U as EnumOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as EnumOptionsTrait>::deprecated_opt(&self.0))
@@ -31528,6 +32020,7 @@ pub mod _puroro_traits {
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
         }
+
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -31718,6 +32211,7 @@ pub mod _puroro_traits {
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
         }
+
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -31908,6 +32402,7 @@ pub mod _puroro_traits {
         fn has_deprecated<'this>(&'this self) -> bool {
             self.deprecated_opt().is_some()
         }
+
         fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -31920,6 +32415,7 @@ pub mod _puroro_traits {
         fn has_idempotency_level<'this>(&'this self) -> bool {
             self.idempotency_level_opt().is_some()
         }
+
         fn idempotency_level_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<
@@ -31940,9 +32436,11 @@ pub mod _puroro_traits {
 
     macro_rules! method_options_delegate {
         ($ty:ty) => {
+
             fn deprecated_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).deprecated_opt()
             }
+
             fn idempotency_level_opt<'this>(&'this self) -> ::std::option::Option<self::_puroro_root::google::protobuf::_puroro_nested::method_options::IdempotencyLevel> {
                 (**self).idempotency_level_opt()
             }
@@ -32015,6 +32513,7 @@ pub mod _puroro_traits {
             <U as MethodOptionsTrait>::deprecated_opt(&self.1)
                 .or_else(|| <T as MethodOptionsTrait>::deprecated_opt(&self.0))
         }
+
         fn idempotency_level_opt<'this>(
             &'this self,
         ) -> Option<
@@ -32143,6 +32642,7 @@ pub mod _puroro_traits {
         fn has_identifier_value<'this>(&'this self) -> bool {
             self.identifier_value_opt().is_some()
         }
+
         fn identifier_value_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -32153,6 +32653,7 @@ pub mod _puroro_traits {
         fn has_positive_int_value<'this>(&'this self) -> bool {
             self.positive_int_value_opt().is_some()
         }
+
         fn positive_int_value_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -32163,6 +32664,7 @@ pub mod _puroro_traits {
         fn has_negative_int_value<'this>(&'this self) -> bool {
             self.negative_int_value_opt().is_some()
         }
+
         fn negative_int_value_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -32173,6 +32675,7 @@ pub mod _puroro_traits {
         fn has_double_value<'this>(&'this self) -> bool {
             self.double_value_opt().is_some()
         }
+
         fn double_value_opt<'this>(&'this self) -> ::std::option::Option<f64> {
             ::std::option::Option::None
         }
@@ -32183,6 +32686,7 @@ pub mod _puroro_traits {
         fn has_string_value<'this>(&'this self) -> bool {
             self.string_value_opt().is_some()
         }
+
         fn string_value_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -32193,6 +32697,7 @@ pub mod _puroro_traits {
         fn has_aggregate_value<'this>(&'this self) -> bool {
             self.aggregate_value_opt().is_some()
         }
+
         fn aggregate_value_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -32212,21 +32717,27 @@ pub mod _puroro_traits {
             fn name<'this>(&'this self) -> Self::NameRepeatedType<'this> {
                 (**self).name()
             }
+
             fn identifier_value_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).identifier_value_opt()
             }
+
             fn positive_int_value_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).positive_int_value_opt()
             }
+
             fn negative_int_value_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).negative_int_value_opt()
             }
+
             fn double_value_opt<'this>(&'this self) -> ::std::option::Option<f64> {
                 (**self).double_value_opt()
             }
+
             fn string_value_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).string_value_opt()
             }
+
             fn aggregate_value_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).aggregate_value_opt()
             }
@@ -32306,26 +32817,32 @@ pub mod _puroro_traits {
                 <U as UninterpretedOptionTrait>::name(&self.1),
             )
         }
+
         fn identifier_value_opt<'this>(&'this self) -> Option<&'this str> {
             <U as UninterpretedOptionTrait>::identifier_value_opt(&self.1)
                 .or_else(|| <T as UninterpretedOptionTrait>::identifier_value_opt(&self.0))
         }
+
         fn positive_int_value_opt<'this>(&'this self) -> Option<u64> {
             <U as UninterpretedOptionTrait>::positive_int_value_opt(&self.1)
                 .or_else(|| <T as UninterpretedOptionTrait>::positive_int_value_opt(&self.0))
         }
+
         fn negative_int_value_opt<'this>(&'this self) -> Option<i64> {
             <U as UninterpretedOptionTrait>::negative_int_value_opt(&self.1)
                 .or_else(|| <T as UninterpretedOptionTrait>::negative_int_value_opt(&self.0))
         }
+
         fn double_value_opt<'this>(&'this self) -> Option<f64> {
             <U as UninterpretedOptionTrait>::double_value_opt(&self.1)
                 .or_else(|| <T as UninterpretedOptionTrait>::double_value_opt(&self.0))
         }
+
         fn string_value_opt<'this>(&'this self) -> Option<&'this [u8]> {
             <U as UninterpretedOptionTrait>::string_value_opt(&self.1)
                 .or_else(|| <T as UninterpretedOptionTrait>::string_value_opt(&self.0))
         }
+
         fn aggregate_value_opt<'this>(&'this self) -> Option<&'this str> {
             <U as UninterpretedOptionTrait>::aggregate_value_opt(&self.1)
                 .or_else(|| <T as UninterpretedOptionTrait>::aggregate_value_opt(&self.0))
@@ -32916,6 +33433,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ExtensionRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -32924,13 +33442,15 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ExtensionRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::ExtensionRangeTrait>::OptionsMessageType<'_>>
                 >::ser_field(
                     <Self as super::_puroro_traits::ExtensionRangeTrait>::options_opt(self),
                     3,
-                    out
+                    out,
+                    false,
                 )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33104,6 +33624,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ReservedRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -33112,6 +33633,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ReservedRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33208,6 +33730,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ExtensionRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33279,6 +33802,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ExtensionRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33355,7 +33879,8 @@ pub mod _puroro_nested {
                 >::ser_field(
                     <Self as super::_puroro_traits::ExtensionRangeTrait>::options_opt(self),
                     3,
-                    out
+                    out,
+                    false,
                 )?;
                 ::std::result::Result::Ok(())
             }
@@ -33581,6 +34106,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ExtensionRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -33589,13 +34115,15 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ExtensionRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::ExtensionRangeTrait>::OptionsMessageType<'_>>
                 >::ser_field(
                     <Self as super::_puroro_traits::ExtensionRangeTrait>::options_opt(self),
                     3,
-                    out
+                    out,
+                    false,
                 )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33687,6 +34215,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ReservedRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33753,6 +34282,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ReservedRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33930,6 +34460,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ReservedRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -33938,6 +34469,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::ReservedRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -33993,6 +34525,7 @@ pub mod _puroro_nested {
                 fn has_start<'this>(&'this self) -> bool {
                     self.start_opt().is_some()
                 }
+
                 fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -34003,6 +34536,7 @@ pub mod _puroro_nested {
                 fn has_end<'this>(&'this self) -> bool {
                     self.end_opt().is_some()
                 }
+
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -34016,6 +34550,7 @@ pub mod _puroro_nested {
                 fn has_options<'this>(&'this self) -> bool {
                     self.options_opt().is_some()
                 }
+
                 fn options_opt<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -34028,6 +34563,7 @@ pub mod _puroro_nested {
                     fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).start_opt()
                     }
+
                     fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).end_opt()
                     }
@@ -34035,6 +34571,7 @@ pub mod _puroro_nested {
                     where
                         Self: 'this,
                     = <$ty>::OptionsMessageType<'this>;
+
                     fn options_opt<'this>(
                         &'this self,
                     ) -> ::std::option::Option<Self::OptionsMessageType<'this>> {
@@ -34092,6 +34629,7 @@ pub mod _puroro_nested {
                     <U as ExtensionRangeTrait>::start_opt(&self.1)
                         .or_else(|| <T as ExtensionRangeTrait>::start_opt(&self.0))
                 }
+
                 fn end_opt<'this>(&'this self) -> Option<i32> {
                     <U as ExtensionRangeTrait>::end_opt(&self.1)
                         .or_else(|| <T as ExtensionRangeTrait>::end_opt(&self.0))
@@ -34103,6 +34641,7 @@ pub mod _puroro_nested {
                     ::std::option::Option<<T as ExtensionRangeTrait>::OptionsMessageType<'this>>,
                     ::std::option::Option<<U as ExtensionRangeTrait>::OptionsMessageType<'this>>,
                 );
+
                 fn options_opt<'this>(&'this self) -> Option<Self::OptionsMessageType<'this>> {
                     match (
                         <T as ExtensionRangeTrait>::options_opt(&self.0),
@@ -34183,6 +34722,7 @@ pub mod _puroro_nested {
                 fn has_start<'this>(&'this self) -> bool {
                     self.start_opt().is_some()
                 }
+
                 fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -34193,6 +34733,7 @@ pub mod _puroro_nested {
                 fn has_end<'this>(&'this self) -> bool {
                     self.end_opt().is_some()
                 }
+
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -34203,6 +34744,7 @@ pub mod _puroro_nested {
                     fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).start_opt()
                     }
+
                     fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).end_opt()
                     }
@@ -34253,6 +34795,7 @@ pub mod _puroro_nested {
                     <U as ReservedRangeTrait>::start_opt(&self.1)
                         .or_else(|| <T as ReservedRangeTrait>::start_opt(&self.0))
                 }
+
                 fn end_opt<'this>(&'this self) -> Option<i32> {
                     <U as ReservedRangeTrait>::end_opt(&self.1)
                         .or_else(|| <T as ReservedRangeTrait>::end_opt(&self.0))
@@ -34587,6 +35130,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::EnumReservedRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -34595,6 +35139,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::EnumReservedRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -34689,6 +35234,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::EnumReservedRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -34758,6 +35304,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::EnumReservedRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -34935,6 +35482,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::EnumReservedRangeTrait>::start_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -34943,6 +35491,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::EnumReservedRangeTrait>::end_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -35001,6 +35550,7 @@ pub mod _puroro_nested {
                 fn has_start<'this>(&'this self) -> bool {
                     self.start_opt().is_some()
                 }
+
                 fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -35011,6 +35561,7 @@ pub mod _puroro_nested {
                 fn has_end<'this>(&'this self) -> bool {
                     self.end_opt().is_some()
                 }
+
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -35021,6 +35572,7 @@ pub mod _puroro_nested {
                     fn start_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).start_opt()
                     }
+
                     fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).end_opt()
                     }
@@ -35071,6 +35623,7 @@ pub mod _puroro_nested {
                     <U as EnumReservedRangeTrait>::start_opt(&self.1)
                         .or_else(|| <T as EnumReservedRangeTrait>::start_opt(&self.0))
                 }
+
                 fn end_opt<'this>(&'this self) -> Option<i32> {
                     <U as EnumReservedRangeTrait>::end_opt(&self.1)
                         .or_else(|| <T as EnumReservedRangeTrait>::end_opt(&self.0))
@@ -35485,6 +36038,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::NamePartTrait>::name_part_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Required,
@@ -35493,6 +36047,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::NamePartTrait>::is_extension_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -35582,6 +36137,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::NamePartTrait>::name_part_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -35647,6 +36203,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::NamePartTrait>::is_extension_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -35830,6 +36387,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::NamePartTrait>::name_part_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Required,
@@ -35838,6 +36396,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::NamePartTrait>::is_extension_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -35898,6 +36457,7 @@ pub mod _puroro_nested {
                 fn has_name_part<'this>(&'this self) -> bool {
                     self.name_part_opt().is_some()
                 }
+
                 fn name_part_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::None
                 }
@@ -35908,6 +36468,7 @@ pub mod _puroro_nested {
                 fn has_is_extension<'this>(&'this self) -> bool {
                     self.is_extension_opt().is_some()
                 }
+
                 fn is_extension_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                     ::std::option::Option::None
                 }
@@ -35918,6 +36479,7 @@ pub mod _puroro_nested {
                     fn name_part_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).name_part_opt()
                     }
+
                     fn is_extension_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                         (**self).is_extension_opt()
                     }
@@ -35968,6 +36530,7 @@ pub mod _puroro_nested {
                     <U as NamePartTrait>::name_part_opt(&self.1)
                         .or_else(|| <T as NamePartTrait>::name_part_opt(&self.0))
                 }
+
                 fn is_extension_opt<'this>(&'this self) -> Option<bool> {
                     <U as NamePartTrait>::is_extension_opt(&self.1)
                         .or_else(|| <T as NamePartTrait>::is_extension_opt(&self.0))
@@ -36224,6 +36787,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::path(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Repeated,
@@ -36232,6 +36796,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::span(self),
                         2,
                         out,
+                        true,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -36240,6 +36805,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::leading_comments_opt(self),
                         3,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -36248,6 +36814,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::trailing_comments_opt(self),
                         4,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Repeated,
@@ -36258,6 +36825,7 @@ pub mod _puroro_nested {
                         ),
                         6,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -36394,6 +36962,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::path(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -36497,6 +37066,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::span(self),
                         2,
                         out,
+                        true,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -36590,6 +37160,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::leading_comments_opt(self),
                         3,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -36679,6 +37250,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::trailing_comments_opt(self),
                         4,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -36780,6 +37352,7 @@ pub mod _puroro_nested {
                         ),
                         6,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -37082,6 +37655,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::path(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Repeated,
@@ -37090,6 +37664,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::span(self),
                         2,
                         out,
+                        true,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -37098,6 +37673,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::leading_comments_opt(self),
                         3,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -37106,6 +37682,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::LocationTrait>::trailing_comments_opt(self),
                         4,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Repeated,
@@ -37116,6 +37693,7 @@ pub mod _puroro_nested {
                         ),
                         6,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -37233,6 +37811,7 @@ pub mod _puroro_nested {
                 fn has_leading_comments<'this>(&'this self) -> bool {
                     self.leading_comments_opt().is_some()
                 }
+
                 fn leading_comments_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::None
                 }
@@ -37243,6 +37822,7 @@ pub mod _puroro_nested {
                 fn has_trailing_comments<'this>(&'this self) -> bool {
                     self.trailing_comments_opt().is_some()
                 }
+
                 fn trailing_comments_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::None
                 }
@@ -37273,11 +37853,13 @@ pub mod _puroro_nested {
                     fn span<'this>(&'this self) -> Self::SpanRepeatedType<'this> {
                         (**self).span()
                     }
+
                     fn leading_comments_opt<'this>(
                         &'this self,
                     ) -> ::std::option::Option<&'this str> {
                         (**self).leading_comments_opt()
                     }
+
                     fn trailing_comments_opt<'this>(
                         &'this self,
                     ) -> ::std::option::Option<&'this str> {
@@ -37388,10 +37970,12 @@ pub mod _puroro_nested {
                         <U as LocationTrait>::span(&self.1),
                     )
                 }
+
                 fn leading_comments_opt<'this>(&'this self) -> Option<&'this str> {
                     <U as LocationTrait>::leading_comments_opt(&self.1)
                         .or_else(|| <T as LocationTrait>::leading_comments_opt(&self.0))
                 }
+
                 fn trailing_comments_opt<'this>(&'this self) -> Option<&'this str> {
                     <U as LocationTrait>::trailing_comments_opt(&self.1)
                         .or_else(|| <T as LocationTrait>::trailing_comments_opt(&self.0))
@@ -37730,6 +38314,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::path(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -37738,6 +38323,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::source_file_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -37746,6 +38332,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::begin_opt(self),
                         3,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -37754,6 +38341,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::end_opt(self),
                         4,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -37866,6 +38454,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::path(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -37943,6 +38532,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::source_file_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -38016,6 +38606,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::begin_opt(self),
                         3,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -38089,6 +38680,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::end_opt(self),
                         4,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -38337,6 +38929,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::path(self),
                         1,
                         out,
+                        true,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -38345,6 +38938,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::source_file_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -38353,6 +38947,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::begin_opt(self),
                         3,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -38361,6 +38956,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::AnnotationTrait>::end_opt(self),
                         4,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -38443,6 +39039,7 @@ pub mod _puroro_nested {
                 fn has_source_file<'this>(&'this self) -> bool {
                     self.source_file_opt().is_some()
                 }
+
                 fn source_file_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::None
                 }
@@ -38453,6 +39050,7 @@ pub mod _puroro_nested {
                 fn has_begin<'this>(&'this self) -> bool {
                     self.begin_opt().is_some()
                 }
+
                 fn begin_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -38463,6 +39061,7 @@ pub mod _puroro_nested {
                 fn has_end<'this>(&'this self) -> bool {
                     self.end_opt().is_some()
                 }
+
                 fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }
@@ -38477,12 +39076,15 @@ pub mod _puroro_nested {
                     fn path<'this>(&'this self) -> Self::PathRepeatedType<'this> {
                         (**self).path()
                     }
+
                     fn source_file_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).source_file_opt()
                     }
+
                     fn begin_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).begin_opt()
                     }
+
                     fn end_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                         (**self).end_opt()
                     }
@@ -38551,14 +39153,17 @@ pub mod _puroro_nested {
                         <U as AnnotationTrait>::path(&self.1),
                     )
                 }
+
                 fn source_file_opt<'this>(&'this self) -> Option<&'this str> {
                     <U as AnnotationTrait>::source_file_opt(&self.1)
                         .or_else(|| <T as AnnotationTrait>::source_file_opt(&self.0))
                 }
+
                 fn begin_opt<'this>(&'this self) -> Option<i32> {
                     <U as AnnotationTrait>::begin_opt(&self.1)
                         .or_else(|| <T as AnnotationTrait>::begin_opt(&self.0))
                 }
+
                 fn end_opt<'this>(&'this self) -> Option<i32> {
                     <U as AnnotationTrait>::end_opt(&self.1)
                         .or_else(|| <T as AnnotationTrait>::end_opt(&self.0))

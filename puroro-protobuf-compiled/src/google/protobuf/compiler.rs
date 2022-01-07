@@ -213,6 +213,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::VersionTrait>::major_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -221,6 +222,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::VersionTrait>::minor_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -229,6 +231,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::VersionTrait>::patch_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -237,6 +240,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::VersionTrait>::suffix_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -483,6 +487,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::file_to_generate(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -491,20 +496,23 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::parameter_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::CodeGeneratorRequestTrait>::ProtoFileMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::proto_file(self),
             15,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::CodeGeneratorRequestTrait>::CompilerVersionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::compiler_version_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -702,6 +710,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::CodeGeneratorResponseTrait>::error_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -712,6 +721,7 @@ pub mod _puroro_simple_impl {
                 ),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -724,6 +734,7 @@ pub mod _puroro_simple_impl {
                 <Self as super::_puroro_traits::CodeGeneratorResponseTrait>::file(self),
                 15,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -817,6 +828,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::major_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -882,6 +894,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::minor_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -947,6 +960,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::patch_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1010,6 +1024,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::suffix_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1260,6 +1275,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::major_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1268,6 +1284,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::minor_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1276,6 +1293,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::patch_opt(self),
                 3,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1284,6 +1302,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::VersionTrait>::suffix_opt(self),
                 4,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1414,6 +1433,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::file_to_generate(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1512,6 +1532,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::parameter_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -1608,7 +1629,8 @@ pub mod _puroro_impls {
         >::ser_field(
             <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::proto_file(self),
             15,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -1707,7 +1729,8 @@ pub mod _puroro_impls {
         >::ser_field(
             <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::compiler_version_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -1985,6 +2008,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::file_to_generate(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1993,20 +2017,23 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::parameter_opt(self),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<<Self as super::_puroro_traits::CodeGeneratorRequestTrait>::ProtoFileMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::proto_file(self),
             15,
-            out
+            out,
+            false,
         )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::CodeGeneratorRequestTrait>::CompilerVersionMessageType<'_>>
         >::ser_field(
             <Self as super::_puroro_traits::CodeGeneratorRequestTrait>::compiler_version_opt(self),
             3,
-            out
+            out,
+            false,
         )?;
             ::std::result::Result::Ok(())
         }
@@ -2148,6 +2175,7 @@ pub mod _puroro_impls {
                 <Self as super::_puroro_traits::CodeGeneratorResponseTrait>::error_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -2230,6 +2258,7 @@ pub mod _puroro_impls {
                 ),
                 2,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -2319,7 +2348,8 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         >::ser_field(
             <Self as super::_puroro_traits::CodeGeneratorResponseTrait>::file(self),
             15,
-            out
+            out,
+            false,
         )?;
         ::std::result::Result::Ok(())
     }
@@ -2538,6 +2568,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::CodeGeneratorResponseTrait>::error_opt(self),
                 1,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -2548,6 +2579,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 ),
                 2,
                 out,
+                false,
             )?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
@@ -2560,6 +2592,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 <Self as super::_puroro_traits::CodeGeneratorResponseTrait>::file(self),
                 15,
                 out,
+                false,
             )?;
             ::std::result::Result::Ok(())
         }
@@ -2638,6 +2671,7 @@ pub mod _puroro_traits {
         fn has_major<'this>(&'this self) -> bool {
             self.major_opt().is_some()
         }
+
         fn major_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -2648,6 +2682,7 @@ pub mod _puroro_traits {
         fn has_minor<'this>(&'this self) -> bool {
             self.minor_opt().is_some()
         }
+
         fn minor_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -2658,6 +2693,7 @@ pub mod _puroro_traits {
         fn has_patch<'this>(&'this self) -> bool {
             self.patch_opt().is_some()
         }
+
         fn patch_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -2668,6 +2704,7 @@ pub mod _puroro_traits {
         fn has_suffix<'this>(&'this self) -> bool {
             self.suffix_opt().is_some()
         }
+
         fn suffix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -2678,12 +2715,15 @@ pub mod _puroro_traits {
             fn major_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).major_opt()
             }
+
             fn minor_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).minor_opt()
             }
+
             fn patch_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).patch_opt()
             }
+
             fn suffix_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).suffix_opt()
             }
@@ -2734,14 +2774,17 @@ pub mod _puroro_traits {
             <U as VersionTrait>::major_opt(&self.1)
                 .or_else(|| <T as VersionTrait>::major_opt(&self.0))
         }
+
         fn minor_opt<'this>(&'this self) -> Option<i32> {
             <U as VersionTrait>::minor_opt(&self.1)
                 .or_else(|| <T as VersionTrait>::minor_opt(&self.0))
         }
+
         fn patch_opt<'this>(&'this self) -> Option<i32> {
             <U as VersionTrait>::patch_opt(&self.1)
                 .or_else(|| <T as VersionTrait>::patch_opt(&self.0))
         }
+
         fn suffix_opt<'this>(&'this self) -> Option<&'this str> {
             <U as VersionTrait>::suffix_opt(&self.1)
                 .or_else(|| <T as VersionTrait>::suffix_opt(&self.0))
@@ -2808,6 +2851,7 @@ pub mod _puroro_traits {
         fn has_parameter<'this>(&'this self) -> bool {
             self.parameter_opt().is_some()
         }
+
         fn parameter_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -2829,6 +2873,7 @@ pub mod _puroro_traits {
         fn has_compiler_version<'this>(&'this self) -> bool {
             self.compiler_version_opt().is_some()
         }
+
         fn compiler_version_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::CompilerVersionMessageType<'this>> {
@@ -2845,6 +2890,7 @@ pub mod _puroro_traits {
             fn file_to_generate<'this>(&'this self) -> Self::FileToGenerateRepeatedType<'this> {
                 (**self).file_to_generate()
             }
+
             fn parameter_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).parameter_opt()
             }
@@ -2864,6 +2910,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::CompilerVersionMessageType<'this>;
+
             fn compiler_version_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::CompilerVersionMessageType<'this>> {
@@ -2949,6 +2996,7 @@ pub mod _puroro_traits {
                 <U as CodeGeneratorRequestTrait>::file_to_generate(&self.1),
             )
         }
+
         fn parameter_opt<'this>(&'this self) -> Option<&'this str> {
             <U as CodeGeneratorRequestTrait>::parameter_opt(&self.1)
                 .or_else(|| <T as CodeGeneratorRequestTrait>::parameter_opt(&self.0))
@@ -2985,6 +3033,7 @@ pub mod _puroro_traits {
                 <U as CodeGeneratorRequestTrait>::CompilerVersionMessageType<'this>,
             >,
         );
+
         fn compiler_version_opt<'this>(
             &'this self,
         ) -> Option<Self::CompilerVersionMessageType<'this>> {
@@ -3120,6 +3169,7 @@ pub mod _puroro_traits {
         fn has_error<'this>(&'this self) -> bool {
             self.error_opt().is_some()
         }
+
         fn error_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -3130,6 +3180,7 @@ pub mod _puroro_traits {
         fn has_supported_features<'this>(&'this self) -> bool {
             self.supported_features_opt().is_some()
         }
+
         fn supported_features_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -3148,6 +3199,7 @@ pub mod _puroro_traits {
             fn error_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).error_opt()
             }
+
             fn supported_features_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).supported_features_opt()
             }
@@ -3222,6 +3274,7 @@ pub mod _puroro_traits {
             <U as CodeGeneratorResponseTrait>::error_opt(&self.1)
                 .or_else(|| <T as CodeGeneratorResponseTrait>::error_opt(&self.0))
         }
+
         fn supported_features_opt<'this>(&'this self) -> Option<u64> {
             <U as CodeGeneratorResponseTrait>::supported_features_opt(&self.1)
                 .or_else(|| <T as CodeGeneratorResponseTrait>::supported_features_opt(&self.0))
@@ -3536,6 +3589,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::name_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -3544,6 +3598,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::insertion_point_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -3552,13 +3607,15 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::content_opt(self),
                         15,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::FileTrait>::GeneratedCodeInfoMessageType<'_>>
                 >::ser_field(
                     <Self as super::_puroro_traits::FileTrait>::generated_code_info_opt(self),
                     16,
-                    out
+                    out,
+                    false,
                 )?;
                     ::std::result::Result::Ok(())
                 }
@@ -3659,6 +3716,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::name_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -3726,6 +3784,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::insertion_point_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -3795,6 +3854,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::content_opt(self),
                         15,
                         out,
+                        false,
                     )?;
                     ::std::result::Result::Ok(())
                 }
@@ -3870,7 +3930,8 @@ pub mod _puroro_nested {
                 >::ser_field(
                     <Self as super::_puroro_traits::FileTrait>::generated_code_info_opt(self),
                     16,
-                    out
+                    out,
+                    false,
                 )?;
                     ::std::result::Result::Ok(())
                 }
@@ -4145,6 +4206,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::name_opt(self),
                         1,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -4153,6 +4215,7 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::insertion_point_opt(self),
                         2,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
@@ -4161,13 +4224,15 @@ pub mod _puroro_nested {
                         <Self as super::_puroro_traits::FileTrait>::content_opt(self),
                         15,
                         out,
+                        false,
                     )?;
                     ::puroro::internal::se::SerFieldToIoWrite::<
                     ::puroro::tags::Optional, ::puroro::tags::Message<<Self as super::_puroro_traits::FileTrait>::GeneratedCodeInfoMessageType<'_>>
                 >::ser_field(
                     <Self as super::_puroro_traits::FileTrait>::generated_code_info_opt(self),
                     16,
-                    out
+                    out,
+                    false,
                 )?;
                     ::std::result::Result::Ok(())
                 }
@@ -4253,6 +4318,7 @@ pub mod _puroro_nested {
                 fn has_name<'this>(&'this self) -> bool {
                     self.name_opt().is_some()
                 }
+
                 fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::None
                 }
@@ -4263,6 +4329,7 @@ pub mod _puroro_nested {
                 fn has_insertion_point<'this>(&'this self) -> bool {
                     self.insertion_point_opt().is_some()
                 }
+
                 fn insertion_point_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::None
                 }
@@ -4273,6 +4340,7 @@ pub mod _puroro_nested {
                 fn has_content<'this>(&'this self) -> bool {
                     self.content_opt().is_some()
                 }
+
                 fn content_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                     ::std::option::Option::None
                 }
@@ -4287,6 +4355,7 @@ pub mod _puroro_nested {
                 fn has_generated_code_info<'this>(&'this self) -> bool {
                     self.generated_code_info_opt().is_some()
                 }
+
                 fn generated_code_info_opt<'this>(
                     &'this self,
                 ) -> ::std::option::Option<Self::GeneratedCodeInfoMessageType<'this>>
@@ -4300,11 +4369,13 @@ pub mod _puroro_nested {
                     fn name_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).name_opt()
                     }
+
                     fn insertion_point_opt<'this>(
                         &'this self,
                     ) -> ::std::option::Option<&'this str> {
                         (**self).insertion_point_opt()
                     }
+
                     fn content_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                         (**self).content_opt()
                     }
@@ -4312,6 +4383,7 @@ pub mod _puroro_nested {
                     where
                         Self: 'this,
                     = <$ty>::GeneratedCodeInfoMessageType<'this>;
+
                     fn generated_code_info_opt<'this>(
                         &'this self,
                     ) -> ::std::option::Option<Self::GeneratedCodeInfoMessageType<'this>> {
@@ -4369,10 +4441,12 @@ pub mod _puroro_nested {
                     <U as FileTrait>::name_opt(&self.1)
                         .or_else(|| <T as FileTrait>::name_opt(&self.0))
                 }
+
                 fn insertion_point_opt<'this>(&'this self) -> Option<&'this str> {
                     <U as FileTrait>::insertion_point_opt(&self.1)
                         .or_else(|| <T as FileTrait>::insertion_point_opt(&self.0))
                 }
+
                 fn content_opt<'this>(&'this self) -> Option<&'this str> {
                     <U as FileTrait>::content_opt(&self.1)
                         .or_else(|| <T as FileTrait>::content_opt(&self.0))
@@ -4384,6 +4458,7 @@ pub mod _puroro_nested {
                     ::std::option::Option<<T as FileTrait>::GeneratedCodeInfoMessageType<'this>>,
                     ::std::option::Option<<U as FileTrait>::GeneratedCodeInfoMessageType<'this>>,
                 );
+
                 fn generated_code_info_opt<'this>(
                     &'this self,
                 ) -> Option<Self::GeneratedCodeInfoMessageType<'this>> {
