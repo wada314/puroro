@@ -1693,6 +1693,7 @@ pub mod _puroro_traits {
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
+
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -1703,6 +1704,7 @@ pub mod _puroro_traits {
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
         }
+
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -1719,6 +1721,7 @@ pub mod _puroro_traits {
         fn has_f32_unlabeled<'this>(&'this self) -> bool {
             self.f32_unlabeled_opt().is_some()
         }
+
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -1729,6 +1732,7 @@ pub mod _puroro_traits {
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
         }
+
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -1742,6 +1746,7 @@ pub mod _puroro_traits {
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
         }
+
         fn submsg_unlabeled_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -1754,6 +1759,7 @@ pub mod _puroro_traits {
             fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_unlabeled_opt()
             }
+
             fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_optional_opt()
             }
@@ -1765,9 +1771,11 @@ pub mod _puroro_traits {
             fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
                 (**self).i32_repeated()
             }
+
             fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_unlabeled_opt()
             }
+
             fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_unlabeled_opt()
             }
@@ -1775,6 +1783,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::SubmsgUnlabeledMessageType<'this>;
+
             fn submsg_unlabeled_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
@@ -1991,6 +2000,7 @@ pub mod _puroro_traits {
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
+
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }

@@ -2757,6 +2757,7 @@ pub mod _puroro_traits {
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
         }
+
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -2773,6 +2774,7 @@ pub mod _puroro_traits {
         fn has_float_optional<'this>(&'this self) -> bool {
             self.float_optional_opt().is_some()
         }
+
         fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -2789,6 +2791,7 @@ pub mod _puroro_traits {
         fn has_string_optional<'this>(&'this self) -> bool {
             self.string_optional_opt().is_some()
         }
+
         fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -2808,6 +2811,7 @@ pub mod _puroro_traits {
         fn has_submsg_optional<'this>(&'this self) -> bool {
             self.submsg_optional_opt().is_some()
         }
+
         fn submsg_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::SubmsgOptionalMessageType<'this>> {
@@ -2828,6 +2832,7 @@ pub mod _puroro_traits {
         fn has_enum_optional<'this>(&'this self) -> bool {
             self.enum_optional_opt().is_some()
         }
+
         fn enum_optional_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
@@ -2846,6 +2851,7 @@ pub mod _puroro_traits {
         fn has_very_large_field_number<'this>(&'this self) -> bool {
             self.very_large_field_number_opt().is_some()
         }
+
         fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -2864,6 +2870,7 @@ pub mod _puroro_traits {
             fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
                 (**self).i32_repeated()
             }
+
             fn float_optional_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).float_optional_opt()
             }
@@ -2875,6 +2882,7 @@ pub mod _puroro_traits {
             fn float_repeated<'this>(&'this self) -> Self::FloatRepeatedRepeatedType<'this> {
                 (**self).float_repeated()
             }
+
             fn string_optional_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_optional_opt()
             }
@@ -2890,6 +2898,7 @@ pub mod _puroro_traits {
             where
                 Self: 'this,
             = <$ty>::SubmsgOptionalMessageType<'this>;
+
             fn submsg_optional_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<Self::SubmsgOptionalMessageType<'this>> {
@@ -2907,6 +2916,7 @@ pub mod _puroro_traits {
             fn submsg_repeated<'this>(&'this self) -> Self::SubmsgRepeatedRepeatedType<'this> {
                 (**self).submsg_repeated()
             }
+
             fn enum_optional_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
@@ -2920,6 +2930,7 @@ pub mod _puroro_traits {
             fn enum_repeated<'this>(&'this self) -> Self::EnumRepeatedRepeatedType<'this> {
                 (**self).enum_repeated()
             }
+
             fn very_large_field_number_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).very_large_field_number_opt()
             }
@@ -3784,6 +3795,7 @@ pub mod _puroro_nested {
                 fn has_i32_optional<'this>(&'this self) -> bool {
                     self.i32_optional_opt().is_some()
                 }
+
                 fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                     ::std::option::Option::None
                 }

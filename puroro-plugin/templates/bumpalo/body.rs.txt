@@ -252,35 +252,6 @@ impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}
     {%- for f in m.fields %}
     {%- call bumpalo_trait_impl_field(f) %}
     {%- endfor %}
-
-    {%- for oneof in m.oneofs %}
-    fn {{ oneof.field_ident }}(&self) ->
-        Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
-        >
-    {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        match &self.{{ oneof.field_ident }} {
-            E::_None(_) => ::std::option::Option::None,
-            {%- for f in oneof.fields %}
-            E::{{ f.ident }}(val) => ::std::option::Option::Some(
-                {%- if f.is_message %}
-                {#- message field need to be cast the lifetime param #}
-                F::{{ f.ident }}(unsafe { ::std::mem::transmute(val.as_ref()) })
-                {%- endif %} {#- if f.is_message #}
-                {%- if f.is_string || f.is_bytes %}
-                F::{{ f.ident }}(val.as_ref())
-                {%- endif %} {#- if f.is_string || f.is_bytes #}
-                {%- if f.is_numerical %}
-                F::{{ f.ident }}(val.inner().clone())
-                {%- endif %} {#- if f.is_numerical #}
-            ),
-            {%- endfor %}
-        }
-    }
-    {%- endfor %}
 }
 
 impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_ident }}<'bump> {

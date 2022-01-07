@@ -554,6 +554,7 @@ pub mod _puroro_traits {
             fn title_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).title_opt()
             }
+
             fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).num_pages_opt()
             }

@@ -53,7 +53,7 @@ pub trait {{ m.trait_ident }} {
 
         {%- for f in oneof.fields %}
         if let ::std::option::Option::Some(val) = self.{{ f.getter_ident_unesc }}_opt() {
-            return E::{{ f.ident }}(v)
+            return ::std::option::Option::Some(E::{{ f.ident }}(val))
         }
         {%- endfor %} {#- for f in oneof.fields #}
 
@@ -78,31 +78,12 @@ macro_rules! {{ m.trait_delegate_macro_ident }} {
 
         {%- else %} {#- if f.is_repeated #}
 
-        {%- if !f.is_explicit_oneof_field %}
         fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
             (**self).{{ f.ident_unesc }}_opt()
         }
-        {%- endif %}
 
         {%- endif %} {#- if f.is_repeated #}
 
-        {%- endfor %}
-
-        {%- for oneof in m.oneofs %}
-        fn {{ oneof.field_ident }}<'this>(&'this self) ->
-            ::std::option::Option<
-                super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-                {%- if oneof.has_ld_field %}
-                {%- if oneof.has_message_field %}
-                <'this, Self>
-                {%- else %}
-                <'this>
-                {%- endif %}
-                {%- endif %}
-            >
-        {
-            (**self).{{ oneof.field_ident }}().map(|v| v.into())
-        }
         {%- endfor %}
     };
 }

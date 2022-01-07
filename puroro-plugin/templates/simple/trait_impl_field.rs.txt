@@ -46,7 +46,6 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedT
 
 {%- else %} {#- if f.is_repeated #}
 
-{%- if !f.is_explicit_oneof_field %}
 {#- As same as the struct itselves impl. #}
 {#- [optional] i32 => Option<i32> #}
 {#- [optional] String => Option<&'this str> #}
@@ -54,6 +53,5 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::{{ f.ident_camel_unesc }}RepeatedT
 fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     <self::{{ m.simple_ident }}>::{{ f.ident_unesc }}_opt(self)
 }
-{%- endif %} {#- if !f.is_explicit_oneof_field #}
 
 {%- endif %} {#- if f.is_repeated #}

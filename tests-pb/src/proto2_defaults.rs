@@ -11045,6 +11045,7 @@ pub mod _puroro_traits {
         fn has_i32_default<'this>(&'this self) -> bool {
             self.i32_default_opt().is_some()
         }
+
         fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11054,6 +11055,7 @@ pub mod _puroro_traits {
         fn has_i32_0<'this>(&'this self) -> bool {
             self.i32_0_opt().is_some()
         }
+
         fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11063,6 +11065,7 @@ pub mod _puroro_traits {
         fn has_i32_42<'this>(&'this self) -> bool {
             self.i32_42_opt().is_some()
         }
+
         fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11072,6 +11075,7 @@ pub mod _puroro_traits {
         fn has_i32_m42<'this>(&'this self) -> bool {
             self.i32_m42_opt().is_some()
         }
+
         fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11081,6 +11085,7 @@ pub mod _puroro_traits {
         fn has_i32_2147483647<'this>(&'this self) -> bool {
             self.i32_2147483647_opt().is_some()
         }
+
         fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11090,6 +11095,7 @@ pub mod _puroro_traits {
         fn has_i32_m2147483648<'this>(&'this self) -> bool {
             self.i32_m2147483648_opt().is_some()
         }
+
         fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11099,6 +11105,7 @@ pub mod _puroro_traits {
         fn has_i32_0123<'this>(&'this self) -> bool {
             self.i32_0123_opt().is_some()
         }
+
         fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11108,6 +11115,7 @@ pub mod _puroro_traits {
         fn has_i32_0x123<'this>(&'this self) -> bool {
             self.i32_0x123_opt().is_some()
         }
+
         fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
@@ -11118,6 +11126,7 @@ pub mod _puroro_traits {
         fn has_u32_default<'this>(&'this self) -> bool {
             self.u32_default_opt().is_some()
         }
+
         fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -11127,6 +11136,7 @@ pub mod _puroro_traits {
         fn has_u32_0<'this>(&'this self) -> bool {
             self.u32_0_opt().is_some()
         }
+
         fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -11136,6 +11146,7 @@ pub mod _puroro_traits {
         fn has_u32_42<'this>(&'this self) -> bool {
             self.u32_42_opt().is_some()
         }
+
         fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -11145,6 +11156,7 @@ pub mod _puroro_traits {
         fn has_u32_4294967295<'this>(&'this self) -> bool {
             self.u32_4294967295_opt().is_some()
         }
+
         fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -11154,6 +11166,7 @@ pub mod _puroro_traits {
         fn has_u32_0123<'this>(&'this self) -> bool {
             self.u32_0123_opt().is_some()
         }
+
         fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -11163,6 +11176,7 @@ pub mod _puroro_traits {
         fn has_u32_0x123<'this>(&'this self) -> bool {
             self.u32_0x123_opt().is_some()
         }
+
         fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
@@ -11173,6 +11187,7 @@ pub mod _puroro_traits {
         fn has_i64_default<'this>(&'this self) -> bool {
             self.i64_default_opt().is_some()
         }
+
         fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11182,6 +11197,7 @@ pub mod _puroro_traits {
         fn has_i64_0<'this>(&'this self) -> bool {
             self.i64_0_opt().is_some()
         }
+
         fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11191,6 +11207,7 @@ pub mod _puroro_traits {
         fn has_i64_42<'this>(&'this self) -> bool {
             self.i64_42_opt().is_some()
         }
+
         fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11200,6 +11217,7 @@ pub mod _puroro_traits {
         fn has_i64_m42<'this>(&'this self) -> bool {
             self.i64_m42_opt().is_some()
         }
+
         fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11210,6 +11228,7 @@ pub mod _puroro_traits {
         fn has_i64_9223372036854775807<'this>(&'this self) -> bool {
             self.i64_9223372036854775807_opt().is_some()
         }
+
         fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11220,6 +11239,7 @@ pub mod _puroro_traits {
         fn has_i64_m9223372036854775808<'this>(&'this self) -> bool {
             self.i64_m9223372036854775808_opt().is_some()
         }
+
         fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11229,6 +11249,7 @@ pub mod _puroro_traits {
         fn has_i64_0123<'this>(&'this self) -> bool {
             self.i64_0123_opt().is_some()
         }
+
         fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11238,6 +11259,7 @@ pub mod _puroro_traits {
         fn has_i64_0x123<'this>(&'this self) -> bool {
             self.i64_0x123_opt().is_some()
         }
+
         fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
             ::std::option::Option::None
         }
@@ -11248,6 +11270,7 @@ pub mod _puroro_traits {
         fn has_u64_default<'this>(&'this self) -> bool {
             self.u64_default_opt().is_some()
         }
+
         fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -11257,6 +11280,7 @@ pub mod _puroro_traits {
         fn has_u64_0<'this>(&'this self) -> bool {
             self.u64_0_opt().is_some()
         }
+
         fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -11266,6 +11290,7 @@ pub mod _puroro_traits {
         fn has_u64_42<'this>(&'this self) -> bool {
             self.u64_42_opt().is_some()
         }
+
         fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -11276,6 +11301,7 @@ pub mod _puroro_traits {
         fn has_u64_18446744073709551615<'this>(&'this self) -> bool {
             self.u64_18446744073709551615_opt().is_some()
         }
+
         fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -11285,6 +11311,7 @@ pub mod _puroro_traits {
         fn has_u64_0123<'this>(&'this self) -> bool {
             self.u64_0123_opt().is_some()
         }
+
         fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -11294,6 +11321,7 @@ pub mod _puroro_traits {
         fn has_u64_0x123<'this>(&'this self) -> bool {
             self.u64_0x123_opt().is_some()
         }
+
         fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
             ::std::option::Option::None
         }
@@ -11304,6 +11332,7 @@ pub mod _puroro_traits {
         fn has_f32_default<'this>(&'this self) -> bool {
             self.f32_default_opt().is_some()
         }
+
         fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11313,6 +11342,7 @@ pub mod _puroro_traits {
         fn has_f32_0<'this>(&'this self) -> bool {
             self.f32_0_opt().is_some()
         }
+
         fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11322,6 +11352,7 @@ pub mod _puroro_traits {
         fn has_f32_m0<'this>(&'this self) -> bool {
             self.f32_m0_opt().is_some()
         }
+
         fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11331,6 +11362,7 @@ pub mod _puroro_traits {
         fn has_f32_0p<'this>(&'this self) -> bool {
             self.f32_0p_opt().is_some()
         }
+
         fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11340,6 +11372,7 @@ pub mod _puroro_traits {
         fn has_f32_p0<'this>(&'this self) -> bool {
             self.f32_p0_opt().is_some()
         }
+
         fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11349,6 +11382,7 @@ pub mod _puroro_traits {
         fn has_f32_0p0<'this>(&'this self) -> bool {
             self.f32_0p0_opt().is_some()
         }
+
         fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11358,6 +11392,7 @@ pub mod _puroro_traits {
         fn has_f32_42<'this>(&'this self) -> bool {
             self.f32_42_opt().is_some()
         }
+
         fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11367,6 +11402,7 @@ pub mod _puroro_traits {
         fn has_f32_m42<'this>(&'this self) -> bool {
             self.f32_m42_opt().is_some()
         }
+
         fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11376,6 +11412,7 @@ pub mod _puroro_traits {
         fn has_f32_0p25<'this>(&'this self) -> bool {
             self.f32_0p25_opt().is_some()
         }
+
         fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11385,6 +11422,7 @@ pub mod _puroro_traits {
         fn has_f32_1p5e2<'this>(&'this self) -> bool {
             self.f32_1p5e2_opt().is_some()
         }
+
         fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11394,6 +11432,7 @@ pub mod _puroro_traits {
         fn has_f32_inf<'this>(&'this self) -> bool {
             self.f32_inf_opt().is_some()
         }
+
         fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11403,6 +11442,7 @@ pub mod _puroro_traits {
         fn has_f32_minf<'this>(&'this self) -> bool {
             self.f32_minf_opt().is_some()
         }
+
         fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11412,6 +11452,7 @@ pub mod _puroro_traits {
         fn has_f32_nan<'this>(&'this self) -> bool {
             self.f32_nan_opt().is_some()
         }
+
         fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11421,6 +11462,7 @@ pub mod _puroro_traits {
         fn has_f32_mnan<'this>(&'this self) -> bool {
             self.f32_mnan_opt().is_some()
         }
+
         fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
@@ -11431,6 +11473,7 @@ pub mod _puroro_traits {
         fn has_bool_default<'this>(&'this self) -> bool {
             self.bool_default_opt().is_some()
         }
+
         fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -11440,6 +11483,7 @@ pub mod _puroro_traits {
         fn has_bool_true<'this>(&'this self) -> bool {
             self.bool_true_opt().is_some()
         }
+
         fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -11449,6 +11493,7 @@ pub mod _puroro_traits {
         fn has_bool_false<'this>(&'this self) -> bool {
             self.bool_false_opt().is_some()
         }
+
         fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
             ::std::option::Option::None
         }
@@ -11459,6 +11504,7 @@ pub mod _puroro_traits {
         fn has_string_default<'this>(&'this self) -> bool {
             self.string_default_opt().is_some()
         }
+
         fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -11468,6 +11514,7 @@ pub mod _puroro_traits {
         fn has_string_empty<'this>(&'this self) -> bool {
             self.string_empty_opt().is_some()
         }
+
         fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -11477,6 +11524,7 @@ pub mod _puroro_traits {
         fn has_string_abc<'this>(&'this self) -> bool {
             self.string_abc_opt().is_some()
         }
+
         fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -11486,6 +11534,7 @@ pub mod _puroro_traits {
         fn has_string_aiu<'this>(&'this self) -> bool {
             self.string_aiu_opt().is_some()
         }
+
         fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -11495,6 +11544,7 @@ pub mod _puroro_traits {
         fn has_string_backslash<'this>(&'this self) -> bool {
             self.string_backslash_opt().is_some()
         }
+
         fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -11504,6 +11554,7 @@ pub mod _puroro_traits {
         fn has_string_tab<'this>(&'this self) -> bool {
             self.string_tab_opt().is_some()
         }
+
         fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -11513,6 +11564,7 @@ pub mod _puroro_traits {
         fn has_string_crlf<'this>(&'this self) -> bool {
             self.string_crlf_opt().is_some()
         }
+
         fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
@@ -11523,6 +11575,7 @@ pub mod _puroro_traits {
         fn has_bytes_default<'this>(&'this self) -> bool {
             self.bytes_default_opt().is_some()
         }
+
         fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -11532,6 +11585,7 @@ pub mod _puroro_traits {
         fn has_bytes_empty<'this>(&'this self) -> bool {
             self.bytes_empty_opt().is_some()
         }
+
         fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -11541,6 +11595,7 @@ pub mod _puroro_traits {
         fn has_bytes_abc<'this>(&'this self) -> bool {
             self.bytes_abc_opt().is_some()
         }
+
         fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -11551,6 +11606,7 @@ pub mod _puroro_traits {
         fn has_bytes_aiu<'this>(&'this self) -> bool {
             self.bytes_aiu_opt().is_some()
         }
+
         fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -11560,6 +11616,7 @@ pub mod _puroro_traits {
         fn has_bytes_backslash<'this>(&'this self) -> bool {
             self.bytes_backslash_opt().is_some()
         }
+
         fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -11569,6 +11626,7 @@ pub mod _puroro_traits {
         fn has_bytes_tab<'this>(&'this self) -> bool {
             self.bytes_tab_opt().is_some()
         }
+
         fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -11578,6 +11636,7 @@ pub mod _puroro_traits {
         fn has_bytes_crlf<'this>(&'this self) -> bool {
             self.bytes_crlf_opt().is_some()
         }
+
         fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
             ::std::option::Option::None
         }
@@ -11588,6 +11647,7 @@ pub mod _puroro_traits {
         fn has_enum_default<'this>(&'this self) -> bool {
             self.enum_default_opt().is_some()
         }
+
         fn enum_default_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
@@ -11600,6 +11660,7 @@ pub mod _puroro_traits {
         fn has_enum_one<'this>(&'this self) -> bool {
             self.enum_one_opt().is_some()
         }
+
         fn enum_one_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
@@ -11612,6 +11673,7 @@ pub mod _puroro_traits {
         fn has_enum_fourty_two<'this>(&'this self) -> bool {
             self.enum_fourty_two_opt().is_some()
         }
+
         fn enum_fourty_two_opt<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
@@ -11624,190 +11686,251 @@ pub mod _puroro_traits {
             fn i32_default_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_default_opt()
             }
+
             fn i32_0_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_0_opt()
             }
+
             fn i32_42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_42_opt()
             }
+
             fn i32_m42_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_m42_opt()
             }
+
             fn i32_2147483647_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_2147483647_opt()
             }
+
             fn i32_m2147483648_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_m2147483648_opt()
             }
+
             fn i32_0123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_0123_opt()
             }
+
             fn i32_0x123_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_0x123_opt()
             }
+
             fn u32_default_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_default_opt()
             }
+
             fn u32_0_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_0_opt()
             }
+
             fn u32_42_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_42_opt()
             }
+
             fn u32_4294967295_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_4294967295_opt()
             }
+
             fn u32_0123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_0123_opt()
             }
+
             fn u32_0x123_opt<'this>(&'this self) -> ::std::option::Option<u32> {
                 (**self).u32_0x123_opt()
             }
+
             fn i64_default_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_default_opt()
             }
+
             fn i64_0_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_0_opt()
             }
+
             fn i64_42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_42_opt()
             }
+
             fn i64_m42_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_m42_opt()
             }
+
             fn i64_9223372036854775807_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_9223372036854775807_opt()
             }
+
             fn i64_m9223372036854775808_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_m9223372036854775808_opt()
             }
+
             fn i64_0123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_0123_opt()
             }
+
             fn i64_0x123_opt<'this>(&'this self) -> ::std::option::Option<i64> {
                 (**self).i64_0x123_opt()
             }
+
             fn u64_default_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_default_opt()
             }
+
             fn u64_0_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_0_opt()
             }
+
             fn u64_42_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_42_opt()
             }
+
             fn u64_18446744073709551615_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_18446744073709551615_opt()
             }
+
             fn u64_0123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_0123_opt()
             }
+
             fn u64_0x123_opt<'this>(&'this self) -> ::std::option::Option<u64> {
                 (**self).u64_0x123_opt()
             }
+
             fn f32_default_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_default_opt()
             }
+
             fn f32_0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_0_opt()
             }
+
             fn f32_m0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_m0_opt()
             }
+
             fn f32_0p_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_0p_opt()
             }
+
             fn f32_p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_p0_opt()
             }
+
             fn f32_0p0_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_0p0_opt()
             }
+
             fn f32_42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_42_opt()
             }
+
             fn f32_m42_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_m42_opt()
             }
+
             fn f32_0p25_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_0p25_opt()
             }
+
             fn f32_1p5e2_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_1p5e2_opt()
             }
+
             fn f32_inf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_inf_opt()
             }
+
             fn f32_minf_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_minf_opt()
             }
+
             fn f32_nan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_nan_opt()
             }
+
             fn f32_mnan_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_mnan_opt()
             }
+
             fn bool_default_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).bool_default_opt()
             }
+
             fn bool_true_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).bool_true_opt()
             }
+
             fn bool_false_opt<'this>(&'this self) -> ::std::option::Option<bool> {
                 (**self).bool_false_opt()
             }
+
             fn string_default_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_default_opt()
             }
+
             fn string_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_empty_opt()
             }
+
             fn string_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_abc_opt()
             }
+
             fn string_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_aiu_opt()
             }
+
             fn string_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_backslash_opt()
             }
+
             fn string_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_tab_opt()
             }
+
             fn string_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_crlf_opt()
             }
+
             fn bytes_default_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_default_opt()
             }
+
             fn bytes_empty_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_empty_opt()
             }
+
             fn bytes_abc_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_abc_opt()
             }
+
             fn bytes_aiu_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_aiu_opt()
             }
+
             fn bytes_backslash_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_backslash_opt()
             }
+
             fn bytes_tab_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_tab_opt()
             }
+
             fn bytes_crlf_opt<'this>(&'this self) -> ::std::option::Option<&'this [u8]> {
                 (**self).bytes_crlf_opt()
             }
+
             fn enum_default_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_default_opt()
             }
+
             fn enum_one_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {
                 (**self).enum_one_opt()
             }
+
             fn enum_fourty_two_opt<'this>(
                 &'this self,
             ) -> ::std::option::Option<self::_puroro_root::proto2_defaults::MyEnum> {

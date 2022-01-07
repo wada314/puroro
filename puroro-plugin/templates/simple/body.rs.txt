@@ -232,28 +232,6 @@ impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
     {%- for f in m.fields %}
     {%- call simple_trait_impl_field(f) %}
     {%- endfor %}
-
-    {%- for oneof in m.oneofs %}
-    fn {{ oneof.field_ident }}(&self) ->
-        Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
-        >
-    {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }} as E;
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as F;
-        match &self.{{ oneof.field_ident }} {
-            E::_None => ::std::option::Option::None,
-            {%- for f in oneof.fields %}
-            {% if f.is_length_delimited %}
-            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.as_ref())),
-            {%- else %}
-            E::{{ f.ident }}(v) => ::std::option::Option::Some(F::{{ f.ident }}(v.inner().clone())),
-            {%- endif %}
-            {%- endfor %}
-        }
-    }
-    {%- endfor %}
 }
 
 impl ::puroro::MessageRepresentativeImpl for {{ m.simple_ident }} {}
