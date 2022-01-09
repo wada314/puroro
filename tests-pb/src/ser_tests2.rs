@@ -439,15 +439,11 @@ pub mod _puroro_simple_impl {
             >::ser_field(self.string_repeated(), 6, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgOptionalMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_optional_opt(), 7, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_repeated(), 8, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
@@ -1402,9 +1398,7 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgOptionalMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
                 7,
@@ -1540,9 +1534,7 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
                 8,
@@ -2468,15 +2460,11 @@ pub mod _puroro_impls {
             >::ser_field(self.string_repeated(), 6, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgOptionalMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_optional_opt(), 7, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_repeated(), 8, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,

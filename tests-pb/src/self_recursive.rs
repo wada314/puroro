@@ -106,9 +106,7 @@ pub mod _puroro_simple_impl {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::RecursiveUnlabeledMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.recursive_unlabeled_opt(), 1, out, true)?;
             ::std::result::Result::Ok(())
         }
@@ -199,9 +197,7 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::RecursiveUnlabeledMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
                 1,
@@ -360,9 +356,7 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::RecursiveUnlabeledMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.recursive_unlabeled_opt(), 1, out, true)?;
             ::std::result::Result::Ok(())
         }

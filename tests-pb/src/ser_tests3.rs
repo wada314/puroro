@@ -429,15 +429,11 @@ pub mod _puroro_simple_impl {
             >::ser_field(self.string_repeated(), 6, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_unlabeled_opt(), 7, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_repeated(), 8, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -1384,9 +1380,7 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
                 7,
@@ -1522,9 +1516,7 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
                 8,
@@ -2440,15 +2432,11 @@ pub mod _puroro_impls {
             >::ser_field(self.string_repeated(), 6, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_unlabeled_opt(), 7, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.submsg_repeated(), 8, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,

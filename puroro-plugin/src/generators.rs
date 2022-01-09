@@ -263,13 +263,7 @@ impl Field {
                 .as_ref()
                 .map(|m| m.rust_trait_path())
                 .unwrap_or_default(),
-            trait_label_and_type_tags: f.rust_label_and_type_tags(|_| {
-                Ok(format!(
-                    "<Self as super::_puroro_traits::{trait_ident}>::{camel_ident}MessageType<'_>",
-                    trait_ident = f.message()?.rust_trait_ident(),
-                    camel_ident = f.ident_camel_unesc(),
-                ))
-            })?,
+            trait_label_and_type_tags: f.rust_label_and_type_tags(|_| Ok("_".to_string()))?,
             oneof_enum_ident: f
                 .oneof()?
                 .map(|o| o.rust_enum_ident().to_string())

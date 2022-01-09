@@ -375,9 +375,7 @@ pub mod _puroro_simple_impl {
             >::ser_field(self.g2_string_opt(), 4, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.g2_submsg_opt(), 5, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
@@ -896,9 +894,7 @@ pub mod _puroro_impls {
         {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(
                 <Self as super::_puroro_traits::MsgTrait>::g2_submsg_opt(self),
                 5,
@@ -1331,9 +1327,7 @@ pub mod _puroro_impls {
             >::ser_field(self.g2_string_opt(), 4, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
-                ::puroro::tags::Message<
-                    <Self as super::_puroro_traits::MsgTrait>::G2SubmsgMessageType<'_>,
-                >,
+                ::puroro::tags::Message<_>,
             >::ser_field(self.g2_submsg_opt(), 5, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::OneofField,
