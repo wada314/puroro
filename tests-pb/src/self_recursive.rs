@@ -57,6 +57,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
+    #[cfg(nightly)]
     impl super::_puroro_traits::MsgTrait for Msg {
         type RecursiveUnlabeledMessageType<'this>
         where
@@ -98,10 +99,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for Msg
-    where
-        Self: super::_puroro_traits::MsgTrait,
-    {
+    impl ::puroro::internal::se::SerMessageToIoWrite for Msg {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -111,12 +109,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::MsgTrait>::RecursiveUnlabeledMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
-                1,
-                out,
-                true,
-            )?;
+            >::ser_field(self.recursive_unlabeled_opt(), 1, out, true)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -127,10 +120,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::std::fmt::Debug for Msg
-    where
-        Self: super::_puroro_traits::MsgTrait,
-    {
+    impl ::std::fmt::Debug for Msg {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
                 .field("recursive_unlabeled", &self.recursive_unlabeled())
@@ -161,8 +151,10 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    #[cfg(nightly)]
     use super::_puroro_traits::*;
 
+    #[cfg(nightly)]
     pub struct MsgSingleField1<ScalarType>
     where
         ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait,
@@ -170,11 +162,13 @@ pub mod _puroro_impls {
         pub recursive_unlabeled: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
         ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
     where
         ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait,
@@ -191,6 +185,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
     where
         ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait,
@@ -217,6 +212,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField1<ScalarType>
     where
         ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait,
@@ -228,6 +224,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for MsgSingleField1<ScalarType>
     where
         ScalarType: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait,
@@ -316,6 +313,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         type RecursiveUnlabeledMessageType<'this>
         where
@@ -355,12 +353,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
-    where
-        Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::RecursiveUnlabeledMessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
-    {
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump> {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -370,17 +363,14 @@ pub mod _puroro_impls {
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::MsgTrait>::RecursiveUnlabeledMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::recursive_unlabeled_opt(self),
-                1,
-                out,
-                true,
-            )?;
+            >::ser_field(self.recursive_unlabeled_opt(), 1, out, true)?;
             ::std::result::Result::Ok(())
         }
     }
+    #[cfg(nightly)]
     pub struct MsgBuilder<T>(T);
 
+    #[cfg(nightly)]
     impl<T> MsgBuilder<T>
     where
         T: MsgTrait,
@@ -405,13 +395,16 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl MsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }
     }
 }
+#[cfg(nightly)]
 pub use _puroro_traits::*;
+#[cfg(nightly)]
 pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;

@@ -54,6 +54,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
+    #[cfg(nightly)]
     impl super::_puroro_traits::Test1Trait for Test1 {
         fn a_opt<'this>(&'this self) -> Option<i32> {
             <self::Test1>::a_opt(self)
@@ -87,10 +88,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for Test1
-    where
-        Self: super::_puroro_traits::Test1Trait,
-    {
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -98,12 +96,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
-                1,
-                out,
-                false,
-            )?;
+            >::ser_field(self.a_opt(), 1, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -114,10 +107,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::std::fmt::Debug for Test1
-    where
-        Self: super::_puroro_traits::Test1Trait,
-    {
+    impl ::std::fmt::Debug for Test1 {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Test1").field("a", &self.a_opt()).finish()
         }
@@ -180,6 +170,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
+    #[cfg(nightly)]
     impl super::_puroro_traits::Test2Trait for Test2 {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Test2>::b_opt(self)
@@ -213,10 +204,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for Test2
-    where
-        Self: super::_puroro_traits::Test2Trait,
-    {
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -224,12 +212,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
-                2,
-                out,
-                false,
-            )?;
+            >::ser_field(self.b_opt(), 2, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -240,10 +223,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::std::fmt::Debug for Test2
-    where
-        Self: super::_puroro_traits::Test2Trait,
-    {
+    impl ::std::fmt::Debug for Test2 {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Test2").field("b", &self.b_opt()).finish()
         }
@@ -313,6 +293,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
+    #[cfg(nightly)]
     impl super::_puroro_traits::Test3Trait for Test3 {
         type CMessageType<'this>
         where
@@ -352,10 +333,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for Test3
-    where
-        Self: super::_puroro_traits::Test3Trait,
-    {
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -365,12 +343,7 @@ pub mod _puroro_simple_impl {
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::Test3Trait>::CMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
-                3,
-                out,
-                false,
-            )?;
+            >::ser_field(self.c_opt(), 3, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -381,10 +354,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::std::fmt::Debug for Test3
-    where
-        Self: super::_puroro_traits::Test3Trait,
-    {
+    impl ::std::fmt::Debug for Test3 {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Test3").field("c", &self.c()).finish()
         }
@@ -426,6 +396,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
+    #[cfg(nightly)]
     impl super::_puroro_traits::Test4Trait for Test4 {
         type DRepeatedType<'this> =
             ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
@@ -461,10 +432,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for Test4
-    where
-        Self: super::_puroro_traits::Test4Trait,
-    {
+    impl ::puroro::internal::se::SerMessageToIoWrite for Test4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -472,12 +440,7 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test4Trait>::d(self),
-                4,
-                out,
-                true,
-            )?;
+            >::ser_field(self.d(), 4, out, true)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -488,10 +451,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::std::fmt::Debug for Test4
-    where
-        Self: super::_puroro_traits::Test4Trait,
-    {
+    impl ::std::fmt::Debug for Test4 {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Test4").field("d", &self.d()).finish()
         }
@@ -518,8 +478,10 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    #[cfg(nightly)]
     use super::_puroro_traits::*;
 
+    #[cfg(nightly)]
     pub struct Test1SingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -527,11 +489,13 @@ pub mod _puroro_impls {
         pub a: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Test1> for Test1SingleField1<ScalarType> where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::Test1Trait for Test1SingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -543,6 +507,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test1SingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -565,6 +530,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for Test1SingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -574,6 +540,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for Test1SingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -647,6 +614,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<'bump> super::_puroro_traits::Test1Trait for Test1Bumpalo<'bump> {
         fn a_opt<'this>(&'this self) -> Option<i32> {
             <Self>::a_opt(self)
@@ -678,10 +646,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test1Bumpalo<'bump>
-    where
-        Self: super::_puroro_traits::Test1Trait,
-    {
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test1Bumpalo<'bump> {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -689,17 +654,14 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test1Trait>::a_opt(self),
-                1,
-                out,
-                false,
-            )?;
+            >::ser_field(self.a_opt(), 1, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
+    #[cfg(nightly)]
     pub struct Test1Builder<T>(T);
 
+    #[cfg(nightly)]
     impl<T> Test1Builder<T>
     where
         T: Test1Trait,
@@ -719,12 +681,14 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl Test1Builder<()> {
         pub fn new() -> Self {
             Self(())
         }
     }
 
+    #[cfg(nightly)]
     pub struct Test2SingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -732,11 +696,13 @@ pub mod _puroro_impls {
         pub b: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Test2> for Test2SingleField2<ScalarType> where
         ScalarType: ::std::convert::AsRef<str>
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::Test2Trait for Test2SingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -746,6 +712,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test2SingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -768,6 +735,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for Test2SingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -777,6 +745,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for Test2SingleField2<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -853,6 +822,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<'bump> super::_puroro_traits::Test2Trait for Test2Bumpalo<'bump> {
         fn b_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::b_opt(self)
@@ -884,10 +854,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test2Bumpalo<'bump>
-    where
-        Self: super::_puroro_traits::Test2Trait,
-    {
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test2Bumpalo<'bump> {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -895,17 +862,14 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test2Trait>::b_opt(self),
-                2,
-                out,
-                false,
-            )?;
+            >::ser_field(self.b_opt(), 2, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
+    #[cfg(nightly)]
     pub struct Test2Builder<T>(T);
 
+    #[cfg(nightly)]
     impl<T> Test2Builder<T>
     where
         T: Test2Trait,
@@ -925,12 +889,14 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl Test2Builder<()> {
         pub fn new() -> Self {
             Self(())
         }
     }
 
+    #[cfg(nightly)]
     pub struct Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait,
@@ -938,11 +904,13 @@ pub mod _puroro_impls {
         pub c: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Test3> for Test3SingleField3<ScalarType> where
         ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::Test3Trait for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait,
@@ -957,6 +925,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait,
@@ -983,6 +952,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait,
@@ -992,6 +962,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for Test3SingleField3<ScalarType>
     where
         ScalarType: self::_puroro_root::official_samples2::_puroro_traits::Test1Trait,
@@ -1080,6 +1051,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<'bump> super::_puroro_traits::Test3Trait for Test3Bumpalo<'bump> {
         type CMessageType<'this>
         where
@@ -1119,12 +1091,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test3Bumpalo<'bump>
-    where
-        Self: super::_puroro_traits::Test3Trait,
-        for<'a> <Self as super::_puroro_traits::Test3Trait>::CMessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
-    {
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test3Bumpalo<'bump> {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1134,17 +1101,14 @@ pub mod _puroro_impls {
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::Test3Trait>::CMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test3Trait>::c_opt(self),
-                3,
-                out,
-                false,
-            )?;
+            >::ser_field(self.c_opt(), 3, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
+    #[cfg(nightly)]
     pub struct Test3Builder<T>(T);
 
+    #[cfg(nightly)]
     impl<T> Test3Builder<T>
     where
         T: Test3Trait,
@@ -1164,12 +1128,14 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl Test3Builder<()> {
         pub fn new() -> Self {
             Self(())
         }
     }
 
+    #[cfg(nightly)]
     pub struct Test4SingleField4<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -1179,6 +1145,7 @@ pub mod _puroro_impls {
         pub d: RepeatedType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Test4>
         for Test4SingleField4<ScalarType, RepeatedType>
     where
@@ -1188,6 +1155,7 @@ pub mod _puroro_impls {
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> super::_puroro_traits::Test4Trait
         for Test4SingleField4<ScalarType, RepeatedType>
     where
@@ -1205,6 +1173,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for Test4SingleField4<ScalarType, RepeatedType>
     where
@@ -1230,6 +1199,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for Test4SingleField4<ScalarType, RepeatedType>
     where
@@ -1242,6 +1212,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::clone::Clone for Test4SingleField4<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -1298,6 +1269,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<'bump> super::_puroro_traits::Test4Trait for Test4Bumpalo<'bump> {
         type DRepeatedType<'this>
         where
@@ -1338,10 +1310,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test4Bumpalo<'bump>
-    where
-        Self: super::_puroro_traits::Test4Trait,
-    {
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for Test4Bumpalo<'bump> {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1349,17 +1318,14 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::Test4Trait>::d(self),
-                4,
-                out,
-                true,
-            )?;
+            >::ser_field(self.d(), 4, out, true)?;
             ::std::result::Result::Ok(())
         }
     }
+    #[cfg(nightly)]
     pub struct Test4Builder<T>(T);
 
+    #[cfg(nightly)]
     impl<T> Test4Builder<T>
     where
         T: Test4Trait,
@@ -1381,13 +1347,16 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl Test4Builder<()> {
         pub fn new() -> Self {
             Self(())
         }
     }
 }
+#[cfg(nightly)]
 pub use _puroro_traits::*;
+#[cfg(nightly)]
 pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;

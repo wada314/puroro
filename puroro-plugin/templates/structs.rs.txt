@@ -23,6 +23,7 @@ pub mod _puroro_impls {
     }
 
     {#- It is guaranteed that the trait idents will never conflict with structs names -#}
+    #[cfg(nightly)]
     use super::_puroro_traits::*;
 
     {%- for m in messages %}

@@ -257,6 +257,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
+    #[cfg(nightly)]
     impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <self::Msg>::i32_optional_opt(self)
@@ -407,10 +408,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for Msg
-    where
-        Self: super::_puroro_traits::MsgTrait,
-    {
+    impl ::puroro::internal::se::SerMessageToIoWrite for Msg {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -418,106 +416,51 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-                1,
-                out,
-                false,
-            )?;
+            >::ser_field(self.i32_optional_opt(), 1, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
-                2,
-                out,
-                false,
-            )?;
+            >::ser_field(self.i32_repeated(), 2, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Float,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
-                3,
-                out,
-                false,
-            )?;
+            >::ser_field(self.float_optional_opt(), 3, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Float,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
-                4,
-                out,
-                false,
-            )?;
+            >::ser_field(self.float_repeated(), 4, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
-                5,
-                out,
-                false,
-            )?;
+            >::ser_field(self.string_optional_opt(), 5, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
-                6,
-                out,
-                false,
-            )?;
+            >::ser_field(self.string_repeated(), 6, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::MsgTrait>::SubmsgOptionalMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
-                7,
-                out,
-                false,
-            )?;
+            >::ser_field(self.submsg_optional_opt(), 7, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
-                8,
-                out,
-                false,
-            )?;
+            >::ser_field(self.submsg_repeated(), 8, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
-                9,
-                out,
-                false,
-            )?;
+            >::ser_field(self.enum_optional_opt(), 9, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
-                10,
-                out,
-                false,
-            )?;
+            >::ser_field(self.enum_repeated(), 10, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
-                536870911,
-                out,
-                false,
-            )?;
+            >::ser_field(self.very_large_field_number_opt(), 536870911, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -528,10 +471,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::std::fmt::Debug for Msg
-    where
-        Self: super::_puroro_traits::MsgTrait,
-    {
+    impl ::std::fmt::Debug for Msg {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Msg")
                 .field("i32_optional", &self.i32_optional_opt())
@@ -600,8 +540,10 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    #[cfg(nightly)]
     use super::_puroro_traits::*;
 
+    #[cfg(nightly)]
     pub struct MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -609,11 +551,13 @@ pub mod _puroro_impls {
         pub i32_optional: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -672,6 +616,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -694,6 +639,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -705,6 +651,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for MsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -717,6 +664,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField2<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -726,6 +674,7 @@ pub mod _puroro_impls {
         pub i32_repeated: RepeatedType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField2<ScalarType, RepeatedType>
     where
@@ -735,6 +684,7 @@ pub mod _puroro_impls {
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField2<ScalarType, RepeatedType>
     where
@@ -792,6 +742,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField2<ScalarType, RepeatedType>
     where
@@ -817,6 +768,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField2<ScalarType, RepeatedType>
     where
@@ -831,6 +783,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField2<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -845,6 +798,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField3<ScalarType>
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
@@ -852,11 +806,13 @@ pub mod _puroro_impls {
         pub float_optional: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField3<ScalarType> where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField3<ScalarType>
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
@@ -916,6 +872,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField3<ScalarType>
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
@@ -938,6 +895,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField3<ScalarType>
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
@@ -949,6 +907,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for MsgSingleField3<ScalarType>
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
@@ -961,6 +920,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField4<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
@@ -970,6 +930,7 @@ pub mod _puroro_impls {
         pub float_repeated: RepeatedType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField4<ScalarType, RepeatedType>
     where
@@ -979,6 +940,7 @@ pub mod _puroro_impls {
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField4<ScalarType, RepeatedType>
     where
@@ -1037,6 +999,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField4<ScalarType, RepeatedType>
     where
@@ -1062,6 +1025,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField4<ScalarType, RepeatedType>
     where
@@ -1076,6 +1040,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField4<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
@@ -1090,6 +1055,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField5<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -1097,11 +1063,13 @@ pub mod _puroro_impls {
         pub string_optional: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField5<ScalarType> where
         ScalarType: ::std::convert::AsRef<str>
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField5<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -1159,6 +1127,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -1181,6 +1150,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField5<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -1192,6 +1162,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for MsgSingleField5<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -1204,6 +1175,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField6<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -1213,6 +1185,7 @@ pub mod _puroro_impls {
         pub string_repeated: RepeatedType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField6<ScalarType, RepeatedType>
     where
@@ -1222,6 +1195,7 @@ pub mod _puroro_impls {
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField6<ScalarType, RepeatedType>
     where
@@ -1280,6 +1254,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField6<ScalarType, RepeatedType>
     where
@@ -1305,6 +1280,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField6<ScalarType, RepeatedType>
     where
@@ -1319,6 +1295,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField6<ScalarType, RepeatedType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -1333,6 +1310,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField7<ScalarType>
     where
         ScalarType:
@@ -1341,12 +1319,14 @@ pub mod _puroro_impls {
         pub submsg_optional: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField7<ScalarType> where
         ScalarType:
             self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField7<ScalarType>
     where
         ScalarType:
@@ -1407,6 +1387,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField7<ScalarType>
     where
         ScalarType:
@@ -1434,6 +1415,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField7<ScalarType>
     where
         ScalarType:
@@ -1446,6 +1428,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for MsgSingleField7<ScalarType>
     where
         ScalarType:
@@ -1459,6 +1442,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
@@ -1469,6 +1453,7 @@ pub mod _puroro_impls {
         pub submsg_repeated: RepeatedType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField8<ScalarType, RepeatedType>
     where
@@ -1479,6 +1464,7 @@ pub mod _puroro_impls {
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField8<ScalarType, RepeatedType>
     where
@@ -1536,6 +1522,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField8<ScalarType, RepeatedType>
     where
@@ -1566,6 +1553,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField8<ScalarType, RepeatedType>
     where
@@ -1581,6 +1569,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField8<ScalarType, RepeatedType>
     where
         ScalarType:
@@ -1596,6 +1585,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField9<ScalarType>
     where
         ScalarType:
@@ -1604,12 +1594,14 @@ pub mod _puroro_impls {
         pub enum_optional: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField9<ScalarType> where
         ScalarType:
             ::std::convert::Into<self::_puroro_root::ser_tests2::Enum> + ::std::clone::Clone
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField9<ScalarType>
     where
         ScalarType:
@@ -1672,6 +1664,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField9<ScalarType>
     where
         ScalarType:
@@ -1695,6 +1688,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField9<ScalarType>
     where
         ScalarType:
@@ -1707,6 +1701,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for MsgSingleField9<ScalarType>
     where
         ScalarType:
@@ -1720,6 +1715,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField10<ScalarType, RepeatedType>
     where
         ScalarType:
@@ -1730,6 +1726,7 @@ pub mod _puroro_impls {
         pub enum_repeated: RepeatedType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
         for MsgSingleField10<ScalarType, RepeatedType>
     where
@@ -1740,6 +1737,7 @@ pub mod _puroro_impls {
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
         for MsgSingleField10<ScalarType, RepeatedType>
     where
@@ -1802,6 +1800,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
         for MsgSingleField10<ScalarType, RepeatedType>
     where
@@ -1828,6 +1827,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
         for MsgSingleField10<ScalarType, RepeatedType>
     where
@@ -1843,6 +1843,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField10<ScalarType, RepeatedType>
     where
         ScalarType:
@@ -1858,6 +1859,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct MsgSingleField536870911<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -1865,11 +1867,13 @@ pub mod _puroro_impls {
         pub very_large_field_number: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField536870911<ScalarType> where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField536870911<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -1929,6 +1933,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField536870911<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -1951,6 +1956,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField536870911<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -1962,6 +1968,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for MsgSingleField536870911<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -2257,6 +2264,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
         fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <Self>::i32_optional_opt(self)
@@ -2429,14 +2437,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
-    where
-        Self: super::_puroro_traits::MsgTrait,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgOptionalMessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
-        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'a>:
-            ::puroro::internal::se::SerMessageToIoWrite,
-    {
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump> {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2444,111 +2445,58 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-                1,
-                out,
-                false,
-            )?;
+            >::ser_field(self.i32_optional_opt(), 1, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
-                2,
-                out,
-                false,
-            )?;
+            >::ser_field(self.i32_repeated(), 2, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Float,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::float_optional_opt(self),
-                3,
-                out,
-                false,
-            )?;
+            >::ser_field(self.float_optional_opt(), 3, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Float,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::float_repeated(self),
-                4,
-                out,
-                false,
-            )?;
+            >::ser_field(self.float_repeated(), 4, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::string_optional_opt(self),
-                5,
-                out,
-                false,
-            )?;
+            >::ser_field(self.string_optional_opt(), 5, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::string_repeated(self),
-                6,
-                out,
-                false,
-            )?;
+            >::ser_field(self.string_repeated(), 6, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::MsgTrait>::SubmsgOptionalMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_optional_opt(self),
-                7,
-                out,
-                false,
-            )?;
+            >::ser_field(self.submsg_optional_opt(), 7, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Message<
                     <Self as super::_puroro_traits::MsgTrait>::SubmsgRepeatedMessageType<'_>,
                 >,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::submsg_repeated(self),
-                8,
-                out,
-                false,
-            )?;
+            >::ser_field(self.submsg_repeated(), 8, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::enum_optional_opt(self),
-                9,
-                out,
-                false,
-            )?;
+            >::ser_field(self.enum_optional_opt(), 9, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::enum_repeated(self),
-                10,
-                out,
-                false,
-            )?;
+            >::ser_field(self.enum_repeated(), 10, out, false)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Int32,
-            >::ser_field(
-                <Self as super::_puroro_traits::MsgTrait>::very_large_field_number_opt(self),
-                536870911,
-                out,
-                false,
-            )?;
+            >::ser_field(self.very_large_field_number_opt(), 536870911, out, false)?;
             ::std::result::Result::Ok(())
         }
     }
+    #[cfg(nightly)]
     pub struct MsgBuilder<T>(T);
 
+    #[cfg(nightly)]
     impl<T> MsgBuilder<T>
     where
         T: MsgTrait,
@@ -2737,13 +2685,16 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl MsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }
     }
 }
+#[cfg(nightly)]
 pub use _puroro_traits::*;
+#[cfg(nightly)]
 pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
@@ -3475,6 +3426,7 @@ pub mod _puroro_nested {
                 }
             }
 
+            #[cfg(nightly)]
             impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
                     <self::Submsg>::i32_optional_opt(self)
@@ -3508,10 +3460,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::se::SerMessageToIoWrite for Submsg
-            where
-                Self: super::_puroro_traits::SubmsgTrait,
-            {
+            impl ::puroro::internal::se::SerMessageToIoWrite for Submsg {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -3519,12 +3468,7 @@ pub mod _puroro_nested {
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
                         ::puroro::tags::Int32,
-                    >::ser_field(
-                        <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
-                        1,
-                        out,
-                        false,
-                    )?;
+                    >::ser_field(self.i32_optional_opt(), 1, out, false)?;
                     ::std::result::Result::Ok(())
                 }
             }
@@ -3535,10 +3479,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::std::fmt::Debug for Submsg
-            where
-                Self: super::_puroro_traits::SubmsgTrait,
-            {
+            impl ::std::fmt::Debug for Submsg {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     f.debug_struct("Submsg")
                         .field("i32_optional", &self.i32_optional_opt())
@@ -3570,8 +3511,10 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
+            #[cfg(nightly)]
             use super::_puroro_traits::*;
 
+            #[cfg(nightly)]
             pub struct SubmsgSingleField1<ScalarType>
             where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -3579,11 +3522,13 @@ pub mod _puroro_nested {
                 pub i32_optional: ScalarType,
             }
 
+            #[cfg(nightly)]
             impl<ScalarType> ::puroro::Message<super::Submsg> for SubmsgSingleField1<ScalarType> where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
             {
             }
 
+            #[cfg(nightly)]
             impl<ScalarType> super::_puroro_traits::SubmsgTrait for SubmsgSingleField1<ScalarType>
             where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -3595,6 +3540,7 @@ pub mod _puroro_nested {
                 }
             }
 
+            #[cfg(nightly)]
             impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField1<ScalarType>
             where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -3617,6 +3563,7 @@ pub mod _puroro_nested {
                 }
             }
 
+            #[cfg(nightly)]
             impl<ScalarType> ::std::convert::From<ScalarType> for SubmsgSingleField1<ScalarType>
             where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -3628,6 +3575,7 @@ pub mod _puroro_nested {
                 }
             }
 
+            #[cfg(nightly)]
             impl<ScalarType> ::std::clone::Clone for SubmsgSingleField1<ScalarType>
             where
                 ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -3703,6 +3651,7 @@ pub mod _puroro_nested {
                 }
             }
 
+            #[cfg(nightly)]
             impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
                 fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
                     <Self>::i32_optional_opt(self)
@@ -3734,10 +3683,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
-            where
-                Self: super::_puroro_traits::SubmsgTrait,
-            {
+            impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump> {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -3745,17 +3691,14 @@ pub mod _puroro_nested {
                     ::puroro::internal::se::SerFieldToIoWrite::<
                         ::puroro::tags::Optional,
                         ::puroro::tags::Int32,
-                    >::ser_field(
-                        <Self as super::_puroro_traits::SubmsgTrait>::i32_optional_opt(self),
-                        1,
-                        out,
-                        false,
-                    )?;
+                    >::ser_field(self.i32_optional_opt(), 1, out, false)?;
                     ::std::result::Result::Ok(())
                 }
             }
+            #[cfg(nightly)]
             pub struct SubmsgBuilder<T>(T);
 
+            #[cfg(nightly)]
             impl<T> SubmsgBuilder<T>
             where
                 T: SubmsgTrait,
@@ -3780,13 +3723,16 @@ pub mod _puroro_nested {
                 }
             }
 
+            #[cfg(nightly)]
             impl SubmsgBuilder<()> {
                 pub fn new() -> Self {
                     Self(())
                 }
             }
         }
+        #[cfg(nightly)]
         pub use _puroro_traits::*;
+        #[cfg(nightly)]
         pub mod _puroro_traits {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;

@@ -279,10 +279,7 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.simple_ident }} 
     }
 }
 
-impl ::puroro::internal::se::SerMessageToIoWrite for {{ m.simple_ident }}
-where
-    Self: super::_puroro_traits::{{ m.ident }}Trait,
-{
+impl ::puroro::internal::se::SerMessageToIoWrite for {{ m.simple_ident }} {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
         W: ::std::io::Write,
@@ -292,9 +289,9 @@ where
             {{ f.trait_label_and_type_tags }}
         >::ser_field(
             {%- if f.is_repeated %}
-            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident }}(self),
+            self.{{ f.ident }}(),
             {%- else %}
-            <Self as super::_puroro_traits::{{ m.ident }}Trait>::{{ f.ident_unesc }}_opt(self),
+            self.{{ f.ident_unesc }}_opt(),
             {%- endif %}
             {{ f.number }},
             out,
@@ -311,10 +308,7 @@ impl ::std::default::Default for {{ m.simple_ident }} {
     }
 }
 
-impl ::std::fmt::Debug for {{ m.simple_ident }} 
-where
-    Self: super::_puroro_traits::{{ m.trait_ident }}
-{
+impl ::std::fmt::Debug for {{ m.simple_ident }}  {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         f.debug_struct("{{ m.simple_ident }}")
             {%- for f in m.fields %}

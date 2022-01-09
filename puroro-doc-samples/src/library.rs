@@ -119,10 +119,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::internal::se::SerMessageToIoWrite for Book
-    where
-        Self: super::_puroro_traits::BookTrait,
-    {
+    impl ::puroro::internal::se::SerMessageToIoWrite for Book {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -130,21 +127,11 @@ pub mod _puroro_simple_impl {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::BookTrait>::title_opt(self),
-                1,
-                out,
-                true,
-            )?;
+            >::ser_field(self.title_opt(), 1, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::UInt32,
-            >::ser_field(
-                <Self as super::_puroro_traits::BookTrait>::num_pages_opt(self),
-                2,
-                out,
-                true,
-            )?;
+            >::ser_field(self.num_pages_opt(), 2, out, true)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -155,10 +142,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::std::fmt::Debug for Book
-    where
-        Self: super::_puroro_traits::BookTrait,
-    {
+    impl ::std::fmt::Debug for Book {
         fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
             f.debug_struct("Book")
                 .field("title", &self.title())
@@ -192,6 +176,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    #[cfg(nightly)]
     use super::_puroro_traits::*;
 
     #[cfg(nightly)]
@@ -466,10 +451,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for BookBumpalo<'bump>
-    where
-        Self: super::_puroro_traits::BookTrait,
-    {
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for BookBumpalo<'bump> {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -477,21 +459,11 @@ pub mod _puroro_impls {
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::String,
-            >::ser_field(
-                <Self as super::_puroro_traits::BookTrait>::title_opt(self),
-                1,
-                out,
-                true,
-            )?;
+            >::ser_field(self.title_opt(), 1, out, true)?;
             ::puroro::internal::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::UInt32,
-            >::ser_field(
-                <Self as super::_puroro_traits::BookTrait>::num_pages_opt(self),
-                2,
-                out,
-                true,
-            )?;
+            >::ser_field(self.num_pages_opt(), 2, out, true)?;
             ::std::result::Result::Ok(())
         }
     }
