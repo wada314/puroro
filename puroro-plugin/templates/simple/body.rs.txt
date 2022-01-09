@@ -218,6 +218,7 @@ impl {{ m.simple_ident }} {
     {%- endfor %} {#- for oneof in m.oneofs #}
 }
 
+#[cfg(nightly)]
 impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
     {%- for f in m.fields %}
     {%- call simple_trait_impl_field(f) %}

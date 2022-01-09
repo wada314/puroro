@@ -277,6 +277,7 @@ impl<'bump> ::puroro::internal::BumpDefault<'bump> for {{ m.bumpalo_ident }}<'bu
     }
 }
 
+#[cfg(nightly)]
 impl<'bump> super::_puroro_traits::{{ m.trait_ident }} for {{ m.bumpalo_ident }}<'bump> {
     {%- for f in m.fields %}
     {%- call bumpalo_trait_impl_field(f) %}

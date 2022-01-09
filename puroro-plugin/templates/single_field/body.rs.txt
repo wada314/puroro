@@ -7,17 +7,20 @@
     {%- let maybe_gp = "<ScalarType>" %}
 {%- endif %}
 
+#[cfg(nightly)]
 pub struct {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
 {
     pub {{ target_f.ident }}: {{ target_f.single_field_type }},
 }
 
+#[cfg(nightly)]
 impl{{ maybe_gp }} ::puroro::Message<super::{{ m.simple_ident }}>
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
 {}
 
+#[cfg(nightly)]
 impl{{ maybe_gp }} super::_puroro_traits::{{ m.trait_ident }}
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
@@ -42,7 +45,7 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     {%- endfor %} {#- for f in m.fields #}
 }
 
-
+#[cfg(nightly)]
 impl{{ maybe_gp }} ::puroro::internal::se::SerMessageToIoWrite
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
@@ -72,6 +75,7 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     }
 }
 
+#[cfg(nightly)]
 impl{{ maybe_gp }} ::std::convert::From<{{ target_f.single_field_type }}>
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}
@@ -83,6 +87,7 @@ for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
     }
 }
 
+#[cfg(nightly)]
 impl{{ maybe_gp }} ::std::clone::Clone
 for {{ m.single_field_ident }}{{ target_f.number }}{{ maybe_gp }}
 {%- call single_field_bound(target_f) %}

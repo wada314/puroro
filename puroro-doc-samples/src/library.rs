@@ -78,6 +78,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
+    #[cfg(nightly)]
     impl super::_puroro_traits::BookTrait for Book {
         fn title_opt<'this>(&'this self) -> Option<&'this str> {
             <self::Book>::title_opt(self)
@@ -193,6 +194,7 @@ pub mod _puroro_impls {
     }
     use super::_puroro_traits::*;
 
+    #[cfg(nightly)]
     pub struct BookSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -200,11 +202,13 @@ pub mod _puroro_impls {
         pub title: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Book> for BookSingleField1<ScalarType> where
         ScalarType: ::std::convert::AsRef<str>
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::BookTrait for BookSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -214,6 +218,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for BookSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -236,6 +241,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for BookSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -245,6 +251,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for BookSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::AsRef<str>,
@@ -257,6 +264,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     pub struct BookSingleField2<ScalarType>
     where
         ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
@@ -264,11 +272,13 @@ pub mod _puroro_impls {
         pub num_pages: ScalarType,
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::Message<super::Book> for BookSingleField2<ScalarType> where
         ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone
     {
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> super::_puroro_traits::BookTrait for BookSingleField2<ScalarType>
     where
         ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
@@ -280,6 +290,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for BookSingleField2<ScalarType>
     where
         ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
@@ -302,6 +313,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::convert::From<ScalarType> for BookSingleField2<ScalarType>
     where
         ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
@@ -311,6 +323,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<ScalarType> ::std::clone::Clone for BookSingleField2<ScalarType>
     where
         ScalarType: ::std::convert::Into<u32> + ::std::clone::Clone,
@@ -414,6 +427,7 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl<'bump> super::_puroro_traits::BookTrait for BookBumpalo<'bump> {
         fn title_opt<'this>(&'this self) -> Option<&'this str> {
             <Self>::title_opt(self)
@@ -481,8 +495,10 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    #[cfg(nightly)]
     pub struct BookBuilder<T>(T);
 
+    #[cfg(nightly)]
     impl<T> BookBuilder<T>
     where
         T: BookTrait,
@@ -512,13 +528,16 @@ pub mod _puroro_impls {
         }
     }
 
+    #[cfg(nightly)]
     impl BookBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }
     }
 }
+#[cfg(nightly)]
 pub use _puroro_traits::*;
+#[cfg(nightly)]
 pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;

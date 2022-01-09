@@ -7,7 +7,9 @@
 {#-################ Traits ################}
 
 {%- if !messages.is_empty() %}
+#[cfg(nightly)]
 pub use _puroro_traits::*;
+#[cfg(nightly)]
 pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;

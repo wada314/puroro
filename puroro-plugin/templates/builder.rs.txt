@@ -1,5 +1,7 @@
+#[cfg(nightly)]
 pub struct {{ m.builder_ident }}<T>(T);
 
+#[cfg(nightly)]
 impl<T> {{ m.builder_ident }}<T>
 where
     T: {{ m.trait_ident }}
@@ -27,6 +29,7 @@ where
     }
 }
 
+#[cfg(nightly)]
 impl {{ m.builder_ident }}<()>
 {
     pub fn new() -> Self { Self(()) }
