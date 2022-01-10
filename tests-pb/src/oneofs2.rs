@@ -1315,7 +1315,7 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
-                    if !matches!(::std::option::Option::Some(&self.group_one), E::G1Int32(_)) {
+                    if !matches!(&self.group_one, ::std::option::Option::Some(E::G1Int32(_))) {
                         self.group_one = ::std::option::Option::Some(E::G1Int32(
                             ::puroro::internal::BumpDefault::default_in(self._bump),
                         ));
@@ -1330,7 +1330,7 @@ pub mod _puroro_impls {
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
-                    if !matches!(::std::option::Option::Some(&self.group_one), E::G1String(_)) {
+                    if !matches!(&self.group_one, ::std::option::Option::Some(E::G1String(_))) {
                         self.group_one = ::std::option::Option::Some(E::G1String(
                             ::puroro::internal::BumpDefault::default_in(self._bump),
                         ));
@@ -1345,7 +1345,7 @@ pub mod _puroro_impls {
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
-                    if !matches!(::std::option::Option::Some(&self.group_two), E::G2F32(_)) {
+                    if !matches!(&self.group_two, ::std::option::Option::Some(E::G2F32(_))) {
                         self.group_two = ::std::option::Option::Some(E::G2F32(
                             ::puroro::internal::BumpDefault::default_in(self._bump),
                         ));
@@ -1360,7 +1360,7 @@ pub mod _puroro_impls {
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
-                    if !matches!(::std::option::Option::Some(&self.group_two), E::G2String(_)) {
+                    if !matches!(&self.group_two, ::std::option::Option::Some(E::G2String(_))) {
                         self.group_two = ::std::option::Option::Some(E::G2String(
                             ::puroro::internal::BumpDefault::default_in(self._bump),
                         ));
@@ -1375,7 +1375,7 @@ pub mod _puroro_impls {
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
-                    if !matches!(::std::option::Option::Some(&self.group_two), E::G2Submsg(_)) {
+                    if !matches!(&self.group_two, ::std::option::Option::Some(E::G2Submsg(_))) {
                         self.group_two = ::std::option::Option::Some(E::G2Submsg(
                             ::puroro::internal::Bare::new(::puroro::BumpaloMessage::new_in(
                                 self._bump,
@@ -1398,8 +1398,8 @@ pub mod _puroro_impls {
                 6 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
                     if !matches!(
-                        ::std::option::Option::Some(&self.group_three),
-                        E::G3Int32(_)
+                        &self.group_three,
+                        ::std::option::Option::Some(E::G3Int32(_))
                     ) {
                         self.group_three = ::std::option::Option::Some(E::G3Int32(
                             ::puroro::internal::BumpDefault::default_in(self._bump),

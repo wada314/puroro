@@ -327,8 +327,8 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
             {{ f.number }} => {
                 use {{ oneof.enum_path_from_owner }} as E;
                 if !matches!(
-                    ::std::option::Option::Some(&self.{{ oneof.field_ident }}),
-                    E::{{ f.ident }}(_))
+                    &self.{{ oneof.field_ident }},
+                    ::std::option::Option::Some(E::{{ f.ident }}(_)))
                 {
                     self.{{ oneof.field_ident }} = ::std::option::Option::Some(E::{{ f.ident }}(
                         {%- if f.is_message %}
