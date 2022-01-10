@@ -133,7 +133,7 @@ impl {{ m.simple_ident }} {
     pub fn {{ oneof.field_ident }}(&self) ->
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
+                {{ oneof.enum_ident }}{{ oneof.enum_generic_params }}
         >
     {
         {#- Reuse the trait's default impl. #}
