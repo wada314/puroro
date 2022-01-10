@@ -45,17 +45,12 @@ where
     {%- for field in fields %}
     {{ field.field_type }}: ::std::clone::Clone,
     {%- endfor %} {#- for field in fields #}
-    {%- if has_ld_field %}
-    {%- if has_message_field %}
-    T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
-    {%- endif %}
 {
     fn clone(&self) -> Self {
         match self {
             {%- for field in fields %}
-            Self::{{ field.ident }}(v) => Self::{{ field.ident }}(
-                ::std::clone::Clone::clone(&v)
+            Self::{{ field.ident }}(ref v) => Self::{{ field.ident }}(
+                <{{ field.field_type }} as ::std::clone::Clone>::clone(v)
             ),
             {%- endfor %} {#- for field in fields #}
         }
@@ -67,11 +62,6 @@ where
     {%- for field in fields %}
     {{ field.field_type }}: ::std::cmp::PartialEq,
     {%- endfor %} {#- for field in fields #}
-    {%- if has_ld_field %}
-    {%- if has_message_field %}
-    T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
-    {%- endif %}
 {
     fn eq(&self, rhs: &Self) -> bool {
         match (self, rhs) {
@@ -83,24 +73,3 @@ where
         }
     }
 }
-
-{%- if !fields.is_empty() %}
-
-impl{{ enum_generic_params_1_and_2 }}
-::std::convert::From<{{ enum_ident }}{{ enum_generic_params }}>
-for {{ enum_ident }}{{ enum_generic_params_2 }}
-where
-    {%- for field in fields %}
-    {{ field.field_type }}: ::std::convert::From<{{ field.field_type_2 }}>,
-    {%- endfor %} {#- for field in fields #}
-{
-    fn from(value: {{ enum_ident }}{{ enum_generic_params }}) -> Self {
-        match value {
-            {%- for field in fields %}
-            {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
-            {%- endfor %}
-        }
-    }
-}
-
-{%- endif %} {#- if !fields.is_empty() #}

@@ -425,8 +425,6 @@ struct Oneof {
     simple_enum_ident: String,
     bumpalo_enum_ident: String,
     enum_generic_params: String,
-    enum_generic_params_2: String,
-    enum_generic_params_1_and_2: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -454,33 +452,11 @@ impl Oneof {
             let items = o.fields()?.iter().map(|f| f.ident_camel()).join(", ");
             format!("<{}>", items)
         };
-        let enum_generic_params_2 = if o.fields()?.is_empty() {
-            "".to_string()
-        } else {
-            let items = o
-                .fields()?
-                .iter()
-                .map(|f| format!("{}_2", f.ident_camel_unesc()))
-                .join(", ");
-            format!("<{}>", items)
-        };
-        let enum_generic_params_1_and_2 = if o.fields()?.is_empty() {
-            "".to_string()
-        } else {
-            let items = o
-                .fields()?
-                .iter()
-                .map(|f| format!("{}, {}_2", f.ident_camel(), f.ident_camel_unesc()))
-                .join(", ");
-            format!("<{}>", items)
-        };
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
             simple_enum_ident: format!("{}Simple", o.rust_enum_ident()),
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
             enum_generic_params,
-            enum_generic_params_2,
-            enum_generic_params_1_and_2,
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
@@ -502,7 +478,6 @@ struct OneofField {
     number: i32,
     is_message: bool,
     field_type: String,
-    field_type_2: String,
     simple_field_type: String,
     simple_getter_mut_type: String,
     bumpalo_field_type: String,
@@ -521,7 +496,6 @@ impl OneofField {
             number: f.number(),
             is_message,
             field_type: f.ident_camel().to_string(),
-            field_type_2: format!("{}_2", f.ident_camel_unesc()),
             simple_field_type: f.simple_field_type()?.into(),
             simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
