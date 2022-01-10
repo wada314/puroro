@@ -22,8 +22,9 @@ pub struct {{ m.bumpalo_ident }}<'bump> {
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
-    {{ oneof.field_ident }}: 
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }}<'bump>,
+    {{ oneof.field_ident }}: ::std::option::Option<
+        {{ oneof.enum_path_from_owner }}{{ oneof.bumpalo_enum_generic_params }}
+    >,
     {%- endfor %} {#- for f in m.fields #}
 }
 
@@ -90,9 +91,10 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     pub fn {{ f.ident_unesc }}_opt<'this>(&'this self) -> {{ f.bumpalo_getter_opt_type }} {
         {%- if f.is_explicit_oneof_field %}
         {#- oneof fields. extract the value from oneof field. #}
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ f.bumpalo_oneof_enum_ident }} as E;
-        if let E::{{ f.ident_camel }}(val) = &self.{{ f.oneof_field_ident }} {
-            ::std::option::Option::Some(
+        use {{ f.oneof_enum_path_from_owner }} as E;
+        use ::std::option::Option::{Some, None};
+        if let Some(E::{{ f.ident_camel }}(ref val)) = &self.{{ f.oneof_field_ident }} {
+            Some(
                 {%- if f.is_length_delimited %}
                 val
                 {%- else %} {#- if f.is_length_delimited #}
@@ -100,7 +102,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
                 {%- endif %} {#- if f.is_length_delimited #}
             )
         } else {
-            ::std::option::Option::None
+            None
         }
 
         {%- else %} {#- if f.is_explicit_oneof_field #}
