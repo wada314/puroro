@@ -2234,8 +2234,7 @@ pub mod _puroro_nested {
                 G1Int32(G1Int32),
                 G1String(G1String),
             }
-
-            impl<'msg> GroupOne<'msg> {
+            impl<G1Int32, G1String> GroupOne<G1Int32, G1String> {
                 pub fn g1_int32(self) -> ::std::option::Option<G1Int32> {
                     match self {
                         Self::G1Int32(v) => ::std::option::Option::Some(v),
@@ -2252,7 +2251,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'msg> ::std::fmt::Debug for GroupOne<'msg>
+            impl<G1Int32, G1String> ::std::fmt::Debug for GroupOne<G1Int32, G1String>
             where
                 G1Int32: ::std::fmt::Debug,
                 G1String: ::std::fmt::Debug,
@@ -2265,7 +2264,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'msg> ::std::clone::Clone for GroupOne<'msg>
+            impl<G1Int32, G1String> ::std::clone::Clone for GroupOne<G1Int32, G1String>
             where
                 G1Int32: ::std::clone::Clone,
                 G1String: ::std::clone::Clone,
@@ -2278,7 +2277,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'msg> ::std::cmp::PartialEq for GroupOne<'msg>
+            impl<G1Int32, G1String> ::std::cmp::PartialEq for GroupOne<G1Int32, G1String>
             where
                 G1Int32: ::std::cmp::PartialEq,
                 G1String: ::std::cmp::PartialEq,
@@ -2293,16 +2292,26 @@ pub mod _puroro_nested {
                 }
             }
 
+            impl<G1Int32, G1String> ::std::convert::From<GroupOne<G1Int32, G1String>>
+                for GroupOne<G1Int32_2, G1String_2>
+            where
+                G1Int32: ::std::convert::From<G1Int32_2>,
+                G1String: ::std::convert::From<G1String_2>,
+            {
+                fn from(value: GroupOne<G1Int32, G1String>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
+
             pub enum GroupTwo<G2F32, G2String, G2Submsg> {
                 G2F32(G2F32),
                 G2String(G2String),
                 G2Submsg(G2Submsg),
             }
-
-            impl<'msg, T> GroupTwo<'msg, T>
-            where
-                T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
-            {
+            impl<G2F32, G2String, G2Submsg> GroupTwo<G2F32, G2String, G2Submsg> {
                 pub fn g2_f32(self) -> ::std::option::Option<G2F32> {
                     match self {
                         Self::G2F32(v) => ::std::option::Option::Some(v),
@@ -2326,12 +2335,11 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'msg, T> ::std::fmt::Debug for GroupTwo<'msg, T>
+            impl<G2F32, G2String, G2Submsg> ::std::fmt::Debug for GroupTwo<G2F32, G2String, G2Submsg>
             where
                 G2F32: ::std::fmt::Debug,
                 G2String: ::std::fmt::Debug,
                 G2Submsg: ::std::fmt::Debug,
-                T: 'msg + ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
             {
                 fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                     match self {
@@ -2342,7 +2350,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'msg, T> ::std::clone::Clone for GroupTwo<'msg, T>
+            impl<G2F32, G2String, G2Submsg> ::std::clone::Clone for GroupTwo<G2F32, G2String, G2Submsg>
             where
                 G2F32: ::std::clone::Clone,
                 G2String: ::std::clone::Clone,
@@ -2358,7 +2366,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl<'msg, T> ::std::cmp::PartialEq for GroupTwo<'msg, T>
+            impl<G2F32, G2String, G2Submsg> ::std::cmp::PartialEq for GroupTwo<G2F32, G2String, G2Submsg>
             where
                 G2F32: ::std::cmp::PartialEq,
                 G2String: ::std::cmp::PartialEq,
@@ -2375,61 +2383,16 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ T>
+
+            impl<G2F32, G2String, G2Submsg>
+                ::std::convert::From<GroupTwo<G2F32, G2String, G2Submsg>>
+                for GroupTwo<G2F32_2, G2String_2, G2Submsg_2>
             where
-                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+                G2F32: ::std::convert::From<G2F32_2>,
+                G2String: ::std::convert::From<G2String_2>,
+                G2Submsg: ::std::convert::From<G2Submsg_2>,
             {
-                fn from(value: GroupTwo<'msg, T>) -> Self {
-                    match value {
-                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
-                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
-                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
-                    }
-                }
-            }
-            impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ mut T>
-            where
-                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
-            {
-                fn from(value: GroupTwo<'msg, T>) -> Self {
-                    match value {
-                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
-                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
-                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
-                    }
-                }
-            }
-            impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, ::std::boxed::Box<T>>
-            where
-                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
-            {
-                fn from(value: GroupTwo<'msg, T>) -> Self {
-                    match value {
-                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
-                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
-                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
-                    }
-                }
-            }
-            impl<'msg, 'bump, T> ::std::convert::From<GroupTwo<'msg, T>>
-                for GroupTwo<'msg, ::puroro::bumpalo::boxed::Box<'bump, T>>
-            where
-                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
-            {
-                fn from(value: GroupTwo<'msg, T>) -> Self {
-                    match value {
-                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
-                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
-                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
-                    }
-                }
-            }
-            impl<'msg, 'bump, T> ::std::convert::From<GroupTwo<'msg, T>>
-                for GroupTwo<'msg, ::puroro::BumpaloOwned<T>>
-            where
-                T: 'msg + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
-            {
-                fn from(value: GroupTwo<'msg, T>) -> Self {
+                fn from(value: GroupTwo<G2F32, G2String, G2Submsg>) -> Self {
                     match value {
                         GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
                         GroupTwo::G2String(v) => GroupTwo::G2String(v),
@@ -2441,8 +2404,7 @@ pub mod _puroro_nested {
             pub enum GroupThree<G3Int32> {
                 G3Int32(G3Int32),
             }
-
-            impl GroupThree {
+            impl<G3Int32> GroupThree<G3Int32> {
                 pub fn g3_int32(self) -> ::std::option::Option<G3Int32> {
                     match self {
                         Self::G3Int32(v) => ::std::option::Option::Some(v),
@@ -2452,7 +2414,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::std::fmt::Debug for GroupThree
+            impl<G3Int32> ::std::fmt::Debug for GroupThree<G3Int32>
             where
                 G3Int32: ::std::fmt::Debug,
             {
@@ -2463,7 +2425,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::std::clone::Clone for GroupThree
+            impl<G3Int32> ::std::clone::Clone for GroupThree<G3Int32>
             where
                 G3Int32: ::std::clone::Clone,
             {
@@ -2474,7 +2436,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::std::cmp::PartialEq for GroupThree
+            impl<G3Int32> ::std::cmp::PartialEq for GroupThree<G3Int32>
             where
                 G3Int32: ::std::cmp::PartialEq,
             {
@@ -2483,6 +2445,17 @@ pub mod _puroro_nested {
                         (Self::G3Int32(left), Self::G3Int32(right)) => left == right,
                         #[allow(unreachable_patterns)]
                         _ => false,
+                    }
+                }
+            }
+
+            impl<G3Int32> ::std::convert::From<GroupThree<G3Int32>> for GroupThree<G3Int32_2>
+            where
+                G3Int32: ::std::convert::From<G3Int32_2>,
+            {
+                fn from(value: GroupThree<G3Int32>) -> Self {
+                    match value {
+                        GroupThree::G3Int32(v) => GroupThree::G3Int32(v),
                     }
                 }
             }
