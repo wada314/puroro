@@ -191,6 +191,7 @@ struct Field {
     trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
     oneof_enum_ident: String,
+    oneof_enum_path_from_owner: String,
     oneof_field_ident: String,
     simple_field_type: String,
     simple_getter_type: String,
@@ -273,6 +274,17 @@ impl Field {
             oneof_enum_ident: f
                 .oneof()?
                 .map(|o| o.rust_enum_ident().to_string())
+                .unwrap_or_default(),
+            oneof_enum_path_from_owner: f
+                .oneof()?
+                .map(|o| -> Result<_> {
+                    Ok(format!(
+                        "super::_puroro_nested::{owner_ident}::_puroro_oneofs::{enum_ident}",
+                        owner_ident = o.message()?.rust_nested_module_ident(),
+                        enum_ident = o.rust_enum_ident()
+                    ))
+                })
+                .transpose()?
                 .unwrap_or_default(),
             oneof_field_ident: f
                 .oneof()?
@@ -496,6 +508,7 @@ struct OneofField {
     getter_ident_unesc: String,
     number: i32,
     is_message: bool,
+    is_length_delimited: bool,
     field_type: String,
     simple_field_type: String,
     simple_getter_mut_type: String,
@@ -507,6 +520,9 @@ struct OneofField {
 impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
+        let is_string = matches!(f.field_type()?, wrappers::FieldType::String);
+        let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
+        let is_length_delimited = is_message || is_string || is_bytes;
         Ok(Self {
             ident: f.ident_camel().to_string(),
             ident_camel_unesc: f.ident_camel_unesc().to_string(),
@@ -514,6 +530,7 @@ impl OneofField {
             getter_ident_unesc: f.lower_snake_ident_unesc().to_string(),
             number: f.number(),
             is_message,
+            is_length_delimited,
             field_type: f.ident_camel().to_string(),
             simple_field_type: f.simple_field_type()?.into(),
             simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),

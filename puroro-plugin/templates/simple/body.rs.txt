@@ -60,8 +60,8 @@ impl {{ m.simple_ident }} {
     pub fn {{ f.ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
         {%- if f.is_explicit_oneof_field %}
         {#- oneof fields. extract the value from oneof field. #}
-        use {{ oneof.enum_path_from_owner }} as E;
-        if let E::{{ f.ident_camel }}(val) = &self.{{ f.oneof_field_ident }} {
+        use {{ f.oneof_enum_path_from_owner }} as E;
+        if let E::{{ f.ident_camel }}(ref val) = &self.{{ f.oneof_field_ident }} {
             ::std::option::Option::Some(
                 {%- if f.is_length_delimited %}
                 val
@@ -133,13 +133,26 @@ impl {{ m.simple_ident }} {
 
     {%- for oneof in m.oneofs %}
     pub fn {{ oneof.field_ident }}(&self) ->
-        Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_generic_params }}
+        ::std::option::Option<
+            {{ oneof.enum_path_from_owner }}{{ oneof.enum_generic_params }}
         >
     {
-        {#- Reuse the trait's default impl. #}
-        <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ oneof.field_ident }}(self)
+        use {{ oneof.enum_path_from_owner }} as E;
+        match &self.{{ oneof.field_ident }} {
+            {%- for f in oneof.fields %}
+            E::{{ f.ident }}(ref val) => ::std::option::Option::Some(
+                E::{{ f.ident }}(
+                    {%- if f.is_length_delimited %}
+                    val
+                    {%- else %} {#- if f.is_length_delimited #}
+                    val.clone().inner()
+                    {%- endif %} {#- if f.is_length_delimited #}
+                )
+            ),
+            {%- endfor %} {#- for f in oneof.fields #}
+            #[allow(unreachable_patterns)]
+            _ => ::std::option::Option::None,
+        }
     }
     {%- endfor %} {#- for oneof in m.oneofs #}
 
