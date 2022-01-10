@@ -176,12 +176,25 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {%- for oneof in m.oneofs %}
     pub fn {{ oneof.field_ident }}(&self) ->
         Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_generic_params }}
+            {{ oneof.enum_path_from_owner }}{{ oneof.enum_generic_params }}
         >
     {
-        {#- Reuse the trait's default impl. #}
-        <Self as super::_puroro_traits::{{ m.trait_ident }}>::{{ oneof.field_ident }}(self)
+        use {{ oneof.enum_path_from_owner }} as E;
+        match &self.{{ oneof.field_ident }} {
+            {%- for f in oneof.fields %}
+            E::{{ f.ident }}(ref val) => ::std::option::Option::Some(
+                E::{{ f.ident }}(
+                    {%- if f.is_length_delimited %}
+                    val
+                    {%- else %} {#- if f.is_length_delimited #}
+                    val.clone().inner()
+                    {%- endif %} {#- if f.is_length_delimited #}
+                )
+            ),
+            {%- endfor %} {#- for f in oneof.fields #}
+            #[allow(unreachable_patterns)]
+            _ => ::std::option::Option::None,
+        }
     }
     {%- endfor %} {#- for oneof in m.oneofs #}
 
@@ -312,21 +325,21 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for {{ m.bumpalo_i
             {%- for oneof in m.oneofs %}
             {%- for f in oneof.fields %}
             {{ f.number }} => {
-                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.bumpalo_enum_ident }} as E;
+                use {{ oneof.enum_path_from_owner }} as E;
                 if !matches!(
-                    &self.{{ oneof.field_ident }},
+                    ::std::option::Option::Some(&self.{{ oneof.field_ident }}),
                     E::{{ f.ident }}(_))
                 {
-                    self.{{ oneof.field_ident }} = E::{{ f.ident }}(
+                    self.{{ oneof.field_ident }} = ::std::option::Option::Some(E::{{ f.ident }}(
                         {%- if f.is_message %}
                         ::puroro::internal::Bare::new(::puroro::BumpaloMessage::new_in(self._bump))
                         {%- else %} {#- if f.is_message #}
                         ::puroro::internal::BumpDefault::default_in(self._bump)
                         {%- endif %} {#- if f.is_message #}
-                    );
+                    ));
                 }
                 let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
-                    E::{{ f.ident }}(v) => v,
+                    ::std::option::Option::Some(E::{{ f.ident }}(v)) => v,
                     _ => unreachable!(),
                 };
                 DeserFieldFromBytesIter::<
