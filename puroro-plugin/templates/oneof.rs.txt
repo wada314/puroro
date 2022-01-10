@@ -10,15 +10,7 @@
 {%- let maybe_gp = "" %}
 {%- endif %}
 
-pub enum {{ enum_ident }}{{ maybe_gp }}
-{%- if has_ld_field %}
-where
-    {%- if has_message_field %}
-    T: 'msg + ?Sized + {{ owner_message_trait_path }},
-    {%- endif %}
-{%- else %}
-{%- endif %}
-{
+pub enum {{ enum_ident }}{{ enum_generic_params }} {
     {%- for field in fields %}
     {{ field.ident }}({{ field.field_type }}),
     {%- endfor %}

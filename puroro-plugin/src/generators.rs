@@ -446,11 +446,17 @@ impl Oneof {
             .fields()?
             .into_iter()
             .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_))));
+        let enum_generic_params = if o.fields()?.is_empty() {
+            "".to_string()
+        } else {
+            let items = o.fields()?.iter().map(|f| f.ident_camel()).join(", ");
+            format!("<{}>", items)
+        };
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
             simple_enum_ident: format!("{}Simple", o.rust_enum_ident()),
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
-            enum_generic_params: if has_message_field { "<Self>" } else { "" }.to_string(),
+            enum_generic_params,
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
@@ -466,6 +472,7 @@ impl Oneof {
 
 struct OneofField {
     ident: String,
+    ident_camel_unesc: String,
     getter_ident: String,
     getter_ident_unesc: String,
     number: i32,
@@ -483,11 +490,12 @@ impl OneofField {
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
         Ok(Self {
             ident: f.ident_camel().to_string(),
+            ident_camel_unesc: f.ident_camel_unesc().to_string(),
             getter_ident: f.ident_lower_snake().to_string(),
             getter_ident_unesc: f.lower_snake_ident_unesc().to_string(),
             number: f.number(),
             is_message,
-            field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
+            field_type: f.ident_camel().to_string(),
             simple_field_type: f.simple_field_type()?.into(),
             simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
             bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
