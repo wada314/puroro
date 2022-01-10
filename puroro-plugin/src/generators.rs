@@ -422,9 +422,11 @@ impl Field {
 #[template(path = "oneof.rs.txt")]
 struct Oneof {
     enum_ident: String,
+    enum_path_from_owner: String,
     simple_enum_ident: String,
     bumpalo_enum_ident: String,
     enum_generic_params: String,
+    simple_enum_generic_params: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -452,11 +454,28 @@ impl Oneof {
             let items = o.fields()?.iter().map(|f| f.ident_camel()).join(", ");
             format!("<{}>", items)
         };
+        let simple_enum_generic_params = if o.fields()?.is_empty() {
+            "".to_string()
+        } else {
+            let items = o
+                .fields()?
+                .iter()
+                .map(|f| f.simple_scalar_field_type())
+                .try_collect::<_, Vec<_>, _>()?
+                .join(", ");
+            format!("<{}>", items)
+        };
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
+            enum_path_from_owner: format!(
+                "super::_puroro_nested::{owner_ident}::_puroro_oneofs::{enum_ident}",
+                owner_ident = o.message()?.rust_nested_module_ident(),
+                enum_ident = o.rust_enum_ident()
+            ),
             simple_enum_ident: format!("{}Simple", o.rust_enum_ident()),
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
             enum_generic_params,
+            simple_enum_generic_params,
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?

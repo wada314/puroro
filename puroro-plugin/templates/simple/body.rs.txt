@@ -11,13 +11,15 @@ pub struct {{ m.simple_ident }} {
     {#- [optional] MyMessage => Option<Box<MyMessage>> #}
     {#- repeated i32 => Vec<i32> #}
     {#- repeated String => Vec<String> #}
-    {#- repeated MyMessage => Option<MyMessage> #}
+    {#- repeated MyMessage => Vec<MyMessage> #}
     {{ f.ident }}: {{ f.simple_field_type }},
     {%- endif %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}
-    {{ oneof.field_ident }}: super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ oneof.simple_enum_ident }},
+    {{ oneof.field_ident }}: ::std::option::Option<
+        {{ oneof.enum_path_from_owner }}{{ oneof.simple_enum_generic_params }}
+    >,
     {%- endfor %}
 }
 impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_ident }} {}
@@ -58,7 +60,7 @@ impl {{ m.simple_ident }} {
     pub fn {{ f.ident_unesc }}_opt(&self) -> {{ f.simple_getter_opt_type }} {
         {%- if f.is_explicit_oneof_field %}
         {#- oneof fields. extract the value from oneof field. #}
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_private_oneofs::{{ f.simple_oneof_enum_ident }} as E;
+        use {{ oneof.enum_path_from_owner }} as E;
         if let E::{{ f.ident_camel }}(val) = &self.{{ f.oneof_field_ident }} {
             ::std::option::Option::Some(
                 {%- if f.is_length_delimited %}
