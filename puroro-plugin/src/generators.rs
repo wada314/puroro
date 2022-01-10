@@ -473,7 +473,7 @@ impl Oneof {
             let items = o
                 .fields()?
                 .iter()
-                .map(|f| f.simple_scalar_field_type())
+                .map(|f| f.simple_field_type())
                 .try_collect::<_, Vec<_>, _>()?
                 .join(", ");
             format!("<{}>", items)
@@ -484,7 +484,7 @@ impl Oneof {
             let items = o
                 .fields()?
                 .iter()
-                .map(|f| f.bumpalo_scalar_field_type())
+                .map(|f| f.bumpalo_field_type())
                 .try_collect::<_, Vec<_>, _>()?
                 .join(", ");
             format!("<{}>", items)
