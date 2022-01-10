@@ -2264,8 +2264,12 @@ pub mod _puroro_nested {
             {
                 fn clone(&self) -> Self {
                     match self {
-                        Self::G1Int32(v) => Self::G1Int32(::std::clone::Clone::clone(&v)),
-                        Self::G1String(v) => Self::G1String(::std::clone::Clone::clone(&v)),
+                        Self::G1Int32(ref v) => {
+                            Self::G1Int32(<G1Int32 as ::std::clone::Clone>::clone(v))
+                        }
+                        Self::G1String(ref v) => {
+                            Self::G1String(<G1String as ::std::clone::Clone>::clone(v))
+                        }
                     }
                 }
             }
@@ -2281,20 +2285,6 @@ pub mod _puroro_nested {
                         (Self::G1String(left), Self::G1String(right)) => left == right,
                         #[allow(unreachable_patterns)]
                         _ => false,
-                    }
-                }
-            }
-
-            impl<G1Int32, G1String> ::std::convert::From<GroupOne<G1Int32, G1String>>
-                for GroupOne<G1Int32_2, G1String_2>
-            where
-                G1Int32: ::std::convert::From<G1Int32_2>,
-                G1String: ::std::convert::From<G1String_2>,
-            {
-                fn from(value: GroupOne<G1Int32, G1String>) -> Self {
-                    match value {
-                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
-                        GroupOne::G1String(v) => GroupOne::G1String(v),
                     }
                 }
             }
@@ -2348,13 +2338,16 @@ pub mod _puroro_nested {
                 G2F32: ::std::clone::Clone,
                 G2String: ::std::clone::Clone,
                 G2Submsg: ::std::clone::Clone,
-                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             {
                 fn clone(&self) -> Self {
                     match self {
-                        Self::G2F32(v) => Self::G2F32(::std::clone::Clone::clone(&v)),
-                        Self::G2String(v) => Self::G2String(::std::clone::Clone::clone(&v)),
-                        Self::G2Submsg(v) => Self::G2Submsg(::std::clone::Clone::clone(&v)),
+                        Self::G2F32(ref v) => Self::G2F32(<G2F32 as ::std::clone::Clone>::clone(v)),
+                        Self::G2String(ref v) => {
+                            Self::G2String(<G2String as ::std::clone::Clone>::clone(v))
+                        }
+                        Self::G2Submsg(ref v) => {
+                            Self::G2Submsg(<G2Submsg as ::std::clone::Clone>::clone(v))
+                        }
                     }
                 }
             }
@@ -2364,7 +2357,6 @@ pub mod _puroro_nested {
                 G2F32: ::std::cmp::PartialEq,
                 G2String: ::std::cmp::PartialEq,
                 G2Submsg: ::std::cmp::PartialEq,
-                T: 'msg + ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             {
                 fn eq(&self, rhs: &Self) -> bool {
                     match (self, rhs) {
@@ -2373,23 +2365,6 @@ pub mod _puroro_nested {
                         (Self::G2Submsg(left), Self::G2Submsg(right)) => left == right,
                         #[allow(unreachable_patterns)]
                         _ => false,
-                    }
-                }
-            }
-
-            impl<G2F32, G2String, G2Submsg>
-                ::std::convert::From<GroupTwo<G2F32, G2String, G2Submsg>>
-                for GroupTwo<G2F32_2, G2String_2, G2Submsg_2>
-            where
-                G2F32: ::std::convert::From<G2F32_2>,
-                G2String: ::std::convert::From<G2String_2>,
-                G2Submsg: ::std::convert::From<G2Submsg_2>,
-            {
-                fn from(value: GroupTwo<G2F32, G2String, G2Submsg>) -> Self {
-                    match value {
-                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
-                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
-                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
                     }
                 }
             }
@@ -2424,7 +2399,9 @@ pub mod _puroro_nested {
             {
                 fn clone(&self) -> Self {
                     match self {
-                        Self::G3Int32(v) => Self::G3Int32(::std::clone::Clone::clone(&v)),
+                        Self::G3Int32(ref v) => {
+                            Self::G3Int32(<G3Int32 as ::std::clone::Clone>::clone(v))
+                        }
                     }
                 }
             }
@@ -2438,17 +2415,6 @@ pub mod _puroro_nested {
                         (Self::G3Int32(left), Self::G3Int32(right)) => left == right,
                         #[allow(unreachable_patterns)]
                         _ => false,
-                    }
-                }
-            }
-
-            impl<G3Int32> ::std::convert::From<GroupThree<G3Int32>> for GroupThree<G3Int32_2>
-            where
-                G3Int32: ::std::convert::From<G3Int32_2>,
-            {
-                fn from(value: GroupThree<G3Int32>) -> Self {
-                    match value {
-                        GroupThree::G3Int32(v) => GroupThree::G3Int32(v),
                     }
                 }
             }
