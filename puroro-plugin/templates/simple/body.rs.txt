@@ -61,8 +61,9 @@ impl {{ m.simple_ident }} {
         {%- if f.is_explicit_oneof_field %}
         {#- oneof fields. extract the value from oneof field. #}
         use {{ f.oneof_enum_path_from_owner }} as E;
-        if let E::{{ f.ident_camel }}(ref val) = &self.{{ f.oneof_field_ident }} {
-            ::std::option::Option::Some(
+        use ::std::option::Option::{Some,  None};
+        if let Some(E::{{ f.ident_camel }}(ref val)) = &self.{{ f.oneof_field_ident }} {
+            Some(
                 {%- if f.is_length_delimited %}
                 val
                 {%- else %} {#- if f.is_length_delimited #}
@@ -70,7 +71,7 @@ impl {{ m.simple_ident }} {
                 {%- endif %} {#- if f.is_length_delimited #}
             )
         } else {
-            ::std::option::Option::None
+            None
         }
 
         {%- else %} {#- if f.is_explicit_oneof_field #}
