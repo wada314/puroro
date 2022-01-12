@@ -202,7 +202,6 @@ struct Field {
     simple_scalar_field_type: String,
     simple_field_message_path: String,
     simple_label_and_type_tags: String,
-    simple_oneof_enum_ident: String,
     single_field_type: String,
     single_numerical_rust_type: String,
     bumpalo_field_type: String,
@@ -212,7 +211,6 @@ struct Field {
     bumpalo_getter_mut_type: String,
     bumpalo_field_message_path: String,
     bumpalo_label_and_type_tags: String,
-    bumpalo_oneof_enum_ident: String,
 }
 
 impl Field {
@@ -322,10 +320,6 @@ impl Field {
                     },
                 )
             })?,
-            simple_oneof_enum_ident: f
-                .oneof()?
-                .map(|o| format!("{}Simple", o.rust_enum_ident()))
-                .unwrap_or_default(),
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
             bumpalo_field_type: f.bumpalo_field_type()?.into(),
@@ -365,10 +359,6 @@ impl Field {
                     },
                 )
             })?,
-            bumpalo_oneof_enum_ident: f
-                .oneof()?
-                .map(|o| format!("{}Bumpalo", o.rust_enum_ident()))
-                .unwrap_or_default(),
         })
     }
 
@@ -437,8 +427,6 @@ impl Field {
 struct Oneof {
     enum_ident: String,
     enum_path_from_owner: String,
-    simple_enum_ident: String,
-    bumpalo_enum_ident: String,
     enum_generic_params: String,
     trait_getter_enum_generic_params: String,
     simple_enum_generic_params: String,
@@ -447,25 +435,10 @@ struct Oneof {
     bumpalo_getter_enum_generic_params: String,
     field_ident: String,
     fields: Vec<OneofField>,
-    has_ld_field: bool,
-    has_message_field: bool,
-    owner_message_trait_path: String,
 }
 
 impl Oneof {
     fn try_new(o: &wrappers::Oneof) -> Result<Self> {
-        let has_ld_field = o.fields()?.into_iter().any(|f| {
-            matches!(
-                f.field_type(),
-                Ok(wrappers::FieldType::Bytes
-                    | wrappers::FieldType::String
-                    | wrappers::FieldType::Message(_))
-            )
-        });
-        let has_message_field = o
-            .fields()?
-            .into_iter()
-            .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_))));
         fn generic_params_from_fields<F: FnMut(&wrappers::Field) -> Result<Cow<'_, str>>>(
             oneof: &wrappers::Oneof,
             mut f: F,
@@ -499,8 +472,6 @@ impl Oneof {
                 owner_ident = o.message()?.rust_nested_module_ident(),
                 enum_ident = o.rust_enum_ident()
             ),
-            simple_enum_ident: format!("{}Simple", o.rust_enum_ident()),
-            bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
             enum_generic_params,
             trait_getter_enum_generic_params,
             simple_enum_generic_params,
@@ -513,25 +484,19 @@ impl Oneof {
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
-            has_ld_field,
-            has_message_field,
-            owner_message_trait_path: o.message()?.rust_trait_path(),
         })
     }
 }
 
 struct OneofField {
     ident: String,
-    ident_camel_unesc: String,
     getter_ident: String,
     getter_ident_unesc: String,
     number: i32,
     is_message: bool,
     is_length_delimited: bool,
     field_type: String,
-    simple_field_type: String,
     simple_getter_mut_type: String,
-    bumpalo_field_type: String,
     simple_field_type_tag: String,
     bumpalo_field_type_tag: String,
 }
@@ -544,16 +509,13 @@ impl OneofField {
         let is_length_delimited = is_message || is_string || is_bytes;
         Ok(Self {
             ident: f.ident_camel().to_string(),
-            ident_camel_unesc: f.ident_camel_unesc().to_string(),
             getter_ident: f.ident_lower_snake().to_string(),
             getter_ident_unesc: f.lower_snake_ident_unesc().to_string(),
             number: f.number(),
             is_message,
             is_length_delimited,
             field_type: f.ident_camel().to_string(),
-            simple_field_type: f.simple_field_type()?.into(),
             simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
-            bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(format!(
                     "::std::boxed::Box<{}>",
