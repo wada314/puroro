@@ -582,12 +582,6 @@ struct Trait<'a> {
     m: &'a Message,
 }
 
-#[derive(Template)]
-#[template(path = "private_oneof.rs.txt")]
-struct PrivateOneof<'a> {
-    oneof: &'a Oneof,
-}
-
 mod filters {
     use super::*;
     pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
@@ -595,8 +589,5 @@ mod filters {
     }
     pub(super) fn print_trait(message: &Message) -> ::askama::Result<Trait> {
         Ok(Trait { m: message })
-    }
-    pub(super) fn print_private_oneof(oneof: &Oneof) -> ::askama::Result<PrivateOneof> {
-        Ok(PrivateOneof { oneof })
     }
 }
