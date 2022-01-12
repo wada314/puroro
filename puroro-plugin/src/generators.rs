@@ -480,28 +480,9 @@ impl Oneof {
             }
         }
         let enum_generic_params = generic_params_from_fields(&o, |f| Ok(f.ident_camel().into()))?;
-        let simple_enum_generic_params = if o.fields()?.is_empty() {
-            "".to_string()
-        } else {
-            let items = o
-                .fields()?
-                .iter()
-                .map(|f| f.simple_field_type())
-                .try_collect::<_, Vec<_>, _>()?
-                .join(", ");
-            format!("<{}>", items)
-        };
-        let bumpalo_enum_generic_params = if o.fields()?.is_empty() {
-            "".to_string()
-        } else {
-            let items = o
-                .fields()?
-                .iter()
-                .map(|f| f.bumpalo_field_type())
-                .try_collect::<_, Vec<_>, _>()?
-                .join(", ");
-            format!("<{}>", items)
-        };
+        let simple_enum_generic_params = generic_params_from_fields(&o, |f| f.simple_field_type())?;
+        let bumpalo_enum_generic_params =
+            generic_params_from_fields(&o, |f| f.bumpalo_field_type())?;
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
             enum_path_from_owner: format!(
