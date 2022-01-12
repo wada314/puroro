@@ -86,10 +86,10 @@ where
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
-    fn {{ oneof.field_ident }}(&self) ->
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
         Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_generic_params }}
+                {{ oneof.enum_ident }}{{ oneof.trait_getter_enum_generic_params }}
         >
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
@@ -97,16 +97,14 @@ where
             (None, None) => { return None; },
 
             {%- for f in oneof.fields %}
+            {%- if f.is_message %}
             (
                 Some(E::{{ f.ident }}({% if f.is_message %}left{% else %}_{% endif %})),
                 Some(E::{{ f.ident }}(right))
             ) => {
-                {%- if f.is_message %}
                 E::{{ f.ident }}((Some(left), Some(right)))
-                {%- else %}
-                E::{{ f.ident }}(right)
-                {%- endif %}
             }
+            {%- endif %} {#- if f.is_message #}
             {%- endfor %}
 
             {%- for f in oneof.fields %}

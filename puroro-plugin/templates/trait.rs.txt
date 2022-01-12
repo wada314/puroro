@@ -46,7 +46,7 @@ pub trait {{ m.trait_ident }} {
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_generic_params }}
+                {{ oneof.enum_ident }}{{ oneof.trait_getter_enum_generic_params }}
         >
     {
         use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;

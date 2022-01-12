@@ -1888,7 +1888,7 @@ pub mod _puroro_traits {
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<G1Int32, G1String>,
+            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'this str>,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             if let ::std::option::Option::Some(val) = self.g1_int32_opt() {
@@ -1903,7 +1903,11 @@ pub mod _puroro_traits {
         fn group_two<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<G2F32, G2String, G2Submsg>,
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
+                f32,
+                &'this str,
+                Self::G2SubmsgMessageType<'this>,
+            >,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             if let ::std::option::Option::Some(val) = self.g2_f32_opt() {
@@ -1920,7 +1924,7 @@ pub mod _puroro_traits {
         }
         fn group_three<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<G3Int32>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             if let ::std::option::Option::Some(val) = self.g3_int32_opt() {
@@ -2004,23 +2008,6 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = ();
-        fn group_one(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<G1Int32, G1String>>
-        {
-            None
-        }
-        fn group_two(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<G2F32, G2String, G2Submsg>>
-        {
-            None
-        }
-        fn group_three(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<G3Int32>> {
-            None
-        }
     }
     impl<T, U> MsgTrait for (T, U)
     where
@@ -2087,34 +2074,34 @@ pub mod _puroro_traits {
                 ::std::option::Option::None
             }
         }
-        fn group_one(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<G1Int32, G1String>>
-        {
+        fn group_one<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'this str>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             Some(match (self.0.group_one(), self.1.group_one()) {
                 (None, None) => {
                     return None;
                 }
-                (Some(E::G1Int32(_)), Some(E::G1Int32(right))) => E::G1Int32(right),
-                (Some(E::G1String(_)), Some(E::G1String(right))) => E::G1String(right),
                 (_, Some(E::G1Int32(right))) => E::G1Int32(right),
                 (_, Some(E::G1String(right))) => E::G1String(right),
                 (Some(E::G1Int32(left)), None) => E::G1Int32(left),
                 (Some(E::G1String(left)), None) => E::G1String(left),
             })
         }
-        fn group_two(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<G2F32, G2String, G2Submsg>>
-        {
+        fn group_two<'this>(
+            &'this self,
+        ) -> Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
+                f32,
+                &'this str,
+                Self::G2SubmsgMessageType<'this>,
+            >,
+        > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             Some(match (self.0.group_two(), self.1.group_two()) {
                 (None, None) => {
                     return None;
                 }
-                (Some(E::G2F32(_)), Some(E::G2F32(right))) => E::G2F32(right),
-                (Some(E::G2String(_)), Some(E::G2String(right))) => E::G2String(right),
                 (Some(E::G2Submsg(left)), Some(E::G2Submsg(right))) => {
                     E::G2Submsg((Some(left), Some(right)))
                 }
@@ -2126,15 +2113,14 @@ pub mod _puroro_traits {
                 (Some(E::G2Submsg(left)), None) => E::G2Submsg((Some(left), None)),
             })
         }
-        fn group_three(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<G3Int32>> {
+        fn group_three<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             Some(match (self.0.group_three(), self.1.group_three()) {
                 (None, None) => {
                     return None;
                 }
-                (Some(E::G3Int32(_)), Some(E::G3Int32(right))) => E::G3Int32(right),
                 (_, Some(E::G3Int32(right))) => E::G3Int32(right),
                 (Some(E::G3Int32(left)), None) => E::G3Int32(left),
             })
@@ -2152,57 +2138,6 @@ pub mod _puroro_traits {
             <T as MsgTrait>::G2SubmsgMessageType<'this>,
             <U as MsgTrait>::G2SubmsgMessageType<'this>,
         >;
-        fn group_one(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<G1Int32, G1String>>
-        {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
-            match self.as_ref().either(
-                |t| t.group_one().map(|t| ::puroro::Either::Left(t)),
-                |u| u.group_one().map(|u| ::puroro::Either::Right(u)),
-            ) {
-                Some(::puroro::Either::Left(E::G1Int32(v))) => Some(E::G1Int32(v)),
-                Some(::puroro::Either::Right(E::G1Int32(v))) => Some(E::G1Int32(v)),
-                Some(::puroro::Either::Left(E::G1String(v))) => Some(E::G1String(v)),
-                Some(::puroro::Either::Right(E::G1String(v))) => Some(E::G1String(v)),
-                None => None,
-            }
-        }
-        fn group_two(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<G2F32, G2String, G2Submsg>>
-        {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
-            match self.as_ref().either(
-                |t| t.group_two().map(|t| ::puroro::Either::Left(t)),
-                |u| u.group_two().map(|u| ::puroro::Either::Right(u)),
-            ) {
-                Some(::puroro::Either::Left(E::G2F32(v))) => Some(E::G2F32(v)),
-                Some(::puroro::Either::Right(E::G2F32(v))) => Some(E::G2F32(v)),
-                Some(::puroro::Either::Left(E::G2String(v))) => Some(E::G2String(v)),
-                Some(::puroro::Either::Right(E::G2String(v))) => Some(E::G2String(v)),
-                Some(::puroro::Either::Left(E::G2Submsg(v))) => {
-                    Some(E::G2Submsg(::puroro::Either::Left(v)))
-                }
-                Some(::puroro::Either::Right(E::G2Submsg(v))) => {
-                    Some(E::G2Submsg(::puroro::Either::Right(v)))
-                }
-                None => None,
-            }
-        }
-        fn group_three(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<G3Int32>> {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
-            match self.as_ref().either(
-                |t| t.group_three().map(|t| ::puroro::Either::Left(t)),
-                |u| u.group_three().map(|u| ::puroro::Either::Right(u)),
-            ) {
-                Some(::puroro::Either::Left(E::G3Int32(v))) => Some(E::G3Int32(v)),
-                Some(::puroro::Either::Right(E::G3Int32(v))) => Some(E::G3Int32(v)),
-                None => None,
-            }
-        }
     }
     impl<T> MsgTrait for ::std::option::Option<T>
     where
@@ -2212,41 +2147,6 @@ pub mod _puroro_traits {
         where
             Self: 'this,
         = T::G2SubmsgMessageType<'this>;
-        fn group_one(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<G1Int32, G1String>>
-        {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
-            self.as_ref().and_then(|msg| {
-                msg.group_one().map(|oneof| match oneof {
-                    E::G1Int32(v) => E::G1Int32(v),
-                    E::G1String(v) => E::G1String(v),
-                })
-            })
-        }
-        fn group_two(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<G2F32, G2String, G2Submsg>>
-        {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
-            self.as_ref().and_then(|msg| {
-                msg.group_two().map(|oneof| match oneof {
-                    E::G2F32(v) => E::G2F32(v),
-                    E::G2String(v) => E::G2String(v),
-                    E::G2Submsg(v) => E::G2Submsg(v),
-                })
-            })
-        }
-        fn group_three(
-            &self,
-        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<G3Int32>> {
-            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
-            self.as_ref().and_then(|msg| {
-                msg.group_three().map(|oneof| match oneof {
-                    E::G3Int32(v) => E::G3Int32(v),
-                })
-            })
-        }
     }
 
     pub trait SubmsgTrait {
