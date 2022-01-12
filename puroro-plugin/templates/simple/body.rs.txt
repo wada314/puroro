@@ -160,8 +160,6 @@ impl {{ m.simple_ident }} {
 
     {#- Tentative mutable interfaces. #}
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
-
     {%- if f.is_repeated %}
 
     {#- repeated int32 => &mut Vec<i32> #}
@@ -173,6 +171,7 @@ impl {{ m.simple_ident }} {
 
     {%- else %} {#- if f.is_repeated #}
 
+    {%- if !f.is_explicit_oneof_field %}
     {#- clear scalar field #}
     pub fn clear_{{ f.ident_unesc }}(&mut self) {
         {%- if f.has_optional_bit %}
@@ -207,9 +206,8 @@ impl {{ m.simple_ident }} {
         {%- endif %} {#- if f.is_message #}
     }
 
-    {%- endif %} {#- if f.is_repeated #}
-
     {%- endif %} {#- if !f.is_explicit_oneof_field #}
+    {%- endif %} {#- if f.is_repeated #}
     {%- endfor %} {#- for f in m.fields #}
 
     {%- for oneof in m.oneofs %}
@@ -221,13 +219,14 @@ impl {{ m.simple_ident }} {
     pub fn {{ f.getter_ident_unesc }}_mut(&mut self) -> {{ f.simple_getter_mut_type }}
     {
         use {{ oneof.enum_path_from_owner }} as E;
-        if !matches!(&self.{{ oneof.field_ident }}, E::{{ f.ident }}(_)) {
-            self.{{ oneof.field_ident }} = E::{{ f.ident }}(
+        use ::std::option::Option::{Some, None};
+        if !matches!(&self.{{ oneof.field_ident }}, Some(E::{{ f.ident }}(_))) {
+            self.{{ oneof.field_ident }} = Some(E::{{ f.ident }}(
                 ::std::default::Default::default()
-            );
+            ));
         }
         match &mut self.{{ oneof.field_ident }} {
-            E::{{ f.ident }}(ref mut v) => v,
+            Some(E::{{ f.ident }}(ref mut v)) => v,
             _ => unreachable!(),
         }
     }

@@ -486,7 +486,7 @@ impl Oneof {
         let simple_getter_enum_generic_params =
             generic_params_from_fields(&o, |f| f.simple_getter_scalar_type("'_"))?;
         let bumpalo_enum_generic_params =
-            generic_params_from_fields(&o, |f| f.bumpalo_field_type())?;
+            generic_params_from_fields(&o, |f| f.bumpalo_oneof_field_type())?;
         let bumpalo_getter_enum_generic_params =
             generic_params_from_fields(&o, |f| f.bumpalo_getter_scalar_type("'_"))?;
         Ok(Oneof {
