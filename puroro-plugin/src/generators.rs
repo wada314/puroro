@@ -19,6 +19,8 @@ use crate::wrappers::{self, FieldType};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
+use ::std::borrow::Cow;
+use ::std::rc::Rc;
 
 #[derive(Template)]
 #[template(path = "output_file.rs.txt")]
@@ -461,12 +463,23 @@ impl Oneof {
             .fields()?
             .into_iter()
             .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_))));
-        let enum_generic_params = if o.fields()?.is_empty() {
-            "".to_string()
-        } else {
-            let items = o.fields()?.iter().map(|f| f.ident_camel()).join(", ");
-            format!("<{}>", items)
-        };
+        fn generic_params_from_fields<F: FnMut(&wrappers::Field) -> Result<Cow<'_, str>>>(
+            oneof: &wrappers::Oneof,
+            mut f: F,
+        ) -> Result<String> {
+            if oneof.fields()?.is_empty() {
+                Ok("".to_string())
+            } else {
+                let items = oneof
+                    .fields()?
+                    .iter()
+                    .map(|field| f(Rc::as_ref(field)))
+                    .try_collect::<_, Vec<_>, _>()?
+                    .join(", ");
+                Ok(format!("<{}>", items))
+            }
+        }
+        let enum_generic_params = generic_params_from_fields(&o, |f| Ok(f.ident_camel().into()))?;
         let simple_enum_generic_params = if o.fields()?.is_empty() {
             "".to_string()
         } else {
