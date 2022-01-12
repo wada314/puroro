@@ -11,15 +11,4 @@ impl {{ m.ident }}Trait for () {
     }
     {%- endif %}
     {%- endfor %} {#- for f in m.fields #}
-
-    {%- for oneof in m.oneofs %}
-    fn {{ oneof.field_ident }}(&self) ->
-        Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
-        >
-    {
-        None
-    }
-    {%- endfor %}
 }

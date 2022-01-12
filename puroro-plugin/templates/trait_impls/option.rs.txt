@@ -25,22 +25,4 @@ where
 
     {%- endif %} {#- if f.is_repeated #}
     {%- endfor %} {#- for f in m.fields #}
-
-    {%- for oneof in m.oneofs %}
-    fn {{ oneof.field_ident }}(&self) ->
-        Option<
-            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::
-                {{ oneof.enum_ident }}{{ oneof.enum_maybe_gp_self }}
-        >
-    {
-        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
-        self.as_ref().and_then(|msg| msg.{{ oneof.field_ident }}().map(|oneof| {
-            match oneof {
-                {%- for f in oneof.fields %}
-                E::{{ f.ident }}(v) => E::{{ f.ident }}(v),
-                {%- endfor %}
-            }
-        }))
-    }
-    {%- endfor %}
 }

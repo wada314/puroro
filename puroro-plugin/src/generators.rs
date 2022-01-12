@@ -19,6 +19,8 @@ use crate::wrappers::{self, FieldType};
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
+use ::std::borrow::Cow;
+use ::std::rc::Rc;
 
 #[derive(Template)]
 #[template(path = "output_file.rs.txt")]
@@ -191,6 +193,7 @@ struct Field {
     trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
     oneof_enum_ident: String,
+    oneof_enum_path_from_owner: String,
     oneof_field_ident: String,
     simple_field_type: String,
     simple_getter_type: String,
@@ -199,7 +202,6 @@ struct Field {
     simple_scalar_field_type: String,
     simple_field_message_path: String,
     simple_label_and_type_tags: String,
-    simple_oneof_enum_ident: String,
     single_field_type: String,
     single_numerical_rust_type: String,
     bumpalo_field_type: String,
@@ -209,7 +211,6 @@ struct Field {
     bumpalo_getter_mut_type: String,
     bumpalo_field_message_path: String,
     bumpalo_label_and_type_tags: String,
-    bumpalo_oneof_enum_ident: String,
 }
 
 impl Field {
@@ -274,6 +275,17 @@ impl Field {
                 .oneof()?
                 .map(|o| o.rust_enum_ident().to_string())
                 .unwrap_or_default(),
+            oneof_enum_path_from_owner: f
+                .oneof()?
+                .map(|o| -> Result<_> {
+                    Ok(format!(
+                        "super::_puroro_nested::{owner_ident}::_puroro_oneofs::{enum_ident}",
+                        owner_ident = o.message()?.rust_nested_module_ident(),
+                        enum_ident = o.rust_enum_ident()
+                    ))
+                })
+                .transpose()?
+                .unwrap_or_default(),
             oneof_field_ident: f
                 .oneof()?
                 .map(|o| o.rust_getter_ident().to_string())
@@ -308,10 +320,6 @@ impl Field {
                     },
                 )
             })?,
-            simple_oneof_enum_ident: f
-                .oneof()?
-                .map(|o| format!("{}Simple", o.rust_enum_ident()))
-                .unwrap_or_default(),
             single_field_type: f.single_field_type()?,
             single_numerical_rust_type: f.single_numerical_rust_type()?.into(),
             bumpalo_field_type: f.bumpalo_field_type()?.into(),
@@ -351,10 +359,6 @@ impl Field {
                     },
                 )
             })?,
-            bumpalo_oneof_enum_ident: f
-                .oneof()?
-                .map(|o| format!("{}Bumpalo", o.rust_enum_ident()))
-                .unwrap_or_default(),
         })
     }
 
@@ -422,44 +426,64 @@ impl Field {
 #[template(path = "oneof.rs.txt")]
 struct Oneof {
     enum_ident: String,
-    simple_enum_ident: String,
-    bumpalo_enum_ident: String,
-    enum_maybe_gp_self: String,
+    enum_path_from_owner: String,
+    enum_generic_params: String,
+    trait_getter_enum_generic_params: String,
+    simple_enum_generic_params: String,
+    simple_getter_enum_generic_params: String,
+    bumpalo_enum_generic_params: String,
+    bumpalo_getter_enum_generic_params: String,
     field_ident: String,
     fields: Vec<OneofField>,
-    has_ld_field: bool,
-    has_message_field: bool,
-    owner_message_trait_path: String,
 }
 
 impl Oneof {
     fn try_new(o: &wrappers::Oneof) -> Result<Self> {
-        let has_ld_field = o.fields()?.into_iter().any(|f| {
-            matches!(
-                f.field_type(),
-                Ok(wrappers::FieldType::Bytes
-                    | wrappers::FieldType::String
-                    | wrappers::FieldType::Message(_))
-            )
-        });
-        let has_message_field = o
-            .fields()?
-            .into_iter()
-            .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_))));
+        fn generic_params_from_fields<F: FnMut(&wrappers::Field) -> Result<Cow<'_, str>>>(
+            oneof: &wrappers::Oneof,
+            mut f: F,
+        ) -> Result<String> {
+            if oneof.fields()?.is_empty() {
+                Ok("".to_string())
+            } else {
+                let items = oneof
+                    .fields()?
+                    .iter()
+                    .map(|field| f(Rc::as_ref(field)))
+                    .try_collect::<_, Vec<_>, _>()?
+                    .join(", ");
+                Ok(format!("<{}>", items))
+            }
+        }
+        let enum_generic_params = generic_params_from_fields(&o, |f| Ok(f.ident_camel().into()))?;
+        let trait_getter_enum_generic_params =
+            generic_params_from_fields(&o, |f| f.trait_scalar_getter_type())?;
+        let simple_enum_generic_params = generic_params_from_fields(&o, |f| f.simple_field_type())?;
+        let simple_getter_enum_generic_params =
+            generic_params_from_fields(&o, |f| f.simple_getter_scalar_type("'_"))?;
+        let bumpalo_enum_generic_params =
+            generic_params_from_fields(&o, |f| f.bumpalo_oneof_field_type())?;
+        let bumpalo_getter_enum_generic_params =
+            generic_params_from_fields(&o, |f| f.bumpalo_getter_scalar_type("'_"))?;
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
-            simple_enum_ident: format!("{}Simple", o.rust_enum_ident()),
-            bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
-            enum_maybe_gp_self: if has_message_field { "<Self>" } else { "" }.to_string(),
+            enum_path_from_owner: format!(
+                "super::_puroro_nested::{owner_ident}::_puroro_oneofs::{enum_ident}",
+                owner_ident = o.message()?.rust_nested_module_ident(),
+                enum_ident = o.rust_enum_ident()
+            ),
+            enum_generic_params,
+            trait_getter_enum_generic_params,
+            simple_enum_generic_params,
+            simple_getter_enum_generic_params,
+            bumpalo_enum_generic_params,
+            bumpalo_getter_enum_generic_params,
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
-            has_ld_field,
-            has_message_field,
-            owner_message_trait_path: o.message()?.rust_trait_path(),
         })
     }
 }
@@ -470,10 +494,9 @@ struct OneofField {
     getter_ident_unesc: String,
     number: i32,
     is_message: bool,
+    is_length_delimited: bool,
     field_type: String,
-    simple_field_type: String,
     simple_getter_mut_type: String,
-    bumpalo_field_type: String,
     simple_field_type_tag: String,
     bumpalo_field_type_tag: String,
 }
@@ -481,16 +504,18 @@ struct OneofField {
 impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
         let is_message = matches!(f.field_type()?, wrappers::FieldType::Message(_));
+        let is_string = matches!(f.field_type()?, wrappers::FieldType::String);
+        let is_bytes = matches!(f.field_type()?, wrappers::FieldType::Bytes);
+        let is_length_delimited = is_message || is_string || is_bytes;
         Ok(Self {
             ident: f.ident_camel().to_string(),
             getter_ident: f.ident_lower_snake().to_string(),
             getter_ident_unesc: f.lower_snake_ident_unesc().to_string(),
             number: f.number(),
             is_message,
-            field_type: f.trait_oneof_field_type("'msg", "T")?.into(),
-            simple_field_type: f.simple_field_type()?.into(),
+            is_length_delimited,
+            field_type: f.ident_camel().to_string(),
             simple_getter_mut_type: f.simple_getter_mut_type("'_")?.into(),
-            bumpalo_field_type: f.bumpalo_oneof_field_type()?.into(),
             simple_field_type_tag: f.rust_type_tag(|msg| {
                 Ok(format!(
                     "::std::boxed::Box<{}>",
@@ -519,12 +544,6 @@ struct Trait<'a> {
     m: &'a Message,
 }
 
-#[derive(Template)]
-#[template(path = "private_oneof.rs.txt")]
-struct PrivateOneof<'a> {
-    oneof: &'a Oneof,
-}
-
 mod filters {
     use super::*;
     pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
@@ -532,8 +551,5 @@ mod filters {
     }
     pub(super) fn print_trait(message: &Message) -> ::askama::Result<Trait> {
         Ok(Trait { m: message })
-    }
-    pub(super) fn print_private_oneof(oneof: &Oneof) -> ::askama::Result<PrivateOneof> {
-        Ok(PrivateOneof { oneof })
     }
 }
