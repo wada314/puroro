@@ -176,7 +176,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
     {%- for oneof in m.oneofs %}
     pub fn {{ oneof.field_ident }}(&self) ->
         Option<
-            {{ oneof.enum_path_from_owner }}{{ oneof.bumpalo_enum_generic_params }}
+            {{ oneof.enum_path_from_owner }}{{ oneof.bumpalo_getter_enum_generic_params }}
         >
     {
         use {{ oneof.enum_path_from_owner }} as E;

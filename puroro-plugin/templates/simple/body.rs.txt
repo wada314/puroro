@@ -135,7 +135,7 @@ impl {{ m.simple_ident }} {
     {%- for oneof in m.oneofs %}
     pub fn {{ oneof.field_ident }}(&self) ->
         ::std::option::Option<
-            {{ oneof.enum_path_from_owner }}{{ oneof.enum_generic_params }}
+            {{ oneof.enum_path_from_owner }}{{ oneof.simple_getter_enum_generic_params }}
         >
     {
         use {{ oneof.enum_path_from_owner }} as E;

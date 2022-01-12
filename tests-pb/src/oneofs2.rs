@@ -159,9 +159,8 @@ pub mod _puroro_simple_impl {
         }
         pub fn group_one(
             &self,
-        ) -> ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<G1Int32, G1String>,
-        > {
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'_ str>>
+        {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             match &self.group_one {
                 E::G1Int32(ref val) => ::std::option::Option::Some(E::G1Int32(val.clone().inner())),
@@ -173,7 +172,11 @@ pub mod _puroro_simple_impl {
         pub fn group_two(
             &self,
         ) -> ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<G2F32, G2String, G2Submsg>,
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
+                f32,
+                &'_ str,
+                &'_ self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
+            >,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             match &self.group_two {
@@ -186,7 +189,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn group_three(
             &self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<G3Int32>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             match &self.group_three {
@@ -1244,12 +1247,7 @@ pub mod _puroro_impls {
         }
         pub fn group_one(
             &self,
-        ) -> Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
-                ::puroro::internal::Bare<i32>,
-                ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
-            >,
-        > {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'_ str>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             match &self.group_one {
                 E::G1Int32(ref val) => ::std::option::Option::Some(E::G1Int32(val.clone().inner())),
@@ -1262,13 +1260,9 @@ pub mod _puroro_impls {
             &self,
         ) -> Option<
             super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
-                ::puroro::internal::Bare<f32>,
-                ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
-                ::std::option::Option<
-                    ::puroro::internal::NoAllocBumpBox<
-                        self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'bump>,
-                    >,
-                >,
+                f32,
+                &'_ str,
+                &'_ self::_puroro_root::oneofs2::_puroro_impls::SubmsgBumpalo<'_>,
             >,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
@@ -1282,9 +1276,7 @@ pub mod _puroro_impls {
         }
         pub fn group_three(
             &self,
-        ) -> Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupThree<::puroro::internal::Bare<i32>>,
-        > {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             match &self.group_three {
                 E::G3Int32(ref val) => ::std::option::Option::Some(E::G3Int32(val.clone().inner())),

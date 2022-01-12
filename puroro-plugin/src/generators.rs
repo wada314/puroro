@@ -441,7 +441,9 @@ struct Oneof {
     bumpalo_enum_ident: String,
     enum_generic_params: String,
     simple_enum_generic_params: String,
+    simple_getter_enum_generic_params: String,
     bumpalo_enum_generic_params: String,
+    bumpalo_getter_enum_generic_params: String,
     field_ident: String,
     fields: Vec<OneofField>,
     has_ld_field: bool,
@@ -481,8 +483,12 @@ impl Oneof {
         }
         let enum_generic_params = generic_params_from_fields(&o, |f| Ok(f.ident_camel().into()))?;
         let simple_enum_generic_params = generic_params_from_fields(&o, |f| f.simple_field_type())?;
+        let simple_getter_enum_generic_params =
+            generic_params_from_fields(&o, |f| f.simple_getter_scalar_type("'_"))?;
         let bumpalo_enum_generic_params =
             generic_params_from_fields(&o, |f| f.bumpalo_field_type())?;
+        let bumpalo_getter_enum_generic_params =
+            generic_params_from_fields(&o, |f| f.bumpalo_getter_scalar_type("'_"))?;
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
             enum_path_from_owner: format!(
@@ -494,7 +500,9 @@ impl Oneof {
             bumpalo_enum_ident: format!("{}Bumpalo", o.rust_enum_ident()),
             enum_generic_params,
             simple_enum_generic_params,
+            simple_getter_enum_generic_params,
             bumpalo_enum_generic_params,
+            bumpalo_getter_enum_generic_params,
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .fields()?
