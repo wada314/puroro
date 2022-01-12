@@ -61,6 +61,7 @@ impl {{ m.simple_ident }} {
         {%- if f.is_explicit_oneof_field %}
         {#- oneof fields. extract the value from oneof field. #}
         use {{ f.oneof_enum_path_from_owner }} as E;
+        #[allow(unused_imports)]
         use ::std::option::Option::{Some,  None};
         if let Some(E::{{ f.ident_camel }}(ref val)) = &self.{{ f.oneof_field_ident }} {
             Some(
@@ -139,6 +140,7 @@ impl {{ m.simple_ident }} {
         >
     {
         use {{ oneof.enum_path_from_owner }} as E;
+        #[allow(unused_imports)]
         use ::std::option::Option::{Some, None};
         match &self.{{ oneof.field_ident }} {
             {%- for f in oneof.fields %}
@@ -219,6 +221,7 @@ impl {{ m.simple_ident }} {
     pub fn {{ f.getter_ident_unesc }}_mut(&mut self) -> {{ f.simple_getter_mut_type }}
     {
         use {{ oneof.enum_path_from_owner }} as E;
+        #[allow(unused_imports)]
         use ::std::option::Option::{Some, None};
         if !matches!(&self.{{ oneof.field_ident }}, Some(E::{{ f.ident }}(_))) {
             self.{{ oneof.field_ident }} = Some(E::{{ f.ident }}(

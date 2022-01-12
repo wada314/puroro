@@ -46,6 +46,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g1_int32_opt(&self) -> ::std::option::Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G1Int32(ref val)) = &self.group_one {
                 Some(val.clone().inner())
@@ -64,6 +65,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g1_string_opt(&self) -> ::std::option::Option<&'_ str> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G1String(ref val)) = &self.group_one {
                 Some(val)
@@ -82,6 +84,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g2_f32_opt(&self) -> ::std::option::Option<f32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G2F32(ref val)) = &self.group_two {
                 Some(val.clone().inner())
@@ -100,6 +103,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g2_string_opt(&self) -> ::std::option::Option<&'_ str> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G2String(ref val)) = &self.group_two {
                 Some(val)
@@ -121,6 +125,7 @@ pub mod _puroro_simple_impl {
         ) -> ::std::option::Option<&'_ self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G2Submsg(ref val)) = &self.group_two {
                 Some(val)
@@ -141,6 +146,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g3_int32_opt(&self) -> ::std::option::Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G3Int32(ref val)) = &self.group_three {
                 Some(val.clone().inner())
@@ -162,6 +168,7 @@ pub mod _puroro_simple_impl {
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'_ str>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             match &self.group_one {
                 Some(E::G1Int32(ref val)) => Some(E::G1Int32(val.clone().inner())),
@@ -180,6 +187,7 @@ pub mod _puroro_simple_impl {
             >,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             match &self.group_two {
                 Some(E::G2F32(ref val)) => Some(E::G2F32(val.clone().inner())),
@@ -194,6 +202,7 @@ pub mod _puroro_simple_impl {
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             match &self.group_three {
                 Some(E::G3Int32(ref val)) => Some(E::G3Int32(val.clone().inner())),
@@ -206,6 +215,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g1_int32_mut(&mut self) -> &'_ mut i32 {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if !matches!(&self.group_one, Some(E::G1Int32(_))) {
                 self.group_one = Some(E::G1Int32(::std::default::Default::default()));
@@ -217,6 +227,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g1_string_mut(&mut self) -> &'_ mut ::std::string::String {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if !matches!(&self.group_one, Some(E::G1String(_))) {
                 self.group_one = Some(E::G1String(::std::default::Default::default()));
@@ -231,6 +242,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g2_f32_mut(&mut self) -> &'_ mut f32 {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if !matches!(&self.group_two, Some(E::G2F32(_))) {
                 self.group_two = Some(E::G2F32(::std::default::Default::default()));
@@ -242,6 +254,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g2_string_mut(&mut self) -> &'_ mut ::std::string::String {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if !matches!(&self.group_two, Some(E::G2String(_))) {
                 self.group_two = Some(E::G2String(::std::default::Default::default()));
@@ -255,6 +268,7 @@ pub mod _puroro_simple_impl {
             &mut self,
         ) -> &'_ mut self::_puroro_root::oneofs3::_puroro_simple_impl::Submsg {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if !matches!(&self.group_two, Some(E::G2Submsg(_))) {
                 self.group_two = Some(E::G2Submsg(::std::default::Default::default()));
@@ -269,6 +283,7 @@ pub mod _puroro_simple_impl {
         }
         pub fn g3_int32_mut(&mut self) -> &'_ mut i32 {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if !matches!(&self.group_three, Some(E::G3Int32(_))) {
                 self.group_three = Some(E::G3Int32(::std::default::Default::default()));
@@ -1132,6 +1147,7 @@ pub mod _puroro_impls {
         }
         pub fn g1_int32_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G1Int32(ref val)) = &self.group_one {
                 Some(val.clone().inner())
@@ -1151,6 +1167,7 @@ pub mod _puroro_impls {
         }
         pub fn g1_string_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G1String(ref val)) = &self.group_one {
                 Some(val)
@@ -1170,6 +1187,7 @@ pub mod _puroro_impls {
         }
         pub fn g2_f32_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G2F32(ref val)) = &self.group_two {
                 Some(val.clone().inner())
@@ -1189,6 +1207,7 @@ pub mod _puroro_impls {
         }
         pub fn g2_string_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G2String(ref val)) = &self.group_two {
                 Some(val)
@@ -1212,6 +1231,7 @@ pub mod _puroro_impls {
             &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgBumpalo<'this>,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G2Submsg(ref val)) = &self.group_two {
                 Some(val)
@@ -1232,6 +1252,7 @@ pub mod _puroro_impls {
         }
         pub fn g3_int32_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             if let Some(E::G3Int32(ref val)) = &self.group_three {
                 Some(val.clone().inner())
@@ -1253,6 +1274,7 @@ pub mod _puroro_impls {
             &self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'_ str>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             match &self.group_one {
                 Some(E::G1Int32(ref val)) => Some(E::G1Int32(val.clone().inner())),
@@ -1271,6 +1293,7 @@ pub mod _puroro_impls {
             >,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             match &self.group_two {
                 Some(E::G2F32(ref val)) => Some(E::G2F32(val.clone().inner())),
@@ -1284,6 +1307,7 @@ pub mod _puroro_impls {
             &self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            #[allow(unused_imports)]
             use ::std::option::Option::{None, Some};
             match &self.group_three {
                 Some(E::G3Int32(ref val)) => Some(E::G3Int32(val.clone().inner())),
