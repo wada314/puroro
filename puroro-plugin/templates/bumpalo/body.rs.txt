@@ -180,9 +180,10 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
         >
     {
         use {{ oneof.enum_path_from_owner }} as E;
+        use ::std::option::Option::{Some, None};
         match &self.{{ oneof.field_ident }} {
             {%- for f in oneof.fields %}
-            E::{{ f.ident }}(ref val) => ::std::option::Option::Some(
+            Some(E::{{ f.ident }}(ref val)) => Some(
                 E::{{ f.ident }}(
                     {%- if f.is_length_delimited %}
                     val
@@ -193,7 +194,7 @@ impl<'bump> {{ m.bumpalo_ident }}<'bump> {
             ),
             {%- endfor %} {#- for f in oneof.fields #}
             #[allow(unreachable_patterns)]
-            _ => ::std::option::Option::None,
+            _ => None,
         }
     }
     {%- endfor %} {#- for oneof in m.oneofs #}

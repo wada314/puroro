@@ -162,11 +162,12 @@ pub mod _puroro_simple_impl {
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'_ str>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            use ::std::option::Option::{None, Some};
             match &self.group_one {
-                E::G1Int32(ref val) => ::std::option::Option::Some(E::G1Int32(val.clone().inner())),
-                E::G1String(ref val) => ::std::option::Option::Some(E::G1String(val)),
+                Some(E::G1Int32(ref val)) => Some(E::G1Int32(val.clone().inner())),
+                Some(E::G1String(ref val)) => Some(E::G1String(val)),
                 #[allow(unreachable_patterns)]
-                _ => ::std::option::Option::None,
+                _ => None,
             }
         }
         pub fn group_two(
@@ -179,12 +180,13 @@ pub mod _puroro_simple_impl {
             >,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            use ::std::option::Option::{None, Some};
             match &self.group_two {
-                E::G2F32(ref val) => ::std::option::Option::Some(E::G2F32(val.clone().inner())),
-                E::G2String(ref val) => ::std::option::Option::Some(E::G2String(val)),
-                E::G2Submsg(ref val) => ::std::option::Option::Some(E::G2Submsg(val)),
+                Some(E::G2F32(ref val)) => Some(E::G2F32(val.clone().inner())),
+                Some(E::G2String(ref val)) => Some(E::G2String(val)),
+                Some(E::G2Submsg(ref val)) => Some(E::G2Submsg(val)),
                 #[allow(unreachable_patterns)]
-                _ => ::std::option::Option::None,
+                _ => None,
             }
         }
         pub fn group_three(
@@ -192,10 +194,11 @@ pub mod _puroro_simple_impl {
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>>
         {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            use ::std::option::Option::{None, Some};
             match &self.group_three {
-                E::G3Int32(ref val) => ::std::option::Option::Some(E::G3Int32(val.clone().inner())),
+                Some(E::G3Int32(ref val)) => Some(E::G3Int32(val.clone().inner())),
                 #[allow(unreachable_patterns)]
-                _ => ::std::option::Option::None,
+                _ => None,
             }
         }
         pub fn clear_group_one(&mut self) {
@@ -1249,11 +1252,12 @@ pub mod _puroro_impls {
             &self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<i32, &'_ str>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            use ::std::option::Option::{None, Some};
             match &self.group_one {
-                E::G1Int32(ref val) => ::std::option::Option::Some(E::G1Int32(val.clone().inner())),
-                E::G1String(ref val) => ::std::option::Option::Some(E::G1String(val)),
+                Some(E::G1Int32(ref val)) => Some(E::G1Int32(val.clone().inner())),
+                Some(E::G1String(ref val)) => Some(E::G1String(val)),
                 #[allow(unreachable_patterns)]
-                _ => ::std::option::Option::None,
+                _ => None,
             }
         }
         pub fn group_two(
@@ -1266,22 +1270,24 @@ pub mod _puroro_impls {
             >,
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            use ::std::option::Option::{None, Some};
             match &self.group_two {
-                E::G2F32(ref val) => ::std::option::Option::Some(E::G2F32(val.clone().inner())),
-                E::G2String(ref val) => ::std::option::Option::Some(E::G2String(val)),
-                E::G2Submsg(ref val) => ::std::option::Option::Some(E::G2Submsg(val)),
+                Some(E::G2F32(ref val)) => Some(E::G2F32(val.clone().inner())),
+                Some(E::G2String(ref val)) => Some(E::G2String(val)),
+                Some(E::G2Submsg(ref val)) => Some(E::G2Submsg(val)),
                 #[allow(unreachable_patterns)]
-                _ => ::std::option::Option::None,
+                _ => None,
             }
         }
         pub fn group_three(
             &self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree<i32>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            use ::std::option::Option::{None, Some};
             match &self.group_three {
-                E::G3Int32(ref val) => ::std::option::Option::Some(E::G3Int32(val.clone().inner())),
+                Some(E::G3Int32(ref val)) => Some(E::G3Int32(val.clone().inner())),
                 #[allow(unreachable_patterns)]
-                _ => ::std::option::Option::None,
+                _ => None,
             }
         }
     }
