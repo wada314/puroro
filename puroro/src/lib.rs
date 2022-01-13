@@ -88,3 +88,23 @@ impl<T> DerefMut for BumpaloOwned<T> {
 }
 
 impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
+
+// メモ
+#[cfg(test)]
+mod test {
+    trait PersonParamsTuple {
+        type NameType;
+        type AgeType;
+        type ChildrenType;
+    }
+    impl<NameType, AgeType, ChildrenType> PersonParamsTuple for (NameType, AgeType, ChildrenType) {
+        type NameType = NameType;
+        type AgeType = AgeType;
+        type ChildrenType = ChildrenType;
+    }
+    struct Person<T: PersonParamsTuple> {
+        name: <T as PersonParamsTuple>::NameType,
+        age: <T as PersonParamsTuple>::AgeType,
+        children: <T as PersonParamsTuple>::ChildrenType,
+    }
+}
