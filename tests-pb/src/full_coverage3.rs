@@ -2179,6 +2179,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    use super::_puroro_internal::*;
     use super::_puroro_traits::*;
 
     pub struct MsgSingleField1<ScalarType>
@@ -14840,58 +14841,6 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {
-        type Alloc;
-        type I32UnlabeledType;
-        type I32OptionalType;
-        type I32RepeatedType;
-        type FloatUnlabeledType;
-        type FloatOptionalType;
-        type FloatRepeatedType;
-        type BytesUnlabeledType;
-        type BytesOptionalType;
-        type BytesRepeatedType;
-        type StringUnlabeledType;
-        type StringOptionalType;
-        type StringRepeatedType;
-        type EnumUnlabeledType;
-        type EnumOptionalType;
-        type EnumRepeatedType;
-        type SubmsgUnlabeledType;
-        type SubmsgOptionalType;
-        type SubmsgRepeatedType;
-        type I64UnlabeledType;
-        type I64OptionalType;
-        type I64RepeatedType;
-        type U32UnlabeledType;
-        type U32OptionalType;
-        type U32RepeatedType;
-        type U64UnlabeledType;
-        type U64OptionalType;
-        type U64RepeatedType;
-        type S32UnlabeledType;
-        type S32OptionalType;
-        type S32RepeatedType;
-        type S64UnlabeledType;
-        type S64OptionalType;
-        type S64RepeatedType;
-        type Fixed32UnlabeledType;
-        type Fixed32OptionalType;
-        type Fixed32RepeatedType;
-        type Fixed64UnlabeledType;
-        type Fixed64OptionalType;
-        type Fixed64RepeatedType;
-        type Sfixed32UnlabeledType;
-        type Sfixed32OptionalType;
-        type Sfixed32RepeatedType;
-        type Sfixed64UnlabeledType;
-        type Sfixed64OptionalType;
-        type Sfixed64RepeatedType;
-        type F64UnlabeledType;
-        type F64OptionalType;
-        type F64RepeatedType;
-    }
-
     pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
@@ -15404,6 +15353,62 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         pub fn f64_repeated(&self) -> &T::F64RepeatedType {
             &self.f64_repeated
         }
+    }
+}
+pub mod _puroro_internal {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type I32UnlabeledType;
+        type I32OptionalType;
+        type I32RepeatedType;
+        type FloatUnlabeledType;
+        type FloatOptionalType;
+        type FloatRepeatedType;
+        type BytesUnlabeledType;
+        type BytesOptionalType;
+        type BytesRepeatedType;
+        type StringUnlabeledType;
+        type StringOptionalType;
+        type StringRepeatedType;
+        type EnumUnlabeledType;
+        type EnumOptionalType;
+        type EnumRepeatedType;
+        type SubmsgUnlabeledType;
+        type SubmsgOptionalType;
+        type SubmsgRepeatedType;
+        type I64UnlabeledType;
+        type I64OptionalType;
+        type I64RepeatedType;
+        type U32UnlabeledType;
+        type U32OptionalType;
+        type U32RepeatedType;
+        type U64UnlabeledType;
+        type U64OptionalType;
+        type U64RepeatedType;
+        type S32UnlabeledType;
+        type S32OptionalType;
+        type S32RepeatedType;
+        type S64UnlabeledType;
+        type S64OptionalType;
+        type S64RepeatedType;
+        type Fixed32UnlabeledType;
+        type Fixed32OptionalType;
+        type Fixed32RepeatedType;
+        type Fixed64UnlabeledType;
+        type Fixed64OptionalType;
+        type Fixed64RepeatedType;
+        type Sfixed32UnlabeledType;
+        type Sfixed32OptionalType;
+        type Sfixed32RepeatedType;
+        type Sfixed64UnlabeledType;
+        type Sfixed64OptionalType;
+        type Sfixed64RepeatedType;
+        type F64UnlabeledType;
+        type F64OptionalType;
+        type F64RepeatedType;
     }
 }
 pub use _puroro_traits::*;
@@ -17803,6 +17808,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
+            use super::_puroro_internal::*;
             use super::_puroro_traits::*;
 
             pub struct SubmsgSingleField1<ScalarType>
@@ -18275,13 +18281,6 @@ pub mod _puroro_nested {
                     Self(())
                 }
             }
-            pub trait SubmsgTemplateFieldTypes {
-                type Alloc;
-                type I32UnlabeledType;
-                type I32OptionalType;
-                type I64UnlabeledType;
-            }
-
             pub struct SubmsgTemplate<T, B>
             where
                 T: SubmsgTemplateFieldTypes,
@@ -18321,6 +18320,17 @@ pub mod _puroro_nested {
                 pub fn i64_unlabeled(&self) -> T::I64UnlabeledType {
                     ::std::clone::Clone::clone(&self.i64_unlabeled)
                 }
+            }
+        }
+        pub mod _puroro_internal {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            pub trait SubmsgTemplateFieldTypes {
+                type Alloc;
+                type I32UnlabeledType;
+                type I32OptionalType;
+                type I64UnlabeledType;
             }
         }
         pub use _puroro_traits::*;

@@ -510,6 +510,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    use super::_puroro_internal::*;
     use super::_puroro_traits::*;
 
     pub struct Test1SingleField1<ScalarType>
@@ -714,11 +715,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test1TemplateFieldTypes {
-        type Alloc;
-        type AType;
-    }
-
     pub struct Test1Template<T, B>
     where
         T: Test1TemplateFieldTypes,
@@ -941,11 +937,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test2TemplateFieldTypes {
-        type Alloc;
-        type BType;
-    }
-
     pub struct Test2Template<T, B>
     where
         T: Test2TemplateFieldTypes,
@@ -1202,11 +1193,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test3TemplateFieldTypes {
-        type Alloc;
-        type CType;
-    }
-
     pub struct Test3Template<T, B>
     where
         T: Test3TemplateFieldTypes,
@@ -1441,11 +1427,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test4TemplateFieldTypes {
-        type Alloc;
-        type DType;
-    }
-
     pub struct Test4Template<T, B>
     where
         T: Test4TemplateFieldTypes,
@@ -1462,6 +1443,27 @@ pub mod _puroro_impls {
         pub fn d(&self) -> &T::DType {
             &self.d
         }
+    }
+}
+pub mod _puroro_internal {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    pub trait Test1TemplateFieldTypes {
+        type Alloc;
+        type AType;
+    }
+    pub trait Test2TemplateFieldTypes {
+        type Alloc;
+        type BType;
+    }
+    pub trait Test3TemplateFieldTypes {
+        type Alloc;
+        type CType;
+    }
+    pub trait Test4TemplateFieldTypes {
+        type Alloc;
+        type DType;
     }
 }
 pub use _puroro_traits::*;

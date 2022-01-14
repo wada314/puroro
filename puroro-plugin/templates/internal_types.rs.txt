@@ -1,0 +1,8 @@
+pub trait {{ m.template_field_types_trait }} {
+    type Alloc;
+    {%- for f in m.fields %}
+    {%- if !f.is_explicit_oneof_field %}
+    type {{ f.template_type_name }};
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
+    {%- endfor %} {#- for f in m.fields #}
+}

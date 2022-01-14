@@ -146,6 +146,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    use super::_puroro_internal::*;
     use super::_puroro_traits::*;
 
     pub struct MsgSingleField1<ScalarType>
@@ -352,11 +353,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {
-        type Alloc;
-        type TypeType;
-    }
-
     pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
@@ -374,6 +370,15 @@ pub mod _puroro_impls {
         pub fn r#type(&self) -> T::TypeType {
             ::std::clone::Clone::clone(&self.r#type)
         }
+    }
+}
+pub mod _puroro_internal {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type TypeType;
     }
 }
 pub use _puroro_traits::*;

@@ -191,6 +191,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    use super::_puroro_internal::*;
     use super::_puroro_traits::*;
 
     pub struct BookSingleField1<ScalarType>
@@ -546,6 +547,16 @@ pub mod _puroro_impls {
         }
     }
 }
+pub mod _puroro_internal {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    pub trait BookTemplateFieldTypes {
+        type Alloc;
+        type TitleType;
+        type NumPagesType;
+    }
+}
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
     mod _puroro_root {
@@ -575,12 +586,6 @@ pub mod _puroro_traits {
         fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
-    }
-
-    pub trait BookTemplateFieldTypes {
-        type Alloc;
-        type TitleType;
-        type NumPagesType;
     }
 
     macro_rules! book_delegate {

@@ -3159,6 +3159,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    use super::_puroro_internal::*;
     use super::_puroro_traits::*;
 
     pub struct MsgSingleField1<ScalarType>
@@ -11030,72 +11031,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {
-        type Alloc;
-        type I32DefaultType;
-        type I320Type;
-        type I3242Type;
-        type I32M42Type;
-        type I322147483647Type;
-        type I32M2147483648Type;
-        type I320123Type;
-        type I320x123Type;
-        type U32DefaultType;
-        type U320Type;
-        type U3242Type;
-        type U324294967295Type;
-        type U320123Type;
-        type U320x123Type;
-        type I64DefaultType;
-        type I640Type;
-        type I6442Type;
-        type I64M42Type;
-        type I649223372036854775807Type;
-        type I64M9223372036854775808Type;
-        type I640123Type;
-        type I640x123Type;
-        type U64DefaultType;
-        type U640Type;
-        type U6442Type;
-        type U6418446744073709551615Type;
-        type U640123Type;
-        type U640x123Type;
-        type F32DefaultType;
-        type F320Type;
-        type F32M0Type;
-        type F320pType;
-        type F32P0Type;
-        type F320p0Type;
-        type F3242Type;
-        type F32M42Type;
-        type F320p25Type;
-        type F321p5e2Type;
-        type F32InfType;
-        type F32MinfType;
-        type F32NanType;
-        type F32MnanType;
-        type BoolDefaultType;
-        type BoolTrueType;
-        type BoolFalseType;
-        type StringDefaultType;
-        type StringEmptyType;
-        type StringAbcType;
-        type StringAiuType;
-        type StringBackslashType;
-        type StringTabType;
-        type StringCrlfType;
-        type BytesDefaultType;
-        type BytesEmptyType;
-        type BytesAbcType;
-        type BytesAiuType;
-        type BytesBackslashType;
-        type BytesTabType;
-        type BytesCrlfType;
-        type EnumDefaultType;
-        type EnumOneType;
-        type EnumFourtyTwoType;
-    }
-
     pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
@@ -11770,6 +11705,76 @@ pub mod _puroro_impls {
         pub fn enum_fourty_two(&self) -> T::EnumFourtyTwoType {
             ::std::clone::Clone::clone(&self.enum_fourty_two)
         }
+    }
+}
+pub mod _puroro_internal {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type I32DefaultType;
+        type I320Type;
+        type I3242Type;
+        type I32M42Type;
+        type I322147483647Type;
+        type I32M2147483648Type;
+        type I320123Type;
+        type I320x123Type;
+        type U32DefaultType;
+        type U320Type;
+        type U3242Type;
+        type U324294967295Type;
+        type U320123Type;
+        type U320x123Type;
+        type I64DefaultType;
+        type I640Type;
+        type I6442Type;
+        type I64M42Type;
+        type I649223372036854775807Type;
+        type I64M9223372036854775808Type;
+        type I640123Type;
+        type I640x123Type;
+        type U64DefaultType;
+        type U640Type;
+        type U6442Type;
+        type U6418446744073709551615Type;
+        type U640123Type;
+        type U640x123Type;
+        type F32DefaultType;
+        type F320Type;
+        type F32M0Type;
+        type F320pType;
+        type F32P0Type;
+        type F320p0Type;
+        type F3242Type;
+        type F32M42Type;
+        type F320p25Type;
+        type F321p5e2Type;
+        type F32InfType;
+        type F32MinfType;
+        type F32NanType;
+        type F32MnanType;
+        type BoolDefaultType;
+        type BoolTrueType;
+        type BoolFalseType;
+        type StringDefaultType;
+        type StringEmptyType;
+        type StringAbcType;
+        type StringAiuType;
+        type StringBackslashType;
+        type StringTabType;
+        type StringCrlfType;
+        type BytesDefaultType;
+        type BytesEmptyType;
+        type BytesAbcType;
+        type BytesAiuType;
+        type BytesBackslashType;
+        type BytesTabType;
+        type BytesCrlfType;
+        type EnumDefaultType;
+        type EnumOneType;
+        type EnumFourtyTwoType;
     }
 }
 pub use _puroro_traits::*;

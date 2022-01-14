@@ -24,12 +24,25 @@ pub mod _puroro_impls {
 
     {#- It is guaranteed that the trait idents will never conflict with structs names -#}
     use super::_puroro_traits::*;
+    use super::_puroro_internal::*;
 
     {%- for m in messages %}
     {%- include "single_field/body.rs.txt" %}
     {%- include "bumpalo/body.rs.txt" %}
     {%- include "builder.rs.txt" %}
     {%- include "struct_template.rs.txt" %}
+    {%- endfor %}
+}
+
+{#- Implementation detail types, it is needed to be public #}
+{#- but not expected to be directly used by the library users. #}
+pub mod _puroro_internal {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    
+    {%- for m in messages %}
+    {%- include "internal_types.rs.txt" %}
     {%- endfor %}
 }
 
