@@ -723,14 +723,31 @@ pub mod _puroro_impls {
         _alloc: <T as Test1TemplateFieldTypes>::Alloc,
         a: <T as Test1TemplateFieldTypes>::AType,
     }
+
     impl<T, B> Test1Template<T, B>
     where
         T: Test1TemplateFieldTypes,
-        <T as Test1TemplateFieldTypes>::AType: ::std::clone::Clone + ::std::convert::Into<i32>,
         B: ::puroro::internal::BitVec,
+        <T as Test1TemplateFieldTypes>::AType: ::std::clone::Clone + ::std::convert::Into<i32>,
     {
         pub fn a(&self) -> i32 {
             ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.a))
+        }
+    }
+
+    impl<T, B> ::std::default::Default for Test1Template<T, B>
+    where
+        B: ::std::default::Default,
+        T: Test1TemplateFieldTypes,
+        <T as Test1TemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as Test1TemplateFieldTypes>::AType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                a: ::std::default::Default::default(),
+            }
         }
     }
 
@@ -945,14 +962,31 @@ pub mod _puroro_impls {
         _alloc: <T as Test2TemplateFieldTypes>::Alloc,
         b: <T as Test2TemplateFieldTypes>::BType,
     }
+
     impl<T, B> Test2Template<T, B>
     where
         T: Test2TemplateFieldTypes,
-        <T as Test2TemplateFieldTypes>::BType: ::std::convert::AsRef<str>,
         B: ::puroro::internal::BitVec,
+        <T as Test2TemplateFieldTypes>::BType: ::std::convert::AsRef<str>,
     {
         pub fn b(&self) -> impl '_ + ::std::convert::AsRef<str> {
             &self.b
+        }
+    }
+
+    impl<T, B> ::std::default::Default for Test2Template<T, B>
+    where
+        B: ::std::default::Default,
+        T: Test2TemplateFieldTypes,
+        <T as Test2TemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as Test2TemplateFieldTypes>::BType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                b: ::std::default::Default::default(),
+            }
         }
     }
 
@@ -1202,6 +1236,7 @@ pub mod _puroro_impls {
         _alloc: <T as Test3TemplateFieldTypes>::Alloc,
         c: <T as Test3TemplateFieldTypes>::CType,
     }
+
     impl<T, B> Test3Template<T, B>
     where
         T: Test3TemplateFieldTypes,
@@ -1209,6 +1244,22 @@ pub mod _puroro_impls {
     {
         pub fn c(&self) -> &T::CType {
             &self.c
+        }
+    }
+
+    impl<T, B> ::std::default::Default for Test3Template<T, B>
+    where
+        B: ::std::default::Default,
+        T: Test3TemplateFieldTypes,
+        <T as Test3TemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as Test3TemplateFieldTypes>::CType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                c: ::std::default::Default::default(),
+            }
         }
     }
 
@@ -1435,6 +1486,22 @@ pub mod _puroro_impls {
         _bitvec: B,
         _alloc: <T as Test4TemplateFieldTypes>::Alloc,
         d: <T as Test4TemplateFieldTypes>::DType,
+    }
+
+    impl<T, B> ::std::default::Default for Test4Template<T, B>
+    where
+        B: ::std::default::Default,
+        T: Test4TemplateFieldTypes,
+        <T as Test4TemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as Test4TemplateFieldTypes>::DType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                d: ::std::default::Default::default(),
+            }
+        }
     }
 }
 pub mod _puroro_internal {

@@ -764,6 +764,26 @@ pub mod _puroro_impls {
         explicitly_not_packed: <T as MsgTemplateFieldTypes>::ExplicitlyNotPackedType,
         not_annotated: <T as MsgTemplateFieldTypes>::NotAnnotatedType,
     }
+
+    impl<T, B> ::std::default::Default for MsgTemplate<T, B>
+    where
+        B: ::std::default::Default,
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::ExplicitlyPackedType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::ExplicitlyNotPackedType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::NotAnnotatedType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                explicitly_packed: ::std::default::Default::default(),
+                explicitly_not_packed: ::std::default::Default::default(),
+                not_annotated: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 pub mod _puroro_internal {
     mod _puroro_root {

@@ -1633,6 +1633,20 @@ pub mod _puroro_impls {
         _alloc: <T as MsgTemplateFieldTypes>::Alloc,
     }
 
+    impl<T, B> ::std::default::Default for MsgTemplate<T, B>
+    where
+        B: ::std::default::Default,
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+            }
+        }
+    }
+
     pub struct SubmsgSingleField1<ScalarType>
     where
         ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
@@ -1852,15 +1866,32 @@ pub mod _puroro_impls {
         _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
         i32_optional: <T as SubmsgTemplateFieldTypes>::I32OptionalType,
     }
+
     impl<T, B> SubmsgTemplate<T, B>
     where
         T: SubmsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as SubmsgTemplateFieldTypes>::I32OptionalType:
             ::std::clone::Clone + ::std::convert::Into<i32>,
-        B: ::puroro::internal::BitVec,
     {
         pub fn i32_optional(&self) -> i32 {
             ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.i32_optional))
+        }
+    }
+
+    impl<T, B> ::std::default::Default for SubmsgTemplate<T, B>
+    where
+        B: ::std::default::Default,
+        T: SubmsgTemplateFieldTypes,
+        <T as SubmsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as SubmsgTemplateFieldTypes>::I32OptionalType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+            }
         }
     }
 }

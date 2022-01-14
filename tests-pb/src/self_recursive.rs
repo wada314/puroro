@@ -419,6 +419,7 @@ pub mod _puroro_impls {
         _alloc: <T as MsgTemplateFieldTypes>::Alloc,
         recursive_unlabeled: <T as MsgTemplateFieldTypes>::RecursiveUnlabeledType,
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
@@ -426,6 +427,22 @@ pub mod _puroro_impls {
     {
         pub fn recursive_unlabeled(&self) -> &T::RecursiveUnlabeledType {
             &self.recursive_unlabeled
+        }
+    }
+
+    impl<T, B> ::std::default::Default for MsgTemplate<T, B>
+    where
+        B: ::std::default::Default,
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::RecursiveUnlabeledType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                recursive_unlabeled: ::std::default::Default::default(),
+            }
         }
     }
 }

@@ -361,14 +361,31 @@ pub mod _puroro_impls {
         _alloc: <T as MsgTemplateFieldTypes>::Alloc,
         r#type: <T as MsgTemplateFieldTypes>::TypeType,
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::TypeType: ::std::clone::Clone + ::std::convert::Into<i32>,
         B: ::puroro::internal::BitVec,
+        <T as MsgTemplateFieldTypes>::TypeType: ::std::clone::Clone + ::std::convert::Into<i32>,
     {
         pub fn r#type(&self) -> i32 {
             ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.r#type))
+        }
+    }
+
+    impl<T, B> ::std::default::Default for MsgTemplate<T, B>
+    where
+        B: ::std::default::Default,
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::TypeType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                r#type: ::std::default::Default::default(),
+            }
         }
     }
 }

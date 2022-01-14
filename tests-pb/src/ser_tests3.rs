@@ -2733,38 +2733,42 @@ pub mod _puroro_impls {
         enum_repeated: <T as MsgTemplateFieldTypes>::EnumRepeatedType,
         very_large_field_number: <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType,
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::I32UnlabeledType:
             ::std::clone::Clone + ::std::convert::Into<i32>,
-        B: ::puroro::internal::BitVec,
     {
         pub fn i32_unlabeled(&self) -> i32 {
             ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::FloatUnlabeledType:
             ::std::clone::Clone + ::std::convert::Into<f32>,
-        B: ::puroro::internal::BitVec,
     {
         pub fn float_unlabeled(&self) -> f32 {
             ::std::convert::Into::<f32>::into(::std::clone::Clone::clone(&self.float_unlabeled))
         }
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::StringUnlabeledType: ::std::convert::AsRef<str>,
         B: ::puroro::internal::BitVec,
+        <T as MsgTemplateFieldTypes>::StringUnlabeledType: ::std::convert::AsRef<str>,
     {
         pub fn string_unlabeled(&self) -> impl '_ + ::std::convert::AsRef<str> {
             &self.string_unlabeled
         }
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
@@ -2774,12 +2778,13 @@ pub mod _puroro_impls {
             &self.submsg_unlabeled
         }
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::EnumUnlabeledType:
             ::std::clone::Clone + ::std::convert::Into<self::_puroro_root::ser_tests3::Enum>,
-        B: ::puroro::internal::BitVec,
     {
         pub fn enum_unlabeled(&self) -> self::_puroro_root::ser_tests3::Enum {
             ::std::convert::Into::<self::_puroro_root::ser_tests3::Enum>::into(
@@ -2787,17 +2792,54 @@ pub mod _puroro_impls {
             )
         }
     }
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType:
             ::std::clone::Clone + ::std::convert::Into<i32>,
-        B: ::puroro::internal::BitVec,
     {
         pub fn very_large_field_number(&self) -> i32 {
             ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(
                 &self.very_large_field_number,
             ))
+        }
+    }
+
+    impl<T, B> ::std::default::Default for MsgTemplate<T, B>
+    where
+        B: ::std::default::Default,
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::I32UnlabeledType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::I32RepeatedType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::FloatUnlabeledType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::FloatRepeatedType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::StringUnlabeledType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::StringRepeatedType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::SubmsgUnlabeledType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::SubmsgRepeatedType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::EnumUnlabeledType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::EnumRepeatedType: ::std::default::Default,
+        <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_unlabeled: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                enum_unlabeled: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                very_large_field_number: ::std::default::Default::default(),
+            }
         }
     }
 }
@@ -3867,17 +3909,34 @@ pub mod _puroro_nested {
                 _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
                 i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
             }
+
             impl<T, B> SubmsgTemplate<T, B>
             where
                 T: SubmsgTemplateFieldTypes,
+                B: ::puroro::internal::BitVec,
                 <T as SubmsgTemplateFieldTypes>::I32UnlabeledType:
                     ::std::clone::Clone + ::std::convert::Into<i32>,
-                B: ::puroro::internal::BitVec,
             {
                 pub fn i32_unlabeled(&self) -> i32 {
                     ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(
                         &self.i32_unlabeled,
                     ))
+                }
+            }
+
+            impl<T, B> ::std::default::Default for SubmsgTemplate<T, B>
+            where
+                B: ::std::default::Default,
+                T: SubmsgTemplateFieldTypes,
+                <T as SubmsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+                <T as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::default::Default,
+            {
+                fn default() -> Self {
+                    Self {
+                        _alloc: ::std::default::Default::default(),
+                        _bitvec: ::std::default::Default::default(),
+                        i32_unlabeled: ::std::default::Default::default(),
+                    }
                 }
             }
         }
