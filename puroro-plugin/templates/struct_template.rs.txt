@@ -1,12 +1,19 @@
 
 pub trait {{ m.template_field_types_ident }} {
+    type Alloc;
     {%- for f in m.fields %}
     type {{ f.template_type_name }};
     {%- endfor %} {#- for f in m.fields #}
 }
 
-pub struct {{ m.template_ident }}<T, B, A>
+pub struct {{ m.template_ident }}<T, B>
     where T: {{ m.template_field_types_ident }}
 {
-    phantom: ::std::marker::PhantomData<(T, B, A)>,
+    _bitvec: B,
+    _alloc: <T as {{ m.template_field_types_ident }}>::Alloc,
+    {%- for f in m.fields %}
+    {{ f.ident }}: <T as {{ m.template_field_types_ident }}>::{{ f.template_type_name }},
+    {%- endfor %} {#- for f in m.fields #}
 }
+
+

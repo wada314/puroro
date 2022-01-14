@@ -28,18 +28,31 @@ pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
 
+use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
-use ::bitvec::store::BitStore;
+use ::bitvec::view::BitViewSized;
 use ::std::fmt::{self, Debug};
 use ::std::ops::{Deref, DerefMut};
 
-pub fn get_bitvec_bit<O, T>(slice: &BitSlice<O, T>, index: usize) -> bool
-where
-    O: BitOrder,
-    T: BitStore,
-{
-    *slice.get(index).expect("bitvec index out of bound.")
+pub trait BitVec {
+    fn get(&self, index: usize) -> bool;
+}
+impl<O: BitOrder, V: BitViewSized> BitVec for BitArray<O, V> {
+    fn get(&self, index: usize) -> bool {
+        <BitSlice<_, _>>::get(&**self, index).map_or(false, |b| *b)
+    }
+}
+impl BitVec for () {
+    fn get(&self, _index: usize) -> bool {
+        false
+    }
+}
+pub struct FlipBitOn<Base, const INDEX: usize>(Base);
+impl<Base: BitVec, const INDEX: usize> BitVec for FlipBitOn<Base, INDEX> {
+    fn get(&self, index: usize) -> bool {
+        index == INDEX || self.0.get(index)
+    }
 }
 
 pub trait IsDefault {

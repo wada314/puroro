@@ -14840,13 +14840,112 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {}
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type I32UnlabeledType;
+        type I32OptionalType;
+        type I32RepeatedType;
+        type FloatUnlabeledType;
+        type FloatOptionalType;
+        type FloatRepeatedType;
+        type BytesUnlabeledType;
+        type BytesOptionalType;
+        type BytesRepeatedType;
+        type StringUnlabeledType;
+        type StringOptionalType;
+        type StringRepeatedType;
+        type EnumUnlabeledType;
+        type EnumOptionalType;
+        type EnumRepeatedType;
+        type SubmsgUnlabeledType;
+        type SubmsgOptionalType;
+        type SubmsgRepeatedType;
+        type I64UnlabeledType;
+        type I64OptionalType;
+        type I64RepeatedType;
+        type U32UnlabeledType;
+        type U32OptionalType;
+        type U32RepeatedType;
+        type U64UnlabeledType;
+        type U64OptionalType;
+        type U64RepeatedType;
+        type S32UnlabeledType;
+        type S32OptionalType;
+        type S32RepeatedType;
+        type S64UnlabeledType;
+        type S64OptionalType;
+        type S64RepeatedType;
+        type Fixed32UnlabeledType;
+        type Fixed32OptionalType;
+        type Fixed32RepeatedType;
+        type Fixed64UnlabeledType;
+        type Fixed64OptionalType;
+        type Fixed64RepeatedType;
+        type Sfixed32UnlabeledType;
+        type Sfixed32OptionalType;
+        type Sfixed32RepeatedType;
+        type Sfixed64UnlabeledType;
+        type Sfixed64OptionalType;
+        type Sfixed64RepeatedType;
+        type F64UnlabeledType;
+        type F64OptionalType;
+        type F64RepeatedType;
+    }
 
-    pub struct MsgTemplate<T, B, A>
+    pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as MsgTemplateFieldTypes>::Alloc,
+        i32_unlabeled: <T as MsgTemplateFieldTypes>::I32UnlabeledType,
+        i32_optional: <T as MsgTemplateFieldTypes>::I32OptionalType,
+        i32_repeated: <T as MsgTemplateFieldTypes>::I32RepeatedType,
+        float_unlabeled: <T as MsgTemplateFieldTypes>::FloatUnlabeledType,
+        float_optional: <T as MsgTemplateFieldTypes>::FloatOptionalType,
+        float_repeated: <T as MsgTemplateFieldTypes>::FloatRepeatedType,
+        bytes_unlabeled: <T as MsgTemplateFieldTypes>::BytesUnlabeledType,
+        bytes_optional: <T as MsgTemplateFieldTypes>::BytesOptionalType,
+        bytes_repeated: <T as MsgTemplateFieldTypes>::BytesRepeatedType,
+        string_unlabeled: <T as MsgTemplateFieldTypes>::StringUnlabeledType,
+        string_optional: <T as MsgTemplateFieldTypes>::StringOptionalType,
+        string_repeated: <T as MsgTemplateFieldTypes>::StringRepeatedType,
+        enum_unlabeled: <T as MsgTemplateFieldTypes>::EnumUnlabeledType,
+        enum_optional: <T as MsgTemplateFieldTypes>::EnumOptionalType,
+        enum_repeated: <T as MsgTemplateFieldTypes>::EnumRepeatedType,
+        submsg_unlabeled: <T as MsgTemplateFieldTypes>::SubmsgUnlabeledType,
+        submsg_optional: <T as MsgTemplateFieldTypes>::SubmsgOptionalType,
+        submsg_repeated: <T as MsgTemplateFieldTypes>::SubmsgRepeatedType,
+        i64_unlabeled: <T as MsgTemplateFieldTypes>::I64UnlabeledType,
+        i64_optional: <T as MsgTemplateFieldTypes>::I64OptionalType,
+        i64_repeated: <T as MsgTemplateFieldTypes>::I64RepeatedType,
+        u32_unlabeled: <T as MsgTemplateFieldTypes>::U32UnlabeledType,
+        u32_optional: <T as MsgTemplateFieldTypes>::U32OptionalType,
+        u32_repeated: <T as MsgTemplateFieldTypes>::U32RepeatedType,
+        u64_unlabeled: <T as MsgTemplateFieldTypes>::U64UnlabeledType,
+        u64_optional: <T as MsgTemplateFieldTypes>::U64OptionalType,
+        u64_repeated: <T as MsgTemplateFieldTypes>::U64RepeatedType,
+        s32_unlabeled: <T as MsgTemplateFieldTypes>::S32UnlabeledType,
+        s32_optional: <T as MsgTemplateFieldTypes>::S32OptionalType,
+        s32_repeated: <T as MsgTemplateFieldTypes>::S32RepeatedType,
+        s64_unlabeled: <T as MsgTemplateFieldTypes>::S64UnlabeledType,
+        s64_optional: <T as MsgTemplateFieldTypes>::S64OptionalType,
+        s64_repeated: <T as MsgTemplateFieldTypes>::S64RepeatedType,
+        fixed32_unlabeled: <T as MsgTemplateFieldTypes>::Fixed32UnlabeledType,
+        fixed32_optional: <T as MsgTemplateFieldTypes>::Fixed32OptionalType,
+        fixed32_repeated: <T as MsgTemplateFieldTypes>::Fixed32RepeatedType,
+        fixed64_unlabeled: <T as MsgTemplateFieldTypes>::Fixed64UnlabeledType,
+        fixed64_optional: <T as MsgTemplateFieldTypes>::Fixed64OptionalType,
+        fixed64_repeated: <T as MsgTemplateFieldTypes>::Fixed64RepeatedType,
+        sfixed32_unlabeled: <T as MsgTemplateFieldTypes>::Sfixed32UnlabeledType,
+        sfixed32_optional: <T as MsgTemplateFieldTypes>::Sfixed32OptionalType,
+        sfixed32_repeated: <T as MsgTemplateFieldTypes>::Sfixed32RepeatedType,
+        sfixed64_unlabeled: <T as MsgTemplateFieldTypes>::Sfixed64UnlabeledType,
+        sfixed64_optional: <T as MsgTemplateFieldTypes>::Sfixed64OptionalType,
+        sfixed64_repeated: <T as MsgTemplateFieldTypes>::Sfixed64RepeatedType,
+        f64_unlabeled: <T as MsgTemplateFieldTypes>::F64UnlabeledType,
+        f64_optional: <T as MsgTemplateFieldTypes>::F64OptionalType,
+        f64_repeated: <T as MsgTemplateFieldTypes>::F64RepeatedType,
     }
 }
 pub use _puroro_traits::*;
@@ -17718,13 +17817,22 @@ pub mod _puroro_nested {
                     Self(())
                 }
             }
-            pub trait SubmsgTemplateFieldTypes {}
+            pub trait SubmsgTemplateFieldTypes {
+                type Alloc;
+                type I32UnlabeledType;
+                type I32OptionalType;
+                type I64UnlabeledType;
+            }
 
-            pub struct SubmsgTemplate<T, B, A>
+            pub struct SubmsgTemplate<T, B>
             where
                 T: SubmsgTemplateFieldTypes,
             {
-                phantom: ::std::marker::PhantomData<(T, B, A)>,
+                _bitvec: B,
+                _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
+                i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
+                i32_optional: <T as SubmsgTemplateFieldTypes>::I32OptionalType,
+                i64_unlabeled: <T as SubmsgTemplateFieldTypes>::I64UnlabeledType,
             }
         }
         pub use _puroro_traits::*;

@@ -753,13 +753,22 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {}
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type ExplicitlyPackedType;
+        type ExplicitlyNotPackedType;
+        type NotAnnotatedType;
+    }
 
-    pub struct MsgTemplate<T, B, A>
+    pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as MsgTemplateFieldTypes>::Alloc,
+        explicitly_packed: <T as MsgTemplateFieldTypes>::ExplicitlyPackedType,
+        explicitly_not_packed: <T as MsgTemplateFieldTypes>::ExplicitlyNotPackedType,
+        not_annotated: <T as MsgTemplateFieldTypes>::NotAnnotatedType,
     }
 }
 pub use _puroro_traits::*;

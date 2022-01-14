@@ -11030,13 +11030,140 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {}
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type I32DefaultType;
+        type I320Type;
+        type I3242Type;
+        type I32M42Type;
+        type I322147483647Type;
+        type I32M2147483648Type;
+        type I320123Type;
+        type I320x123Type;
+        type U32DefaultType;
+        type U320Type;
+        type U3242Type;
+        type U324294967295Type;
+        type U320123Type;
+        type U320x123Type;
+        type I64DefaultType;
+        type I640Type;
+        type I6442Type;
+        type I64M42Type;
+        type I649223372036854775807Type;
+        type I64M9223372036854775808Type;
+        type I640123Type;
+        type I640x123Type;
+        type U64DefaultType;
+        type U640Type;
+        type U6442Type;
+        type U6418446744073709551615Type;
+        type U640123Type;
+        type U640x123Type;
+        type F32DefaultType;
+        type F320Type;
+        type F32M0Type;
+        type F320pType;
+        type F32P0Type;
+        type F320p0Type;
+        type F3242Type;
+        type F32M42Type;
+        type F320p25Type;
+        type F321p5e2Type;
+        type F32InfType;
+        type F32MinfType;
+        type F32NanType;
+        type F32MnanType;
+        type BoolDefaultType;
+        type BoolTrueType;
+        type BoolFalseType;
+        type StringDefaultType;
+        type StringEmptyType;
+        type StringAbcType;
+        type StringAiuType;
+        type StringBackslashType;
+        type StringTabType;
+        type StringCrlfType;
+        type BytesDefaultType;
+        type BytesEmptyType;
+        type BytesAbcType;
+        type BytesAiuType;
+        type BytesBackslashType;
+        type BytesTabType;
+        type BytesCrlfType;
+        type EnumDefaultType;
+        type EnumOneType;
+        type EnumFourtyTwoType;
+    }
 
-    pub struct MsgTemplate<T, B, A>
+    pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as MsgTemplateFieldTypes>::Alloc,
+        i32_default: <T as MsgTemplateFieldTypes>::I32DefaultType,
+        i32_0: <T as MsgTemplateFieldTypes>::I320Type,
+        i32_42: <T as MsgTemplateFieldTypes>::I3242Type,
+        i32_m42: <T as MsgTemplateFieldTypes>::I32M42Type,
+        i32_2147483647: <T as MsgTemplateFieldTypes>::I322147483647Type,
+        i32_m2147483648: <T as MsgTemplateFieldTypes>::I32M2147483648Type,
+        i32_0123: <T as MsgTemplateFieldTypes>::I320123Type,
+        i32_0x123: <T as MsgTemplateFieldTypes>::I320x123Type,
+        u32_default: <T as MsgTemplateFieldTypes>::U32DefaultType,
+        u32_0: <T as MsgTemplateFieldTypes>::U320Type,
+        u32_42: <T as MsgTemplateFieldTypes>::U3242Type,
+        u32_4294967295: <T as MsgTemplateFieldTypes>::U324294967295Type,
+        u32_0123: <T as MsgTemplateFieldTypes>::U320123Type,
+        u32_0x123: <T as MsgTemplateFieldTypes>::U320x123Type,
+        i64_default: <T as MsgTemplateFieldTypes>::I64DefaultType,
+        i64_0: <T as MsgTemplateFieldTypes>::I640Type,
+        i64_42: <T as MsgTemplateFieldTypes>::I6442Type,
+        i64_m42: <T as MsgTemplateFieldTypes>::I64M42Type,
+        i64_9223372036854775807: <T as MsgTemplateFieldTypes>::I649223372036854775807Type,
+        i64_m9223372036854775808: <T as MsgTemplateFieldTypes>::I64M9223372036854775808Type,
+        i64_0123: <T as MsgTemplateFieldTypes>::I640123Type,
+        i64_0x123: <T as MsgTemplateFieldTypes>::I640x123Type,
+        u64_default: <T as MsgTemplateFieldTypes>::U64DefaultType,
+        u64_0: <T as MsgTemplateFieldTypes>::U640Type,
+        u64_42: <T as MsgTemplateFieldTypes>::U6442Type,
+        u64_18446744073709551615: <T as MsgTemplateFieldTypes>::U6418446744073709551615Type,
+        u64_0123: <T as MsgTemplateFieldTypes>::U640123Type,
+        u64_0x123: <T as MsgTemplateFieldTypes>::U640x123Type,
+        f32_default: <T as MsgTemplateFieldTypes>::F32DefaultType,
+        f32_0: <T as MsgTemplateFieldTypes>::F320Type,
+        f32_m0: <T as MsgTemplateFieldTypes>::F32M0Type,
+        f32_0p: <T as MsgTemplateFieldTypes>::F320pType,
+        f32_p0: <T as MsgTemplateFieldTypes>::F32P0Type,
+        f32_0p0: <T as MsgTemplateFieldTypes>::F320p0Type,
+        f32_42: <T as MsgTemplateFieldTypes>::F3242Type,
+        f32_m42: <T as MsgTemplateFieldTypes>::F32M42Type,
+        f32_0p25: <T as MsgTemplateFieldTypes>::F320p25Type,
+        f32_1p5e2: <T as MsgTemplateFieldTypes>::F321p5e2Type,
+        f32_inf: <T as MsgTemplateFieldTypes>::F32InfType,
+        f32_minf: <T as MsgTemplateFieldTypes>::F32MinfType,
+        f32_nan: <T as MsgTemplateFieldTypes>::F32NanType,
+        f32_mnan: <T as MsgTemplateFieldTypes>::F32MnanType,
+        bool_default: <T as MsgTemplateFieldTypes>::BoolDefaultType,
+        bool_true: <T as MsgTemplateFieldTypes>::BoolTrueType,
+        bool_false: <T as MsgTemplateFieldTypes>::BoolFalseType,
+        string_default: <T as MsgTemplateFieldTypes>::StringDefaultType,
+        string_empty: <T as MsgTemplateFieldTypes>::StringEmptyType,
+        string_abc: <T as MsgTemplateFieldTypes>::StringAbcType,
+        string_aiu: <T as MsgTemplateFieldTypes>::StringAiuType,
+        string_backslash: <T as MsgTemplateFieldTypes>::StringBackslashType,
+        string_tab: <T as MsgTemplateFieldTypes>::StringTabType,
+        string_crlf: <T as MsgTemplateFieldTypes>::StringCrlfType,
+        bytes_default: <T as MsgTemplateFieldTypes>::BytesDefaultType,
+        bytes_empty: <T as MsgTemplateFieldTypes>::BytesEmptyType,
+        bytes_abc: <T as MsgTemplateFieldTypes>::BytesAbcType,
+        bytes_aiu: <T as MsgTemplateFieldTypes>::BytesAiuType,
+        bytes_backslash: <T as MsgTemplateFieldTypes>::BytesBackslashType,
+        bytes_tab: <T as MsgTemplateFieldTypes>::BytesTabType,
+        bytes_crlf: <T as MsgTemplateFieldTypes>::BytesCrlfType,
+        enum_default: <T as MsgTemplateFieldTypes>::EnumDefaultType,
+        enum_one: <T as MsgTemplateFieldTypes>::EnumOneType,
+        enum_fourty_two: <T as MsgTemplateFieldTypes>::EnumFourtyTwoType,
     }
 }
 pub use _puroro_traits::*;

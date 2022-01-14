@@ -1624,13 +1624,28 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {}
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type G1Int32Type;
+        type G1StringType;
+        type G2F32Type;
+        type G2StringType;
+        type G2SubmsgType;
+        type G3Int32Type;
+    }
 
-    pub struct MsgTemplate<T, B, A>
+    pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as MsgTemplateFieldTypes>::Alloc,
+        g1_int32: <T as MsgTemplateFieldTypes>::G1Int32Type,
+        g1_string: <T as MsgTemplateFieldTypes>::G1StringType,
+        g2_f32: <T as MsgTemplateFieldTypes>::G2F32Type,
+        g2_string: <T as MsgTemplateFieldTypes>::G2StringType,
+        g2_submsg: <T as MsgTemplateFieldTypes>::G2SubmsgType,
+        g3_int32: <T as MsgTemplateFieldTypes>::G3Int32Type,
     }
 
     pub struct SubmsgSingleField1<ScalarType>
@@ -1844,13 +1859,18 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait SubmsgTemplateFieldTypes {}
+    pub trait SubmsgTemplateFieldTypes {
+        type Alloc;
+        type I32OptionalType;
+    }
 
-    pub struct SubmsgTemplate<T, B, A>
+    pub struct SubmsgTemplate<T, B>
     where
         T: SubmsgTemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
+        i32_optional: <T as SubmsgTemplateFieldTypes>::I32OptionalType,
     }
 }
 pub use _puroro_traits::*;

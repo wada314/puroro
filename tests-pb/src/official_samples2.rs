@@ -724,13 +724,18 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test1TemplateFieldTypes {}
+    pub trait Test1TemplateFieldTypes {
+        type Alloc;
+        type AType;
+    }
 
-    pub struct Test1Template<T, B, A>
+    pub struct Test1Template<T, B>
     where
         T: Test1TemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as Test1TemplateFieldTypes>::Alloc,
+        a: <T as Test1TemplateFieldTypes>::AType,
     }
 
     pub struct Test2SingleField2<ScalarType>
@@ -938,13 +943,18 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test2TemplateFieldTypes {}
+    pub trait Test2TemplateFieldTypes {
+        type Alloc;
+        type BType;
+    }
 
-    pub struct Test2Template<T, B, A>
+    pub struct Test2Template<T, B>
     where
         T: Test2TemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as Test2TemplateFieldTypes>::Alloc,
+        b: <T as Test2TemplateFieldTypes>::BType,
     }
 
     pub struct Test3SingleField3<ScalarType>
@@ -1185,13 +1195,18 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test3TemplateFieldTypes {}
+    pub trait Test3TemplateFieldTypes {
+        type Alloc;
+        type CType;
+    }
 
-    pub struct Test3Template<T, B, A>
+    pub struct Test3Template<T, B>
     where
         T: Test3TemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as Test3TemplateFieldTypes>::Alloc,
+        c: <T as Test3TemplateFieldTypes>::CType,
     }
 
     pub struct Test4SingleField4<ScalarType, RepeatedType>
@@ -1410,13 +1425,18 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait Test4TemplateFieldTypes {}
+    pub trait Test4TemplateFieldTypes {
+        type Alloc;
+        type DType;
+    }
 
-    pub struct Test4Template<T, B, A>
+    pub struct Test4Template<T, B>
     where
         T: Test4TemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as Test4TemplateFieldTypes>::Alloc,
+        d: <T as Test4TemplateFieldTypes>::DType,
     }
 }
 pub use _puroro_traits::*;

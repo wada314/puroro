@@ -2714,13 +2714,38 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait MsgTemplateFieldTypes {}
+    pub trait MsgTemplateFieldTypes {
+        type Alloc;
+        type I32UnlabeledType;
+        type I32RepeatedType;
+        type FloatUnlabeledType;
+        type FloatRepeatedType;
+        type StringUnlabeledType;
+        type StringRepeatedType;
+        type SubmsgUnlabeledType;
+        type SubmsgRepeatedType;
+        type EnumUnlabeledType;
+        type EnumRepeatedType;
+        type VeryLargeFieldNumberType;
+    }
 
-    pub struct MsgTemplate<T, B, A>
+    pub struct MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as MsgTemplateFieldTypes>::Alloc,
+        i32_unlabeled: <T as MsgTemplateFieldTypes>::I32UnlabeledType,
+        i32_repeated: <T as MsgTemplateFieldTypes>::I32RepeatedType,
+        float_unlabeled: <T as MsgTemplateFieldTypes>::FloatUnlabeledType,
+        float_repeated: <T as MsgTemplateFieldTypes>::FloatRepeatedType,
+        string_unlabeled: <T as MsgTemplateFieldTypes>::StringUnlabeledType,
+        string_repeated: <T as MsgTemplateFieldTypes>::StringRepeatedType,
+        submsg_unlabeled: <T as MsgTemplateFieldTypes>::SubmsgUnlabeledType,
+        submsg_repeated: <T as MsgTemplateFieldTypes>::SubmsgRepeatedType,
+        enum_unlabeled: <T as MsgTemplateFieldTypes>::EnumUnlabeledType,
+        enum_repeated: <T as MsgTemplateFieldTypes>::EnumRepeatedType,
+        very_large_field_number: <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType,
     }
 }
 pub use _puroro_traits::*;
@@ -3761,13 +3786,18 @@ pub mod _puroro_nested {
                     Self(())
                 }
             }
-            pub trait SubmsgTemplateFieldTypes {}
+            pub trait SubmsgTemplateFieldTypes {
+                type Alloc;
+                type I32UnlabeledType;
+            }
 
-            pub struct SubmsgTemplate<T, B, A>
+            pub struct SubmsgTemplate<T, B>
             where
                 T: SubmsgTemplateFieldTypes,
             {
-                phantom: ::std::marker::PhantomData<(T, B, A)>,
+                _bitvec: B,
+                _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
+                i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
             }
         }
         pub use _puroro_traits::*;

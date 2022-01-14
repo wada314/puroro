@@ -518,15 +518,19 @@ pub mod _puroro_impls {
         }
     }
     pub trait BookTemplateFieldTypes {
+        type Alloc;
         type TitleType;
         type NumPagesType;
     }
 
-    pub struct BookTemplate<T, B, A>
+    pub struct BookTemplate<T, B>
     where
         T: BookTemplateFieldTypes,
     {
-        phantom: ::std::marker::PhantomData<(T, B, A)>,
+        _bitvec: B,
+        _alloc: <T as BookTemplateFieldTypes>::Alloc,
+        title: <T as BookTemplateFieldTypes>::TitleType,
+        num_pages: <T as BookTemplateFieldTypes>::NumPagesType,
     }
 }
 pub use _puroro_traits::*;
