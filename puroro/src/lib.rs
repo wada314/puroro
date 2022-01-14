@@ -111,7 +111,7 @@ mod test {
         age: <T as PersonParamsTuple>::AgeType,
         children: <T as PersonParamsTuple>::ChildrenType,
     }
-    impl<T: PersonParamsTuple<AgeType=u32>> Person<T> {
+    impl<T: PersonParamsTuple<AgeType = u32>> Person<T> {
         fn age(&self) -> u32 {
             self.age
         }
@@ -137,7 +137,9 @@ mod test {
 
     #[test]
     fn test() {
-        let pn = Person_NameType::<&str>("hoge");
-        assert_eq!(8, std::mem::size_of_val(&pn));
+        let pn_str = Person_NameType::<&str>("hoge");
+        assert_eq!(16, std::mem::size_of_val(&pn_str));
+        let pn_string = Person_NameType::<String>("hoge".to_string());
+        assert_eq!(24, std::mem::size_of_val(&pn_str));
     }
 }
