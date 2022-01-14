@@ -77,6 +77,8 @@ struct Message {
     bumpalo_ident: String,
     bumpalo_owned_ident: String,
     builder_ident: String,
+    template_ident: String,
+    template_field_types_ident: String,
 }
 
 impl Message {
@@ -120,6 +122,8 @@ impl Message {
             bumpalo_ident: m.rust_impl_ident("Bumpalo"),
             bumpalo_owned_ident: m.rust_impl_ident("BumpaloOwned"),
             builder_ident: m.rust_impl_ident("Builder"),
+            template_ident: m.rust_impl_ident("Template"),
+            template_field_types_ident: m.rust_impl_ident("TemplateFieldTypes"),
         })
     }
 }

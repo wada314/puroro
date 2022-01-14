@@ -1624,6 +1624,9 @@ pub mod _puroro_impls {
             Self(())
         }
     }
+    pub struct MsgTemplate<T, B, A> {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
+    }
 
     pub struct SubmsgSingleField1<ScalarType>
     where
@@ -1835,6 +1838,9 @@ pub mod _puroro_impls {
         pub fn new() -> Self {
             Self(())
         }
+    }
+    pub struct SubmsgTemplate<T, B, A> {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 }
 pub use _puroro_traits::*;

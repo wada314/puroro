@@ -517,6 +517,14 @@ pub mod _puroro_impls {
             Self(())
         }
     }
+    pub trait BookTemplateFieldTypes {}
+
+    pub struct BookTemplate<T, B, A>
+    where
+        T: BookTemplateFieldTypes,
+    {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

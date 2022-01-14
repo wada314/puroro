@@ -352,6 +352,9 @@ pub mod _puroro_impls {
             Self(())
         }
     }
+    pub struct MsgTemplate<T, B, A> {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

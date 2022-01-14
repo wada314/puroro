@@ -1,0 +1,10 @@
+
+pub trait {{ m.template_field_types_ident }} {
+
+}
+
+pub struct {{ m.template_ident }}<T, B, A>
+    where T: {{ m.template_field_types_ident }}
+{
+    phantom: ::std::marker::PhantomData<(T, B, A)>,
+}

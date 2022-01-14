@@ -714,6 +714,9 @@ pub mod _puroro_impls {
             Self(())
         }
     }
+    pub struct Test1Template<T, B, A> {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
+    }
 
     pub struct Test2SingleField2<ScalarType>
     where
@@ -917,6 +920,9 @@ pub mod _puroro_impls {
         pub fn new() -> Self {
             Self(())
         }
+    }
+    pub struct Test2Template<T, B, A> {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 
     pub struct Test3SingleField3<ScalarType>
@@ -1157,6 +1163,9 @@ pub mod _puroro_impls {
             Self(())
         }
     }
+    pub struct Test3Template<T, B, A> {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
+    }
 
     pub struct Test4SingleField4<ScalarType, RepeatedType>
     where
@@ -1373,6 +1382,9 @@ pub mod _puroro_impls {
         pub fn new() -> Self {
             Self(())
         }
+    }
+    pub struct Test4Template<T, B, A> {
+        phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 }
 pub use _puroro_traits::*;
