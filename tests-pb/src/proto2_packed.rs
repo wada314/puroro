@@ -795,6 +795,13 @@ pub mod _puroro_internal {
         type ExplicitlyNotPackedType;
         type NotAnnotatedType;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type ExplicitlyPackedType = ::std::vec::Vec<i32>;
+        type ExplicitlyNotPackedType = ::std::vec::Vec<i32>;
+        type NotAnnotatedType = ::std::vec::Vec<i32>;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

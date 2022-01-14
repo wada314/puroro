@@ -12019,6 +12019,74 @@ pub mod _puroro_internal {
         type EnumOneType;
         type EnumFourtyTwoType;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type I32DefaultType = ::puroro::internal::Bare<i32>;
+        type I320Type = ::puroro::internal::Bare<i32>;
+        type I3242Type = ::puroro::internal::Bare<i32>;
+        type I32M42Type = ::puroro::internal::Bare<i32>;
+        type I322147483647Type = ::puroro::internal::Bare<i32>;
+        type I32M2147483648Type = ::puroro::internal::Bare<i32>;
+        type I320123Type = ::puroro::internal::Bare<i32>;
+        type I320x123Type = ::puroro::internal::Bare<i32>;
+        type U32DefaultType = ::puroro::internal::Bare<u32>;
+        type U320Type = ::puroro::internal::Bare<u32>;
+        type U3242Type = ::puroro::internal::Bare<u32>;
+        type U324294967295Type = ::puroro::internal::Bare<u32>;
+        type U320123Type = ::puroro::internal::Bare<u32>;
+        type U320x123Type = ::puroro::internal::Bare<u32>;
+        type I64DefaultType = ::puroro::internal::Bare<i64>;
+        type I640Type = ::puroro::internal::Bare<i64>;
+        type I6442Type = ::puroro::internal::Bare<i64>;
+        type I64M42Type = ::puroro::internal::Bare<i64>;
+        type I649223372036854775807Type = ::puroro::internal::Bare<i64>;
+        type I64M9223372036854775808Type = ::puroro::internal::Bare<i64>;
+        type I640123Type = ::puroro::internal::Bare<i64>;
+        type I640x123Type = ::puroro::internal::Bare<i64>;
+        type U64DefaultType = ::puroro::internal::Bare<u64>;
+        type U640Type = ::puroro::internal::Bare<u64>;
+        type U6442Type = ::puroro::internal::Bare<u64>;
+        type U6418446744073709551615Type = ::puroro::internal::Bare<u64>;
+        type U640123Type = ::puroro::internal::Bare<u64>;
+        type U640x123Type = ::puroro::internal::Bare<u64>;
+        type F32DefaultType = ::puroro::internal::Bare<f32>;
+        type F320Type = ::puroro::internal::Bare<f32>;
+        type F32M0Type = ::puroro::internal::Bare<f32>;
+        type F320pType = ::puroro::internal::Bare<f32>;
+        type F32P0Type = ::puroro::internal::Bare<f32>;
+        type F320p0Type = ::puroro::internal::Bare<f32>;
+        type F3242Type = ::puroro::internal::Bare<f32>;
+        type F32M42Type = ::puroro::internal::Bare<f32>;
+        type F320p25Type = ::puroro::internal::Bare<f32>;
+        type F321p5e2Type = ::puroro::internal::Bare<f32>;
+        type F32InfType = ::puroro::internal::Bare<f32>;
+        type F32MinfType = ::puroro::internal::Bare<f32>;
+        type F32NanType = ::puroro::internal::Bare<f32>;
+        type F32MnanType = ::puroro::internal::Bare<f32>;
+        type BoolDefaultType = ::puroro::internal::Bare<bool>;
+        type BoolTrueType = ::puroro::internal::Bare<bool>;
+        type BoolFalseType = ::puroro::internal::Bare<bool>;
+        type StringDefaultType = ::puroro::internal::Bare<::std::string::String>;
+        type StringEmptyType = ::puroro::internal::Bare<::std::string::String>;
+        type StringAbcType = ::puroro::internal::Bare<::std::string::String>;
+        type StringAiuType = ::puroro::internal::Bare<::std::string::String>;
+        type StringBackslashType = ::puroro::internal::Bare<::std::string::String>;
+        type StringTabType = ::puroro::internal::Bare<::std::string::String>;
+        type StringCrlfType = ::puroro::internal::Bare<::std::string::String>;
+        type BytesDefaultType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesEmptyType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesAbcType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesAiuType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesBackslashType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesTabType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesCrlfType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type EnumDefaultType =
+            ::puroro::internal::Bare<self::_puroro_root::proto2_defaults::MyEnum>;
+        type EnumOneType = ::puroro::internal::Bare<self::_puroro_root::proto2_defaults::MyEnum>;
+        type EnumFourtyTwoType =
+            ::puroro::internal::Bare<self::_puroro_root::proto2_defaults::MyEnum>;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

@@ -89,6 +89,8 @@ impl<T> DerefMut for BumpaloOwned<T> {
 
 impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
 
+pub struct SimpleImpl;
+
 // メモ
 mod test {
     trait PersonParamsTuple {

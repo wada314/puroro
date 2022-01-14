@@ -2889,6 +2889,27 @@ pub mod _puroro_internal {
         type EnumRepeatedType;
         type VeryLargeFieldNumberType;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type I32OptionalType = ::puroro::internal::Bare<i32>;
+        type I32RepeatedType = ::std::vec::Vec<i32>;
+        type FloatOptionalType = ::puroro::internal::Bare<f32>;
+        type FloatRepeatedType = ::std::vec::Vec<f32>;
+        type StringOptionalType = ::puroro::internal::Bare<::std::string::String>;
+        type StringRepeatedType = ::std::vec::Vec<::std::string::String>;
+        type SubmsgOptionalType = ::std::option::Option<
+            ::std::boxed::Box<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+            >,
+        >;
+        type SubmsgRepeatedType = ::std::vec::Vec<
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+        >;
+        type EnumOptionalType = ::puroro::internal::Bare<self::_puroro_root::ser_tests2::Enum>;
+        type EnumRepeatedType = ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>;
+        type VeryLargeFieldNumberType = ::puroro::internal::Bare<i32>;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -3979,6 +4000,11 @@ pub mod _puroro_nested {
             pub trait SubmsgTemplateFieldTypes {
                 type Alloc;
                 type I32OptionalType;
+            }
+
+            impl SubmsgTemplateFieldTypes for ::puroro::SimpleImpl {
+                type Alloc = ();
+                type I32OptionalType = ::puroro::internal::Bare<i32>;
             }
         }
         pub use _puroro_traits::*;

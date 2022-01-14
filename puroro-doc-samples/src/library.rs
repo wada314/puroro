@@ -578,6 +578,12 @@ pub mod _puroro_internal {
         type TitleType;
         type NumPagesType;
     }
+
+    impl BookTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type TitleType = ::puroro::internal::Bare<::std::string::String>;
+        type NumPagesType = ::puroro::internal::Bare<u32>;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

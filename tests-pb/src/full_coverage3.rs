@@ -15442,6 +15442,60 @@ pub mod _puroro_internal {
         type F64OptionalType;
         type F64RepeatedType;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type I32UnlabeledType = ::puroro::internal::Bare<i32>;
+        type I32OptionalType = ::puroro::internal::Bare<i32>;
+        type I32RepeatedType = ::std::vec::Vec<i32>;
+        type FloatUnlabeledType = ::puroro::internal::Bare<f32>;
+        type FloatOptionalType = ::puroro::internal::Bare<f32>;
+        type FloatRepeatedType = ::std::vec::Vec<f32>;
+        type BytesUnlabeledType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesOptionalType = ::puroro::internal::Bare<::std::vec::Vec<u8>>;
+        type BytesRepeatedType = ::std::vec::Vec<::std::vec::Vec<u8>>;
+        type StringUnlabeledType = ::puroro::internal::Bare<::std::string::String>;
+        type StringOptionalType = ::puroro::internal::Bare<::std::string::String>;
+        type StringRepeatedType = ::std::vec::Vec<::std::string::String>;
+        type EnumUnlabeledType = ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum>;
+        type EnumOptionalType = ::puroro::internal::Bare<self::_puroro_root::full_coverage3::Enum>;
+        type EnumRepeatedType = ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>;
+        type SubmsgUnlabeledType = ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>;
+        type SubmsgOptionalType = ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>;
+        type SubmsgRepeatedType = ::std::vec::Vec<
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+        >;
+        type I64UnlabeledType = ::puroro::internal::Bare<i64>;
+        type I64OptionalType = ::puroro::internal::Bare<i64>;
+        type I64RepeatedType = ::std::vec::Vec<i64>;
+        type U32UnlabeledType = ::puroro::internal::Bare<u32>;
+        type U32OptionalType = ::puroro::internal::Bare<u32>;
+        type U32RepeatedType = ::std::vec::Vec<u32>;
+        type U64UnlabeledType = ::puroro::internal::Bare<u64>;
+        type U64OptionalType = ::puroro::internal::Bare<u64>;
+        type U64RepeatedType = ::std::vec::Vec<u64>;
+        type S32UnlabeledType = ::puroro::internal::Bare<i32>;
+        type S32OptionalType = ::puroro::internal::Bare<i32>;
+        type S32RepeatedType = ::std::vec::Vec<i32>;
+        type S64UnlabeledType = ::puroro::internal::Bare<i64>;
+        type S64OptionalType = ::puroro::internal::Bare<i64>;
+        type S64RepeatedType = ::std::vec::Vec<i64>;
+        type Fixed32UnlabeledType = ::puroro::internal::Bare<u32>;
+        type Fixed32OptionalType = ::puroro::internal::Bare<u32>;
+        type Fixed32RepeatedType = ::std::vec::Vec<u32>;
+        type Fixed64UnlabeledType = ::puroro::internal::Bare<u64>;
+        type Fixed64OptionalType = ::puroro::internal::Bare<u64>;
+        type Fixed64RepeatedType = ::std::vec::Vec<u64>;
+        type Sfixed32UnlabeledType = ::puroro::internal::Bare<i32>;
+        type Sfixed32OptionalType = ::puroro::internal::Bare<i32>;
+        type Sfixed32RepeatedType = ::std::vec::Vec<i32>;
+        type Sfixed64UnlabeledType = ::puroro::internal::Bare<i64>;
+        type Sfixed64OptionalType = ::puroro::internal::Bare<i64>;
+        type Sfixed64RepeatedType = ::std::vec::Vec<i64>;
+        type F64UnlabeledType = ::puroro::internal::Bare<f64>;
+        type F64OptionalType = ::puroro::internal::Bare<f64>;
+        type F64RepeatedType = ::std::vec::Vec<f64>;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -18395,6 +18449,13 @@ pub mod _puroro_nested {
                 type I32UnlabeledType;
                 type I32OptionalType;
                 type I64UnlabeledType;
+            }
+
+            impl SubmsgTemplateFieldTypes for ::puroro::SimpleImpl {
+                type Alloc = ();
+                type I32UnlabeledType = ::puroro::internal::Bare<i32>;
+                type I32OptionalType = ::puroro::internal::Bare<i32>;
+                type I64UnlabeledType = ::puroro::internal::Bare<i64>;
             }
         }
         pub use _puroro_traits::*;

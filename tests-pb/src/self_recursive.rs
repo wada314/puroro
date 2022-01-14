@@ -454,6 +454,13 @@ pub mod _puroro_internal {
         type Alloc;
         type RecursiveUnlabeledType;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type RecursiveUnlabeledType = ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_simple_impl::Msg>,
+        >;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

@@ -1524,17 +1524,39 @@ pub mod _puroro_internal {
         type Alloc;
         type AType;
     }
+
+    impl Test1TemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type AType = ::puroro::internal::Bare<i32>;
+    }
     pub trait Test2TemplateFieldTypes {
         type Alloc;
         type BType;
+    }
+
+    impl Test2TemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type BType = ::puroro::internal::Bare<::std::string::String>;
     }
     pub trait Test3TemplateFieldTypes {
         type Alloc;
         type CType;
     }
+
+    impl Test3TemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type CType = ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_simple_impl::Test1>,
+        >;
+    }
     pub trait Test4TemplateFieldTypes {
         type Alloc;
         type DType;
+    }
+
+    impl Test4TemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type DType = ::std::vec::Vec<i32>;
     }
 }
 pub use _puroro_traits::*;

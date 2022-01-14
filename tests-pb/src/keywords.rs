@@ -397,6 +397,11 @@ pub mod _puroro_internal {
         type Alloc;
         type TypeType;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type TypeType = ::puroro::internal::Bare<i32>;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

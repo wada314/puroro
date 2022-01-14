@@ -1825,9 +1825,26 @@ pub mod _puroro_internal {
         type StringUnlabeledType;
         type SubmsgUnlabeledType;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type I32UnlabeledType = ::puroro::internal::Bare<i32>;
+        type I32OptionalType = ::puroro::internal::Bare<i32>;
+        type I32RepeatedType = ::std::vec::Vec<i32>;
+        type F32UnlabeledType = ::puroro::internal::Bare<f32>;
+        type StringUnlabeledType = ::puroro::internal::Bare<::std::string::String>;
+        type SubmsgUnlabeledType = ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
+        >;
+    }
     pub trait SubmsgTemplateFieldTypes {
         type Alloc;
         type I32UnlabeledType;
+    }
+
+    impl SubmsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type I32UnlabeledType = ::puroro::internal::Bare<i32>;
     }
 }
 pub use _puroro_traits::*;

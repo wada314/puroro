@@ -1895,9 +1895,18 @@ pub mod _puroro_internal {
     pub trait MsgTemplateFieldTypes {
         type Alloc;
     }
+
+    impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+    }
     pub trait SubmsgTemplateFieldTypes {
         type Alloc;
         type I32UnlabeledType;
+    }
+
+    impl SubmsgTemplateFieldTypes for ::puroro::SimpleImpl {
+        type Alloc = ();
+        type I32UnlabeledType = ::puroro::internal::Bare<i32>;
     }
 }
 pub use _puroro_traits::*;
