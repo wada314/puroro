@@ -532,6 +532,25 @@ pub mod _puroro_impls {
         title: <T as BookTemplateFieldTypes>::TitleType,
         num_pages: <T as BookTemplateFieldTypes>::NumPagesType,
     }
+    impl<T, B> BookTemplate<T, B>
+    where
+        T: BookTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn title(&self) -> &T::TitleType {
+            &self.title
+        }
+    }
+    impl<T, B> BookTemplate<T, B>
+    where
+        T: BookTemplateFieldTypes,
+        <T as BookTemplateFieldTypes>::NumPagesType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn num_pages(&self) -> T::NumPagesType {
+            ::std::clone::Clone::clone(&self.num_pages)
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

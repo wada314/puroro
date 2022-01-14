@@ -1491,6 +1491,63 @@ pub mod _puroro_impls {
         string_unlabeled: <T as MsgTemplateFieldTypes>::StringUnlabeledType,
         submsg_unlabeled: <T as MsgTemplateFieldTypes>::SubmsgUnlabeledType,
     }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_optional(&self) -> T::I32OptionalType {
+            ::std::clone::Clone::clone(&self.i32_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_unlabeled(&self) -> T::F32UnlabeledType {
+            ::std::clone::Clone::clone(&self.f32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_unlabeled(&self) -> &T::StringUnlabeledType {
+            &self.string_unlabeled
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_unlabeled(&self) -> &T::SubmsgUnlabeledType {
+            &self.submsg_unlabeled
+        }
+    }
 
     pub struct SubmsgSingleField1<ScalarType>
     where
@@ -1713,6 +1770,16 @@ pub mod _puroro_impls {
         _bitvec: B,
         _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
         i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
+    }
+    impl<T, B> SubmsgTemplate<T, B>
+    where
+        T: SubmsgTemplateFieldTypes,
+        <T as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
+        }
     }
 }
 pub use _puroro_traits::*;

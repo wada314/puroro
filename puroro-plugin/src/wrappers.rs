@@ -958,6 +958,27 @@ impl Field {
             _ => "".into(),
         })
     }
+
+    pub fn template_type_name(&self) -> Result<Cow<'static, str>> {
+        Ok(format!("{}Type", self.ident_camel_unesc()).into())
+    }
+
+    pub fn template_getter_type(&self, types_trait: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        let field_type = format!("{types_trait}::{}", self.template_type_name()?);
+
+        Ok(match self.field_type()?.categories()? {
+            LengthDelimited(_) => format!("&{field_type}").into(),
+            Trivial(_) => {
+                if self.is_repeated()? {
+                    format!("&{field_type}").into()
+                } else {
+                    field_type.into()
+                }
+            }
+        })
+    }
 }
 
 #[derive(Debug)]

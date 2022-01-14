@@ -2775,6 +2775,109 @@ pub mod _puroro_impls {
         enum_repeated: <T as MsgTemplateFieldTypes>::EnumRepeatedType,
         very_large_field_number: <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType,
     }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_optional(&self) -> T::I32OptionalType {
+            ::std::clone::Clone::clone(&self.i32_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::FloatOptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_optional(&self) -> T::FloatOptionalType {
+            ::std::clone::Clone::clone(&self.float_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_repeated(&self) -> &T::FloatRepeatedType {
+            &self.float_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_optional(&self) -> &T::StringOptionalType {
+            &self.string_optional
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_repeated(&self) -> &T::StringRepeatedType {
+            &self.string_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_optional(&self) -> &T::SubmsgOptionalType {
+            &self.submsg_optional
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_repeated(&self) -> &T::SubmsgRepeatedType {
+            &self.submsg_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumOptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_optional(&self) -> T::EnumOptionalType {
+            ::std::clone::Clone::clone(&self.enum_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_repeated(&self) -> &T::EnumRepeatedType {
+            &self.enum_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn very_large_field_number(&self) -> T::VeryLargeFieldNumberType {
+            ::std::clone::Clone::clone(&self.very_large_field_number)
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -3830,6 +3933,16 @@ pub mod _puroro_nested {
                 _bitvec: B,
                 _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
                 i32_optional: <T as SubmsgTemplateFieldTypes>::I32OptionalType,
+            }
+            impl<T, B> SubmsgTemplate<T, B>
+            where
+                T: SubmsgTemplateFieldTypes,
+                <T as SubmsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+                B: ::puroro::internal::BitVec,
+            {
+                pub fn i32_optional(&self) -> T::I32OptionalType {
+                    ::std::clone::Clone::clone(&self.i32_optional)
+                }
             }
         }
         pub use _puroro_traits::*;

@@ -1621,12 +1621,6 @@ pub mod _puroro_impls {
     }
     pub trait MsgTemplateFieldTypes {
         type Alloc;
-        type G1Int32Type;
-        type G1StringType;
-        type G2F32Type;
-        type G2StringType;
-        type G2SubmsgType;
-        type G3Int32Type;
     }
 
     pub struct MsgTemplate<T, B>
@@ -1635,12 +1629,6 @@ pub mod _puroro_impls {
     {
         _bitvec: B,
         _alloc: <T as MsgTemplateFieldTypes>::Alloc,
-        g1_int32: <T as MsgTemplateFieldTypes>::G1Int32Type,
-        g1_string: <T as MsgTemplateFieldTypes>::G1StringType,
-        g2_f32: <T as MsgTemplateFieldTypes>::G2F32Type,
-        g2_string: <T as MsgTemplateFieldTypes>::G2StringType,
-        g2_submsg: <T as MsgTemplateFieldTypes>::G2SubmsgType,
-        g3_int32: <T as MsgTemplateFieldTypes>::G3Int32Type,
     }
 
     pub struct SubmsgSingleField1<ScalarType>
@@ -1864,6 +1852,16 @@ pub mod _puroro_impls {
         _bitvec: B,
         _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
         i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
+    }
+    impl<T, B> SubmsgTemplate<T, B>
+    where
+        T: SubmsgTemplateFieldTypes,
+        <T as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
+        }
     }
 }
 pub use _puroro_traits::*;

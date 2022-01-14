@@ -2747,6 +2747,109 @@ pub mod _puroro_impls {
         enum_repeated: <T as MsgTemplateFieldTypes>::EnumRepeatedType,
         very_large_field_number: <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType,
     }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::FloatUnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_unlabeled(&self) -> T::FloatUnlabeledType {
+            ::std::clone::Clone::clone(&self.float_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_repeated(&self) -> &T::FloatRepeatedType {
+            &self.float_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_unlabeled(&self) -> &T::StringUnlabeledType {
+            &self.string_unlabeled
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_repeated(&self) -> &T::StringRepeatedType {
+            &self.string_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_unlabeled(&self) -> &T::SubmsgUnlabeledType {
+            &self.submsg_unlabeled
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_repeated(&self) -> &T::SubmsgRepeatedType {
+            &self.submsg_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumUnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_unlabeled(&self) -> T::EnumUnlabeledType {
+            ::std::clone::Clone::clone(&self.enum_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_repeated(&self) -> &T::EnumRepeatedType {
+            &self.enum_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn very_large_field_number(&self) -> T::VeryLargeFieldNumberType {
+            ::std::clone::Clone::clone(&self.very_large_field_number)
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -3798,6 +3901,16 @@ pub mod _puroro_nested {
                 _bitvec: B,
                 _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
                 i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
+            }
+            impl<T, B> SubmsgTemplate<T, B>
+            where
+                T: SubmsgTemplateFieldTypes,
+                <T as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+                B: ::puroro::internal::BitVec,
+            {
+                pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+                    ::std::clone::Clone::clone(&self.i32_unlabeled)
+                }
             }
         }
         pub use _puroro_traits::*;

@@ -14947,6 +14947,464 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         f64_optional: <T as MsgTemplateFieldTypes>::F64OptionalType,
         f64_repeated: <T as MsgTemplateFieldTypes>::F64RepeatedType,
     }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_optional(&self) -> T::I32OptionalType {
+            ::std::clone::Clone::clone(&self.i32_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::FloatUnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_unlabeled(&self) -> T::FloatUnlabeledType {
+            ::std::clone::Clone::clone(&self.float_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::FloatOptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_optional(&self) -> T::FloatOptionalType {
+            ::std::clone::Clone::clone(&self.float_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_repeated(&self) -> &T::FloatRepeatedType {
+            &self.float_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_unlabeled(&self) -> &T::BytesUnlabeledType {
+            &self.bytes_unlabeled
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_optional(&self) -> &T::BytesOptionalType {
+            &self.bytes_optional
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_repeated(&self) -> &T::BytesRepeatedType {
+            &self.bytes_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_unlabeled(&self) -> &T::StringUnlabeledType {
+            &self.string_unlabeled
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_optional(&self) -> &T::StringOptionalType {
+            &self.string_optional
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_repeated(&self) -> &T::StringRepeatedType {
+            &self.string_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumUnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_unlabeled(&self) -> T::EnumUnlabeledType {
+            ::std::clone::Clone::clone(&self.enum_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumOptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_optional(&self) -> T::EnumOptionalType {
+            ::std::clone::Clone::clone(&self.enum_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_repeated(&self) -> &T::EnumRepeatedType {
+            &self.enum_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_unlabeled(&self) -> &T::SubmsgUnlabeledType {
+            &self.submsg_unlabeled
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_optional(&self) -> &T::SubmsgOptionalType {
+            &self.submsg_optional
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_repeated(&self) -> &T::SubmsgRepeatedType {
+            &self.submsg_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I64UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_unlabeled(&self) -> T::I64UnlabeledType {
+            ::std::clone::Clone::clone(&self.i64_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I64OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_optional(&self) -> T::I64OptionalType {
+            ::std::clone::Clone::clone(&self.i64_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_repeated(&self) -> &T::I64RepeatedType {
+            &self.i64_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_unlabeled(&self) -> T::U32UnlabeledType {
+            ::std::clone::Clone::clone(&self.u32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U32OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_optional(&self) -> T::U32OptionalType {
+            ::std::clone::Clone::clone(&self.u32_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_repeated(&self) -> &T::U32RepeatedType {
+            &self.u32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U64UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_unlabeled(&self) -> T::U64UnlabeledType {
+            ::std::clone::Clone::clone(&self.u64_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U64OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_optional(&self) -> T::U64OptionalType {
+            ::std::clone::Clone::clone(&self.u64_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_repeated(&self) -> &T::U64RepeatedType {
+            &self.u64_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::S32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn s32_unlabeled(&self) -> T::S32UnlabeledType {
+            ::std::clone::Clone::clone(&self.s32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::S32OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn s32_optional(&self) -> T::S32OptionalType {
+            ::std::clone::Clone::clone(&self.s32_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn s32_repeated(&self) -> &T::S32RepeatedType {
+            &self.s32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::S64UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn s64_unlabeled(&self) -> T::S64UnlabeledType {
+            ::std::clone::Clone::clone(&self.s64_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::S64OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn s64_optional(&self) -> T::S64OptionalType {
+            ::std::clone::Clone::clone(&self.s64_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn s64_repeated(&self) -> &T::S64RepeatedType {
+            &self.s64_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Fixed32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed32_unlabeled(&self) -> T::Fixed32UnlabeledType {
+            ::std::clone::Clone::clone(&self.fixed32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Fixed32OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed32_optional(&self) -> T::Fixed32OptionalType {
+            ::std::clone::Clone::clone(&self.fixed32_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed32_repeated(&self) -> &T::Fixed32RepeatedType {
+            &self.fixed32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Fixed64UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed64_unlabeled(&self) -> T::Fixed64UnlabeledType {
+            ::std::clone::Clone::clone(&self.fixed64_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Fixed64OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed64_optional(&self) -> T::Fixed64OptionalType {
+            ::std::clone::Clone::clone(&self.fixed64_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed64_repeated(&self) -> &T::Fixed64RepeatedType {
+            &self.fixed64_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Sfixed32UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed32_unlabeled(&self) -> T::Sfixed32UnlabeledType {
+            ::std::clone::Clone::clone(&self.sfixed32_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Sfixed32OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed32_optional(&self) -> T::Sfixed32OptionalType {
+            ::std::clone::Clone::clone(&self.sfixed32_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed32_repeated(&self) -> &T::Sfixed32RepeatedType {
+            &self.sfixed32_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Sfixed64UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed64_unlabeled(&self) -> T::Sfixed64UnlabeledType {
+            ::std::clone::Clone::clone(&self.sfixed64_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::Sfixed64OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed64_optional(&self) -> T::Sfixed64OptionalType {
+            ::std::clone::Clone::clone(&self.sfixed64_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed64_repeated(&self) -> &T::Sfixed64RepeatedType {
+            &self.sfixed64_repeated
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F64UnlabeledType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f64_unlabeled(&self) -> T::F64UnlabeledType {
+            ::std::clone::Clone::clone(&self.f64_unlabeled)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F64OptionalType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f64_optional(&self) -> T::F64OptionalType {
+            ::std::clone::Clone::clone(&self.f64_optional)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f64_repeated(&self) -> &T::F64RepeatedType {
+            &self.f64_repeated
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -17833,6 +18291,36 @@ pub mod _puroro_nested {
                 i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
                 i32_optional: <T as SubmsgTemplateFieldTypes>::I32OptionalType,
                 i64_unlabeled: <T as SubmsgTemplateFieldTypes>::I64UnlabeledType,
+            }
+            impl<T, B> SubmsgTemplate<T, B>
+            where
+                T: SubmsgTemplateFieldTypes,
+                <T as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+                B: ::puroro::internal::BitVec,
+            {
+                pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+                    ::std::clone::Clone::clone(&self.i32_unlabeled)
+                }
+            }
+            impl<T, B> SubmsgTemplate<T, B>
+            where
+                T: SubmsgTemplateFieldTypes,
+                <T as SubmsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+                B: ::puroro::internal::BitVec,
+            {
+                pub fn i32_optional(&self) -> T::I32OptionalType {
+                    ::std::clone::Clone::clone(&self.i32_optional)
+                }
+            }
+            impl<T, B> SubmsgTemplate<T, B>
+            where
+                T: SubmsgTemplateFieldTypes,
+                <T as SubmsgTemplateFieldTypes>::I64UnlabeledType: ::std::clone::Clone,
+                B: ::puroro::internal::BitVec,
+            {
+                pub fn i64_unlabeled(&self) -> T::I64UnlabeledType {
+                    ::std::clone::Clone::clone(&self.i64_unlabeled)
+                }
             }
         }
         pub use _puroro_traits::*;

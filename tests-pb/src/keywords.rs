@@ -365,6 +365,16 @@ pub mod _puroro_impls {
         _alloc: <T as MsgTemplateFieldTypes>::Alloc,
         r#type: <T as MsgTemplateFieldTypes>::TypeType,
     }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::TypeType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn r#type(&self) -> T::TypeType {
+            ::std::clone::Clone::clone(&self.r#type)
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

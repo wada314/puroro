@@ -11165,6 +11165,612 @@ pub mod _puroro_impls {
         enum_one: <T as MsgTemplateFieldTypes>::EnumOneType,
         enum_fourty_two: <T as MsgTemplateFieldTypes>::EnumFourtyTwoType,
     }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32DefaultType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_default(&self) -> T::I32DefaultType {
+            ::std::clone::Clone::clone(&self.i32_default)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I320Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_0(&self) -> T::I320Type {
+            ::std::clone::Clone::clone(&self.i32_0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I3242Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_42(&self) -> T::I3242Type {
+            ::std::clone::Clone::clone(&self.i32_42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32M42Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_m42(&self) -> T::I32M42Type {
+            ::std::clone::Clone::clone(&self.i32_m42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I322147483647Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_2147483647(&self) -> T::I322147483647Type {
+            ::std::clone::Clone::clone(&self.i32_2147483647)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I32M2147483648Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_m2147483648(&self) -> T::I32M2147483648Type {
+            ::std::clone::Clone::clone(&self.i32_m2147483648)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I320123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_0123(&self) -> T::I320123Type {
+            ::std::clone::Clone::clone(&self.i32_0123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I320x123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_0x123(&self) -> T::I320x123Type {
+            ::std::clone::Clone::clone(&self.i32_0x123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U32DefaultType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_default(&self) -> T::U32DefaultType {
+            ::std::clone::Clone::clone(&self.u32_default)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U320Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_0(&self) -> T::U320Type {
+            ::std::clone::Clone::clone(&self.u32_0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U3242Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_42(&self) -> T::U3242Type {
+            ::std::clone::Clone::clone(&self.u32_42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U324294967295Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_4294967295(&self) -> T::U324294967295Type {
+            ::std::clone::Clone::clone(&self.u32_4294967295)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U320123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_0123(&self) -> T::U320123Type {
+            ::std::clone::Clone::clone(&self.u32_0123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U320x123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_0x123(&self) -> T::U320x123Type {
+            ::std::clone::Clone::clone(&self.u32_0x123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I64DefaultType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_default(&self) -> T::I64DefaultType {
+            ::std::clone::Clone::clone(&self.i64_default)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I640Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_0(&self) -> T::I640Type {
+            ::std::clone::Clone::clone(&self.i64_0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I6442Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_42(&self) -> T::I6442Type {
+            ::std::clone::Clone::clone(&self.i64_42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I64M42Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_m42(&self) -> T::I64M42Type {
+            ::std::clone::Clone::clone(&self.i64_m42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I649223372036854775807Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_9223372036854775807(&self) -> T::I649223372036854775807Type {
+            ::std::clone::Clone::clone(&self.i64_9223372036854775807)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I64M9223372036854775808Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_m9223372036854775808(&self) -> T::I64M9223372036854775808Type {
+            ::std::clone::Clone::clone(&self.i64_m9223372036854775808)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I640123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_0123(&self) -> T::I640123Type {
+            ::std::clone::Clone::clone(&self.i64_0123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::I640x123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_0x123(&self) -> T::I640x123Type {
+            ::std::clone::Clone::clone(&self.i64_0x123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U64DefaultType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_default(&self) -> T::U64DefaultType {
+            ::std::clone::Clone::clone(&self.u64_default)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U640Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_0(&self) -> T::U640Type {
+            ::std::clone::Clone::clone(&self.u64_0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U6442Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_42(&self) -> T::U6442Type {
+            ::std::clone::Clone::clone(&self.u64_42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U6418446744073709551615Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_18446744073709551615(&self) -> T::U6418446744073709551615Type {
+            ::std::clone::Clone::clone(&self.u64_18446744073709551615)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U640123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_0123(&self) -> T::U640123Type {
+            ::std::clone::Clone::clone(&self.u64_0123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::U640x123Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_0x123(&self) -> T::U640x123Type {
+            ::std::clone::Clone::clone(&self.u64_0x123)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32DefaultType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_default(&self) -> T::F32DefaultType {
+            ::std::clone::Clone::clone(&self.f32_default)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F320Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_0(&self) -> T::F320Type {
+            ::std::clone::Clone::clone(&self.f32_0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32M0Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_m0(&self) -> T::F32M0Type {
+            ::std::clone::Clone::clone(&self.f32_m0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F320pType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_0p(&self) -> T::F320pType {
+            ::std::clone::Clone::clone(&self.f32_0p)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32P0Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_p0(&self) -> T::F32P0Type {
+            ::std::clone::Clone::clone(&self.f32_p0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F320p0Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_0p0(&self) -> T::F320p0Type {
+            ::std::clone::Clone::clone(&self.f32_0p0)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F3242Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_42(&self) -> T::F3242Type {
+            ::std::clone::Clone::clone(&self.f32_42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32M42Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_m42(&self) -> T::F32M42Type {
+            ::std::clone::Clone::clone(&self.f32_m42)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F320p25Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_0p25(&self) -> T::F320p25Type {
+            ::std::clone::Clone::clone(&self.f32_0p25)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F321p5e2Type: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_1p5e2(&self) -> T::F321p5e2Type {
+            ::std::clone::Clone::clone(&self.f32_1p5e2)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32InfType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_inf(&self) -> T::F32InfType {
+            ::std::clone::Clone::clone(&self.f32_inf)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32MinfType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_minf(&self) -> T::F32MinfType {
+            ::std::clone::Clone::clone(&self.f32_minf)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32NanType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_nan(&self) -> T::F32NanType {
+            ::std::clone::Clone::clone(&self.f32_nan)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::F32MnanType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f32_mnan(&self) -> T::F32MnanType {
+            ::std::clone::Clone::clone(&self.f32_mnan)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::BoolDefaultType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bool_default(&self) -> T::BoolDefaultType {
+            ::std::clone::Clone::clone(&self.bool_default)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::BoolTrueType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bool_true(&self) -> T::BoolTrueType {
+            ::std::clone::Clone::clone(&self.bool_true)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::BoolFalseType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bool_false(&self) -> T::BoolFalseType {
+            ::std::clone::Clone::clone(&self.bool_false)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_default(&self) -> &T::StringDefaultType {
+            &self.string_default
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_empty(&self) -> &T::StringEmptyType {
+            &self.string_empty
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_abc(&self) -> &T::StringAbcType {
+            &self.string_abc
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_aiu(&self) -> &T::StringAiuType {
+            &self.string_aiu
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_backslash(&self) -> &T::StringBackslashType {
+            &self.string_backslash
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_tab(&self) -> &T::StringTabType {
+            &self.string_tab
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_crlf(&self) -> &T::StringCrlfType {
+            &self.string_crlf
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_default(&self) -> &T::BytesDefaultType {
+            &self.bytes_default
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_empty(&self) -> &T::BytesEmptyType {
+            &self.bytes_empty
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_abc(&self) -> &T::BytesAbcType {
+            &self.bytes_abc
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_aiu(&self) -> &T::BytesAiuType {
+            &self.bytes_aiu
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_backslash(&self) -> &T::BytesBackslashType {
+            &self.bytes_backslash
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_tab(&self) -> &T::BytesTabType {
+            &self.bytes_tab
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn bytes_crlf(&self) -> &T::BytesCrlfType {
+            &self.bytes_crlf
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumDefaultType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_default(&self) -> T::EnumDefaultType {
+            ::std::clone::Clone::clone(&self.enum_default)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumOneType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_one(&self) -> T::EnumOneType {
+            ::std::clone::Clone::clone(&self.enum_one)
+        }
+    }
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumFourtyTwoType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_fourty_two(&self) -> T::EnumFourtyTwoType {
+            ::std::clone::Clone::clone(&self.enum_fourty_two)
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

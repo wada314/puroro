@@ -727,6 +727,16 @@ pub mod _puroro_impls {
         _alloc: <T as Test1TemplateFieldTypes>::Alloc,
         a: <T as Test1TemplateFieldTypes>::AType,
     }
+    impl<T, B> Test1Template<T, B>
+    where
+        T: Test1TemplateFieldTypes,
+        <T as Test1TemplateFieldTypes>::AType: ::std::clone::Clone,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn a(&self) -> T::AType {
+            ::std::clone::Clone::clone(&self.a)
+        }
+    }
 
     pub struct Test2SingleField2<ScalarType>
     where
@@ -943,6 +953,15 @@ pub mod _puroro_impls {
         _bitvec: B,
         _alloc: <T as Test2TemplateFieldTypes>::Alloc,
         b: <T as Test2TemplateFieldTypes>::BType,
+    }
+    impl<T, B> Test2Template<T, B>
+    where
+        T: Test2TemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn b(&self) -> &T::BType {
+            &self.b
+        }
     }
 
     pub struct Test3SingleField3<ScalarType>
@@ -1196,6 +1215,15 @@ pub mod _puroro_impls {
         _alloc: <T as Test3TemplateFieldTypes>::Alloc,
         c: <T as Test3TemplateFieldTypes>::CType,
     }
+    impl<T, B> Test3Template<T, B>
+    where
+        T: Test3TemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn c(&self) -> &T::CType {
+            &self.c
+        }
+    }
 
     pub struct Test4SingleField4<ScalarType, RepeatedType>
     where
@@ -1425,6 +1453,15 @@ pub mod _puroro_impls {
         _bitvec: B,
         _alloc: <T as Test4TemplateFieldTypes>::Alloc,
         d: <T as Test4TemplateFieldTypes>::DType,
+    }
+    impl<T, B> Test4Template<T, B>
+    where
+        T: Test4TemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn d(&self) -> &T::DType {
+            &self.d
+        }
     }
 }
 pub use _puroro_traits::*;

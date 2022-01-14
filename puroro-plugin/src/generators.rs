@@ -78,7 +78,7 @@ struct Message {
     bumpalo_owned_ident: String,
     builder_ident: String,
     template_ident: String,
-    template_field_types_ident: String,
+    template_field_types_trait: String,
 }
 
 impl Message {
@@ -123,7 +123,7 @@ impl Message {
             bumpalo_owned_ident: m.rust_impl_ident("BumpaloOwned"),
             builder_ident: m.rust_impl_ident("Builder"),
             template_ident: m.rust_impl_ident("Template"),
-            template_field_types_ident: m.rust_impl_ident("TemplateFieldTypes"),
+            template_field_types_trait: m.rust_impl_ident("TemplateFieldTypes"),
         })
     }
 }
@@ -216,6 +216,7 @@ struct Field {
     bumpalo_field_message_path: String,
     bumpalo_label_and_type_tags: String,
     template_type_name: String,
+    template_getter_type: String,
 }
 
 impl Field {
@@ -364,7 +365,8 @@ impl Field {
                     },
                 )
             })?,
-            template_type_name: format!("{}Type", f.ident_camel_unesc()),
+            template_type_name: f.template_type_name()?.to_string(),
+            template_getter_type: f.template_getter_type("T")?.to_string(),
         })
     }
 
