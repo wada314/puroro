@@ -517,12 +517,6 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait BookTemplateFieldTypes {
-        type Alloc;
-        type TitleType;
-        type NumPagesType;
-    }
-
     pub struct BookTemplate<T, B>
     where
         T: BookTemplateFieldTypes,
@@ -581,6 +575,12 @@ pub mod _puroro_traits {
         fn num_pages_opt<'this>(&'this self) -> ::std::option::Option<u32> {
             ::std::option::Option::None
         }
+    }
+
+    pub trait BookTemplateFieldTypes {
+        type Alloc;
+        type TitleType;
+        type NumPagesType;
     }
 
     macro_rules! book_delegate {
