@@ -90,12 +90,16 @@ impl<T> DerefMut for BumpaloOwned<T> {
 impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
 
 // メモ
-#[cfg(test)]
 mod test {
     trait PersonParamsTuple {
         type NameType;
         type AgeType;
         type ChildrenType;
+    }
+    impl PersonParamsTuple for () {
+        type NameType = ();
+        type AgeType = ();
+        type ChildrenType = ();
     }
     impl<NameType, AgeType, ChildrenType> PersonParamsTuple for (NameType, AgeType, ChildrenType) {
         type NameType = NameType;
@@ -106,5 +110,34 @@ mod test {
         name: <T as PersonParamsTuple>::NameType,
         age: <T as PersonParamsTuple>::AgeType,
         children: <T as PersonParamsTuple>::ChildrenType,
+    }
+    impl<T: PersonParamsTuple<AgeType=u32>> Person<T> {
+        fn age(&self) -> u32 {
+            self.age
+        }
+    }
+
+    macro_rules! derive_person_params {
+        ($base:ty, $new_param_type:ty, $new_param_ident:ident) => {
+            derive_person_params!(@typedecl $base, NameType, $new_param_type, $new_param_ident);
+            derive_person_params!(@typedecl $base, AgeType, $new_param_type, $new_param_ident);
+            derive_person_params!(@typedecl $base, ChildrenType, $new_param_type, $new_param_ident);
+        };
+        (@typedecl $base:ty, NameType, $new_param_type:ty, NameType) => {
+            type NameType = $new_param_type;
+        };
+        (@typedecl $base:ty, $ident:ident, $new_param_type:ty, $new_param_ident:ident) => {
+            type $ident = <$base as PersonParamsTuple>::$ident;
+        };
+    }
+    struct Person_NameType<NameType>(NameType);
+    impl<NameType> PersonParamsTuple for Person_NameType<NameType> {
+        derive_person_params!((), NameType, NameType);
+    }
+
+    #[test]
+    fn test() {
+        let pn = Person_NameType::<&str>("hoge");
+        assert_eq!(8, std::mem::size_of_val(&pn));
     }
 }
