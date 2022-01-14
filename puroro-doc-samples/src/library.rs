@@ -527,25 +527,45 @@ pub mod _puroro_impls {
         title: <T as BookTemplateFieldTypes>::TitleType,
         num_pages: <T as BookTemplateFieldTypes>::NumPagesType,
     }
+
     impl<T, B> BookTemplate<T, B>
     where
         T: BookTemplateFieldTypes,
-        <T as BookTemplateFieldTypes>::TitleType: ::std::convert::AsRef<str>,
         B: ::puroro::internal::BitVec,
+        <T as BookTemplateFieldTypes>::TitleType: ::std::convert::AsRef<str>,
     {
         pub fn title(&self) -> impl '_ + ::std::convert::AsRef<str> {
             &self.title
         }
     }
+
     impl<T, B> BookTemplate<T, B>
     where
         T: BookTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as BookTemplateFieldTypes>::NumPagesType:
             ::std::clone::Clone + ::std::convert::Into<u32>,
-        B: ::puroro::internal::BitVec,
     {
         pub fn num_pages(&self) -> u32 {
             ::std::convert::Into::<u32>::into(::std::clone::Clone::clone(&self.num_pages))
+        }
+    }
+
+    impl<T, B> ::std::default::Default for BookTemplate<T, B>
+    where
+        B: ::std::default::Default,
+        T: BookTemplateFieldTypes,
+        <T as BookTemplateFieldTypes>::Alloc: ::std::default::Default,
+        <T as BookTemplateFieldTypes>::TitleType: ::std::default::Default,
+        <T as BookTemplateFieldTypes>::NumPagesType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _alloc: ::std::default::Default::default(),
+                _bitvec: ::std::default::Default::default(),
+                title: ::std::default::Default::default(),
+                num_pages: ::std::default::Default::default(),
+            }
         }
     }
 }

@@ -15,10 +15,12 @@ pub struct {{ m.template_ident }}<T, B>
 {%- if f.is_repeated %}
 {%- else %} {#- if f.is_repeated #}
 
+{#################- Scalar field getters ################-#}
 {%- if !f.is_explicit_oneof_field %}
 impl<T, B> {{ m.template_ident }}<T, B>
 where
     T: {{ m.template_field_types_trait }},
+    B: ::puroro::internal::BitVec,
 {%- if f.is_length_delimited %}
 {%- if f.is_string %}
     <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}:
@@ -32,7 +34,6 @@ where
     <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}:
         ::std::clone::Clone + ::std::convert::Into<{{ f.numeric_type_name }}>,
 {%- endif %} {#- if f.is_length_delimited #}
-    B: ::puroro::internal::BitVec,
 {
     pub fn {{ f.ident }}(&self) -> {{ f.template_getter_type }} {
         {%- if f.is_length_delimited %}
@@ -49,3 +50,27 @@ where
 
 {%- endfor %} {#- for f in m.fields #}
 
+{#################- std trait impls ################-#}
+impl<T, B> ::std::default::Default for {{ m.template_ident }}<T, B>
+where
+    B: ::std::default::Default,
+    T: {{ m.template_field_types_trait }},
+    <T as {{ m.template_field_types_trait }}>::Alloc: ::std::default::Default,
+    {%- for f in m.fields %}
+    {%- if !f.is_explicit_oneof_field %}
+    <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}: ::std::default::Default,
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
+    {%- endfor %} {#- for f in m.fields #}
+{
+    fn default() -> Self {
+        Self {
+            _alloc: ::std::default::Default::default(),
+            _bitvec: ::std::default::Default::default(),
+            {%- for f in m.fields %}
+            {%- if !f.is_explicit_oneof_field %}
+            {{ f.ident }}: ::std::default::Default::default(),
+            {%- endif %} {#- if !f.is_explicit_oneof_field #}
+            {%- endfor %} {#- for f in m.fields #}
+        }
+    }
+}
