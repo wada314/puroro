@@ -969,12 +969,25 @@ impl Field {
         let field_type = format!("{types_trait}::{}", self.template_type_name()?);
 
         Ok(match self.field_type()?.categories()? {
-            LengthDelimited(_) => format!("&{field_type}").into(),
-            Trivial(_) => {
+            LengthDelimited(field_type @ String) | LengthDelimited(field_type @ Bytes) => {
+                let scalar_type = match field_type {
+                    String => "impl '_ + ::std::convert::AsRef<str>",
+                    Bytes => "impl '_ + ::std::convert::AsRef<[u8]>",
+                    _ => unreachable!(),
+                };
                 if self.is_repeated()? {
-                    format!("&{field_type}").into()
+                    format!("::std::iter::IntoIterator<Item={scalar_type}>").into()
                 } else {
-                    field_type.into()
+                    scalar_type.into()
+                }
+            }
+            LengthDelimited(Message(_)) => format!("&{field_type}").into(),
+            Trivial(field_type) => {
+                let scalar_type = field_type.rust_type_name()?;
+                if self.is_repeated()? {
+                    format!("&{scalar_type}").into()
+                } else {
+                    scalar_type.into()
                 }
             }
         })

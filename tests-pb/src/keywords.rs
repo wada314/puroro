@@ -364,11 +364,11 @@ pub mod _puroro_impls {
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::TypeType: ::std::clone::Clone,
+        <T as MsgTemplateFieldTypes>::TypeType: ::std::clone::Clone + ::std::convert::Into<i32>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn r#type(&self) -> T::TypeType {
-            ::std::clone::Clone::clone(&self.r#type)
+        pub fn r#type(&self) -> i32 {
+            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.r#type))
         }
     }
 }

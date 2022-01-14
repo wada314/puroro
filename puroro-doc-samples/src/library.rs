@@ -530,20 +530,22 @@ pub mod _puroro_impls {
     impl<T, B> BookTemplate<T, B>
     where
         T: BookTemplateFieldTypes,
+        <T as BookTemplateFieldTypes>::TitleType: ::std::convert::AsRef<str>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn title(&self) -> &T::TitleType {
+        pub fn title(&self) -> impl '_ + ::std::convert::AsRef<str> {
             &self.title
         }
     }
     impl<T, B> BookTemplate<T, B>
     where
         T: BookTemplateFieldTypes,
-        <T as BookTemplateFieldTypes>::NumPagesType: ::std::clone::Clone,
+        <T as BookTemplateFieldTypes>::NumPagesType:
+            ::std::clone::Clone + ::std::convert::Into<u32>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn num_pages(&self) -> T::NumPagesType {
-            ::std::clone::Clone::clone(&self.num_pages)
+        pub fn num_pages(&self) -> u32 {
+            ::std::convert::Into::<u32>::into(::std::clone::Clone::clone(&self.num_pages))
         }
     }
 }

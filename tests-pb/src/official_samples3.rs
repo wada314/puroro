@@ -726,11 +726,11 @@ pub mod _puroro_impls {
     impl<T, B> Test1Template<T, B>
     where
         T: Test1TemplateFieldTypes,
-        <T as Test1TemplateFieldTypes>::AType: ::std::clone::Clone,
+        <T as Test1TemplateFieldTypes>::AType: ::std::clone::Clone + ::std::convert::Into<i32>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn a(&self) -> T::AType {
-            ::std::clone::Clone::clone(&self.a)
+        pub fn a(&self) -> i32 {
+            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.a))
         }
     }
 
@@ -948,9 +948,10 @@ pub mod _puroro_impls {
     impl<T, B> Test2Template<T, B>
     where
         T: Test2TemplateFieldTypes,
+        <T as Test2TemplateFieldTypes>::BType: ::std::convert::AsRef<str>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn b(&self) -> &T::BType {
+        pub fn b(&self) -> impl '_ + ::std::convert::AsRef<str> {
             &self.b
         }
     }
@@ -1434,15 +1435,6 @@ pub mod _puroro_impls {
         _bitvec: B,
         _alloc: <T as Test4TemplateFieldTypes>::Alloc,
         d: <T as Test4TemplateFieldTypes>::DType,
-    }
-    impl<T, B> Test4Template<T, B>
-    where
-        T: Test4TemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-    {
-        pub fn d(&self) -> &T::DType {
-            &self.d
-        }
     }
 }
 pub mod _puroro_internal {

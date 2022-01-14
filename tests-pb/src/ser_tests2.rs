@@ -2764,57 +2764,33 @@ pub mod _puroro_impls {
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+        <T as MsgTemplateFieldTypes>::I32OptionalType:
+            ::std::clone::Clone + ::std::convert::Into<i32>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn i32_optional(&self) -> T::I32OptionalType {
-            ::std::clone::Clone::clone(&self.i32_optional)
+        pub fn i32_optional(&self) -> i32 {
+            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.i32_optional))
         }
     }
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::FloatOptionalType:
+            ::std::clone::Clone + ::std::convert::Into<f32>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
-            &self.i32_repeated
+        pub fn float_optional(&self) -> f32 {
+            ::std::convert::Into::<f32>::into(::std::clone::Clone::clone(&self.float_optional))
         }
     }
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::FloatOptionalType: ::std::clone::Clone,
+        <T as MsgTemplateFieldTypes>::StringOptionalType: ::std::convert::AsRef<str>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn float_optional(&self) -> T::FloatOptionalType {
-            ::std::clone::Clone::clone(&self.float_optional)
-        }
-    }
-    impl<T, B> MsgTemplate<T, B>
-    where
-        T: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-    {
-        pub fn float_repeated(&self) -> &T::FloatRepeatedType {
-            &self.float_repeated
-        }
-    }
-    impl<T, B> MsgTemplate<T, B>
-    where
-        T: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-    {
-        pub fn string_optional(&self) -> &T::StringOptionalType {
+        pub fn string_optional(&self) -> impl '_ + ::std::convert::AsRef<str> {
             &self.string_optional
-        }
-    }
-    impl<T, B> MsgTemplate<T, B>
-    where
-        T: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-    {
-        pub fn string_repeated(&self) -> &T::StringRepeatedType {
-            &self.string_repeated
         }
     }
     impl<T, B> MsgTemplate<T, B>
@@ -2829,39 +2805,27 @@ pub mod _puroro_impls {
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
+        <T as MsgTemplateFieldTypes>::EnumOptionalType:
+            ::std::clone::Clone + ::std::convert::Into<self::_puroro_root::ser_tests2::Enum>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn submsg_repeated(&self) -> &T::SubmsgRepeatedType {
-            &self.submsg_repeated
+        pub fn enum_optional(&self) -> self::_puroro_root::ser_tests2::Enum {
+            ::std::convert::Into::<self::_puroro_root::ser_tests2::Enum>::into(
+                ::std::clone::Clone::clone(&self.enum_optional),
+            )
         }
     }
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::EnumOptionalType: ::std::clone::Clone,
+        <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType:
+            ::std::clone::Clone + ::std::convert::Into<i32>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn enum_optional(&self) -> T::EnumOptionalType {
-            ::std::clone::Clone::clone(&self.enum_optional)
-        }
-    }
-    impl<T, B> MsgTemplate<T, B>
-    where
-        T: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-    {
-        pub fn enum_repeated(&self) -> &T::EnumRepeatedType {
-            &self.enum_repeated
-        }
-    }
-    impl<T, B> MsgTemplate<T, B>
-    where
-        T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType: ::std::clone::Clone,
-        B: ::puroro::internal::BitVec,
-    {
-        pub fn very_large_field_number(&self) -> T::VeryLargeFieldNumberType {
-            ::std::clone::Clone::clone(&self.very_large_field_number)
+        pub fn very_large_field_number(&self) -> i32 {
+            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(
+                &self.very_large_field_number,
+            ))
         }
     }
 }
@@ -3938,11 +3902,14 @@ pub mod _puroro_nested {
             impl<T, B> SubmsgTemplate<T, B>
             where
                 T: SubmsgTemplateFieldTypes,
-                <T as SubmsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+                <T as SubmsgTemplateFieldTypes>::I32OptionalType:
+                    ::std::clone::Clone + ::std::convert::Into<i32>,
                 B: ::puroro::internal::BitVec,
             {
-                pub fn i32_optional(&self) -> T::I32OptionalType {
-                    ::std::clone::Clone::clone(&self.i32_optional)
+                pub fn i32_optional(&self) -> i32 {
+                    ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(
+                        &self.i32_optional,
+                    ))
                 }
             }
         }

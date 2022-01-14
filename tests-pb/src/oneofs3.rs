@@ -1848,11 +1848,12 @@ pub mod _puroro_impls {
     impl<T, B> SubmsgTemplate<T, B>
     where
         T: SubmsgTemplateFieldTypes,
-        <T as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+        <T as SubmsgTemplateFieldTypes>::I32UnlabeledType:
+            ::std::clone::Clone + ::std::convert::Into<i32>,
         B: ::puroro::internal::BitVec,
     {
-        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
-            ::std::clone::Clone::clone(&self.i32_unlabeled)
+        pub fn i32_unlabeled(&self) -> i32 {
+            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.i32_unlabeled))
         }
     }
 }

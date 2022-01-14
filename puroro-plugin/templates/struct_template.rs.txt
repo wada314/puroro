@@ -19,21 +19,32 @@ pub struct {{ m.template_ident }}<T, B>
 impl<T, B> {{ m.template_ident }}<T, B>
 where
     T: {{ m.template_field_types_trait }},
-{%- if !f.is_length_delimited %}
-    <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}: ::std::clone::Clone,
-{%- endif %} {#- if !f.is_length_delimited #}
+{%- if f.is_length_delimited %}
+{%- if f.is_string %}
+    <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}:
+        ::std::convert::AsRef<str>,
+{%- endif %} {#- if f.is_string #}
+{%- if f.is_bytes %}
+    <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}:
+        ::std::convert::AsRef<[u8]>,
+{%- endif %} {#- if f.is_bytes #}
+{%- else %} {#- if f.is_length_delimited #}
+    <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}:
+        ::std::clone::Clone + ::std::convert::Into<{{ f.numeric_type_name }}>,
+{%- endif %} {#- if f.is_length_delimited #}
     B: ::puroro::internal::BitVec,
 {
     pub fn {{ f.ident }}(&self) -> {{ f.template_getter_type }} {
-        {%- f.is_length_delimited %}
+        {%- if f.is_length_delimited %}
         &self.{{ f.ident }}
-        {%- else %} {#- f.is_length_delimited #}
-        ::std::clone::Clone::clone(&self.{{ f.ident }})
-        {%- endif %} {#- f.is_length_delimited #}
+        {%- else %} {#- if f.is_length_delimited #}
+        ::std::convert::Into::<{{ f.numeric_type_name }}>::into(
+            ::std::clone::Clone::clone(&self.{{ f.ident }})
+        )
+        {%- endif %} {#- if f.is_length_delimited #}
     }
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
-
 {%- endif %} {#- if f.is_repeated #}
 
 {%- endfor %} {#- for f in m.fields #}
