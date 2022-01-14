@@ -517,7 +517,10 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub trait BookTemplateFieldTypes {}
+    pub trait BookTemplateFieldTypes {
+        type TitleType;
+        type NumPagesType;
+    }
 
     pub struct BookTemplate<T, B, A>
     where

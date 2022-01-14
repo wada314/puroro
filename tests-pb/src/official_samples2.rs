@@ -724,7 +724,12 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub struct Test1Template<T, B, A> {
+    pub trait Test1TemplateFieldTypes {}
+
+    pub struct Test1Template<T, B, A>
+    where
+        T: Test1TemplateFieldTypes,
+    {
         phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 
@@ -933,7 +938,12 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub struct Test2Template<T, B, A> {
+    pub trait Test2TemplateFieldTypes {}
+
+    pub struct Test2Template<T, B, A>
+    where
+        T: Test2TemplateFieldTypes,
+    {
         phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 
@@ -1175,7 +1185,12 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub struct Test3Template<T, B, A> {
+    pub trait Test3TemplateFieldTypes {}
+
+    pub struct Test3Template<T, B, A>
+    where
+        T: Test3TemplateFieldTypes,
+    {
         phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 
@@ -1395,7 +1410,12 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub struct Test4Template<T, B, A> {
+    pub trait Test4TemplateFieldTypes {}
+
+    pub struct Test4Template<T, B, A>
+    where
+        T: Test4TemplateFieldTypes,
+    {
         phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 }

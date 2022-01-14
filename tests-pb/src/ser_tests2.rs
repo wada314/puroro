@@ -2742,7 +2742,12 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub struct MsgTemplate<T, B, A> {
+    pub trait MsgTemplateFieldTypes {}
+
+    pub struct MsgTemplate<T, B, A>
+    where
+        T: MsgTemplateFieldTypes,
+    {
         phantom: ::std::marker::PhantomData<(T, B, A)>,
     }
 }
@@ -3788,7 +3793,12 @@ pub mod _puroro_nested {
                     Self(())
                 }
             }
-            pub struct SubmsgTemplate<T, B, A> {
+            pub trait SubmsgTemplateFieldTypes {}
+
+            pub struct SubmsgTemplate<T, B, A>
+            where
+                T: SubmsgTemplateFieldTypes,
+            {
                 phantom: ::std::marker::PhantomData<(T, B, A)>,
             }
         }

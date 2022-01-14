@@ -1,6 +1,8 @@
 
 pub trait {{ m.template_field_types_ident }} {
-
+    {%- for f in m.fields %}
+    type {{ f.template_type_name }};
+    {%- endfor %} {#- for f in m.fields #}
 }
 
 pub struct {{ m.template_ident }}<T, B, A>

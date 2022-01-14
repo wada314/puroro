@@ -215,6 +215,7 @@ struct Field {
     bumpalo_getter_mut_type: String,
     bumpalo_field_message_path: String,
     bumpalo_label_and_type_tags: String,
+    template_type_name: String,
 }
 
 impl Field {
@@ -363,6 +364,7 @@ impl Field {
                     },
                 )
             })?,
+            template_type_name: format!("{}Type", f.ident_camel_unesc()),
         })
     }
 
