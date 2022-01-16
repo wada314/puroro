@@ -1527,7 +1527,7 @@ pub mod _puroro_internal {
 
     impl Test1TemplateFieldTypes for ::puroro::SimpleImpl {
         type Alloc = ();
-        type AType = ::puroro::internal::Bare<i32>;
+        type AType = i32;
     }
     pub trait Test2TemplateFieldTypes {
         type Alloc;
@@ -1536,7 +1536,7 @@ pub mod _puroro_internal {
 
     impl Test2TemplateFieldTypes for ::puroro::SimpleImpl {
         type Alloc = ();
-        type BType = ::puroro::internal::Bare<::std::string::String>;
+        type BType = ::std::string::String;
     }
     pub trait Test3TemplateFieldTypes {
         type Alloc;

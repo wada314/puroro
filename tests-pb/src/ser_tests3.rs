@@ -2864,11 +2864,11 @@ pub mod _puroro_internal {
 
     impl MsgTemplateFieldTypes for ::puroro::SimpleImpl {
         type Alloc = ();
-        type I32UnlabeledType = ::puroro::internal::Bare<i32>;
+        type I32UnlabeledType = i32;
         type I32RepeatedType = ::std::vec::Vec<i32>;
-        type FloatUnlabeledType = ::puroro::internal::Bare<f32>;
+        type FloatUnlabeledType = f32;
         type FloatRepeatedType = ::std::vec::Vec<f32>;
-        type StringUnlabeledType = ::puroro::internal::Bare<::std::string::String>;
+        type StringUnlabeledType = ::std::string::String;
         type StringRepeatedType = ::std::vec::Vec<::std::string::String>;
         type SubmsgUnlabeledType = ::std::option::Option<
             ::std::boxed::Box<
@@ -2878,9 +2878,9 @@ pub mod _puroro_internal {
         type SubmsgRepeatedType = ::std::vec::Vec<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >;
-        type EnumUnlabeledType = ::puroro::internal::Bare<self::_puroro_root::ser_tests3::Enum>;
+        type EnumUnlabeledType = self::_puroro_root::ser_tests3::Enum;
         type EnumRepeatedType = ::std::vec::Vec<self::_puroro_root::ser_tests3::Enum>;
-        type VeryLargeFieldNumberType = ::puroro::internal::Bare<i32>;
+        type VeryLargeFieldNumberType = i32;
     }
 }
 pub use _puroro_traits::*;
@@ -3972,7 +3972,7 @@ pub mod _puroro_nested {
 
             impl SubmsgTemplateFieldTypes for ::puroro::SimpleImpl {
                 type Alloc = ();
-                type I32UnlabeledType = ::puroro::internal::Bare<i32>;
+                type I32UnlabeledType = i32;
             }
         }
         pub use _puroro_traits::*;

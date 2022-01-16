@@ -1906,7 +1906,7 @@ pub mod _puroro_internal {
 
     impl SubmsgTemplateFieldTypes for ::puroro::SimpleImpl {
         type Alloc = ();
-        type I32UnlabeledType = ::puroro::internal::Bare<i32>;
+        type I32UnlabeledType = i32;
     }
 }
 pub use _puroro_traits::*;

@@ -744,6 +744,21 @@ impl Field {
         })
     }
 
+    pub fn simple2_field_type(&self) -> Result<Cow<'static, str>> {
+        let scalar_type = self.simple_scalar_field_type()?;
+        Ok(match self.field_label()? {
+            FieldLabel::Repeated => format!("::std::vec::Vec<{scalar_type}>").into(),
+            FieldLabel::OneofField => scalar_type.into(),
+            _ => {
+                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{scalar_type}>").into()
+                } else {
+                    scalar_type.into()
+                }
+            }
+        })
+    }
+
     pub fn simple_scalar_field_type(&self) -> Result<Cow<'static, str>> {
         use FieldTypeCategories::*;
         use LdFieldType::*;
