@@ -728,10 +728,10 @@ pub mod _puroro_impls {
     where
         T: Test1TemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as Test1TemplateFieldTypes>::AType: ::std::clone::Clone + ::std::convert::Into<i32>,
+        <T as Test1TemplateFieldTypes>::AType: ::std::clone::Clone,
     {
-        pub fn a(&self) -> i32 {
-            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.a))
+        pub fn a(&self) -> T::AType {
+            ::std::clone::Clone::clone(&self.a)
         }
     }
 
@@ -967,9 +967,8 @@ pub mod _puroro_impls {
     where
         T: Test2TemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as Test2TemplateFieldTypes>::BType: ::std::convert::AsRef<str>,
     {
-        pub fn b(&self) -> impl '_ + ::std::convert::AsRef<str> {
+        pub fn b(&self) -> &T::BType {
             &self.b
         }
     }

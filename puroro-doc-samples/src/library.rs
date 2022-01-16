@@ -532,9 +532,8 @@ pub mod _puroro_impls {
     where
         T: BookTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as BookTemplateFieldTypes>::TitleType: ::std::convert::AsRef<str>,
     {
-        pub fn title(&self) -> impl '_ + ::std::convert::AsRef<str> {
+        pub fn title(&self) -> &T::TitleType {
             &self.title
         }
     }
@@ -543,11 +542,10 @@ pub mod _puroro_impls {
     where
         T: BookTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as BookTemplateFieldTypes>::NumPagesType:
-            ::std::clone::Clone + ::std::convert::Into<u32>,
+        <T as BookTemplateFieldTypes>::NumPagesType: ::std::clone::Clone,
     {
-        pub fn num_pages(&self) -> u32 {
-            ::std::convert::Into::<u32>::into(::std::clone::Clone::clone(&self.num_pages))
+        pub fn num_pages(&self) -> T::NumPagesType {
+            ::std::clone::Clone::clone(&self.num_pages)
         }
     }
 
@@ -581,8 +579,8 @@ pub mod _puroro_internal {
 
     impl BookTemplateFieldTypes for ::puroro::SimpleImpl {
         type Alloc = ();
-        type TitleType = ::puroro::internal::Bare<::std::string::String>;
-        type NumPagesType = ::puroro::internal::Bare<u32>;
+        type TitleType = ::std::string::String;
+        type NumPagesType = u32;
     }
 }
 pub use _puroro_traits::*;

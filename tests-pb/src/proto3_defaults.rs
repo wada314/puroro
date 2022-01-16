@@ -1487,11 +1487,10 @@ pub mod _puroro_impls {
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as MsgTemplateFieldTypes>::I32UnlabeledType:
-            ::std::clone::Clone + ::std::convert::Into<i32>,
+        <T as MsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
     {
-        pub fn i32_unlabeled(&self) -> i32 {
-            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.i32_unlabeled))
+        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
     }
 
@@ -1499,11 +1498,10 @@ pub mod _puroro_impls {
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as MsgTemplateFieldTypes>::I32OptionalType:
-            ::std::clone::Clone + ::std::convert::Into<i32>,
+        <T as MsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
     {
-        pub fn i32_optional(&self) -> i32 {
-            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.i32_optional))
+        pub fn i32_optional(&self) -> T::I32OptionalType {
+            ::std::clone::Clone::clone(&self.i32_optional)
         }
     }
 
@@ -1511,11 +1509,10 @@ pub mod _puroro_impls {
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as MsgTemplateFieldTypes>::F32UnlabeledType:
-            ::std::clone::Clone + ::std::convert::Into<f32>,
+        <T as MsgTemplateFieldTypes>::F32UnlabeledType: ::std::clone::Clone,
     {
-        pub fn f32_unlabeled(&self) -> f32 {
-            ::std::convert::Into::<f32>::into(::std::clone::Clone::clone(&self.f32_unlabeled))
+        pub fn f32_unlabeled(&self) -> T::F32UnlabeledType {
+            ::std::clone::Clone::clone(&self.f32_unlabeled)
         }
     }
 
@@ -1523,9 +1520,8 @@ pub mod _puroro_impls {
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as MsgTemplateFieldTypes>::StringUnlabeledType: ::std::convert::AsRef<str>,
     {
-        pub fn string_unlabeled(&self) -> impl '_ + ::std::convert::AsRef<str> {
+        pub fn string_unlabeled(&self) -> &T::StringUnlabeledType {
             &self.string_unlabeled
         }
     }
@@ -1788,11 +1784,10 @@ pub mod _puroro_impls {
     where
         T: SubmsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
-        <T as SubmsgTemplateFieldTypes>::I32UnlabeledType:
-            ::std::clone::Clone + ::std::convert::Into<i32>,
+        <T as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
     {
-        pub fn i32_unlabeled(&self) -> i32 {
-            ::std::convert::Into::<i32>::into(::std::clone::Clone::clone(&self.i32_unlabeled))
+        pub fn i32_unlabeled(&self) -> T::I32UnlabeledType {
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
     }
 

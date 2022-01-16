@@ -18,7 +18,7 @@ use crate::tests_pb::full_coverage2::MsgTemplate as Msg2;
 
 #[test]
 fn test_basic() {
-    let m: Msg2<_, _> = Msg2::<
+    let m = Msg2::<
         ::puroro::SimpleImpl,
         ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
     >::default();
