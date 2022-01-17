@@ -96,13 +96,14 @@ pub struct BumpaloImpl;
 use internal::Bitfield;
 
 pub struct SimpleFields;
+#[derive(Default, Clone, Debug)]
 pub struct SimpleShared<const BITFIELD_U32_LEN: usize> {
     bitfield: crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
 }
 
 pub trait SharedObjects {
     type AllocatorType;
-    type BitfieldType;
+    type BitfieldType: Bitfield;
     fn alloc(&self) -> &Self::AllocatorType;
     fn bitfield(&self) -> &Self::BitfieldType;
     fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
@@ -146,7 +147,6 @@ where
     >,
     <FP as FieldProperties>::TypeTag: tags::NumericalTypeTag,
     Shared: SharedObjects,
-    <Shared as SharedObjects>::BitfieldType: Bitfield,
 {
     type OptGetterType = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
     fn into_opt_getter(self) -> Option<Self::OptGetterType> {
@@ -191,7 +191,23 @@ struct Person<Fields: PersonFieldsType, Shared> {
     children: <Fields as PersonFieldsType>::ChildrenType,
 }
 type PersonSimple = Person<SimpleFields, SimpleShared<1>>;
-impl<Fields: PersonFieldsType, Shared> Person<Fields, Shared> {}
+impl<Fields, Shared> Default for Person<Fields, Shared>
+where
+    Fields: PersonFieldsType,
+    <Fields as PersonFieldsType>::NameType: Default,
+    <Fields as PersonFieldsType>::AgeType: Default,
+    <Fields as PersonFieldsType>::ChildrenType: Default,
+    Shared: Default,
+{
+    fn default() -> Self {
+        Self {
+            _shared: Default::default(),
+            name: Default::default(),
+            age: Default::default(),
+            children: Default::default(),
+        }
+    }
+}
 
 struct PersonFieldProperty<const FIELD_NUMBER: i32>;
 impl FieldProperties for PersonFieldProperty<2> {
@@ -242,10 +258,8 @@ impl<NameType> PersonFieldsType for Person_NameType<NameType> {
     derive_person_params!((), NameType, NameType);
 }
 
-#[test]
 fn test() {
-    let pn_str = Person_NameType::<&str>("hoge");
-    assert_eq!(16, std::mem::size_of_val(&pn_str));
-    let pn_string = Person_NameType::<String>("hoge".to_string());
-    assert_eq!(24, std::mem::size_of_val(&pn_str));
+    let person = PersonSimple::default();
+    let _hoge = person.age_opt();
+    assert_eq!(Some(0), person.age_opt());
 }
