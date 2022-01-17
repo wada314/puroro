@@ -754,15 +754,14 @@ pub mod _puroro_impls {
             Self(())
         }
     }
-    pub struct MsgTemplate<T, B>
+    pub struct MsgTemplate<Fields, Shared>
     where
-        T: MsgTemplateFieldTypes,
+        Fields: MsgTemplateFieldTypes,
     {
-        _bitvec: B,
-        _alloc: <T as MsgTemplateFieldTypes>::Alloc,
-        explicitly_packed: <T as MsgTemplateFieldTypes>::ExplicitlyPackedType,
-        explicitly_not_packed: <T as MsgTemplateFieldTypes>::ExplicitlyNotPackedType,
-        not_annotated: <T as MsgTemplateFieldTypes>::NotAnnotatedType,
+        _shared: Shared,
+        explicitly_packed: <Fields as MsgTemplateFieldTypes>::ExplicitlyPackedType,
+        explicitly_not_packed: <Fields as MsgTemplateFieldTypes>::ExplicitlyNotPackedType,
+        not_annotated: <Fields as MsgTemplateFieldTypes>::NotAnnotatedType,
     }
 
     pub type MsgSimple2 = MsgTemplate<
@@ -770,44 +769,44 @@ pub mod _puroro_impls {
         ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
     >;
 
-    impl<T, B> MsgTemplate<T, B>
+    impl<Fields, B> MsgTemplate<Fields, B>
     where
-        T: MsgTemplateFieldTypes,
+        Fields: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
     {
-        pub fn explicitly_packed(&self) -> &T::ExplicitlyPackedType {
+        pub fn explicitly_packed(&self) -> &Fields::ExplicitlyPackedType {
             &self.explicitly_packed
         }
     }
 
-    impl<T, B> MsgTemplate<T, B>
+    impl<Fields, B> MsgTemplate<Fields, B>
     where
-        T: MsgTemplateFieldTypes,
+        Fields: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
     {
-        pub fn explicitly_not_packed(&self) -> &T::ExplicitlyNotPackedType {
+        pub fn explicitly_not_packed(&self) -> &Fields::ExplicitlyNotPackedType {
             &self.explicitly_not_packed
         }
     }
 
-    impl<T, B> MsgTemplate<T, B>
+    impl<Fields, B> MsgTemplate<Fields, B>
     where
-        T: MsgTemplateFieldTypes,
+        Fields: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
     {
-        pub fn not_annotated(&self) -> &T::NotAnnotatedType {
+        pub fn not_annotated(&self) -> &Fields::NotAnnotatedType {
             &self.not_annotated
         }
     }
 
-    impl<T, B> ::std::default::Default for MsgTemplate<T, B>
+    impl<Fields, B> ::std::default::Default for MsgTemplate<Fields, B>
     where
         B: ::std::default::Default,
-        T: MsgTemplateFieldTypes,
-        <T as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
-        <T as MsgTemplateFieldTypes>::ExplicitlyPackedType: ::std::default::Default,
-        <T as MsgTemplateFieldTypes>::ExplicitlyNotPackedType: ::std::default::Default,
-        <T as MsgTemplateFieldTypes>::NotAnnotatedType: ::std::default::Default,
+        Fields: MsgTemplateFieldTypes,
+        <Fields as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        <Fields as MsgTemplateFieldTypes>::ExplicitlyPackedType: ::std::default::Default,
+        <Fields as MsgTemplateFieldTypes>::ExplicitlyNotPackedType: ::std::default::Default,
+        <Fields as MsgTemplateFieldTypes>::NotAnnotatedType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {

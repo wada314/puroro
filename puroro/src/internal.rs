@@ -121,13 +121,23 @@ impl<T: Debug> Debug for Bare<T> {
     }
 }
 
-pub trait MessageFieldType {
-    type MessageType;
-    fn as_getter_type(&self) -> Option<&Self::MessageType>;
+pub trait SharedObjects {
+    type AllocatorType;
+    type BitvecType;
+    fn alloc(&self) -> &Self::AllocatorType;
+    fn bitvec(&self) -> &Self::BitvecType;
+    fn bitvec_mut(&mut self) -> &mut Self::BitvecType;
 }
-impl<M> MessageFieldType for Option<Box<M>> {
-    type MessageType = M;
-    fn as_getter_type(&self) -> Option<&Self::MessageType> {
-        self.as_deref()
+impl<A, B> SharedObjects for (A, B) {
+    type AllocatorType = A;
+    type BitvecType = B;
+    fn alloc(&self) -> &Self::AllocatorType {
+        &self.0
+    }
+    fn bitvec(&self) -> &Self::BitvecType {
+        &self.1
+    }
+    fn bitvec_mut(&mut self) -> &mut Self::BitvecType {
+        &mut self.1
     }
 }
