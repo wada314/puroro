@@ -176,3 +176,5 @@ impl FieldLabelTag for Required {
 impl FieldLabelTag for OneofField {
     const DO_DEFAULT_CHECK: bool = false;
 }
+
+pub struct SimpleImpl;

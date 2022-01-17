@@ -143,14 +143,19 @@ pub trait FieldProperties {
     type TypeTag: tags::FieldTypeTag;
 }
 
-pub trait OptGetFieldMethod<'a, FP, LabelTag, TypeTag> {
+pub trait OptGetFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
     type OptGetterType;
     fn get_opt(&self) -> Option<Self::OptGetterType>;
 }
 
 impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
-    OptGetFieldMethod<'a, FP, tags::NeedOptionalBitLabel<_1, _2>, tags::NonLdType<_3, _4, _5>>
-    for FieldAndSharedRef<'a, FieldType, Shared>
+    OptGetFieldMethod<
+        'a,
+        FP,
+        tags::SimpleImpl,
+        tags::NeedOptionalBitLabel<_1, _2>,
+        tags::NonLdType<_3, _4, _5>,
+    > for FieldAndSharedRef<'a, FieldType, Shared>
 where
     FP: FieldProperties<
         LabelTag = tags::NeedOptionalBitLabel<_1, _2>,
@@ -181,16 +186,13 @@ where
 // }
 //
 trait PersonFieldsType {
+    type ImplTag;
     type NameType;
     type AgeType;
     type ChildrenType;
 }
-impl PersonFieldsType for () {
-    type NameType = ();
-    type AgeType = ();
-    type ChildrenType = ();
-}
 impl PersonFieldsType for SimpleFields {
+    type ImplTag = tags::SimpleImpl;
     type NameType = String;
     type AgeType = u32;
     type ChildrenType = Vec<PersonSimple>;
@@ -234,8 +236,13 @@ impl FieldProperties for PersonFieldProperties<2> {
 impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
-    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>:
-        OptGetFieldMethod<'a, PersonFieldProperties<2>, tags::Optional, tags::UInt32>,
+    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>: OptGetFieldMethod<
+        'a,
+        PersonFieldProperties<2>,
+        Fields::ImplTag,
+        tags::Optional,
+        tags::UInt32,
+    >,
 {
     pub fn age_opt(
         &self,
@@ -243,6 +250,7 @@ where
         <FieldAndSharedRef<Fields::AgeType, Shared> as OptGetFieldMethod<
             '_,
             PersonFieldProperties<2>,
+            Fields::ImplTag,
             tags::Optional,
             tags::UInt32,
         >>::OptGetterType,
@@ -252,21 +260,17 @@ where
 }
 
 macro_rules! derive_person_params {
-        ($base:ty, $new_param_type:ty, $new_param_ident:ident) => {
-            derive_person_params!(@typedecl $base, NameType, $new_param_type, $new_param_ident);
-            derive_person_params!(@typedecl $base, AgeType, $new_param_type, $new_param_ident);
-            derive_person_params!(@typedecl $base, ChildrenType, $new_param_type, $new_param_ident);
-        };
-        (@typedecl $base:ty, NameType, $new_param_type:ty, NameType) => {
-            type NameType = $new_param_type;
-        };
-        (@typedecl $base:ty, $ident:ident, $new_param_type:ty, $new_param_ident:ident) => {
-            type $ident = <$base as PersonFieldsType>::$ident;
-        };
-    }
-struct Person_NameType<NameType>(NameType);
-impl<NameType> PersonFieldsType for Person_NameType<NameType> {
-    derive_person_params!((), NameType, NameType);
+    ($base:ty, $new_param_type:ty, $new_param_ident:ident) => {
+        derive_person_params!(@typedecl $base, NameType, $new_param_type, $new_param_ident);
+        derive_person_params!(@typedecl $base, AgeType, $new_param_type, $new_param_ident);
+        derive_person_params!(@typedecl $base, ChildrenType, $new_param_type, $new_param_ident);
+    };
+    (@typedecl $base:ty, NameType, $new_param_type:ty, NameType) => {
+        type NameType = $new_param_type;
+    };
+    (@typedecl $base:ty, $ident:ident, $new_param_type:ty, $new_param_ident:ident) => {
+        type $ident = <$base as PersonFieldsType>::$ident;
+    };
 }
 
 fn test() {
