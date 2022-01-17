@@ -133,8 +133,12 @@ impl<'a, Field, Shared> FieldAndSharedRef<'a, Field, Shared> {
     }
 }
 
+pub trait MessageProperties {
+    const OPTIONAL_FIELD_BITFIELD_START_INDEX: usize;
+}
 pub trait FieldProperties {
-    const OPTIONAL_FIELD_BIT_VEC_INDEX: usize = 0;
+    type MessageProperties: self::MessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag: tags::FieldLabelTag;
     type TypeTag: tags::FieldTypeTag;
 }
@@ -159,10 +163,12 @@ where
 {
     type OptGetterType = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
     fn get_opt(&self) -> Option<Self::OptGetterType> {
+        let opt_bit_index = <FP as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX + 
+        <<FP as FieldProperties>::MessageProperties as MessageProperties>::OPTIONAL_FIELD_BITFIELD_START_INDEX;
         if self
             .shared
             .bitfield()
-            .get(<FP as FieldProperties>::OPTIONAL_FIELD_BIT_VEC_INDEX)
+            .get(opt_bit_index)
         {
             Some(self.field.clone().into())
         } else {
@@ -218,9 +224,14 @@ where
     }
 }
 
+struct PersonMessageProperties;
+impl MessageProperties for PersonMessageProperties {
+    const OPTIONAL_FIELD_BITFIELD_START_INDEX: usize = 0;
+}
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 impl FieldProperties for PersonFieldProperties<2> {
-    const OPTIONAL_FIELD_BIT_VEC_INDEX: usize = 1;
+    type MessageProperties = PersonMessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 1;
     type LabelTag = tags::Optional;
     type TypeTag = tags::UInt32;
 }
