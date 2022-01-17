@@ -157,19 +157,15 @@ where
         TypeTag = tags::NonLdType<_3, _4, _5>,
     >,
     tags::NonLdType<_3, _4, _5>: tags::NumericalTypeTag,
-    <FP as FieldProperties>::TypeTag: tags::NumericalTypeTag,
-    FieldType: Clone + Into<<tags::NonLdType<_3, _4, _5> as tags::NumericalTypeTag>::NativeType>,
+    FP::TypeTag: tags::NumericalTypeTag,
+    FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,
 {
-    type OptGetterType = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
+    type OptGetterType = <FP::TypeTag as tags::NumericalTypeTag>::NativeType;
     fn get_opt(&self) -> Option<Self::OptGetterType> {
-        let opt_bit_index = <FP as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX + 
-        <<FP as FieldProperties>::MessageProperties as MessageProperties>::OPTIONAL_FIELD_BITFIELD_START_INDEX;
-        if self
-            .shared
-            .bitfield()
-            .get(opt_bit_index)
-        {
+        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
+            + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
+        if self.shared.bitfield().get(opt_bit_index) {
             Some(self.field.clone().into())
         } else {
             None
