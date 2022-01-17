@@ -11101,6 +11101,11 @@ pub mod _puroro_impls {
         enum_fourty_two: <T as MsgTemplateFieldTypes>::EnumFourtyTwoType,
     }
 
+    pub type MsgSimple2 = MsgTemplate<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (62 + 31) / 32]>,
+    >;
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,

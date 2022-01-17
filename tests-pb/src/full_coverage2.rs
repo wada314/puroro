@@ -14972,6 +14972,11 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         f64_repeated: <T as MsgTemplateFieldTypes>::F64RepeatedType,
     }
 
+    pub type MsgSimple2 = MsgTemplate<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (30 + 31) / 32]>,
+    >;
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
@@ -18251,6 +18256,14 @@ pub mod _puroro_nested {
                 i32_required: <T as SubmsgTemplateFieldTypes>::I32RequiredType,
                 i64_required: <T as SubmsgTemplateFieldTypes>::I64RequiredType,
             }
+
+            pub type SubmsgSimple2 = SubmsgTemplate<
+                ::puroro::SimpleImpl,
+                ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (2 + 31) / 32],
+                >,
+            >;
 
             impl<T, B> SubmsgTemplate<T, B>
             where

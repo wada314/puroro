@@ -734,6 +734,11 @@ pub mod _puroro_impls {
         a: <T as Test1TemplateFieldTypes>::AType,
     }
 
+    pub type Test1Simple2 = Test1Template<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+    >;
+
     impl<T, B> Test1Template<T, B>
     where
         T: Test1TemplateFieldTypes,
@@ -974,6 +979,11 @@ pub mod _puroro_impls {
         _alloc: <T as Test2TemplateFieldTypes>::Alloc,
         b: <T as Test2TemplateFieldTypes>::BType,
     }
+
+    pub type Test2Simple2 = Test2Template<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+    >;
 
     impl<T, B> Test2Template<T, B>
     where
@@ -1248,6 +1258,11 @@ pub mod _puroro_impls {
         c: <T as Test3TemplateFieldTypes>::CType,
     }
 
+    pub type Test3Simple2 = Test3Template<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+    >;
+
     impl<T, B> Test3Template<T, B>
     where
         T: Test3TemplateFieldTypes,
@@ -1498,6 +1513,11 @@ pub mod _puroro_impls {
         _alloc: <T as Test4TemplateFieldTypes>::Alloc,
         d: <T as Test4TemplateFieldTypes>::DType,
     }
+
+    pub type Test4Simple2 = Test4Template<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+    >;
 
     impl<T, B> ::std::default::Default for Test4Template<T, B>
     where

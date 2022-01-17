@@ -420,6 +420,11 @@ pub mod _puroro_impls {
         recursive_unlabeled: <T as MsgTemplateFieldTypes>::RecursiveUnlabeledType,
     }
 
+    pub type MsgSimple2 = MsgTemplate<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+    >;
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,

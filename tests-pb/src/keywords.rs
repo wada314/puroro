@@ -362,6 +362,11 @@ pub mod _puroro_impls {
         r#type: <T as MsgTemplateFieldTypes>::TypeType,
     }
 
+    pub type MsgSimple2 = MsgTemplate<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+    >;
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,

@@ -765,6 +765,11 @@ pub mod _puroro_impls {
         not_annotated: <T as MsgTemplateFieldTypes>::NotAnnotatedType,
     }
 
+    pub type MsgSimple2 = MsgTemplate<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+    >;
+
     impl<T, B> ::std::default::Default for MsgTemplate<T, B>
     where
         B: ::std::default::Default,

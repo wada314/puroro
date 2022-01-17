@@ -2734,6 +2734,11 @@ pub mod _puroro_impls {
         very_large_field_number: <T as MsgTemplateFieldTypes>::VeryLargeFieldNumberType,
     }
 
+    pub type MsgSimple2 = MsgTemplate<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+    >;
+
     impl<T, B> MsgTemplate<T, B>
     where
         T: MsgTemplateFieldTypes,
@@ -3921,6 +3926,14 @@ pub mod _puroro_nested {
                 _alloc: <T as SubmsgTemplateFieldTypes>::Alloc,
                 i32_unlabeled: <T as SubmsgTemplateFieldTypes>::I32UnlabeledType,
             }
+
+            pub type SubmsgSimple2 = SubmsgTemplate<
+                ::puroro::SimpleImpl,
+                ::puroro::bitvec::array::BitArray<
+                    ::puroro::bitvec::order::Lsb0,
+                    [u32; (0 + 31) / 32],
+                >,
+            >;
 
             impl<T, B> SubmsgTemplate<T, B>
             where

@@ -1,4 +1,6 @@
 
+{#################- The template struct ################-#}
+
 pub struct {{ m.template_ident }}<T, B>
     where T: {{ m.template_field_types_trait }}
 {
@@ -10,6 +12,12 @@ pub struct {{ m.template_ident }}<T, B>
     {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 }
+
+{#################- The struct with actual parameters ################-#}
+pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
+    ::puroro::SimpleImpl, 
+    ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; ({{ m.bitfield_len }} + 31) / 32]>
+>;
 
 {%- for f in m.fields %}
 {%- if f.is_repeated %}

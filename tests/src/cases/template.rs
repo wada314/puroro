@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use tests_pb::full_coverage3::MsgTrait;
-
-use crate::tests_pb::full_coverage2::MsgTemplate as Msg2;
+use crate::tests_pb::full_coverage2::MsgSimple2 as Msg2;
 
 #[test]
 fn test_basic() {
-    let m = Msg2::<
-        ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
-    >::default();
+    let m = Msg2::default();
     let i = m.string_optional();
     let i2 = i.clone();
 }

@@ -79,6 +79,7 @@ struct Message {
     builder_ident: String,
     template_ident: String,
     template_field_types_trait: String,
+    template_simple_ident: String,
 }
 
 impl Message {
@@ -124,6 +125,7 @@ impl Message {
             builder_ident: m.rust_impl_ident("Builder"),
             template_ident: m.rust_impl_ident("Template"),
             template_field_types_trait: m.rust_impl_ident("TemplateFieldTypes"),
+            template_simple_ident: m.rust_impl_ident("Simple2"),
         })
     }
 }

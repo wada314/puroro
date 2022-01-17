@@ -528,6 +528,11 @@ pub mod _puroro_impls {
         num_pages: <T as BookTemplateFieldTypes>::NumPagesType,
     }
 
+    pub type BookSimple2 = BookTemplate<
+        ::puroro::SimpleImpl,
+        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+    >;
+
     impl<T, B> BookTemplate<T, B>
     where
         T: BookTemplateFieldTypes,
