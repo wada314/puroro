@@ -2754,10 +2754,30 @@ pub mod _puroro_impls {
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::FloatUnlabeledType: ::std::clone::Clone,
     {
         pub fn float_unlabeled(&self) -> T::FloatUnlabeledType {
             ::std::clone::Clone::clone(&self.float_unlabeled)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_repeated(&self) -> &T::FloatRepeatedType {
+            &self.float_repeated
         }
     }
 
@@ -2776,8 +2796,28 @@ pub mod _puroro_impls {
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
     {
+        pub fn string_repeated(&self) -> &T::StringRepeatedType {
+            &self.string_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
         pub fn submsg_unlabeled(&self) -> &T::SubmsgUnlabeledType {
             &self.submsg_unlabeled
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_repeated(&self) -> &T::SubmsgRepeatedType {
+            &self.submsg_repeated
         }
     }
 
@@ -2789,6 +2829,16 @@ pub mod _puroro_impls {
     {
         pub fn enum_unlabeled(&self) -> T::EnumUnlabeledType {
             ::std::clone::Clone::clone(&self.enum_unlabeled)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_repeated(&self) -> &T::EnumRepeatedType {
+            &self.enum_repeated
         }
     }
 

@@ -983,10 +983,12 @@ impl Field {
         use LdFieldType::*;
         let field_type = format!("{types_trait}::{}", self.template_type_name()?);
 
-        Ok(match self.field_type()?.categories()? {
-            LengthDelimited(_) => format!("&{field_type}").into(),
-            Trivial(_) => field_type.into(),
-        })
+        Ok(
+            match (self.field_type()?.categories()?, self.is_repeated()?) {
+                (Trivial(_), false) => field_type.into(),
+                _ => format!("&{field_type}").into(),
+            },
+        )
     }
 }
 

@@ -1519,6 +1519,16 @@ pub mod _puroro_impls {
         ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
     >;
 
+    impl<T, B> Test4Template<T, B>
+    where
+        T: Test4TemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn d(&self) -> &T::DType {
+            &self.d
+        }
+    }
+
     impl<T, B> ::std::default::Default for Test4Template<T, B>
     where
         B: ::std::default::Default,

@@ -21,6 +21,18 @@ pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
 
 {%- for f in m.fields %}
 {%- if f.is_repeated %}
+
+{#################- Repeated field getters ################-#}
+impl<T, B> {{ m.template_ident }}<T, B>
+where
+    T: {{ m.template_field_types_trait }},
+    B: ::puroro::internal::BitVec,
+{
+    pub fn {{ f.ident }}(&self) -> {{ f.template_getter_type }} {
+        &self.{{ f.ident }}
+    }
+}
+
 {%- else %} {#- if f.is_repeated #}
 
 {#################- Scalar field getters ################-#}

@@ -19,4 +19,5 @@ fn test_basic() {
     let m = Msg2::default();
     let i = m.string_optional();
     let i2 = i.clone();
+    let sr = m.string_repeated();
 }

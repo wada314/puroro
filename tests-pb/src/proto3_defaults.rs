@@ -1514,6 +1514,16 @@ pub mod _puroro_impls {
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::F32UnlabeledType: ::std::clone::Clone,
     {
         pub fn f32_unlabeled(&self) -> T::F32UnlabeledType {

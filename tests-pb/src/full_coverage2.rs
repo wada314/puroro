@@ -15003,6 +15003,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::FloatRequiredType: ::std::clone::Clone,
     {
         pub fn float_required(&self) -> T::FloatRequiredType {
@@ -15018,6 +15028,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn float_optional(&self) -> T::FloatOptionalType {
             ::std::clone::Clone::clone(&self.float_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_repeated(&self) -> &T::FloatRepeatedType {
+            &self.float_repeated
         }
     }
 
@@ -15046,6 +15066,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
     {
+        pub fn bytes_repeated(&self) -> &T::BytesRepeatedType {
+            &self.bytes_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
         pub fn string_required(&self) -> &T::StringRequiredType {
             &self.string_required
         }
@@ -15058,6 +15088,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn string_optional(&self) -> &T::StringOptionalType {
             &self.string_optional
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn string_repeated(&self) -> &T::StringRepeatedType {
+            &self.string_repeated
         }
     }
 
@@ -15088,6 +15128,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
     {
+        pub fn enum_repeated(&self) -> &T::EnumRepeatedType {
+            &self.enum_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
         pub fn submsg_required(&self) -> &T::SubmsgRequiredType {
             &self.submsg_required
         }
@@ -15100,6 +15150,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn submsg_optional(&self) -> &T::SubmsgOptionalType {
             &self.submsg_optional
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_repeated(&self) -> &T::SubmsgRepeatedType {
+            &self.submsg_repeated
         }
     }
 
@@ -15129,6 +15189,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn i64_repeated(&self) -> &T::I64RepeatedType {
+            &self.i64_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::U32RequiredType: ::std::clone::Clone,
     {
         pub fn u32_required(&self) -> T::U32RequiredType {
@@ -15144,6 +15214,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn u32_optional(&self) -> T::U32OptionalType {
             ::std::clone::Clone::clone(&self.u32_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn u32_repeated(&self) -> &T::U32RepeatedType {
+            &self.u32_repeated
         }
     }
 
@@ -15173,6 +15253,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn u64_repeated(&self) -> &T::U64RepeatedType {
+            &self.u64_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::S32RequiredType: ::std::clone::Clone,
     {
         pub fn s32_required(&self) -> T::S32RequiredType {
@@ -15188,6 +15278,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn s32_optional(&self) -> T::S32OptionalType {
             ::std::clone::Clone::clone(&self.s32_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn s32_repeated(&self) -> &T::S32RepeatedType {
+            &self.s32_repeated
         }
     }
 
@@ -15217,6 +15317,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn s64_repeated(&self) -> &T::S64RepeatedType {
+            &self.s64_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::Fixed32RequiredType: ::std::clone::Clone,
     {
         pub fn fixed32_required(&self) -> T::Fixed32RequiredType {
@@ -15232,6 +15342,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn fixed32_optional(&self) -> T::Fixed32OptionalType {
             ::std::clone::Clone::clone(&self.fixed32_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed32_repeated(&self) -> &T::Fixed32RepeatedType {
+            &self.fixed32_repeated
         }
     }
 
@@ -15261,6 +15381,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn fixed64_repeated(&self) -> &T::Fixed64RepeatedType {
+            &self.fixed64_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::Sfixed32RequiredType: ::std::clone::Clone,
     {
         pub fn sfixed32_required(&self) -> T::Sfixed32RequiredType {
@@ -15276,6 +15406,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn sfixed32_optional(&self) -> T::Sfixed32OptionalType {
             ::std::clone::Clone::clone(&self.sfixed32_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed32_repeated(&self) -> &T::Sfixed32RepeatedType {
+            &self.sfixed32_repeated
         }
     }
 
@@ -15305,6 +15445,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn sfixed64_repeated(&self) -> &T::Sfixed64RepeatedType {
+            &self.sfixed64_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::F64RequiredType: ::std::clone::Clone,
     {
         pub fn f64_required(&self) -> T::F64RequiredType {
@@ -15320,6 +15470,16 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
     {
         pub fn f64_optional(&self) -> T::F64OptionalType {
             ::std::clone::Clone::clone(&self.f64_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn f64_repeated(&self) -> &T::F64RepeatedType {
+            &self.f64_repeated
         }
     }
 

@@ -2782,10 +2782,30 @@ pub mod _puroro_impls {
     where
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
+    {
+        pub fn i32_repeated(&self) -> &T::I32RepeatedType {
+            &self.i32_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
         <T as MsgTemplateFieldTypes>::FloatOptionalType: ::std::clone::Clone,
     {
         pub fn float_optional(&self) -> T::FloatOptionalType {
             ::std::clone::Clone::clone(&self.float_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn float_repeated(&self) -> &T::FloatRepeatedType {
+            &self.float_repeated
         }
     }
 
@@ -2804,8 +2824,28 @@ pub mod _puroro_impls {
         T: MsgTemplateFieldTypes,
         B: ::puroro::internal::BitVec,
     {
+        pub fn string_repeated(&self) -> &T::StringRepeatedType {
+            &self.string_repeated
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
         pub fn submsg_optional(&self) -> &T::SubmsgOptionalType {
             &self.submsg_optional
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn submsg_repeated(&self) -> &T::SubmsgRepeatedType {
+            &self.submsg_repeated
         }
     }
 
@@ -2817,6 +2857,16 @@ pub mod _puroro_impls {
     {
         pub fn enum_optional(&self) -> T::EnumOptionalType {
             ::std::clone::Clone::clone(&self.enum_optional)
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn enum_repeated(&self) -> &T::EnumRepeatedType {
+            &self.enum_repeated
         }
     }
 

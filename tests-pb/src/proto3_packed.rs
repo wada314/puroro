@@ -770,6 +770,36 @@ pub mod _puroro_impls {
         ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
     >;
 
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn explicitly_packed(&self) -> &T::ExplicitlyPackedType {
+            &self.explicitly_packed
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn explicitly_not_packed(&self) -> &T::ExplicitlyNotPackedType {
+            &self.explicitly_not_packed
+        }
+    }
+
+    impl<T, B> MsgTemplate<T, B>
+    where
+        T: MsgTemplateFieldTypes,
+        B: ::puroro::internal::BitVec,
+    {
+        pub fn not_annotated(&self) -> &T::NotAnnotatedType {
+            &self.not_annotated
+        }
+    }
+
     impl<T, B> ::std::default::Default for MsgTemplate<T, B>
     where
         B: ::std::default::Default,
