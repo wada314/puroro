@@ -120,3 +120,14 @@ impl<T: Debug> Debug for Bare<T> {
         <T as Debug>::fmt(&self.0, f)
     }
 }
+
+pub trait MessageFieldType {
+    type MessageType;
+    fn as_getter_type(&self) -> Option<&Self::MessageType>;
+}
+impl<M> MessageFieldType for Option<Box<M>> {
+    type MessageType = M;
+    fn as_getter_type(&self) -> Option<&Self::MessageType> {
+        self.as_deref()
+    }
+}

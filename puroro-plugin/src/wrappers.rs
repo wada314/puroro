@@ -980,7 +980,6 @@ impl Field {
 
     pub fn template_getter_type(&self, types_trait: &str) -> Result<Cow<'static, str>> {
         use FieldTypeCategories::*;
-        use LdFieldType::*;
         let field_type = format!("{types_trait}::{}", self.template_type_name()?);
 
         Ok(
@@ -989,6 +988,18 @@ impl Field {
                 _ => format!("&{field_type}").into(),
             },
         )
+    }
+
+    pub fn template_opt_getter_type(&self, types_trait: &str) -> Result<Cow<'static, str>> {
+        use FieldTypeCategories::*;
+        use LdFieldType::*;
+        let field_type = format!("{types_trait}::{}", self.template_type_name()?);
+
+        Ok(match self.field_type()?.categories()? {
+            Trivial(_) => format!("::std::option::Option<{field_type}>").into(),
+            LengthDelimited(Message(_)) => format!("&{field_type}").into(),
+            _ => format!("::std::option::Option<&{field_type}>").into(),
+        })
     }
 }
 

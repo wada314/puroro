@@ -219,6 +219,7 @@ struct Field {
     bumpalo_label_and_type_tags: String,
     template_type_name: String,
     template_getter_type: String,
+    template_opt_getter_type: String,
     numeric_type_name: String,
     simple2_field_type: String,
 }
@@ -371,6 +372,7 @@ impl Field {
             })?,
             template_type_name: f.template_type_name()?.to_string(),
             template_getter_type: f.template_getter_type("T")?.to_string(),
+            template_opt_getter_type: f.template_opt_getter_type("T")?.to_string(),
             numeric_type_name: f.single_numerical_rust_type()?.to_string(),
             simple2_field_type: f.simple2_field_type()?.to_string(),
         })

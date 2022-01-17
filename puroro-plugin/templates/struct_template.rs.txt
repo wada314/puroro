@@ -41,10 +41,40 @@ impl<T, B> {{ m.template_ident }}<T, B>
 where
     T: {{ m.template_field_types_trait }},
     B: ::puroro::internal::BitVec,
+{%- if f.is_message %}
+    <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}:
+        ::puroro::internal::MessageFieldType,
+{%- endif %} {#- if f.is_message #}
 {%- if !f.is_length_delimited %}
     <T as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}: ::std::clone::Clone,
-{%- endif %} {#- if !f.is_length_delimited #}
+{%- endif %} {#- if !f.is_length_delimited #}_unesc_opt
 {
+    pub fn {{ f.ident_unesc }}_opt(&self) -> {{ f.template_opt_getter_type }} {
+        #[allow(unused)]
+        use ::std::option::Option::{Some, None};
+        {%- if f.has_optional_bit %}
+        {#- optional non-message fields. Check the `_bitvec` field and wrap by Option. #}
+        if self._bitvec.get({{ f.bitfield_index }}) {
+            Some(
+                {%- if f.is_length_delimited %}
+                &self.{{ f.ident }}
+                {%- else %} {#- if f.is_length_delimited #}
+                ::std::clone::Clone::clone(&self.{{ f.ident }})
+                {%- endif %} {#- if f.is_length_delimited #}
+            )
+        } else {
+            None
+        }
+        {%- else %} {#- if f.has_optional_bit #}
+        {%- if f.is_message %}
+        {#- message fields. Do proper conversion (e.g. `&Option<Box<M>>` => `Option<&M>`) #}
+        self.{{ f.ident }}.as_getter_type()
+        {%- else %} {#- if f.is_message #}
+
+        {%- endif %} {#- if f.is_message #}
+        {%- endif %} {#- if f.has_optional_bit #}
+    }
+
     pub fn {{ f.ident }}(&self) -> {{ f.template_getter_type }} {
         {%- if f.is_length_delimited %}
         &self.{{ f.ident }}
