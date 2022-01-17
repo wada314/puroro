@@ -144,8 +144,7 @@ where
     >,
     tags::NonLdType<_3, _4, _5>: tags::NumericalTypeTag,
     <FP as FieldProperties>::TypeTag: tags::NumericalTypeTag,
-    FieldType:
-        Clone + Into<<<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType>,
+    FieldType: Clone + Into<<tags::NonLdType<_3, _4, _5> as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,
 {
     type OptGetterType = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
