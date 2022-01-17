@@ -93,25 +93,33 @@ pub struct SimpleImpl;
 pub struct BumpaloImpl;
 
 // メモ
-use internal::BitVec;
+use internal::Bitfield;
+
+pub struct SimpleFields;
+pub struct SimpleShared<const BITFIELD_U32_LEN: usize> {
+    bit_vec: crate::bitvec::array::BitArray<
+        crate::bitvec::order::Lsb0,
+        [u32; BITFIELD_U32_LEN]
+    >
+}
 
 pub trait SharedObjects {
     type AllocatorType;
-    type BitVecType;
+    type BitfieldType;
     fn alloc(&self) -> &Self::AllocatorType;
-    fn bit_vec(&self) -> &Self::BitVecType;
-    fn bit_vec_mut(&mut self) -> &mut Self::BitVecType;
+    fn bitfield(&self) -> &Self::BitfieldType;
+    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
 }
 impl<A, B> SharedObjects for (A, B) {
     type AllocatorType = A;
-    type BitVecType = B;
+    type BitfieldType = B;
     fn alloc(&self) -> &Self::AllocatorType {
         &self.0
     }
-    fn bit_vec(&self) -> &Self::BitVecType {
+    fn bitfield(&self) -> &Self::BitfieldType {
         &self.1
     }
-    fn bit_vec_mut(&mut self) -> &mut Self::BitVecType {
+    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType {
         &mut self.1
     }
 }
@@ -122,18 +130,16 @@ pub trait FieldProperties {
     type TypeTag: tags::FieldTypeTag;
 }
 
-pub trait OptGetField<FP, LabelTag, TypeTag> {
-    type OptGetterType<'a>
-    where
-        Self: 'a;
-    fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>>;
+pub trait OptGetField<'a, FP, LabelTag, TypeTag> {
+    type OptGetterType;
+    fn into_opt_getter(self) -> Option<Self::OptGetterType>;
 }
 
-impl<_1, _2, _3, _4, _5, FP, Shared>
-    OptGetField<FP, tags::NeedOptionalBitLabel<_1, _2>, tags::NonLdType<_3, _4, _5>>
+impl<'a, _1, _2, _3, _4, _5, FP, Shared>
+    OptGetField<'a, FP, tags::NeedOptionalBitLabel<_1, _2>, tags::NonLdType<_3, _4, _5>>
     for (
-        &<<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType,
-        &Shared,
+        &'a <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType,
+        &'a Shared,
     )
 where
     FP: FieldProperties<
@@ -142,16 +148,13 @@ where
     >,
     <FP as FieldProperties>::TypeTag: tags::NumericalTypeTag,
     Shared: SharedObjects,
-    <Shared as SharedObjects>::BitVecType: BitVec,
+    <Shared as SharedObjects>::BitfieldType: Bitfield,
 {
-    type OptGetterType<'a>
-    where
-        Self: 'a,
-    = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
-    fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>> {
+    type OptGetterType = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
+    fn into_opt_getter(self) -> Option<Self::OptGetterType> {
         if self
             .1
-            .bit_vec()
+            .bitfield()
             .get(<FP as FieldProperties>::OPTIONAL_FIELD_BIT_VEC_INDEX)
         {
             Some(Clone::clone(self.0))
@@ -161,29 +164,65 @@ where
     }
 }
 
-trait PersonParamsTuple {
+// assume a proto like this:
+// message Person {
+//     optional string name = 1;
+//     optional uint32 age = 2;
+//     repeated Person children = 3;
+// }
+//
+trait PersonFieldsType {
     type NameType;
     type AgeType;
     type ChildrenType;
 }
-impl PersonParamsTuple for () {
+impl PersonFieldsType for () {
     type NameType = ();
     type AgeType = ();
     type ChildrenType = ();
 }
-impl<NameType, AgeType, ChildrenType> PersonParamsTuple for (NameType, AgeType, ChildrenType) {
-    type NameType = NameType;
-    type AgeType = AgeType;
-    type ChildrenType = ChildrenType;
+impl<NameType, AgeType, ChildrenType> PersonFieldsType for SimpleImpl {
+    type NameType = String;
+    type AgeType = u32;
+    type ChildrenType = Vec<PersonSimple>;
 }
-struct Person<T: PersonParamsTuple> {
-    name: <T as PersonParamsTuple>::NameType,
-    age: <T as PersonParamsTuple>::AgeType,
-    children: <T as PersonParamsTuple>::ChildrenType,
+struct Person<Fields: PersonFieldsType, Shared> {
+    _shared: Shared,
+    name: <Fields as PersonFieldsType>::NameType,
+    age: <Fields as PersonFieldsType>::AgeType,
+    children: <Fields as PersonFieldsType>::ChildrenType,
 }
-impl<T: PersonParamsTuple<AgeType = u32>> Person<T> {
-    fn age(&self) -> u32 {
-        self.age
+type PersonSimple = Person<SimpleImpl, SimpleShared>
+impl<Fields: PersonFieldsType, Shared> Person<Fields, Shared> {}
+
+struct PersonFieldProperty<const FIELD_NUMBER: i32>;
+impl FieldProperties for PersonFieldProperty<2> {
+    const OPTIONAL_FIELD_BIT_VEC_INDEX: usize = 1;
+    type LabelTag = tags::Optional;
+    type TypeTag = tags::UInt32;
+}
+impl<Fields, Shared> Person<Fields, Shared>
+where
+    Fields: PersonFieldsType,
+    for<'a> (&'a Fields::AgeType, &'a Shared):
+        OptGetField<'a, PersonFieldProperty<2>, tags::Optional, tags::UInt32>,
+{
+    pub fn age_opt(
+        &self,
+    ) -> Option<
+        <(&Fields::AgeType, &Shared) as OptGetField<
+            '_,
+            PersonFieldProperty<2>,
+            tags::Optional,
+            tags::UInt32,
+        >>::OptGetterType,
+    > {
+        <(&Fields::AgeType, &Shared) as OptGetField<
+            '_,
+            PersonFieldProperty<2>,
+            tags::Optional,
+            tags::UInt32,
+        >>::into_opt_getter((&self.age, &self._shared))
     }
 }
 
@@ -197,11 +236,11 @@ macro_rules! derive_person_params {
             type NameType = $new_param_type;
         };
         (@typedecl $base:ty, $ident:ident, $new_param_type:ty, $new_param_ident:ident) => {
-            type $ident = <$base as PersonParamsTuple>::$ident;
+            type $ident = <$base as PersonFieldsType>::$ident;
         };
     }
 struct Person_NameType<NameType>(NameType);
-impl<NameType> PersonParamsTuple for Person_NameType<NameType> {
+impl<NameType> PersonFieldsType for Person_NameType<NameType> {
     derive_person_params!((), NameType, NameType);
 }
 
