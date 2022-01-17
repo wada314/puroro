@@ -41,9 +41,9 @@ pub fn write_field_number_and_wire_type<W: Write>(
 
 pub struct SerFieldToIoWrite<L, V>(PhantomData<(L, V)>);
 
-impl<V, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::Variant<V>>
+impl<V, _1, _2, _3> SerFieldToIoWrite<tags::NonRepeatedLabel<_1, _2, _3>, tags::Variant<V>>
 where
-    tags::LabelNonRepeated<_1, _2, _3>: tags::FieldLabelTag,
+    tags::NonRepeatedLabel<_1, _2, _3>: tags::FieldLabelTag,
     tags::Variant<V>: VariantTypeTag,
 {
     pub fn ser_field<W>(

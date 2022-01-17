@@ -97,65 +97,67 @@ use internal::BitVec;
 
 pub trait SharedObjects {
     type AllocatorType;
-    type BitvecType;
+    type BitVecType;
     fn alloc(&self) -> &Self::AllocatorType;
-    fn bitvec(&self) -> &Self::BitvecType;
-    fn bitvec_mut(&mut self) -> &mut Self::BitvecType;
+    fn bit_vec(&self) -> &Self::BitVecType;
+    fn bit_vec_mut(&mut self) -> &mut Self::BitVecType;
 }
 impl<A, B> SharedObjects for (A, B) {
     type AllocatorType = A;
-    type BitvecType = B;
+    type BitVecType = B;
     fn alloc(&self) -> &Self::AllocatorType {
         &self.0
     }
-    fn bitvec(&self) -> &Self::BitvecType {
+    fn bit_vec(&self) -> &Self::BitVecType {
         &self.1
     }
-    fn bitvec_mut(&mut self) -> &mut Self::BitvecType {
+    fn bit_vec_mut(&mut self) -> &mut Self::BitVecType {
         &mut self.1
     }
 }
 
-pub trait MessageProperties {
-    const OPTIONAL_FIELD_BITVEC_START_INDEX: usize;
-}
 pub trait FieldProperties {
-    type MessageProperties: self::MessageProperties;
-    const OPTIONAL_FIELD_BITVEC_INDEX: usize = 0;
+    const OPTIONAL_FIELD_BIT_VEC_INDEX: usize = 0;
     type LabelTag: tags::FieldLabelTag;
     type TypeTag: tags::FieldTypeTag;
 }
 
-pub trait GetFieldDataSet<FP> {
-    type GetterType<'a>
-    where
-        Self: 'a;
-    fn as_getter(&self) -> Self::GetterType<'_>;
-}
-pub trait OptGetFieldDataSet<FP> {
+pub trait OptGetField<FP, LabelTag, TypeTag> {
     type OptGetterType<'a>
     where
         Self: 'a;
     fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>>;
 }
 
-impl<_1, _2, _3, FP, Shared> OptGetFieldDataSet<FP>
+impl<_1, _2, _3, _4, _5, FP, Shared>
+    OptGetField<FP, tags::NeedOptionalBitLabel<_1, _2>, tags::NonLdType<_3, _4, _5>>
     for (
         &<<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType,
         &Shared,
     )
 where
-    FP: FieldProperties<LabelTag = tags::LabelNonRepeated<_1, _2, _3>>,
+    FP: FieldProperties<
+        LabelTag = tags::NeedOptionalBitLabel<_1, _2>,
+        TypeTag = tags::NonLdType<_3, _4, _5>,
+    >,
     <FP as FieldProperties>::TypeTag: tags::NumericalTypeTag,
     Shared: SharedObjects,
-    <Shared as SharedObjects>::BitvecType: BitVec,
+    <Shared as SharedObjects>::BitVecType: BitVec,
 {
     type OptGetterType<'a>
     where
         Self: 'a,
     = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
     fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>> {
-        todo!()
+        if self
+            .1
+            .bit_vec()
+            .get(<FP as FieldProperties>::OPTIONAL_FIELD_BIT_VEC_INDEX)
+        {
+            Some(Clone::clone(self.0))
+        } else {
+            None
+        }
     }
 }
 

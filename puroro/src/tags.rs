@@ -59,7 +59,7 @@ pub type LengthDelimited<V> = (PhantomData<V>, (False, True), (False, False));
 pub type Bits32<V> = (PhantomData<V>, (False, False), (True, False));
 pub type Bits64<V> = (PhantomData<V>, (False, False), (False, True));
 
-pub type NonLD<V, _1, _2> = (PhantomData<V>, (_1, False), _2);
+pub type NonLdType<V, _1, _2> = (PhantomData<V>, (_1, False), _2);
 
 pub type Int32 = Variant<value::Int32>;
 pub type SInt32 = Variant<value::SInt32>;
@@ -93,7 +93,8 @@ pub type OneofField = (False, False, False, True, False);
 /// Reserved for future use...
 pub type MapEntry = (False, False, False, False, True);
 
-pub type LabelNonRepeated<_1, _2, _3> = (False, _1, _2, _3, False);
+pub type NonRepeatedLabel<_1, _2, _3> = (False, _1, _2, _3, False);
+pub type NeedOptionalBitLabel<_1, _2> = (False, _1, False, _2, False);
 
 impl FieldTypeTag for Int32 {}
 impl FieldTypeTag for Int64 {}
