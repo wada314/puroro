@@ -14979,339 +14979,291 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         ),
     >;
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> MsgTemplate<Fields, Shared>
-    where
-        Fields: MsgTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where
+        Fields: MsgTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
@@ -18257,17 +18209,15 @@ pub mod _puroro_nested {
                 ),
             >;
 
-            impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
-            where
-                Fields: SubmsgTemplateFieldTypes,
-                Shared: ::puroro::internal::SharedObjects,
+            impl<Fields, Shared> SubmsgTemplate<Fields, Shared> where
+                Fields: SubmsgTemplateFieldTypes
+                //    Shared: ::puroro::internal::SharedObjects,
             {
             }
 
-            impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
-            where
-                Fields: SubmsgTemplateFieldTypes,
-                Shared: ::puroro::internal::SharedObjects,
+            impl<Fields, Shared> SubmsgTemplate<Fields, Shared> where
+                Fields: SubmsgTemplateFieldTypes
+                //    Shared: ::puroro::internal::SharedObjects,
             {
             }
 

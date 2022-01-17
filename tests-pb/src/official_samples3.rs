@@ -731,10 +731,9 @@ pub mod _puroro_impls {
         ),
     >;
 
-    impl<Fields, Shared> Test1Template<Fields, Shared>
-    where
-        Fields: Test1TemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> Test1Template<Fields, Shared> where
+        Fields: Test1TemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
@@ -971,10 +970,9 @@ pub mod _puroro_impls {
         ),
     >;
 
-    impl<Fields, Shared> Test2Template<Fields, Shared>
-    where
-        Fields: Test2TemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> Test2Template<Fields, Shared> where
+        Fields: Test2TemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
@@ -1246,10 +1244,9 @@ pub mod _puroro_impls {
         ),
     >;
 
-    impl<Fields, Shared> Test3Template<Fields, Shared>
-    where
-        Fields: Test3TemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> Test3Template<Fields, Shared> where
+        Fields: Test3TemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
@@ -1499,10 +1496,9 @@ pub mod _puroro_impls {
         ),
     >;
 
-    impl<Fields, Shared> Test4Template<Fields, Shared>
-    where
-        Fields: Test4TemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> Test4Template<Fields, Shared> where
+        Fields: Test4TemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
