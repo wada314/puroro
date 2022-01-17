@@ -134,18 +134,18 @@ pub trait OptGetField<'a, FP, LabelTag, TypeTag> {
     fn into_opt_getter(self) -> Option<Self::OptGetterType>;
 }
 
-impl<'a, _1, _2, _3, _4, _5, FP, Shared>
+impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
     OptGetField<'a, FP, tags::NeedOptionalBitLabel<_1, _2>, tags::NonLdType<_3, _4, _5>>
-    for (
-        &'a <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType,
-        &'a Shared,
-    )
+    for (&'a FieldType, &'a Shared)
 where
     FP: FieldProperties<
         LabelTag = tags::NeedOptionalBitLabel<_1, _2>,
         TypeTag = tags::NonLdType<_3, _4, _5>,
     >,
+    tags::NonLdType<_3, _4, _5>: tags::NumericalTypeTag,
     <FP as FieldProperties>::TypeTag: tags::NumericalTypeTag,
+    FieldType:
+        Clone + Into<<<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,
 {
     type OptGetterType = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
@@ -155,7 +155,7 @@ where
             .bitfield()
             .get(<FP as FieldProperties>::OPTIONAL_FIELD_BIT_VEC_INDEX)
         {
-            Some(Clone::clone(self.0))
+            Some(self.0.clone().into())
         } else {
             None
         }
@@ -231,12 +231,7 @@ where
             tags::UInt32,
         >>::OptGetterType,
     > {
-        <(&Fields::AgeType, &Shared) as OptGetField<
-            '_,
-            PersonFieldProperty<2>,
-            tags::Optional,
-            tags::UInt32,
-        >>::into_opt_getter((&self.age, &self._shared))
+        (&self.age, &self._shared).into_opt_getter()
     }
 }
 
