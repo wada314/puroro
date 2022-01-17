@@ -90,36 +90,102 @@ impl<T> DerefMut for BumpaloOwned<T> {
 impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
 
 pub struct SimpleImpl;
+pub struct BumpaloImpl;
 
 // メモ
-mod test {
-    trait PersonParamsTuple {
-        type NameType;
-        type AgeType;
-        type ChildrenType;
-    }
-    impl PersonParamsTuple for () {
-        type NameType = ();
-        type AgeType = ();
-        type ChildrenType = ();
-    }
-    impl<NameType, AgeType, ChildrenType> PersonParamsTuple for (NameType, AgeType, ChildrenType) {
-        type NameType = NameType;
-        type AgeType = AgeType;
-        type ChildrenType = ChildrenType;
-    }
-    struct Person<T: PersonParamsTuple> {
-        name: <T as PersonParamsTuple>::NameType,
-        age: <T as PersonParamsTuple>::AgeType,
-        children: <T as PersonParamsTuple>::ChildrenType,
-    }
-    impl<T: PersonParamsTuple<AgeType = u32>> Person<T> {
-        fn age(&self) -> u32 {
-            self.age
-        }
-    }
+use internal::BitVec;
 
-    macro_rules! derive_person_params {
+pub trait SharedObjects {
+    type AllocatorType;
+    type BitvecType;
+    fn alloc(&self) -> &Self::AllocatorType;
+    fn bitvec(&self) -> &Self::BitvecType;
+    fn bitvec_mut(&mut self) -> &mut Self::BitvecType;
+}
+impl<A, B> SharedObjects for (A, B) {
+    type AllocatorType = A;
+    type BitvecType = B;
+    fn alloc(&self) -> &Self::AllocatorType {
+        &self.0
+    }
+    fn bitvec(&self) -> &Self::BitvecType {
+        &self.1
+    }
+    fn bitvec_mut(&mut self) -> &mut Self::BitvecType {
+        &mut self.1
+    }
+}
+
+pub trait MessageProperties {
+    const OPTIONAL_FIELD_BITVEC_START_INDEX: usize;
+}
+pub trait FieldProperties {
+    type MessageProperties: self::MessageProperties;
+    const OPTIONAL_FIELD_BITVEC_INDEX: usize = 0;
+    type LabelTag: tags::FieldLabelTag;
+    type TypeTag: tags::FieldTypeTag;
+}
+
+pub trait GetFieldDataSet<FP> {
+    type GetterType<'a>
+    where
+        Self: 'a;
+    fn as_getter(&self) -> Self::GetterType<'_>;
+}
+pub trait OptGetFieldDataSet<FP> {
+    type OptGetterType<'a>
+    where
+        Self: 'a;
+    fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>>;
+}
+
+impl<_1, _2, _3, FP, Shared> OptGetFieldDataSet<FP>
+    for (
+        &<<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType,
+        &Shared,
+    )
+where
+    FP: FieldProperties<LabelTag = tags::LabelNonRepeated<_1, _2, _3>>,
+    <FP as FieldProperties>::TypeTag: tags::NumericalTypeTag,
+    Shared: SharedObjects,
+    <Shared as SharedObjects>::BitvecType: BitVec,
+{
+    type OptGetterType<'a>
+    where
+        Self: 'a,
+    = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
+    fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>> {
+        todo!()
+    }
+}
+
+trait PersonParamsTuple {
+    type NameType;
+    type AgeType;
+    type ChildrenType;
+}
+impl PersonParamsTuple for () {
+    type NameType = ();
+    type AgeType = ();
+    type ChildrenType = ();
+}
+impl<NameType, AgeType, ChildrenType> PersonParamsTuple for (NameType, AgeType, ChildrenType) {
+    type NameType = NameType;
+    type AgeType = AgeType;
+    type ChildrenType = ChildrenType;
+}
+struct Person<T: PersonParamsTuple> {
+    name: <T as PersonParamsTuple>::NameType,
+    age: <T as PersonParamsTuple>::AgeType,
+    children: <T as PersonParamsTuple>::ChildrenType,
+}
+impl<T: PersonParamsTuple<AgeType = u32>> Person<T> {
+    fn age(&self) -> u32 {
+        self.age
+    }
+}
+
+macro_rules! derive_person_params {
         ($base:ty, $new_param_type:ty, $new_param_ident:ident) => {
             derive_person_params!(@typedecl $base, NameType, $new_param_type, $new_param_ident);
             derive_person_params!(@typedecl $base, AgeType, $new_param_type, $new_param_ident);
@@ -132,16 +198,15 @@ mod test {
             type $ident = <$base as PersonParamsTuple>::$ident;
         };
     }
-    struct Person_NameType<NameType>(NameType);
-    impl<NameType> PersonParamsTuple for Person_NameType<NameType> {
-        derive_person_params!((), NameType, NameType);
-    }
+struct Person_NameType<NameType>(NameType);
+impl<NameType> PersonParamsTuple for Person_NameType<NameType> {
+    derive_person_params!((), NameType, NameType);
+}
 
-    #[test]
-    fn test() {
-        let pn_str = Person_NameType::<&str>("hoge");
-        assert_eq!(16, std::mem::size_of_val(&pn_str));
-        let pn_string = Person_NameType::<String>("hoge".to_string());
-        assert_eq!(24, std::mem::size_of_val(&pn_str));
-    }
+#[test]
+fn test() {
+    let pn_str = Person_NameType::<&str>("hoge");
+    assert_eq!(16, std::mem::size_of_val(&pn_str));
+    let pn_string = Person_NameType::<String>("hoge".to_string());
+    assert_eq!(24, std::mem::size_of_val(&pn_str));
 }

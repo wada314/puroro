@@ -28,7 +28,7 @@ pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
-    Shared: ::puroro::internal::SharedObjects,
+//    Shared: ::puroro::internal::SharedObjects,
 {
 }
 
@@ -39,7 +39,7 @@ where
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
-    Shared: ::puroro::internal::SharedObjects,
+//    Shared: ::puroro::internal::SharedObjects,
 {
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}

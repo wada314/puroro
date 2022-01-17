@@ -535,17 +535,15 @@ pub mod _puroro_impls {
         ),
     >;
 
-    impl<Fields, Shared> BookTemplate<Fields, Shared>
-    where
-        Fields: BookTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> BookTemplate<Fields, Shared> where
+        Fields: BookTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
-    impl<Fields, Shared> BookTemplate<Fields, Shared>
-    where
-        Fields: BookTemplateFieldTypes,
-        Shared: ::puroro::internal::SharedObjects,
+    impl<Fields, Shared> BookTemplate<Fields, Shared> where
+        Fields: BookTemplateFieldTypes
+        //    Shared: ::puroro::internal::SharedObjects,
     {
     }
 
