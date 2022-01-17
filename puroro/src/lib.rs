@@ -97,10 +97,7 @@ use internal::Bitfield;
 
 pub struct SimpleFields;
 pub struct SimpleShared<const BITFIELD_U32_LEN: usize> {
-    bit_vec: crate::bitvec::array::BitArray<
-        crate::bitvec::order::Lsb0,
-        [u32; BITFIELD_U32_LEN]
-    >
+    bitfield: crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
 }
 
 pub trait SharedObjects {
@@ -110,17 +107,18 @@ pub trait SharedObjects {
     fn bitfield(&self) -> &Self::BitfieldType;
     fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
 }
-impl<A, B> SharedObjects for (A, B) {
-    type AllocatorType = A;
-    type BitfieldType = B;
+impl<const BITFIELD_U32_LEN: usize> SharedObjects for SimpleShared<BITFIELD_U32_LEN> {
+    type AllocatorType = ();
+    type BitfieldType =
+        crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>;
     fn alloc(&self) -> &Self::AllocatorType {
-        &self.0
+        &()
     }
     fn bitfield(&self) -> &Self::BitfieldType {
-        &self.1
+        &self.bitfield
     }
     fn bitfield_mut(&mut self) -> &mut Self::BitfieldType {
-        &mut self.1
+        &mut self.bitfield
     }
 }
 
@@ -181,7 +179,7 @@ impl PersonFieldsType for () {
     type AgeType = ();
     type ChildrenType = ();
 }
-impl<NameType, AgeType, ChildrenType> PersonFieldsType for SimpleImpl {
+impl PersonFieldsType for SimpleFields {
     type NameType = String;
     type AgeType = u32;
     type ChildrenType = Vec<PersonSimple>;
@@ -192,7 +190,7 @@ struct Person<Fields: PersonFieldsType, Shared> {
     age: <Fields as PersonFieldsType>::AgeType,
     children: <Fields as PersonFieldsType>::ChildrenType,
 }
-type PersonSimple = Person<SimpleImpl, SimpleShared>
+type PersonSimple = Person<SimpleFields, SimpleShared<1>>;
 impl<Fields: PersonFieldsType, Shared> Person<Fields, Shared> {}
 
 struct PersonFieldProperty<const FIELD_NUMBER: i32>;
