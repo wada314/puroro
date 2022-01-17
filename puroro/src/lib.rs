@@ -123,20 +123,30 @@ impl<const BITFIELD_U32_LEN: usize> SharedObjects for SimpleShared<BITFIELD_U32_
     }
 }
 
+pub struct FieldAndSharedRef<'a, Field, Shared> {
+    field: &'a Field,
+    shared: &'a Shared,
+}
+impl<'a, Field, Shared> FieldAndSharedRef<'a, Field, Shared> {
+    pub fn new(field: &'a Field, shared: &'a Shared) -> Self {
+        Self { field, shared }
+    }
+}
+
 pub trait FieldProperties {
     const OPTIONAL_FIELD_BIT_VEC_INDEX: usize = 0;
     type LabelTag: tags::FieldLabelTag;
     type TypeTag: tags::FieldTypeTag;
 }
 
-pub trait OptGetField<'a, FP, LabelTag, TypeTag> {
+pub trait OptGetFieldMethod<'a, FP, LabelTag, TypeTag> {
     type OptGetterType;
-    fn into_opt_getter(self) -> Option<Self::OptGetterType>;
+    fn get_opt(&self) -> Option<Self::OptGetterType>;
 }
 
 impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
-    OptGetField<'a, FP, tags::NeedOptionalBitLabel<_1, _2>, tags::NonLdType<_3, _4, _5>>
-    for (&'a FieldType, &'a Shared)
+    OptGetFieldMethod<'a, FP, tags::NeedOptionalBitLabel<_1, _2>, tags::NonLdType<_3, _4, _5>>
+    for FieldAndSharedRef<'a, FieldType, Shared>
 where
     FP: FieldProperties<
         LabelTag = tags::NeedOptionalBitLabel<_1, _2>,
@@ -148,13 +158,13 @@ where
     Shared: SharedObjects,
 {
     type OptGetterType = <<FP as FieldProperties>::TypeTag as tags::NumericalTypeTag>::NativeType;
-    fn into_opt_getter(self) -> Option<Self::OptGetterType> {
+    fn get_opt(&self) -> Option<Self::OptGetterType> {
         if self
-            .1
+            .shared
             .bitfield()
             .get(<FP as FieldProperties>::OPTIONAL_FIELD_BIT_VEC_INDEX)
         {
-            Some(self.0.clone().into())
+            Some(self.field.clone().into())
         } else {
             None
         }
@@ -208,8 +218,8 @@ where
     }
 }
 
-struct PersonFieldProperty<const FIELD_NUMBER: i32>;
-impl FieldProperties for PersonFieldProperty<2> {
+struct PersonFieldProperties<const FIELD_NUMBER: i32>;
+impl FieldProperties for PersonFieldProperties<2> {
     const OPTIONAL_FIELD_BIT_VEC_INDEX: usize = 1;
     type LabelTag = tags::Optional;
     type TypeTag = tags::UInt32;
@@ -217,20 +227,20 @@ impl FieldProperties for PersonFieldProperty<2> {
 impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
-    for<'a> (&'a Fields::AgeType, &'a Shared):
-        OptGetField<'a, PersonFieldProperty<2>, tags::Optional, tags::UInt32>,
+    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>:
+        OptGetFieldMethod<'a, PersonFieldProperties<2>, tags::Optional, tags::UInt32>,
 {
     pub fn age_opt(
         &self,
     ) -> Option<
-        <(&Fields::AgeType, &Shared) as OptGetField<
+        <FieldAndSharedRef<Fields::AgeType, Shared> as OptGetFieldMethod<
             '_,
-            PersonFieldProperty<2>,
+            PersonFieldProperties<2>,
             tags::Optional,
             tags::UInt32,
         >>::OptGetterType,
     > {
-        (&self.age, &self._shared).into_opt_getter()
+        FieldAndSharedRef::new(&self.age, &self._shared).get_opt()
     }
 }
 
