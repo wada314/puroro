@@ -28,6 +28,7 @@ pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
 
+use crate::tags;
 use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
@@ -139,5 +140,34 @@ impl<A, B> SharedObjects for (A, B) {
     }
     fn bitvec_mut(&mut self) -> &mut Self::BitvecType {
         &mut self.1
+    }
+}
+
+pub trait GetFieldDataSet<L, V> {
+    type GetterType<'a>
+    where
+        Self: 'a;
+    fn as_getter(&self) -> Self::GetterType<'_>;
+}
+pub trait OptGetFieldDataSet<L, V> {
+    type OptGetterType<'a>
+    where
+        Self: 'a;
+    fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>>;
+}
+
+impl<_1, _2, _3, V, Shared> OptGetFieldDataSet<tags::LabelNonRepeated<_1, _2, _3>, V>
+    for (&<V as tags::NumericalTypeTag>::NativeType, &Shared)
+where
+    V: tags::NumericalTypeTag,
+    Shared: SharedObjects,
+    <Shared as SharedObjects>::BitvecType: BitVec,
+{
+    type OptGetterType<'a>
+    where
+        Self: 'a,
+    = <V as tags::NumericalTypeTag>::NativeType;
+    fn as_opt_getter(&self) -> Option<Self::OptGetterType<'_>> {
+        todo!()
     }
 }

@@ -363,41 +363,28 @@ pub mod _puroro_impls {
 
     pub type MsgSimple2 = MsgTemplate<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as MsgTemplateFieldTypes>::TypeType: ::std::clone::Clone,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn type_opt(&self) -> ::std::option::Option<Fields::TypeType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(0) {
-                Some(::std::clone::Clone::clone(&self.r#type))
-            } else {
-                None
-            }
-        }
-
-        pub fn r#type(&self) -> Fields::TypeType {
-            ::std::clone::Clone::clone(&self.r#type)
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for MsgTemplate<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: MsgTemplateFieldTypes,
-        <Fields as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as MsgTemplateFieldTypes>::TypeType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 r#type: ::std::default::Default::default(),
             }
         }

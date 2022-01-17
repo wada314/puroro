@@ -2763,187 +2763,93 @@ pub mod _puroro_impls {
 
     pub type MsgSimple2 = MsgTemplate<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as MsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn i32_optional_opt(&self) -> ::std::option::Option<Fields::I32OptionalType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(0) {
-                Some(::std::clone::Clone::clone(&self.i32_optional))
-            } else {
-                None
-            }
-        }
-
-        pub fn i32_optional(&self) -> Fields::I32OptionalType {
-            ::std::clone::Clone::clone(&self.i32_optional)
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn i32_repeated(&self) -> &Fields::I32RepeatedType {
-            &self.i32_repeated
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as MsgTemplateFieldTypes>::FloatOptionalType: ::std::clone::Clone,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn float_optional_opt(&self) -> ::std::option::Option<Fields::FloatOptionalType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(1) {
-                Some(::std::clone::Clone::clone(&self.float_optional))
-            } else {
-                None
-            }
-        }
-
-        pub fn float_optional(&self) -> Fields::FloatOptionalType {
-            ::std::clone::Clone::clone(&self.float_optional)
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn float_repeated(&self) -> &Fields::FloatRepeatedType {
-            &self.float_repeated
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn string_optional_opt(&self) -> ::std::option::Option<&Fields::StringOptionalType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(2) {
-                Some(&self.string_optional)
-            } else {
-                None
-            }
-        }
-
-        pub fn string_optional(&self) -> &Fields::StringOptionalType {
-            &self.string_optional
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn string_repeated(&self) -> &Fields::StringRepeatedType {
-            &self.string_repeated
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as MsgTemplateFieldTypes>::SubmsgOptionalType: ::puroro::internal::MessageFieldType,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn submsg_optional_opt(&self) -> &Fields::SubmsgOptionalType {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            self.submsg_optional.as_getter_type()
-        }
-
-        pub fn submsg_optional(&self) -> &Fields::SubmsgOptionalType {
-            &self.submsg_optional
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn submsg_repeated(&self) -> &Fields::SubmsgRepeatedType {
-            &self.submsg_repeated
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as MsgTemplateFieldTypes>::EnumOptionalType: ::std::clone::Clone,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn enum_optional_opt(&self) -> ::std::option::Option<Fields::EnumOptionalType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(3) {
-                Some(::std::clone::Clone::clone(&self.enum_optional))
-            } else {
-                None
-            }
-        }
-
-        pub fn enum_optional(&self) -> Fields::EnumOptionalType {
-            ::std::clone::Clone::clone(&self.enum_optional)
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn enum_repeated(&self) -> &Fields::EnumRepeatedType {
-            &self.enum_repeated
-        }
     }
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as MsgTemplateFieldTypes>::VeryLargeFieldNumberType: ::std::clone::Clone,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn very_large_field_number_opt(
-            &self,
-        ) -> ::std::option::Option<Fields::VeryLargeFieldNumberType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(4) {
-                Some(::std::clone::Clone::clone(&self.very_large_field_number))
-            } else {
-                None
-            }
-        }
-
-        pub fn very_large_field_number(&self) -> Fields::VeryLargeFieldNumberType {
-            ::std::clone::Clone::clone(&self.very_large_field_number)
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for MsgTemplate<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: MsgTemplateFieldTypes,
-        <Fields as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as MsgTemplateFieldTypes>::I32OptionalType: ::std::default::Default,
         <Fields as MsgTemplateFieldTypes>::I32RepeatedType: ::std::default::Default,
         <Fields as MsgTemplateFieldTypes>::FloatOptionalType: ::std::default::Default,
@@ -2958,8 +2864,7 @@ pub mod _puroro_impls {
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 i32_optional: ::std::default::Default::default(),
                 i32_repeated: ::std::default::Default::default(),
                 float_optional: ::std::default::Default::default(),
@@ -4068,44 +3973,31 @@ pub mod _puroro_nested {
 
             pub type SubmsgSimple2 = SubmsgTemplate<
                 ::puroro::SimpleImpl,
-                ::puroro::bitvec::array::BitArray<
-                    ::puroro::bitvec::order::Lsb0,
-                    [u32; (1 + 31) / 32],
-                >,
+                (
+                    (),
+                    ::puroro::bitvec::array::BitArray<
+                        ::puroro::bitvec::order::Lsb0,
+                        [u32; (1 + 31) / 32],
+                    >,
+                ),
             >;
 
-            impl<Fields, B> SubmsgTemplate<Fields, B>
+            impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
             where
                 Fields: SubmsgTemplateFieldTypes,
-                B: ::puroro::internal::BitVec,
-                <Fields as SubmsgTemplateFieldTypes>::I32OptionalType: ::std::clone::Clone,
+                Shared: ::puroro::internal::SharedObjects,
             {
-                pub fn i32_optional_opt(&self) -> ::std::option::Option<Fields::I32OptionalType> {
-                    #[allow(unused)]
-                    use ::std::option::Option::{None, Some};
-                    if self._bitvec.get(0) {
-                        Some(::std::clone::Clone::clone(&self.i32_optional))
-                    } else {
-                        None
-                    }
-                }
-
-                pub fn i32_optional(&self) -> Fields::I32OptionalType {
-                    ::std::clone::Clone::clone(&self.i32_optional)
-                }
             }
 
-            impl<Fields, B> ::std::default::Default for SubmsgTemplate<Fields, B>
+            impl<Fields, Shared> ::std::default::Default for SubmsgTemplate<Fields, Shared>
             where
-                B: ::std::default::Default,
                 Fields: SubmsgTemplateFieldTypes,
-                <Fields as SubmsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+                Shared: ::std::default::Default,
                 <Fields as SubmsgTemplateFieldTypes>::I32OptionalType: ::std::default::Default,
             {
                 fn default() -> Self {
                     Self {
-                        _alloc: ::std::default::Default::default(),
-                        _bitvec: ::std::default::Default::default(),
+                        _shared: ::std::default::Default::default(),
                         i32_optional: ::std::default::Default::default(),
                     }
                 }

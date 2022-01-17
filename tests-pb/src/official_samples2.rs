@@ -735,41 +735,28 @@ pub mod _puroro_impls {
 
     pub type Test1Simple2 = Test1Template<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> Test1Template<Fields, B>
+    impl<Fields, Shared> Test1Template<Fields, Shared>
     where
         Fields: Test1TemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as Test1TemplateFieldTypes>::AType: ::std::clone::Clone,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn a_opt(&self) -> ::std::option::Option<Fields::AType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(0) {
-                Some(::std::clone::Clone::clone(&self.a))
-            } else {
-                None
-            }
-        }
-
-        pub fn a(&self) -> Fields::AType {
-            ::std::clone::Clone::clone(&self.a)
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for Test1Template<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for Test1Template<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: Test1TemplateFieldTypes,
-        <Fields as Test1TemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as Test1TemplateFieldTypes>::AType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
         }
@@ -990,40 +977,28 @@ pub mod _puroro_impls {
 
     pub type Test2Simple2 = Test2Template<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> Test2Template<Fields, B>
+    impl<Fields, Shared> Test2Template<Fields, Shared>
     where
         Fields: Test2TemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn b_opt(&self) -> ::std::option::Option<&Fields::BType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            if self._bitvec.get(0) {
-                Some(&self.b)
-            } else {
-                None
-            }
-        }
-
-        pub fn b(&self) -> &Fields::BType {
-            &self.b
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for Test2Template<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for Test2Template<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: Test2TemplateFieldTypes,
-        <Fields as Test2TemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as Test2TemplateFieldTypes>::BType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 b: ::std::default::Default::default(),
             }
         }
@@ -1277,37 +1252,28 @@ pub mod _puroro_impls {
 
     pub type Test3Simple2 = Test3Template<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> Test3Template<Fields, B>
+    impl<Fields, Shared> Test3Template<Fields, Shared>
     where
         Fields: Test3TemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as Test3TemplateFieldTypes>::CType: ::puroro::internal::MessageFieldType,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn c_opt(&self) -> &Fields::CType {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            self.c.as_getter_type()
-        }
-
-        pub fn c(&self) -> &Fields::CType {
-            &self.c
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for Test3Template<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for Test3Template<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: Test3TemplateFieldTypes,
-        <Fields as Test3TemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as Test3TemplateFieldTypes>::CType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 c: ::std::default::Default::default(),
             }
         }
@@ -1539,30 +1505,28 @@ pub mod _puroro_impls {
 
     pub type Test4Simple2 = Test4Template<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> Test4Template<Fields, B>
+    impl<Fields, Shared> Test4Template<Fields, Shared>
     where
         Fields: Test4TemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn d(&self) -> &Fields::DType {
-            &self.d
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for Test4Template<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for Test4Template<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: Test4TemplateFieldTypes,
-        <Fields as Test4TemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as Test4TemplateFieldTypes>::DType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 d: ::std::default::Default::default(),
             }
         }

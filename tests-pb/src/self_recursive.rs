@@ -421,38 +421,28 @@ pub mod _puroro_impls {
 
     pub type MsgSimple2 = MsgTemplate<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> MsgTemplate<Fields, B>
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as MsgTemplateFieldTypes>::RecursiveUnlabeledType:
-            ::puroro::internal::MessageFieldType,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn recursive_unlabeled_opt(&self) -> &Fields::RecursiveUnlabeledType {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-            self.recursive_unlabeled.as_getter_type()
-        }
-
-        pub fn recursive_unlabeled(&self) -> &Fields::RecursiveUnlabeledType {
-            &self.recursive_unlabeled
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for MsgTemplate<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: MsgTemplateFieldTypes,
-        <Fields as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as MsgTemplateFieldTypes>::RecursiveUnlabeledType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 recursive_unlabeled: ::std::default::Default::default(),
             }
         }

@@ -1629,19 +1629,20 @@ pub mod _puroro_impls {
 
     pub type MsgSimple2 = MsgTemplate<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (5 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> ::std::default::Default for MsgTemplate<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: MsgTemplateFieldTypes,
-        <Fields as MsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
             }
         }
     }
@@ -1865,36 +1866,28 @@ pub mod _puroro_impls {
 
     pub type SubmsgSimple2 = SubmsgTemplate<
         ::puroro::SimpleImpl,
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        (
+            (),
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        ),
     >;
 
-    impl<Fields, B> SubmsgTemplate<Fields, B>
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
     where
         Fields: SubmsgTemplateFieldTypes,
-        B: ::puroro::internal::BitVec,
-        <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::clone::Clone,
+        Shared: ::puroro::internal::SharedObjects,
     {
-        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<Fields::I32UnlabeledType> {
-            #[allow(unused)]
-            use ::std::option::Option::{None, Some};
-        }
-
-        pub fn i32_unlabeled(&self) -> Fields::I32UnlabeledType {
-            ::std::clone::Clone::clone(&self.i32_unlabeled)
-        }
     }
 
-    impl<Fields, B> ::std::default::Default for SubmsgTemplate<Fields, B>
+    impl<Fields, Shared> ::std::default::Default for SubmsgTemplate<Fields, Shared>
     where
-        B: ::std::default::Default,
         Fields: SubmsgTemplateFieldTypes,
-        <Fields as SubmsgTemplateFieldTypes>::Alloc: ::std::default::Default,
+        Shared: ::std::default::Default,
         <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType: ::std::default::Default,
     {
         fn default() -> Self {
             Self {
-                _alloc: ::std::default::Default::default(),
-                _bitvec: ::std::default::Default::default(),
+                _shared: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
             }
         }
