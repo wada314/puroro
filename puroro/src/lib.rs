@@ -292,11 +292,34 @@ impl MessageProperties for PersonMessageProperties {
     const OPTIONAL_FIELD_BITFIELD_START_INDEX: usize = 0;
 }
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
+impl FieldProperties for PersonFieldProperties<1> {
+    type MessageProperties = PersonMessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+    type LabelTag = tags::Optional;
+    type TypeTag = tags::String;
+}
 impl FieldProperties for PersonFieldProperties<2> {
     type MessageProperties = PersonMessageProperties;
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 1;
     type LabelTag = tags::Optional;
     type TypeTag = tags::UInt32;
+}
+impl<Fields, Shared> Person<Fields, Shared>
+where
+    Fields: PersonFieldsType,
+    for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>:
+        GetOptFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag>,
+{
+    pub fn name_opt(
+        &self,
+    ) -> Option<
+        <FieldAndSharedRef<Fields::NameType, Shared> as GetOptFieldMethod<
+            PersonFieldProperties<1>,
+            Fields::ImplTag,
+        >>::InnerType,
+    > {
+        FieldAndSharedRef::new(&self.name, &self._shared).get_opt()
+    }
 }
 impl<Fields, Shared> Person<Fields, Shared>
 where
@@ -334,4 +357,6 @@ fn test() {
     let person = PersonSimple::default();
     let _hoge = person.age_opt();
     assert_eq!(Some(0), person.age_opt());
+    let _foo = person.name_opt();
+    assert_eq!(Some(""), person.name_opt());
 }
