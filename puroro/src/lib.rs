@@ -150,7 +150,25 @@ pub trait GetFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
 
 pub trait GetOptFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
     type InnerType;
-    fn get_opt(&self) -> Option<Self::InnerType>;
+    fn get_opt_impl(&self) -> Option<Self::InnerType>;
+}
+pub trait GetOptFieldMethodProxy<'a, FP, ImplTag>:
+    GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>
+where
+    FP: FieldProperties,
+{
+    fn get_opt(
+        &self,
+    ) -> Option<<Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::InnerType>
+    {
+        <Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_opt_impl(&self)
+    }
+}
+impl<'a, FP, ImplTag, T> GetOptFieldMethodProxy<'a, FP, ImplTag> for T
+where
+    FP: FieldProperties,
+    T: GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
+{
 }
 
 impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
@@ -172,7 +190,7 @@ where
     Shared: SharedObjects,
 {
     type InnerType = <FP::TypeTag as tags::NumericalTypeTag>::NativeType;
-    fn get_opt(&self) -> Option<Self::InnerType> {
+    fn get_opt_impl(&self) -> Option<Self::InnerType> {
         let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
             + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
