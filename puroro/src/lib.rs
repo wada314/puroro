@@ -143,13 +143,18 @@ pub trait FieldProperties {
     type TypeTag: tags::FieldTypeTag;
 }
 
-pub trait OptGetFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
-    type OptGetterType;
-    fn get_opt(&self) -> Option<Self::OptGetterType>;
+pub trait GetFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
+    type GetterType;
+    fn get(&self) -> Self::GetterType;
+}
+
+pub trait GetOptFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
+    type InnerType;
+    fn get_opt(&self) -> Option<Self::InnerType>;
 }
 
 impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
-    OptGetFieldMethod<
+    GetOptFieldMethod<
         'a,
         FP,
         tags::SimpleImpl,
@@ -166,8 +171,8 @@ where
     FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,
 {
-    type OptGetterType = <FP::TypeTag as tags::NumericalTypeTag>::NativeType;
-    fn get_opt(&self) -> Option<Self::OptGetterType> {
+    type InnerType = <FP::TypeTag as tags::NumericalTypeTag>::NativeType;
+    fn get_opt(&self) -> Option<Self::InnerType> {
         let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
             + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
@@ -236,7 +241,7 @@ impl FieldProperties for PersonFieldProperties<2> {
 impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
-    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>: OptGetFieldMethod<
+    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>: GetOptFieldMethod<
         'a,
         PersonFieldProperties<2>,
         Fields::ImplTag,
@@ -247,13 +252,12 @@ where
     pub fn age_opt(
         &self,
     ) -> Option<
-        <FieldAndSharedRef<Fields::AgeType, Shared> as OptGetFieldMethod<
-            '_,
+        <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethod<
             PersonFieldProperties<2>,
             Fields::ImplTag,
             tags::Optional,
             tags::UInt32,
-        >>::OptGetterType,
+        >>::InnerType,
     > {
         FieldAndSharedRef::new(&self.age, &self._shared).get_opt()
     }
