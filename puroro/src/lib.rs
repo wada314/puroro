@@ -149,26 +149,27 @@ pub trait GetFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
 }
 
 pub trait GetOptFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
-    type InnerType;
-    fn get_opt_impl(&self) -> Option<Self::InnerType>;
+    type InnerTypeImpl;
+    fn get_opt_impl(&self) -> Option<Self::InnerTypeImpl>;
 }
 pub trait GetOptFieldMethodProxy<'a, FP, ImplTag>:
     GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>
 where
     FP: FieldProperties,
 {
-    fn get_opt(
-        &self,
-    ) -> Option<<Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::InnerType>
-    {
-        <Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_opt_impl(&self)
-    }
+    type InnerType;
+    fn get_opt(&self) -> Option<Self::InnerType>;
 }
 impl<'a, FP, ImplTag, T> GetOptFieldMethodProxy<'a, FP, ImplTag> for T
 where
     FP: FieldProperties,
     T: GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
 {
+    type InnerType =
+        <Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::InnerTypeImpl;
+    fn get_opt(&self) -> Option<Self::InnerType> {
+        <Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_opt_impl(&self)
+    }
 }
 
 impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
@@ -189,8 +190,8 @@ where
     FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,
 {
-    type InnerType = <FP::TypeTag as tags::NumericalTypeTag>::NativeType;
-    fn get_opt_impl(&self) -> Option<Self::InnerType> {
+    type InnerTypeImpl = <FP::TypeTag as tags::NumericalTypeTag>::NativeType;
+    fn get_opt_impl(&self) -> Option<Self::InnerTypeImpl> {
         let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
             + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
@@ -259,22 +260,15 @@ impl FieldProperties for PersonFieldProperties<2> {
 impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
-    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>: GetOptFieldMethod<
-        'a,
-        PersonFieldProperties<2>,
-        Fields::ImplTag,
-        tags::Optional,
-        tags::UInt32,
-    >,
+    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>:
+        GetOptFieldMethodProxy<'a, PersonFieldProperties<2>, Fields::ImplTag>,
 {
     pub fn age_opt(
         &self,
     ) -> Option<
-        <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethod<
+        <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethodProxy<
             PersonFieldProperties<2>,
             Fields::ImplTag,
-            tags::Optional,
-            tags::UInt32,
         >>::InnerType,
     > {
         FieldAndSharedRef::new(&self.age, &self._shared).get_opt()
