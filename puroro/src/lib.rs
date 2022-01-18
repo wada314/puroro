@@ -148,32 +148,30 @@ pub trait GetFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
     fn get(&self) -> Self::GetterType;
 }
 
-pub trait GetOptFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
+pub trait GetOptFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
     type InnerTypeImpl;
     fn get_opt_impl(&self) -> Option<Self::InnerTypeImpl>;
 }
-pub trait GetOptFieldMethodProxy<'a, FP, ImplTag>:
-    GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>
-where
-    FP: FieldProperties,
-{
+pub trait GetOptFieldMethod<'a, FP, ImplTag> {
     type InnerType;
     fn get_opt(&self) -> Option<Self::InnerType>;
 }
-impl<'a, FP, ImplTag, T> GetOptFieldMethodProxy<'a, FP, ImplTag> for T
+impl<'a, FP, ImplTag, T> GetOptFieldMethod<'a, FP, ImplTag> for T
 where
     FP: FieldProperties,
-    T: GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
+    T: GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
 {
     type InnerType =
-        <Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::InnerTypeImpl;
+        <Self as GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::InnerTypeImpl;
     fn get_opt(&self) -> Option<Self::InnerType> {
-        <Self as GetOptFieldMethod<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_opt_impl(&self)
+        <Self as GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_opt_impl(
+            &self,
+        )
     }
 }
 
 impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
-    GetOptFieldMethod<
+    GetOptFieldMethodImpl<
         'a,
         FP,
         tags::SimpleImpl,
@@ -261,12 +259,12 @@ impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
     for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>:
-        GetOptFieldMethodProxy<'a, PersonFieldProperties<2>, Fields::ImplTag>,
+        GetOptFieldMethod<'a, PersonFieldProperties<2>, Fields::ImplTag>,
 {
     pub fn age_opt(
         &self,
     ) -> Option<
-        <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethodProxy<
+        <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethod<
             PersonFieldProperties<2>,
             Fields::ImplTag,
         >>::InnerType,
