@@ -94,6 +94,7 @@ pub struct BumpaloImpl;
 
 // メモ
 use internal::Bitfield;
+use std::marker::PhantomData;
 
 pub struct SimpleFields;
 #[derive(Default, Clone, Debug)]
