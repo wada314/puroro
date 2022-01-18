@@ -144,9 +144,24 @@ pub trait FieldProperties {
     type TypeTag: tags::FieldTypeTag;
 }
 
-pub trait GetFieldMethod<'a, FP, ImplTag, LabelTag, TypeTag> {
+pub trait GetFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
+    type GetterTypeImpl;
+    fn get_impl(&self) -> Self::GetterTypeImpl;
+}
+pub trait GetFieldMethod<'a, FP, ImplTag> {
     type GetterType;
     fn get(&self) -> Self::GetterType;
+}
+impl<'a, FP, ImplTag, T> GetFieldMethod<'a, FP, ImplTag> for T
+where
+    FP: FieldProperties,
+    T: GetFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
+{
+    type GetterType =
+        <Self as GetFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
+    fn get(&self) -> Self::GetterType {
+        <Self as GetFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_impl(self)
+    }
 }
 
 pub trait GetOptFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
