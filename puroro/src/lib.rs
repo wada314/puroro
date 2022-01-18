@@ -243,6 +243,20 @@ where
     }
 }
 
+// for repeated message type
+impl<'a, FP, MP, MessageType, Shared>
+    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Repeated, tags::Message<MP>>
+    for FieldAndSharedRef<'a, Vec<MessageType>, Shared>
+where
+    FP: FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::Message<MP>>,
+    Shared: SharedObjects,
+{
+    type GetterTypeImpl = &'a [MessageType];
+    fn get_impl(&self) -> Self::GetterTypeImpl {
+        self.field
+    }
+}
+
 // assume a proto like this:
 // message Person {
 //     optional string name = 1;
@@ -304,6 +318,12 @@ impl FieldProperties for PersonFieldProperties<2> {
     type LabelTag = tags::Optional;
     type TypeTag = tags::UInt32;
 }
+impl FieldProperties for PersonFieldProperties<3> {
+    type MessageProperties = PersonMessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+    type LabelTag = tags::Repeated;
+    type TypeTag = tags::Message<PersonMessageProperties>;
+}
 impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
@@ -322,6 +342,21 @@ where
 {
     pub fn age_opt(&self) -> Option<u32> {
         FieldAndSharedRef::new(&self.age, &self._shared).get_opt()
+    }
+}
+impl<Fields, Shared> Person<Fields, Shared>
+where
+    Fields: PersonFieldsType,
+    for<'a> FieldAndSharedRef<'a, Fields::ChildrenType, Shared>:
+        GetFieldMethod<'a, PersonFieldProperties<3>, Fields::ImplTag>,
+{
+    pub fn children(
+        &self,
+    ) -> <FieldAndSharedRef<Fields::ChildrenType, Shared> as GetFieldMethod<
+        PersonFieldProperties<3>,
+        Fields::ImplTag,
+    >>::GetterType {
+        FieldAndSharedRef::new(&self.children, &self._shared).get()
     }
 }
 
@@ -345,4 +380,5 @@ fn test() {
     assert_eq!(Some(0), person.age_opt());
     let _foo = person.name_opt();
     assert_eq!(Some(""), person.name_opt());
+    let _hoga = person.children();
 }
