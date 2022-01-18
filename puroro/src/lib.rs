@@ -308,16 +308,9 @@ impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
     for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>:
-        GetOptFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag>,
+        GetOptFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag, InnerType = &'a str>,
 {
-    pub fn name_opt(
-        &self,
-    ) -> Option<
-        <FieldAndSharedRef<Fields::NameType, Shared> as GetOptFieldMethod<
-            PersonFieldProperties<1>,
-            Fields::ImplTag,
-        >>::InnerType,
-    > {
+    pub fn name_opt(&self) -> Option<&str> {
         FieldAndSharedRef::new(&self.name, &self._shared).get_opt()
     }
 }
@@ -325,16 +318,9 @@ impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
     for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>:
-        GetOptFieldMethod<'a, PersonFieldProperties<2>, Fields::ImplTag>,
+        GetOptFieldMethod<'a, PersonFieldProperties<2>, Fields::ImplTag, InnerType = u32>,
 {
-    pub fn age_opt(
-        &self,
-    ) -> Option<
-        <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethod<
-            PersonFieldProperties<2>,
-            Fields::ImplTag,
-        >>::InnerType,
-    > {
+    pub fn age_opt(&self) -> Option<u32> {
         FieldAndSharedRef::new(&self.age, &self._shared).get_opt()
     }
 }
