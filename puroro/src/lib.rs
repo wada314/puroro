@@ -170,6 +170,7 @@ where
     }
 }
 
+// for [optional|required] numeric types
 impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
     GetOptFieldMethodImpl<
         'a,
@@ -194,6 +195,32 @@ where
             + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             Some(self.field.clone().into())
+        } else {
+            None
+        }
+    }
+}
+
+// for [optional|required] string type
+impl<'a, _1, _2, FP, FieldType, Shared>
+    GetOptFieldMethodImpl<
+        'a,
+        FP,
+        tags::SimpleImpl,
+        tags::NeedOptionalBitLabel<_1, _2>,
+        tags::String,
+    > for FieldAndSharedRef<'a, FieldType, Shared>
+where
+    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1, _2>, TypeTag = tags::String>,
+    FieldType: AsRef<str>,
+    Shared: SharedObjects,
+{
+    type InnerTypeImpl = &'a str;
+    fn get_opt_impl(&self) -> Option<Self::InnerTypeImpl> {
+        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
+            + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
+        if self.shared.bitfield().get(opt_bit_index) {
+            Some(AsRef::as_ref(self.field))
         } else {
             None
         }
