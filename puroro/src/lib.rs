@@ -165,21 +165,21 @@ where
 }
 
 pub trait GetOptFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
-    type InnerTypeImpl;
-    fn get_opt_impl(&self) -> Option<Self::InnerTypeImpl>;
+    type GetterTypeImpl;
+    fn get_opt_impl(&self) -> Self::GetterTypeImpl;
 }
 pub trait GetOptFieldMethod<'a, FP, ImplTag> {
-    type InnerType;
-    fn get_opt(&self) -> Option<Self::InnerType>;
+    type GetterType;
+    fn get_opt(&self) -> Self::GetterType;
 }
 impl<'a, FP, ImplTag, T> GetOptFieldMethod<'a, FP, ImplTag> for T
 where
     FP: FieldProperties,
     T: GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
 {
-    type InnerType =
-        <Self as GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::InnerTypeImpl;
-    fn get_opt(&self) -> Option<Self::InnerType> {
+    type GetterType =
+        <Self as GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
+    fn get_opt(&self) -> Self::GetterType {
         <Self as GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_opt_impl(
             &self,
         )
@@ -205,8 +205,8 @@ where
     FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,
 {
-    type InnerTypeImpl = <FP::TypeTag as tags::NumericalTypeTag>::NativeType;
-    fn get_opt_impl(&self) -> Option<Self::InnerTypeImpl> {
+    type GetterTypeImpl = Option<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>;
+    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
         let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
             + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
@@ -231,8 +231,8 @@ where
     FieldType: AsRef<str>,
     Shared: SharedObjects,
 {
-    type InnerTypeImpl = &'a str;
-    fn get_opt_impl(&self) -> Option<Self::InnerTypeImpl> {
+    type GetterTypeImpl = Option<&'a str>;
+    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
         let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
             + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
@@ -328,9 +328,14 @@ impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
     for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>:
-        GetOptFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag, InnerType = &'a str>,
+        GetOptFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag>,
 {
-    pub fn name_opt(&self) -> Option<&str> {
+    pub fn name_opt(
+        &self,
+    ) -> <FieldAndSharedRef<Fields::NameType, Shared> as GetOptFieldMethod<
+        PersonFieldProperties<1>,
+        Fields::ImplTag,
+    >>::GetterType {
         FieldAndSharedRef::new(&self.name, &self._shared).get_opt()
     }
 }
@@ -338,9 +343,14 @@ impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
     for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>:
-        GetOptFieldMethod<'a, PersonFieldProperties<2>, Fields::ImplTag, InnerType = u32>,
+        GetOptFieldMethod<'a, PersonFieldProperties<2>, Fields::ImplTag>,
 {
-    pub fn age_opt(&self) -> Option<u32> {
+    pub fn age_opt(
+        &self,
+    ) -> <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethod<
+        PersonFieldProperties<2>,
+        Fields::ImplTag,
+    >>::GetterType {
         FieldAndSharedRef::new(&self.age, &self._shared).get_opt()
     }
 }
