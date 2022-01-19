@@ -42,6 +42,8 @@ pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
 >;
 
 {%- for f in m.fields %}
+
+{#################- getter method ################-#}
 {%- if !f.is_explicit_oneof_field %}
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
@@ -53,7 +55,7 @@ where
             Fields::ImplTag,
         >
 {
-    pub fn {{ f.ident_unesc }}(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::{{ f.template_type_name }}, Shared> as
+    pub fn {{ f.ident }}(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::{{ f.template_type_name }}, Shared> as
         ::puroro::internal::methods::GetFieldMethod<
             self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
             Fields::ImplTag,
@@ -64,6 +66,48 @@ where
     }
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
+
+{#################- optional getter method ################-#}
+{%- if !f.is_repeated %}
+impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
+where
+    Fields: {{ m.template_field_types_trait }},
+    for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::{{ f.template_type_name }}, Shared>:
+        ::puroro::internal::methods::GetOptFieldMethod<
+            'a,
+            self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
+            Fields::ImplTag,
+        >
+{
+    pub fn {{ f.ident_unesc }}_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::{{ f.template_type_name }}, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
+            Fields::ImplTag,
+        >
+    >::GetterType {
+        use ::puroro::internal::methods::GetOptFieldMethod as _;
+        ::puroro::internal::FieldAndSharedRef::new(&self.{{ f.ident }}, &self._shared).get_opt()
+    }
+}
+{%- endif %} {#- if !f.is_repeated #}
+
+{#################- has_ method ################-#}
+impl<Fields, Shared, OptionInnerType> {{ m.template_ident }}<Fields, Shared>
+where
+    Fields: {{ m.template_field_types_trait }},
+    for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::{{ f.template_type_name }}, Shared>:
+        ::puroro::internal::methods::GetOptFieldMethod<
+            'a,
+            self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
+            Fields::ImplTag,
+            GetterType = Option<OptionInnerType>,
+        >
+{
+    pub fn has_{{ f.ident_unesc }}(&self) -> bool {
+        self.{{ f.ident_unesc }}_opt().is_some()
+    }
+}
+
 {%- endfor %} {#- for f in m.fields #}
 
 {#################- std trait impls ################-#}

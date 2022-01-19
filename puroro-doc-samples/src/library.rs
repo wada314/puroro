@@ -551,6 +551,7 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
+
     impl<Fields, Shared> BookTemplate<Fields, Shared>
     where
         Fields: BookTemplateFieldTypes,
@@ -571,6 +572,44 @@ pub mod _puroro_impls {
             ::puroro::internal::FieldAndSharedRef::new(&self.title, &self._shared).get()
         }
     }
+
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::TitleType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::BookFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn title_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::TitleType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::BookFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.title, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::TitleType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::BookFieldProperties<1>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_title(&self) -> bool {
+            self.title_opt().is_some()
+        }
+    }
+
     impl<Fields, Shared> BookTemplate<Fields, Shared>
     where
         Fields: BookTemplateFieldTypes,
@@ -589,6 +628,43 @@ pub mod _puroro_impls {
         >::GetterType{
             use ::puroro::internal::methods::GetFieldMethod as _;
             ::puroro::internal::FieldAndSharedRef::new(&self.num_pages, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::NumPagesType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::BookFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn num_pages_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::NumPagesType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::BookFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.num_pages, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::NumPagesType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::BookFieldProperties<2>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_num_pages(&self) -> bool {
+            self.num_pages_opt().is_some()
         }
     }
 
