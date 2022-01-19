@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::tests_pb::full_coverage2::MsgSimple2 as Msg2;
-
 #[test]
-fn test_basic() {
-    let m = Msg2::default();
-    let i = m.string_optional();
-    let i2 = i.clone();
-    let sr = m.string_repeated();
+fn test_basic1() {
+    use crate::tests_pb::official_samples2::*;
+    let m = Test2Simple2::default();
+    let so = m.b();
 }

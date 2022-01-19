@@ -20,7 +20,7 @@ use crate::tags;
 // [optional|required|(unlabeled)] non-message field
 // assuming that getter_opt method is implemented, and the `FieldPropetry::DEFAULT_VALUE`
 // type is the same as the getter's return type.
-impl<'a, _1, _2, _3, FP, FieldType, Shared>
+impl<'a, _1, _2, _3, FP, FieldType, Shared, GetterType>
     GetFieldMethodImpl<
         'a,
         FP,
@@ -29,23 +29,19 @@ impl<'a, _1, _2, _3, FP, FieldType, Shared>
         tags::NonMessageType<_2, _3>,
     > for FieldAndSharedRef<'a, FieldType, Shared>
 where
+    GetterType: 'a,
     FP: FieldProperties<
         LabelTag = tags::NonRepeatedLabel<_1>,
         TypeTag = tags::NonMessageType<_2, _3>,
     >,
-    Shared: SharedObjects,
-    tags::NonMessageType<_2, _3>: tags::FieldTypeTag,
-    Self: GetOptFieldMethod<
-        'a,
-        FP,
-        tags::SimpleImpl,
-        GetterType = Option<<FP::TypeTag as tags::FieldTypeTag>::DefaultValueType>,
-    >,
+    tags::NonMessageType<_2, _3>: tags::FieldTypeTag<DefaultValueType = GetterType>,
+    //<tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType: Into<GetterType>,
+    Self: GetOptFieldMethod<'a, FP, tags::SimpleImpl, GetterType = Option<GetterType>>,
 {
-    type GetterTypeImpl = <FP::TypeTag as tags::FieldTypeTag>::DefaultValueType;
+    type GetterTypeImpl = GetterType;
     fn get_impl(&self) -> Self::GetterTypeImpl {
         let opt_value = <Self as GetOptFieldMethod<FP, tags::SimpleImpl>>::get_opt(self);
-        opt_value.unwrap_or(FP::DEFAULT_VALUE)
+        opt_value.unwrap_or(Into::into(FP::DEFAULT_VALUE))
     }
 }
 

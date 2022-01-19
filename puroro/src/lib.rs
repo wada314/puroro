@@ -183,6 +183,36 @@ where
         FieldAndSharedRef::new(&self.name, &self._shared).get_opt()
     }
 }
+use internal::methods::GetFieldMethodImpl;
+impl<Fields, Shared> Person<Fields, Shared>
+where
+    Fields: PersonFieldsType,
+    for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>: GetFieldMethodImpl<
+        'a,
+        PersonFieldProperties<1>,
+        Fields::ImplTag,
+        tags::Optional,
+        tags::String,
+    >,
+{
+    pub fn hoge(&self) {}
+} /*
+impl<Fields, Shared> Person<Fields, Shared>
+where
+Fields: PersonFieldsType,
+for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>:
+GetFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag>,
+{
+pub fn hoge(&self) {}
+pub fn name(
+&self,
+) -> <FieldAndSharedRef<Fields::NameType, Shared> as GetFieldMethod<
+PersonFieldProperties<1>,
+Fields::ImplTag,
+>>::GetterType {
+FieldAndSharedRef::new(&self.name, &self._shared).get()
+}
+}*/
 impl<Fields, Shared> Person<Fields, Shared>
 where
     Fields: PersonFieldsType,
@@ -235,4 +265,15 @@ fn test() {
     let _foo = person.name_opt();
     assert_eq!(Some(""), person.name_opt());
     let _hoga = person.children();
+    //let _nama = person.name();
+    //person.hoge();
+    let name = String::new();
+    let shared = SimpleShared::<1>::default();
+    let fands = FieldAndSharedRef::new(&name, &shared);
+    <FieldAndSharedRef<String, SimpleShared<1>> as GetFieldMethodImpl<
+        PersonFieldProperties<1>,
+        tags::SimpleImpl,
+        tags::Optional,
+        tags::String,
+    >>::get_impl(&fands);
 }
