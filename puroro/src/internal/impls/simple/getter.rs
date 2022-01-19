@@ -65,15 +65,15 @@ where
     }
 }
 
-// repeated message field
-impl<'a, FP, MP, MessageType, Shared>
-    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Repeated, tags::Message<MP>>
-    for FieldAndSharedRef<'a, Vec<MessageType>, Shared>
+// repeated field
+impl<'a, FP, ScalarType, Shared, TypeTag>
+    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Repeated, TypeTag>
+    for FieldAndSharedRef<'a, Vec<ScalarType>, Shared>
 where
-    FP: FieldProperties<LabelTag = tags::Repeated, TypeTag = tags::Message<MP>>,
+    FP: FieldProperties<LabelTag = tags::Repeated, TypeTag = TypeTag>,
     Shared: SharedObjects,
 {
-    type GetterTypeImpl = &'a [MessageType];
+    type GetterTypeImpl = &'a [ScalarType];
     fn get_impl(&self) -> Self::GetterTypeImpl {
         self.field
     }
