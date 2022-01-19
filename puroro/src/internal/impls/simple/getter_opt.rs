@@ -18,7 +18,7 @@ use crate::internal::FieldProperties;
 use crate::internal::{FieldAndSharedRef, SharedObjects};
 use crate::tags;
 
-// [optional|required] numeric field
+// (optional|required) numeric field
 impl<'a, _1, _2, FP, FieldType, Shared>
     GetOptFieldMethodImpl<
         'a,
@@ -45,16 +45,26 @@ where
     }
 }
 
-// [optional|required] string field
-impl<'a, _1, FP, FieldType, Shared>
-    GetOptFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NeedOptionalBitLabel<_1>, tags::String>
-    for FieldAndSharedRef<'a, FieldType, Shared>
+// (optional|required) (string|bytes) field
+impl<'a, _1, _2, FP, FieldType, Shared>
+    GetOptFieldMethodImpl<
+        'a,
+        FP,
+        tags::SimpleImpl,
+        tags::NeedOptionalBitLabel<_1>,
+        tags::StringOrBytesType<_2>,
+    > for FieldAndSharedRef<'a, FieldType, Shared>
 where
-    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1>, TypeTag = tags::String>,
-    FieldType: AsRef<str>,
+    FP: FieldProperties<
+        LabelTag = tags::NeedOptionalBitLabel<_1>,
+        TypeTag = tags::StringOrBytesType<_2>,
+    >,
+    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag,
+    <FP::TypeTag as tags::StringOrBytesTypeTag>::BorrowedType: 'a,
+    FieldType: AsRef<<FP::TypeTag as tags::StringOrBytesTypeTag>::BorrowedType>,
     Shared: SharedObjects,
 {
-    type GetterTypeImpl = Option<&'a str>;
+    type GetterTypeImpl = Option<&'a <FP::TypeTag as tags::StringOrBytesTypeTag>::BorrowedType>;
     fn get_opt_impl(&self) -> Self::GetterTypeImpl {
         let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
@@ -65,27 +75,7 @@ where
     }
 }
 
-// [optional|required] bytes field
-impl<'a, _1, FP, FieldType, Shared>
-    GetOptFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NeedOptionalBitLabel<_1>, tags::Bytes>
-    for FieldAndSharedRef<'a, FieldType, Shared>
-where
-    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1>, TypeTag = tags::Bytes>,
-    FieldType: AsRef<[u8]>,
-    Shared: SharedObjects,
-{
-    type GetterTypeImpl = Option<&'a [u8]>;
-    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX;
-        if self.shared.bitfield().get(opt_bit_index) {
-            Some(AsRef::as_ref(self.field))
-        } else {
-            None
-        }
-    }
-}
-
-// (unlabeled) numeric field
+// [unlabeled] numeric field
 // Returns `Some(...)` when the field value is non-default value,
 // and returns `None` if it is default value.
 impl<'a, _1, FP, FieldType, Shared>
@@ -109,7 +99,7 @@ where
     }
 }
 
-// [optional|required|(unlabeled)] message field
+// (optional|required|[unlabeled]) message field
 // The field value type is `Option<Box<M>>`, where the return type should be
 // `Option<&M>`.
 impl<'a, _1, MP, FP, MessageType, Shared>

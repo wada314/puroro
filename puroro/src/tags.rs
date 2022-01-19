@@ -28,6 +28,11 @@ pub trait NumericalTypeTag {
     type NativeType: 'static + Default + PartialEq + Clone;
 }
 
+/// A `FieldTypeTag` which is either String or Bytes.
+pub trait StringOrBytesTypeTag {
+    type BorrowedType: ?Sized;
+}
+
 /// A tag trait for types corresponding to the field label.
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {
@@ -199,6 +204,12 @@ impl<E: crate::Enum2> NumericalTypeTag for Enum2<E> {
 }
 impl<E: crate::Enum3> NumericalTypeTag for Enum3<E> {
     type NativeType = E;
+}
+impl StringOrBytesTypeTag for String {
+    type BorrowedType = str;
+}
+impl StringOrBytesTypeTag for Bytes {
+    type BorrowedType = [u8];
 }
 
 impl FieldLabelTag for Repeated {
