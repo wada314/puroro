@@ -126,7 +126,7 @@ impl<T: Debug> Debug for Bare<T> {
 }
 
 pub trait MessageProperties {
-    const OPTIONAL_FIELD_BITFIELD_START_INDEX: usize;
+    const BITFIELD_OPTIONAL_FIELD_COUNT: usize;
 }
 pub trait FieldProperties {
     type MessageProperties: self::MessageProperties;

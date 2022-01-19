@@ -14,8 +14,8 @@
 
 use crate::internal::methods::GetOptFieldMethodImpl;
 use crate::internal::Bitfield;
+use crate::internal::FieldProperties;
 use crate::internal::{FieldAndSharedRef, SharedObjects};
-use crate::internal::{FieldProperties, MessageProperties};
 use crate::tags;
 
 // for [optional|required] numeric types
@@ -39,8 +39,7 @@ where
 {
     type GetterTypeImpl = Option<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>;
     fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
-            + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
+        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             Some(self.field.clone().into())
         } else {
@@ -65,8 +64,7 @@ where
 {
     type GetterTypeImpl = Option<&'a str>;
     fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX
-            + FP::MessageProperties::OPTIONAL_FIELD_BITFIELD_START_INDEX;
+        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             Some(AsRef::as_ref(self.field))
         } else {

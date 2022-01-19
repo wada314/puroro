@@ -144,7 +144,7 @@ where
 
 struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {
-    const OPTIONAL_FIELD_BITFIELD_START_INDEX: usize = 0;
+    const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
 }
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 impl FieldProperties for PersonFieldProperties<1> {
