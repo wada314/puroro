@@ -35,6 +35,7 @@ pub trait FieldLabelTag {
 }
 
 mod value {
+    use super::{False, True};
     use ::std::marker::PhantomData;
     pub struct Int32;
     pub struct UInt32;
@@ -43,25 +44,27 @@ mod value {
     pub struct UInt64;
     pub struct SInt64;
     pub struct Bool;
-    pub struct Bytes;
-    pub struct String;
     pub struct Enum2<E>(PhantomData<E>);
     pub struct Enum3<E>(PhantomData<E>);
-    pub struct Message<M>(PhantomData<M>);
     pub struct Float;
     pub struct Double;
     pub struct SFixed32;
     pub struct SFixed64;
     pub struct Fixed32;
     pub struct Fixed64;
+    pub type Bytes = (False, (True, False));
+    pub type String = (False, (False, True));
+    pub type Message<M> = (True, PhantomData<M>);
 }
 
-pub type Variant<V> = (PhantomData<V>, (True, False), (False, False));
-pub type LengthDelimited<V> = (PhantomData<V>, (False, True), (False, False));
-pub type Bits32<V> = (PhantomData<V>, (False, False), (True, False));
-pub type Bits64<V> = (PhantomData<V>, (False, False), (False, True));
+type EmptyLd = (False, (False, False));
+pub type Variant<V> = (EmptyLd, (True, PhantomData<V>));
+pub type LengthDelimited<V> = (V, False);
+pub type Bits32<V> = (EmptyLd, (False, (True, PhantomData<V>)));
+pub type Bits64<V> = (EmptyLd, (False, (False, PhantomData<V>)));
 
-pub type NonLdType<V, _1, _2> = (PhantomData<V>, (_1, False), _2);
+pub type NonLdType<_1> = (EmptyLd, _1);
+pub type NonMessageType<_1, _2> = ((False, _1), _2);
 
 pub type Int32 = Variant<value::Int32>;
 pub type SInt32 = Variant<value::SInt32>;

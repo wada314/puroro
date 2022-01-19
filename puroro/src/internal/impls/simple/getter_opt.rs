@@ -19,20 +19,20 @@ use crate::internal::{FieldAndSharedRef, SharedObjects};
 use crate::tags;
 
 // for [optional|required] numeric types
-impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
+impl<'a, _1, _2, _3, FP, FieldType, Shared>
     GetOptFieldMethodImpl<
         'a,
         FP,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1, _2>,
-        tags::NonLdType<_3, _4, _5>,
+        tags::NonLdType<_3>,
     > for FieldAndSharedRef<'a, FieldType, Shared>
 where
     FP: FieldProperties<
         LabelTag = tags::NeedOptionalBitLabel<_1, _2>,
-        TypeTag = tags::NonLdType<_3, _4, _5>,
+        TypeTag = tags::NonLdType<_3>,
     >,
-    tags::NonLdType<_3, _4, _5>: tags::NumericalTypeTag,
+    tags::NonLdType<_3>: tags::NumericalTypeTag,
     FP::TypeTag: tags::NumericalTypeTag,
     FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,

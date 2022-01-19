@@ -12,12 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::internal::methods::GetFieldMethodImpl;
+use crate::internal::methods::{GetFieldMethodImpl, GetOptFieldMethod};
 use crate::internal::FieldProperties;
 use crate::internal::{FieldAndSharedRef, SharedObjects};
 use crate::tags;
 
-// for repeated message type
+// [optional|required|(unlabeled)] non-message field
+// assuming that getter_opt method is implemented, and the `FieldPropetry::DEFAULT_VALUE`
+// type is the same as the getter's return type.
+impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
+    GetFieldMethodImpl<
+        'a,
+        FP,
+        tags::SimpleImpl,
+        tags::NonRepeatedLabel<_1, _2, _3>,
+        tags::NonMessageType<_4, _5>,
+    > for FieldAndSharedRef<'a, FieldType, Shared>
+where
+    FP: FieldProperties<
+        LabelTag = tags::NonRepeatedLabel<_1, _2, _3>,
+        TypeTag = tags::NonMessageType<_4, _5>,
+    >,
+    Shared: SharedObjects,
+    tags::NonMessageType<_4, _5>: tags::FieldTypeTag,
+    Self: GetOptFieldMethod<
+        'a,
+        FP,
+        tags::SimpleImpl,
+        GetterType = Option<<FP::TypeTag as tags::FieldTypeTag>::DefaultValueType>,
+    >,
+{
+    type GetterTypeImpl = <FP::TypeTag as tags::FieldTypeTag>::DefaultValueType;
+    fn get_impl(&self) -> Self::GetterTypeImpl {
+        let opt_value = <Self as GetOptFieldMethod<FP, tags::SimpleImpl>>::get_opt(self);
+        opt_value.unwrap_or(FP::DEFAULT_VALUE)
+    }
+}
+
+// repeated message field
 impl<'a, FP, MP, MessageType, Shared>
     GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Repeated, tags::Message<MP>>
     for FieldAndSharedRef<'a, Vec<MessageType>, Shared>
