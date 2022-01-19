@@ -80,6 +80,8 @@ struct Message {
     template_ident: String,
     template_field_types_trait: String,
     template_simple_ident: String,
+    template_message_properties_ident: String,
+    template_field_properties_ident: String,
 }
 
 impl Message {
@@ -126,6 +128,8 @@ impl Message {
             template_ident: m.rust_impl_ident("Template"),
             template_field_types_trait: m.rust_impl_ident("TemplateFieldTypes"),
             template_simple_ident: m.rust_impl_ident("Simple2"),
+            template_message_properties_ident: m.rust_message_properties_ident()?,
+            template_field_properties_ident: m.rust_impl_ident("FieldProperties"),
         })
     }
 }
@@ -195,6 +199,8 @@ struct Field {
     has_optional_bit: bool,
     bitfield_index: i32,
     allow_variant_packing: bool,
+    label_tag_ident: String,
+    type_tag_ident: String,
     trait_scalar_getter_type: String,
     trait_field_message_trait_path: String,
     trait_label_and_type_tags: String,
@@ -270,6 +276,10 @@ impl Field {
                 }
             },
             allow_variant_packing: f.allow_variant_packing()?,
+            label_tag_ident: f.field_label()?.tag_ident().into(),
+            type_tag_ident: f
+                .field_type()?
+                .tag_ident_and_gp(|m| m.rust_message_properties_path())?,
             trait_scalar_getter_type: f.trait_scalar_getter_type()?.into(),
             trait_field_message_trait_path: maybe_message
                 .as_ref()

@@ -1,5 +1,5 @@
 pub trait {{ m.template_field_types_trait }} {
-    type Alloc;
+    type ImplTag;
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
     type {{ f.template_type_name }};
@@ -7,8 +7,8 @@ pub trait {{ m.template_field_types_trait }} {
     {%- endfor %} {#- for f in m.fields #}
 }
 
-impl {{ m.template_field_types_trait }} for ::puroro::SimpleImpl {
-    type Alloc = (); {#- feature allocator_api is unstable #}
+impl {{ m.template_field_types_trait }} for ::puroro::internal::SimpleFields {
+    type ImplTag = ::puroro::tags::SimpleImpl
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
     type {{ f.template_type_name }} = {{ f.simple2_field_type }};

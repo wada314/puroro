@@ -12,39 +12,42 @@ pub struct {{ m.template_ident }}<Fields, Shared>
     {%- endfor %} {#- for f in m.fields #}
 }
 
+{#################- Message properties ################-#}
+
+pub struct {{ m.template_message_properties_ident }};
+impl ::puroro::internal::MessageProperties for {{ m.template_message_properties_ident }} {
+    const BITFIELD_OPTIONAL_FIELD_COUNT: usize = {{ m.bitfield_len }};
+}
+
+{#################- Field properties ################-#}
+
+pub struct {{ m.template_field_properties_ident }}<const FIELD_NUMBER: i32>;
+{%- for f in m.fields %}
+{%- if !f.is_explicit_oneof_field %}
+impl ::puroro::internal::FieldProperties for {{ m.template_field_properties_ident }}<{{ f.number }}> {
+    type MessageProperties = self::{{ m.template_message_properties_ident }};
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = {{ f.bitfield_index }};
+    type LabelTag = ::puroro::tags::{{ f.label_tag_ident }};
+    type TypeTag = ::puroro::tags::{{ f.type_tag_ident }};
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = {{ f.default_value }};
+}
+{%- endif %} {#- if !f.is_explicit_oneof_field #}
+{%- endfor %} {#- for f in m.fields #}
+
 {#################- The struct with actual parameters ################-#}
 pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
-    ::puroro::SimpleImpl, 
-    (
-        (),
-        ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; ({{ m.bitfield_len }} + 31) / 32]>,
-    )
+    ::puroro::internal::SimpleFields, 
+    ::puroro::internal::SimpleShared<({{ m.bitfield_len }} + 31) / 32>,
 >;
 
 {%- for f in m.fields %}
-{%- if f.is_repeated %}
-
-{#################- Repeated field getters ################-#}
-impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
-where
-    Fields: {{ m.template_field_types_trait }},
-//    Shared: ::puroro::internal::SharedObjects,
-{
-}
-
-{%- else %} {#- if f.is_repeated #}
-
-{#################- Scalar field getters ################-#}
 {%- if !f.is_explicit_oneof_field %}
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
-//    Shared: ::puroro::internal::SharedObjects,
 {
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
-{%- endif %} {#- if f.is_repeated #}
-
 {%- endfor %} {#- for f in m.fields #}
 
 {#################- std trait impls ################-#}
@@ -54,7 +57,7 @@ where
     Shared: ::std::default::Default,
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
-    <Fields as {{ m.template_field_types_trait }}>::{{ f.template_type_name }}: ::std::default::Default,
+    Fields::{{ f.template_type_name }}: ::std::default::Default,
     {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 {

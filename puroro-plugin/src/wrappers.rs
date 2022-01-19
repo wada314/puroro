@@ -329,6 +329,14 @@ impl Message {
             maybe_gp = maybe_gp,
         )
     }
+    pub fn rust_message_properties_ident(&self) -> Result<String> {
+        Ok(self.rust_impl_ident("MessageProperties"))
+    }
+    pub fn rust_message_properties_path(&self) -> Result<String> {
+        let path = self.rust_module_path();
+        let ident = self.rust_impl_ident("MessageProperties");
+        Ok(format!("{path}::{ident}"))
+    }
 
     pub fn input_file(&self) -> Result<Rc<InputFile>> {
         Ok(upgrade(&self.input_file)?)
