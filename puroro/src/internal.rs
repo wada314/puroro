@@ -16,10 +16,13 @@ pub mod bool;
 pub mod de;
 pub mod fixed_bits;
 pub mod impls;
+pub mod methods;
 pub mod se;
 pub mod types;
 pub mod utils;
 pub mod variant;
+
+pub use impls::simple::{SimpleFields, SimpleShared};
 
 pub use impls::bumpalo::NoAllocBox as NoAllocBumpBox;
 pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
@@ -130,4 +133,22 @@ pub trait FieldProperties {
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag: tags::FieldLabelTag;
     type TypeTag: tags::FieldTypeTag;
+}
+
+pub struct FieldAndSharedRef<'a, Field, Shared> {
+    field: &'a Field,
+    shared: &'a Shared,
+}
+impl<'a, Field, Shared> FieldAndSharedRef<'a, Field, Shared> {
+    pub fn new(field: &'a Field, shared: &'a Shared) -> Self {
+        Self { field, shared }
+    }
+}
+
+pub trait SharedObjects {
+    type AllocatorType;
+    type BitfieldType: Bitfield;
+    fn alloc(&self) -> &Self::AllocatorType;
+    fn bitfield(&self) -> &Self::BitfieldType;
+    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
 }
