@@ -1890,7 +1890,64 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (1 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> SubmsgTemplate<Fields, Shared> where Fields: SubmsgTemplateFieldTypes {}
+
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32OptionalType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::SubmsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_optional(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32OptionalType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::SubmsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_optional, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32OptionalType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::SubmsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_optional_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32OptionalType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::SubmsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_optional, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32OptionalType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::SubmsgFieldProperties<1>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_i32_optional(&self) -> bool {
+            self.i32_optional_opt().is_some()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for SubmsgTemplate<Fields, Shared>
     where

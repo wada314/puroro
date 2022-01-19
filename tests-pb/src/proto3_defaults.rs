@@ -1533,12 +1533,319 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (1 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_unlabeled(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_unlabeled, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_unlabeled_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_unlabeled, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_i32_unlabeled(&self) -> bool {
+            self.i32_unlabeled_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32OptionalType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_optional(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32OptionalType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_optional, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32OptionalType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_optional_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32OptionalType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::MsgFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_optional, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32OptionalType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<2>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_i32_optional(&self) -> bool {
+            self.i32_optional_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32RepeatedType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<3>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_repeated(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32RepeatedType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<3>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_repeated, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::F32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<4>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn f32_unlabeled(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::F32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<4>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.f32_unlabeled, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::F32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<4>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn f32_unlabeled_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::F32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::MsgFieldProperties<4>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.f32_unlabeled, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::F32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<4>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_f32_unlabeled(&self) -> bool {
+            self.f32_unlabeled_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::StringUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<5>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn string_unlabeled(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::StringUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<5>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.string_unlabeled, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::StringUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<5>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn string_unlabeled_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::StringUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::MsgFieldProperties<5>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.string_unlabeled, &self._shared)
+                .get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::StringUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<5>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_string_unlabeled(&self) -> bool {
+            self.string_unlabeled_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::SubmsgUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<6>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn submsg_unlabeled(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::SubmsgUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<6>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.submsg_unlabeled, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::SubmsgUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<6>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn submsg_unlabeled_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::SubmsgUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::MsgFieldProperties<6>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.submsg_unlabeled, &self._shared)
+                .get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::SubmsgUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<6>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_submsg_unlabeled(&self) -> bool {
+            self.submsg_unlabeled_opt().is_some()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where
@@ -1801,7 +2108,64 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> SubmsgTemplate<Fields, Shared> where Fields: SubmsgTemplateFieldTypes {}
+
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::SubmsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_unlabeled(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::SubmsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_unlabeled, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::SubmsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_unlabeled_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::I32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::SubmsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.i32_unlabeled, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::SubmsgFieldProperties<1>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_i32_unlabeled(&self) -> bool {
+            self.i32_unlabeled_opt().is_some()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for SubmsgTemplate<Fields, Shared>
     where

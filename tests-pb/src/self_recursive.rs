@@ -439,7 +439,66 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::RecursiveUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn recursive_unlabeled(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::RecursiveUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.recursive_unlabeled, &self._shared)
+                .get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::RecursiveUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn recursive_unlabeled_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::RecursiveUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.recursive_unlabeled, &self._shared)
+                .get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::RecursiveUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_recursive_unlabeled(&self) -> bool {
+            self.recursive_unlabeled_opt().is_some()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where

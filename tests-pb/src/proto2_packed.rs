@@ -797,9 +797,70 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
-    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::ExplicitlyPackedType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn explicitly_packed(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::ExplicitlyPackedType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.explicitly_packed, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::ExplicitlyNotPackedType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn explicitly_not_packed(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::ExplicitlyNotPackedType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.explicitly_not_packed, &self._shared)
+                .get()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::NotAnnotatedType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::MsgFieldProperties<3>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn not_annotated(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::NotAnnotatedType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::MsgFieldProperties<3>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.not_annotated, &self._shared).get()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where

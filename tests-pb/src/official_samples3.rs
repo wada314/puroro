@@ -742,7 +742,64 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> Test1Template<Fields, Shared> where Fields: Test1TemplateFieldTypes {}
+
+    impl<Fields, Shared> Test1Template<Fields, Shared>
+    where
+        Fields: Test1TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::AType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::Test1FieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn a(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::AType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::Test1FieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.a, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> Test1Template<Fields, Shared>
+    where
+        Fields: Test1TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::AType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::Test1FieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn a_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::AType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::Test1FieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.a, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> Test1Template<Fields, Shared>
+    where
+        Fields: Test1TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::AType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::Test1FieldProperties<1>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_a(&self) -> bool {
+            self.a_opt().is_some()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for Test1Template<Fields, Shared>
     where
@@ -989,7 +1046,64 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> Test2Template<Fields, Shared> where Fields: Test2TemplateFieldTypes {}
+
+    impl<Fields, Shared> Test2Template<Fields, Shared>
+    where
+        Fields: Test2TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::BType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::Test2FieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn b(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::BType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::Test2FieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.b, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> Test2Template<Fields, Shared>
+    where
+        Fields: Test2TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::BType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::Test2FieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn b_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::BType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::Test2FieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.b, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> Test2Template<Fields, Shared>
+    where
+        Fields: Test2TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::BType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::Test2FieldProperties<2>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_b(&self) -> bool {
+            self.b_opt().is_some()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for Test2Template<Fields, Shared>
     where
@@ -1272,7 +1386,64 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> Test3Template<Fields, Shared> where Fields: Test3TemplateFieldTypes {}
+
+    impl<Fields, Shared> Test3Template<Fields, Shared>
+    where
+        Fields: Test3TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::CType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::Test3FieldProperties<3>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn c(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::CType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::Test3FieldProperties<3>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.c, &self._shared).get()
+        }
+    }
+
+    impl<Fields, Shared> Test3Template<Fields, Shared>
+    where
+        Fields: Test3TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::CType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::Test3FieldProperties<3>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn c_opt(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::CType, Shared> as
+        ::puroro::internal::methods::GetOptFieldMethod<
+            self::Test3FieldProperties<3>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetOptFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.c, &self._shared).get_opt()
+        }
+    }
+
+    impl<Fields, Shared, OptionInnerType> Test3Template<Fields, Shared>
+    where
+        Fields: Test3TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::CType, Shared>:
+            ::puroro::internal::methods::GetOptFieldMethod<
+                'a,
+                self::Test3FieldProperties<3>,
+                Fields::ImplTag,
+                GetterType = Option<OptionInnerType>,
+            >,
+    {
+        pub fn has_c(&self) -> bool {
+            self.c_opt().is_some()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for Test3Template<Fields, Shared>
     where
@@ -1532,7 +1703,27 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> Test4Template<Fields, Shared> where Fields: Test4TemplateFieldTypes {}
+
+    impl<Fields, Shared> Test4Template<Fields, Shared>
+    where
+        Fields: Test4TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::DType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::Test4FieldProperties<4>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn d(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::DType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::Test4FieldProperties<4>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.d, &self._shared).get()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for Test4Template<Fields, Shared>
     where

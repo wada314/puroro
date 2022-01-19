@@ -68,7 +68,7 @@ where
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 
 {#################- optional getter method ################-#}
-{%- if !f.is_repeated %}
+{%- if !f.is_repeated && !f.is_explicit_oneof_field %}
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
@@ -89,9 +89,10 @@ where
         ::puroro::internal::FieldAndSharedRef::new(&self.{{ f.ident }}, &self._shared).get_opt()
     }
 }
-{%- endif %} {#- if !f.is_repeated #}
+{%- endif %} {#- if !f.is_repeated && !f.is_explicit_oneof_field #}
 
 {#################- has_ method ################-#}
+{%- if !f.is_repeated && !f.is_explicit_oneof_field %}
 impl<Fields, Shared, OptionInnerType> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
@@ -107,7 +108,7 @@ where
         self.{{ f.ident_unesc }}_opt().is_some()
     }
 }
-
+{%- endif %} {#- if !f.is_repeated && !f.is_explicit_oneof_field #}
 {%- endfor %} {#- for f in m.fields #}
 
 {#################- std trait impls ################-#}
