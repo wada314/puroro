@@ -65,6 +65,7 @@ pub type Bits64<V> = (EmptyLd, (False, (False, PhantomData<V>)));
 
 pub type NonLdType<_1> = (EmptyLd, _1);
 pub type NonMessageType<_1, _2> = ((False, _1), _2);
+pub type StringOrBytesType<_1> = ((False, _1), False);
 
 pub type Int32 = Variant<value::Int32>;
 pub type SInt32 = Variant<value::SInt32>;

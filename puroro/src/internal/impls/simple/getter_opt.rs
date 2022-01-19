@@ -85,6 +85,30 @@ where
     }
 }
 
+// (unlabeled) numeric field
+// Returns `Some(...)` when the field value is non-default value,
+// and returns `None` if it is default value.
+impl<'a, _1, FP, FieldType, Shared>
+    GetOptFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Unlabeled, tags::NonLdType<_1>>
+    for FieldAndSharedRef<'a, FieldType, Shared>
+where
+    FP: FieldProperties<LabelTag = tags::Unlabeled, TypeTag = tags::NonLdType<_1>>,
+    tags::NonLdType<_1>: tags::NumericalTypeTag,
+    FP::TypeTag: tags::NumericalTypeTag,
+    FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
+    Shared: SharedObjects,
+{
+    type GetterTypeImpl = Option<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>;
+    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
+        let inner_value = Into::into(Clone::clone(self.field));
+        if inner_value == Default::default() {
+            None
+        } else {
+            Some(inner_value)
+        }
+    }
+}
+
 // [optional|required|(unlabeled)] message field
 // The field value type is `Option<Box<M>>`, where the return type should be
 // `Option<&M>`.
