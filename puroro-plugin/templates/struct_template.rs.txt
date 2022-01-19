@@ -46,7 +46,22 @@ pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
+    for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::{{ f.template_type_name }}, Shared>:
+        ::puroro::internal::methods::GetFieldMethod<
+            'a,
+            self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
+            Fields::ImplTag,
+        >
 {
+    pub fn {{ f.ident_unesc }}(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::{{ f.template_type_name }}, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
+            Fields::ImplTag,
+        >
+    >::GetterType {
+        use ::puroro::internal::methods::GetFieldMethod as _;
+        ::puroro::internal::FieldAndSharedRef::new(&self.{{ f.ident }}, &self._shared).get()
+    }
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 {%- endfor %} {#- for f in m.fields #}

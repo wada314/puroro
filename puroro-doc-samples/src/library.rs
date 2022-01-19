@@ -521,6 +521,7 @@ pub mod _puroro_impls {
         Fields: BookTemplateFieldTypes,
     {
         _shared: Shared,
+        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
         title: <Fields as BookTemplateFieldTypes>::TitleType,
         num_pages: <Fields as BookTemplateFieldTypes>::NumPagesType,
     }
@@ -550,8 +551,46 @@ pub mod _puroro_impls {
         ::puroro::internal::SimpleFields,
         ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
     >;
-    impl<Fields, Shared> BookTemplate<Fields, Shared> where Fields: BookTemplateFieldTypes {}
-    impl<Fields, Shared> BookTemplate<Fields, Shared> where Fields: BookTemplateFieldTypes {}
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::TitleType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::BookFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn title(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::TitleType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::BookFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.title, &self._shared).get()
+        }
+    }
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::NumPagesType, Shared>:
+            ::puroro::internal::methods::GetFieldMethod<
+                'a,
+                self::BookFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn num_pages(&self) -> <::puroro::internal::FieldAndSharedRef<Fields::NumPagesType, Shared> as
+        ::puroro::internal::methods::GetFieldMethod<
+            self::BookFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetFieldMethod as _;
+            ::puroro::internal::FieldAndSharedRef::new(&self.num_pages, &self._shared).get()
+        }
+    }
 
     impl<Fields, Shared> ::std::default::Default for BookTemplate<Fields, Shared>
     where
@@ -563,6 +602,7 @@ pub mod _puroro_impls {
         fn default() -> Self {
             Self {
                 _shared: ::std::default::Default::default(),
+                _phantom: ::std::default::Default::default(),
                 title: ::std::default::Default::default(),
                 num_pages: ::std::default::Default::default(),
             }
