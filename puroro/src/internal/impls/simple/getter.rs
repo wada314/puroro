@@ -29,19 +29,19 @@ impl<'a, _1, _2, _3, FP, FieldType, Shared, GetterType>
         tags::NonMessageType<_2, _3>,
     > for FieldAndSharedRef<'a, FieldType, Shared>
 where
-    GetterType: 'a,
+    GetterType: Default,
     FP: FieldProperties<
         LabelTag = tags::NonRepeatedLabel<_1>,
         TypeTag = tags::NonMessageType<_2, _3>,
     >,
-    tags::NonMessageType<_2, _3>: tags::FieldTypeTag<DefaultValueType = GetterType>,
+    tags::NonMessageType<_2, _3>: tags::FieldTypeTag, /*<DefaultValueType = GetterType>*/
     //<tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType: Into<GetterType>,
     Self: GetOptFieldMethod<'a, FP, tags::SimpleImpl, GetterType = Option<GetterType>>,
 {
     type GetterTypeImpl = GetterType;
     fn get_impl(&self) -> Self::GetterTypeImpl {
         let opt_value = <Self as GetOptFieldMethod<FP, tags::SimpleImpl>>::get_opt(self);
-        opt_value.unwrap_or(Into::into(FP::DEFAULT_VALUE))
+        opt_value.unwrap_or(/*Into::into(FP::DEFAULT_VALUE)*/ Default::default())
     }
 }
 
