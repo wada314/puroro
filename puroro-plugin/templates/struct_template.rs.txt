@@ -5,6 +5,7 @@ pub struct {{ m.template_ident }}<Fields, Shared>
     where Fields: {{ m.template_field_types_trait }}
 {
     _shared: Shared,
+    _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
     {%- for f in m.fields %}
     {%- if !f.is_explicit_oneof_field %}
     {{ f.ident }}: <Fields as {{ m.template_field_types_trait }}>::{{ f.template_type_name }},
@@ -29,7 +30,7 @@ impl ::puroro::internal::FieldProperties for {{ m.template_field_properties_iden
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = {{ f.bitfield_index }};
     type LabelTag = ::puroro::tags::{{ f.label_tag_ident }};
     type TypeTag = ::puroro::tags::{{ f.type_tag_ident }};
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = {{ f.default_value }};
+    const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType = {{ f.default_value }};
 }
 {%- endif %} {#- if !f.is_explicit_oneof_field #}
 {%- endfor %} {#- for f in m.fields #}
@@ -37,7 +38,7 @@ impl ::puroro::internal::FieldProperties for {{ m.template_field_properties_iden
 {#################- The struct with actual parameters ################-#}
 pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<{ {({{ m.bitfield_len }} + 31) / 32} }>,
+    ::puroro::internal::SimpleShared<{({{ m.bitfield_len }} + 31) / 32}>,
 >;
 
 {%- for f in m.fields %}
@@ -64,6 +65,7 @@ where
     fn default() -> Self {
         Self {
             _shared: ::std::default::Default::default(),
+            _phantom: ::std::default::Default::default(),
             {%- for f in m.fields %}
             {%- if !f.is_explicit_oneof_field %}
             {{ f.ident }}: ::std::default::Default::default(),

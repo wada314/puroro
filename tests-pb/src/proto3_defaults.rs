@@ -11,216 +11,213 @@ pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-pub struct Msg {
-    _bitfield: ::puroro::bitvec::array::BitArray<
-        ::puroro::bitvec::order::Lsb0,
-        [u32; (1 + 31) / 32],
-    >,
-    i32_unlabeled: ::puroro::internal::Bare<i32>,
-    i32_optional: ::puroro::internal::Bare<i32>,
-    i32_repeated: ::std::vec::Vec<i32>,
-    f32_unlabeled: ::puroro::internal::Bare<f32>,
-    string_unlabeled: ::puroro::internal::Bare<::std::string::String>,
-    submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>>,
-}
-impl ::puroro::Message<Msg> for Msg {}
+    pub struct Msg {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
+        i32_optional: ::puroro::internal::Bare<i32>,
+        i32_repeated: ::std::vec::Vec<i32>,
+        f32_unlabeled: ::puroro::internal::Bare<f32>,
+        string_unlabeled: ::puroro::internal::Bare<::std::string::String>,
+        submsg_unlabeled: ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
+        >,
+    }
+    impl ::puroro::Message<Msg> for Msg {}
 
-impl Msg {
-    pub fn new() -> Self {
-        Self {
-            _bitfield: ::std::default::Default::default(),
-            i32_unlabeled: ::std::default::Default::default(),
-            i32_optional: ::std::default::Default::default(),
-            i32_repeated: ::std::default::Default::default(),
-            f32_unlabeled: ::std::default::Default::default(),
-            string_unlabeled: ::std::default::Default::default(),
-            submsg_unlabeled: ::std::default::Default::default(),
+    impl Msg {
+        pub fn new() -> Self {
+            Self {
+                _bitfield: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                f32_unlabeled: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+            }
         }
-    }
-    pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-        if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
-            ::std::option::Option::Some(
-                self.i32_unlabeled.inner()
-            )
-        } else {
-            ::std::option::Option::None
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
-    }
 
-    pub fn has_i32_unlabeled(&self) -> bool {
-        Self::i32_unlabeled_opt(self).is_some()
-    }
-
-    pub fn i32_unlabeled(&self) -> i32 {
-        self.i32_unlabeled_opt().unwrap_or(
-            ::std::default::Default::default()
-        )
-    }
-    pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
-        if self._bitfield.get(0).map_or(false, |v| *v) {
-            ::std::option::Option::Some(
-                self.i32_optional.clone().inner()
-            )
-        } else {
-            ::std::option::Option::None
+        pub fn has_i32_unlabeled(&self) -> bool {
+            Self::i32_unlabeled_opt(self).is_some()
         }
-    }
 
-    pub fn has_i32_optional(&self) -> bool {
-        Self::i32_optional_opt(self).is_some()
-    }
-
-    pub fn i32_optional(&self) -> i32 {
-        self.i32_optional_opt().unwrap_or(
-            ::std::default::Default::default()
-        )
-    }
-    pub fn i32_repeated(&self) -> &'_[i32] {
-        &self.i32_repeated
-    }
-    pub fn f32_unlabeled_opt(&self) -> ::std::option::Option<f32> {
-        if !::puroro::internal::IsDefault::is_default(&*self.f32_unlabeled) {
-            ::std::option::Option::Some(
-                self.f32_unlabeled.inner()
-            )
-        } else {
-            ::std::option::Option::None
+        pub fn i32_unlabeled(&self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or(0)
         }
-    }
-
-    pub fn has_f32_unlabeled(&self) -> bool {
-        Self::f32_unlabeled_opt(self).is_some()
-    }
-
-    pub fn f32_unlabeled(&self) -> f32 {
-        self.f32_unlabeled_opt().unwrap_or(
-            ::std::default::Default::default()
-        )
-    }
-    pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&'_ str> {
-        if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
-            ::std::option::Option::Some(
-                &self.string_unlabeled
-            )
-        } else {
-            ::std::option::Option::None
+        pub fn i32_optional_opt(&self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.clone().inner())
+            } else {
+                ::std::option::Option::None
+            }
         }
-    }
 
-    pub fn has_string_unlabeled(&self) -> bool {
-        Self::string_unlabeled_opt(self).is_some()
-    }
+        pub fn has_i32_optional(&self) -> bool {
+            Self::i32_optional_opt(self).is_some()
+        }
 
-    pub fn string_unlabeled(&self) -> &'_ str {
-        self.string_unlabeled_opt().unwrap_or(
-            ::std::default::Default::default()
-        )
-    }
-    pub fn submsg_unlabeled_opt(&self) -> ::std::option::Option<&'_ self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg> {
-        self.submsg_unlabeled.as_deref()
-    }
+        pub fn i32_optional(&self) -> i32 {
+            self.i32_optional_opt().unwrap_or(0)
+        }
+        pub fn i32_repeated(&self) -> &'_ [i32] {
+            &self.i32_repeated
+        }
+        pub fn f32_unlabeled_opt(&self) -> ::std::option::Option<f32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.f32_unlabeled) {
+                ::std::option::Option::Some(self.f32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
 
-    pub fn has_submsg_unlabeled(&self) -> bool {
-        Self::submsg_unlabeled_opt(self).is_some()
-    }
+        pub fn has_f32_unlabeled(&self) -> bool {
+            Self::f32_unlabeled_opt(self).is_some()
+        }
 
-    pub fn submsg_unlabeled(&self) -> ::std::option::Option<&'_ self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg> {
-        self.submsg_unlabeled_opt()
-    }
-    pub fn clear_i32_unlabeled(&mut self) {
-        self.i32_unlabeled = ::std::default::Default::default();
-    }
-    pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
-        if !self.has_i32_unlabeled() {
+        pub fn f32_unlabeled(&self) -> f32 {
+            self.f32_unlabeled_opt().unwrap_or(0.0f32)
+        }
+        pub fn string_unlabeled_opt(&self) -> ::std::option::Option<&'_ str> {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
+                ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+
+        pub fn has_string_unlabeled(&self) -> bool {
+            Self::string_unlabeled_opt(self).is_some()
+        }
+
+        pub fn string_unlabeled(&self) -> &'_ str {
+            self.string_unlabeled_opt().unwrap_or("")
+        }
+        pub fn submsg_unlabeled_opt(
+            &self,
+        ) -> ::std::option::Option<
+            &'_ self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+        > {
+            self.submsg_unlabeled.as_deref()
+        }
+
+        pub fn has_submsg_unlabeled(&self) -> bool {
+            Self::submsg_unlabeled_opt(self).is_some()
+        }
+
+        pub fn submsg_unlabeled(
+            &self,
+        ) -> ::std::option::Option<
+            &'_ self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg,
+        > {
+            self.submsg_unlabeled_opt()
+        }
+        pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();
         }
-        &mut self.i32_unlabeled
-    }
-    pub fn clear_i32_optional(&mut self) {
-        self._bitfield.set(0, false);
-    }
-    pub fn i32_optional_mut(&mut self) -> &'_ mut i32 {
-        if !self.has_i32_optional() {
-            self.i32_optional = ::std::default::Default::default();
-            self._bitfield.set(0, true);
+        pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.i32_unlabeled
         }
-        &mut self.i32_optional
-    }
-    pub fn i32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
-        &mut self.i32_repeated
-    }
-    pub fn clear_f32_unlabeled(&mut self) {
-        self.f32_unlabeled = ::std::default::Default::default();
-    }
-    pub fn f32_unlabeled_mut(&mut self) -> &'_ mut f32 {
-        if !self.has_f32_unlabeled() {
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn i32_optional_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
+            &mut self.i32_optional
+        }
+        pub fn i32_repeated_mut(&mut self) -> &'_ mut ::std::vec::Vec<i32> {
+            &mut self.i32_repeated
+        }
+        pub fn clear_f32_unlabeled(&mut self) {
             self.f32_unlabeled = ::std::default::Default::default();
         }
-        &mut self.f32_unlabeled
-    }
-    pub fn clear_string_unlabeled(&mut self) {
-        self.string_unlabeled = ::std::default::Default::default();
-    }
-    pub fn string_unlabeled_mut(&mut self) -> &'_ mut ::std::string::String {
-        if !self.has_string_unlabeled() {
+        pub fn f32_unlabeled_mut(&mut self) -> &'_ mut f32 {
+            if !self.has_f32_unlabeled() {
+                self.f32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.f32_unlabeled
+        }
+        pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
         }
-        &mut self.string_unlabeled
-    }
-    pub fn clear_submsg_unlabeled(&mut self) {
-        self.submsg_unlabeled = ::std::default::Default::default();
-    }
-    pub fn submsg_unlabeled_mut(&mut self) -> &'_ mut self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg {
-        if !self.has_submsg_unlabeled() {
+        pub fn string_unlabeled_mut(&mut self) -> &'_ mut ::std::string::String {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.string_unlabeled
+        }
+        pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
-        self.submsg_unlabeled.get_or_insert_with(::std::default::Default::default)
+        pub fn submsg_unlabeled_mut(
+            &mut self,
+        ) -> &'_ mut self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg {
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
+            self.submsg_unlabeled
+                .get_or_insert_with(::std::default::Default::default)
+        }
     }
-}
 
-impl super::_puroro_traits::MsgTrait for Msg {
-fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-    <self::Msg>::i32_unlabeled_opt(self)
-}
-fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-    <self::Msg>::i32_optional_opt(self)
-}
-type I32RepeatedRepeatedType<'this> =
-    ::puroro::CloneThenIntoRepeatedField<
-        'this,
-        ::std::vec::Vec<i32>,
-        i32,
-        i32,
-        >;
+    impl super::_puroro_traits::MsgTrait for Msg {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <self::Msg>::i32_unlabeled_opt(self)
+        }
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <self::Msg>::i32_optional_opt(self)
+        }
+        type I32RepeatedRepeatedType<'this> =
+            ::puroro::CloneThenIntoRepeatedField<'this, ::std::vec::Vec<i32>, i32, i32>;
 
-fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-    ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
-}
-fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-    <self::Msg>::f32_unlabeled_opt(self)
-}
-fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-    <self::Msg>::string_unlabeled_opt(self)
-}
-type SubmsgUnlabeledMessageType<'this> where Self: 'this = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
-fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
-    <self::Msg>::submsg_unlabeled_opt(self)
-}
-}
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
+        }
+        fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
+            <self::Msg>::f32_unlabeled_opt(self)
+        }
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+            <self::Msg>::string_unlabeled_opt(self)
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg;
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
+            <self::Msg>::submsg_unlabeled_opt(self)
+        }
+    }
 
-impl ::puroro::MessageRepresentativeImpl for Msg {}
+    impl ::puroro::MessageRepresentativeImpl for Msg {}
 
-impl ::puroro::internal::de::DeserMessageFromBytesIter for Msg {
-    fn deser_field<I>(
-        &mut self,
-        field_number: i32,
-        data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-    ) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
-    {
-        use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-        match field_number {
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for Msg {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -255,183 +252,187 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for Msg {
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
+        }
     }
-}
 
-impl ::puroro::internal::se::SerMessageToIoWrite for Msg
-where
-    Self: super::_puroro_traits::MsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    impl ::puroro::internal::se::SerMessageToIoWrite for Msg
     where
-        W: ::std::io::Write,
+        Self: super::_puroro_traits::MsgTrait,
     {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
-            1,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-            2,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
-            3,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Float
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
-            4,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::String
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
-            5,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>>
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
-            6,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
-
-impl ::std::default::Default for Msg {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl ::std::fmt::Debug for Msg 
-where
-    Self: super::_puroro_traits::MsgTrait
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("Msg")
-            .field("i32_unlabeled", &self.i32_unlabeled())
-            .field("i32_optional", &self.i32_optional_opt())
-            .field("i32_repeated", &self.i32_repeated())
-            .field("f32_unlabeled", &self.f32_unlabeled())
-            .field("string_unlabeled", &self.string_unlabeled())
-            .field("submsg_unlabeled", &self.submsg_unlabeled())
-            .finish()
-    }
-}
-
-impl ::std::clone::Clone for Msg {
-    fn clone(&self) -> Self {
-        Self {
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
-            i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
-            i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
-            i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
-            f32_unlabeled: ::std::clone::Clone::clone(&self.f32_unlabeled),
-            string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
-            submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
-        }
-    }
-}
-
-impl ::std::cmp::PartialEq for Msg {
-    fn eq(&self, rhs: &Self) -> bool {
-        self._bitfield == rhs._bitfield &&
-        self.i32_unlabeled == rhs.i32_unlabeled &&
-        (self._bitfield.get(0).as_deref() != Some(&true) ||
-            self.i32_optional == rhs.i32_optional) &&
-        self.i32_repeated == rhs.i32_repeated &&
-        self.f32_unlabeled == rhs.f32_unlabeled &&
-        self.string_unlabeled == rhs.string_unlabeled &&
-        self.submsg_unlabeled == rhs.submsg_unlabeled &&
-        true
-    }
-}
-pub struct Submsg {
-    _bitfield: ::puroro::bitvec::array::BitArray<
-        ::puroro::bitvec::order::Lsb0,
-        [u32; (0 + 31) / 32],
-    >,
-    i32_unlabeled: ::puroro::internal::Bare<i32>,
-}
-impl ::puroro::Message<Submsg> for Submsg {}
-
-impl Submsg {
-    pub fn new() -> Self {
-        Self {
-            _bitfield: ::std::default::Default::default(),
-            i32_unlabeled: ::std::default::Default::default(),
-        }
-    }
-    pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
-        if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
-            ::std::option::Option::Some(
-                self.i32_unlabeled.inner()
-            )
-        } else {
-            ::std::option::Option::None
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                2,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                3,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
+                4,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
+                5,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
+                6,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
-    pub fn has_i32_unlabeled(&self) -> bool {
-        Self::i32_unlabeled_opt(self).is_some()
+    impl ::std::default::Default for Msg {
+        fn default() -> Self {
+            Self::new()
+        }
     }
 
-    pub fn i32_unlabeled(&self) -> i32 {
-        self.i32_unlabeled_opt().unwrap_or(
-            ::std::default::Default::default()
-        )
+    impl ::std::fmt::Debug for Msg
+    where
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Msg")
+                .field("i32_unlabeled", &self.i32_unlabeled())
+                .field("i32_optional", &self.i32_optional_opt())
+                .field("i32_repeated", &self.i32_repeated())
+                .field("f32_unlabeled", &self.f32_unlabeled())
+                .field("string_unlabeled", &self.string_unlabeled())
+                .field("submsg_unlabeled", &self.submsg_unlabeled())
+                .finish()
+        }
     }
-    pub fn clear_i32_unlabeled(&mut self) {
-        self.i32_unlabeled = ::std::default::Default::default();
+
+    impl ::std::clone::Clone for Msg {
+        fn clone(&self) -> Self {
+            Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+                f32_unlabeled: ::std::clone::Clone::clone(&self.f32_unlabeled),
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+                submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
+            }
+        }
     }
-    pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
-        if !self.has_i32_unlabeled() {
+
+    impl ::std::cmp::PartialEq for Msg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self._bitfield == rhs._bitfield
+                && self.i32_unlabeled == rhs.i32_unlabeled
+                && (self._bitfield.get(0).as_deref() != Some(&true)
+                    || self.i32_optional == rhs.i32_optional)
+                && self.i32_repeated == rhs.i32_repeated
+                && self.f32_unlabeled == rhs.f32_unlabeled
+                && self.string_unlabeled == rhs.string_unlabeled
+                && self.submsg_unlabeled == rhs.submsg_unlabeled
+                && true
+        }
+    }
+    pub struct Submsg {
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
+    }
+    impl ::puroro::Message<Submsg> for Submsg {}
+
+    impl Submsg {
+        pub fn new() -> Self {
+            Self {
+                _bitfield: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+            }
+        }
+        pub fn i32_unlabeled_opt(&self) -> ::std::option::Option<i32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+
+        pub fn has_i32_unlabeled(&self) -> bool {
+            Self::i32_unlabeled_opt(self).is_some()
+        }
+
+        pub fn i32_unlabeled(&self) -> i32 {
+            self.i32_unlabeled_opt().unwrap_or(0)
+        }
+        pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();
         }
-        &mut self.i32_unlabeled
+        pub fn i32_unlabeled_mut(&mut self) -> &'_ mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.i32_unlabeled
+        }
     }
-}
 
-impl super::_puroro_traits::SubmsgTrait for Submsg {
-fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-    <self::Submsg>::i32_unlabeled_opt(self)
-}
-}
+    impl super::_puroro_traits::SubmsgTrait for Submsg {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <self::Submsg>::i32_unlabeled_opt(self)
+        }
+    }
 
-impl ::puroro::MessageRepresentativeImpl for Submsg {}
+    impl ::puroro::MessageRepresentativeImpl for Submsg {}
 
-impl ::puroro::internal::de::DeserMessageFromBytesIter for Submsg {
-    fn deser_field<I>(
-        &mut self,
-        field_number: i32,
-        data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-    ) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
-    {
-        use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-        match field_number {
+    impl ::puroro::internal::de::DeserMessageFromBytesIter for Submsg {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -440,866 +441,815 @@ impl ::puroro::internal::de::DeserMessageFromBytesIter for Submsg {
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
-    }
-}
-
-impl ::puroro::internal::se::SerMessageToIoWrite for Submsg
-where
-    Self: super::_puroro_traits::SubmsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-    where
-        W: ::std::io::Write,
-    {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
-            1,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
-
-impl ::std::default::Default for Submsg {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl ::std::fmt::Debug for Submsg 
-where
-    Self: super::_puroro_traits::SubmsgTrait
-{
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        f.debug_struct("Submsg")
-            .field("i32_unlabeled", &self.i32_unlabeled())
-            .finish()
-    }
-}
-
-impl ::std::clone::Clone for Submsg {
-    fn clone(&self) -> Self {
-        Self {
-            _bitfield: ::std::clone::Clone::clone(&self._bitfield),
-            i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
         }
     }
-}
 
-impl ::std::cmp::PartialEq for Submsg {
-    fn eq(&self, rhs: &Self) -> bool {
-        self._bitfield == rhs._bitfield &&
-        self.i32_unlabeled == rhs.i32_unlabeled &&
-        true
+    impl ::puroro::internal::se::SerMessageToIoWrite for Submsg
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
+        }
     }
-}
+
+    impl ::std::default::Default for Submsg {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
+    impl ::std::fmt::Debug for Submsg
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            f.debug_struct("Submsg")
+                .field("i32_unlabeled", &self.i32_unlabeled())
+                .finish()
+        }
+    }
+
+    impl ::std::clone::Clone for Submsg {
+        fn clone(&self) -> Self {
+            Self {
+                _bitfield: ::std::clone::Clone::clone(&self._bitfield),
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+            }
+        }
+    }
+
+    impl ::std::cmp::PartialEq for Submsg {
+        fn eq(&self, rhs: &Self) -> bool {
+            self._bitfield == rhs._bitfield && self.i32_unlabeled == rhs.i32_unlabeled && true
+        }
+    }
 }
 
 pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
-    }use super::_puroro_traits::*;
+    }
     use super::_puroro_internal::*;
+    use super::_puroro_traits::*;
 
-pub struct MsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-    pub i32_unlabeled: ScalarType,
-}
-
-impl<ScalarType> ::puroro::Message<super::Msg>
-for MsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{}
-
-impl<ScalarType> super::_puroro_traits::MsgTrait
-for MsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-
-fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-    ::std::option::Option::Some(
-        ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_unlabeled))
-    )
-}
-    type I32RepeatedRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-    fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-    }
-    type SubmsgUnlabeledMessageType<'this> where Self: 'this = ();
-}
-
-
-impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
-for MsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    Self: super::_puroro_traits::MsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    pub struct MsgSingleField1<ScalarType>
     where
-        W: ::std::io::Write,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
-            1,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
+        pub i32_unlabeled: ScalarType,
     }
-}
 
-impl<ScalarType> ::std::convert::From<ScalarType>
-for MsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-    fn from(value: ScalarType) -> Self {
-        Self {
-            i32_unlabeled: value,
-        }
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField1<ScalarType> where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
+    {
     }
-}
 
-impl<ScalarType> ::std::clone::Clone
-for MsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    ScalarType: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
-        }
-    }
-}
-
-pub struct MsgSingleField2<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-    pub i32_optional: ScalarType,
-}
-
-impl<ScalarType> ::puroro::Message<super::Msg>
-for MsgSingleField2<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{}
-
-impl<ScalarType> super::_puroro_traits::MsgTrait
-for MsgSingleField2<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-
-fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-    ::std::option::Option::Some(
-        ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_optional))
-    )
-}
-    type I32RepeatedRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-    fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-    }
-    type SubmsgUnlabeledMessageType<'this> where Self: 'this = ();
-}
-
-
-impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
-for MsgSingleField2<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    Self: super::_puroro_traits::MsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField1<ScalarType>
     where
-        W: ::std::io::Write,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-            2,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
-
-impl<ScalarType> ::std::convert::From<ScalarType>
-for MsgSingleField2<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-    fn from(value: ScalarType) -> Self {
-        Self {
-            i32_optional: value,
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.i32_unlabeled,
+            )))
         }
-    }
-}
-
-impl<ScalarType> ::std::clone::Clone
-for MsgSingleField2<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    ScalarType: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
-}
 
-pub struct MsgSingleField3<ScalarType, RepeatedType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
-    ::std::iter::IntoIterator<Item = &'a ScalarType>,
-{
-    pub i32_repeated: RepeatedType,
-}
-
-impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
-for MsgSingleField3<ScalarType, RepeatedType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
-    ::std::iter::IntoIterator<Item = &'a ScalarType>,
-{}
-
-impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
-for MsgSingleField3<ScalarType, RepeatedType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
-    ::std::iter::IntoIterator<Item = &'a ScalarType>,
-{
-
-type I32RepeatedRepeatedType<'this> where Self: 'this =
-    ::puroro::CloneThenIntoRepeatedField<
-        'this,
-        RepeatedType,
-        ScalarType,
-        i32
-    >;
-
-fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-    ::puroro::CloneThenIntoRepeatedField::new(
-        &self.i32_repeated
-    )
-}
-    type SubmsgUnlabeledMessageType<'this> where Self: 'this = ();
-}
-
-
-impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
-for MsgSingleField3<ScalarType, RepeatedType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
-    ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    Self: super::_puroro_traits::MsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField1<ScalarType>
     where
-        W: ::std::io::Write,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        Self: super::_puroro_traits::MsgTrait,
     {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
-            3,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
-
-impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
-for MsgSingleField3<ScalarType, RepeatedType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
-    ::std::iter::IntoIterator<Item = &'a ScalarType>,
-{
-    fn from(value: RepeatedType) -> Self {
-        Self {
-            i32_repeated: value,
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
-}
 
-impl<ScalarType, RepeatedType> ::std::clone::Clone
-for MsgSingleField3<ScalarType, RepeatedType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
-    ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    RepeatedType: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
-        }
-    }
-}
-
-pub struct MsgSingleField4<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<f32> + ::std::clone::Clone,
-{
-    pub f32_unlabeled: ScalarType,
-}
-
-impl<ScalarType> ::puroro::Message<super::Msg>
-for MsgSingleField4<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<f32> + ::std::clone::Clone,
-{}
-
-impl<ScalarType> super::_puroro_traits::MsgTrait
-for MsgSingleField4<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<f32> + ::std::clone::Clone,
-{
-    type I32RepeatedRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-    fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-    }
-
-fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-    ::std::option::Option::Some(
-        ::std::convert::Into::into(::std::clone::Clone::clone(&self.f32_unlabeled))
-    )
-}
-    type SubmsgUnlabeledMessageType<'this> where Self: 'this = ();
-}
-
-
-impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
-for MsgSingleField4<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<f32> + ::std::clone::Clone,
-    Self: super::_puroro_traits::MsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField1<ScalarType>
     where
-        W: ::std::io::Write,
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
     {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Float
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
-            4,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
-
-impl<ScalarType> ::std::convert::From<ScalarType>
-for MsgSingleField4<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<f32> + ::std::clone::Clone,
-{
-    fn from(value: ScalarType) -> Self {
-        Self {
-            f32_unlabeled: value,
-        }
-    }
-}
-
-impl<ScalarType> ::std::clone::Clone
-for MsgSingleField4<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<f32> + ::std::clone::Clone,
-    ScalarType: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            f32_unlabeled: ::std::clone::Clone::clone(&self.f32_unlabeled),
-        }
-    }
-}
-
-pub struct MsgSingleField5<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::AsRef<str>,
-{
-    pub string_unlabeled: ScalarType,
-}
-
-impl<ScalarType> ::puroro::Message<super::Msg>
-for MsgSingleField5<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::AsRef<str>,
-{}
-
-impl<ScalarType> super::_puroro_traits::MsgTrait
-for MsgSingleField5<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::AsRef<str>,
-{
-    type I32RepeatedRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-    fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-    }
-
-fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-    ::std::option::Option::Some(self.string_unlabeled.as_ref())
-}
-    type SubmsgUnlabeledMessageType<'this> where Self: 'this = ();
-}
-
-
-impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
-for MsgSingleField5<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::AsRef<str>,
-    Self: super::_puroro_traits::MsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-    where
-        W: ::std::io::Write,
-    {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::String
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
-            5,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
-
-impl<ScalarType> ::std::convert::From<ScalarType>
-for MsgSingleField5<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::AsRef<str>,
-{
-    fn from(value: ScalarType) -> Self {
-        Self {
-            string_unlabeled: value,
-        }
-    }
-}
-
-impl<ScalarType> ::std::clone::Clone
-for MsgSingleField5<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::AsRef<str>,
-    ScalarType: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
-        }
-    }
-}
-
-pub struct MsgSingleField6<ScalarType>
-where
-
-ScalarType:
-    self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
-{
-    pub submsg_unlabeled: ScalarType,
-}
-
-impl<ScalarType> ::puroro::Message<super::Msg>
-for MsgSingleField6<ScalarType>
-where
-
-ScalarType:
-    self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
-{}
-
-impl<ScalarType> super::_puroro_traits::MsgTrait
-for MsgSingleField6<ScalarType>
-where
-
-ScalarType:
-    self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
-{
-    type I32RepeatedRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
-    fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-        ::puroro::internal::impls::empty::EmptyRepeatedField::new()
-    }
-type SubmsgUnlabeledMessageType<'this> where Self: 'this = &'this ScalarType;
-
-fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
-    ::std::option::Option::Some(&self.submsg_unlabeled)
-}
-}
-
-
-impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
-for MsgSingleField6<ScalarType>
-where
-
-ScalarType:
-    self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
-    Self: super::_puroro_traits::MsgTrait,
-    for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'a> :
-        ::puroro::internal::se::SerMessageToIoWrite,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-    where
-        W: ::std::io::Write,
-    {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>>
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
-            6,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
-
-impl<ScalarType> ::std::convert::From<ScalarType>
-for MsgSingleField6<ScalarType>
-where
-
-ScalarType:
-    self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
-{
-    fn from(value: ScalarType) -> Self {
-        Self {
-            submsg_unlabeled: value,
-        }
-    }
-}
-
-impl<ScalarType> ::std::clone::Clone
-for MsgSingleField6<ScalarType>
-where
-
-ScalarType:
-    self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
-    ScalarType: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
-        }
-    }
-}
-pub struct MsgBumpalo<'bump> {
-    _bump: &'bump ::puroro::bumpalo::Bump,
-    _bitfield: ::puroro::bitvec::array::BitArray<
-        ::puroro::bitvec::order::Lsb0,
-        [u32; (1 + 31) / 32],
-    >,
-    i32_unlabeled: ::puroro::internal::Bare<i32>,
-    i32_optional: ::puroro::internal::Bare<i32>,
-    i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
-    f32_unlabeled: ::puroro::internal::Bare<f32>,
-    string_unlabeled: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
-    submsg_unlabeled: ::std::option::Option<::puroro::internal::NoAllocBumpBox<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>>>,
-}
-
-pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
-impl<'bump> MsgBumpalo<'bump> {
-    pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        #[allow(unused)]
-        let bump_ref: &::puroro::bumpalo::Bump = unsafe {
-            ::std::mem::transmute(
-                ::std::ops::Deref::deref(&bump)
-            )
-        };
-
-        Self {
-            _bump: bump,
-            _bitfield: ::std::default::Default::default(),
-            i32_unlabeled: ::std::default::Default::default(),
-            i32_optional: ::std::default::Default::default(),
-            i32_repeated: ::std::default::Default::default(),
-            f32_unlabeled: ::std::default::Default::default(),
-            string_unlabeled: ::std::default::Default::default(),
-            submsg_unlabeled: ::std::default::Default::default(),
-        }
-    }
-    pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-        if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
-            ::std::option::Option::Some(
-                self.i32_unlabeled.inner()
-            )
-        } else {
-            ::std::option::Option::None
-        }
-    }
-    pub fn i32_unlabeled<'this>(&'this self) -> i32 {
-        match self.i32_unlabeled_opt() {
-            ::std::option::Option::Some(x) => x,
-            _ => {
-                ::std::default::Default::default()
+        fn from(value: ScalarType) -> Self {
+            Self {
+                i32_unlabeled: value,
             }
         }
     }
 
-    pub fn has_i32_unlabeled(&self) -> bool {
-        self.i32_unlabeled_opt().is_some()
-    }
-    pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-        if self._bitfield.get(0).map_or(false, |v| *v) {
-            ::std::option::Option::Some(
-                self.i32_optional.inner()
-            )
-        } else {
-            ::std::option::Option::None
-        }
-    }
-    pub fn i32_optional<'this>(&'this self) -> i32 {
-        match self.i32_optional_opt() {
-            ::std::option::Option::Some(x) => x,
-            _ => {
-                ::std::default::Default::default()
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
             }
         }
     }
 
-    pub fn has_i32_optional(&self) -> bool {
-        self.i32_optional_opt().is_some()
+    pub struct MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+    {
+        pub i32_optional: ScalarType,
     }
-    pub fn i32_repeated<'this>(&'this self) -> &'this[i32] {
-        &self.i32_repeated
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField2<ScalarType> where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
+    {
     }
-    pub fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
-        if !::puroro::internal::IsDefault::is_default(&*self.f32_unlabeled) {
-            ::std::option::Option::Some(
-                self.f32_unlabeled.inner()
-            )
-        } else {
-            ::std::option::Option::None
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+    {
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.i32_optional,
+            )))
+        }
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                2,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
-    pub fn f32_unlabeled<'this>(&'this self) -> f32 {
-        match self.f32_unlabeled_opt() {
-            ::std::option::Option::Some(x) => x,
-            _ => {
-                ::std::default::Default::default()
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                i32_optional: value,
             }
         }
     }
 
-    pub fn has_f32_unlabeled(&self) -> bool {
-        self.f32_unlabeled_opt().is_some()
-    }
-    pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
-        if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
-            ::std::option::Option::Some(
-                &self.string_unlabeled
-            )
-        } else {
-            ::std::option::Option::None
-        }
-    }
-    pub fn string_unlabeled<'this>(&'this self) -> &'this str {
-        match self.string_unlabeled_opt() {
-            ::std::option::Option::Some(x) => x,
-            _ => {
-                ::std::default::Default::default()
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField2<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                i32_optional: ::std::clone::Clone::clone(&self.i32_optional),
             }
         }
     }
 
-    pub fn has_string_unlabeled(&self) -> bool {
-        self.string_unlabeled_opt().is_some()
-    }
-    pub fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>> {
-        self.submsg_unlabeled.as_ref().map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
-    }
-    pub fn submsg_unlabeled<'this>(&'this self) -> ::std::option::Option<&'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>> {
-        self.submsg_unlabeled_opt()
+    pub struct MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
+        pub i32_repeated: RepeatedType,
     }
 
-    pub fn has_submsg_unlabeled(&self) -> bool {
-        self.submsg_unlabeled_opt().is_some()
+    impl<ScalarType, RepeatedType> ::puroro::Message<super::Msg>
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
     }
-    pub fn clear_i32_unlabeled(&mut self) {
-        self.i32_unlabeled = ::std::default::Default::default();
+
+    impl<ScalarType, RepeatedType> super::_puroro_traits::MsgTrait
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::CloneThenIntoRepeatedField<'this, RepeatedType, ScalarType, i32>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = ();
     }
-    pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
-        if !self.has_i32_unlabeled() {
+
+    impl<ScalarType, RepeatedType> ::puroro::internal::se::SerMessageToIoWrite
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                3,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType, RepeatedType> ::std::convert::From<RepeatedType>
+        for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+    {
+        fn from(value: RepeatedType) -> Self {
+            Self {
+                i32_repeated: value,
+            }
+        }
+    }
+
+    impl<ScalarType, RepeatedType> ::std::clone::Clone for MsgSingleField3<ScalarType, RepeatedType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        for<'a> &'a RepeatedType:
+            ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        RepeatedType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                i32_repeated: ::std::clone::Clone::clone(&self.i32_repeated),
+            }
+        }
+    }
+
+    pub struct MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+    {
+        pub f32_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField4<ScalarType> where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+    {
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+
+        fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.f32_unlabeled,
+            )))
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
+                4,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                f32_unlabeled: value,
+            }
+        }
+    }
+
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField4<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                f32_unlabeled: ::std::clone::Clone::clone(&self.f32_unlabeled),
+            }
+        }
+    }
+
+    pub struct MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+    {
+        pub string_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField5<ScalarType> where
+        ScalarType: ::std::convert::AsRef<str>
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+    {
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+
+        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            ::std::option::Option::Some(self.string_unlabeled.as_ref())
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+        Self: super::_puroro_traits::MsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
+                5,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                string_unlabeled: value,
+            }
+        }
+    }
+
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField5<ScalarType>
+    where
+        ScalarType: ::std::convert::AsRef<str>,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                string_unlabeled: ::std::clone::Clone::clone(&self.string_unlabeled),
+            }
+        }
+    }
+
+    pub struct MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
+    {
+        pub submsg_unlabeled: ScalarType,
+    }
+
+    impl<ScalarType> ::puroro::Message<super::Msg> for MsgSingleField6<ScalarType> where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
+    {
+    }
+
+    impl<ScalarType> super::_puroro_traits::MsgTrait for MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
+    {
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = &'this ScalarType;
+
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
+            ::std::option::Option::Some(&self.submsg_unlabeled)
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
+        Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
+                6,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                submsg_unlabeled: value,
+            }
+        }
+    }
+
+    impl<ScalarType> ::std::clone::Clone for MsgSingleField6<ScalarType>
+    where
+        ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                submsg_unlabeled: ::std::clone::Clone::clone(&self.submsg_unlabeled),
+            }
+        }
+    }
+    pub struct MsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (1 + 31) / 32]>,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
+        i32_optional: ::puroro::internal::Bare<i32>,
+        i32_repeated: ::puroro::internal::NoAllocBumpVec<i32>,
+        f32_unlabeled: ::puroro::internal::Bare<f32>,
+        string_unlabeled: ::puroro::internal::Bare<::puroro::internal::NoAllocBumpString>,
+        submsg_unlabeled: ::std::option::Option<
+            ::puroro::internal::NoAllocBumpBox<
+                self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>,
+            >,
+        >,
+    }
+
+    pub type MsgBumpaloOwned = ::puroro::BumpaloOwned<MsgBumpalo<'static>>;
+    impl<'bump> MsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+            Self {
+                _bump: bump,
+                _bitfield: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                f32_unlabeled: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+            }
+        }
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_unlabeled<'this>(&'this self) -> i32 {
+            match self.i32_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+
+        pub fn has_i32_unlabeled(&self) -> bool {
+            self.i32_unlabeled_opt().is_some()
+        }
+        pub fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if self._bitfield.get(0).map_or(false, |v| *v) {
+                ::std::option::Option::Some(self.i32_optional.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_optional<'this>(&'this self) -> i32 {
+            match self.i32_optional_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+
+        pub fn has_i32_optional(&self) -> bool {
+            self.i32_optional_opt().is_some()
+        }
+        pub fn i32_repeated<'this>(&'this self) -> &'this [i32] {
+            &self.i32_repeated
+        }
+        pub fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.f32_unlabeled) {
+                ::std::option::Option::Some(self.f32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn f32_unlabeled<'this>(&'this self) -> f32 {
+            match self.f32_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+
+        pub fn has_f32_unlabeled(&self) -> bool {
+            self.f32_unlabeled_opt().is_some()
+        }
+        pub fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
+            if !::puroro::internal::IsDefault::is_default(&*self.string_unlabeled) {
+                ::std::option::Option::Some(&self.string_unlabeled)
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn string_unlabeled<'this>(&'this self) -> &'this str {
+            match self.string_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+
+        pub fn has_string_unlabeled(&self) -> bool {
+            self.string_unlabeled_opt().is_some()
+        }
+        pub fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>,
+        > {
+            self.submsg_unlabeled
+                .as_ref()
+                .map(|x| unsafe { ::std::mem::transmute(::std::ops::Deref::deref(x)) })
+        }
+        pub fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>,
+        > {
+            self.submsg_unlabeled_opt()
+        }
+
+        pub fn has_submsg_unlabeled(&self) -> bool {
+            self.submsg_unlabeled_opt().is_some()
+        }
+        pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();
         }
-        &mut self.i32_unlabeled
-    }
-    pub fn clear_i32_optional(&mut self) {
-        self._bitfield.set(0, false);
-    }
-    pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
-        if !self.has_i32_optional() {
-            self.i32_optional = ::std::default::Default::default();
-            self._bitfield.set(0, true);
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.i32_unlabeled
         }
-        &mut self.i32_optional
-    }
-    pub fn i32_repeated_mut<'this>(&'this mut self) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
-        unsafe { self.i32_repeated.as_mut_vec_in(self._bump) }
-    }
-    pub fn clear_f32_unlabeled(&mut self) {
-        self.f32_unlabeled = ::std::default::Default::default();
-    }
-    pub fn f32_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
-        if !self.has_f32_unlabeled() {
+        pub fn clear_i32_optional(&mut self) {
+            self._bitfield.set(0, false);
+        }
+        pub fn i32_optional_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_optional() {
+                self.i32_optional = ::std::default::Default::default();
+                self._bitfield.set(0, true);
+            }
+            &mut self.i32_optional
+        }
+        pub fn i32_repeated_mut<'this>(
+            &'this mut self,
+        ) -> ::puroro::internal::RefMutBumpVec<'bump, 'this, i32> {
+            unsafe { self.i32_repeated.as_mut_vec_in(self._bump) }
+        }
+        pub fn clear_f32_unlabeled(&mut self) {
             self.f32_unlabeled = ::std::default::Default::default();
         }
-        &mut self.f32_unlabeled
-    }
-    pub fn clear_string_unlabeled(&mut self) {
-        self.string_unlabeled = ::std::default::Default::default();
-    }
-    pub fn string_unlabeled_mut<'this>(&'this mut self) -> impl 'this + ::std::ops::DerefMut<Target=::puroro::bumpalo::collections::String<'bump>> {
-        if !self.has_string_unlabeled() {
+        pub fn f32_unlabeled_mut<'this>(&'this mut self) -> &'this mut f32 {
+            if !self.has_f32_unlabeled() {
+                self.f32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.f32_unlabeled
+        }
+        pub fn clear_string_unlabeled(&mut self) {
             self.string_unlabeled = ::std::default::Default::default();
         }
-        unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
-    }
-    pub fn clear_submsg_unlabeled(&mut self) {
-        self.submsg_unlabeled = ::std::default::Default::default();
-    }
-    pub fn submsg_unlabeled_mut<'this>(&'this mut self) -> &'this mut self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump> {
-        if !self.has_submsg_unlabeled() {
+        pub fn string_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> impl 'this + ::std::ops::DerefMut<Target = ::puroro::bumpalo::collections::String<'bump>>
+        {
+            if !self.has_string_unlabeled() {
+                self.string_unlabeled = ::std::default::Default::default();
+            }
+            unsafe { self.string_unlabeled.as_mut_string_in(self._bump) }
+        }
+        pub fn clear_submsg_unlabeled(&mut self) {
             self.submsg_unlabeled = ::std::default::Default::default();
         }
-        let bump = self._bump;
-        self.submsg_unlabeled.get_or_insert_with(|| ::puroro::internal::NoAllocBumpBox::new_in(
-            ::puroro::internal::BumpDefault::default_in(bump),
-            bump,
-        ))
+        pub fn submsg_unlabeled_mut<'this>(
+            &'this mut self,
+        ) -> &'this mut self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'bump>
+        {
+            if !self.has_submsg_unlabeled() {
+                self.submsg_unlabeled = ::std::default::Default::default();
+            }
+            let bump = self._bump;
+            self.submsg_unlabeled.get_or_insert_with(|| {
+                ::puroro::internal::NoAllocBumpBox::new_in(
+                    ::puroro::internal::BumpDefault::default_in(bump),
+                    bump,
+                )
+            })
+        }
     }
-}
-impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Msg> for MsgBumpalo<'bump> {}
 
-impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
-    fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        Self::new_in(bump)
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for MsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
     }
-}
 
-impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
-    fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        Self::new_in(bump)
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for MsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
     }
-}
 
-impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
-fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-    <Self>::i32_unlabeled_opt(self)
-}
-fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
-    <Self>::i32_optional_opt(self)
-}
-type I32RepeatedRepeatedType<'this> where Self: 'this =
-    ::puroro::CloneThenIntoRepeatedField<'this, ::puroro::internal::NoAllocBumpVec<i32>, i32, i32>;
+    impl<'bump> super::_puroro_traits::MsgTrait for MsgBumpalo<'bump> {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::i32_unlabeled_opt(self)
+        }
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::i32_optional_opt(self)
+        }
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::CloneThenIntoRepeatedField<
+            'this,
+            ::puroro::internal::NoAllocBumpVec<i32>,
+            i32,
+            i32,
+        >;
 
-fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-    ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
-}
-fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
-    <Self>::f32_unlabeled_opt(self)
-}
-fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
-    <Self>::string_unlabeled_opt(self)
-}
-type SubmsgUnlabeledMessageType<'this> where Self: 'this = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>;
-fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
-    <Self>::submsg_unlabeled_opt(self)
-}
-}
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::CloneThenIntoRepeatedField::new(&self.i32_repeated)
+        }
+        fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
+            <Self>::f32_unlabeled_opt(self)
+        }
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
+            <Self>::string_unlabeled_opt(self)
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = &'this self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgBumpalo<'this>;
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
+            <Self>::submsg_unlabeled_opt(self)
+        }
+    }
 
-impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
-    fn deser_field<'this, I>(
-        &'this mut self,
-        field_number: i32,
-        data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-    ) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
-    {
-        use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-        match field_number {
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bump> {
+        fn deser_field<'this, I>(
+            &'this mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -1334,439 +1284,434 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for MsgBumpalo<'bu
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
+        }
     }
-}
 
-impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
-where
-    Self: super::_puroro_traits::MsgTrait,
-    for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'a> :
-        ::puroro::internal::se::SerMessageToIoWrite,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for MsgBumpalo<'bump>
     where
-        W: ::std::io::Write,
+        Self: super::_puroro_traits::MsgTrait,
+        for<'a> <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'a>:
+            ::puroro::internal::se::SerMessageToIoWrite,
     {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
-            1,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
-            2,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
-            3,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Float
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
-            4,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::String
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
-            5,
-            out,
-            true,
-        )?;
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Message<<Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>>
-        >::ser_field(
-            <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
-            6,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}pub struct MsgBuilder<T>(T);
-
-impl<T> MsgBuilder<T>
-where
-    T: MsgTrait
-{
-
-    pub fn append_i32_unlabeled<ScalarType>(self, value: ScalarType)
-        -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    {
-        MsgBuilder((self.0, MsgSingleField1 { i32_unlabeled: value}))
-    }
-
-    pub fn append_i32_optional<ScalarType>(self, value: ScalarType)
-        -> MsgBuilder<(T, MsgSingleField2<ScalarType>)>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    {
-        MsgBuilder((self.0, MsgSingleField2 { i32_optional: value}))
-    }
-
-    pub fn append_i32_repeated<ScalarType, RepeatedType>(self, value: RepeatedType)
-        -> MsgBuilder<(T, MsgSingleField3<ScalarType, RepeatedType>)>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> + 
-    ::std::iter::IntoIterator<Item = &'a ScalarType>,
-    {
-        MsgBuilder((self.0, MsgSingleField3 { i32_repeated: value}))
-    }
-
-    pub fn append_f32_unlabeled<ScalarType>(self, value: ScalarType)
-        -> MsgBuilder<(T, MsgSingleField4<ScalarType>)>
-where
-
-ScalarType:
-    ::std::convert::Into<f32> + ::std::clone::Clone,
-    {
-        MsgBuilder((self.0, MsgSingleField4 { f32_unlabeled: value}))
-    }
-
-    pub fn append_string_unlabeled<ScalarType>(self, value: ScalarType)
-        -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
-where
-
-ScalarType:
-    ::std::convert::AsRef<str>,
-    {
-        MsgBuilder((self.0, MsgSingleField5 { string_unlabeled: value}))
-    }
-
-    pub fn append_submsg_unlabeled<ScalarType>(self, value: ScalarType)
-        -> MsgBuilder<(T, MsgSingleField6<ScalarType>)>
-where
-
-ScalarType:
-    self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
-    {
-        MsgBuilder((self.0, MsgSingleField6 { submsg_unlabeled: value}))
-    }
-
-    pub fn build(self) -> T {
-        self.0
-    }
-}
-
-impl MsgBuilder<()>
-{
-    pub fn new() -> Self { Self(()) }
-}
-pub struct MsgTemplate<Fields, Shared>
-    where Fields: MsgTemplateFieldTypes
-{
-    _shared: Shared,
-    i32_unlabeled: <Fields as MsgTemplateFieldTypes>::I32UnlabeledType,
-    i32_optional: <Fields as MsgTemplateFieldTypes>::I32OptionalType,
-    i32_repeated: <Fields as MsgTemplateFieldTypes>::I32RepeatedType,
-    f32_unlabeled: <Fields as MsgTemplateFieldTypes>::F32UnlabeledType,
-    string_unlabeled: <Fields as MsgTemplateFieldTypes>::StringUnlabeledType,
-    submsg_unlabeled: <Fields as MsgTemplateFieldTypes>::SubmsgUnlabeledType,
-}
-
-pub struct MsgMessageProperties;
-impl ::puroro::internal::MessageProperties for MsgMessageProperties {
-    const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 1;
-}
-
-pub struct MsgFieldProperties<const FIELD_NUMBER: i32>;
-impl ::puroro::internal::FieldProperties for MsgFieldProperties<1> {
-    type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = ::puroro::tags::Unlabeled;
-    type TypeTag = ::puroro::tags::Int32;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
-}
-impl ::puroro::internal::FieldProperties for MsgFieldProperties<2> {
-    type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = ::puroro::tags::Optional;
-    type TypeTag = ::puroro::tags::Int32;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
-}
-impl ::puroro::internal::FieldProperties for MsgFieldProperties<3> {
-    type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = ::puroro::tags::Repeated;
-    type TypeTag = ::puroro::tags::Int32;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
-}
-impl ::puroro::internal::FieldProperties for MsgFieldProperties<4> {
-    type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = ::puroro::tags::Unlabeled;
-    type TypeTag = ::puroro::tags::Float;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
-}
-impl ::puroro::internal::FieldProperties for MsgFieldProperties<5> {
-    type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = ::puroro::tags::Unlabeled;
-    type TypeTag = ::puroro::tags::String;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
-}
-impl ::puroro::internal::FieldProperties for MsgFieldProperties<6> {
-    type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = ::puroro::tags::Unlabeled;
-    type TypeTag = ::puroro::tags::Message<self::_puroro_root::proto3_defaults::SubmsgMessageProperties>;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
-}
-
-pub type MsgSimple2 = MsgTemplate<
-    ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<{ {(1 + 31) / 32} }>,
->;
-impl<Fields, Shared> MsgTemplate<Fields, Shared>
-where
-    Fields: MsgTemplateFieldTypes,
-{
-}
-impl<Fields, Shared> MsgTemplate<Fields, Shared>
-where
-    Fields: MsgTemplateFieldTypes,
-{
-}
-impl<Fields, Shared> MsgTemplate<Fields, Shared>
-where
-    Fields: MsgTemplateFieldTypes,
-{
-}
-impl<Fields, Shared> MsgTemplate<Fields, Shared>
-where
-    Fields: MsgTemplateFieldTypes,
-{
-}
-impl<Fields, Shared> MsgTemplate<Fields, Shared>
-where
-    Fields: MsgTemplateFieldTypes,
-{
-}
-impl<Fields, Shared> MsgTemplate<Fields, Shared>
-where
-    Fields: MsgTemplateFieldTypes,
-{
-}
-
-impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
-where
-    Fields: MsgTemplateFieldTypes,
-    Shared: ::std::default::Default,
-    Fields::I32UnlabeledType: ::std::default::Default,
-    Fields::I32OptionalType: ::std::default::Default,
-    Fields::I32RepeatedType: ::std::default::Default,
-    Fields::F32UnlabeledType: ::std::default::Default,
-    Fields::StringUnlabeledType: ::std::default::Default,
-    Fields::SubmsgUnlabeledType: ::std::default::Default,
-{
-    fn default() -> Self {
-        Self {
-            _shared: ::std::default::Default::default(),
-            i32_unlabeled: ::std::default::Default::default(),
-            i32_optional: ::std::default::Default::default(),
-            i32_repeated: ::std::default::Default::default(),
-            f32_unlabeled: ::std::default::Default::default(),
-            string_unlabeled: ::std::default::Default::default(),
-            submsg_unlabeled: ::std::default::Default::default(),
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_optional_opt(self),
+                2,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::i32_repeated(self),
+                3,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Float,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::f32_unlabeled_opt(self),
+                4,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::String,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::string_unlabeled_opt(self),
+                5,
+                out,
+                true,
+            )?;
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    <Self as super::_puroro_traits::MsgTrait>::SubmsgUnlabeledMessageType<'_>,
+                >,
+            >::ser_field(
+                <Self as super::_puroro_traits::MsgTrait>::submsg_unlabeled_opt(self),
+                6,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
-}
+    pub struct MsgBuilder<T>(T);
 
-pub struct SubmsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-    pub i32_unlabeled: ScalarType,
-}
-
-impl<ScalarType> ::puroro::Message<super::Submsg>
-for SubmsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{}
-
-impl<ScalarType> super::_puroro_traits::SubmsgTrait
-for SubmsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-
-fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-    ::std::option::Option::Some(
-        ::std::convert::Into::into(::std::clone::Clone::clone(&self.i32_unlabeled))
-    )
-}
-}
-
-
-impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite
-for SubmsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    Self: super::_puroro_traits::SubmsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    impl<T> MsgBuilder<T>
     where
-        W: ::std::io::Write,
+        T: MsgTrait,
     {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
-            1,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}
+        pub fn append_i32_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField1 {
+                    i32_unlabeled: value,
+                },
+            ))
+        }
 
-impl<ScalarType> ::std::convert::From<ScalarType>
-for SubmsgSingleField1<ScalarType>
-where
+        pub fn append_i32_optional<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField2<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField2 {
+                    i32_optional: value,
+                },
+            ))
+        }
 
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-{
-    fn from(value: ScalarType) -> Self {
-        Self {
-            i32_unlabeled: value,
+        pub fn append_i32_repeated<ScalarType, RepeatedType>(
+            self,
+            value: RepeatedType,
+        ) -> MsgBuilder<(T, MsgSingleField3<ScalarType, RepeatedType>)>
+        where
+            ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+            for<'a> &'a RepeatedType:
+                ::puroro::RepeatedField<'a> + ::std::iter::IntoIterator<Item = &'a ScalarType>,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField3 {
+                    i32_repeated: value,
+                },
+            ))
+        }
+
+        pub fn append_f32_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField4<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<f32> + ::std::clone::Clone,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField4 {
+                    f32_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn append_string_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField5<ScalarType>)>
+        where
+            ScalarType: ::std::convert::AsRef<str>,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField5 {
+                    string_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn append_submsg_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> MsgBuilder<(T, MsgSingleField6<ScalarType>)>
+        where
+            ScalarType: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait,
+        {
+            MsgBuilder((
+                self.0,
+                MsgSingleField6 {
+                    submsg_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn build(self) -> T {
+            self.0
         }
     }
-}
 
-impl<ScalarType> ::std::clone::Clone
-for SubmsgSingleField1<ScalarType>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    ScalarType: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self {
-            i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+    impl MsgBuilder<()> {
+        pub fn new() -> Self {
+            Self(())
         }
     }
-}
-pub struct SubmsgBumpalo<'bump> {
-    _bump: &'bump ::puroro::bumpalo::Bump,
-    _bitfield: ::puroro::bitvec::array::BitArray<
-        ::puroro::bitvec::order::Lsb0,
-        [u32; (0 + 31) / 32],
-    >,
-    i32_unlabeled: ::puroro::internal::Bare<i32>,
-}
-
-pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
-impl<'bump> SubmsgBumpalo<'bump> {
-    pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        #[allow(unused)]
-        let bump_ref: &::puroro::bumpalo::Bump = unsafe {
-            ::std::mem::transmute(
-                ::std::ops::Deref::deref(&bump)
-            )
-        };
-
-        Self {
-            _bump: bump,
-            _bitfield: ::std::default::Default::default(),
-            i32_unlabeled: ::std::default::Default::default(),
-        }
+    pub struct MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+    {
+        _shared: Shared,
+        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        i32_unlabeled: <Fields as MsgTemplateFieldTypes>::I32UnlabeledType,
+        i32_optional: <Fields as MsgTemplateFieldTypes>::I32OptionalType,
+        i32_repeated: <Fields as MsgTemplateFieldTypes>::I32RepeatedType,
+        f32_unlabeled: <Fields as MsgTemplateFieldTypes>::F32UnlabeledType,
+        string_unlabeled: <Fields as MsgTemplateFieldTypes>::StringUnlabeledType,
+        submsg_unlabeled: <Fields as MsgTemplateFieldTypes>::SubmsgUnlabeledType,
     }
-    pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
-        if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
-            ::std::option::Option::Some(
-                self.i32_unlabeled.inner()
-            )
-        } else {
-            ::std::option::Option::None
-        }
+
+    pub struct MsgMessageProperties;
+    impl ::puroro::internal::MessageProperties for MsgMessageProperties {
+        const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 1;
     }
-    pub fn i32_unlabeled<'this>(&'this self) -> i32 {
-        match self.i32_unlabeled_opt() {
-            ::std::option::Option::Some(x) => x,
-            _ => {
-                ::std::default::Default::default()
+
+    pub struct MsgFieldProperties<const FIELD_NUMBER: i32>;
+    impl ::puroro::internal::FieldProperties for MsgFieldProperties<1> {
+        type MessageProperties = self::MsgMessageProperties;
+        const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+        type LabelTag = ::puroro::tags::Unlabeled;
+        type TypeTag = ::puroro::tags::Int32;
+        const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType = 0;
+    }
+    impl ::puroro::internal::FieldProperties for MsgFieldProperties<2> {
+        type MessageProperties = self::MsgMessageProperties;
+        const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+        type LabelTag = ::puroro::tags::Optional;
+        type TypeTag = ::puroro::tags::Int32;
+        const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType = 0;
+    }
+    impl ::puroro::internal::FieldProperties for MsgFieldProperties<3> {
+        type MessageProperties = self::MsgMessageProperties;
+        const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+        type LabelTag = ::puroro::tags::Repeated;
+        type TypeTag = ::puroro::tags::Int32;
+        const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType = 0;
+    }
+    impl ::puroro::internal::FieldProperties for MsgFieldProperties<4> {
+        type MessageProperties = self::MsgMessageProperties;
+        const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+        type LabelTag = ::puroro::tags::Unlabeled;
+        type TypeTag = ::puroro::tags::Float;
+        const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType =
+            0.0f32;
+    }
+    impl ::puroro::internal::FieldProperties for MsgFieldProperties<5> {
+        type MessageProperties = self::MsgMessageProperties;
+        const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+        type LabelTag = ::puroro::tags::Unlabeled;
+        type TypeTag = ::puroro::tags::String;
+        const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType = "";
+    }
+    impl ::puroro::internal::FieldProperties for MsgFieldProperties<6> {
+        type MessageProperties = self::MsgMessageProperties;
+        const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+        type LabelTag = ::puroro::tags::Unlabeled;
+        type TypeTag =
+            ::puroro::tags::Message<self::_puroro_root::proto3_defaults::SubmsgMessageProperties>;
+        const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType = ();
+    }
+
+    pub type MsgSimple2 = MsgTemplate<
+        ::puroro::internal::SimpleFields,
+        ::puroro::internal::SimpleShared<{ (1 + 31) / 32 }>,
+    >;
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+    impl<Fields, Shared> MsgTemplate<Fields, Shared> where Fields: MsgTemplateFieldTypes {}
+
+    impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        Shared: ::std::default::Default,
+        Fields::I32UnlabeledType: ::std::default::Default,
+        Fields::I32OptionalType: ::std::default::Default,
+        Fields::I32RepeatedType: ::std::default::Default,
+        Fields::F32UnlabeledType: ::std::default::Default,
+        Fields::StringUnlabeledType: ::std::default::Default,
+        Fields::SubmsgUnlabeledType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _shared: ::std::default::Default::default(),
+                _phantom: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                f32_unlabeled: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
             }
         }
     }
 
-    pub fn has_i32_unlabeled(&self) -> bool {
-        self.i32_unlabeled_opt().is_some()
+    pub struct SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+    {
+        pub i32_unlabeled: ScalarType,
     }
-    pub fn clear_i32_unlabeled(&mut self) {
-        self.i32_unlabeled = ::std::default::Default::default();
+
+    impl<ScalarType> ::puroro::Message<super::Submsg> for SubmsgSingleField1<ScalarType> where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone
+    {
     }
-    pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
-        if !self.has_i32_unlabeled() {
+
+    impl<ScalarType> super::_puroro_traits::SubmsgTrait for SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+    {
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::option::Option::Some(::std::convert::Into::into(::std::clone::Clone::clone(
+                &self.i32_unlabeled,
+            )))
+        }
+    }
+
+    impl<ScalarType> ::puroro::internal::se::SerMessageToIoWrite for SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
+    impl<ScalarType> ::std::convert::From<ScalarType> for SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+    {
+        fn from(value: ScalarType) -> Self {
+            Self {
+                i32_unlabeled: value,
+            }
+        }
+    }
+
+    impl<ScalarType> ::std::clone::Clone for SubmsgSingleField1<ScalarType>
+    where
+        ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        ScalarType: ::std::clone::Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                i32_unlabeled: ::std::clone::Clone::clone(&self.i32_unlabeled),
+            }
+        }
+    }
+    pub struct SubmsgBumpalo<'bump> {
+        _bump: &'bump ::puroro::bumpalo::Bump,
+        _bitfield:
+            ::puroro::bitvec::array::BitArray<::puroro::bitvec::order::Lsb0, [u32; (0 + 31) / 32]>,
+        i32_unlabeled: ::puroro::internal::Bare<i32>,
+    }
+
+    pub type SubmsgBumpaloOwned = ::puroro::BumpaloOwned<SubmsgBumpalo<'static>>;
+    impl<'bump> SubmsgBumpalo<'bump> {
+        pub fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            #[allow(unused)]
+            let bump_ref: &::puroro::bumpalo::Bump =
+                unsafe { ::std::mem::transmute(::std::ops::Deref::deref(&bump)) };
+
+            Self {
+                _bump: bump,
+                _bitfield: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+            }
+        }
+        pub fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
+            if !::puroro::internal::IsDefault::is_default(&*self.i32_unlabeled) {
+                ::std::option::Option::Some(self.i32_unlabeled.inner())
+            } else {
+                ::std::option::Option::None
+            }
+        }
+        pub fn i32_unlabeled<'this>(&'this self) -> i32 {
+            match self.i32_unlabeled_opt() {
+                ::std::option::Option::Some(x) => x,
+                _ => ::std::default::Default::default(),
+            }
+        }
+
+        pub fn has_i32_unlabeled(&self) -> bool {
+            self.i32_unlabeled_opt().is_some()
+        }
+        pub fn clear_i32_unlabeled(&mut self) {
             self.i32_unlabeled = ::std::default::Default::default();
         }
-        &mut self.i32_unlabeled
+        pub fn i32_unlabeled_mut<'this>(&'this mut self) -> &'this mut i32 {
+            if !self.has_i32_unlabeled() {
+                self.i32_unlabeled = ::std::default::Default::default();
+            }
+            &mut self.i32_unlabeled
+        }
     }
-}
-impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
+    impl<'bump> ::puroro::Message<super::_puroro_simple_impl::Submsg> for SubmsgBumpalo<'bump> {}
 
-impl<'bump> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump> {
-    fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        Self::new_in(bump)
+    impl<'bump> ::puroro::BumpaloMessage<'bump> for SubmsgBumpalo<'bump> {
+        fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
     }
-}
 
-impl<'bump> ::puroro::internal::BumpDefault<'bump> for SubmsgBumpalo<'bump> {
-    fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
-        Self::new_in(bump)
+    impl<'bump> ::puroro::internal::BumpDefault<'bump> for SubmsgBumpalo<'bump> {
+        fn default_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self {
+            Self::new_in(bump)
+        }
     }
-}
 
-impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
-fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
-    <Self>::i32_unlabeled_opt(self)
-}
-}
+    impl<'bump> super::_puroro_traits::SubmsgTrait for SubmsgBumpalo<'bump> {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
+            <Self>::i32_unlabeled_opt(self)
+        }
+    }
 
-impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
-    fn deser_field<'this, I>(
-        &'this mut self,
-        field_number: i32,
-        data: ::puroro::internal::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-    ) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
-    {
-        use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
-        match field_number {
+    impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<'bump> {
+        fn deser_field<'this, I>(
+            &'this mut self,
+            field_number: i32,
+            data: ::puroro::internal::types::FieldData<
+                &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
+            >,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::bumpalo::de::DeserFieldFromBytesIter;
+            match field_number {
             1 => {
                 DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -1775,317 +1720,351 @@ impl<'bump> ::puroro::internal::de::DeserMessageFromBytesIter for SubmsgBumpalo<
 
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
-    }
-}
-
-impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
-where
-    Self: super::_puroro_traits::SubmsgTrait,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-    where
-        W: ::std::io::Write,
-    {
-        ::puroro::internal::se::SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Int32
-        >::ser_field(
-            <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
-            1,
-            out,
-            true,
-        )?;
-        ::std::result::Result::Ok(())
-    }
-}pub struct SubmsgBuilder<T>(T);
-
-impl<T> SubmsgBuilder<T>
-where
-    T: SubmsgTrait
-{
-
-    pub fn append_i32_unlabeled<ScalarType>(self, value: ScalarType)
-        -> SubmsgBuilder<(T, SubmsgSingleField1<ScalarType>)>
-where
-
-ScalarType:
-    ::std::convert::Into<i32> + ::std::clone::Clone,
-    {
-        SubmsgBuilder((self.0, SubmsgSingleField1 { i32_unlabeled: value}))
-    }
-
-    pub fn build(self) -> T {
-        self.0
-    }
-}
-
-impl SubmsgBuilder<()>
-{
-    pub fn new() -> Self { Self(()) }
-}
-pub struct SubmsgTemplate<Fields, Shared>
-    where Fields: SubmsgTemplateFieldTypes
-{
-    _shared: Shared,
-    i32_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType,
-}
-
-pub struct SubmsgMessageProperties;
-impl ::puroro::internal::MessageProperties for SubmsgMessageProperties {
-    const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
-}
-
-pub struct SubmsgFieldProperties<const FIELD_NUMBER: i32>;
-impl ::puroro::internal::FieldProperties for SubmsgFieldProperties<1> {
-    type MessageProperties = self::SubmsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag = ::puroro::tags::Unlabeled;
-    type TypeTag = ::puroro::tags::Int32;
-    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
-}
-
-pub type SubmsgSimple2 = SubmsgTemplate<
-    ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<{ {(0 + 31) / 32} }>,
->;
-impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
-where
-    Fields: SubmsgTemplateFieldTypes,
-{
-}
-
-impl<Fields, Shared> ::std::default::Default for SubmsgTemplate<Fields, Shared>
-where
-    Fields: SubmsgTemplateFieldTypes,
-    Shared: ::std::default::Default,
-    Fields::I32UnlabeledType: ::std::default::Default,
-{
-    fn default() -> Self {
-        Self {
-            _shared: ::std::default::Default::default(),
-            i32_unlabeled: ::std::default::Default::default(),
         }
     }
-}
+
+    impl<'bump> ::puroro::internal::se::SerMessageToIoWrite for SubmsgBumpalo<'bump>
+    where
+        Self: super::_puroro_traits::SubmsgTrait,
+    {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::puroro::internal::se::SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Int32,
+            >::ser_field(
+                <Self as super::_puroro_traits::SubmsgTrait>::i32_unlabeled_opt(self),
+                1,
+                out,
+                true,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+    pub struct SubmsgBuilder<T>(T);
+
+    impl<T> SubmsgBuilder<T>
+    where
+        T: SubmsgTrait,
+    {
+        pub fn append_i32_unlabeled<ScalarType>(
+            self,
+            value: ScalarType,
+        ) -> SubmsgBuilder<(T, SubmsgSingleField1<ScalarType>)>
+        where
+            ScalarType: ::std::convert::Into<i32> + ::std::clone::Clone,
+        {
+            SubmsgBuilder((
+                self.0,
+                SubmsgSingleField1 {
+                    i32_unlabeled: value,
+                },
+            ))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
+    }
+
+    impl SubmsgBuilder<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
+    pub struct SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+    {
+        _shared: Shared,
+        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        i32_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType,
+    }
+
+    pub struct SubmsgMessageProperties;
+    impl ::puroro::internal::MessageProperties for SubmsgMessageProperties {
+        const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
+    }
+
+    pub struct SubmsgFieldProperties<const FIELD_NUMBER: i32>;
+    impl ::puroro::internal::FieldProperties for SubmsgFieldProperties<1> {
+        type MessageProperties = self::SubmsgMessageProperties;
+        const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+        type LabelTag = ::puroro::tags::Unlabeled;
+        type TypeTag = ::puroro::tags::Int32;
+        const DEFAULT_VALUE: <Self::TypeTag as ::puroro::tags::FieldTypeTag>::DefaultValueType = 0;
+    }
+
+    pub type SubmsgSimple2 = SubmsgTemplate<
+        ::puroro::internal::SimpleFields,
+        ::puroro::internal::SimpleShared<{ (0 + 31) / 32 }>,
+    >;
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared> where Fields: SubmsgTemplateFieldTypes {}
+
+    impl<Fields, Shared> ::std::default::Default for SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        Shared: ::std::default::Default,
+        Fields::I32UnlabeledType: ::std::default::Default,
+    {
+        fn default() -> Self {
+            Self {
+                _shared: ::std::default::Default::default(),
+                _phantom: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
 }
 pub mod _puroro_internal {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
-    }pub trait MsgTemplateFieldTypes {
-    type ImplTag;
-    type I32UnlabeledType;
-    type I32OptionalType;
-    type I32RepeatedType;
-    type F32UnlabeledType;
-    type StringUnlabeledType;
-    type SubmsgUnlabeledType;
-}
+    }
+    pub trait MsgTemplateFieldTypes {
+        type ImplTag;
+        type I32UnlabeledType;
+        type I32OptionalType;
+        type I32RepeatedType;
+        type F32UnlabeledType;
+        type StringUnlabeledType;
+        type SubmsgUnlabeledType;
+    }
 
-impl MsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-    type ImplTag = ::puroro::tags::SimpleImpl
-    type I32UnlabeledType = i32;
-    type I32OptionalType = i32;
-    type I32RepeatedType = ::std::vec::Vec<i32>;
-    type F32UnlabeledType = f32;
-    type StringUnlabeledType = ::std::string::String;
-    type SubmsgUnlabeledType = ::std::option::Option<::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>>;
-}pub trait SubmsgTemplateFieldTypes {
-    type ImplTag;
-    type I32UnlabeledType;
-}
+    impl MsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
+        type ImplTag = ::puroro::tags::SimpleImpl;
+        type I32UnlabeledType = i32;
+        type I32OptionalType = i32;
+        type I32RepeatedType = ::std::vec::Vec<i32>;
+        type F32UnlabeledType = f32;
+        type StringUnlabeledType = ::std::string::String;
+        type SubmsgUnlabeledType = ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_simple_impl::Submsg>,
+        >;
+    }
+    pub trait SubmsgTemplateFieldTypes {
+        type ImplTag;
+        type I32UnlabeledType;
+    }
 
-impl SubmsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
-    type ImplTag = ::puroro::tags::SimpleImpl
-    type I32UnlabeledType = i32;
-}
+    impl SubmsgTemplateFieldTypes for ::puroro::internal::SimpleFields {
+        type ImplTag = ::puroro::tags::SimpleImpl;
+        type I32UnlabeledType = i32;
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    
+
     pub trait MsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.i32_unlabeled_opt().unwrap_or_else(::std::default::Default::default)
+            self.i32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
-    
+
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
         fn i32_optional<'this>(&'this self) -> i32 {
-            self.i32_optional_opt().unwrap_or_else(::std::default::Default::default)
+            self.i32_optional_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
         fn has_i32_optional<'this>(&'this self) -> bool {
             self.i32_optional_opt().is_some()
         }
-    
+
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
-    
-        type I32RepeatedRepeatedType<'this>:
-            ::puroro::RepeatedField<'this>
+
+        type I32RepeatedRepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>
-        where Self: 'this;
+        where
+            Self: 'this;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this>;
         fn f32_unlabeled<'this>(&'this self) -> f32 {
-            self.f32_unlabeled_opt().unwrap_or_else(::std::default::Default::default)
+            self.f32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
         fn has_f32_unlabeled<'this>(&'this self) -> bool {
             self.f32_unlabeled_opt().is_some()
         }
-    
+
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::option::Option::None
         }
         fn string_unlabeled<'this>(&'this self) -> &'this str {
-            self.string_unlabeled_opt().unwrap_or_else(::std::default::Default::default)
+            self.string_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
         fn has_string_unlabeled<'this>(&'this self) -> bool {
             self.string_unlabeled_opt().is_some()
         }
-    
+
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             ::std::option::Option::None
         }
         type SubmsgUnlabeledMessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait
             where Self: 'this;
-        fn submsg_unlabeled<'this>(&'this self) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             self.submsg_unlabeled_opt()
         }
         fn has_submsg_unlabeled<'this>(&'this self) -> bool {
             self.submsg_unlabeled_opt().is_some()
         }
-    
-        fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
+
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             ::std::option::Option::None
         }
     }
-    
+
     macro_rules! msg_delegate {
         ($ty:ty) => {
-    
             fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_unlabeled_opt()
             }
-    
+
             fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_optional_opt()
             }
-    
-            type I32RepeatedRepeatedType<'this> where Self: 'this = <$ty>::I32RepeatedRepeatedType<'this>;
+
+            type I32RepeatedRepeatedType<'this>
+            where
+                Self: 'this,
+            = <$ty>::I32RepeatedRepeatedType<'this>;
             fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
                 (**self).i32_repeated()
             }
-    
+
             fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
                 (**self).f32_unlabeled_opt()
             }
-    
+
             fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
                 (**self).string_unlabeled_opt()
             }
-            type SubmsgUnlabeledMessageType<'this> where Self: 'this = <$ty>::SubmsgUnlabeledMessageType<'this>;
-    
-            fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
+            type SubmsgUnlabeledMessageType<'this>
+            where
+                Self: 'this,
+            = <$ty>::SubmsgUnlabeledMessageType<'this>;
+
+            fn submsg_unlabeled_opt<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
                 (**self).submsg_unlabeled_opt()
             }
         };
     }
-    
+
     impl<T> MsgTrait for &'_ T
     where
-        T: MsgTrait
+        T: MsgTrait,
     {
         msg_delegate!(T);
     }
-    
+
     impl<T> MsgTrait for &'_ mut T
     where
-        T: MsgTrait
+        T: MsgTrait,
     {
         msg_delegate!(T);
     }
-    
+
     impl<T> MsgTrait for ::std::boxed::Box<T>
     where
-        T: MsgTrait
+        T: MsgTrait,
     {
         msg_delegate!(T);
     }
-    
+
     impl<'bump, T> MsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
     where
-        T: MsgTrait
+        T: MsgTrait,
     {
         msg_delegate!(T);
     }
-    
+
     impl<T> MsgTrait for ::puroro::BumpaloOwned<T>
     where
-        T: MsgTrait
+        T: MsgTrait,
     {
         msg_delegate!(T);
-    }impl MsgTrait for () {
-        type I32RepeatedRepeatedType<'this> where Self: 'this = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
+    }
+    impl MsgTrait for () {
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type SubmsgUnlabeledMessageType<'this> where Self: 'this = ();
-    }impl<T, U> MsgTrait for (T, U)
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = ();
+    }
+    impl<T, U> MsgTrait for (T, U)
     where
         T: MsgTrait,
         U: MsgTrait,
     {
-    
-        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32>
-        {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::i32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_unlabeled_opt(&self.0))
         }
-    
-        fn i32_optional_opt<'this>(&'this self) -> Option<i32>
-        {
+
+        fn i32_optional_opt<'this>(&'this self) -> Option<i32> {
             <U as MsgTrait>::i32_optional_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_optional_opt(&self.0))
         }
-        type I32RepeatedRepeatedType<'this> where Self: 'this
-            = ::puroro::internal::impls::merged::MergedRepeatedField<
-                <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
-                <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
-            >;
-    
-        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this>
-        {
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::merged::MergedRepeatedField<
+            <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
+            <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
+        >;
+
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
             ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::i32_repeated(&self.0),
                 <U as MsgTrait>::i32_repeated(&self.1),
             )
         }
-    
-        fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32>
-        {
+
+        fn f32_unlabeled_opt<'this>(&'this self) -> Option<f32> {
             <U as MsgTrait>::f32_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::f32_unlabeled_opt(&self.0))
         }
-    
-        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str>
-        {
+
+        fn string_unlabeled_opt<'this>(&'this self) -> Option<&'this str> {
             <U as MsgTrait>::string_unlabeled_opt(&self.1)
                 .or_else(|| <T as MsgTrait>::string_unlabeled_opt(&self.0))
-        }type SubmsgUnlabeledMessageType<'this> where Self: 'this = (
+        }
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = (
             ::std::option::Option<<T as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
             ::std::option::Option<<U as MsgTrait>::SubmsgUnlabeledMessageType<'this>>,
         );
-    
-        fn submsg_unlabeled_opt<'this>(&'this self) -> Option<Self::SubmsgUnlabeledMessageType<'this>>
-        {
+
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> Option<Self::SubmsgUnlabeledMessageType<'this>> {
             match (
                 <T as MsgTrait>::submsg_unlabeled_opt(&self.0),
-                <U as MsgTrait>::submsg_unlabeled_opt(&self.1)
+                <U as MsgTrait>::submsg_unlabeled_opt(&self.1),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some((Some(t), None)),
@@ -2093,73 +2072,68 @@ pub mod _puroro_traits {
                 (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
-    }impl<T, U> MsgTrait for ::puroro::Either<T, U>
+    }
+    impl<T, U> MsgTrait for ::puroro::Either<T, U>
     where
         T: MsgTrait,
         U: MsgTrait,
     {
-        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32>
-        {
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::i32_unlabeled_opt(t),
                 |u| <U as MsgTrait>::i32_unlabeled_opt(u),
             )
         }
-        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32>
-        {
+        fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::i32_optional_opt(t),
                 |u| <U as MsgTrait>::i32_optional_opt(u),
             )
         }
-        type I32RepeatedRepeatedType<'this> where Self: 'this
-            = ::puroro::internal::impls::either::EitherRepeatedField<
-                <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
-                <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
-            >;
-    
-        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this>
-        {
-            ::puroro::internal::impls::either::EitherRepeatedField::new(self
-                .as_ref()
-                .map_left(
-                    |t| <T as MsgTrait>::i32_repeated(t)
-                )
-                .map_right(
-                    |u| <U as MsgTrait>::i32_repeated(u)
-                )
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::either::EitherRepeatedField<
+            <T as MsgTrait>::I32RepeatedRepeatedType<'this>,
+            <U as MsgTrait>::I32RepeatedRepeatedType<'this>,
+        >;
+
+        fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(|t| <T as MsgTrait>::i32_repeated(t))
+                    .map_right(|u| <U as MsgTrait>::i32_repeated(u)),
             )
         }
-        fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32>
-        {
+        fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::f32_unlabeled_opt(t),
                 |u| <U as MsgTrait>::f32_unlabeled_opt(u),
             )
         }
-        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str>
-        {
+        fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().either(
                 |t| <T as MsgTrait>::string_unlabeled_opt(t),
                 |u| <U as MsgTrait>::string_unlabeled_opt(u),
             )
         }
-        type SubmsgUnlabeledMessageType<'this> where Self: 'this = ::puroro::Either<
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = ::puroro::Either<
             <T as MsgTrait>::SubmsgUnlabeledMessageType<'this>,
             <U as MsgTrait>::SubmsgUnlabeledMessageType<'this>,
         >;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>>
-        {
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             self.as_ref().either(
-                |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(
-                    |t| ::puroro::Either::Left(t)
-                ),
-                |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(
-                    |u| ::puroro::Either::Right(u)
-                ),
+                |t| <T as MsgTrait>::submsg_unlabeled_opt(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::submsg_unlabeled_opt(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
-    }impl<T> MsgTrait for ::std::option::Option<T>
+    }
+    impl<T> MsgTrait for ::std::option::Option<T>
     where
         T: MsgTrait,
     {
@@ -2169,11 +2143,15 @@ pub mod _puroro_traits {
         fn i32_optional_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().and_then(|msg| msg.i32_optional_opt())
         }
-    
-        type I32RepeatedRepeatedType<'this> where Self: 'this =
-            ::puroro::internal::impls::option::OptionRepeatedField<T::I32RepeatedRepeatedType<'this>>;
+
+        type I32RepeatedRepeatedType<'this>
+        where
+            Self: 'this,
+        = ::puroro::internal::impls::option::OptionRepeatedField<T::I32RepeatedRepeatedType<'this>>;
         fn i32_repeated<'this>(&'this self) -> Self::I32RepeatedRepeatedType<'this> {
-            ::puroro::internal::impls::option::OptionRepeatedField::new(self.as_ref().map(|msg| msg.i32_repeated()))
+            ::puroro::internal::impls::option::OptionRepeatedField::new(
+                self.as_ref().map(|msg| msg.i32_repeated()),
+            )
         }
         fn f32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<f32> {
             self.as_ref().and_then(|msg| msg.f32_unlabeled_opt())
@@ -2181,92 +2159,97 @@ pub mod _puroro_traits {
         fn string_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<&'this str> {
             self.as_ref().and_then(|msg| msg.string_unlabeled_opt())
         }
-        type SubmsgUnlabeledMessageType<'this> where Self: 'this = T::SubmsgUnlabeledMessageType<'this>;
-        fn submsg_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
+        type SubmsgUnlabeledMessageType<'this>
+        where
+            Self: 'this,
+        = T::SubmsgUnlabeledMessageType<'this>;
+        fn submsg_unlabeled_opt<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::SubmsgUnlabeledMessageType<'this>> {
             self.as_ref().and_then(|msg| msg.submsg_unlabeled_opt())
         }
     }
-    
+
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.i32_unlabeled_opt().unwrap_or_else(::std::default::Default::default)
+            self.i32_unlabeled_opt()
+                .unwrap_or_else(::std::default::Default::default)
         }
         fn has_i32_unlabeled<'this>(&'this self) -> bool {
             self.i32_unlabeled_opt().is_some()
         }
-    
+
         fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::option::Option::None
         }
     }
-    
+
     macro_rules! submsg_delegate {
         ($ty:ty) => {
-    
             fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
                 (**self).i32_unlabeled_opt()
             }
         };
     }
-    
+
     impl<T> SubmsgTrait for &'_ T
     where
-        T: SubmsgTrait
+        T: SubmsgTrait,
     {
         submsg_delegate!(T);
     }
-    
+
     impl<T> SubmsgTrait for &'_ mut T
     where
-        T: SubmsgTrait
+        T: SubmsgTrait,
     {
         submsg_delegate!(T);
     }
-    
+
     impl<T> SubmsgTrait for ::std::boxed::Box<T>
     where
-        T: SubmsgTrait
+        T: SubmsgTrait,
     {
         submsg_delegate!(T);
     }
-    
+
     impl<'bump, T> SubmsgTrait for ::puroro::bumpalo::boxed::Box<'bump, T>
     where
-        T: SubmsgTrait
+        T: SubmsgTrait,
     {
         submsg_delegate!(T);
     }
-    
+
     impl<T> SubmsgTrait for ::puroro::BumpaloOwned<T>
     where
-        T: SubmsgTrait
+        T: SubmsgTrait,
     {
         submsg_delegate!(T);
-    }impl SubmsgTrait for () {
-    }impl<T, U> SubmsgTrait for (T, U)
+    }
+    impl SubmsgTrait for () {}
+    impl<T, U> SubmsgTrait for (T, U)
     where
         T: SubmsgTrait,
         U: SubmsgTrait,
     {
-    
-        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32>
-        {
+        fn i32_unlabeled_opt<'this>(&'this self) -> Option<i32> {
             <U as SubmsgTrait>::i32_unlabeled_opt(&self.1)
                 .or_else(|| <T as SubmsgTrait>::i32_unlabeled_opt(&self.0))
         }
-    }impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
+    }
+    impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
     where
         T: SubmsgTrait,
         U: SubmsgTrait,
     {
-        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32>
-        {
+        fn i32_unlabeled_opt<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
                 |t| <T as SubmsgTrait>::i32_unlabeled_opt(t),
                 |u| <U as SubmsgTrait>::i32_unlabeled_opt(u),
             )
         }
-    }impl<T> SubmsgTrait for ::std::option::Option<T>
+    }
+    impl<T> SubmsgTrait for ::std::option::Option<T>
     where
         T: SubmsgTrait,
     {
@@ -2281,12 +2264,10 @@ pub mod _puroro_nested {
         mod _puroro_root {
             pub use super::super::super::_puroro_root::*;
         }
-        
     }
     pub mod submsg {
         mod _puroro_root {
             pub use super::super::super::_puroro_root::*;
         }
-        
     }
 }

@@ -260,11 +260,11 @@ impl Field {
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             is_repeated,
             has_default_value: f.default_value().is_some(),
-            default_value: f
-                .default_value()
-                .map(|v| -> Result<_> { Ok(Self::convert_default_value(v, f.field_type()?)?) })
-                .transpose()?
-                .unwrap_or("::std::default::Default::default()".to_string()),
+            default_value: Self::convert_default_value(
+                f.default_value().unwrap_or(""),
+                f.field_type()?,
+            )?
+            .into(),
             has_optional_bit,
             bitfield_index: {
                 if has_optional_bit {
@@ -388,24 +388,26 @@ impl Field {
         })
     }
 
-    fn convert_default_value(input: &str, field_type: FieldType) -> Result<String> {
+    fn convert_default_value(input: &str, field_type: FieldType) -> Result<Cow<'_, str>> {
         Ok(match field_type {
             FieldType::Float => match input {
-                "inf" => "f32::INFINITY".to_string(),
-                "-inf" => "f32::NEG_INFINITY".to_string(),
-                "nan" | "-nan" => "f32::NAN".to_string(),
+                "inf" => "f32::INFINITY".into(),
+                "-inf" => "f32::NEG_INFINITY".into(),
+                "nan" | "-nan" => "f32::NAN".into(),
+                "" => "0.0f32".into(),
                 digits => {
                     let append_zero = if digits.ends_with('.') { "0" } else { "" };
-                    format!("{}{}f32", digits, append_zero)
+                    format!("{}{}f32", digits, append_zero).into()
                 }
             },
             FieldType::Double => match input {
-                "inf" => "f64::INFINITY".to_string(),
-                "-inf" => "f64::NEG_INFINITY".to_string(),
-                "nan" | "-nan" => "f64::NAN".to_string(),
+                "inf" => "f64::INFINITY".into(),
+                "-inf" => "f64::NEG_INFINITY".into(),
+                "nan" | "-nan" => "f64::NAN".into(),
+                "" => "0.0f64".into(),
                 digits => {
                     let append_zero = if digits.ends_with('.') { "0" } else { "" };
-                    format!("{}{}f64", digits, append_zero)
+                    format!("{}{}f64", digits, append_zero).into()
                 }
             },
             FieldType::Int32
@@ -418,32 +420,41 @@ impl Field {
             | FieldType::Fixed64
             | FieldType::SFixed32
             | FieldType::SFixed64 => {
-                // As-is is okay. Even if the input is octal of hexadecimal format,
-                // the protoc command automatically converts it to decimal format
-                // so we only need to treat a decimal format.
-                input.to_string()
+                if input.is_empty() {
+                    "0".into()
+                } else {
+                    // As-is is okay. Even if the input is octal of hexadecimal format,
+                    // the protoc command automatically converts it to decimal format
+                    // so we only need to treat a decimal format.
+                    input.into()
+                }
             }
             FieldType::Bool => {
-                // the possible input is "true" or "false", so as-is is okay.
-                input.to_string()
+                if input.is_empty() {
+                    "false".into()
+                } else {
+                    // the possible input is "true" or "false", so as-is is okay.
+                    input.into()
+                }
             }
             FieldType::String => {
-                format!(r###""{}""###, input.escape_default().collect::<String>())
+                format!(r###""{}""###, input.escape_default().collect::<String>()).into()
             }
             FieldType::Bytes => {
                 let rust_style_bytes = convert_octal_escape_to_rust_style_escape(input)?;
-                format!(r#"b"{}""#, rust_style_bytes)
+                format!(r#"b"{}""#, rust_style_bytes).into()
             }
             FieldType::Enum2(e) | FieldType::Enum3(e) => {
-                format!(
-                    "{}::{}",
-                    upgrade(&e)?.rust_path(),
-                    get_keyword_safe_ident(&to_camel_case(input))
-                )
+                let e = upgrade(&e)?;
+                let enum_path = e.rust_path();
+                let item = if input.is_empty() {
+                    e.first_value()?.rust_ident().to_string()
+                } else {
+                    get_keyword_safe_ident(&to_camel_case(input)).to_string()
+                };
+                format!("{enum_path}::{item}").into()
             }
-            FieldType::Message(_) | FieldType::Group => {
-                unreachable!("Message and Group should not have default values")
-            }
+            FieldType::Message(_) | FieldType::Group => "()".into(),
         })
     }
 }
