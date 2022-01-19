@@ -20,21 +20,21 @@ use crate::tags;
 // [optional|required|(unlabeled)] non-message field
 // assuming that getter_opt method is implemented, and the `FieldPropetry::DEFAULT_VALUE`
 // type is the same as the getter's return type.
-impl<'a, _1, _2, _3, _4, _5, FP, FieldType, Shared>
+impl<'a, _1, _2, _3, FP, FieldType, Shared>
     GetFieldMethodImpl<
         'a,
         FP,
         tags::SimpleImpl,
-        tags::NonRepeatedLabel<_1, _2, _3>,
-        tags::NonMessageType<_4, _5>,
+        tags::NonRepeatedLabel<_1>,
+        tags::NonMessageType<_2, _3>,
     > for FieldAndSharedRef<'a, FieldType, Shared>
 where
     FP: FieldProperties<
-        LabelTag = tags::NonRepeatedLabel<_1, _2, _3>,
-        TypeTag = tags::NonMessageType<_4, _5>,
+        LabelTag = tags::NonRepeatedLabel<_1>,
+        TypeTag = tags::NonMessageType<_2, _3>,
     >,
     Shared: SharedObjects,
-    tags::NonMessageType<_4, _5>: tags::FieldTypeTag,
+    tags::NonMessageType<_2, _3>: tags::FieldTypeTag,
     Self: GetOptFieldMethod<
         'a,
         FP,

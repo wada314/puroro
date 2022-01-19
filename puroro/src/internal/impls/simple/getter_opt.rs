@@ -19,20 +19,17 @@ use crate::internal::{FieldAndSharedRef, SharedObjects};
 use crate::tags;
 
 // for [optional|required] numeric types
-impl<'a, _1, _2, _3, FP, FieldType, Shared>
+impl<'a, _1, _2, FP, FieldType, Shared>
     GetOptFieldMethodImpl<
         'a,
         FP,
         tags::SimpleImpl,
-        tags::NeedOptionalBitLabel<_1, _2>,
-        tags::NonLdType<_3>,
+        tags::NeedOptionalBitLabel<_1>,
+        tags::NonLdType<_2>,
     > for FieldAndSharedRef<'a, FieldType, Shared>
 where
-    FP: FieldProperties<
-        LabelTag = tags::NeedOptionalBitLabel<_1, _2>,
-        TypeTag = tags::NonLdType<_3>,
-    >,
-    tags::NonLdType<_3>: tags::NumericalTypeTag,
+    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1>, TypeTag = tags::NonLdType<_2>>,
+    tags::NonLdType<_2>: tags::NumericalTypeTag,
     FP::TypeTag: tags::NumericalTypeTag,
     FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
     Shared: SharedObjects,
@@ -49,16 +46,11 @@ where
 }
 
 // for [optional|required] string type
-impl<'a, _1, _2, FP, FieldType, Shared>
-    GetOptFieldMethodImpl<
-        'a,
-        FP,
-        tags::SimpleImpl,
-        tags::NeedOptionalBitLabel<_1, _2>,
-        tags::String,
-    > for FieldAndSharedRef<'a, FieldType, Shared>
+impl<'a, _1, FP, FieldType, Shared>
+    GetOptFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NeedOptionalBitLabel<_1>, tags::String>
+    for FieldAndSharedRef<'a, FieldType, Shared>
 where
-    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1, _2>, TypeTag = tags::String>,
+    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1>, TypeTag = tags::String>,
     FieldType: AsRef<str>,
     Shared: SharedObjects,
 {

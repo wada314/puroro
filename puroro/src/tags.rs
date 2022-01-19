@@ -86,20 +86,18 @@ pub type Enum3<E> = Variant<value::Enum3<E>>;
 pub type Message<M> = LengthDelimited<value::Message<M>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
-pub type Repeated = (True, False, False, False, False);
+pub type Repeated = (True, False);
 /// Proto2 optional field || Proto3 explicitly optional marked field.
-pub type Optional = (False, (True, False), False, False, False);
+pub type Optional = (False, (False, (True, True)));
 /// Only available in proto2.
-pub type Required = (False, (False, True), False, False, False);
+pub type Required = (False, (False, (True, False)));
 /// Proto3 unlabeled field.
-pub type Unlabeled = (False, False, True, False, False);
+pub type Unlabeled = (False, (True, False));
 /// An item of oneof.
-pub type OneofField = (False, False, False, True, False);
-/// Reserved for future use...
-pub type MapEntry = (False, False, False, False, True);
+pub type OneofField = (False, (False, (False, False)));
 
-pub type NonRepeatedLabel<_1, _2, _3> = (False, _1, _2, _3, False);
-pub type NeedOptionalBitLabel<_1, _2> = (False, _1, False, _2, False);
+pub type NonRepeatedLabel<_1> = (False, _1);
+pub type NeedOptionalBitLabel<_1> = (False, (False, (True, _1)));
 
 impl FieldTypeTag for Int32 {
     type DefaultValueType = i32;
