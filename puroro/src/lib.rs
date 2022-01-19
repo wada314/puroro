@@ -152,18 +152,21 @@ impl FieldProperties for PersonFieldProperties<1> {
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = tags::Optional;
     type TypeTag = tags::String;
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = "";
 }
 impl FieldProperties for PersonFieldProperties<2> {
     type MessageProperties = PersonMessageProperties;
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 1;
     type LabelTag = tags::Optional;
     type TypeTag = tags::UInt32;
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = 0;
 }
 impl FieldProperties for PersonFieldProperties<3> {
     type MessageProperties = PersonMessageProperties;
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = tags::Repeated;
     type TypeTag = tags::Message<PersonMessageProperties>;
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ();
 }
 impl<Fields, Shared> Person<Fields, Shared>
 where

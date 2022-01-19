@@ -133,6 +133,7 @@ pub trait FieldProperties {
     const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag: tags::FieldLabelTag;
     type TypeTag: tags::FieldTypeTag;
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType;
 }
 
 pub struct FieldAndSharedRef<'a, Field, Shared> {

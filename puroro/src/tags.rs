@@ -19,9 +19,11 @@ use ::std::marker::PhantomData;
 /// e.g. Int32, Float, String, Message<M>
 /// This type actually consist of two tags for generics specialization:
 /// `wire_tag<value::value_tag>`.
-pub trait FieldTypeTag {}
+pub trait FieldTypeTag {
+    type DefaultValueType;
+}
 
-/// A `FieldTypeTag` which has wire type one of Variant (except enum), Bits32 or Bits64.
+/// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
 pub trait NumericalTypeTag {
     type NativeType: 'static + Default + PartialEq + Clone;
 }
@@ -96,24 +98,60 @@ pub type MapEntry = (False, False, False, False, True);
 pub type NonRepeatedLabel<_1, _2, _3> = (False, _1, _2, _3, False);
 pub type NeedOptionalBitLabel<_1, _2> = (False, _1, False, _2, False);
 
-impl FieldTypeTag for Int32 {}
-impl FieldTypeTag for Int64 {}
-impl FieldTypeTag for UInt32 {}
-impl FieldTypeTag for UInt64 {}
-impl FieldTypeTag for SInt32 {}
-impl FieldTypeTag for SInt64 {}
-impl FieldTypeTag for Bool {}
-impl FieldTypeTag for Bytes {}
-impl FieldTypeTag for String {}
-impl<E> FieldTypeTag for Enum2<E> {}
-impl<E> FieldTypeTag for Enum3<E> {}
-impl<M> FieldTypeTag for Message<M> {}
-impl FieldTypeTag for Float {}
-impl FieldTypeTag for Double {}
-impl FieldTypeTag for Fixed32 {}
-impl FieldTypeTag for Fixed64 {}
-impl FieldTypeTag for SFixed32 {}
-impl FieldTypeTag for SFixed64 {}
+impl FieldTypeTag for Int32 {
+    type DefaultValueType = i32;
+}
+impl FieldTypeTag for Int64 {
+    type DefaultValueType = i64;
+}
+impl FieldTypeTag for UInt32 {
+    type DefaultValueType = u32;
+}
+impl FieldTypeTag for UInt64 {
+    type DefaultValueType = u64;
+}
+impl FieldTypeTag for SInt32 {
+    type DefaultValueType = i32;
+}
+impl FieldTypeTag for SInt64 {
+    type DefaultValueType = i64;
+}
+impl FieldTypeTag for Bool {
+    type DefaultValueType = bool;
+}
+impl FieldTypeTag for Bytes {
+    type DefaultValueType = &'static [u8];
+}
+impl FieldTypeTag for String {
+    type DefaultValueType = &'static str;
+}
+impl<E> FieldTypeTag for Enum2<E> {
+    type DefaultValueType = E;
+}
+impl<E> FieldTypeTag for Enum3<E> {
+    type DefaultValueType = E;
+}
+impl<M> FieldTypeTag for Message<M> {
+    type DefaultValueType = (); // Never be instanciated
+}
+impl FieldTypeTag for Float {
+    type DefaultValueType = f32;
+}
+impl FieldTypeTag for Double {
+    type DefaultValueType = f64;
+}
+impl FieldTypeTag for Fixed32 {
+    type DefaultValueType = u32;
+}
+impl FieldTypeTag for Fixed64 {
+    type DefaultValueType = u64;
+}
+impl FieldTypeTag for SFixed32 {
+    type DefaultValueType = i32;
+}
+impl FieldTypeTag for SFixed64 {
+    type DefaultValueType = i64;
+}
 
 impl NumericalTypeTag for Int32 {
     type NativeType = i32;
