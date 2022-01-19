@@ -403,7 +403,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<1> {
 
 pub type MsgSimple2 = MsgTemplate<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(1 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(1 + 31) / 32} }>,
 >;
 impl<Fields, Shared> MsgTemplate<Fields, Shared>
 where

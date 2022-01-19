@@ -12580,7 +12580,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<2> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<3> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Int32;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12601,7 +12601,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<12> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<13> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Float;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12622,7 +12622,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<22> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<23> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Bytes;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12643,7 +12643,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<32> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<33> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::String;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12664,28 +12664,28 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<42> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<43> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Enum2<self::_puroro_root::full_coverage2::Enum>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<51> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Required;
     type TypeTag = ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::SubmsgMessageProperties>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<52> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Optional;
     type TypeTag = ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::SubmsgMessageProperties>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<53> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Message<self::_puroro_root::full_coverage2::_puroro_nested::msg::SubmsgMessageProperties>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12706,7 +12706,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<102> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<103> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Int64;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12727,7 +12727,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<112> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<113> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::UInt32;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12748,7 +12748,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<122> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<123> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::UInt64;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12769,7 +12769,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<132> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<133> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::SInt32;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12790,7 +12790,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<142> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<143> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::SInt64;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12811,7 +12811,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<152> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<153> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Fixed32;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12832,7 +12832,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<162> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<163> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Fixed64;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12853,7 +12853,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<172> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<173> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::SFixed32;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12874,7 +12874,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<182> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<183> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::SFixed64;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12895,7 +12895,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<192> {
 }
 impl ::puroro::internal::FieldProperties for MsgFieldProperties<193> {
     type MessageProperties = self::MsgMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Double;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -12903,7 +12903,7 @@ impl ::puroro::internal::FieldProperties for MsgFieldProperties<193> {
 
 pub type MsgSimple2 = MsgTemplate<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(30 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(30 + 31) / 32} }>,
 >;
 impl<Fields, Shared> MsgTemplate<Fields, Shared>
 where
@@ -15927,7 +15927,7 @@ pub mod _puroro_nested {
         
         pub type SubmsgSimple2 = SubmsgTemplate<
             ::puroro::internal::SimpleFields, 
-            ::puroro::internal::SimpleShared<(2 + 31) / 32>,
+            ::puroro::internal::SimpleShared<{ {(2 + 31) / 32} }>,
         >;
         impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
         where

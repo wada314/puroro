@@ -775,7 +775,7 @@ impl ::puroro::internal::FieldProperties for Test1FieldProperties<1> {
 
 pub type Test1Simple2 = Test1Template<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(1 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(1 + 31) / 32} }>,
 >;
 impl<Fields, Shared> Test1Template<Fields, Shared>
 where
@@ -1047,7 +1047,7 @@ impl ::puroro::internal::FieldProperties for Test2FieldProperties<2> {
 
 pub type Test2Simple2 = Test2Template<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(1 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(1 + 31) / 32} }>,
 >;
 impl<Fields, Shared> Test2Template<Fields, Shared>
 where
@@ -1308,7 +1308,7 @@ impl ::puroro::internal::MessageProperties for Test3MessageProperties {
 pub struct Test3FieldProperties<const FIELD_NUMBER: i32>;
 impl ::puroro::internal::FieldProperties for Test3FieldProperties<3> {
     type MessageProperties = self::Test3MessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Optional;
     type TypeTag = ::puroro::tags::Message<self::_puroro_root::official_samples2::Test1MessageProperties>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -1316,7 +1316,7 @@ impl ::puroro::internal::FieldProperties for Test3FieldProperties<3> {
 
 pub type Test3Simple2 = Test3Template<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(0 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(0 + 31) / 32} }>,
 >;
 impl<Fields, Shared> Test3Template<Fields, Shared>
 where
@@ -1581,7 +1581,7 @@ impl ::puroro::internal::MessageProperties for Test4MessageProperties {
 pub struct Test4FieldProperties<const FIELD_NUMBER: i32>;
 impl ::puroro::internal::FieldProperties for Test4FieldProperties<4> {
     type MessageProperties = self::Test4MessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Repeated;
     type TypeTag = ::puroro::tags::Int32;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -1589,7 +1589,7 @@ impl ::puroro::internal::FieldProperties for Test4FieldProperties<4> {
 
 pub type Test4Simple2 = Test4Template<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(0 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(0 + 31) / 32} }>,
 >;
 impl<Fields, Shared> Test4Template<Fields, Shared>
 where

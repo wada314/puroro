@@ -582,14 +582,14 @@ impl ::puroro::internal::MessageProperties for BookMessageProperties {
 pub struct BookFieldProperties<const FIELD_NUMBER: i32>;
 impl ::puroro::internal::FieldProperties for BookFieldProperties<1> {
     type MessageProperties = self::BookMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Unlabeled;
     type TypeTag = ::puroro::tags::String;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
 }
 impl ::puroro::internal::FieldProperties for BookFieldProperties<2> {
     type MessageProperties = self::BookMessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = -1;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
     type LabelTag = ::puroro::tags::Unlabeled;
     type TypeTag = ::puroro::tags::UInt32;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ::std::default::Default::default();
@@ -597,7 +597,7 @@ impl ::puroro::internal::FieldProperties for BookFieldProperties<2> {
 
 pub type BookSimple2 = BookTemplate<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(0 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(0 + 31) / 32} }>,
 >;
 impl<Fields, Shared> BookTemplate<Fields, Shared>
 where

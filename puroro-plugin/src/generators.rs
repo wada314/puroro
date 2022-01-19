@@ -272,7 +272,7 @@ impl Field {
                     *bitfield_index += 1;
                     i
                 } else {
-                    -1
+                    0
                 }
             },
             allow_variant_packing: f.allow_variant_packing()?,

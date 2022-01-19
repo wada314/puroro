@@ -1814,7 +1814,7 @@ pub struct MsgFieldProperties<const FIELD_NUMBER: i32>;
 
 pub type MsgSimple2 = MsgTemplate<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(5 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(5 + 31) / 32} }>,
 >;
 
 impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
@@ -2081,7 +2081,7 @@ impl ::puroro::internal::FieldProperties for SubmsgFieldProperties<1> {
 
 pub type SubmsgSimple2 = SubmsgTemplate<
     ::puroro::internal::SimpleFields, 
-    ::puroro::internal::SimpleShared<(1 + 31) / 32>,
+    ::puroro::internal::SimpleShared<{ {(1 + 31) / 32} }>,
 >;
 impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
 where
