@@ -121,3 +121,13 @@ impl<T: Debug> Debug for Bare<T> {
         <T as Debug>::fmt(&self.0, f)
     }
 }
+
+pub trait MessageProperties {
+    const OPTIONAL_FIELD_BITFIELD_START_INDEX: usize;
+}
+pub trait FieldProperties {
+    type MessageProperties: self::MessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+    type LabelTag: tags::FieldLabelTag;
+    type TypeTag: tags::FieldTypeTag;
+}

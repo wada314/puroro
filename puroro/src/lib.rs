@@ -94,7 +94,7 @@ pub struct BumpaloImpl;
 
 // メモ
 use internal::Bitfield;
-use std::marker::PhantomData;
+use internal::{FieldProperties, MessageProperties};
 
 pub struct SimpleFields;
 #[derive(Default, Clone, Debug)]
@@ -132,16 +132,6 @@ impl<'a, Field, Shared> FieldAndSharedRef<'a, Field, Shared> {
     pub fn new(field: &'a Field, shared: &'a Shared) -> Self {
         Self { field, shared }
     }
-}
-
-pub trait MessageProperties {
-    const OPTIONAL_FIELD_BITFIELD_START_INDEX: usize;
-}
-pub trait FieldProperties {
-    type MessageProperties: self::MessageProperties;
-    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
-    type LabelTag: tags::FieldLabelTag;
-    type TypeTag: tags::FieldTypeTag;
 }
 
 pub trait GetFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
