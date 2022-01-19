@@ -49,6 +49,22 @@ where
     }
 }
 
+// [optional|required|(unlabeled)] message field
+// assuming that getter_opt method is implemented.
+impl<'a, _1, FP, MP, FieldType, Shared>
+    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::Message<MP>>
+    for FieldAndSharedRef<'a, FieldType, Shared>
+where
+    FP: FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<MP>>,
+    Shared: SharedObjects,
+    Self: GetOptFieldMethod<'a, FP, tags::SimpleImpl>,
+{
+    type GetterTypeImpl = <Self as GetOptFieldMethod<'a, FP, tags::SimpleImpl>>::GetterType;
+    fn get_impl(&self) -> Self::GetterTypeImpl {
+        <Self as GetOptFieldMethod<FP, tags::SimpleImpl>>::get_opt(self)
+    }
+}
+
 // repeated message field
 impl<'a, FP, MP, MessageType, Shared>
     GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Repeated, tags::Message<MP>>
