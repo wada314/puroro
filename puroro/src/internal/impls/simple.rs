@@ -15,6 +15,8 @@
 #![doc = include_str!("simple.md")]
 
 pub mod de;
+mod getter;
+mod getter_opt;
 use super::super::SharedObjects;
 
 pub struct SimpleFields;
