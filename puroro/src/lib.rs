@@ -288,14 +288,19 @@ impl DefaultValue for StrFoo {
     type Type = &'static str;
     const DEFAULT_VALUE: Self::Type = "foo";
 }
-trait OrDefaultTrait<D: DefaultValue<Type = Self::Type>> {
+trait OrDefaultTrait {
     type Type;
     fn or_default(val: Option<Self::Type>) -> Self::Type;
 }
-struct StrOrFoo<'a>(std::marker::PhantomData<&'a ()>);
-impl<'a> OrDefaultTrait<StrFoo> for StrOrFoo<'a> {
+struct StrOrDefault<'a, D>(std::marker::PhantomData<&'a D>);
+impl<'a, D: DefaultValue<Type = &'a str>> OrDefaultTrait for StrOrDefault<'a, D> {
     type Type = &'a str;
     fn or_default(val: Option<Self::Type>) -> Self::Type {
-        val.unwrap_or(StrFoo::DEFAULT_VALUE)
+        val.unwrap_or(D::DEFAULT_VALUE)
     }
+}
+fn test() {
+    let string = String::new();
+    let s = string.as_ref();
+    StrOrDefault::<StrFoo>::or_default(Some(s));
 }
