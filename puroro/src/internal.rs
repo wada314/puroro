@@ -41,21 +41,24 @@ use ::std::ops::{Deref, DerefMut};
 
 pub trait Bitfield {
     fn get(&self, index: usize) -> bool;
+    fn set(&mut self, index: usize, val: bool);
 }
 impl<O: BitOrder, V: BitViewSized> Bitfield for BitArray<O, V> {
     fn get(&self, index: usize) -> bool {
         <BitSlice<_, _>>::get(&**self, index).map_or(false, |b| *b)
     }
-}
-impl Bitfield for () {
-    fn get(&self, _index: usize) -> bool {
-        false
+    fn set(&mut self, index: usize, val: bool) {
+        <BitSlice<_, _>>::set(&mut **self, index, val);
     }
 }
+
 pub struct FlipBitOn<Base, const INDEX: usize>(Base);
 impl<Base: Bitfield, const INDEX: usize> Bitfield for FlipBitOn<Base, INDEX> {
     fn get(&self, index: usize) -> bool {
         index == INDEX || self.0.get(index)
+    }
+    fn set(&mut self, index: usize, val: bool) {
+        todo!()
     }
 }
 
