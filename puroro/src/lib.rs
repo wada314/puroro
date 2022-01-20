@@ -258,7 +258,6 @@ macro_rules! derive_person_params {
     };
 }
 
-#[cfg(test2)]
 fn test() {
     let person = PersonSimple::default();
     let _hoge = person.age_opt();
@@ -293,13 +292,13 @@ trait OrDefaultTrait {
     fn or_default(val: Option<Self::Type>) -> Self::Type;
 }
 struct StrOrDefault<'a, D>(std::marker::PhantomData<&'a D>);
-impl<'a, D: DefaultValue<Type = &'a str>> OrDefaultTrait for StrOrDefault<'a, D> {
+impl<'a, 'b: 'a, D: DefaultValue<Type = &'b str>> OrDefaultTrait for StrOrDefault<'a, D> {
     type Type = &'a str;
     fn or_default(val: Option<Self::Type>) -> Self::Type {
         val.unwrap_or(D::DEFAULT_VALUE)
     }
 }
-fn test() {
+fn test2() {
     let string = String::new();
     let s = string.as_ref();
     StrOrDefault::<StrFoo>::or_default(Some(s));

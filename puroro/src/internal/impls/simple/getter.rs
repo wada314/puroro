@@ -17,36 +17,53 @@ use crate::internal::FieldProperties;
 use crate::internal::{FieldAndSharedRef, SharedObjects};
 use crate::tags;
 
-use crate::internal::methods::GetOptFieldMethodImpl;
-// [optional|required|(unlabeled)] non-message field
+// [optional|required|(unlabeled)] numeric field
 // assuming that getter_opt method is implemented, and the `FieldPropetry::DEFAULT_VALUE`
 // type is the same as the getter's return type.
-impl<'a, _1, _2, _3, FP, FieldType, Shared, GetterType>
+impl<'a, _1, _2, FP, FieldType, Shared, GetterType>
+    GetFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::NonLdType<_2>>
+    for FieldAndSharedRef<'a, FieldType, Shared>
+where
+    FP: FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::NonLdType<_2>>,
+    tags::NonLdType<_2>: tags::FieldTypeTag<DefaultValueType = GetterType>,
+    Self: GetOptFieldMethod<'a, FP, tags::SimpleImpl, GetterType = Option<GetterType>>,
+{
+    type GetterTypeImpl = GetterType;
+    fn get_impl(&self) -> Self::GetterTypeImpl {
+        let opt_value = <Self as GetOptFieldMethod<FP, tags::SimpleImpl>>::get_opt(self);
+        opt_value.unwrap_or(FP::DEFAULT_VALUE)
+    }
+}
+
+// [optional|required|(unlabeled)] (string|bytes) field
+// assuming that getter_opt method is implemented, and the `FieldPropetry::DEFAULT_VALUE`
+// type is the *subtype* of the getter's return type.
+// (e.g. `&'static str` for the DEFAULT_VALUE, and `&'a str` for the getter's return type.)
+// Because of this difference, I needed to split the impl code with other numerical types.
+// Maybe theer's a good solution for this, but I'm not sure...
+
+// i.e. `str` or `[u8]`
+type Borrowed<_2> = <tags::StringOrBytesType<_2> as tags::StringOrBytesTypeTag>::BorrowedType;
+
+impl<'a, 'b: 'a, _1, _2, FP, FieldType, Shared>
     GetFieldMethodImpl<
         'a,
         FP,
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,
-        tags::NonMessageType<_2, _3>,
+        tags::StringOrBytesType<_2>,
     > for FieldAndSharedRef<'a, FieldType, Shared>
 where
-    GetterType: Default,
     FP: FieldProperties<
         LabelTag = tags::NonRepeatedLabel<_1>,
-        TypeTag = tags::NonMessageType<_2, _3>,
+        TypeTag = tags::StringOrBytesType<_2>,
     >,
-    tags::NonMessageType<_2, _3>: tags::FieldTypeTag<DefaultValueType = GetterType>,
-    //<tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType: Into<GetterType>,
-    Self: GetOptFieldMethodImpl<
-        'a,
-        FP,
-        tags::SimpleImpl,
-        tags::NonRepeatedLabel<_1>,
-        tags::NonMessageType<_2, _3>,
-        GetterTypeImpl = Option<GetterType>,
-    >,
+    tags::StringOrBytesType<_2>:
+        tags::FieldTypeTag<DefaultValueType = &'b Borrowed<_2>> + tags::StringOrBytesTypeTag,
+    Borrowed<_2>: 'a + 'b,
+    Self: GetOptFieldMethod<'a, FP, tags::SimpleImpl, GetterType = Option<&'a Borrowed<_2>>>,
 {
-    type GetterTypeImpl = GetterType;
+    type GetterTypeImpl = &'a Borrowed<_2>;
     fn get_impl(&self) -> Self::GetterTypeImpl {
         let opt_value = <Self as GetOptFieldMethod<FP, tags::SimpleImpl>>::get_opt(self);
         opt_value.unwrap_or(FP::DEFAULT_VALUE)
