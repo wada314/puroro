@@ -277,29 +277,3 @@ fn test() {
         tags::String,
     >>::get_impl(&fands);
 }
-
-trait DefaultValue {
-    type Type;
-    const DEFAULT_VALUE: Self::Type;
-}
-struct StrFoo;
-impl DefaultValue for StrFoo {
-    type Type = &'static str;
-    const DEFAULT_VALUE: Self::Type = "foo";
-}
-trait OrDefaultTrait {
-    type Type;
-    fn or_default(val: Option<Self::Type>) -> Self::Type;
-}
-struct StrOrDefault<'a, D>(std::marker::PhantomData<&'a D>);
-impl<'a, 'b: 'a, D: DefaultValue<Type = &'b str>> OrDefaultTrait for StrOrDefault<'a, D> {
-    type Type = &'a str;
-    fn or_default(val: Option<Self::Type>) -> Self::Type {
-        val.unwrap_or(D::DEFAULT_VALUE)
-    }
-}
-fn test2() {
-    let string = String::new();
-    let s = string.as_ref();
-    StrOrDefault::<StrFoo>::or_default(Some(s));
-}
