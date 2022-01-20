@@ -145,6 +145,15 @@ impl<'a, Field, Shared> FieldAndSharedRef<'a, Field, Shared> {
         Self { field, shared }
     }
 }
+pub struct FieldAndSharedMut<'a, Field, Shared> {
+    field: &'a mut Field,
+    shared: &'a mut Shared,
+}
+impl<'a, Field, Shared> FieldAndSharedMut<'a, Field, Shared> {
+    pub fn new(field: &'a mut Field, shared: &'a mut Shared) -> Self {
+        Self { field, shared }
+    }
+}
 
 pub trait SharedObjects {
     type AllocatorType;
