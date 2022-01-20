@@ -258,6 +258,7 @@ macro_rules! derive_person_params {
     };
 }
 
+#[cfg(test2)]
 fn test() {
     let person = PersonSimple::default();
     let _hoge = person.age_opt();
@@ -276,4 +277,25 @@ fn test() {
         tags::Optional,
         tags::String,
     >>::get_impl(&fands);
+}
+
+trait DefaultValue {
+    type Type;
+    const DEFAULT_VALUE: Self::Type;
+}
+struct StrFoo;
+impl DefaultValue for StrFoo {
+    type Type = &'static str;
+    const DEFAULT_VALUE: Self::Type = "foo";
+}
+trait OrDefaultTrait<D: DefaultValue<Type = Self::Type>> {
+    type Type;
+    fn or_default(val: Option<Self::Type>) -> Self::Type;
+}
+struct StrOrFoo<'a>(std::marker::PhantomData<&'a ()>);
+impl<'a> OrDefaultTrait<StrFoo> for StrOrFoo<'a> {
+    type Type = &'a str;
+    fn or_default(val: Option<Self::Type>) -> Self::Type {
+        val.unwrap_or(StrFoo::DEFAULT_VALUE)
+    }
 }
