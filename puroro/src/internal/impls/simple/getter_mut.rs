@@ -31,7 +31,8 @@ where
     }
 }
 
-// (optional|required) numerical field
+// (optional|required) numerical field,
+// assuming the field type is the rust primitive type (e.g. i32, f64).
 impl<'a, _1, _2, FP, FieldType, Shared>
     GetMutFieldMethodImpl<
         'a,
