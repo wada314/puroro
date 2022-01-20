@@ -16,6 +16,7 @@
 
 pub mod de;
 mod getter;
+mod getter_mut;
 mod getter_opt;
 use super::super::SharedObjects;
 

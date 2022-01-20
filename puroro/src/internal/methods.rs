@@ -55,3 +55,25 @@ where
         )
     }
 }
+
+pub trait GetMutFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
+    type GetterTypeImpl;
+    fn get_mut_impl(self) -> Self::GetterTypeImpl;
+}
+pub trait GetMutFieldMethod<'a, FP, ImplTag> {
+    type GetterType;
+    fn get_mut(self) -> Self::GetterType;
+}
+impl<'a, FP, ImplTag, T> GetMutFieldMethod<'a, FP, ImplTag> for T
+where
+    FP: FieldProperties,
+    T: GetMutFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
+{
+    type GetterType =
+        <Self as GetMutFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
+    fn get_mut(self) -> Self::GetterType {
+        <Self as GetMutFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_mut_impl(
+            self,
+        )
+    }
+}
