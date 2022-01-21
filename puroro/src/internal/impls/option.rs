@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod getter;
 pub mod getter_opt;
 
 use crate::internal::{FieldsContainer, HasField};
 use crate::tags;
 use crate::Message;
-use ::std::marker::PhantomData;
 
 #[derive(Default, Clone)]
 pub struct OptionFields;

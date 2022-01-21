@@ -194,8 +194,9 @@ fn test() {
     let _: &Vec<String> = p.nicknames();
     let _: &Vec<Person> = p.children();
 
-    let partner = p.partner();
+    let partner: PersonOptional<&Person> = p.partner();
     let _: Option<u32> = partner.age_opt();
     let _: Option<&Person> = partner.partner_opt();
     let _: u32 = partner.age();
+    let _: PersonOptional<&Person> = partner.partner();
 }
