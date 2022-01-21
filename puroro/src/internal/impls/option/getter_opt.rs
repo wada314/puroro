@@ -18,6 +18,9 @@ use crate::internal::{FieldProperties, MessageProperties};
 use crate::Message;
 use crate::{tags, AsMessageRef};
 
+// any field
+// If the inner `Option` is `Some` then delegate to the inner type.
+// If it's `None`, then just return `None`.
 impl<
     'a,
     MP,
