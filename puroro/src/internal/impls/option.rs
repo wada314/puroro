@@ -15,8 +15,11 @@
 pub mod getter_opt;
 
 use crate::internal::{FieldsContainer, HasField};
+use crate::tags;
+use crate::Message;
 use ::std::marker::PhantomData;
 
+#[derive(Default, Clone)]
 pub struct OptionFields;
 impl FieldsContainer for OptionFields {}
 impl<const NUMBER: i32> HasField<NUMBER> for OptionFields {
@@ -36,5 +39,14 @@ pub struct OptionShared<T> {
 impl<T> From<Option<T>> for OptionShared<T> {
     fn from(v: Option<T>) -> Self {
         Self { option: v }
+    }
+}
+impl<MP, T> From<Option<T>> for Message<MP, tags::OptionImpl, OptionFields, OptionShared<T>> {
+    fn from(val: Option<T>) -> Self {
+        Message {
+            fields: Default::default(),
+            shared: Into::into(val),
+            _phantom: Default::default(),
+        }
     }
 }

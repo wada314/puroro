@@ -190,8 +190,11 @@ fn test() {
     let _: Option<&Person> = p.partner_opt();
     let _: u32 = p.age();
     let _: &str = p.name();
-    //let _: &Person = p.partner();
     let _: &Vec<u32> = p.scores();
     let _: &Vec<String> = p.nicknames();
     let _: &Vec<Person> = p.children();
+
+    let partner = p.partner();
+    let _: Option<u32> = partner.age_opt();
+    let _: Option<&Person> = partner.partner_opt();
 }

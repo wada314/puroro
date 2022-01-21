@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::impls::option::{OptionFields, OptionShared};
 use crate::internal::methods::{GetFieldMethodImpl, GetOptFieldMethod};
 use crate::internal::{Bitfield, SharedBitfield};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
@@ -49,6 +50,7 @@ where
     }
 }
 
+// (optional|required|[unlabeled]) (string|bytes) field
 impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
@@ -80,6 +82,35 @@ where
     }
 }
 
+// (optional|required|[unlabeled]) message field
+// returns a `OptionalImpl`-nized message
+impl<'a, MP, FieldMP, FieldMessageType, FieldsType, SharedType, _1, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        tags::SimpleImpl,
+        tags::NonRepeatedLabel<_1>,
+        tags::Message<FieldMP>,
+        NUMBER,
+    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<FieldMP>>,
+    FieldMessageType: 'a,
+    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a FieldMessageType>>,
+{
+    type GetterType =
+        Message<FieldMP, tags::OptionImpl, OptionFields, OptionShared<&'a FieldMessageType>>;
+    fn get(&'a self) -> Self::GetterType {
+        let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
+        Into::into(value_opt)
+    }
+}
+
+// repeated field
 impl<'a, MP, FieldsType, SharedType, TypeTag, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
