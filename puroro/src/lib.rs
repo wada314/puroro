@@ -43,6 +43,19 @@ pub struct Message<MP, ImplTag, Fields, Shared> {
     pub shared: Shared,
     _phantom: PhantomData<(MP, ImplTag)>,
 }
+impl<MP, ImplTag, Fields, Shared> Default for Message<MP, ImplTag, Fields, Shared>
+where
+    Fields: Default,
+    Shared: Default,
+{
+    fn default() -> Self {
+        Self {
+            fields: Default::default(),
+            shared: Default::default(),
+            _phantom: Default::default(),
+        }
+    }
+}
 
 // メモ
 use internal::methods::GetOptFieldMethod;
@@ -59,6 +72,17 @@ use internal::{FieldProperties, MessageProperties};
 type Person =
     Message<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
 
+impl<ImplTag, FieldsType, SharedType>
+    Message<PersonMessageProperties, ImplTag, FieldsType, SharedType>
+where
+    Self: crate::internal::methods::GetOptFieldMethod<2>,
+{
+    pub fn age_opt(&self) -> <Self as crate::internal::methods::GetOptFieldMethod<2>>::GetterType {
+        <Self as crate::internal::methods::GetOptFieldMethod<2>>::get_opt(self)
+    }
+}
+
+#[derive(Default)]
 struct PersonFieldsContainer {
     name: String,
     age: u32,
@@ -119,4 +143,9 @@ impl FieldProperties for PersonFieldProperties<3> {
     type LabelTag = tags::Repeated;
     type TypeTag = tags::Message<PersonMessageProperties>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ();
+}
+
+fn test() {
+    let p = Person::default();
+    let i = p.age_opt();
 }
