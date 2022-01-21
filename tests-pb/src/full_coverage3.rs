@@ -14869,6 +14869,124 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         f64_repeated: <Fields as MsgTemplateFieldTypes>::F64RepeatedType,
     }
 
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::I32UnlabeledType: ::std::default::Default,
+        Fields::I32OptionalType: ::std::default::Default,
+        Fields::I32RepeatedType: ::std::default::Default,
+        Fields::FloatUnlabeledType: ::std::default::Default,
+        Fields::FloatOptionalType: ::std::default::Default,
+        Fields::FloatRepeatedType: ::std::default::Default,
+        Fields::BytesUnlabeledType: ::std::default::Default,
+        Fields::BytesOptionalType: ::std::default::Default,
+        Fields::BytesRepeatedType: ::std::default::Default,
+        Fields::StringUnlabeledType: ::std::default::Default,
+        Fields::StringOptionalType: ::std::default::Default,
+        Fields::StringRepeatedType: ::std::default::Default,
+        Fields::EnumUnlabeledType: ::std::default::Default,
+        Fields::EnumOptionalType: ::std::default::Default,
+        Fields::EnumRepeatedType: ::std::default::Default,
+        Fields::SubmsgUnlabeledType: ::std::default::Default,
+        Fields::SubmsgOptionalType: ::std::default::Default,
+        Fields::SubmsgRepeatedType: ::std::default::Default,
+        Fields::I64UnlabeledType: ::std::default::Default,
+        Fields::I64OptionalType: ::std::default::Default,
+        Fields::I64RepeatedType: ::std::default::Default,
+        Fields::U32UnlabeledType: ::std::default::Default,
+        Fields::U32OptionalType: ::std::default::Default,
+        Fields::U32RepeatedType: ::std::default::Default,
+        Fields::U64UnlabeledType: ::std::default::Default,
+        Fields::U64OptionalType: ::std::default::Default,
+        Fields::U64RepeatedType: ::std::default::Default,
+        Fields::S32UnlabeledType: ::std::default::Default,
+        Fields::S32OptionalType: ::std::default::Default,
+        Fields::S32RepeatedType: ::std::default::Default,
+        Fields::S64UnlabeledType: ::std::default::Default,
+        Fields::S64OptionalType: ::std::default::Default,
+        Fields::S64RepeatedType: ::std::default::Default,
+        Fields::Fixed32UnlabeledType: ::std::default::Default,
+        Fields::Fixed32OptionalType: ::std::default::Default,
+        Fields::Fixed32RepeatedType: ::std::default::Default,
+        Fields::Fixed64UnlabeledType: ::std::default::Default,
+        Fields::Fixed64OptionalType: ::std::default::Default,
+        Fields::Fixed64RepeatedType: ::std::default::Default,
+        Fields::Sfixed32UnlabeledType: ::std::default::Default,
+        Fields::Sfixed32OptionalType: ::std::default::Default,
+        Fields::Sfixed32RepeatedType: ::std::default::Default,
+        Fields::Sfixed64UnlabeledType: ::std::default::Default,
+        Fields::Sfixed64OptionalType: ::std::default::Default,
+        Fields::Sfixed64RepeatedType: ::std::default::Default,
+        Fields::F64UnlabeledType: ::std::default::Default,
+        Fields::F64OptionalType: ::std::default::Default,
+        Fields::F64RepeatedType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_unlabeled: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                bytes_unlabeled: ::std::default::Default::default(),
+                bytes_optional: ::std::default::Default::default(),
+                bytes_repeated: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                enum_unlabeled: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                i64_unlabeled: ::std::default::Default::default(),
+                i64_optional: ::std::default::Default::default(),
+                i64_repeated: ::std::default::Default::default(),
+                u32_unlabeled: ::std::default::Default::default(),
+                u32_optional: ::std::default::Default::default(),
+                u32_repeated: ::std::default::Default::default(),
+                u64_unlabeled: ::std::default::Default::default(),
+                u64_optional: ::std::default::Default::default(),
+                u64_repeated: ::std::default::Default::default(),
+                s32_unlabeled: ::std::default::Default::default(),
+                s32_optional: ::std::default::Default::default(),
+                s32_repeated: ::std::default::Default::default(),
+                s64_unlabeled: ::std::default::Default::default(),
+                s64_optional: ::std::default::Default::default(),
+                s64_repeated: ::std::default::Default::default(),
+                fixed32_unlabeled: ::std::default::Default::default(),
+                fixed32_optional: ::std::default::Default::default(),
+                fixed32_repeated: ::std::default::Default::default(),
+                fixed64_unlabeled: ::std::default::Default::default(),
+                fixed64_optional: ::std::default::Default::default(),
+                fixed64_repeated: ::std::default::Default::default(),
+                sfixed32_unlabeled: ::std::default::Default::default(),
+                sfixed32_optional: ::std::default::Default::default(),
+                sfixed32_repeated: ::std::default::Default::default(),
+                sfixed64_unlabeled: ::std::default::Default::default(),
+                sfixed64_optional: ::std::default::Default::default(),
+                sfixed64_repeated: ::std::default::Default::default(),
+                f64_unlabeled: ::std::default::Default::default(),
+                f64_optional: ::std::default::Default::default(),
+                f64_repeated: ::std::default::Default::default(),
+            }
+        }
+    }
+
     pub struct MsgMessageProperties;
     impl ::puroro::internal::MessageProperties for MsgMessageProperties {
         const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 15;
@@ -22239,6 +22357,35 @@ pub mod _puroro_nested {
                 i32_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType,
                 i32_optional: <Fields as SubmsgTemplateFieldTypes>::I32OptionalType,
                 i64_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I64UnlabeledType,
+            }
+
+            impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+            where
+                Fields: SubmsgTemplateFieldTypes,
+                Self: ::std::default::Default,
+            {
+                pub fn new() -> Self {
+                    ::std::default::Default::default()
+                }
+            }
+            impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType>
+                for SubmsgTemplate<Fields, Shared>
+            where
+                Fields: SubmsgTemplateFieldTypes,
+                AllocatorType: ::std::convert::Into<Shared>,
+                Fields::I32UnlabeledType: ::std::default::Default,
+                Fields::I32OptionalType: ::std::default::Default,
+                Fields::I64UnlabeledType: ::std::default::Default,
+            {
+                pub fn new_in(alloc: AllocatorType) -> Self {
+                    Self {
+                        _shared: ::std::convert::Into::into(alloc),
+                        _phantom: ::std::default::Default::default(),
+                        i32_unlabeled: ::std::default::Default::default(),
+                        i32_optional: ::std::default::Default::default(),
+                        i64_unlabeled: ::std::default::Default::default(),
+                    }
+                }
             }
 
             pub struct SubmsgMessageProperties;

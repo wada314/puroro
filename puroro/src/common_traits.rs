@@ -131,3 +131,8 @@ where
         NoAllocBumpBox::new_in(BumpaloMessage::new_in(bump), bump)
     }
 }
+
+/// `new_in()` initialize function.
+pub trait NewIn<AllocatorType> {
+    fn new_in(alloc: AllocatorType) -> Self;
+}

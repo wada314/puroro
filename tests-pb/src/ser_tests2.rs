@@ -2758,6 +2758,50 @@ pub mod _puroro_impls {
         very_large_field_number: <Fields as MsgTemplateFieldTypes>::VeryLargeFieldNumberType,
     }
 
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::I32OptionalType: ::std::default::Default,
+        Fields::I32RepeatedType: ::std::default::Default,
+        Fields::FloatOptionalType: ::std::default::Default,
+        Fields::FloatRepeatedType: ::std::default::Default,
+        Fields::StringOptionalType: ::std::default::Default,
+        Fields::StringRepeatedType: ::std::default::Default,
+        Fields::SubmsgOptionalType: ::std::default::Default,
+        Fields::SubmsgRepeatedType: ::std::default::Default,
+        Fields::EnumOptionalType: ::std::default::Default,
+        Fields::EnumRepeatedType: ::std::default::Default,
+        Fields::VeryLargeFieldNumberType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                float_optional: ::std::default::Default::default(),
+                float_repeated: ::std::default::Default::default(),
+                string_optional: ::std::default::Default::default(),
+                string_repeated: ::std::default::Default::default(),
+                submsg_optional: ::std::default::Default::default(),
+                submsg_repeated: ::std::default::Default::default(),
+                enum_optional: ::std::default::Default::default(),
+                enum_repeated: ::std::default::Default::default(),
+                very_large_field_number: ::std::default::Default::default(),
+            }
+        }
+    }
+
     pub struct MsgMessageProperties;
     impl ::puroro::internal::MessageProperties for MsgMessageProperties {
         const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 5;
@@ -4870,6 +4914,31 @@ pub mod _puroro_nested {
                 _shared: Shared,
                 _phantom: ::std::marker::PhantomData<Fields>,
                 i32_optional: <Fields as SubmsgTemplateFieldTypes>::I32OptionalType,
+            }
+
+            impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+            where
+                Fields: SubmsgTemplateFieldTypes,
+                Self: ::std::default::Default,
+            {
+                pub fn new() -> Self {
+                    ::std::default::Default::default()
+                }
+            }
+            impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType>
+                for SubmsgTemplate<Fields, Shared>
+            where
+                Fields: SubmsgTemplateFieldTypes,
+                AllocatorType: ::std::convert::Into<Shared>,
+                Fields::I32OptionalType: ::std::default::Default,
+            {
+                pub fn new_in(alloc: AllocatorType) -> Self {
+                    Self {
+                        _shared: ::std::convert::Into::into(alloc),
+                        _phantom: ::std::default::Default::default(),
+                        i32_optional: ::std::default::Default::default(),
+                    }
+                }
             }
 
             pub struct SubmsgMessageProperties;

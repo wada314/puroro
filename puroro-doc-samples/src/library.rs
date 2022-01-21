@@ -526,6 +526,44 @@ pub mod _puroro_impls {
         num_pages: <Fields as BookTemplateFieldTypes>::NumPagesType,
     }
 
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::TitleType: ::std::default::Default,
+        Fields::NumPagesType: ::std::default::Default,
+    {
+        fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                title: ::std::default::Default::default(),
+                num_pages: ::std::default::Default::default(),
+            }
+        }
+    }
+
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
+        }
+    }
+
     pub struct BookMessageProperties;
     impl ::puroro::internal::MessageProperties for BookMessageProperties {
         const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;

@@ -41,3 +41,9 @@ impl<const BITFIELD_U32_LEN: usize> SharedObjects for SimpleShared<BITFIELD_U32_
         &mut self.bitfield
     }
 }
+
+impl<const BITFIELD_U32_LEN: usize> From<&()> for SimpleShared<BITFIELD_U32_LEN> {
+    fn from(_: &()) -> Self {
+        Default::default()
+    }
+}

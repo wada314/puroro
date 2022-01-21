@@ -1478,6 +1478,40 @@ pub mod _puroro_impls {
         submsg_unlabeled: <Fields as MsgTemplateFieldTypes>::SubmsgUnlabeledType,
     }
 
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::I32UnlabeledType: ::std::default::Default,
+        Fields::I32OptionalType: ::std::default::Default,
+        Fields::I32RepeatedType: ::std::default::Default,
+        Fields::F32UnlabeledType: ::std::default::Default,
+        Fields::StringUnlabeledType: ::std::default::Default,
+        Fields::SubmsgUnlabeledType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+                i32_optional: ::std::default::Default::default(),
+                i32_repeated: ::std::default::Default::default(),
+                f32_unlabeled: ::std::default::Default::default(),
+                string_unlabeled: ::std::default::Default::default(),
+                submsg_unlabeled: ::std::default::Default::default(),
+            }
+        }
+    }
+
     pub struct MsgMessageProperties;
     impl ::puroro::internal::MessageProperties for MsgMessageProperties {
         const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 1;
@@ -2263,6 +2297,31 @@ pub mod _puroro_impls {
         _shared: Shared,
         _phantom: ::std::marker::PhantomData<Fields>,
         i32_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType,
+    }
+
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType>
+        for SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::I32UnlabeledType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                i32_unlabeled: ::std::default::Default::default(),
+            }
+        }
     }
 
     pub struct SubmsgMessageProperties;

@@ -765,6 +765,34 @@ pub mod _puroro_impls {
         not_annotated: <Fields as MsgTemplateFieldTypes>::NotAnnotatedType,
     }
 
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::ExplicitlyPackedType: ::std::default::Default,
+        Fields::ExplicitlyNotPackedType: ::std::default::Default,
+        Fields::NotAnnotatedType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                explicitly_packed: ::std::default::Default::default(),
+                explicitly_not_packed: ::std::default::Default::default(),
+                not_annotated: ::std::default::Default::default(),
+            }
+        }
+    }
+
     pub struct MsgMessageProperties;
     impl ::puroro::internal::MessageProperties for MsgMessageProperties {
         const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;

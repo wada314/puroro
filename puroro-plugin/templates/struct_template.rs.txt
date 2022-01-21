@@ -14,6 +14,58 @@ pub struct {{ m.template_ident }}<Fields, Shared>
     {%- endfor %} {#- for f in m.fields #}
 }
 
+{#################- Initialize ################-#}
+
+{#- `new()` static function, which is only available if `Default` trait is implemented. #}
+impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
+where 
+    Fields: {{ m.template_field_types_trait }},
+    Self: ::std::default::Default
+{
+    pub fn new() -> Self {
+        ::std::default::Default::default()
+    }
+}
+
+{#- `new_in()` static function, which is only available if: #}
+{#-   * The `Shared` type is `Into`-able from the given allocator type, #}
+{#-   * and the all other fields are `Default`. #}
+impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType>
+for {{ m.template_ident }}<Fields, Shared>
+where 
+    Fields: {{ m.template_field_types_trait }},
+    AllocatorType: ::std::convert::Into<Shared>,
+    {%- for f in m.fields %}
+    {%- if !f.is_explicit_oneof_field %}
+    Fields::{{ f.template_type_name }}: ::std::default::Default,
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
+    {%- endfor %} {#- for f in m.fields #}
+{
+    fn new_in(alloc: AllocatorType) -> Self {
+        Self {
+            _shared: ::std::convert::Into::into(alloc),
+            _phantom: ::std::default::Default::default(),
+            {%- for f in m.fields %}
+            {%- if !f.is_explicit_oneof_field %}
+            {{ f.ident }}: ::std::default::Default::default(),
+            {%- endif %} {#- if !f.is_explicit_oneof_field #}
+            {%- endfor %} {#- for f in m.fields #}
+        }
+    }
+}
+
+impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared> 
+where 
+    Fields: {{ m.template_field_types_trait }},
+{
+    pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+    where
+        Self: ::puroro::NewIn<AllocatorType>
+    {
+        <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
+    }
+}
+
 {#################- Message properties ################-#}
 
 pub struct {{ m.template_message_properties_ident }};

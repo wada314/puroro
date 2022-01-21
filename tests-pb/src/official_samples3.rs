@@ -724,6 +724,30 @@ pub mod _puroro_impls {
         a: <Fields as Test1TemplateFieldTypes>::AType,
     }
 
+    impl<Fields, Shared> Test1Template<Fields, Shared>
+    where
+        Fields: Test1TemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for Test1Template<Fields, Shared>
+    where
+        Fields: Test1TemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::AType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                a: ::std::default::Default::default(),
+            }
+        }
+    }
+
     pub struct Test1MessageProperties;
     impl ::puroro::internal::MessageProperties for Test1MessageProperties {
         const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
@@ -1047,6 +1071,30 @@ pub mod _puroro_impls {
         _shared: Shared,
         _phantom: ::std::marker::PhantomData<Fields>,
         b: <Fields as Test2TemplateFieldTypes>::BType,
+    }
+
+    impl<Fields, Shared> Test2Template<Fields, Shared>
+    where
+        Fields: Test2TemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for Test2Template<Fields, Shared>
+    where
+        Fields: Test2TemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::BType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                b: ::std::default::Default::default(),
+            }
+        }
     }
 
     pub struct Test2MessageProperties;
@@ -1409,6 +1457,30 @@ pub mod _puroro_impls {
         c: <Fields as Test3TemplateFieldTypes>::CType,
     }
 
+    impl<Fields, Shared> Test3Template<Fields, Shared>
+    where
+        Fields: Test3TemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for Test3Template<Fields, Shared>
+    where
+        Fields: Test3TemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::CType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                c: ::std::default::Default::default(),
+            }
+        }
+    }
+
     pub struct Test3MessageProperties;
     impl ::puroro::internal::MessageProperties for Test3MessageProperties {
         const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
@@ -1746,6 +1818,30 @@ pub mod _puroro_impls {
         _shared: Shared,
         _phantom: ::std::marker::PhantomData<Fields>,
         d: <Fields as Test4TemplateFieldTypes>::DType,
+    }
+
+    impl<Fields, Shared> Test4Template<Fields, Shared>
+    where
+        Fields: Test4TemplateFieldTypes,
+        Self: ::std::default::Default,
+    {
+        pub fn new() -> Self {
+            ::std::default::Default::default()
+        }
+    }
+    impl<Fields, Shared, AllocatorType> ::puroro::NewIn<AllocatorType> for Test4Template<Fields, Shared>
+    where
+        Fields: Test4TemplateFieldTypes,
+        AllocatorType: ::std::convert::Into<Shared>,
+        Fields::DType: ::std::default::Default,
+    {
+        pub fn new_in(alloc: AllocatorType) -> Self {
+            Self {
+                _shared: ::std::convert::Into::into(alloc),
+                _phantom: ::std::default::Default::default(),
+                d: ::std::default::Default::default(),
+            }
+        }
     }
 
     pub struct Test4MessageProperties;
