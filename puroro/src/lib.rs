@@ -75,6 +75,17 @@ type Person =
 impl<ImplTag, FieldsType, SharedType>
     Message<PersonMessageProperties, ImplTag, FieldsType, SharedType>
 where
+    for<'a> Self: crate::internal::methods::GetOptFieldMethod<'a, 1>,
+{
+    pub fn name_opt(
+        &self,
+    ) -> <Self as crate::internal::methods::GetOptFieldMethod<'_, 1>>::GetterType {
+        <Self as crate::internal::methods::GetOptFieldMethod<'_, 1>>::get_opt(self)
+    }
+}
+impl<ImplTag, FieldsType, SharedType>
+    Message<PersonMessageProperties, ImplTag, FieldsType, SharedType>
+where
     for<'a> Self: crate::internal::methods::GetOptFieldMethod<'a, 2>,
 {
     pub fn age_opt(
@@ -150,4 +161,5 @@ impl FieldProperties for PersonFieldProperties<3> {
 fn test() {
     let p = Person::default();
     let i = p.age_opt();
+    let n = p.name_opt();
 }
