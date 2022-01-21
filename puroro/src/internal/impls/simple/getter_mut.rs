@@ -85,3 +85,17 @@ where
             .get_or_insert_with(|| <Box<MessageType> as NewIn<&()>>::new_in(alloc))
     }
 }
+
+// repeated field.
+// Just return a mutable reference to the field.
+impl<'a, FP, FieldType, Shared>
+    GetMutFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Repeated, FP::TypeTag>
+    for FieldAndSharedMut<'a, FieldType, Shared>
+where
+    FP: FieldProperties<LabelTag = tags::Repeated>,
+{
+    type GetterTypeImpl = &'a mut FieldType;
+    fn get_mut_impl(self) -> Self::GetterTypeImpl {
+        self.field
+    }
+}
