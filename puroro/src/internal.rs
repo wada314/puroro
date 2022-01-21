@@ -104,6 +104,20 @@ pub trait HasField<const NUMBER: i32>: FieldsContainer {
     fn get(&self) -> &Self::Type;
     fn get_mut(&mut self) -> &mut Self::Type;
 }
+#[macro_export]
+macro_rules! declare_has_field {
+    ($container:ty, $number:expr, $ty:ty, $name:ident) => {
+        impl crate::internal::HasField<$number> for $container {
+            type Type = $ty;
+            fn get(&self) -> &Self::Type {
+                &self.$name
+            }
+            fn get_mut(&mut self) -> &mut Self::Type {
+                &mut self.$name
+            }
+        }
+    };
+}
 
 pub struct FieldAndSharedRef<'a, Field, Shared> {
     field: &'a Field,

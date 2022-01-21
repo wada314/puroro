@@ -102,33 +102,10 @@ struct PersonFieldsContainer {
     children: Vec<Person>,
 }
 impl crate::internal::FieldsContainer for PersonFieldsContainer {}
-impl crate::internal::HasField<1> for PersonFieldsContainer {
-    type Type = String;
-    fn get(&self) -> &Self::Type {
-        &self.name
-    }
-    fn get_mut(&mut self) -> &mut Self::Type {
-        &mut self.name
-    }
-}
-impl crate::internal::HasField<2> for PersonFieldsContainer {
-    type Type = u32;
-    fn get(&self) -> &Self::Type {
-        &self.age
-    }
-    fn get_mut(&mut self) -> &mut Self::Type {
-        &mut self.age
-    }
-}
-impl crate::internal::HasField<3> for PersonFieldsContainer {
-    type Type = Vec<Person>;
-    fn get(&self) -> &Self::Type {
-        &self.children
-    }
-    fn get_mut(&mut self) -> &mut Self::Type {
-        &mut self.children
-    }
-}
+
+declare_has_field!(PersonFieldsContainer, 1, String, name);
+declare_has_field!(PersonFieldsContainer, 2, u32, age);
+declare_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
 
 struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {
