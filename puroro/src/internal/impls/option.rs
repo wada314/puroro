@@ -12,9 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::super::SharedObjects;
 use crate::RepeatedField;
 use ::std::iter;
 use ::std::option;
+
+pub struct OptionFields;
+#[derive(Default, Clone, Debug)]
+pub struct OptionShared<T> {
+    option: Option<T>,
+}
+impl<T> From<Option<T>> for OptionShared<T> {
+    fn from(v: Option<T>) -> Self {
+        Self { option: v }
+    }
+}
+impl<T> SharedObjects for OptionShared<T> {
+    type AllocatorType = ();
+    type BitfieldType = ();
+    fn alloc(&self) -> &Self::AllocatorType {
+        &()
+    }
+    fn bitfield(&self) -> &Self::BitfieldType {
+        &()
+    }
+    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType {
+        unimplemented!()
+    }
+}
 
 pub struct OptionRepeatedField<R>(Option<R>);
 impl<R> OptionRepeatedField<R> {

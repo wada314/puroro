@@ -89,12 +89,8 @@ impl<T> DerefMut for BumpaloOwned<T> {
 
 impl<M, T> Message<M> for BumpaloOwned<T> where T: Message<M> {}
 
-pub struct SimpleImpl;
-pub struct BumpaloImpl;
-
 // メモ
 use internal::methods::{GetFieldMethod, GetOptFieldMethod};
-use internal::Bitfield;
 use internal::{FieldAndSharedRef, FieldProperties, MessageProperties};
 use internal::{SimpleFields, SimpleShared};
 

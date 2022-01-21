@@ -229,3 +229,4 @@ impl FieldLabelTag for OneofField {
 }
 
 pub struct SimpleImpl;
+pub struct OptionImpl;

@@ -22,14 +22,13 @@ pub mod types;
 pub mod utils;
 pub mod variant;
 
-pub use impls::simple::{SimpleFields, SimpleShared};
-
 pub use impls::bumpalo::NoAllocBox as NoAllocBumpBox;
 pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
 pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
 pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
 pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
+pub use impls::simple::{SimpleFields, SimpleShared};
 
 use crate::tags;
 use ::bitvec::array::BitArray;
@@ -52,13 +51,22 @@ impl<O: BitOrder, V: BitViewSized> Bitfield for BitArray<O, V> {
     }
 }
 
+impl Bitfield for () {
+    fn get(&self, _: usize) -> bool {
+        false
+    }
+    fn set(&mut self, _: usize, _: bool) {
+        unimplemented!()
+    }
+}
+
 pub struct FlipBitOn<Base, const INDEX: usize>(Base);
 impl<Base: Bitfield, const INDEX: usize> Bitfield for FlipBitOn<Base, INDEX> {
     fn get(&self, index: usize) -> bool {
         index == INDEX || self.0.get(index)
     }
-    fn set(&mut self, index: usize, val: bool) {
-        todo!()
+    fn set(&mut self, _: usize, _: bool) {
+        unimplemented!()
     }
 }
 
