@@ -118,6 +118,22 @@ macro_rules! impl_has_field {
         }
     };
 }
+#[macro_export]
+macro_rules! impl_scalar_getters {
+    ($mp:ty, $number:expr, $get:ident, $get_opt:ident) => {
+        impl<ImplTag, FieldsType, SharedType> Message<$mp, ImplTag, FieldsType, SharedType>
+        where
+            Self: crate::internal::methods::GetOptFieldMethod<$number>,
+        {
+            pub fn $get_opt(
+                &self,
+            ) -> <Self as crate::internal::methods::GetOptFieldMethod<$number>>::GetterType<'_>
+            {
+                <Self as crate::internal::methods::GetOptFieldMethod<$number>>::get_opt(self)
+            }
+        }
+    };
+}
 
 pub struct FieldAndSharedRef<'a, Field, Shared> {
     field: &'a Field,

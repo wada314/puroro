@@ -66,34 +66,18 @@ use internal::{FieldProperties, MessageProperties};
 // message Person {
 //     optional string name = 1;
 //     optional uint32 age = 2;
+//     optional Person partner = 4;
+//     repeated string nicknames = 5;
+//     repeated uint32 scores = 6;
 //     repeated Person children = 3;
 // }
 //
 type Person =
     Message<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
 
-impl<ImplTag, FieldsType, SharedType>
-    Message<PersonMessageProperties, ImplTag, FieldsType, SharedType>
-where
-    Self: crate::internal::methods::GetOptFieldMethod<1>,
-{
-    pub fn name_opt(
-        &self,
-    ) -> <Self as crate::internal::methods::GetOptFieldMethod<1>>::GetterType<'_> {
-        <Self as crate::internal::methods::GetOptFieldMethod<1>>::get_opt(self)
-    }
-}
-impl<ImplTag, FieldsType, SharedType>
-    Message<PersonMessageProperties, ImplTag, FieldsType, SharedType>
-where
-    Self: crate::internal::methods::GetOptFieldMethod<2>,
-{
-    pub fn age_opt(
-        &self,
-    ) -> <Self as crate::internal::methods::GetOptFieldMethod<2>>::GetterType<'_> {
-        <Self as crate::internal::methods::GetOptFieldMethod<2>>::get_opt(self)
-    }
-}
+impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
+impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);
+impl_scalar_getters!(PersonMessageProperties, 4, partner, partner_opt);
 
 #[derive(Default)]
 struct PersonFieldsContainer {
