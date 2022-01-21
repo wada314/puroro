@@ -34,16 +34,11 @@ pub struct OptionShared<MessageType, T> {
     option: Option<T>,
     _phantom: PhantomData<MessageType>,
 }
-impl<T> From<Option<T>> for OptionShared<T, T> {
+impl<MessageType, T> From<Option<T>> for OptionShared<MessageType, T>
+where
+    T: AsRef<MessageType>,
+{
     fn from(v: Option<T>) -> Self {
-        Self {
-            option: v,
-            _phantom: PhantomData,
-        }
-    }
-}
-impl<'a, T> From<Option<&'a T>> for OptionShared<T, &'a T> {
-    fn from(v: Option<&'a T>) -> Self {
         Self {
             option: v,
             _phantom: PhantomData,
