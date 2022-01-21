@@ -30,18 +30,11 @@ impl<const NUMBER: i32> HasField<NUMBER> for OptionFields {
 }
 
 #[derive(Default, Clone, Debug)]
-pub struct OptionShared<MessageType, T> {
+pub struct OptionShared<T> {
     option: Option<T>,
-    _phantom: PhantomData<MessageType>,
 }
-impl<MessageType, T> From<Option<T>> for OptionShared<MessageType, T>
-where
-    T: AsRef<MessageType>,
-{
+impl<T> From<Option<T>> for OptionShared<T> {
     fn from(v: Option<T>) -> Self {
-        Self {
-            option: v,
-            _phantom: PhantomData,
-        }
+        Self { option: v }
     }
 }

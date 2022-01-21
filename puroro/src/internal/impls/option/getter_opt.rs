@@ -15,13 +15,13 @@
 use super::{OptionFields, OptionShared};
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
 use crate::internal::{FieldProperties, HasField, MessageProperties};
-use crate::tags;
 use crate::Message;
+use crate::{tags, AsMessageRef};
 
 impl<
     'a,
     MP,
-    InnerType,
+    MessageRef,
     InnerImplTag,
     InnerFieldsType,
     InnerSharedType,
@@ -31,30 +31,29 @@ impl<
     GetOptFieldMethodImpl<
         'a,
         (),
-        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>, InnerType>,
+        OptionShared<MessageRef>,
         tags::OptionImpl,
         <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::LabelTag,
         <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
-    >
-    for Message<
-        MP,
-        tags::OptionImpl,
-        OptionFields,
-        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>, InnerType>,
-    >
+    > for Message<MP, tags::OptionImpl, OptionFields, OptionShared<MessageRef>>
 where
     Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
-        GetOptFieldMethod<'a, NUMBER, GetterType = Option<FinalInnerGetterType>>,
+        'a + GetOptFieldMethod<'a, NUMBER, GetterType = Option<FinalInnerGetterType>>,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
-    InnerType: AsRef<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>>,
+    MessageRef: AsMessageRef<
+        MessageProperties = MP,
+        ImplTag = InnerImplTag,
+        FieldsType = InnerFieldsType,
+        SharedType = InnerSharedType,
+    >,
 {
     type GetterType = Option<FinalInnerGetterType>;
     fn get_opt(&'a self) -> Self::GetterType {
         self.shared
             .option
             .as_ref()
-            .and_then(|msg| msg.as_ref().get_opt())
+            .and_then(|msg| msg.as_message_ref().get_opt())
     }
 }

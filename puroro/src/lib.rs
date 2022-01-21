@@ -35,6 +35,7 @@ pub use ::bitvec;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::either::Either;
+use internal::impls::option::{OptionFields, OptionShared};
 
 use ::std::marker::PhantomData;
 
@@ -56,18 +57,35 @@ where
         }
     }
 }
-impl<MP, ImplTag, Fields, Shared> AsRef<Message<MP, ImplTag, Fields, Shared>>
-    for Message<MP, ImplTag, Fields, Shared>
-{
-    fn as_ref(&self) -> &Message<MP, ImplTag, Fields, Shared> {
+trait AsMessageRef {
+    type MessageProperties;
+    type ImplTag;
+    type FieldsType;
+    type SharedType;
+    fn as_message_ref(
+        &self,
+    ) -> &Message<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType>;
+}
+impl<MP, ImplTag, Fields, Shared> AsMessageRef for Message<MP, ImplTag, Fields, Shared> {
+    type MessageProperties = MP;
+    type ImplTag = ImplTag;
+    type FieldsType = Fields;
+    type SharedType = Shared;
+    fn as_message_ref(
+        &self,
+    ) -> &Message<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
         self
     }
 }
-impl<MP, ImplTag, Fields, Shared> AsMut<Message<MP, ImplTag, Fields, Shared>>
-    for Message<MP, ImplTag, Fields, Shared>
-{
-    fn as_mut(&mut self) -> &mut Message<MP, ImplTag, Fields, Shared> {
-        self
+impl<'a, MP, ImplTag, Fields, Shared> AsMessageRef for &'a Message<MP, ImplTag, Fields, Shared> {
+    type MessageProperties = MP;
+    type ImplTag = ImplTag;
+    type FieldsType = Fields;
+    type SharedType = Shared;
+    fn as_message_ref(
+        &self,
+    ) -> &Message<Self::MessageProperties, Self::ImplTag, Self::FieldsType, Self::SharedType> {
+        *self
     }
 }
 
@@ -88,6 +106,8 @@ use internal::{FieldProperties, MessageProperties};
 //
 type Person =
     Message<PersonMessageProperties, tags::SimpleImpl, PersonFieldsContainer, SimpleShared<1>>;
+type PersonOptional<T> =
+    Message<PersonMessageProperties, tags::OptionImpl, OptionFields, OptionShared<T>>;
 
 impl_scalar_getters!(PersonMessageProperties, 1, name, name_opt);
 impl_scalar_getters!(PersonMessageProperties, 2, age, age_opt);
