@@ -22,9 +22,8 @@ type NumType<_1> = <tags::NonLdType<_1> as tags::NumericalTypeTag>::NativeType;
 type BorrowedType<_1> = <tags::StringOrBytesType<_1> as tags::StringOrBytesTypeTag>::BorrowedType;
 
 // [optional|required] numeric field
-impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+impl<MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
-        'a,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         tags::SimpleImpl,
@@ -40,8 +39,11 @@ where
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType = Option<NumType<_2>>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type GetterType<'a>
+    where
+        Self: 'a,
+    = Option<NumType<_2>>;
+    fn get_opt(&self) -> Self::GetterType<'_> {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
@@ -53,9 +55,8 @@ where
 }
 
 // [optional|required] (string|bytes) field
-impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+impl<MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
-        'a,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         tags::SimpleImpl,
@@ -67,13 +68,16 @@ where
     FieldsType: HasField<NUMBER>,
     <FieldsType as HasField<NUMBER>>::Type: AsRef<BorrowedType<_2>>,
     tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag,
-    BorrowedType<_2>: 'a,
+    BorrowedType<_2>: 'static,
     MP: MessageProperties,
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType = Option<&'a BorrowedType<_2>>;
-    fn get_opt(&'a self) -> Self::GetterType {
+    type GetterType<'a>
+    where
+        Self: 'a,
+    = Option<&'a BorrowedType<_2>>;
+    fn get_opt(&self) -> Self::GetterType<'_> {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);

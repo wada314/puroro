@@ -75,23 +75,23 @@ type Person =
 impl<ImplTag, FieldsType, SharedType>
     Message<PersonMessageProperties, ImplTag, FieldsType, SharedType>
 where
-    for<'a> Self: crate::internal::methods::GetOptFieldMethod<'a, 1>,
+    Self: crate::internal::methods::GetOptFieldMethod<1>,
 {
     pub fn name_opt(
         &self,
-    ) -> <Self as crate::internal::methods::GetOptFieldMethod<'_, 1>>::GetterType {
-        <Self as crate::internal::methods::GetOptFieldMethod<'_, 1>>::get_opt(self)
+    ) -> <Self as crate::internal::methods::GetOptFieldMethod<1>>::GetterType<'_> {
+        <Self as crate::internal::methods::GetOptFieldMethod<1>>::get_opt(self)
     }
 }
 impl<ImplTag, FieldsType, SharedType>
     Message<PersonMessageProperties, ImplTag, FieldsType, SharedType>
 where
-    for<'a> Self: crate::internal::methods::GetOptFieldMethod<'a, 2>,
+    Self: crate::internal::methods::GetOptFieldMethod<2>,
 {
     pub fn age_opt(
         &self,
-    ) -> <Self as crate::internal::methods::GetOptFieldMethod<'_, 2>>::GetterType {
-        <Self as crate::internal::methods::GetOptFieldMethod<'_, 2>>::get_opt(self)
+    ) -> <Self as crate::internal::methods::GetOptFieldMethod<2>>::GetterType<'_> {
+        <Self as crate::internal::methods::GetOptFieldMethod<2>>::get_opt(self)
     }
 }
 
