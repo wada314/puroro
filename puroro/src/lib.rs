@@ -63,29 +63,33 @@ struct PersonFieldsContainer {
     age: u32,
     children: Vec<Person>,
 }
-impl crate::internal::FieldsContainer for PersonFieldsContainer {
-    type FieldType<const NUMBER: i32> = PersonFieldType<NUMBER>;
-    fn get<const NUMBER: i32>(&self) -> &<Self::FieldType<NUMBER> as internal::TypeWrapper>::Type
-    where
-        Self::FieldType<NUMBER>: internal::TypeWrapper {
-        todo!()
-    }
-
-    fn get_mut<const NUMBER: i32>(&mut self) -> &mut <Self::FieldType<NUMBER> as internal::TypeWrapper>::Type
-    where
-        Self::FieldType<NUMBER>: internal::TypeWrapper {
-        todo!()
-    }
-}
-struct PersonFieldType<const NUMBER: i32>;
-impl crate::internal::TypeWrapper for PersonFieldType<1> {
+impl crate::internal::FieldsContainer for PersonFieldsContainer {}
+impl crate::internal::HasField<1> for PersonFieldsContainer {
     type Type = String;
+    fn get(&self) -> &Self::Type {
+        &self.name
+    }
+    fn get_mut(&mut self) -> &mut Self::Type {
+        &mut self.name
+    }
 }
-impl crate::internal::TypeWrapper for PersonFieldType<2> {
+impl crate::internal::HasField<2> for PersonFieldsContainer {
     type Type = u32;
+    fn get(&self) -> &Self::Type {
+        &self.age
+    }
+    fn get_mut(&mut self) -> &mut Self::Type {
+        &mut self.age
+    }
 }
-impl crate::internal::TypeWrapper for PersonFieldType<3> {
+impl crate::internal::HasField<3> for PersonFieldsContainer {
     type Type = Vec<Person>;
+    fn get(&self) -> &Self::Type {
+        &self.children
+    }
+    fn get_mut(&mut self) -> &mut Self::Type {
+        &mut self.children
+    }
 }
 
 struct PersonMessageProperties;

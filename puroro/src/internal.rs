@@ -97,18 +97,12 @@ pub trait FieldProperties {
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType;
 }
 
-pub trait FieldsContainer {
-    type FieldType<const NUMBER: i32>;
-    fn get<const NUMBER: i32>(&self) -> &<Self::FieldType<NUMBER> as TypeWrapper>::Type
-    where
-        Self::FieldType<NUMBER>: TypeWrapper;
-    fn get_mut<const NUMBER: i32>(&mut self) -> &mut <Self::FieldType<NUMBER> as TypeWrapper>::Type
-    where
-        Self::FieldType<NUMBER>: TypeWrapper;
-}
+pub trait FieldsContainer {}
 
-pub trait TypeWrapper {
+pub trait HasField<const NUMBER: i32>: FieldsContainer {
     type Type;
+    fn get(&self) -> &Self::Type;
+    fn get_mut(&mut self) -> &mut Self::Type;
 }
 
 pub struct FieldAndSharedRef<'a, Field, Shared> {
