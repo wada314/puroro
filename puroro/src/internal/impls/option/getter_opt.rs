@@ -14,7 +14,7 @@
 
 use super::{OptionFields, OptionShared};
 use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
-use crate::internal::{FieldProperties, HasField, MessageProperties};
+use crate::internal::{FieldProperties, MessageProperties};
 use crate::Message;
 use crate::{tags, AsMessageRef};
 
