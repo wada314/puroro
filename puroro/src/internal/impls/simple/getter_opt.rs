@@ -21,7 +21,7 @@ use crate::Message;
 type NumType<_1> = <tags::NonLdType<_1> as tags::NumericalTypeTag>::NativeType;
 type BorrowedType<_1> = <tags::StringOrBytesType<_1> as tags::StringOrBytesTypeTag>::BorrowedType;
 
-// [optional|required] numeric field
+// (optional|required) numeric field
 impl<MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
         <FieldsType as HasField<NUMBER>>::Type,
@@ -54,7 +54,7 @@ where
     }
 }
 
-// [optional|required] (string|bytes) field
+// (optional|required) (string|bytes) field
 impl<MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
         <FieldsType as HasField<NUMBER>>::Type,
@@ -88,7 +88,7 @@ where
     }
 }
 
-// [optional|required] message field
+// (optional|required|[unlabeled]) message field
 // Typically the field type is `Option<Box<M>>`.
 impl<
     MP,
@@ -103,7 +103,7 @@ impl<
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         tags::SimpleImpl,
-        tags::NeedOptionalBitLabel<_1>,
+        tags::NonRepeatedLabel<_1>,
         tags::Message<FieldMP>,
         NUMBER,
     > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
