@@ -14,7 +14,7 @@
 
 pub mod getter_opt;
 
-use super::super::SharedObjects;
+use super::super::SharedBitfield;
 use crate::RepeatedField;
 use ::std::iter;
 use ::std::option;
@@ -29,12 +29,8 @@ impl<T> From<Option<T>> for OptionShared<T> {
         Self { option: v }
     }
 }
-impl<T> SharedObjects for OptionShared<T> {
-    type AllocatorType = ();
+impl<T> SharedBitfield for OptionShared<T> {
     type BitfieldType = ();
-    fn alloc(&self) -> &Self::AllocatorType {
-        &()
-    }
     fn bitfield(&self) -> &Self::BitfieldType {
         &()
     }

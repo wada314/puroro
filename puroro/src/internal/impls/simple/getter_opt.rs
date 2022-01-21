@@ -13,104 +13,39 @@
 // limitations under the License.
 
 use crate::internal::methods::GetOptFieldMethodImpl;
-use crate::internal::Bitfield;
-use crate::internal::FieldProperties;
-use crate::internal::{FieldAndSharedRef, SharedObjects};
+use crate::internal::{Bitfield, SharedBitfield};
+use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
+use crate::Message;
 
-// (optional|required) numeric field
-impl<'a, _1, _2, FP, FieldType, Shared>
+type NumType<_1> = <tags::NonLdType<_1> as tags::NumericalTypeTag>::NativeType;
+
+// [optional|required] numeric field
+impl<MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
     GetOptFieldMethodImpl<
-        'a,
-        FP,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
         tags::NonLdType<_2>,
-    > for FieldAndSharedRef<'a, FieldType, Shared>
+        NUMBER,
+    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
-    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1>, TypeTag = tags::NonLdType<_2>>,
+    FieldsType: HasField<NUMBER>,
     tags::NonLdType<_2>: tags::NumericalTypeTag,
-    FP::TypeTag: tags::NumericalTypeTag,
-    FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
-    Shared: SharedObjects,
+    <FieldsType as HasField<NUMBER>>::Type: Clone + Into<NumType<_2>>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    SharedType: SharedBitfield,
 {
-    type GetterTypeImpl = Option<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>;
-    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX;
+    type GetterType = Option<NumType<_2>>;
+    fn get_opt(&self) -> Self::GetterType {
+        let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
-            Some(self.field.clone().into())
+            let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+            Some(field.clone().into())
         } else {
             None
         }
-    }
-}
-
-// (optional|required) (string|bytes) field
-impl<'a, _1, _2, FP, FieldType, Shared>
-    GetOptFieldMethodImpl<
-        'a,
-        FP,
-        tags::SimpleImpl,
-        tags::NeedOptionalBitLabel<_1>,
-        tags::StringOrBytesType<_2>,
-    > for FieldAndSharedRef<'a, FieldType, Shared>
-where
-    FP: FieldProperties<
-        LabelTag = tags::NeedOptionalBitLabel<_1>,
-        TypeTag = tags::StringOrBytesType<_2>,
-    >,
-    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag,
-    <FP::TypeTag as tags::StringOrBytesTypeTag>::BorrowedType: 'a,
-    FieldType: AsRef<<FP::TypeTag as tags::StringOrBytesTypeTag>::BorrowedType>,
-    Shared: SharedObjects,
-{
-    type GetterTypeImpl = Option<&'a <FP::TypeTag as tags::StringOrBytesTypeTag>::BorrowedType>;
-    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX;
-        if self.shared.bitfield().get(opt_bit_index) {
-            Some(AsRef::as_ref(self.field))
-        } else {
-            None
-        }
-    }
-}
-
-// [unlabeled] numeric field
-// Returns `Some(...)` when the field value is non-default value,
-// and returns `None` if it is default value.
-impl<'a, _1, FP, FieldType, Shared>
-    GetOptFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Unlabeled, tags::NonLdType<_1>>
-    for FieldAndSharedRef<'a, FieldType, Shared>
-where
-    FP: FieldProperties<LabelTag = tags::Unlabeled, TypeTag = tags::NonLdType<_1>>,
-    tags::NonLdType<_1>: tags::NumericalTypeTag,
-    FP::TypeTag: tags::NumericalTypeTag,
-    FieldType: Clone + Into<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>,
-    Shared: SharedObjects,
-{
-    type GetterTypeImpl = Option<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>;
-    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        let inner_value = Into::into(Clone::clone(self.field));
-        if inner_value == Default::default() {
-            None
-        } else {
-            Some(inner_value)
-        }
-    }
-}
-
-// (optional|required|[unlabeled]) message field
-// The field value type is `Option<Box<M>>`, where the return type should be
-// `Option<&M>`.
-impl<'a, _1, MP, FP, MessageType, Shared>
-    GetOptFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::Message<MP>>
-    for FieldAndSharedRef<'a, Option<Box<MessageType>>, Shared>
-where
-    FP: FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<MP>>,
-    Shared: SharedObjects,
-{
-    type GetterTypeImpl = Option<&'a MessageType>;
-    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        self.field.as_deref()
     }
 }

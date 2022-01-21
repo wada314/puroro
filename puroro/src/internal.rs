@@ -124,10 +124,12 @@ impl<'a, Field, Shared> FieldAndSharedMut<'a, Field, Shared> {
     }
 }
 
-pub trait SharedObjects {
-    type AllocatorType;
+pub trait SharedBitfield {
     type BitfieldType: Bitfield;
-    fn alloc(&self) -> &Self::AllocatorType;
     fn bitfield(&self) -> &Self::BitfieldType;
     fn bitfield_mut(&mut self) -> &mut Self::BitfieldType;
+}
+pub trait SharedAllocator {
+    type AllocatorType;
+    fn alloc(&self) -> &Self::AllocatorType;
 }

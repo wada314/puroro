@@ -15,109 +15,53 @@
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::Message;
 
-pub trait GetFieldMethodImpl<FieldType, SharedType, ImplTag, LabelTag, TypeTag, const NUMBER: i32> {
+pub trait GetOptFieldMethodImpl<
+    FieldType,
+    SharedType,
+    ImplTag,
+    LabelTag,
+    TypeTag,
+    const NUMBER: i32,
+>
+{
     type GetterType;
-    fn get(&self) -> Self::GetterType;
+    fn get_opt(&self) -> Self::GetterType;
 }
-pub trait GetFieldMethod<const NUMBER: i32> {
+pub trait GetOptFieldMethod<const NUMBER: i32> {
     type GetterType;
-    fn get(&self) -> Self::GetterType;
+    fn get_opt(&self) -> Self::GetterType;
 }
-impl<MP, ImplTag, Fields, Shared, const NUMBER: i32> GetFieldMethod<NUMBER>
-    for Message<MP, ImplTag, Fields, Shared>
+impl<MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetOptFieldMethod<NUMBER>
+    for Message<MP, ImplTag, FieldsType, SharedType>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
-    Fields: HasField<NUMBER>,
-    Self: GetFieldMethodImpl<
-        <Fields as HasField<NUMBER>>::Type,
-        Shared,
+    FieldsType: HasField<NUMBER>,
+    Self: GetOptFieldMethodImpl<
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
         ImplTag,
         <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
         <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
     >,
 {
-    type GetterType = <Self as GetFieldMethodImpl<
-        <Fields as HasField<NUMBER>>::Type,
-        Shared,
+    type GetterType = <Self as GetOptFieldMethodImpl<
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
         ImplTag,
         <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
         <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
     >>::GetterType;
-    fn get(&self) -> Self::GetterType {
-        <Self as GetFieldMethodImpl<
-            <Fields as HasField<NUMBER>>::Type,
-            Shared,
+    fn get_opt(&self) -> Self::GetterType {
+        <Self as GetOptFieldMethodImpl<
+            <FieldsType as HasField<NUMBER>>::Type,
+            SharedType,
             ImplTag,
             <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
             <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
             NUMBER,
-        >>::get(&self)
-    }
-}
-
-pub trait GetFieldMethodImpl2<'a, FP, ImplTag, LabelTag, TypeTag> {
-    type GetterTypeImpl;
-    fn get_impl(&self) -> Self::GetterTypeImpl;
-}
-pub trait GetFieldMethod2<'a, FP, ImplTag> {
-    type GetterType;
-    fn get(&self) -> Self::GetterType;
-}
-impl<'a, FP, ImplTag, T> GetFieldMethod2<'a, FP, ImplTag> for T
-where
-    FP: FieldProperties,
-    T: GetFieldMethodImpl2<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
-{
-    type GetterType =
-        <Self as GetFieldMethodImpl2<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
-    fn get(&self) -> Self::GetterType {
-        <Self as GetFieldMethodImpl2<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_impl(self)
-    }
-}
-
-pub trait GetOptFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
-    type GetterTypeImpl;
-    fn get_opt_impl(&self) -> Self::GetterTypeImpl;
-}
-pub trait GetOptFieldMethod<'a, FP, ImplTag> {
-    type GetterType;
-    fn get_opt(&self) -> Self::GetterType;
-}
-impl<'a, FP, ImplTag, T> GetOptFieldMethod<'a, FP, ImplTag> for T
-where
-    FP: FieldProperties,
-    T: GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
-{
-    type GetterType =
-        <Self as GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
-    fn get_opt(&self) -> Self::GetterType {
-        <Self as GetOptFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_opt_impl(
-            &self,
-        )
-    }
-}
-
-pub trait GetMutFieldMethodImpl<'a, FP, ImplTag, LabelTag, TypeTag> {
-    type GetterTypeImpl;
-    fn get_mut_impl(self) -> Self::GetterTypeImpl;
-}
-pub trait GetMutFieldMethod<'a, FP, ImplTag> {
-    type GetterType;
-    fn get_mut(self) -> Self::GetterType;
-}
-impl<'a, FP, ImplTag, T> GetMutFieldMethod<'a, FP, ImplTag> for T
-where
-    FP: FieldProperties,
-    T: GetMutFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>,
-{
-    type GetterType =
-        <Self as GetMutFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::GetterTypeImpl;
-    fn get_mut(self) -> Self::GetterType {
-        <Self as GetMutFieldMethodImpl<'a, FP, ImplTag, FP::LabelTag, FP::TypeTag>>::get_mut_impl(
-            self,
-        )
+        >>::get_opt(&self)
     }
 }

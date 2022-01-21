@@ -17,7 +17,7 @@
 mod getter;
 mod getter_mut;
 mod getter_opt;
-use super::super::SharedObjects;
+use super::super::SharedBitfield;
 
 pub struct SimpleFields;
 
@@ -26,13 +26,9 @@ pub struct SimpleShared<const BITFIELD_U32_LEN: usize> {
     bitfield: crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>,
 }
 
-impl<const BITFIELD_U32_LEN: usize> SharedObjects for SimpleShared<BITFIELD_U32_LEN> {
-    type AllocatorType = ();
+impl<const BITFIELD_U32_LEN: usize> SharedBitfield for SimpleShared<BITFIELD_U32_LEN> {
     type BitfieldType =
         crate::bitvec::array::BitArray<crate::bitvec::order::Lsb0, [u32; BITFIELD_U32_LEN]>;
-    fn alloc(&self) -> &Self::AllocatorType {
-        &()
-    }
     fn bitfield(&self) -> &Self::BitfieldType {
         &self.bitfield
     }

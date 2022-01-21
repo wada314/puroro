@@ -45,9 +45,9 @@ pub struct Message<MP, ImplTag, Fields, Shared> {
 }
 
 // メモ
-use internal::methods::{GetFieldMethod2, GetOptFieldMethod};
-use internal::{FieldAndSharedRef, FieldProperties, MessageProperties};
-use internal::{SimpleFields, SimpleShared};
+use internal::methods::GetOptFieldMethod;
+use internal::SimpleShared;
+use internal::{FieldProperties, MessageProperties};
 
 // assume a proto like this:
 // message Person {

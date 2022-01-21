@@ -14,7 +14,7 @@
 
 use super::OptionShared;
 use crate::internal::methods::GetOptFieldMethodImpl;
-use crate::internal::{FieldAndSharedRef, FieldProperties};
+use crate::internal::FieldProperties;
 use crate::tags;
 /*
 impl<'a, FP, T> GetOptFieldMethodImpl<'a, FP, tags::OptionImpl, FP::LabelTag, FP::TypeTag>
