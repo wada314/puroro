@@ -25,5 +25,5 @@
 //mod simple_get_set;
 //mod simple_misc_traits;
 //mod simple_ser_tests;
-mod template;
+//mod template;
 //mod variants_packed;

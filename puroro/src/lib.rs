@@ -56,46 +56,42 @@ use internal::{SimpleFields, SimpleShared};
 //     repeated Person children = 3;
 // }
 //
-trait PersonFieldsType {
-    type ImplTag;
-    type NameType;
-    type AgeType;
-    type ChildrenType;
+type Person = Message<PersonMessageProperties, SimpleFields, SimpleShared<1>>;
+
+struct PersonFieldsContainer {
+    name: String,
+    age: u32,
+    children: Vec<Person>,
 }
-impl PersonFieldsType for SimpleFields {
-    type ImplTag = tags::SimpleImpl;
-    type NameType = String;
-    type AgeType = u32;
-    type ChildrenType = Vec<PersonSimple>;
-}
-struct Person<Fields: PersonFieldsType, Shared> {
-    _shared: Shared,
-    name: <Fields as PersonFieldsType>::NameType,
-    age: <Fields as PersonFieldsType>::AgeType,
-    children: <Fields as PersonFieldsType>::ChildrenType,
-}
-type PersonSimple = Person<SimpleFields, SimpleShared<1>>;
-impl<Fields, Shared> Default for Person<Fields, Shared>
-where
-    Fields: PersonFieldsType,
-    <Fields as PersonFieldsType>::NameType: Default,
-    <Fields as PersonFieldsType>::AgeType: Default,
-    <Fields as PersonFieldsType>::ChildrenType: Default,
-    Shared: Default,
-{
-    fn default() -> Self {
-        Self {
-            _shared: Default::default(),
-            name: Default::default(),
-            age: Default::default(),
-            children: Default::default(),
-        }
+impl crate::internal::FieldsContainer for PersonFieldsContainer {
+    type FieldType<const NUMBER: i32> = PersonFieldType<NUMBER>;
+    fn get<const NUMBER: i32>(&self) -> &<Self::FieldType<NUMBER> as internal::TypeWrapper>::Type
+    where
+        Self::FieldType<NUMBER>: internal::TypeWrapper {
+        todo!()
     }
+
+    fn get_mut<const NUMBER: i32>(&mut self) -> &mut <Self::FieldType<NUMBER> as internal::TypeWrapper>::Type
+    where
+        Self::FieldType<NUMBER>: internal::TypeWrapper {
+        todo!()
+    }
+}
+struct PersonFieldType<const NUMBER: i32>;
+impl crate::internal::TypeWrapper for PersonFieldType<1> {
+    type Type = String;
+}
+impl crate::internal::TypeWrapper for PersonFieldType<2> {
+    type Type = u32;
+}
+impl crate::internal::TypeWrapper for PersonFieldType<3> {
+    type Type = Vec<Person>;
 }
 
 struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize = 0;
+    type Fields<const NUMBER: i32> = PersonFieldProperties<NUMBER>;
 }
 struct PersonFieldProperties<const FIELD_NUMBER: i32>;
 impl FieldProperties for PersonFieldProperties<1> {
@@ -118,113 +114,4 @@ impl FieldProperties for PersonFieldProperties<3> {
     type LabelTag = tags::Repeated;
     type TypeTag = tags::Message<PersonMessageProperties>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ();
-}
-impl<Fields, Shared> Person<Fields, Shared>
-where
-    Fields: PersonFieldsType,
-    for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>:
-        GetOptFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag>,
-{
-    pub fn name_opt(
-        &self,
-    ) -> <FieldAndSharedRef<Fields::NameType, Shared> as GetOptFieldMethod<
-        PersonFieldProperties<1>,
-        Fields::ImplTag,
-    >>::GetterType {
-        FieldAndSharedRef::new(&self.name, &self._shared).get_opt()
-    }
-}
-use internal::methods::GetFieldMethodImpl;
-impl<Fields, Shared> Person<Fields, Shared>
-where
-    Fields: PersonFieldsType,
-    for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>: GetFieldMethodImpl<
-        'a,
-        PersonFieldProperties<1>,
-        Fields::ImplTag,
-        tags::Optional,
-        tags::String,
-    >,
-{
-    pub fn hoge(&self) {}
-} /*
-impl<Fields, Shared> Person<Fields, Shared>
-where
-Fields: PersonFieldsType,
-for<'a> FieldAndSharedRef<'a, Fields::NameType, Shared>:
-GetFieldMethod<'a, PersonFieldProperties<1>, Fields::ImplTag>,
-{
-pub fn hoge(&self) {}
-pub fn name(
-&self,
-) -> <FieldAndSharedRef<Fields::NameType, Shared> as GetFieldMethod<
-PersonFieldProperties<1>,
-Fields::ImplTag,
->>::GetterType {
-FieldAndSharedRef::new(&self.name, &self._shared).get()
-}
-}*/
-impl<Fields, Shared> Person<Fields, Shared>
-where
-    Fields: PersonFieldsType,
-    for<'a> FieldAndSharedRef<'a, Fields::AgeType, Shared>:
-        GetOptFieldMethod<'a, PersonFieldProperties<2>, Fields::ImplTag>,
-{
-    pub fn age_opt(
-        &self,
-    ) -> <FieldAndSharedRef<Fields::AgeType, Shared> as GetOptFieldMethod<
-        PersonFieldProperties<2>,
-        Fields::ImplTag,
-    >>::GetterType {
-        FieldAndSharedRef::new(&self.age, &self._shared).get_opt()
-    }
-}
-impl<Fields, Shared> Person<Fields, Shared>
-where
-    Fields: PersonFieldsType,
-    for<'a> FieldAndSharedRef<'a, Fields::ChildrenType, Shared>:
-        GetFieldMethod<'a, PersonFieldProperties<3>, Fields::ImplTag>,
-{
-    pub fn children(
-        &self,
-    ) -> <FieldAndSharedRef<Fields::ChildrenType, Shared> as GetFieldMethod<
-        PersonFieldProperties<3>,
-        Fields::ImplTag,
-    >>::GetterType {
-        FieldAndSharedRef::new(&self.children, &self._shared).get()
-    }
-}
-
-macro_rules! derive_person_params {
-    ($base:ty, $new_param_type:ty, $new_param_ident:ident) => {
-        derive_person_params!(@typedecl $base, NameType, $new_param_type, $new_param_ident);
-        derive_person_params!(@typedecl $base, AgeType, $new_param_type, $new_param_ident);
-        derive_person_params!(@typedecl $base, ChildrenType, $new_param_type, $new_param_ident);
-    };
-    (@typedecl $base:ty, NameType, $new_param_type:ty, NameType) => {
-        type NameType = $new_param_type;
-    };
-    (@typedecl $base:ty, $ident:ident, $new_param_type:ty, $new_param_ident:ident) => {
-        type $ident = <$base as PersonFieldsType>::$ident;
-    };
-}
-
-fn test() {
-    let person = PersonSimple::default();
-    let _hoge = person.age_opt();
-    assert_eq!(Some(0), person.age_opt());
-    let _foo = person.name_opt();
-    assert_eq!(Some(""), person.name_opt());
-    let _hoga = person.children();
-    //let _nama = person.name();
-    //person.hoge();
-    let name = String::new();
-    let shared = SimpleShared::<1>::default();
-    let fands = FieldAndSharedRef::new(&name, &shared);
-    <FieldAndSharedRef<String, SimpleShared<1>> as GetFieldMethodImpl<
-        PersonFieldProperties<1>,
-        tags::SimpleImpl,
-        tags::Optional,
-        tags::String,
-    >>::get_impl(&fands);
 }

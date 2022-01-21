@@ -13,77 +13,16 @@
 // limitations under the License.
 
 use crate::bumpalo::Bump;
-use crate::internal::de::from_iter::deser_from_iter;
-use crate::internal::de::DeserMessageFromBytesIter;
-use crate::internal::se::SerMessageToIoWrite;
 use crate::internal::NoAllocBumpBox;
 use crate::Result;
 use ::std::convert::TryFrom;
 use ::std::io::Write;
-
-/// A common trait for protobuf message implementation in Rust.
-pub trait Message_<M> {
-    /// Deserialize the message from input bytes.
-    /// This method does not clear the `&mut self` before deserializing.
-    /// i.e. This method "merges" the input into `&mut self`.
-    ///
-    /// Please note that this method is not implemented for some types
-    /// (e.g. Either<T, U> cannot be deserialized).
-    ///
-    /// ```ignore
-    /// use puroro::Message;
-    /// use std::io::Read;
-    /// let mut my_message = MyMessage::default();
-    /// let input = vec![0x80, 0x0a];
-    /// my_message.merge_from_bytes(input.bytes()).unwrap();
-    /// ```
-    fn merge_from_bytes<I>(&mut self, iter: I) -> Result<()>
-    where
-        Self: DeserMessageFromBytesIter,
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        deser_from_iter(self, iter)
-    }
-
-    /// A shorthand method that allocates and deserializes the message.
-    fn from_bytes<I>(iter: I) -> Result<Self>
-    where
-        Self: DeserMessageFromBytesIter + Default,
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        let mut msg = <Self as Default>::default();
-        msg.merge_from_bytes(iter)?;
-        Ok(msg)
-    }
-
-    /// Serializes the message into [`std::io::Write`].
-    fn ser<W>(&self, out: &mut W) -> Result<()>
-    where
-        Self: SerMessageToIoWrite,
-        W: Write,
-    {
-        <Self as SerMessageToIoWrite>::ser(&self, out)
-    }
-}
 
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
 {
 }
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
-
-/// Bumpalo message, initialized from bump ptr instance.
-pub trait BumpaloMessage<'bump> {
-    fn new_in(bump: &'bump Bump) -> Self;
-}
-impl<'bump, T> BumpaloMessage<'bump> for NoAllocBumpBox<T>
-where
-    T: BumpaloMessage<'bump>,
-{
-    fn new_in(bump: &'bump Bump) -> Self {
-        NoAllocBumpBox::new_in(BumpaloMessage::new_in(bump), bump)
-    }
-}
 
 /// `new_in()` initialize function.
 pub trait NewIn<AllocatorType> {

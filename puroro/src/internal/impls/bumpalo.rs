@@ -14,11 +14,8 @@
 
 #![doc = include_str!("bumpalo.md")]
 
-pub mod de;
-
 use crate::bumpalo::collections::{String, Vec};
 use crate::bumpalo::Bump;
-use crate::internal::Bare;
 use ::std::borrow::Borrow;
 use ::std::mem;
 use ::std::mem::ManuallyDrop;
@@ -27,46 +24,6 @@ use ::std::ptr;
 use ::std::ptr::NonNull;
 use ::std::slice;
 use ::std::str::Utf8Error;
-
-pub trait BumpDefault<'bump> {
-    fn default_in(bump: &'bump Bump) -> Self;
-}
-impl<'bump> BumpDefault<'bump> for NoAllocString {
-    fn default_in(bump: &'bump Bump) -> Self {
-        NoAllocString::new_in(bump)
-    }
-}
-impl<'bump, T> BumpDefault<'bump> for NoAllocVec<T> {
-    fn default_in(bump: &'bump Bump) -> Self {
-        NoAllocVec::new_in(bump)
-    }
-}
-impl<'bump, T> BumpDefault<'bump> for Option<T> {
-    fn default_in(_: &'bump Bump) -> Self {
-        ::std::default::Default::default()
-    }
-}
-impl<'bump, T: BumpDefault<'bump>> BumpDefault<'bump> for Bare<T> {
-    fn default_in(bump: &'bump Bump) -> Self {
-        Bare::new(BumpDefault::default_in(bump))
-    }
-}
-macro_rules! impl_bumpalo_default {
-    ($ty:ty) => {
-        impl<'bump> BumpDefault<'bump> for $ty {
-            fn default_in(_: &'bump Bump) -> Self {
-                Default::default()
-            }
-        }
-    };
-}
-impl_bumpalo_default!(i32);
-impl_bumpalo_default!(u32);
-impl_bumpalo_default!(f32);
-impl_bumpalo_default!(i64);
-impl_bumpalo_default!(u64);
-impl_bumpalo_default!(f64);
-impl_bumpalo_default!(bool);
 
 /// A box for proto message internal usage.
 /// DO NOT USE THIS TYPE IN NORMAL PLACES, IT'S NOT SAFE!

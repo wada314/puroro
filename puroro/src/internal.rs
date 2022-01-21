@@ -13,21 +13,19 @@
 // limitations under the License.
 
 pub mod bool;
-pub mod de;
 pub mod fixed_bits;
 pub mod impls;
 pub mod methods;
-pub mod se;
 pub mod types;
 pub mod utils;
 pub mod variant;
 
+pub use impls::bumpalo::AddBumpVecView;
 pub use impls::bumpalo::NoAllocBox as NoAllocBumpBox;
 pub use impls::bumpalo::NoAllocString as NoAllocBumpString;
 pub use impls::bumpalo::NoAllocVec as NoAllocBumpVec;
 pub use impls::bumpalo::RefMutString as RefMutBumpString;
 pub use impls::bumpalo::RefMutVec as RefMutBumpVec;
-pub use impls::bumpalo::{AddBumpVecView, BumpDefault};
 pub use impls::simple::{SimpleFields, SimpleShared};
 
 use crate::tags;
@@ -35,8 +33,6 @@ use ::bitvec::array::BitArray;
 use ::bitvec::order::BitOrder;
 use ::bitvec::slice::BitSlice;
 use ::bitvec::view::BitViewSized;
-use ::std::fmt::{self, Debug};
-use ::std::ops::{Deref, DerefMut};
 
 pub trait Bitfield {
     fn get(&self, index: usize) -> bool;
@@ -89,55 +85,9 @@ impl<T> IsDefault for NoAllocBumpVec<T> {
     }
 }
 
-pub struct Bare<T>(T);
-impl<T> Bare<T> {
-    pub fn new(val: T) -> Self {
-        Self(val)
-    }
-    pub fn inner(self) -> T {
-        self.0
-    }
-}
-impl<T> Deref for Bare<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-impl<T> DerefMut for Bare<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-impl<T> From<T> for Bare<T> {
-    fn from(from: T) -> Self {
-        Self(from)
-    }
-}
-impl<T: Default> Default for Bare<T> {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
-impl<T: PartialEq> PartialEq for Bare<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-impl<T: Clone> Clone for Bare<T> {
-    fn clone(&self) -> Self {
-        Self(self.0.clone())
-    }
-}
-impl<T: Copy> Copy for Bare<T> {}
-impl<T: Debug> Debug for Bare<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        <T as Debug>::fmt(&self.0, f)
-    }
-}
-
 pub trait MessageProperties {
     const BITFIELD_OPTIONAL_FIELD_COUNT: usize;
+    type Fields<const NUMBER: usize>;
 }
 pub trait FieldProperties {
     type MessageProperties: self::MessageProperties;
@@ -145,6 +95,20 @@ pub trait FieldProperties {
     type LabelTag: tags::FieldLabelTag;
     type TypeTag: tags::FieldTypeTag;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType;
+}
+
+pub trait FieldsContainer {
+    type FieldType<const NUMBER: i32>;
+    fn get<const NUMBER: i32>(&self) -> &<Self::FieldType<NUMBER> as TypeWrapper>::Type
+    where
+        Self::FieldType<NUMBER>: TypeWrapper;
+    fn get_mut<const NUMBER: i32>(&mut self) -> &mut <Self::FieldType<NUMBER> as TypeWrapper>::Type
+    where
+        Self::FieldType<NUMBER>: TypeWrapper;
+}
+
+pub trait TypeWrapper {
+    type Type;
 }
 
 pub struct FieldAndSharedRef<'a, Field, Shared> {
