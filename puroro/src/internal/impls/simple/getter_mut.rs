@@ -31,21 +31,24 @@ where
     }
 }
 
-// (optional|required) numerical field,
-// assuming the field type is the rust primitive type (e.g. i32, f64).
+// (optional|required) non-message field,
 // Check the optional bit, set if it's not set,
 // initialize the field if the optional bit was not set, and then return it.
-impl<'a, _1, _2, FP, FieldType, Shared>
+impl<'a, _1, _2, _3, FP, FieldType, Shared>
     GetMutFieldMethodImpl<
         'a,
         FP,
         tags::SimpleImpl,
         tags::NeedOptionalBitLabel<_1>,
-        tags::NonLdType<_2>,
+        tags::NonMessageType<_2, _3>,
     > for FieldAndSharedMut<'a, FieldType, Shared>
 where
-    FP: FieldProperties<LabelTag = tags::NeedOptionalBitLabel<_1>, TypeTag = tags::NonLdType<_2>>,
-    tags::NonLdType<_2>: tags::FieldTypeTag<DefaultValueType = FieldType> + tags::NumericalTypeTag,
+    FP: FieldProperties<
+        LabelTag = tags::NeedOptionalBitLabel<_1>,
+        TypeTag = tags::NonMessageType<_2, _3>,
+    >,
+    tags::NonMessageType<_2, _3>: tags::FieldTypeTag,
+    <tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<FieldType>,
     Shared: SharedObjects,
 {
     type GetterTypeImpl = &'a mut FieldType;
@@ -54,7 +57,7 @@ where
         if !self.shared.bitfield().get(bitfield_index) {
             // need to initialize
             self.shared.bitfield_mut().set(bitfield_index, true);
-            *self.field = FP::DEFAULT_VALUE;
+            *self.field = Into::into(Clone::clone(&FP::DEFAULT_VALUE));
         }
         self.field
     }
