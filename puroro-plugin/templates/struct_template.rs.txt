@@ -5,11 +5,10 @@ pub struct {{ m.template_ident }}<Fields, Shared>
     where Fields: {{ m.template_field_types_trait }}
 {
     _shared: Shared,
-    _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+    {#- We need this field for empty message case, otherwise `Fields` param won't be used #}
+    _phantom: ::std::marker::PhantomData<Fields>,
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
     {{ f.ident }}: <Fields as {{ m.template_field_types_trait }}>::{{ f.template_type_name }},
-    {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 }
 
@@ -44,7 +43,6 @@ pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
 {%- for f in m.fields %}
 
 {#################- getter method ################-#}
-{%- if !f.is_explicit_oneof_field %}
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
@@ -65,10 +63,8 @@ where
         ::puroro::internal::FieldAndSharedRef::new(&self.{{ f.ident }}, &self._shared).get()
     }
 }
-{%- endif %} {#- if !f.is_explicit_oneof_field #}
 
 {#################- optional getter method ################-#}
-{%- if !f.is_repeated && !f.is_explicit_oneof_field %}
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
@@ -89,10 +85,8 @@ where
         ::puroro::internal::FieldAndSharedRef::new(&self.{{ f.ident }}, &self._shared).get_opt()
     }
 }
-{%- endif %} {#- if !f.is_repeated && !f.is_explicit_oneof_field #}
 
 {#################- has_ method ################-#}
-{%- if !f.is_repeated && !f.is_explicit_oneof_field %}
 impl<Fields, Shared, OptionInnerType> {{ m.template_ident }}<Fields, Shared>
 where
     Fields: {{ m.template_field_types_trait }},
@@ -108,7 +102,6 @@ where
         self.{{ f.ident_unesc }}_opt().is_some()
     }
 }
-{%- endif %} {#- if !f.is_repeated && !f.is_explicit_oneof_field #}
 {%- endfor %} {#- for f in m.fields #}
 
 {#################- std trait impls ################-#}

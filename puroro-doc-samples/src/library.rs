@@ -521,7 +521,7 @@ pub mod _puroro_impls {
         Fields: BookTemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         title: <Fields as BookTemplateFieldTypes>::TitleType,
         num_pages: <Fields as BookTemplateFieldTypes>::NumPagesType,
     }
