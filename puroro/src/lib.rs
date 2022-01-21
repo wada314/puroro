@@ -103,9 +103,9 @@ struct PersonFieldsContainer {
 }
 impl crate::internal::FieldsContainer for PersonFieldsContainer {}
 
-declare_has_field!(PersonFieldsContainer, 1, String, name);
-declare_has_field!(PersonFieldsContainer, 2, u32, age);
-declare_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
+impl_has_field!(PersonFieldsContainer, 1, String, name);
+impl_has_field!(PersonFieldsContainer, 2, u32, age);
+impl_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
 
 struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {

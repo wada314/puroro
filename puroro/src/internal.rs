@@ -105,7 +105,7 @@ pub trait HasField<const NUMBER: i32>: FieldsContainer {
     fn get_mut(&mut self) -> &mut Self::Type;
 }
 #[macro_export]
-macro_rules! declare_has_field {
+macro_rules! impl_has_field {
     ($container:ty, $number:expr, $ty:ty, $name:ident) => {
         impl crate::internal::HasField<$number> for $container {
             type Type = $ty;
