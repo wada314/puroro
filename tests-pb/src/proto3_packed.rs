@@ -759,7 +759,7 @@ pub mod _puroro_impls {
         Fields: MsgTemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         explicitly_packed: <Fields as MsgTemplateFieldTypes>::ExplicitlyPackedType,
         explicitly_not_packed: <Fields as MsgTemplateFieldTypes>::ExplicitlyNotPackedType,
         not_annotated: <Fields as MsgTemplateFieldTypes>::NotAnnotatedType,

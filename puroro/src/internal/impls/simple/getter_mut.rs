@@ -17,7 +17,8 @@ use crate::internal::FieldProperties;
 use crate::internal::{Bitfield, FieldAndSharedMut, SharedObjects};
 use crate::tags;
 
-// [unlabeled] non-message field
+// [unlabeled] non-message field.
+// Just return a mutable reference to the field.
 impl<'a, _1, _2, FP, FieldType, Shared>
     GetMutFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::Unlabeled, tags::NonMessageType<_1, _2>>
     for FieldAndSharedMut<'a, FieldType, Shared>
@@ -26,13 +27,14 @@ where
 {
     type GetterTypeImpl = &'a mut FieldType;
     fn get_mut_impl(self) -> Self::GetterTypeImpl {
-        // Just return the mutable reference.
         self.field
     }
 }
 
 // (optional|required) numerical field,
 // assuming the field type is the rust primitive type (e.g. i32, f64).
+// Check the optional bit, set if it's not set,
+// initialize the field if the optional bit was not set, and then return it.
 impl<'a, _1, _2, FP, FieldType, Shared>
     GetMutFieldMethodImpl<
         'a,

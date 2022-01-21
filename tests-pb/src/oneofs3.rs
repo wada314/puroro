@@ -1619,7 +1619,13 @@ pub mod _puroro_impls {
         Fields: MsgTemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
+        g1_int32: <Fields as MsgTemplateFieldTypes>::G1Int32Type,
+        g1_string: <Fields as MsgTemplateFieldTypes>::G1StringType,
+        g2_f32: <Fields as MsgTemplateFieldTypes>::G2F32Type,
+        g2_string: <Fields as MsgTemplateFieldTypes>::G2StringType,
+        g2_submsg: <Fields as MsgTemplateFieldTypes>::G2SubmsgType,
+        g3_int32: <Fields as MsgTemplateFieldTypes>::G3Int32Type,
     }
 
     pub struct MsgMessageProperties;
@@ -2209,7 +2215,7 @@ pub mod _puroro_impls {
         Fields: SubmsgTemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         i32_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType,
     }
 

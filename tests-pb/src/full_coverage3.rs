@@ -14818,7 +14818,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         Fields: MsgTemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         i32_unlabeled: <Fields as MsgTemplateFieldTypes>::I32UnlabeledType,
         i32_optional: <Fields as MsgTemplateFieldTypes>::I32OptionalType,
         i32_repeated: <Fields as MsgTemplateFieldTypes>::I32RepeatedType,
@@ -21137,7 +21137,7 @@ pub mod _puroro_nested {
                 Fields: SubmsgTemplateFieldTypes,
             {
                 _shared: Shared,
-                _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+                _phantom: ::std::marker::PhantomData<Fields>,
                 i32_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I32UnlabeledType,
                 i32_optional: <Fields as SubmsgTemplateFieldTypes>::I32OptionalType,
                 i64_unlabeled: <Fields as SubmsgTemplateFieldTypes>::I64UnlabeledType,

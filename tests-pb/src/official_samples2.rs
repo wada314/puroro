@@ -730,7 +730,7 @@ pub mod _puroro_impls {
         Fields: Test1TemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         a: <Fields as Test1TemplateFieldTypes>::AType,
     }
 
@@ -1036,7 +1036,7 @@ pub mod _puroro_impls {
         Fields: Test2TemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         b: <Fields as Test2TemplateFieldTypes>::BType,
     }
 
@@ -1375,7 +1375,7 @@ pub mod _puroro_impls {
         Fields: Test3TemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         c: <Fields as Test3TemplateFieldTypes>::CType,
     }
 
@@ -1693,7 +1693,7 @@ pub mod _puroro_impls {
         Fields: Test4TemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         d: <Fields as Test4TemplateFieldTypes>::DType,
     }
 

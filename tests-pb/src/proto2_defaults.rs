@@ -11028,7 +11028,7 @@ pub mod _puroro_impls {
         Fields: MsgTemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         i32_default: <Fields as MsgTemplateFieldTypes>::I32DefaultType,
         i32_0: <Fields as MsgTemplateFieldTypes>::I320Type,
         i32_42: <Fields as MsgTemplateFieldTypes>::I3242Type,

@@ -416,7 +416,7 @@ pub mod _puroro_impls {
         Fields: MsgTemplateFieldTypes,
     {
         _shared: Shared,
-        _phantom: ::std::marker::PhantomData<Fields>, // REMOVE ME
+        _phantom: ::std::marker::PhantomData<Fields>,
         recursive_unlabeled: <Fields as MsgTemplateFieldTypes>::RecursiveUnlabeledType,
     }
 
