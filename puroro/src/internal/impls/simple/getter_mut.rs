@@ -16,6 +16,7 @@ use crate::internal::methods::GetMutFieldMethodImpl;
 use crate::internal::FieldProperties;
 use crate::internal::{Bitfield, FieldAndSharedMut, SharedObjects};
 use crate::tags;
+use crate::NewIn;
 
 // [unlabeled] non-message field.
 // Just return a mutable reference to the field.
@@ -60,5 +61,27 @@ where
             *self.field = Into::into(Clone::clone(&FP::DEFAULT_VALUE));
         }
         self.field
+    }
+}
+
+// (optional|required|[unlabeled]) message field,
+// Assuming the field type is `Option<Box<T>>`, and `T` implements
+// `NewIn` trait.
+// Typically the field type is `Option<Box<MessageType>>`.
+// If the field is `Some` then return the content's mut reference,
+// and if it's `None` then initialize it and then return the mut reference.
+impl<'a, _1, MP, FP, MessageType, Shared>
+    GetMutFieldMethodImpl<'a, FP, tags::SimpleImpl, tags::NonRepeatedLabel<_1>, tags::Message<MP>>
+    for FieldAndSharedMut<'a, Option<Box<MessageType>>, Shared>
+where
+    FP: FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::Message<MP>>,
+    MessageType: NewIn<&'a ()>,
+    Shared: SharedObjects<AllocatorType = ()>,
+{
+    type GetterTypeImpl = &'a mut MessageType;
+    fn get_mut_impl(self) -> Self::GetterTypeImpl {
+        let alloc = self.shared.alloc();
+        self.field
+            .get_or_insert_with(|| <Box<MessageType> as NewIn<&()>>::new_in(alloc))
     }
 }

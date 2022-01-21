@@ -739,12 +739,24 @@ pub mod _puroro_impls {
         AllocatorType: ::std::convert::Into<Shared>,
         Fields::AType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
                 a: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> Test1Template<Fields, Shared>
+    where
+        Fields: Test1TemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 
@@ -1088,12 +1100,24 @@ pub mod _puroro_impls {
         AllocatorType: ::std::convert::Into<Shared>,
         Fields::BType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
                 b: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> Test2Template<Fields, Shared>
+    where
+        Fields: Test2TemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 
@@ -1472,12 +1496,24 @@ pub mod _puroro_impls {
         AllocatorType: ::std::convert::Into<Shared>,
         Fields::CType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
                 c: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> Test3Template<Fields, Shared>
+    where
+        Fields: Test3TemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 
@@ -1835,12 +1871,24 @@ pub mod _puroro_impls {
         AllocatorType: ::std::convert::Into<Shared>,
         Fields::DType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
                 d: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> Test4Template<Fields, Shared>
+    where
+        Fields: Test4TemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 

@@ -1498,7 +1498,7 @@ pub mod _puroro_impls {
         Fields::StringUnlabeledType: ::std::default::Default,
         Fields::SubmsgUnlabeledType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
@@ -1509,6 +1509,18 @@ pub mod _puroro_impls {
                 string_unlabeled: ::std::default::Default::default(),
                 submsg_unlabeled: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 
@@ -2315,12 +2327,24 @@ pub mod _puroro_impls {
         AllocatorType: ::std::convert::Into<Shared>,
         Fields::I32UnlabeledType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
                 i32_unlabeled: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 

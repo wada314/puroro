@@ -2783,7 +2783,7 @@ pub mod _puroro_impls {
         Fields::EnumRepeatedType: ::std::default::Default,
         Fields::VeryLargeFieldNumberType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
@@ -2799,6 +2799,18 @@ pub mod _puroro_impls {
                 enum_repeated: ::std::default::Default::default(),
                 very_large_field_number: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 
@@ -4932,12 +4944,24 @@ pub mod _puroro_nested {
                 AllocatorType: ::std::convert::Into<Shared>,
                 Fields::I32OptionalType: ::std::default::Default,
             {
-                pub fn new_in(alloc: AllocatorType) -> Self {
+                fn new_in(alloc: AllocatorType) -> Self {
                     Self {
                         _shared: ::std::convert::Into::into(alloc),
                         _phantom: ::std::default::Default::default(),
                         i32_optional: ::std::default::Default::default(),
                     }
+                }
+            }
+
+            impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+            where
+                Fields: SubmsgTemplateFieldTypes,
+            {
+                pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+                where
+                    Self: ::puroro::NewIn<AllocatorType>,
+                {
+                    <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
                 }
             }
 

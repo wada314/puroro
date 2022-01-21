@@ -14931,7 +14931,7 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
         Fields::F64OptionalType: ::std::default::Default,
         Fields::F64RepeatedType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
@@ -14984,6 +14984,18 @@ for <'a> &'a RepeatedType: ::puroro::RepeatedField<'a> +
                 f64_optional: ::std::default::Default::default(),
                 f64_repeated: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 
@@ -22377,7 +22389,7 @@ pub mod _puroro_nested {
                 Fields::I32OptionalType: ::std::default::Default,
                 Fields::I64UnlabeledType: ::std::default::Default,
             {
-                pub fn new_in(alloc: AllocatorType) -> Self {
+                fn new_in(alloc: AllocatorType) -> Self {
                     Self {
                         _shared: ::std::convert::Into::into(alloc),
                         _phantom: ::std::default::Default::default(),
@@ -22385,6 +22397,18 @@ pub mod _puroro_nested {
                         i32_optional: ::std::default::Default::default(),
                         i64_unlabeled: ::std::default::Default::default(),
                     }
+                }
+            }
+
+            impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+            where
+                Fields: SubmsgTemplateFieldTypes,
+            {
+                pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+                where
+                    Self: ::puroro::NewIn<AllocatorType>,
+                {
+                    <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
                 }
             }
 

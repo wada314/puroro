@@ -136,3 +136,11 @@ where
 pub trait NewIn<AllocatorType> {
     fn new_in(alloc: AllocatorType) -> Self;
 }
+impl<'a, T> NewIn<&'a ()> for Box<T>
+where
+    T: NewIn<&'a ()>,
+{
+    fn new_in(_: &()) -> Self {
+        Box::new(T::new_in(&()))
+    }
+}

@@ -11169,7 +11169,7 @@ pub mod _puroro_impls {
         Fields::EnumOneType: ::std::default::Default,
         Fields::EnumFourtyTwoType: ::std::default::Default,
     {
-        pub fn new_in(alloc: AllocatorType) -> Self {
+        fn new_in(alloc: AllocatorType) -> Self {
             Self {
                 _shared: ::std::convert::Into::into(alloc),
                 _phantom: ::std::default::Default::default(),
@@ -11236,6 +11236,18 @@ pub mod _puroro_impls {
                 enum_one: ::std::default::Default::default(),
                 enum_fourty_two: ::std::default::Default::default(),
             }
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+    {
+        pub fn new_in<AllocatorType>(alloc: AllocatorType) -> Self
+        where
+            Self: ::puroro::NewIn<AllocatorType>,
+        {
+            <Self as ::puroro::NewIn<AllocatorType>>::new_in(alloc)
         }
     }
 
