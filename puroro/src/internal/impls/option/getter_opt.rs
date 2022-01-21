@@ -12,24 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::OptionShared;
-use crate::internal::methods::GetOptFieldMethodImpl;
-use crate::internal::FieldProperties;
+use super::{OptionFields, OptionShared};
+use crate::internal::methods::{GetOptFieldMethod, GetOptFieldMethodImpl};
+use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
-/*
-impl<'a, FP, T> GetOptFieldMethodImpl<'a, FP, tags::OptionImpl, FP::LabelTag, FP::TypeTag>
-    for FieldAndSharedRef<'a, (), OptionShared<T>>
+use crate::Message;
+
+// (optional|required) numeric field
+impl<
+    'a,
+    MP,
+    InnerImplTag,
+    InnerFieldsType,
+    InnerSharedType,
+    FinalInnerGetterType,
+    const NUMBER: i32,
+>
+    GetOptFieldMethodImpl<
+        'a,
+        (),
+        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>>,
+        tags::OptionImpl,
+        <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::LabelTag,
+        <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::TypeTag,
+        NUMBER,
+    >
+    for Message<
+        MP,
+        tags::OptionImpl,
+        OptionFields,
+        OptionShared<Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>>,
+    >
 where
-    FP: FieldProperties,
+    Message<MP, InnerImplTag, InnerFieldsType, InnerSharedType>:
+        GetOptFieldMethod<'a, NUMBER, GetterType = Option<FinalInnerGetterType>>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
 {
-    type GetterTypeImpl = Option<<FP::TypeTag as tags::NumericalTypeTag>::NativeType>;
-    fn get_opt_impl(&self) -> Self::GetterTypeImpl {
-        let opt_bit_index = FP::OPTIONAL_FIELD_BITFIELD_INDEX;
-        if self.shared.bitfield().get(opt_bit_index) {
-            Some(self.field.clone().into())
-        } else {
-            None
-        }
+    type GetterType = Option<FinalInnerGetterType>;
+    fn get_opt(&'a self) -> Self::GetterType {
+        self.shared.option.as_ref().and_then(|msg| msg.get_opt())
     }
 }
-*/

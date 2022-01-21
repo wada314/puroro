@@ -13,13 +13,20 @@
 // limitations under the License.
 
 pub mod getter_opt;
-
-use super::super::SharedBitfield;
-use crate::RepeatedField;
-use ::std::iter;
-use ::std::option;
+use crate::internal::{FieldsContainer, HasField};
 
 pub struct OptionFields;
+impl FieldsContainer for OptionFields {}
+impl<const NUMBER: i32> HasField<NUMBER> for OptionFields {
+    type Type = ();
+    fn get(&self) -> &Self::Type {
+        &()
+    }
+    fn get_mut(&mut self) -> &mut Self::Type {
+        unreachable!()
+    }
+}
+
 #[derive(Default, Clone, Debug)]
 pub struct OptionShared<T> {
     option: Option<T>,
@@ -27,32 +34,5 @@ pub struct OptionShared<T> {
 impl<T> From<Option<T>> for OptionShared<T> {
     fn from(v: Option<T>) -> Self {
         Self { option: v }
-    }
-}
-impl<T> SharedBitfield for OptionShared<T> {
-    type BitfieldType = ();
-    fn bitfield(&self) -> &Self::BitfieldType {
-        &()
-    }
-    fn bitfield_mut(&mut self) -> &mut Self::BitfieldType {
-        unimplemented!()
-    }
-}
-
-pub struct OptionRepeatedField<R>(Option<R>);
-impl<R> OptionRepeatedField<R> {
-    pub fn new(maybe_repeated_field: Option<R>) -> Self {
-        Self(maybe_repeated_field)
-    }
-}
-impl<'msg, R> RepeatedField<'msg> for OptionRepeatedField<R> where R: RepeatedField<'msg> {}
-impl<R> IntoIterator for OptionRepeatedField<R>
-where
-    R: IntoIterator,
-{
-    type Item = <R as IntoIterator>::Item;
-    type IntoIter = iter::Flatten<option::IntoIter<R>>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter().flatten()
     }
 }
