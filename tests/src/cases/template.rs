@@ -26,4 +26,6 @@ fn test_basic2() {
     assert_eq!(0, m.i32_optional());
     *m.i32_optional_mut() = 10;
     assert_eq!(10, m.i32_optional());
+    m.i32_repeated_mut().extend([10, 20]);
+    assert_eq!(&[10, 20], m.i32_repeated());
 }
