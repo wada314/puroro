@@ -18,27 +18,26 @@ use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::Message;
 
-// (optional|required|[unlabeled]) non-message field
-impl<'a, MP, FieldsType, SharedType, GetterType, _1, _2, _3, const NUMBER: i32>
+type BorrowedType<_1> = <tags::StringOrBytesType<_1> as tags::StringOrBytesTypeTag>::BorrowedType;
+
+// (optional|required|[unlabeled]) non-ld field
+impl<'a, MP, FieldsType, SharedType, GetterType, _1, _2, const NUMBER: i32>
     GetFieldMethodImpl<
         'a,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         tags::SimpleImpl,
         tags::NonRepeatedLabel<_1>,
-        tags::NonMessageType<_2, _3>,
+        tags::NonLdType<_2>,
         NUMBER,
     > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
 where
     FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<
-        LabelTag = tags::NonRepeatedLabel<_1>,
-        TypeTag = tags::NonMessageType<_2, _3>,
-    >,
-    tags::NonMessageType<_2, _3>: tags::FieldTypeTag,
-    <tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType:
-        Clone + Into<GetterType>,
+    <MP as MessageProperties>::Fields<NUMBER>:
+        FieldProperties<LabelTag = tags::NonRepeatedLabel<_1>, TypeTag = tags::NonLdType<_2>>,
+    tags::NonLdType<_2>: tags::FieldTypeTag,
+    <tags::NonLdType<_2> as tags::FieldTypeTag>::DefaultValueType: Clone + Into<GetterType>,
     Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
 {
     type GetterType = GetterType;
@@ -47,5 +46,36 @@ where
         value_opt.unwrap_or(Into::<GetterType>::into(Clone::clone(
             &<<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
         )))
+    }
+}
+
+impl<'a, MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+    GetFieldMethodImpl<
+        'a,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        tags::SimpleImpl,
+        tags::NonRepeatedLabel<_1>,
+        tags::StringOrBytesType<_2>,
+        NUMBER,
+    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER>,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<
+        LabelTag = tags::NonRepeatedLabel<_1>,
+        TypeTag = tags::StringOrBytesType<_2>,
+    >,
+    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag,
+    tags::StringOrBytesType<_2>: tags::FieldTypeTag<DefaultValueType = &'static BorrowedType<_2>>,
+    BorrowedType<_2>: 'a + 'static,
+    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<&'a BorrowedType<_2>>>,
+{
+    type GetterType = &'a BorrowedType<_2>;
+    fn get(&'a self) -> Self::GetterType {
+        let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
+        value_opt.unwrap_or(
+            <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
+        )
     }
 }

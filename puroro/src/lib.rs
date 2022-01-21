@@ -151,7 +151,10 @@ impl FieldProperties for PersonFieldProperties<5> {
 
 fn test() {
     let p = Person::default();
-    let a: Option<u32> = p.age_opt();
-    let n: Option<&str> = p.name_opt();
-    let pa: Option<&Person> = p.partner_opt();
+    let _: Option<u32> = p.age_opt();
+    let _: Option<&str> = p.name_opt();
+    let _: Option<&Person> = p.partner_opt();
+    let _: u32 = p.age();
+    let _: &str = p.name();
+    //let _: &Person = p.partner();
 }
