@@ -87,3 +87,38 @@ where
         }
     }
 }
+
+// [optional|required] message field
+// Typically the field type is `Option<Box<M>>`.
+impl<
+    MP,
+    FieldsType,
+    SharedType,
+    FieldMP,
+    FieldMessageType, // `M`
+    _1,
+    const NUMBER: i32,
+>
+    GetOptFieldMethodImpl<
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        tags::SimpleImpl,
+        tags::NeedOptionalBitLabel<_1>,
+        tags::Message<FieldMP>,
+        NUMBER,
+    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER, Type = Option<Box<FieldMessageType>>>,
+    FieldMessageType: 'static,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+{
+    type GetterType<'a>
+    where
+        Self: 'a,
+    = Option<&'a FieldMessageType>;
+    fn get_opt(&self) -> Self::GetterType<'_> {
+        let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+        field.as_deref()
+    }
+}

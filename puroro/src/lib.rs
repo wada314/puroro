@@ -87,12 +87,18 @@ struct PersonFieldsContainer {
     name: String,
     age: u32,
     children: Vec<Person>,
+    partner: Option<Box<Person>>,
+    nicknames: Vec<String>,
+    scores: Vec<u32>,
 }
 impl crate::internal::FieldsContainer for PersonFieldsContainer {}
 
 impl_has_field!(PersonFieldsContainer, 1, String, name);
 impl_has_field!(PersonFieldsContainer, 2, u32, age);
 impl_has_field!(PersonFieldsContainer, 3, Vec<Person>, children);
+impl_has_field!(PersonFieldsContainer, 4, Option<Box<Person>>, partner);
+impl_has_field!(PersonFieldsContainer, 5, Vec<String>, nicknames);
+impl_has_field!(PersonFieldsContainer, 6, Vec<u32>, scores);
 
 struct PersonMessageProperties;
 impl MessageProperties for PersonMessageProperties {
@@ -121,9 +127,31 @@ impl FieldProperties for PersonFieldProperties<3> {
     type TypeTag = tags::Message<PersonMessageProperties>;
     const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ();
 }
+impl FieldProperties for PersonFieldProperties<4> {
+    type MessageProperties = PersonMessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+    type LabelTag = tags::Optional;
+    type TypeTag = tags::Message<PersonMessageProperties>;
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = ();
+}
+impl FieldProperties for PersonFieldProperties<6> {
+    type MessageProperties = PersonMessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+    type LabelTag = tags::Repeated;
+    type TypeTag = tags::String;
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = "";
+}
+impl FieldProperties for PersonFieldProperties<5> {
+    type MessageProperties = PersonMessageProperties;
+    const OPTIONAL_FIELD_BITFIELD_INDEX: usize = 0;
+    type LabelTag = tags::Repeated;
+    type TypeTag = tags::UInt32;
+    const DEFAULT_VALUE: <Self::TypeTag as tags::FieldTypeTag>::DefaultValueType = 0;
+}
 
 fn test() {
     let p = Person::default();
-    let i = p.age_opt();
-    let n = p.name_opt();
+    let a: Option<u32> = p.age_opt();
+    let n: Option<&str> = p.name_opt();
+    let pa: Option<&Person> = p.partner_opt();
 }
