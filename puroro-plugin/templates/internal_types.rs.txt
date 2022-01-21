@@ -1,17 +1,13 @@
 pub trait {{ m.template_field_types_trait }} {
     type ImplTag;
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
     type {{ f.template_type_name }};
-    {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 }
 
 impl {{ m.template_field_types_trait }} for ::puroro::internal::SimpleFields {
     type ImplTag = ::puroro::tags::SimpleImpl;
     {%- for f in m.fields %}
-    {%- if !f.is_explicit_oneof_field %}
     type {{ f.template_type_name }} = {{ f.simple2_field_type }};
-    {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 }

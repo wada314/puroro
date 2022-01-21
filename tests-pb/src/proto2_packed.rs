@@ -860,6 +860,31 @@ pub mod _puroro_impls {
     impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::ExplicitlyPackedType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn explicitly_packed_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::ExplicitlyPackedType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(
+                &mut self.explicitly_packed,
+                &mut self._shared,
+            )
+            .get_mut()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
         for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::ExplicitlyNotPackedType, Shared>:
             ::puroro::internal::methods::GetFieldMethod<
                 'a,
@@ -920,6 +945,31 @@ pub mod _puroro_impls {
     impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::ExplicitlyNotPackedType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn explicitly_not_packed_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::ExplicitlyNotPackedType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(
+                &mut self.explicitly_not_packed,
+                &mut self._shared,
+            )
+            .get_mut()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
         for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::NotAnnotatedType, Shared>:
             ::puroro::internal::methods::GetFieldMethod<
                 'a,
@@ -972,6 +1022,28 @@ pub mod _puroro_impls {
     {
         pub fn has_not_annotated(&self) -> bool {
             self.not_annotated_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::NotAnnotatedType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<3>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn not_annotated_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::NotAnnotatedType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<3>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.not_annotated, &mut self._shared)
+                .get_mut()
         }
     }
 

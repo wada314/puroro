@@ -1595,6 +1595,28 @@ pub mod _puroro_impls {
     impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_unlabeled_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::I32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.i32_unlabeled, &mut self._shared)
+                .get_mut()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
         for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::I32OptionalType, Shared>:
             ::puroro::internal::methods::GetFieldMethod<
                 'a,
@@ -1647,6 +1669,28 @@ pub mod _puroro_impls {
     {
         pub fn has_i32_optional(&self) -> bool {
             self.i32_optional_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::I32OptionalType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_optional_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::I32OptionalType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.i32_optional, &mut self._shared)
+                .get_mut()
         }
     }
 
@@ -1711,6 +1755,28 @@ pub mod _puroro_impls {
     impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::I32RepeatedType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<3>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_repeated_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::I32RepeatedType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<3>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.i32_repeated, &mut self._shared)
+                .get_mut()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
         for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::F32UnlabeledType, Shared>:
             ::puroro::internal::methods::GetFieldMethod<
                 'a,
@@ -1763,6 +1829,28 @@ pub mod _puroro_impls {
     {
         pub fn has_f32_unlabeled(&self) -> bool {
             self.f32_unlabeled_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::F32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<4>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn f32_unlabeled_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::F32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<4>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.f32_unlabeled, &mut self._shared)
+                .get_mut()
         }
     }
 
@@ -1828,6 +1916,31 @@ pub mod _puroro_impls {
     impl<Fields, Shared> MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::StringUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<5>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn string_unlabeled_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::StringUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<5>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(
+                &mut self.string_unlabeled,
+                &mut self._shared,
+            )
+            .get_mut()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
         for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::SubmsgUnlabeledType, Shared>:
             ::puroro::internal::methods::GetFieldMethod<
                 'a,
@@ -1881,6 +1994,31 @@ pub mod _puroro_impls {
     {
         pub fn has_submsg_unlabeled(&self) -> bool {
             self.submsg_unlabeled_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::SubmsgUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<6>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn submsg_unlabeled_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::SubmsgUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<6>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(
+                &mut self.submsg_unlabeled,
+                &mut self._shared,
+            )
+            .get_mut()
         }
     }
 
@@ -2201,6 +2339,28 @@ pub mod _puroro_impls {
     {
         pub fn has_i32_unlabeled(&self) -> bool {
             self.i32_unlabeled_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> SubmsgTemplate<Fields, Shared>
+    where
+        Fields: SubmsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::I32UnlabeledType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::SubmsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn i32_unlabeled_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::I32UnlabeledType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::SubmsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.i32_unlabeled, &mut self._shared)
+                .get_mut()
         }
     }
 

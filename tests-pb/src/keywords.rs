@@ -438,6 +438,28 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::TypeType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn type_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::TypeType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.r#type, &mut self._shared)
+                .get_mut()
+        }
+    }
+
     impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,

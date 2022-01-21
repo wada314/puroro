@@ -613,6 +613,27 @@ pub mod _puroro_impls {
     impl<Fields, Shared> BookTemplate<Fields, Shared>
     where
         Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::TitleType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::BookFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn title_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::TitleType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::BookFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.title, &mut self._shared).get_mut()
+        }
+    }
+
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
         for<'a> ::puroro::internal::FieldAndSharedRef<'a, Fields::NumPagesType, Shared>:
             ::puroro::internal::methods::GetFieldMethod<
                 'a,
@@ -665,6 +686,28 @@ pub mod _puroro_impls {
     {
         pub fn has_num_pages(&self) -> bool {
             self.num_pages_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> BookTemplate<Fields, Shared>
+    where
+        Fields: BookTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::NumPagesType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::BookFieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn num_pages_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::NumPagesType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::BookFieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.num_pages, &mut self._shared)
+                .get_mut()
         }
     }
 

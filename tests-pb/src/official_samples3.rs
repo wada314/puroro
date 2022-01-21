@@ -801,6 +801,27 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<Fields, Shared> Test1Template<Fields, Shared>
+    where
+        Fields: Test1TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::AType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::Test1FieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn a_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::AType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::Test1FieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.a, &mut self._shared).get_mut()
+        }
+    }
+
     impl<Fields, Shared> ::std::default::Default for Test1Template<Fields, Shared>
     where
         Fields: Test1TemplateFieldTypes,
@@ -1102,6 +1123,27 @@ pub mod _puroro_impls {
     {
         pub fn has_b(&self) -> bool {
             self.b_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> Test2Template<Fields, Shared>
+    where
+        Fields: Test2TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::BType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::Test2FieldProperties<2>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn b_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::BType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::Test2FieldProperties<2>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.b, &mut self._shared).get_mut()
         }
     }
 
@@ -1445,6 +1487,27 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<Fields, Shared> Test3Template<Fields, Shared>
+    where
+        Fields: Test3TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::CType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::Test3FieldProperties<3>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn c_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::CType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::Test3FieldProperties<3>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.c, &mut self._shared).get_mut()
+        }
+    }
+
     impl<Fields, Shared> ::std::default::Default for Test3Template<Fields, Shared>
     where
         Fields: Test3TemplateFieldTypes,
@@ -1759,6 +1822,27 @@ pub mod _puroro_impls {
     {
         pub fn has_d(&self) -> bool {
             self.d_opt().is_some()
+        }
+    }
+
+    impl<Fields, Shared> Test4Template<Fields, Shared>
+    where
+        Fields: Test4TemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::DType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::Test4FieldProperties<4>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn d_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::DType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::Test4FieldProperties<4>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(&mut self.d, &mut self._shared).get_mut()
         }
     }
 

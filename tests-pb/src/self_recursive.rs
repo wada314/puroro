@@ -500,6 +500,31 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<Fields, Shared> MsgTemplate<Fields, Shared>
+    where
+        Fields: MsgTemplateFieldTypes,
+        for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::RecursiveUnlabeledType, Shared>:
+            ::puroro::internal::methods::GetMutFieldMethod<
+                'a,
+                self::MsgFieldProperties<1>,
+                Fields::ImplTag,
+            >,
+    {
+        pub fn recursive_unlabeled_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::RecursiveUnlabeledType, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::MsgFieldProperties<1>,
+            Fields::ImplTag,
+        >
+        >::GetterType{
+            use ::puroro::internal::methods::GetMutFieldMethod as _;
+            ::puroro::internal::FieldAndSharedMut::new(
+                &mut self.recursive_unlabeled,
+                &mut self._shared,
+            )
+            .get_mut()
+        }
+    }
+
     impl<Fields, Shared> ::std::default::Default for MsgTemplate<Fields, Shared>
     where
         Fields: MsgTemplateFieldTypes,

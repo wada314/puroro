@@ -18,3 +18,12 @@ fn test_basic1() {
     let m = Test2Simple2::default();
     let so = m.b();
 }
+
+#[test]
+fn test_basic2() {
+    use crate::tests_pb::full_coverage2::MsgSimple2 as Msg;
+    let mut m = Msg::default();
+    assert_eq!(0, m.i32_optional());
+    *m.i32_optional_mut() = 10;
+    assert_eq!(10, m.i32_optional());
+}

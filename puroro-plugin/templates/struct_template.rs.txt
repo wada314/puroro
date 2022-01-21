@@ -8,7 +8,9 @@ pub struct {{ m.template_ident }}<Fields, Shared>
     {#- We need this field for empty message case, otherwise `Fields` param won't be used #}
     _phantom: ::std::marker::PhantomData<Fields>,
     {%- for f in m.fields %}
+    {%- if !f.is_explicit_oneof_field %}
     {{ f.ident }}: <Fields as {{ m.template_field_types_trait }}>::{{ f.template_type_name }},
+    {%- endif %} {#- if !f.is_explicit_oneof_field #}
     {%- endfor %} {#- for f in m.fields #}
 }
 
@@ -41,6 +43,7 @@ pub type {{ m.template_simple_ident }} = {{ m.template_ident }}<
 >;
 
 {%- for f in m.fields %}
+{%- if !f.is_explicit_oneof_field %}
 
 {#################- getter method ################-#}
 impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
@@ -102,6 +105,30 @@ where
         self.{{ f.ident_unesc }}_opt().is_some()
     }
 }
+
+{#################- mut getter method ################-#}
+impl<Fields, Shared> {{ m.template_ident }}<Fields, Shared>
+where
+    Fields: {{ m.template_field_types_trait }},
+    for<'a> ::puroro::internal::FieldAndSharedMut<'a, Fields::{{ f.template_type_name }}, Shared>:
+        ::puroro::internal::methods::GetMutFieldMethod<
+            'a,
+            self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
+            Fields::ImplTag,
+        >
+{
+    pub fn {{ f.ident_unesc }}_mut(&mut self) -> <::puroro::internal::FieldAndSharedMut<Fields::{{ f.template_type_name }}, Shared> as
+        ::puroro::internal::methods::GetMutFieldMethod<
+            self::{{ m.template_field_properties_ident }}<{{ f.number }}>,
+            Fields::ImplTag,
+        >
+    >::GetterType {
+        use ::puroro::internal::methods::GetMutFieldMethod as _;
+        ::puroro::internal::FieldAndSharedMut::new(&mut self.{{ f.ident }}, &mut self._shared).get_mut()
+    }
+}
+
+{%- endif %} {#- if !f.is_explicit_oneof_field #}
 {%- endfor %} {#- for f in m.fields #}
 
 {#################- std trait impls ################-#}
