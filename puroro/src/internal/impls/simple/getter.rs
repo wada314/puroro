@@ -19,8 +19,9 @@ use crate::tags;
 use crate::Message;
 
 // (optional|required|[unlabeled]) non-message field
-impl<MP, FieldsType, SharedType, GetterType, _1, _2, _3, const NUMBER: i32>
+impl<'a, MP, FieldsType, SharedType, GetterType, _1, _2, _3, const NUMBER: i32>
     GetFieldMethodImpl<
+        'a,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         tags::SimpleImpl,
@@ -31,20 +32,20 @@ impl<MP, FieldsType, SharedType, GetterType, _1, _2, _3, const NUMBER: i32>
 where
     FieldsType: HasField<NUMBER>,
     MP: MessageProperties,
-    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties<
+        LabelTag = tags::NonRepeatedLabel<_1>,
+        TypeTag = tags::NonMessageType<_2, _3>,
+    >,
     tags::NonMessageType<_2, _3>: tags::FieldTypeTag,
     <tags::NonMessageType<_2, _3> as tags::FieldTypeTag>::DefaultValueType:
         Clone + Into<GetterType>,
-    for<'a> Self: 'a + GetOptFieldMethod<NUMBER, GetterType<'a> = Option<GetterType>>,
+    Self: GetOptFieldMethod<'a, NUMBER, GetterType = Option<GetterType>>,
 {
-    type GetterType<'a>
-    where
-        Self: 'a,
-    = GetterType;
-    fn get(&self) -> Self::GetterType<'_> {
+    type GetterType = GetterType;
+    fn get(&'a self) -> Self::GetterType {
         let value_opt = <Self as GetOptFieldMethod<NUMBER>>::get_opt(self);
-        value_opt.unwrap_or(
-            <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
-        )
+        value_opt.unwrap_or(Into::<GetterType>::into(Clone::clone(
+            &<<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::DEFAULT_VALUE,
+        )))
     }
 }

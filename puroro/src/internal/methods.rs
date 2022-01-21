@@ -15,57 +15,8 @@
 use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::Message;
 
-pub trait GetFieldMethodImpl<FieldType, SharedType, ImplTag, LabelTag, TypeTag, const NUMBER: i32> {
-    type GetterType<'a>
-    where
-        Self: 'a;
-    fn get(&self) -> Self::GetterType<'_>;
-}
-pub trait GetFieldMethod<const NUMBER: i32> {
-    type GetterType<'a>
-    where
-        Self: 'a;
-    fn get(&self) -> Self::GetterType<'_>;
-}
-impl<MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetFieldMethod<NUMBER>
-    for Message<MP, ImplTag, FieldsType, SharedType>
-where
-    MP: MessageProperties,
-    MP::Fields<NUMBER>: FieldProperties,
-    FieldsType: HasField<NUMBER>,
-    Self: GetFieldMethodImpl<
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        ImplTag,
-        <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
-        <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
-        NUMBER,
-    >,
-{
-    type GetterType<'a>
-    where
-        Self: 'a,
-    = <Self as GetFieldMethodImpl<
-        <FieldsType as HasField<NUMBER>>::Type,
-        SharedType,
-        ImplTag,
-        <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
-        <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
-        NUMBER,
-    >>::GetterType<'a>;
-    fn get(&self) -> Self::GetterType<'_> {
-        <Self as GetFieldMethodImpl<
-            <FieldsType as HasField<NUMBER>>::Type,
-            SharedType,
-            ImplTag,
-            <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
-            <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
-            NUMBER,
-        >>::get(&self)
-    }
-}
-
-pub trait GetOptFieldMethodImpl<
+pub trait GetFieldMethodImpl<
+    'a,
     FieldType,
     SharedType,
     ImplTag,
@@ -74,24 +25,21 @@ pub trait GetOptFieldMethodImpl<
     const NUMBER: i32,
 >
 {
-    type GetterType<'a>
-    where
-        Self: 'a;
-    fn get_opt(&self) -> Self::GetterType<'_>;
+    type GetterType;
+    fn get(&'a self) -> Self::GetterType;
 }
-pub trait GetOptFieldMethod<const NUMBER: i32> {
-    type GetterType<'a>
-    where
-        Self: 'a;
-    fn get_opt(&self) -> Self::GetterType<'_>;
+pub trait GetFieldMethod<'a, const NUMBER: i32> {
+    type GetterType;
+    fn get(&'a self) -> Self::GetterType;
 }
-impl<MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetOptFieldMethod<NUMBER>
+impl<'a, MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetFieldMethod<'a, NUMBER>
     for Message<MP, ImplTag, FieldsType, SharedType>
 where
     MP: MessageProperties,
     MP::Fields<NUMBER>: FieldProperties,
     FieldsType: HasField<NUMBER>,
-    Self: GetOptFieldMethodImpl<
+    Self: GetFieldMethodImpl<
+        'a,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         ImplTag,
@@ -100,18 +48,70 @@ where
         NUMBER,
     >,
 {
-    type GetterType<'a>
-    where
-        Self: 'a,
-    = <Self as GetOptFieldMethodImpl<
+    type GetterType = <Self as GetFieldMethodImpl<
+        'a,
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         ImplTag,
         <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
         <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
-    >>::GetterType<'a>;
-    fn get_opt(&self) -> Self::GetterType<'_> {
+    >>::GetterType;
+    fn get(&'a self) -> Self::GetterType {
+        <Self as GetFieldMethodImpl<
+            <FieldsType as HasField<NUMBER>>::Type,
+            SharedType,
+            ImplTag,
+            <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
+            <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
+            NUMBER,
+        >>::get(self)
+    }
+}
+
+pub trait GetOptFieldMethodImpl<
+    'a,
+    FieldType,
+    SharedType,
+    ImplTag,
+    LabelTag,
+    TypeTag,
+    const NUMBER: i32,
+>
+{
+    type GetterType;
+    fn get_opt(&'a self) -> Self::GetterType;
+}
+pub trait GetOptFieldMethod<'a, const NUMBER: i32> {
+    type GetterType;
+    fn get_opt(&'a self) -> Self::GetterType;
+}
+impl<'a, MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetOptFieldMethod<'a, NUMBER>
+    for Message<MP, ImplTag, FieldsType, SharedType>
+where
+    MP: MessageProperties,
+    MP::Fields<NUMBER>: FieldProperties,
+    FieldsType: HasField<NUMBER>,
+    Self: GetOptFieldMethodImpl<
+        'a,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        ImplTag,
+        <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
+        <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
+        NUMBER,
+    >,
+{
+    type GetterType = <Self as GetOptFieldMethodImpl<
+        'a,
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        ImplTag,
+        <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
+        <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
+        NUMBER,
+    >>::GetterType;
+    fn get_opt(&'a self) -> Self::GetterType {
         <Self as GetOptFieldMethodImpl<
             <FieldsType as HasField<NUMBER>>::Type,
             SharedType,
@@ -119,6 +119,6 @@ where
             <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
             <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
             NUMBER,
-        >>::get_opt(&self)
+        >>::get_opt(self)
     }
 }
