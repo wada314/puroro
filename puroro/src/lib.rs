@@ -56,6 +56,20 @@ where
         }
     }
 }
+impl<MP, ImplTag, Fields, Shared> AsRef<Message<MP, ImplTag, Fields, Shared>>
+    for Message<MP, ImplTag, Fields, Shared>
+{
+    fn as_ref(&self) -> &Message<MP, ImplTag, Fields, Shared> {
+        self
+    }
+}
+impl<MP, ImplTag, Fields, Shared> AsMut<Message<MP, ImplTag, Fields, Shared>>
+    for Message<MP, ImplTag, Fields, Shared>
+{
+    fn as_mut(&mut self) -> &mut Message<MP, ImplTag, Fields, Shared> {
+        self
+    }
+}
 
 // メモ
 use internal::methods::GetOptFieldMethod;

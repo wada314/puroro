@@ -18,7 +18,6 @@ use crate::internal::{FieldProperties, HasField, MessageProperties};
 use crate::tags;
 use crate::Message;
 
-// (optional|required) numeric field
 impl<
     'a,
     MP,
