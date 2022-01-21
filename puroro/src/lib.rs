@@ -77,7 +77,9 @@ impl<ImplTag, FieldsType, SharedType>
 where
     Self: crate::internal::methods::GetOptFieldMethod<2>,
 {
-    pub fn age_opt(&self) -> <Self as crate::internal::methods::GetOptFieldMethod<2>>::GetterType {
+    pub fn age_opt(
+        &self,
+    ) -> <Self as crate::internal::methods::GetOptFieldMethod<2>>::GetterType<'_> {
         <Self as crate::internal::methods::GetOptFieldMethod<2>>::get_opt(self)
     }
 }

@@ -24,12 +24,16 @@ pub trait GetOptFieldMethodImpl<
     const NUMBER: i32,
 >
 {
-    type GetterType;
-    fn get_opt(&self) -> Self::GetterType;
+    type GetterType<'a>
+    where
+        Self: 'a;
+    fn get_opt(&self) -> Self::GetterType<'_>;
 }
 pub trait GetOptFieldMethod<const NUMBER: i32> {
-    type GetterType;
-    fn get_opt(&self) -> Self::GetterType;
+    type GetterType<'a>
+    where
+        Self: 'a;
+    fn get_opt(&self) -> Self::GetterType<'_>;
 }
 impl<MP, ImplTag, FieldsType, SharedType, const NUMBER: i32> GetOptFieldMethod<NUMBER>
     for Message<MP, ImplTag, FieldsType, SharedType>
@@ -46,15 +50,15 @@ where
         NUMBER,
     >,
 {
-    type GetterType = <Self as GetOptFieldMethodImpl<
+    type GetterType<'a> = <Self as GetOptFieldMethodImpl<
         <FieldsType as HasField<NUMBER>>::Type,
         SharedType,
         ImplTag,
         <MP::Fields<NUMBER> as FieldProperties>::LabelTag,
         <MP::Fields<NUMBER> as FieldProperties>::TypeTag,
         NUMBER,
-    >>::GetterType;
-    fn get_opt(&self) -> Self::GetterType {
+    >>::GetterType<'a>;
+    fn get_opt(&self) -> Self::GetterType<'_> {
         <Self as GetOptFieldMethodImpl<
             <FieldsType as HasField<NUMBER>>::Type,
             SharedType,

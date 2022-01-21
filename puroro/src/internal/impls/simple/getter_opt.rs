@@ -38,8 +38,38 @@ where
     <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
     SharedType: SharedBitfield,
 {
-    type GetterType = Option<NumType<_2>>;
-    fn get_opt(&self) -> Self::GetterType {
+    type GetterType<'a> = Option<NumType<_2>>;
+    fn get_opt(&self) -> Self::GetterType<'_> {
+        let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
+        if self.shared.bitfield().get(opt_bit_index) {
+            let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
+            Some(field.clone().into())
+        } else {
+            None
+        }
+    }
+}
+
+// [optional|required] (string|bytes) field
+impl<MP, FieldsType, SharedType, _1, _2, const NUMBER: i32>
+    GetOptFieldMethodImpl<
+        <FieldsType as HasField<NUMBER>>::Type,
+        SharedType,
+        tags::SimpleImpl,
+        tags::NeedOptionalBitLabel<_1>,
+        tags::StringOrBytesType<_2>,
+        NUMBER,
+    > for Message<MP, tags::SimpleImpl, FieldsType, SharedType>
+where
+    FieldsType: HasField<NUMBER>,
+    tags::StringOrBytesType<_2>: tags::StringOrBytesTypeTag,
+    MP: MessageProperties,
+    <MP as MessageProperties>::Fields<NUMBER>: FieldProperties,
+    SharedType: SharedBitfield,
+{
+    type GetterType<'a> =
+        Option<&'a <tags::StringOrBytesType<_2> as tags::StringOrBytesTypeTag>::BorrowedType>;
+    fn get_opt(&self) -> Self::GetterType<'_> {
         let opt_bit_index = <<MP as MessageProperties>::Fields<NUMBER> as FieldProperties>::OPTIONAL_FIELD_BITFIELD_INDEX;
         if self.shared.bitfield().get(opt_bit_index) {
             let field = <FieldsType as HasField<NUMBER>>::get(&self.fields);
